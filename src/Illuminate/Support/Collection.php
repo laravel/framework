@@ -269,7 +269,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return bool
      */
-    public function any($key, $operator = null, $value = null)
+    public function some($key, $operator = null, $value = null)
     {
         return $this->contains($key, $operator, $value);
     }
