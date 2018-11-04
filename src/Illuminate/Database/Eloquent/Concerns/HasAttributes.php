@@ -842,11 +842,11 @@ trait HasAttributes
     protected function serializeDate(DateTimeInterface $date)
     {
         if ($this->dateFormat) {
-            return $date->format($this->dateFormat);
+            return $date->format($this->getDateFormat());
         } elseif (Carbon::getSerializer()) {
             return $date->serialize();
         } else {
-            return $date->format($this->getConnection()->getQueryGrammar()->getDateFormat());
+            return $date->format($this->getDateFormat());
         }
     }
 
