@@ -3,11 +3,9 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
-use Illuminate\Database\Schema\Blueprint;
 
 class CockroachGrammar extends PostgresGrammar
 {
-
     /**
      * Create the column definition for a date-time type.
      *
@@ -16,7 +14,7 @@ class CockroachGrammar extends PostgresGrammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return "timestamp";
+        return 'timestamp';
     }
 
     /**
@@ -27,7 +25,7 @@ class CockroachGrammar extends PostgresGrammar
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return "timestamptz";
+        return 'timestamptz';
     }
 
     /**
@@ -38,7 +36,7 @@ class CockroachGrammar extends PostgresGrammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $columnType = "timestamp";
+        $columnType = 'timestamp';
 
         return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
@@ -51,9 +49,8 @@ class CockroachGrammar extends PostgresGrammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        $columnType = "timestamptz";
+        $columnType = 'timestamptz';
 
         return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
-
 }

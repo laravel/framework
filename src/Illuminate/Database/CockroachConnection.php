@@ -3,14 +3,10 @@
 namespace Illuminate\Database;
 
 use Illuminate\Database\Schema\PostgresBuilder;
-use Doctrine\DBAL\Driver\PDOPgSql\Driver as DoctrineDriver;
-use Illuminate\Database\Query\Processors\PostgresProcessor;
-use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\CockroachGrammar as SchemaGrammar;
 
 class CockroachConnection extends PostgresConnection
 {
-
     /**
      * Get a schema builder instance for the connection.
      *

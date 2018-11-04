@@ -277,7 +277,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function supportedDrivers()
     {
-        return ['mysql', 'cockroach','pgsql', 'sqlite', 'sqlsrv'];
+        return ['mysql', 'cockroach', 'pgsql', 'sqlite', 'sqlsrv'];
     }
 
     /**
@@ -289,10 +289,9 @@ class DatabaseManager implements ConnectionResolverInterface
         $availableDrivers = PDO::getAvailableDrivers();
         $availableDrivers = str_replace('dblib', 'sqlsrv', $availableDrivers);
 
-        if (array_has('pgsql')){
+        if (array_has('pgsql')) {
             $availableDrivers[] = 'cockroach';
         }
-
 
         return array_intersect(
             $this->supportedDrivers(),
