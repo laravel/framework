@@ -277,19 +277,26 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function supportedDrivers()
     {
-        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv'];
+        return ['mysql', 'cockroach','pgsql', 'sqlite', 'sqlsrv'];
     }
 
     /**
      * Get all of the drivers that are actually available.
-     *
      * @return array
      */
     public function availableDrivers()
     {
+        $availableDrivers = PDO::getAvailableDrivers();
+        $availableDrivers = str_replace('dblib', 'sqlsrv', $availableDrivers);
+
+        if (array_has('pgsql')){
+            $availableDrivers[] = 'cockroach';
+        }
+
+
         return array_intersect(
             $this->supportedDrivers(),
-            str_replace('dblib', 'sqlsrv', PDO::getAvailableDrivers())
+            $availableDrivers
         );
     }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Connectors;
 
+use Illuminate\Database\CockroachConnection;
 use PDOException;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
@@ -240,6 +241,7 @@ class ConnectionFactory
         switch ($config['driver']) {
             case 'mysql':
                 return new MySqlConnector;
+            case 'cockroach':
             case 'pgsql':
                 return new PostgresConnector;
             case 'sqlite':
@@ -272,6 +274,8 @@ class ConnectionFactory
         switch ($driver) {
             case 'mysql':
                 return new MySqlConnection($connection, $database, $prefix, $config);
+            case 'cockroach':
+                return new CockroachConnection($connection, $database, $prefix, $config);
             case 'pgsql':
                 return new PostgresConnection($connection, $database, $prefix, $config);
             case 'sqlite':
