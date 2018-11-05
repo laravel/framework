@@ -58,7 +58,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     protected static $proxies = [
         'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
         'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
-        'reject', 'sortBy', 'sortByDesc', 'sum', 'unique',
+        'reject', 'some', 'sortBy', 'sortByDesc', 'sum', 'unique',
     ];
 
     /**
@@ -239,6 +239,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Alias for the "contains" method.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function some($key, $operator = null, $value = null)
+    {
+        return $this->contains($key, $operator, $value);
+    }
+
+    /**
      * Determine if an item exists in the collection.
      *
      * @param  mixed  $key
@@ -259,19 +272,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return $this->contains($this->operatorForWhere(...func_get_args()));
-    }
-
-    /**
-     * Alias for the "contains" method.
-     *
-     * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function some($key, $operator = null, $value = null)
-    {
-        return $this->contains($key, $operator, $value);
     }
 
     /**
