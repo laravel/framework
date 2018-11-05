@@ -201,11 +201,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->hasBeenBootstrapped = true;
 
         foreach ($bootstrappers as $bootstrapper) {
-            $this['events']->fire('bootstrapping: '.$bootstrapper, [$this]);
+            $this['events']->dispatch('bootstrapping: '.$bootstrapper, [$this]);
 
             $this->make($bootstrapper)->bootstrap($this);
 
-            $this['events']->fire('bootstrapped: '.$bootstrapper, [$this]);
+            $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
         }
     }
 
