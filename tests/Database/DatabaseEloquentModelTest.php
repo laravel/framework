@@ -459,7 +459,6 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setDateFormat('Y-m-d H:i');
         $model->created_at = '2018-11-05 09:26';
         $this->assertEquals($model->attributesToArray()['created_at'], '2018-11-05 09:26');
-
     }
 
     public function testFromDateTime()
