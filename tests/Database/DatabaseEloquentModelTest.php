@@ -447,6 +447,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $model->created_at);
     }
 
+    public function testSerializeDate()
+    {
+        $model = new EloquentDateModelStub;
+        $model->created_at = '2018-11-05 09:26:00';
+        $this->assertEquals($model->attributesToArray()['created_at'], '2018-11-05 09:26:00');
+        Carbon::serializeUsing(function ($carbon) {
+            return intval($carbon->format('U'));
+        });
+        $this->assertEquals($model->attributesToArray()['created_at'], 1541409960);
+        $model->setDateFormat('Y-m-d H:i');
+        $model->created_at = '2018-11-05 09:26';
+        $this->assertEquals($model->attributesToArray()['created_at'], '2018-11-05 09:26');
+
+    }
+
     public function testFromDateTime()
     {
         $model = new EloquentModelStub;
