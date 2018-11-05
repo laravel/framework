@@ -9,6 +9,7 @@ use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -172,20 +173,28 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
         if (is_subclass_of($command, SymfonyCommand::class)) {
+            $callingClass = true;
             $command = $this->laravel->make($command)->getName();
+        }
+
+        if (! isset($callingClass) && empty($parameters)) {
+            $command = $this->getCommandName(
+                $input = new StringInput($command)
+            );
+        } else {
+            array_unshift($parameters, $command);
+            $input = new ArrayInput($parameters);
         }
 
         if (! $this->has($command)) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
         }
 
-        array_unshift($parameters, $command);
-
-        $this->lastOutput = $outputBuffer ?: new BufferedOutput;
-
         $this->setCatchExceptions(false);
 
-        $result = $this->run(new ArrayInput($parameters), $this->lastOutput);
+        $result = $this->run(
+            $input, $this->lastOutput = $outputBuffer ?: new BufferedOutput
+        );
 
         $this->setCatchExceptions(true);
 

@@ -50,6 +50,26 @@ class ConsoleApplicationTest extends TestCase
         $this->assertEquals($command, $result);
     }
 
+    public function testCallFullyStringCommandLine()
+    {
+        $app = new Application(
+            $app = m::mock(ApplicationContract::class, ['version' => '5.8']),
+            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            'testing'
+        );
+
+        $outputOfCallArrayInput = $app->call('help', [
+            '--raw' => true,
+            '--format' => 'txt',
+            '--no-interaction' => true,
+            '--env' => 'testing',
+        ]);
+
+        $outputOfCallStringInput = $app->call('help --raw --format=txt --no-interaction --env=testing');
+
+        $this->assertSame($outputOfCallArrayInput, $outputOfCallStringInput);
+    }
+
     protected function getMockConsole(array $methods)
     {
         $app = m::mock(ApplicationContract::class, ['version' => '5.8']);
