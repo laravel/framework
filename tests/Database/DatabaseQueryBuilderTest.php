@@ -833,6 +833,33 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('(select * from `users`) union (select * from `dogs`) limit 10 offset 5', $builder->toSql());
     }
 
+    public function testUnionAggregate()
+    {
+        $expected = 'select count(*) as aggregate from ((select * from `posts`) union (select * from `videos`)) as `temp_table`';
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getProcessor()->shouldReceive('processSelect')->once();
+        $builder->from('posts')->union($this->getMySqlBuilder()->from('videos'))->count();
+
+        $expected = 'select count(*) as aggregate from (select * from "posts" union select * from "videos") as "temp_table"';
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getProcessor()->shouldReceive('processSelect')->once();
+        $builder->from('posts')->union($this->getPostgresBuilder()->from('videos'))->count();
+
+        $expected = 'select count(*) as aggregate from (select * from (select * from "posts") union select * from (select * from "videos")) as "temp_table"';
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getProcessor()->shouldReceive('processSelect')->once();
+        $builder->from('posts')->union($this->getSQLiteBuilder()->from('videos'))->count();
+
+        $expected = 'select count(*) as aggregate from (select * from [posts] union select * from [videos]) as [temp_table]';
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getProcessor()->shouldReceive('processSelect')->once();
+        $builder->from('posts')->union($this->getSqlServerBuilder()->from('videos'))->count();
+    }
+
     public function testSubSelectWhereIns()
     {
         $builder = $this->getBuilder();

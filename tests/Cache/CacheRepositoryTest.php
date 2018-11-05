@@ -71,6 +71,16 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($repo->has('foo'));
     }
 
+    public function testMissingMethod()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('get')->once()->with('bar')->andReturn('bar');
+
+        $this->assertTrue($repo->missing('foo'));
+        $this->assertFalse($repo->missing('bar'));
+    }
+
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $repo = $this->getRepository();

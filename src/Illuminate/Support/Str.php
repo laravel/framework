@@ -412,12 +412,12 @@ class Str
      *
      * @param  string  $title
      * @param  string  $separator
-     * @param  string  $language
+     * @param  string|null  $language
      * @return string
      */
     public static function slug($title, $separator = '-', $language = 'en')
     {
-        $title = static::ascii($title, $language);
+        $title = $language ? static::ascii($title, $language) : $title;
 
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';

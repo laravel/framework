@@ -2693,6 +2693,70 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
 
+    public function testWhenEmpty()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->whenEmpty(function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame(['michael', 'tom'], $collection->toArray());
+
+        $collection = new Collection;
+
+        $collection->whenEmpty(function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame(['adam'], $collection->toArray());
+    }
+
+    public function testWhenEmptyDefault()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->whenEmpty(function ($collection) {
+            return $collection->push('adam');
+        }, function ($collection) {
+            return $collection->push('taylor');
+        });
+
+        $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
+    }
+
+    public function testWhenNotEmpty()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->whenNotEmpty(function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame(['michael', 'tom', 'adam'], $collection->toArray());
+
+        $collection = new Collection;
+
+        $collection->whenNotEmpty(function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame([], $collection->toArray());
+    }
+
+    public function testWhenNotEmptyDefault()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->whenNotEmpty(function ($collection) {
+            return $collection->push('adam');
+        }, function ($collection) {
+            return $collection->push('taylor');
+        });
+
+        $this->assertSame(['michael', 'tom', 'adam'], $collection->toArray());
+    }
+
     public function testUnless()
     {
         $collection = new Collection(['michael', 'tom']);
@@ -2718,6 +2782,70 @@ class SupportCollectionTest extends TestCase
 
         $collection->unless(true, function ($collection) {
             return $collection->push('caleb');
+        }, function ($collection) {
+            return $collection->push('taylor');
+        });
+
+        $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
+    }
+
+    public function testUnlessEmpty()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->unlessEmpty(function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame(['michael', 'tom', 'adam'], $collection->toArray());
+
+        $collection = new Collection;
+
+        $collection->unlessEmpty(function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame([], $collection->toArray());
+    }
+
+    public function testUnlessEmptyDefault()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->unlessEmpty(function ($collection) {
+            return $collection->push('adam');
+        }, function ($collection) {
+            return $collection->push('taylor');
+        });
+
+        $this->assertSame(['michael', 'tom', 'adam'], $collection->toArray());
+    }
+
+    public function testUnlessNotEmpty()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->unlessNotEmpty(function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame(['michael', 'tom'], $collection->toArray());
+
+        $collection = new Collection;
+
+        $collection->unlessNotEmpty(function ($collection) {
+            return $collection->push('adam');
+        });
+
+        $this->assertSame(['adam'], $collection->toArray());
+    }
+
+    public function testUnlessNotEmptyDefault()
+    {
+        $collection = new Collection(['michael', 'tom']);
+
+        $collection->unlessNotEmpty(function ($collection) {
+            return $collection->push('adam');
         }, function ($collection) {
             return $collection->push('taylor');
         });
