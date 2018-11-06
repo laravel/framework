@@ -41,9 +41,6 @@ class StartSession
     public function handle($request, Closure $next)
     {
         if ($this->sessionConfigured()) {
-            // First of all, we need to start the session here so that the data
-            // is ready for an application. Note that the Laravel sessions do not
-            // make use of PHP "native" sessions in any way since they are crappy.
             $request->setLaravelSession(
                 $session = $this->startSession($request)
             );
@@ -54,12 +51,8 @@ class StartSession
 
             $response = $next($request);
 
-            // Then we need to add the session identifier cookie
-            // to the application response headers.
             $this->addCookieToResponse($response, $session);
 
-            // And finally we need to persist the session attributes
-            // to some storage medium.
             $this->manager->driver()->save();
         }
 
