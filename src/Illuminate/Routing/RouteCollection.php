@@ -256,7 +256,7 @@ class RouteCollection implements Countable, IteratorAggregate
         throw new MethodNotAllowedHttpException(
             $others,
             sprintf(
-                'Method %s is not allowed. Allowed methods: %s.',
+                'The %s method is not supported for this route. Supported methods: %s.',
                 $method,
                 implode(', ', $others)
             )
