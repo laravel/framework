@@ -265,6 +265,10 @@ trait HasAttributes
             unset($relation);
         }
 
+        $attributes = $this->addMutatedAttributesToArray(
+            $attributes, $this->getMutatedAttributes()
+        );
+
         return $attributes;
     }
 
