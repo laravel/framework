@@ -246,7 +246,7 @@ class RouteCollection implements Countable, IteratorAggregate
      * Throw a method not allowed HTTP exception.
      *
      * @param  array  $others
-     * @param  string $method
+     * @param  string  $method
      * @return void
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
