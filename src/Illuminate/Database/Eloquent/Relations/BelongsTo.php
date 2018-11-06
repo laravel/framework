@@ -221,6 +221,9 @@ class BelongsTo extends Relation
 
         if ($model instanceof Model) {
             $this->child->setRelation($this->relation, $model);
+        } elseif ($this->child->isDirty($this->foreignKey)) {
+            // Relation has changed, so unset the previous relation
+            $this->child->unsetRelation($this->relation);
         }
 
         return $this->child;
