@@ -37,7 +37,8 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertFalse($parent->relationLoaded('foo'));
     }
 
-    public function testRelationshipMutatorOnToArray() {
+    public function testRelationshipMutatorOnToArray()
+    {
         $parent = new EloquentRelationMutatorModelStub;
         $relation = new EloquentRelationResetModelStub;
         $parent->setRelation('foo', $relation);
@@ -268,13 +269,13 @@ class EloquentRelationResetModelStub extends Model
     }
 }
 
-class EloquentRelationMutatorModelStub extends Model {
+class EloquentRelationMutatorModelStub extends Model
+{
     public function getFooAttribute($value)
     {
         return 'Mutated';
     }
 }
-
 
 class EloquentRelationStub extends Relation
 {
