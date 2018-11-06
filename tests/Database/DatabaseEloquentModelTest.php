@@ -451,14 +451,14 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentDateModelStub;
         $model->created_at = '2018-11-05 09:26:00';
-        $this->assertEquals($model->attributesToArray()['created_at'], '2018-11-05 09:26:00');
+        $this->assertSame('2018-11-05 09:26:00', $model->attributesToArray()['created_at']);
         Carbon::serializeUsing(function ($carbon) {
-            return intval($carbon->format('U'));
+            return (int) $carbon->format('U');
         });
-        $this->assertEquals($model->attributesToArray()['created_at'], 1541409960);
+        $this->assertSame(1541409960, $model->attributesToArray()['created_at']);
         $model->setDateFormat('Y-m-d H:i');
         $model->created_at = '2018-11-05 09:26';
-        $this->assertEquals($model->attributesToArray()['created_at'], '2018-11-05 09:26');
+        $this->assertSame('2018-11-05 09:26', $model->attributesToArray()['created_at']);
         Carbon::serializeUsing(null);
     }
 
