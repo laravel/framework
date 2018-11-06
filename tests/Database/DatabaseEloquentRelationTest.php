@@ -37,6 +37,14 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertFalse($parent->relationLoaded('foo'));
     }
 
+    public function testRelationshipMutatorOnToArray() {
+        $parent = new EloquentRelationMutatorModelStub;
+        $relation = new EloquentRelationResetModelStub;
+        $parent->setRelation('foo', $relation);
+
+        $this->assertEquals(['foo' => 'Mutated'], $parent->toArray());
+    }
+
     public function testTouchMethodUpdatesRelatedTimestamps()
     {
         $builder = m::mock(Builder::class);
@@ -259,6 +267,14 @@ class EloquentRelationResetModelStub extends Model
         return $this->newQuery()->getQuery();
     }
 }
+
+class EloquentRelationMutatorModelStub extends Model {
+    public function getFooAttribute($value)
+    {
+        return 'Mutated';
+    }
+}
+
 
 class EloquentRelationStub extends Relation
 {
