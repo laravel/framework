@@ -239,20 +239,28 @@ class RouteCollection implements Countable, IteratorAggregate
             }))->bind($request);
         }
 
-        $this->methodNotAllowed($methods);
+        $this->methodNotAllowed($methods, $request->method());
     }
 
     /**
      * Throw a method not allowed HTTP exception.
      *
      * @param  array  $others
+     * @param  string  $method
      * @return void
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function methodNotAllowed(array $others)
+    protected function methodNotAllowed(array $others, $method)
     {
-        throw new MethodNotAllowedHttpException($others);
+        throw new MethodNotAllowedHttpException(
+            $others,
+            sprintf(
+                'Method %s is not allowed. Allowed methods: %s.',
+                $method,
+                implode(', ', $others)
+            )
+        );
     }
 
     /**
