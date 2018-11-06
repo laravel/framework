@@ -21,13 +21,6 @@ class StartSession
     protected $manager;
 
     /**
-     * Indicates if the session was handled for the current request.
-     *
-     * @var bool
-     */
-    protected $sessionHandled = false;
-
-    /**
      * Create a new session middleware.
      *
      * @param  \Illuminate\Session\SessionManager  $manager
@@ -47,45 +40,30 @@ class StartSession
      */
     public function handle($request, Closure $next)
     {
-        $this->sessionHandled = true;
-
-        // If a session driver has been configured, we will need to start the session here
-        // so that the data is ready for an application. Note that the Laravel sessions
-        // do not make use of PHP "native" sessions in any way since they are crappy.
         if ($this->sessionConfigured()) {
+            // First of all, we need to start the session here so that the data
+            // is ready for an application. Note that the Laravel sessions do not
+            // make use of PHP "native" sessions in any way since they are crappy.
             $request->setLaravelSession(
                 $session = $this->startSession($request)
             );
 
             $this->collectGarbage($session);
-        }
 
-        $response = $next($request);
-
-        // Again, if the session has been configured we will need to close out the session
-        // so that the attributes may be persisted to some storage medium. We will also
-        // add the session identifier cookie to the application response headers now.
-        if ($this->sessionConfigured()) {
             $this->storeCurrentUrl($request, $session);
 
+            $response = $next($request);
+
+            // Then we need to add the session identifier cookie
+            // to the application response headers.
             $this->addCookieToResponse($response, $session);
-        }
 
-        return $response;
-    }
-
-    /**
-     * Perform any final actions for the request lifecycle.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @return void
-     */
-    public function terminate($request, $response)
-    {
-        if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions()) {
+            // And finally we need to persist the session attributes
+            // to some storage medium.
             $this->manager->driver()->save();
         }
+
+        return $response ?? $next($request);
     }
 
     /**
@@ -168,10 +146,6 @@ class StartSession
      */
     protected function addCookieToResponse(Response $response, Session $session)
     {
-        if ($this->usingCookieSessions()) {
-            $this->manager->driver()->save();
-        }
-
         if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
             $response->headers->setCookie(new Cookie(
                 $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
