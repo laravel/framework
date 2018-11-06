@@ -253,7 +253,7 @@ class BelongsTo extends Relation
         }
 
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedForeignKey(), '=', $query->qualifyColumn($this->ownerKey)
+            $this->getQualifiedForeignKeyName(), '=', $query->qualifyColumn($this->ownerKey)
         );
     }
 
@@ -274,7 +274,7 @@ class BelongsTo extends Relation
         $query->getModel()->setTable($hash);
 
         return $query->whereColumn(
-            $hash.'.'.$this->ownerKey, '=', $this->getQualifiedForeignKey()
+            $hash.'.'.$this->ownerKey, '=', $this->getQualifiedForeignKeyName()
         );
     }
 
@@ -311,11 +311,21 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Get the child of the relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function getChild()
+    {
+        return $this->child;
+    }
+
+    /**
      * Get the foreign key of the relationship.
      *
      * @return string
      */
-    public function getForeignKey()
+    public function getForeignKeyName()
     {
         return $this->foreignKey;
     }
@@ -325,7 +335,7 @@ class BelongsTo extends Relation
      *
      * @return string
      */
-    public function getQualifiedForeignKey()
+    public function getQualifiedForeignKeyName()
     {
         return $this->child->qualifyColumn($this->foreignKey);
     }
@@ -335,7 +345,7 @@ class BelongsTo extends Relation
      *
      * @return string
      */
-    public function getOwnerKey()
+    public function getOwnerKeyName()
     {
         return $this->ownerKey;
     }
