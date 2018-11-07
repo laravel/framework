@@ -22,13 +22,13 @@ class TableGuesser
      */
     public static function guess($migration)
     {
-        foreach(self::CREATE_PATTERNS as $pattern) {
+        foreach (self::CREATE_PATTERNS as $pattern) {
             if (preg_match($pattern, $migration, $matches)) {
                 return [$matches[1], $create = true];
             }
         }
 
-        foreach(self::CHANGE_PATTERNS as $pattern) {
+        foreach (self::CHANGE_PATTERNS as $pattern) {
             if (preg_match($pattern, $migration, $matches)) {
                 return [$matches[2], $create = false];
             }
