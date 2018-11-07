@@ -39,6 +39,39 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
         $this->assertEquals(1, $users->count());
     }
+
+    public function test_associate_with_model()
+    {
+        $parent = User::doesntHave('parent')->first();
+        $child = User::has('parent')->first();
+
+        $parent->parent()->associate($child);
+
+        $this->assertEquals($parent->parent_id, $child->id);
+        $this->assertEquals($parent->parent->id, $child->id);
+    }
+
+    public function test_associate_with_id()
+    {
+        $parent = User::doesntHave('parent')->first();
+        $child = User::has('parent')->first();
+
+        $parent->parent()->associate($child->id);
+
+        $this->assertEquals($parent->parent_id, $child->id);
+        $this->assertEquals($parent->parent->id, $child->id);
+    }
+
+    public function test_associate_with_id_unsets_eager_loaded_relation()
+    {
+        $child = User::has('parent')->with('parent')->first();
+
+        // Overwrite the (eager loaded) parent relation
+        $child->parent()->associate($child->id);
+
+        $this->assertEquals($child->parent_id, $child->id);
+        $this->assertFalse($child->relationLoaded('parent'));
+    }
 }
 
 class User extends Model
