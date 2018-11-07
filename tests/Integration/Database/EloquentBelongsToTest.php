@@ -62,11 +62,11 @@ class EloquentBelongsToTest extends DatabaseTestCase
         $this->assertEquals($parent->parent->id, $child->id);
     }
 
-    public function test_associate_with_id_unsets_eager_loaded_relation()
+    public function test_associate_with_id_unsets_loaded_relation()
     {
         $child = User::has('parent')->with('parent')->first();
 
-        // Overwrite the (eager loaded) parent relation
+        // Overwrite the (loaded) parent relation
         $child->parent()->associate($child->id);
 
         $this->assertEquals($child->parent_id, $child->id);
