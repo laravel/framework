@@ -1277,13 +1277,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getTable()
     {
-        if (! isset($this->table)) {
-            return str_replace(
-                '\\', '', Str::snake(Str::plural(class_basename($this)))
-            );
-        }
-
-        return $this->table;
+        return isset($this->table)
+            ? $this->table
+            : Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**
