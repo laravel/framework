@@ -4254,6 +4254,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $data);
     }
 
+    public function testValidateAndValidatedData()
+    {
+        $post = ['first' => 'john',  'preferred'=>'john', 'last' => 'doe', 'type' => 'admin'];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'preferred'=> 'required']);
+        $v->sometimes('type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+        $validatedData = $v->validated();
+
+        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertEquals($data, $validatedData);
+    }
+
+    public function testValidatedNotValidateTwiceData()
+    {
+        $post = ['first' => 'john',  'preferred'=>'john', 'last' => 'doe', 'type' => 'admin'];
+
+        $validateCount = 0;
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'preferred'=> 'required']);
+        $v->after(function () use (&$validateCount) {
+            $validateCount++;
+        });
+        $data = $v->validate();
+        $v->validated();
+
+        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertEquals(1, $validateCount);
+    }
+
     /**
      * @dataProvider validUuidList
      */
