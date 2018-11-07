@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
 /**
@@ -47,8 +48,8 @@ class FoundationHelpersTest extends TestCase
 
         mix('missing.js');
 
-        $this->assertInstanceOf(Exception::class, $handler->reported);
-        $this->assertSame('Unable to locate Mix file: /missing.js.', $handler->reported->getMessage());
+        $this->assertInstanceOf(Exception::class, $handler->reported[0]);
+        $this->assertSame('Unable to locate Mix file: /missing.js.', $handler->reported[0]->getMessage());
 
         unlink($manifest);
     }
@@ -67,7 +68,7 @@ class FoundationHelpersTest extends TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Undefined index: /missing.js
+     * @expectedExceptionMessage Unable to locate Mix file: /missing.js.
      */
     public function testMixThrowsExceptionWhenAssetIsMissingFromManifestWhenInDebugMode()
     {
@@ -81,6 +82,23 @@ class FoundationHelpersTest extends TestCase
         } finally { // make sure we can cleanup the file
             unlink($manifest);
         }
+    }
+
+    public function testMixOnlyThrowsAndReportsOneExceptionWhenAssetIsMissingFromManifestWhenInDebugMode()
+    {
+        $handler = new FakeHandler;
+        $this->app->instance(ExceptionHandler::class, $handler);
+        $this->app['config']->set('app.debug', true);
+        $manifest = $this->makeManifest();
+        Route::get('test-route', function () {
+            mix('missing.js');
+        });
+
+        $this->get('/test-route');
+
+        $this->assertCount(1, $handler->reported);
+
+        unlink($manifest);
     }
 
     protected function makeManifest($directory = '')
@@ -105,10 +123,15 @@ class FoundationHelpersTest extends TestCase
 
 class FakeHandler
 {
-    public $reported;
+    public $reported = [];
 
     public function report($exception)
     {
-        $this->reported = $exception;
+        $this->reported[] = $exception;
+    }
+
+    public function render($exception)
+    {
+        //
     }
 }
