@@ -3,6 +3,7 @@
 use Illuminate\Database\Connection;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 
 class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAwareInterface {
 
