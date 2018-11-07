@@ -1143,26 +1143,44 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function auth(array $options = [])
     {
+        $login = 'login';
+        $logout = 'logout';
+        $register = 'register';
+        $password = 'password';
+        $reset = 'reset';
+        $email = 'email';
+
+        // Locale translates the routes' names according to configured locale
+        $should_use_locale = $options['locale'] ?? false;
+        if ($should_use_locale) {
+            $login = __('auth.routes.login');
+            $logout = __('auth.routes.logout');
+            $register = __('auth.routes.register');
+            $password = __('auth.routes.password');
+            $reset = __('auth.routes.reset');
+            $email = __('auth.routes.email');
+        }
+
         // Authentication Routes...
-        $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
-        $this->post('login', 'Auth\LoginController@login');
-        $this->post('logout', 'Auth\LoginController@logout')->name('logout');
+        $this->get($login, 'Auth\LoginController@showLoginForm')->name('login');
+        $this->post($login, 'Auth\LoginController@login');
+        $this->post($logout, 'Auth\LoginController@logout')->name('logout');
 
         // Registration Routes...
         if ($options['register'] ?? true) {
-            $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
-            $this->post('register', 'Auth\RegisterController@register');
+            $this->get($register, 'Auth\RegisterController@showRegistrationForm')->name('register');
+            $this->post($register, 'Auth\RegisterController@register');
         }
 
         // Password Reset Routes...
-        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-        $this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
+        $this->get("$password/$reset", 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+        $this->post("$password/$email", 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+        $this->get("$password/$reset/{token}", 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+        $this->post("$password/$reset", 'Auth\ResetPasswordController@reset')->name('password.update');
 
         // Email Verification Routes...
         if ($options['verify'] ?? false) {
-            $this->emailVerification();
+            $this->emailVerification($should_use_locale);
         }
     }
 
@@ -1171,11 +1189,21 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @return void
      */
-    public function emailVerification()
+    public function emailVerification($should_use_locale = false)
     {
-        $this->get('email/verify', 'Auth\VerificationController@show')->name('verification.notice');
-        $this->get('email/verify/{id}', 'Auth\VerificationController@verify')->name('verification.verify');
-        $this->get('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
+        $email = 'email';
+        $verify = 'verify';
+        $resend = 'resend';
+
+        if ($should_use_locale) {
+            $email = __('auth.routes.email');
+            $verify = __('auth.routes.verify');
+            $resend = __('auth.routes.resend');
+        }
+
+        $this->get("$email/$verify", 'Auth\VerificationController@show')->name('verification.notice');
+        $this->get("$email/$verify/{id}", 'Auth\VerificationController@verify')->name('verification.verify');
+        $this->get("$email/$resend", 'Auth\VerificationController@resend')->name('verification.resend');
     }
 
     /**
