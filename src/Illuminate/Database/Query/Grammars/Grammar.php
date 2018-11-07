@@ -302,6 +302,22 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where in raw" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereInRaw(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            return $this->wrap($where['column']).' in ('.implode(', ', $where['values']).')';
+        }
+
+        return '0 = 1';
+    }
+
+    /**
      * Compile a "where null" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
