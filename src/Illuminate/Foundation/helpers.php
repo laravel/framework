@@ -166,6 +166,19 @@ if (! function_exists('auth')) {
     }
 }
 
+if (! function_exists('user')) {
+    /**
+     * Get the available user instance.
+     * 
+     * @param null $guard
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    function user($guard = null)
+    {
+        return auth($guard)->user();
+    }
+}
+
 if (! function_exists('back')) {
     /**
      * Create a new redirect response to the previous location.
