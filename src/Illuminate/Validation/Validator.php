@@ -310,7 +310,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Return validated value.
+     * Return validated values.
      *
      * @return array
      *
