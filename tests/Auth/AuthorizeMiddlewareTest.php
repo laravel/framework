@@ -110,6 +110,7 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         $this->gate()->define('view-dashboard', function ($user, $param = null) {
             $this->assertNull($param);
+
             return true;
         });
 
@@ -155,7 +156,6 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $response = $this->router->dispatch(Request::create('comments', 'GET'));
         $this->assertEquals($response->content(), 'success');
-
     }
 
     public function testSimpleAbilityWithStringParameterFromRouteParameter()
