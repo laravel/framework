@@ -1,6 +1,8 @@
 <?php namespace Illuminate\Session;
 
 use Illuminate\Database\Connection;
+use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 
 class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAwareInterface {
 
@@ -74,22 +76,67 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, ExistenceAware
 	 */
 	public function write($sessionId, $data)
 	{
+		$payload = $this->getDefaultPayload($data);
+		
+		if (! $this->exists) {
+            $this->read($sessionId);
+        }
+		
 		if ($this->exists)
 		{
-			$this->getQuery()->where('id', $sessionId)->update([
-				'payload' => base64_encode($data), 'last_activity' => time(),
-			]);
+			$this->performUpdate($sessionId, $payload);
 		}
 		else
 		{
-			$this->getQuery()->insert([
-				'id' => $sessionId, 'payload' => base64_encode($data), 'last_activity' => time(),
-			]);
+			$this->performInsert($sessionId, $payload);
 		}
 
 		$this->exists = true;
 	}
+/**
+     * Perform an insert operation on the session ID.
+     *
+     * @param  string  $sessionId
+     * @param  string  $payload
+     * @return void
+     */
+    protected function performInsert($sessionId, $payload)
+    {
+        try {
+            return $this->getQuery()->insert(Arr::set($payload, 'id', $sessionId));
+        } catch (QueryException $e) {
+            $this->performUpdate($sessionId, $payload);
+        }
+    }
 
+    /**
+     * Perform an update operation on the session ID.
+     *
+     * @param  string  $sessionId
+     * @param  string  $payload
+     * @return int
+     */
+    protected function performUpdate($sessionId, $payload)
+    {
+        return $this->getQuery()->where('id', $sessionId)->update($payload);
+    }
+	
+    /**
+     * Get the default payload for the session.
+     *
+     * @param  string  $data
+     * @return array
+     */
+	protected function getDefaultPayload($data)
+    {
+		//timestamp was time() in 4.2 origionally
+        $payload = [
+            'payload' => base64_encode($data),
+            'last_activity' => Carbon::now()->getTimestamp(),
+        ];
+		//just return the payload
+        return $payload;
+    }
 	/**
 	 * {@inheritDoc}
 	 */
