@@ -112,12 +112,7 @@ class TokenGuard implements Guard
         }
 
         $credentials = [$this->storageKey => $credentials[$this->inputKey]];
-
-        if ($this->provider->retrieveByCredentials($credentials)) {
-            return true;
-        }
-
-        return false;
+        return (bool) $this->provider->retrieveByCredentials($credentials);
     }
 
     /**
