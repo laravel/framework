@@ -86,7 +86,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "master": "4.2.23"
         }
     },
     "suggest": {
