@@ -57,7 +57,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
     }
 
     /** @test */
-    function it_pluralizes_the_table_name()
+    public function it_pluralizes_the_table_name()
     {
         $model = new IrregularPluralHuman();
 
@@ -65,7 +65,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
     }
 
     /** @test */
-    function it_touches_the_parent_with_an_irregular_plural()
+    public function it_touches_the_parent_with_an_irregular_plural()
     {
         Carbon::setTestNow('2018-05-01 12:13:14');
 
