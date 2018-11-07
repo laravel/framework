@@ -91,11 +91,11 @@ class AuthorizeMiddlewareTest extends TestCase
     public function testSimpleAbilityWithStringParameter()
     {
         $this->gate()->define('view-dashboard', function ($user, $param) {
-            return $param === 'true';
+            return $param === 'some string';
         });
 
         $this->router->get('dashboard', [
-            'middleware' => Authorize::class.':view-dashboard,true',
+            'middleware' => Authorize::class.':view-dashboard,"some string"',
             'uses' => function () {
                 return 'success';
             },
@@ -103,6 +103,58 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
 
+        $this->assertEquals($response->content(), 'success');
+    }
+
+    public function testSimpleAbilityWithNullParameter()
+    {
+        $this->gate()->define('view-dashboard', function ($user, $param = null) {
+            $this->assertNull($param);
+
+            return true;
+        });
+
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':view-dashboard,null',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $this->router->dispatch(Request::create('dashboard', 'GET'));
+    }
+
+    public function testSimpleAbilityWithOptionalParameter()
+    {
+        $post = new stdClass;
+
+        $this->router->bind('post', function () use ($post) {
+            return $post;
+        });
+
+        $this->gate()->define('view-comments', function ($user, $model = null) use ($post) {
+            return true;
+        });
+
+        $middleware = [SubstituteBindings::class, Authorize::class.':view-comments,post'];
+
+        $this->router->get('comments', [
+            'middleware' => $middleware,
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+        $this->router->get('posts/{post}/comments', [
+            'middleware' => $middleware,
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('posts/1/comments', 'GET'));
+        $this->assertEquals($response->content(), 'success');
+
+        $response = $this->router->dispatch(Request::create('comments', 'GET'));
         $this->assertEquals($response->content(), 'success');
     }
 
