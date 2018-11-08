@@ -83,7 +83,7 @@ abstract class HasOneOrMany extends Relation
     {
         $whereIn = in_array($this->parent->getKeyType(), ['int', 'integer']) ? 'whereInRaw' : 'whereIn';
 
-        $this->query->$whereIn(
+        $this->query->{$whereIn}(
             $this->foreignKey, $this->getKeys($models, $this->localKey)
         );
     }
