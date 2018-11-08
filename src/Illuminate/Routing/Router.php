@@ -1276,6 +1276,7 @@ class Router implements RegistrarContract, BindingRegistrar
 	 *
 	 * @param $group
 	 * @param $strategy
+	 * @param $caller
 	 */
 	private function ensureGroupNameIsAvailable($group, $strategy, $caller){
 		if(array_key_exists($group, $this->middleware)){
