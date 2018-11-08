@@ -869,13 +869,35 @@ class Router implements RegistrarContract, BindingRegistrar
      * Add a middleware to the beginning of a middleware group.
      *
      * If the middleware is already in the group, it will not be added again.
+     * If the group name conflicts with un-grouped names, throw an exception.
      *
-     * @param  string  $group
-     * @param  string  $middleware
+     * @param  string       $group
+     * @param  string       $middleware
+     * @param  string|null  $strategy
      * @return $this
      */
-    public function prependMiddlewareToGroup($group, $middleware)
+    public function prependMiddlewareToGroup($group, $middleware, $strategy = null)
     {
+	    if(array_key_exists($group, $this->middleware)){
+		    switch(true){
+
+			    case ($strategy == 'replace'):
+				    // no logical change in framework behaviour
+				    break;
+
+			    case ($strategy == 'auto-group'):
+				    $this->prependMiddlewareToGroup($group, $this->middleware[$group], 'replace');
+				    unset($this->middleware[$group]);
+				    break;
+
+
+			    case (empty($strategy)):
+			    default:
+				    throw new \LogicException("The middleware key '$group' is already in use, and it is not a group. Choose a different group, or use the 'auto-group' strategy.");
+				    break;
+		    }
+	    }
+
 	    if (! array_key_exists($group, $this->middlewareGroups)) {
 		    $this->middlewareGroups[$group] = [];
 	    }
