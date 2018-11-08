@@ -878,25 +878,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function prependMiddlewareToGroup($group, $middleware, $strategy = null)
     {
-	    if(array_key_exists($group, $this->middleware)){
-		    switch(true){
-
-			    case ($strategy == 'replace'):
-				    // no logical change in framework behaviour
-				    break;
-
-			    case ($strategy == 'auto-group'):
-				    $this->prependMiddlewareToGroup($group, $this->middleware[$group], 'replace');
-				    unset($this->middleware[$group]);
-				    break;
-
-
-			    case (empty($strategy)):
-			    default:
-				    throw new \LogicException("The middleware key '$group' is already in use, and it is not a group. Choose a different group, or use the 'auto-group' strategy.");
-				    break;
-		    }
-	    }
+	    $this->ensureGroupNameIsAvailable($group, $strategy, __FUNCTION__);
 
 	    if (! array_key_exists($group, $this->middlewareGroups)) {
 		    $this->middlewareGroups[$group] = [];
@@ -922,25 +904,7 @@ class Router implements RegistrarContract, BindingRegistrar
 	 */
 	public function pushMiddlewareToGroup($group, $middleware, $strategy = null)
 	{
-		if(array_key_exists($group, $this->middleware)){
-			switch(true){
-
-				case ($strategy == 'replace'):
-					// no logical change in framework behaviour
-					break;
-
-				case ($strategy == 'auto-group'):
-					$this->pushMiddlewareToGroup($group, $this->middleware[$group], 'replace');
-					unset($this->middleware[$group]);
-					break;
-
-
-				case (empty($strategy)):
-				default:
-					throw new \LogicException("The middleware key '$group' is already in use, and it is not a group. Choose a different group, or use the 'auto-group' strategy.");
-					break;
-			}
-		}
+		$this->ensureGroupNameIsAvailable($group, $strategy, __FUNCTION__);
 
         if (! array_key_exists($group, $this->middlewareGroups)) {
             $this->middlewareGroups[$group] = [];
@@ -1305,4 +1269,33 @@ class Router implements RegistrarContract, BindingRegistrar
 
         return (new RouteRegistrar($this))->attribute($method, $parameters[0]);
     }
+
+	/**
+	 * Check that the programmer is not over writing a middleware
+	 * by creating a middleware group with the same named key.
+	 *
+	 * @param $group
+	 * @param $strategy
+	 */
+	private function ensureGroupNameIsAvailable($group, $strategy, $caller){
+		if(array_key_exists($group, $this->middleware)){
+			switch(true){
+
+				case ($strategy == 'replace'):
+					// no logical change in framework behaviour
+					break;
+
+				case ($strategy == 'auto-group'):
+					$this->$caller($group, $this->middleware[$group], 'replace');
+					unset($this->middleware[$group]);
+					break;
+
+
+				case (empty($strategy)):
+				default:
+					throw new \LogicException("The middleware key '$group' is already in use, and it is not a group. Choose a different group, or use the 'auto-group' strategy.");
+					break;
+			}
+		}
+	}
 }
