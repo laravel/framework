@@ -102,14 +102,17 @@ class Gate implements GateContract
      * Define a new ability.
      *
      * @param  string  $ability
-     * @param  callable|string  $callback
+     * @param  callable|string|array  $callback
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
     public function define($ability, $callback)
     {
-        if (is_callable($callback)) {
+        if (is_array($callback)) {
+            $callback = implode('@', $callback);
+            $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
+        } elseif (is_callable($callback)) {
             $this->abilities[$ability] = $callback;
         } elseif (is_string($callback)) {
             $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
