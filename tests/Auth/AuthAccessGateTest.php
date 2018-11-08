@@ -364,6 +364,15 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
+    public function test_arrays_can_be_defined_as_callbacks_using_tuple_notation()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', [AccessGateTestClass::class, 'foo']);
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
     public function test_invokable_classes_can_be_defined()
     {
         $gate = $this->getBasicGate();
@@ -480,7 +489,7 @@ class AuthAccessGateTest extends TestCase
      * @dataProvider notCallableDataProvider
      * @expectedException \InvalidArgumentException
      */
-    public function test_define_second_parametter_should_be_string_or_callable($callback)
+    public function test_define_second_parameter_should_be_string_or_callable_or_array($callback)
     {
         $gate = $this->getBasicGate();
 
@@ -495,7 +504,6 @@ class AuthAccessGateTest extends TestCase
         return [
             [1],
             [new stdClass],
-            [[]],
             [1.1],
         ];
     }
