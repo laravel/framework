@@ -163,7 +163,8 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
+        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereInRaw')->once()->with('table.foreign_key', [1, 2]);
         $model1 = new EloquentHasOneModelStub;
         $model1->id = 1;
         $model2 = new EloquentHasOneModelStub;

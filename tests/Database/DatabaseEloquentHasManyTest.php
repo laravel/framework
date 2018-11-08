@@ -200,6 +200,19 @@ class DatabaseEloquentHasManyTest extends TestCase
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
+        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereInRaw')->once()->with('table.foreign_key', [1, 2]);
+        $model1 = new EloquentHasManyModelStub;
+        $model1->id = 1;
+        $model2 = new EloquentHasManyModelStub;
+        $model2->id = 2;
+        $relation->addEagerConstraints([$model1, $model2]);
+    }
+
+    public function testEagerConstraintsAreProperlyAddedWithStringKey()
+    {
+        $relation = $this->getRelation();
+        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
         $model1 = new EloquentHasManyModelStub;
         $model1->id = 1;
