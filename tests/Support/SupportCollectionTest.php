@@ -2151,6 +2151,15 @@ class SupportCollectionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function testClear()
+    {
+        $expected = [];
+
+        $actual = (new Collection(['taylorotwell', 'hivokas']))->clear()->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function testConcatWithArray()
     {
         $expected = [

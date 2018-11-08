@@ -1242,6 +1242,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Remove all items from the collection.
+     *
+     * @return $this
+     */
+    public function clear()
+    {
+        $this->items = [];
+
+        return $this;
+    }
+
+    /**
      * Push all of the given items onto the collection.
      *
      * @param  \Traversable|array  $source
