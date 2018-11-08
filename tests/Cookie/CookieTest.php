@@ -88,6 +88,15 @@ class CookieTest extends TestCase
         $this->assertEmpty($cookie->getQueuedCookies());
     }
 
+    public function testCookieJarIsMacroable()
+    {
+        $cookie = $this->getCreator();
+        $cookie->macro('foo', function () {
+            return 'bar';
+        });
+        $this->assertEquals('bar', $cookie->foo());
+    }
+
     public function getCreator()
     {
         return new CookieJar(Request::create('/foo', 'GET'), [
