@@ -528,7 +528,13 @@ trait HasRelationships
         // Now we're ready to create a new query builder for this related model and
         // the relationship instances for this relation. This relations will set
         // appropriate query constraints then entirely manages the hydrations.
-        $table = $table ?: Str::plural($name);
+        if (! $table) {
+            $words = preg_split('/(_)/', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+            $lastWord = array_pop($words);
+
+            $table = implode('', $words).Str::plural($lastWord);
+        }
 
         return $this->newMorphToMany(
             $instance->newQuery(), $this, $name, $table,
