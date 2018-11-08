@@ -986,6 +986,14 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(['framework' => 'laravel', 'name' => 'taylor'], $reversed->all());
     }
 
+    public function testReverseWithoutPreservingKeys()
+    {
+        $data = new Collection(['zaeed', 'alan']);
+        $reversed = $data->reverse(false);
+
+        $this->assertSame([0 => 'alan', 1 => 'zaeed'], $reversed->all());
+    }
+
     public function testFlip()
     {
         $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
