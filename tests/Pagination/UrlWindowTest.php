@@ -43,7 +43,7 @@ class UrlWindowTest extends TestCase
         $p = new LengthAwarePaginator($array, count($array), 1, 8);
         $window = new UrlWindow($p);
         $last = [];
-        for ($i = 5; $i <= 13; $i++) {
+        for ($i = 6; $i <= 13; $i++) {
             $last[$i] = '/?page='.$i;
         }
 
