@@ -37,6 +37,13 @@ class Builder
     public static $defaultStringLength = 255;
 
     /**
+     * The default increments type for migrations.
+     *
+     * @var string
+     */
+    public static $defaultIncrementsType = 'unsignedBigInteger';
+
+    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -57,6 +64,16 @@ class Builder
     public static function defaultStringLength($length)
     {
         static::$defaultStringLength = $length;
+    }
+
+    /**
+     * Set the default increments type to a 4 byte integer.
+     *
+     * @return void
+     */
+    public static function useIntegerIncrements()
+    {
+        static::$defaultIncrementsType = 'unsignedInteger';
     }
 
     /**

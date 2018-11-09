@@ -526,14 +526,14 @@ class Blueprint
     }
 
     /**
-     * Create a new auto-incrementing integer (4-byte) column on the table.
+     * Create a new auto-incrementing integer column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function increments($column)
     {
-        return $this->unsignedInteger($column, true);
+        return $this->{Builder::$defaultIncrementsType}($column, true);
     }
 
     /**
@@ -567,6 +567,17 @@ class Blueprint
     public function mediumIncrements($column)
     {
         return $this->unsignedMediumInteger($column, true);
+    }
+
+    /**
+     * Create a new auto-incrementing integer (4-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function integerIncrements($column)
+    {
+        return $this->unsignedInteger($column, true);
     }
 
     /**
