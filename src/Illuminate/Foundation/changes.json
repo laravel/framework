@@ -1,8 +1,5 @@
 {
-		"4.3.*": [
-		{"message": "Session fixation backported from 270991219.", "backport": null}
-	],
-		"4.2.*": [
+	"4.2.*": [
 		{"message": "View and Pagination 'Environment' classes renamed to 'Factory'.", "backport": null},
 		{"message": "Configurable encryption for Iron.io queue messages.", "backport": null},
 		{"message": "Make FrameGuard middleware opt-in.", "backport": null},
