@@ -211,7 +211,10 @@ class BelongsToMany extends Relation
     {
         $whereIn = $this->whereInMethod($this->parent, $this->parentKey);
 
-        $this->query->{$whereIn}($this->getQualifiedForeignPivotKeyName(), $this->getKeys($models, $this->parentKey));
+        $this->query->{$whereIn}(
+            $this->getQualifiedForeignPivotKeyName(),
+            $this->getKeys($models, $this->parentKey)
+        );
     }
 
     /**
