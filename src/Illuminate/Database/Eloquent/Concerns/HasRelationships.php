@@ -529,7 +529,7 @@ trait HasRelationships
         // the relationship instances for this relation. This relations will set
         // appropriate query constraints then entirely manages the hydrations.
         if (! $table) {
-            $words = preg_split('/(_)/', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
+            $words = preg_split('/(_)/u', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 
             $lastWord = array_pop($words);
 
