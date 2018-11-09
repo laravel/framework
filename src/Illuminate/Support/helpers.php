@@ -739,7 +739,7 @@ if (! function_exists('retry')) {
      * Retry an operation a given number of times.
      *
      * @param  int  $times
-     * @param  callable  $callback First parameter is the number of attempt
+     * @param  callable  $callback
      * @param  int  $sleep
      * @return mixed
      *
@@ -747,13 +747,14 @@ if (! function_exists('retry')) {
      */
     function retry($times, callable $callback, $sleep = 0)
     {
-        $attempt = 0;
+        $attempts = 0;
         $times--;
 
         beginning:
-        $attempt++;
+        $attempts++;
+
         try {
-            return $callback($attempt);
+            return $callback($attempts);
         } catch (Exception $e) {
             if (! $times) {
                 throw $e;
