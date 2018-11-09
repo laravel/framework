@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
@@ -274,6 +275,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add "id" bigint identity primary key not null', $statements[0]);
+
+        Builder::useIntegerIncrements();
+        $blueprint = new Blueprint('users');
+        $blueprint->increments('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "id" int identity primary key not null', $statements[0]);
+
+        Builder::$defaultIncrementsType = 'unsignedBigInteger';
     }
 
     public function testAddingSmallIncrementingID()
