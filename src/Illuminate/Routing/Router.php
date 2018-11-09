@@ -876,9 +876,9 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function prependMiddlewareToGroup($group, $middleware)
     {
-	    if (! array_key_exists($group, $this->middlewareGroups)) {
-		    $this->middlewareGroups[$group] = [$middleware];
-	    }elseif (! in_array($middleware, $this->middlewareGroups[$group])) {
+        if (! array_key_exists($group, $this->middlewareGroups)) {
+            $this->middlewareGroups[$group] = [$middleware];
+        } elseif (! in_array($middleware, $this->middlewareGroups[$group])) {
             array_unshift($this->middlewareGroups[$group], $middleware);
         }
 
@@ -898,7 +898,7 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         if (! array_key_exists($group, $this->middlewareGroups)) {
             $this->middlewareGroups[$group] = [$middleware];
-        }elseif (! in_array($middleware, $this->middlewareGroups[$group])) {
+        } elseif (! in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
         }
 
