@@ -893,6 +893,75 @@ class Builder
     }
 
     /**
+     * Add a where in with a sub-select to the query.
+     *
+     * @param  string   $column
+     * @param  \Closure $callback
+     * @param  string   $boolean
+     * @param  bool     $not
+     * @return $this
+     */
+    protected function whereInSub($column, Closure $callback, $boolean, $not)
+    {
+        $type = $not ? 'NotInSub' : 'InSub';
+
+        // To create the exists sub-select, we will actually create a query and call the
+        // provided callback with the query so the developer may set any of the query
+        // conditions they want for the in clause, then we'll put it in this array.
+        call_user_func($callback, $query = $this->forSubQuery());
+
+        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add an external sub-select to the query.
+     *
+     * @param  string   $column
+     * @param  \Illuminate\Database\Query\Builder|static  $query
+     * @param  string   $boolean
+     * @param  bool     $not
+     * @return $this
+     */
+    protected function whereInExistingQuery($column, $query, $boolean, $not)
+    {
+        $type = $not ? 'NotInSub' : 'InSub';
+
+        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a "where in raw" clause to the query.
+     *
+     * @param  string  $column
+     * @param  array   $values
+     * @param  string  $boolean
+     * @param  bool    $not
+     * @return $this
+     */
+    public function whereInRaw($column, array $values, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotInRaw' : 'InRaw';
+
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $values = array_map('intval', $values);
+
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean');
+
+        return $this;
+    }
+
+    /**
      * Add a "where null" clause to the query.
      *
      * @param  string  $column
