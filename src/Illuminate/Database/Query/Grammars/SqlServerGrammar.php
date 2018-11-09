@@ -4,9 +4,12 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Traits\Macroable;
 
 class SqlServerGrammar extends Grammar
 {
+    use Macroable;
+
     /**
      * All of the available clause operators.
      *

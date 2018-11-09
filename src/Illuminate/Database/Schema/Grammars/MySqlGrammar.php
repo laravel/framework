@@ -4,10 +4,13 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Schema\Blueprint;
 
 class MySqlGrammar extends Grammar
 {
+    use Macroable;
+
     /**
      * The possible column modifiers.
      *

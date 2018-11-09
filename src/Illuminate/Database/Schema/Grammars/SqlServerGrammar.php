@@ -3,10 +3,13 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Schema\Blueprint;
 
 class SqlServerGrammar extends Grammar
 {
+    use Macroable;
+
     /**
      * If this Grammar supports schema changes wrapped in a transaction.
      *

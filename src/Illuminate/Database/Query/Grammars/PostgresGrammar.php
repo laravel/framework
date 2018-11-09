@@ -5,9 +5,12 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Traits\Macroable;
 
 class PostgresGrammar extends Grammar
 {
+    use Macroable;
+
     /**
      * All of the available clause operators.
      *

@@ -7,10 +7,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\Index;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Schema\Blueprint;
 
 class SQLiteGrammar extends Grammar
 {
+    use Macroable;
+
     /**
      * The possible column modifiers.
      *
