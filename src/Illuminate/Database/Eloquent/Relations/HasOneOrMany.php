@@ -81,7 +81,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function addEagerConstraints(array $models)
     {
-        $whereIn = in_array($this->parent->getKeyType(), ['int', 'integer']) ? 'whereInRaw' : 'whereIn';
+        $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
         $this->query->{$whereIn}(
             $this->foreignKey, $this->getKeys($models, $this->localKey)
