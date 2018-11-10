@@ -1529,12 +1529,12 @@ class RoutingRouteTest extends TestCase
         $router->get('message_us', function () {
             throw new Exception('Route B should not be reachable.');
         });
-        $router->redirect(['contact_us', 'message_us'], 'route_c');
+        $router->redirect(['contact_us', 'message_us'], 'contact');
 
         $responseA = $router->dispatch(Request::create('contact_us', 'GET'));
         $responseB = $router->dispatch(Request::create('message_us', 'GET'));
-        $this->assertTrue($responseA->isRedirect('route_c'));
-        $this->assertTrue($responseB->isRedirect('route_c'));
+        $this->assertTrue($responseA->isRedirect('contact'));
+        $this->assertTrue($responseB->isRedirect('contact'));
         $this->assertEquals(302, $responseA->getStatusCode());
         $this->assertEquals(302, $responseB->getStatusCode());
     }
