@@ -843,6 +843,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getMySqlBuilder()->from('videos'))->count();
 
+        $expected = 'select count(*) as aggregate from ((select `id` from `posts`) union (select `id` from `videos`)) as `temp_table`';
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getProcessor()->shouldReceive('processSelect')->once();
+        $builder->from('posts')->select('id')->union($this->getMySqlBuilder()->from('videos')->select('id'))->count();
+
         $expected = 'select count(*) as aggregate from (select * from "posts" union select * from "videos") as "temp_table"';
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
@@ -1092,6 +1098,20 @@ class DatabaseQueryBuilderTest extends TestCase
         });
 
         $count = $builder->getCountForPagination($columns);
+        $this->assertEquals(1, $count);
+    }
+
+    public function testGetCountForPaginationWithUnion()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'));
+
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from (select "id" from "posts" union select "id" from "videos") as "temp_table"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $count = $builder->getCountForPagination();
         $this->assertEquals(1, $count);
     }
 

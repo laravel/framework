@@ -2130,8 +2130,10 @@ class Builder
      */
     protected function runPaginationCountQuery($columns = ['*'])
     {
-        return $this->cloneWithout(['columns', 'orders', 'limit', 'offset'])
-                    ->cloneWithoutBindings(['select', 'order'])
+        $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];
+
+        return $this->cloneWithout($without)
+                    ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
                     ->setAggregate('count', $this->withoutSelectAliases($columns))
                     ->get()->all();
     }
@@ -2444,8 +2446,8 @@ class Builder
      */
     public function aggregate($function, $columns = ['*'])
     {
-        $results = $this->cloneWithout(['columns'])
-                        ->cloneWithoutBindings(['select'])
+        $results = $this->cloneWithout($this->unions ? [] : ['columns'])
+                        ->cloneWithoutBindings($this->unions ? [] : ['select'])
                         ->setAggregate($function, $columns)
                         ->get($columns);
 
