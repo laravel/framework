@@ -373,6 +373,24 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
+    public function test_gates_can_be_defined_using_an_array_callback()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', [new AccessGateTestStaticClass, 'foo']);
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_gates_can_be_defined_using_an_array_callback_with_static_method()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', [AccessGateTestStaticClass::class, 'foo']);
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
     public function test_policy_classes_can_be_defined_to_handle_checks_for_given_type()
     {
         $gate = $this->getBasicGate();
@@ -480,7 +498,7 @@ class AuthAccessGateTest extends TestCase
      * @dataProvider notCallableDataProvider
      * @expectedException \InvalidArgumentException
      */
-    public function test_define_second_parametter_should_be_string_or_callable($callback)
+    public function test_define_second_parameter_should_be_string_or_callable($callback)
     {
         $gate = $this->getBasicGate();
 
@@ -635,6 +653,14 @@ class AuthAccessGateTest extends TestCase
             [$noAbilities, '', false],
             [$noAbilities, [], true],
         ];
+    }
+}
+
+class AccessGateTestStaticClass
+{
+    public static function foo()
+    {
+        return true;
     }
 }
 

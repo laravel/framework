@@ -1,5 +1,28 @@
 # Release Notes for 5.7.x
 
+## [v5.7.13 (2018-11-07)](https://github.com/laravel/framework/compare/v5.7.12...v5.7.13)
+
+### Added
+- Added ability to return an array of messages in a custom validation rule ([#26327](https://github.com/laravel/framework/pull/26327))
+- Added `whenEmpty`/ `whenNotEmpty` / `unlessEmpty` / `unlessNotEmpty` methods to `Collection` ([#26345](https://github.com/laravel/framework/pull/26345))
+- Added `Illuminate\Support\Collection::some` method ([#26376](https://github.com/laravel/framework/pull/26376), [8f7e647](https://github.com/laravel/framework/commit/8f7e647dcee5fe13d7fc33a1e0e1ce531ea9f49e))
+- Added `Illuminate\Cache\Repository::missing` method ([#26351](https://github.com/laravel/framework/pull/26351)) 
+- Added `Macroable` trait to `Illuminate\View\Factory` ([#26361](https://github.com/laravel/framework/pull/26361))
+- Added support for UNION aggregate queries ([#26365](https://github.com/laravel/framework/pull/26365))
+
+### Changed
+- Updated `AbstractPaginator::appends` to handle null ([#26326](https://github.com/laravel/framework/pull/26326))
+- Added "guzzlehttp/guzzle": "^6.3", to `composer.json` ([#26328](https://github.com/laravel/framework/pull/26328))
+- Showed exception message on 403 error page when message is available ([#26356](https://github.com/laravel/framework/pull/26356))
+- Don't run TransformsRequest twice on ?query= parameters ([#26366](https://github.com/laravel/framework/pull/26366))
+- Added missing logging options to slack log driver ([#26360](https://github.com/laravel/framework/pull/26360))
+- Use cascade when truncating table in PostgreSQL ([#26389](https://github.com/laravel/framework/pull/26389))
+- Allowed pass absolute parameter in has valid signature request macro ([#26397](https://github.com/laravel/framework/pull/26397))
+
+### Changed realization
+- Used `Request::validate` macro in Auth traits ([#26314](https://github.com/laravel/framework/pull/26314))
+
+
 ## [v5.7.12 (2018-10-30)](https://github.com/laravel/framework/compare/v5.7.11...v5.7.12)
 
 ### Added

@@ -653,6 +653,15 @@ class ViewFactoryTest extends TestCase
         $this->assertNull($factory->getLoopStack()[0]['last']);
     }
 
+    public function testMacro()
+    {
+        $factory = $this->getFactory();
+        $factory->macro('getFoo', function () {
+            return 'Hello World';
+        });
+        $this->assertEquals('Hello World', $factory->getFoo());
+    }
+
     protected function getFactory()
     {
         return new Factory(

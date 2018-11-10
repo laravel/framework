@@ -49,8 +49,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerRequestSignatureValidation()
     {
-        Request::macro('hasValidSignature', function () {
-            return URL::hasValidSignature($this);
+        Request::macro('hasValidSignature', function ($absolute = true) {
+            return URL::hasValidSignature($this, $absolute);
         });
     }
 }

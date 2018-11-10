@@ -18,7 +18,9 @@ class DatabaseEloquentMorphToManyTest extends TestCase
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('taggables.taggable_id', [1, 2]);
+        $relation->getParent()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getParent()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereInRaw')->once()->with('taggables.taggable_id', [1, 2]);
         $relation->getQuery()->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($relation->getParent()));
         $model1 = new EloquentMorphToManyModelStub;
         $model1->id = 1;

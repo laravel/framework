@@ -4128,6 +4128,49 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('states.0 must be AR or TX', $v->errors()->get('states.0')[0]);
         $this->assertEquals('states.1 must be AR or TX', $v->errors()->get('states.1')[0]);
         $this->assertEquals('number must be divisible by 4', $v->errors()->get('number')[0]);
+
+        // Test array of messages with failing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 42],
+            ['name' => new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return [':attribute must be taylor', ':attribute must be a first name'];
+                }
+            }]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name must be taylor', $v->errors()->get('name')[0]);
+        $this->assertEquals('name must be a first name', $v->errors()->get('name')[1]);
+
+        // Test array of messages with multiple rules for one attribute case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 42],
+            ['name' => [new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return [':attribute must be taylor', ':attribute must be a first name'];
+                }
+            }, 'string']]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name must be taylor', $v->errors()->get('name')[0]);
+        $this->assertEquals('name must be a first name', $v->errors()->get('name')[1]);
+        $this->assertEquals('validation.string', $v->errors()->get('name')[2]);
     }
 
     public function testImplicitCustomValidationObjects()
