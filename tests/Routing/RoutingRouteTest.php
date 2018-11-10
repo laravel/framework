@@ -1520,6 +1520,25 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
+    public function testMultipleRouteRedirects()
+    {
+        $router = $this->getRouter();
+        $router->get('contact_us', function () {
+            throw new Exception('Route A should not be reachable.');
+        });
+        $router->get('message_us', function () {
+            throw new Exception('Route B should not be reachable.');
+        });
+        $router->redirect(['contact_us', 'message_us'], 'route_c');
+
+        $responseA = $router->dispatch(Request::create('contact_us', 'GET'));
+        $responseB = $router->dispatch(Request::create('message_us', 'GET'));
+        $this->assertTrue($responseA->isRedirect('route_c'));
+        $this->assertTrue($responseB->isRedirect('route_c'));
+        $this->assertEquals(302, $responseA->getStatusCode());
+        $this->assertEquals(302, $responseB->getStatusCode());
+    }
+
     public function testRouteRedirectWithCustomStatus()
     {
         $router = $this->getRouter();
@@ -1533,6 +1552,25 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(301, $response->getStatusCode());
     }
 
+    public function testMultipleRouteRedirectsWithCustomStatuses()
+    {
+        $router = $this->getRouter();
+        $router->get('contact_us', function () {
+            throw new Exception('Route A should not be reachable.');
+        });
+        $router->get('message_us', function () {
+            throw new Exception('Route B should not be reachable.');
+        });
+        $router->redirect(['contact_us', 'message_us'], 'contact', 301);
+
+        $responseA = $router->dispatch(Request::create('contact_us', 'GET'));
+        $responseB = $router->dispatch(Request::create('message_us', 'GET'));
+        $this->assertTrue($responseA->isRedirect('contact'));
+        $this->assertTrue($responseB->isRedirect('contact'));
+        $this->assertEquals(301, $responseA->getStatusCode());
+        $this->assertEquals(301, $responseB->getStatusCode());
+    }
+
     public function testRoutePermanentRedirect()
     {
         $router = $this->getRouter();
@@ -1544,6 +1582,25 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch(Request::create('contact_us', 'GET'));
         $this->assertTrue($response->isRedirect('contact'));
         $this->assertEquals(301, $response->getStatusCode());
+    }
+
+    public function testMultipleRoutePermanentRedirects()
+    {
+        $router = $this->getRouter();
+        $router->get('contact_us', function () {
+            throw new Exception('Route A should not be reachable.');
+        });
+        $router->get('message_us', function () {
+            throw new Exception('Route B should not be reachable.');
+        });
+        $router->permanentRedirect(['contact_us', 'message_us'], 'contact');
+
+        $responseA = $router->dispatch(Request::create('contact_us', 'GET'));
+        $responseB = $router->dispatch(Request::create('message_us', 'GET'));
+        $this->assertTrue($responseA->isRedirect('contact'));
+        $this->assertTrue($responseB->isRedirect('contact'));
+        $this->assertEquals(301, $responseA->getStatusCode());
+        $this->assertEquals(301, $responseB->getStatusCode());
     }
 
     protected function getRouter()
