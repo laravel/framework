@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Database;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
@@ -25,7 +24,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table "users" ("id" bigint identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
+        $this->assertEquals('create table "users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
@@ -33,7 +32,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "id" bigint identity primary key not null, "email" nvarchar(255) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "id" int identity primary key not null, "email" nvarchar(255) not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -42,7 +41,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar()->setTablePrefix('prefix_'));
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table "prefix_users" ("id" bigint identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
+        $this->assertEquals('create table "prefix_users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
     }
 
     public function testCreateTemporaryTable()
@@ -55,7 +54,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table "#users" ("id" bigint identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
+        $this->assertEquals('create table "#users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -274,17 +273,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "id" bigint identity primary key not null', $statements[0]);
-
-        Builder::useIntegerIncrements();
-        $blueprint = new Blueprint('users');
-        $blueprint->increments('id');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add "id" int identity primary key not null', $statements[0]);
-
-        Builder::$defaultIncrementsType = 'unsignedBigInteger';
     }
 
     public function testAddingSmallIncrementingID()
@@ -301,16 +290,6 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->mediumIncrements('id');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "id" int identity primary key not null', $statements[0]);
-    }
-
-    public function testAddingIntegerIncrementingID()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->integerIncrements('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
