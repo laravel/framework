@@ -54,7 +54,7 @@ class TransformsRequestTest extends TestCase
                 'beers' => [4, 8, 12],
             ],
             [
-                'age' => [28, 56, 84]
+                'age' => [28, 56, 84],
             ]
         );
         $symfonyRequest->server->set('REQUEST_METHOD', 'POST');
