@@ -949,15 +949,15 @@ class Builder
     }
 
     /**
-     * Add a "where in raw" clause to the query.
+     * Add a "where in raw" clause for integer values to the query.
      *
      * @param  string  $column
-     * @param  array   $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
      * @param  string  $boolean
-     * @param  bool    $not
+     * @param  bool  $not
      * @return $this
      */
-    public function whereInRaw($column, array $values, $boolean = 'and', $not = false)
+    public function whereInRawInt($column, $values, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotInRaw' : 'InRaw';
 
@@ -965,7 +965,9 @@ class Builder
             $values = $values->toArray();
         }
 
-        $values = array_map('intval', $values);
+        foreach ($values as &$value) {
+            $value = (int) $value;
+        }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
