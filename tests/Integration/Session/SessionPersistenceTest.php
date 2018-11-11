@@ -55,6 +55,7 @@ class FakeNullSessionHandler extends NullSessionHandler
     public function write($sessionId, $data)
     {
         $this->written = true;
+
         return true;
     }
 }
