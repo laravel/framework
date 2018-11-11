@@ -37,7 +37,7 @@ trait InteractsWithContainer
      * Mock an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $instance
+     * @param  \Closure|null  $mock
      * @return object
      */
     protected function mock($abstract, Closure $mock = null)
@@ -49,7 +49,7 @@ trait InteractsWithContainer
      * Spy an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $instance
+     * @param  \Closure|null  $mock
      * @return object
      */
     protected function spy($abstract, Closure $mock = null)

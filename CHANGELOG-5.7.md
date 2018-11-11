@@ -1,5 +1,22 @@
 # Release Notes for 5.7.x
 
+## Unreleased
+
+### Added
+- Added `Macroable` trait to `Illuminate\Cookie\CookieJar` ([#26445](https://github.com/laravel/framework/pull/26445))
+- Added ability to disable password reset route ([#26459](https://github.com/laravel/framework/pull/26459))
+
+### Fixed
+- Fixed `UNION` aggregate queries with columns ([#26466](https://github.com/laravel/framework/pull/26466))
+- Allowed migration table name to be guessed without `_table` suffix ([#26429](https://github.com/laravel/framework/pull/26429))
+
+### Changed
+- Improved eager loading performance ([#26434](https://github.com/laravel/framework/pull/26434), [#26453](https://github.com/laravel/framework/pull/26453), [3992140](https://github.com/laravel/framework/commit/3992140064307ef82d23328995e7c59045c231f2))
+- Adjusted `mix` missing asset exceptions ([#26431](https://github.com/laravel/framework/pull/26431))
+- Used `asset` helper to generate full path urls in exception views ([#26411](https://github.com/laravel/framework/pull/26411))
+- Changed `Illuminate\Foundation\Testing\Concerns\MocksApplicationServices::withoutJobs` method ([#26437](https://github.com/laravel/framework/pull/26437))
+
+
 ## [v5.7.13 (2018-11-07)](https://github.com/laravel/framework/compare/v5.7.12...v5.7.13)
 
 ### Added

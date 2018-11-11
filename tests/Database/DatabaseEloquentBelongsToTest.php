@@ -79,7 +79,9 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 'foreign.value.two']);
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', ['foreign.value', 'foreign.value.two']);
         $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStub, new AnotherEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }
@@ -87,7 +89,9 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testIdsInEagerConstraintsCanBeZero()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 0]);
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', ['foreign.value', 0]);
         $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStubWithZeroId];
         $relation->addEagerConstraints($models);
     }
@@ -156,7 +160,9 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testDefaultEagerConstraintsWhenIncrementing()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', m::mustBe([null]));
         $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }
@@ -172,7 +178,9 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testDefaultEagerConstraintsWhenNotIncrementing()
     {
         $relation = $this->getRelation(null, false);
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', m::mustBe([null]));
         $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }

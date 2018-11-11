@@ -938,15 +938,15 @@ class Builder
     }
 
     /**
-     * Add a "where in raw" clause to the query.
+     * Add a "where in raw" clause for integer values to the query.
      *
      * @param  string  $column
-     * @param  array   $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
      * @param  string  $boolean
-     * @param  bool    $not
+     * @param  bool  $not
      * @return $this
      */
-    public function whereInRaw($column, array $values, $boolean = 'and', $not = false)
+    public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotInRaw' : 'InRaw';
 
@@ -954,7 +954,9 @@ class Builder
             $values = $values->toArray();
         }
 
-        $values = array_map('intval', $values);
+        foreach ($values as &$value) {
+            $value = (int) $value;
+        }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
@@ -2119,8 +2121,10 @@ class Builder
      */
     protected function runPaginationCountQuery($columns = ['*'])
     {
-        return $this->cloneWithout(['columns', 'orders', 'limit', 'offset'])
-                    ->cloneWithoutBindings(['select', 'order'])
+        $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];
+
+        return $this->cloneWithout($without)
+                    ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
                     ->setAggregate('count', $this->withoutSelectAliases($columns))
                     ->get()->all();
     }
@@ -2433,8 +2437,8 @@ class Builder
      */
     public function aggregate($function, $columns = ['*'])
     {
-        $results = $this->cloneWithout(['columns'])
-                        ->cloneWithoutBindings(['select'])
+        $results = $this->cloneWithout($this->unions ? [] : ['columns'])
+                        ->cloneWithoutBindings($this->unions ? [] : ['select'])
                         ->setAggregate($function, $columns)
                         ->get($columns);
 

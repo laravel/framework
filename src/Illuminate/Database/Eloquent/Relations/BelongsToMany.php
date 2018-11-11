@@ -209,7 +209,12 @@ class BelongsToMany extends Relation
      */
     public function addEagerConstraints(array $models)
     {
-        $this->query->whereIn($this->getQualifiedForeignPivotKeyName(), $this->getKeys($models, $this->parentKey));
+        $whereIn = $this->whereInMethod($this->parent, $this->parentKey);
+
+        $this->query->{$whereIn}(
+            $this->getQualifiedForeignPivotKeyName(),
+            $this->getKeys($models, $this->parentKey)
+        );
     }
 
     /**
