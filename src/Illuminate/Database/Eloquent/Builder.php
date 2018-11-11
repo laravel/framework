@@ -1107,9 +1107,10 @@ class Builder
      * Parse a list of relations into individuals.
      *
      * @param  array  $relations
+     * @param  bool   $selectConstraints
      * @return array
      */
-    protected function parseWithRelations(array $relations)
+    protected function parseWithRelations(array $relations, $selectConstraints = true)
     {
         $results = [];
 
@@ -1120,7 +1121,7 @@ class Builder
             if (is_numeric($name)) {
                 $name = $constraints;
 
-                [$name, $constraints] = Str::contains($name, ':')
+                [$name, $constraints] = $selectConstraints && Str::contains($name, ':')
                             ? $this->createSelectWithConstraint($name)
                             : [$name, function () {
                                 //

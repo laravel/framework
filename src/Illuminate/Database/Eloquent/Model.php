@@ -79,6 +79,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $withCount = [];
 
     /**
+     * The relationship aggregates that should be eager loaded on every query.
+     *
+     * @var array
+     */
+    protected $withAggregates = [];
+
+    /**
      * The number of models to return for pagination.
      *
      * @var int
@@ -987,7 +994,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         return $this->newModelQuery()
                     ->with($this->with)
-                    ->withCount($this->withCount);
+                    ->withCount($this->withCount)
+                    ->withAggregates($this->withAggregates);
     }
 
     /**

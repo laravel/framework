@@ -191,8 +191,23 @@ abstract class Relation
      */
     public function getRelationExistenceCountQuery(Builder $query, Builder $parentQuery)
     {
+        return $this->getRelationExistenceAggregateQuery($query, $parentQuery, 'count', '*');
+    }
+
+    /**
+     * Add the constraints for a relationship aggregate query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $function
+     * @param  string  $column
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceAggregateQuery(Builder $query, Builder $parentQuery, $function, $column)
+    {
+        $wrappedColumn = $query->getQuery()->getGrammar()->wrap($column);
         return $this->getRelationExistenceQuery(
-            $query, $parentQuery, new Expression('count(*)')
+            $query, $parentQuery, new Expression($function.'('.$wrappedColumn.')')
         )->setBindings([], 'select');
     }
 
