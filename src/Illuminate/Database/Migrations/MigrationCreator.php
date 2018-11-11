@@ -24,6 +24,13 @@ class MigrationCreator
     protected $postCreate = [];
 
     /**
+     * The path to the stubs.
+     *
+     * @var string
+     */
+    protected $stubPath = __DIR__.'/stubs';
+
+    /**
      * Create a new migration creator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -92,7 +99,7 @@ class MigrationCreator
     protected function getStub($table, $create)
     {
         if (is_null($table)) {
-            return $this->files->get($this->stubPath().'/blank.stub');
+            return $this->files->get($this->getStubPath().'/blank.stub');
         }
 
         // We also have stubs for creating new tables and modifying existing tables
@@ -100,7 +107,7 @@ class MigrationCreator
         // or modifying existing tables. We'll grab the appropriate stub here.
         $stub = $create ? 'create.stub' : 'update.stub';
 
-        return $this->files->get($this->stubPath()."/{$stub}");
+        return $this->files->get($this->getStubPath()."/{$stub}");
     }
 
     /**
@@ -187,9 +194,20 @@ class MigrationCreator
      *
      * @return string
      */
-    public function stubPath()
+    public function getStubPath()
     {
-        return __DIR__.'/stubs';
+        return $this->stubPath;
+    }
+
+    /**
+     * Set the path to the stubs.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function setStubPath($path)
+    {
+        $this->stubPath = $path;
     }
 
     /**
