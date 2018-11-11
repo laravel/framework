@@ -4,6 +4,7 @@
 
 ### Added
 - Added `Macroable` trait to `Illuminate\Cookie\CookieJar` ([#26445](https://github.com/laravel/framework/pull/26445))
+- Added ability to disable password reset route ([#26459](https://github.com/laravel/framework/pull/26459))
 
 ### Fixed
 - Fixed `UNION` aggregate queries with columns ([#26466](https://github.com/laravel/framework/pull/26466))
