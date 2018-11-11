@@ -318,7 +318,7 @@ abstract class Relation
     {
         return $model->getKeyName() === last(explode('.', $key))
                     && in_array($model->getKeyType(), ['int', 'integer'])
-                        ? 'whereInRawInt'
+                        ? 'whereIntegerInRaw'
                         : 'whereIn';
     }
 

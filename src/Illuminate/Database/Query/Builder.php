@@ -957,7 +957,7 @@ class Builder
      * @param  bool  $not
      * @return $this
      */
-    public function whereInRawInt($column, $values, $boolean = 'and', $not = false)
+    public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotInRaw' : 'InRaw';
 

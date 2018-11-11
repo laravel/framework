@@ -693,10 +693,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
-    public function testWhereInRawInt()
+    public function testwhereIntegerInRaw()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereInRawInt('id', ['1a', 2]);
+        $builder->select('*')->from('users')->whereIntegerInRaw('id', ['1a', 2]);
         $this->assertEquals('select * from "users" where "id" in (1, 2)', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
     }
