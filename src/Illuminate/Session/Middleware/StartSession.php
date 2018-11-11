@@ -41,23 +41,31 @@ class StartSession
      */
     public function handle($request, Closure $next)
     {
-        if ($this->sessionConfigured()) {
-            $request->setLaravelSession(
-                $session = $this->startSession($request)
-            );
-
-            $this->collectGarbage($session);
-
-            $this->storeCurrentUrl($request, $session);
-
-            $response = $next($request);
-
-            $this->addCookieToResponse($response, $session);
-
-            $this->manager->driver()->save();
+        if (! $this->sessionConfigured()) {
+            return next($request);
         }
 
-        return $response ?? $next($request);
+        // If a session driver has been configured, we will need to start the session here
+        // so that the data is ready for an application. Note that the Laravel sessions
+        // do not make use of PHP "native" sessions in any way since they are crappy.
+        $request->setLaravelSession(
+            $session = $this->startSession($request)
+        );
+
+        $this->collectGarbage($session);
+
+        $this->storeCurrentUrl($request, $session);
+
+        $this->addCookieToResponse(
+            $response = $next($request), $session
+        );
+
+        // Again, if the session has been configured we will need to close out the session
+        // so that the attributes may be persisted to some storage medium. We will also
+        // add the session identifier cookie to the application response headers now.
+        $this->manager->driver()->save();
+
+        return $response;
     }
 
     /**
@@ -168,7 +176,9 @@ class StartSession
     {
         $config = $this->manager->getSessionConfig();
 
-        return $config['expire_on_close'] ? 0 : Date::instance(Carbon::now()->addRealMinutes($config['lifetime']));
+        return $config['expire_on_close'] ? 0 : Date::instance(
+            Carbon::now()->addRealMinutes($config['lifetime'])
+        );
     }
 
     /**
