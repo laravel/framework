@@ -203,18 +203,4 @@ class StartSession
 
         return ! in_array($config['driver'], [null, 'array']);
     }
-
-    /**
-     * Determine if the session is using cookie sessions.
-     *
-     * @return bool
-     */
-    protected function usingCookieSessions()
-    {
-        if ($this->sessionConfigured()) {
-            return $this->manager->driver()->getHandler() instanceof CookieSessionHandler;
-        }
-
-        return false;
-    }
 }
