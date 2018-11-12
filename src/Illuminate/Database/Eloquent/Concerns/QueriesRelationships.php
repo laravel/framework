@@ -309,7 +309,7 @@ trait QueriesRelationships
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
             $suffix = isset($aggregateColumn) ? '_'.$aggregateColumn : null;
-            $column = $alias ?? Str::snake($name . $suffix.'_'.$function);
+            $column = $alias ?? Str::snake($name.$suffix.'_'.$function);
 
             $this->selectSub($query, $column);
         }
@@ -318,7 +318,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Apply a set of aggregate functions of related model
+     * Apply a set of aggregate functions of related model.
      *
      * @param  array  $aggregates
      * @return $this

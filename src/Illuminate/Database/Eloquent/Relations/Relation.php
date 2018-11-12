@@ -206,6 +206,7 @@ abstract class Relation
     public function getRelationExistenceAggregateQuery(Builder $query, Builder $parentQuery, $function, $column)
     {
         $wrappedColumn = $query->getQuery()->getGrammar()->wrap($column);
+
         return $this->getRelationExistenceQuery(
             $query, $parentQuery, new Expression($function.'('.$wrappedColumn.')')
         )->setBindings([], 'select');
