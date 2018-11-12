@@ -686,7 +686,9 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponse = json_decode($this->getContent(), true);
+        $decodedResponse = $this->decodeJsonWhilePreservingEmptyObjects(
+            $this->getContent()
+        );
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
@@ -697,6 +699,46 @@ class TestResponse
         }
 
         return data_get($decodedResponse, $key);
+    }
+
+    /**
+     * Decode the JSON string while preserving empty objects.
+     *
+     * @param  string  $json
+     * @return mixed
+     */
+    public function decodeJsonWhilePreservingEmptyObjects(string $json)
+    {
+        $payload = json_decode($json);
+
+        if ($payload === false) {
+            return $payload;
+        }
+
+        return $this->parseJsonWhilePreservingEmptyObjects($payload);
+    }
+
+    /**
+     * Parse the given JSON object while preserving empty objects.
+     *
+     * @param  StdClass|array  $payload
+     * @return
+     */
+    protected function parseJsonWhilePreservingEmptyObjects($payload)
+    {
+        if (is_object($payload)) {
+            return ! empty((array) $payload)
+                ? $this->parseJsonWhilePreservingEmptyObjects((array) $payload)
+                : $payload;
+        }
+
+        foreach ($payload as $key => $item) {
+            if (is_array($item) || is_object($item)) {
+                $payload[$key] = $this->parseJsonWhilePreservingEmptyObjects($item);
+            }
+        }
+
+        return $payload;
     }
 
     /**
