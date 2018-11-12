@@ -72,6 +72,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function getValidatorInstance()
     {
+        if ($this->validator) {
+            return $this->validator;
+        }
+
         $factory = $this->container->make(ValidationFactory::class);
 
         if (method_exists($this, 'validator')) {
@@ -84,9 +88,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
             $this->withValidator($validator);
         }
 
-        $this->setValidator($validator);
-
-        return $this->validator;
+        return $this->validator = $validator;
     }
 
     /**
@@ -181,7 +183,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function validated()
     {
-        return $this->validator->validated();
+        return $this->getValidatorInstance()->validated();
     }
 
     /**
@@ -202,19 +204,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
-    }
-
-    /**
-     * Set the Validator instance.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return $this
-     */
-    public function setValidator(Validator $validator)
-    {
-        $this->validator = $validator;
-
-        return $this;
     }
 
     /**
