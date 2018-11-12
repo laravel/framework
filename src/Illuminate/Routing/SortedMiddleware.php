@@ -33,6 +33,11 @@ class SortedMiddleware extends Collection
      */
     protected function sortMiddleware($priorityMap, $middlewares)
     {
+        // fix bug : $middlewares is empty but $priorityMap is not empty return empty array
+        if (empty($middlewares)) {
+            return $priorityMap;
+        }
+
         $lastIndex = 0;
 
         foreach ($middlewares as $index => $middleware) {
