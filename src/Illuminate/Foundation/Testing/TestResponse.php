@@ -686,7 +686,9 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponse = $this->jsonDecodeKeepEmptyObject($this->getContent());
+        $decodedResponse = $this->decodeJsonWhilePreservingEmptyObjects(
+            $this->getContent()
+        );
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
@@ -705,7 +707,7 @@ class TestResponse
      * @param  string  $json
      * @return mixed
      */
-    public function jsonDecodeKeepEmptyObject(string $json)
+    public function decodeJsonWhilePreservingEmptyObjects(string $json)
     {
         $payload = json_decode($json);
 
