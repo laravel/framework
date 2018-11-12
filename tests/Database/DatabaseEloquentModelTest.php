@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
-use Illuminate\Support\Str;
 use stdClass;
 use Exception;
 use Mockery as m;
