@@ -59,45 +59,6 @@ class TestResponse
     }
 
     /**
-     * JSON decode assoc and keep the empty object.
-     * @param string $json
-     * @link https://github.com/laravel/framework/issues/25769
-     * @return mixed
-     */
-    public static function jsonDecodeKeepEmptyObject(string $json)
-    {
-        $patchEmptyObject = function ($array) use (&$patchEmptyObject) {
-
-            // If it is an empty class,it is reserved.
-            // Otherwise converted into an associative array.
-            if (is_object($array)) {
-                return empty((array) $array)
-                    ? $array
-                    : $patchEmptyObject((array) $array);
-            }
-
-            foreach ($array as $key => $item) {
-                // We recursively deal with each of these terms.
-                if (is_array($item)
-                    || is_object($item)
-                ) {
-                    $array[$key] = $patchEmptyObject($item);
-                }
-            }
-
-            return $array;
-        };
-
-        $stdClass = json_decode($json);
-
-        if ($stdClass === false) {
-            return $stdClass;
-        }
-
-        return $patchEmptyObject($stdClass);
-    }
-
-    /**
      * Assert that the response has a successful status code.
      *
      * @return $this
@@ -725,7 +686,7 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponse = static::jsonDecodeKeepEmptyObject($this->getContent());
+        $decodedResponse = $this->jsonDecodeKeepEmptyObject($this->getContent());
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
@@ -736,6 +697,46 @@ class TestResponse
         }
 
         return data_get($decodedResponse, $key);
+    }
+
+    /**
+     * Decode the JSON string while preserving empty objects.
+     *
+     * @param  string  $json
+     * @return mixed
+     */
+    public function jsonDecodeKeepEmptyObject(string $json)
+    {
+        $payload = json_decode($json);
+
+        if ($payload === false) {
+            return $payload;
+        }
+
+        return $this->parseJsonWhilePreservingEmptyObjects($payload);
+    }
+
+    /**
+     * Parse the given JSON object while preserving empty objects.
+     *
+     * @param  StdClass|array  $payload
+     * @return
+     */
+    protected function parseJsonWhilePreservingEmptyObjects($payload)
+    {
+        if (is_object($payload)) {
+            return ! empty((array) $payload)
+                ? $this->parseJsonWhilePreservingEmptyObjects((array) $payload)
+                : $payload;
+        }
+
+        foreach ($payload as $key => $item) {
+            if (is_array($item) || is_object($item)) {
+                $payload[$key] = $this->parseJsonWhilePreservingEmptyObjects($item);
+            }
+        }
+
+        return $payload;
     }
 
     /**
