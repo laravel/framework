@@ -126,8 +126,7 @@ class MorphTo extends BelongsTo
                             ->mergeConstraintsFrom($this->getQuery())
                             ->with($this->getQuery()->getEagerLoads());
 
-        if ($columns = $this->getQuery()->getQuery()->columns)
-        {
+        if ($columns = $this->getQuery()->getQuery()->columns) {
             $query->select($columns);
         }
 
