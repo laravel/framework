@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
+use Illuminate\Support\Str;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -690,6 +691,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('stub', $model->getTable());
         $model->setTable('foo');
         $this->assertEquals('foo', $model->getTable());
+    }
+
+    public function testGetTableOnlyExecutedOnce()
+    {
+        $model = new EloquentModelStub;
+        $model->setTableRaw(null);
+
+        $this->assertEquals(null, $model->getTableRaw());
+        $model->getTable();
+        $this->assertEquals('eloquent_model_stubs', $model->getTableRaw());
     }
 
     public function testGetKeyReturnsValueOfPrimaryKey()
@@ -1935,6 +1946,16 @@ class EloquentModelStub extends Model
     public function scopeFramework(Builder $builder, $framework, $version)
     {
         $this->scopesCalled['framework'] = [$framework, $version];
+    }
+
+    public function getTableRaw()
+    {
+        return $this->table;
+    }
+
+    public function setTableRaw($table)
+    {
+        $this->table = $table;
     }
 }
 
