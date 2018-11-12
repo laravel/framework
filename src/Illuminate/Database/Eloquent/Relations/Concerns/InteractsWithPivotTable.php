@@ -151,15 +151,14 @@ trait InteractsWithPivotTable
     protected function attachNew(array $records, array $current, $touch = true)
     {
         $changes = ['attached' => [], 'updated' => []];
+        $recordsForAttachment = [];
 
         foreach ($records as $id => $attributes) {
             // If the ID is not in the list of existing pivot IDs, we will insert a new pivot
             // record, otherwise, we will just update this existing record on this joining
             // table, so that the developers will easily update these records pain free.
             if (! in_array($id, $current)) {
-                $this->attach($id, $attributes, $touch);
-
-                $changes['attached'][] = $this->castKey($id);
+                $recordsForAttachment[$id] = $records[$id];
             }
 
             // Now we'll try to update an existing pivot record with the attributes that were
@@ -170,7 +169,12 @@ trait InteractsWithPivotTable
                 $changes['updated'][] = $this->castKey($id);
             }
         }
-
+        
+        if (count($recordsForAttachment) > 0) {
+            $this->attach($recordsForAttachment, [], $touch);
+            $changes['attached'] = $this->castKeys(array_keys($recordsForAttachment));
+        }
+        
         return $changes;
     }
 
