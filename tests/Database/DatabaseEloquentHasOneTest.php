@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 
@@ -206,8 +207,13 @@ class DatabaseEloquentHasOneTest extends TestCase
         $parentQuery = m::mock(BaseBuilder::class);
         $parentQuery->from = 'two';
 
-        $builder->shouldReceive('getQuery')->once()->andReturn($baseQuery);
+        $grammar = m::mock(Grammar::class);
+
+        $builder->shouldReceive('getQuery')->twice()->andReturn($baseQuery);
         $builder->shouldReceive('getQuery')->once()->andReturn($parentQuery);
+
+        $grammar->shouldReceive('wrap')->once()->with('*')->andReturn('*');
+        $baseQuery->shouldReceive('getGrammar')->once()->andReturn($grammar);
 
         $builder->shouldReceive('select')->once()->with(m::type(Expression::class))->andReturnSelf();
         $relation->getParent()->shouldReceive('qualifyColumn')->andReturn('table.id');
