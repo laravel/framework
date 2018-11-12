@@ -59,6 +59,45 @@ class TestResponse
     }
 
     /**
+     * JSON decode assoc and keep the empty object.
+     * @param string $json
+     * @link https://github.com/laravel/framework/issues/25769
+     * @return mixed
+     */
+    public static function jsonDecodeKeepEmptyObject(string $json)
+    {
+        $patchEmptyObject = function ($array) use (&$patchEmptyObject) {
+
+            // If it is an empty class,it is reserved.
+            // Otherwise converted into an associative array.
+            if (is_object($array)) {
+                return empty((array) $array)
+                    ? $array
+                    : $patchEmptyObject((array) $array);
+            }
+
+            foreach ($array as $key => $item) {
+                // We recursively deal with each of these terms.
+                if (is_array($item)
+                    || is_object($item)
+                ) {
+                    $array[$key] = $patchEmptyObject($item);
+                }
+            }
+
+            return $array;
+        };
+
+        $stdClass = json_decode($json);
+
+        if ($stdClass === false) {
+            return $stdClass;
+        }
+
+        return $patchEmptyObject($stdClass);
+    }
+
+    /**
      * Assert that the response has a successful status code.
      *
      * @return $this
@@ -686,7 +725,7 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponse = json_decode($this->getContent(), true);
+        $decodedResponse = static::jsonDecodeKeepEmptyObject($this->getContent());
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
