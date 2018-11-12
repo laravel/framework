@@ -253,6 +253,25 @@ trait InteractsWithInput
     }
 
     /**
+     * Get all of the input except obscure the value for a specified array of items.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function obscure($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $results = $this->all();
+
+        foreach ($this->only($keys) as $key => $value) {
+            Arr::set($results, $key, str_repeat('*', strlen($value)));
+        }
+
+        return $results;
+    }
+
+    /**
      * Retrieve a query string item from the request.
      *
      * @param  string  $key

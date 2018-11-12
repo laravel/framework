@@ -983,4 +983,22 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
     }
+
+    public function testHttpRequestCanObscureParameters()
+    {
+        // Email to be obscured
+        $email = 'example@example.com';
+
+        // Simulates request with query string parameters
+        $request = Request::create('/', 'GET', [
+            'email' => $email,
+            'foo' => 'bar',
+        ]);
+
+        $result = $request->obscure('email');
+
+        // Ensure parameter we want obscured is indeed obscured, and remaining parameter is left unchanged
+        $this->assertNotEquals($email, $result['email']);
+        $this->assertEquals('bar', $result['foo']);
+    }
 }
