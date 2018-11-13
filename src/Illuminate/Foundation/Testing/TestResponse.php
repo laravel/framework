@@ -727,8 +727,10 @@ class TestResponse
     protected function parseJsonWhilePreservingEmptyObjects($payload)
     {
         if (is_object($payload)) {
-            return ! empty((array) $payload)
-                ? $this->parseJsonWhilePreservingEmptyObjects((array) $payload)
+            $arrayPayload = (array) $payload;
+
+            return ! empty($arrayPayload)
+                ? $this->parseJsonWhilePreservingEmptyObjects($arrayPayload)
                 : $payload;
         }
 
