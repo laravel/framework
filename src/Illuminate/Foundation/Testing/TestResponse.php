@@ -727,11 +727,13 @@ class TestResponse
     protected function parseJsonWhilePreservingEmptyObjects($payload)
     {
         if (is_object($payload)) {
-            $arrayPayload = (array) $payload;
+            $originalPayload = $payload;
 
-            return ! empty($arrayPayload)
-                ? $this->parseJsonWhilePreservingEmptyObjects($arrayPayload)
-                : $payload;
+            $payload = (array) $payload;
+
+            if (empty($payload)) {
+                return $originalPayload;
+            }
         }
 
         foreach ($payload as $key => $item) {
