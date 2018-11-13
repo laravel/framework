@@ -21,6 +21,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 trait ValidatesAttributes
 {
     /**
+     * The cached data for distinct rules.
+     *
+     * @var array
+     */
+    protected $distinctValues = [];
+
+    /**
      * Validate that an attribute was "accepted".
      *
      * This validation rule implies the attribute is "required".
@@ -561,23 +568,38 @@ trait ValidatesAttributes
      */
     public function validateDistinct($attribute, $value, $parameters)
     {
-        $attributeName = $this->getPrimaryAttribute($attribute);
-
-        $attributeData = ValidationData::extractDataFromPath(
-            ValidationData::getLeadingExplicitAttributePath($attributeName), $this->data
-        );
-
-        $pattern = str_replace('\*', '[^.]+', preg_quote($attributeName, '#'));
-
-        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $pattern) {
-            return $key != $attribute && (bool) preg_match('#^'.$pattern.'\z#u', $key);
-        });
+        $data = $this->getDistinctValues($attribute);
 
         if (in_array('ignore_case', $parameters)) {
-            return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
+            return empty(preg_grep('/^' . preg_quote($value, '/') . '$/iu', $data));
         }
 
-        return ! in_array($value, array_values($data));
+        return !in_array($value, array_values($data));
+    }
+
+    /**
+     * Get the values to distinct between.
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function getDistinctValues($attribute)
+    {
+        $attributeName = $this->getPrimaryAttribute($attribute);
+
+        if (!array_key_exists($attributeName, $this->distinctValues)) {
+            $attributeData = ValidationData::extractDataFromPath(
+                ValidationData::getLeadingExplicitAttributePath($attributeName), $this->data
+            );
+
+            $pattern = str_replace('\*', '[^.]+', preg_quote($attributeName, '#'));
+
+            $this->distinctValues[$attributeName] = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $pattern) {
+                return (bool)preg_match('#^' . $pattern . '\z#u', $key);
+            });
+        }
+
+        return Arr::except($this->distinctValues[$attributeName], $attribute);
     }
 
     /**
