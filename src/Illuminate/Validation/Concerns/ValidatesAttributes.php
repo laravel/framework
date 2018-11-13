@@ -574,7 +574,7 @@ trait ValidatesAttributes
             return empty(preg_grep('/^' . preg_quote($value, '/') . '$/iu', $data));
         }
 
-        return !in_array($value, array_values($data));
+        return ! in_array($value, array_values($data));
     }
 
     /**
@@ -587,7 +587,7 @@ trait ValidatesAttributes
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
-        if (!array_key_exists($attributeName, $this->distinctValues)) {
+        if (! array_key_exists($attributeName, $this->distinctValues)) {
             $attributeData = ValidationData::extractDataFromPath(
                 ValidationData::getLeadingExplicitAttributePath($attributeName), $this->data
             );
@@ -595,7 +595,7 @@ trait ValidatesAttributes
             $pattern = str_replace('\*', '[^.]+', preg_quote($attributeName, '#'));
 
             $this->distinctValues[$attributeName] = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $pattern) {
-                return (bool)preg_match('#^' . $pattern . '\z#u', $key);
+                return (bool) preg_match('#^'.$pattern.'\z#u', $key);
             });
         }
 
