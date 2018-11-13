@@ -565,7 +565,7 @@ class Repository implements CacheContract, ArrayAccess
         $duration = $this->parseDateInterval($duration);
 
         if ($duration instanceof DateTimeInterface) {
-            $duration = Carbon::now()->diffInSeconds(Carbon::createFromTimestamp($duration->getTimestamp()), false) / 60;
+            $duration = Carbon::now()->diffInRealSeconds($duration, false) / 60;
         }
 
         return (int) ($duration * 60) > 0 ? $duration : null;
