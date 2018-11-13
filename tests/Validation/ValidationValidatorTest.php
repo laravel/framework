@@ -1798,7 +1798,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertCount(4, $v->messages());
 
-        $v = new Validator($trans, ['foo' => ['foo', 'bar'], 'bar' => ['foo', 'bar']], ['foo.*' => 'distinct', 'bar.*' => 'distinct']);
+        $v->setData(['foo' => ['foo', 'bar'], 'bar' => ['foo', 'bar']]);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => ['foo', 'foo']], ['foo.*' => 'distinct'], ['foo.*.distinct' => 'There is a duplication!']);
