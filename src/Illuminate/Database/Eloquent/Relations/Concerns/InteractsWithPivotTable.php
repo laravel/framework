@@ -169,12 +169,12 @@ trait InteractsWithPivotTable
                 $changes['updated'][] = $this->castKey($id);
             }
         }
-        
+
         if (count($recordsForAttachment) > 0) {
             $this->attach($recordsForAttachment, [], $touch);
             $changes['attached'] = $this->castKeys(array_keys($recordsForAttachment));
         }
-        
+
         return $changes;
     }
 
