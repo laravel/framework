@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
+use Egulias\EmailValidator\EmailValidator;
 use Symfony\Component\HttpFoundation\File\File;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 trait ValidatesAttributes
@@ -590,7 +592,7 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value)
     {
-        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+        return (new EmailValidator)->isValid($value, new RFCValidation);
     }
 
     /**
