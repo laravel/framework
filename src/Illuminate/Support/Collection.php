@@ -496,6 +496,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Find the index of the first passing callback.
+     *
+     * @param  callable|null  $callback
+     * @return integer|boolean
+     */
+    public function findIndex(callable $callback = null)
+    {
+        if($callback) {
+            foreach ($this->items as $key => $value) {
+                if ($callback($value)) {
+                    return $key;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Apply the callback if the value is truthy.
      *
      * @param  bool  $value

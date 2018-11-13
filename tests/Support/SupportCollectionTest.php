@@ -335,6 +335,27 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    public function testFindIndex() {
+
+        $c = new Collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
+        $this->assertEquals(1, $c->findIndex(function($item) {
+            return $item['name'] === 'World';
+        }));
+
+        $c = new Collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
+        $this->assertEquals(false, $c->findIndex(function($item) {
+            return $item['name'] === 'Worlds';
+        }));
+
+        $c = new Collection(['Hello', 'world', 'find', 'the', 'correct', 'index']);
+        $this->assertEquals(4, $c->findIndex(function($item) {
+            return $item === 'correct';
+        }));
+
+        $this->assertEquals(false, $c->findIndex());
+
+    }
+
     public function testHigherOrderKeyBy()
     {
         $c = new Collection([
