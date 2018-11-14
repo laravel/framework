@@ -22,14 +22,14 @@ class QueueTransactionalJobTest extends TestCase
     public function testRunFireInDatabaseTransaction($jobClassname, $isTransactional)
     {
         $connection = $this->createMock(Connection::class);
-        $connection->expects($isTransactional ? $this->once(): $this->never())
+        $connection->expects($isTransactional ? $this->once() : $this->never())
             ->method('transaction')
             ->willReturnCallback(function ($handler) {
                 $handler();
             });
 
         $db = $this->createMock(Manager::class);
-        $db->expects($isTransactional ? $this->once(): $this->never())
+        $db->expects($isTransactional ? $this->once() : $this->never())
             ->method('getConnection')
             ->willReturn($connection);
 
