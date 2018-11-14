@@ -98,8 +98,6 @@ abstract class Job
         }
 
         $handler();
-
-        // ($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
     }
 
     /**
