@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Contracts\Queue\Transactional;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Queue\Transactional;
 
 abstract class Job
 {
@@ -88,9 +88,8 @@ abstract class Job
         };
 
         if ($this->instance instanceof Transactional) {
-            dump($payload);
             $handler = function () use ($handler) {
-                $connection = method_exists($this->instance, 'dbConnection') &&  \is_callable([$this->instance, 'dbConnection'])
+                $connection = method_exists($this->instance, 'dbConnection') && \is_callable([$this->instance, 'dbConnection'])
                     ? $this->instance->dbConnection()
                     : null;
 

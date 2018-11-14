@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\Transactional;
-use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Queue\Jobs\SyncJob;
+use Illuminate\Container\Container;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Capsule\Manager;
+use Illuminate\Contracts\Queue\Transactional;
 
 class QueueTransactionalJobTest extends TestCase
 {
