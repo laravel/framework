@@ -580,7 +580,7 @@ trait ValidatesAttributes
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
-        if(! property_exists($this, 'distinctValues')){
+        if (! property_exists($this, 'distinctValues')){
             return $this->extractDistinctValues($attributeName);
         }
 
