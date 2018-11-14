@@ -21,13 +21,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 trait ValidatesAttributes
 {
     /**
-     * The cached data for distinct rules.
-     *
-     * @var array
-     */
-    protected $distinctValues = [];
-
-    /**
      * Validate that an attribute was "accepted".
      *
      * This validation rule implies the attribute is "required".
@@ -568,7 +561,7 @@ trait ValidatesAttributes
      */
     public function validateDistinct($attribute, $value, $parameters)
     {
-        $data = $this->getDistinctValues($attribute);
+        $data = Arr::except($this->getDistinctValues($attribute), $attribute);
 
         if (in_array('ignore_case', $parameters)) {
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
@@ -587,19 +580,34 @@ trait ValidatesAttributes
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
-        if (! array_key_exists($attributeName, $this->distinctValues)) {
-            $attributeData = ValidationData::extractDataFromPath(
-                ValidationData::getLeadingExplicitAttributePath($attributeName), $this->data
-            );
-
-            $pattern = str_replace('\*', '[^.]+', preg_quote($attributeName, '#'));
-
-            $this->distinctValues[$attributeName] = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $pattern) {
-                return (bool) preg_match('#^'.$pattern.'\z#u', $key);
-            });
+        if(! property_exists($this, 'distinctValues')){
+            return $this->extractDistinctValues($attributeName);
         }
 
-        return Arr::except($this->distinctValues[$attributeName], $attribute);
+        if (! array_key_exists($attributeName, $this->distinctValues)) {
+            $this->distinctValues[$attributeName] = $this->extractDistinctValues($attributeName);
+        }
+
+        return $this->distinctValues[$attributeName];
+    }
+
+    /**
+     * Extract the distinct values from the database.
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function extractDistinctValues($attribute)
+    {
+        $attributeData = ValidationData::extractDataFromPath(
+            ValidationData::getLeadingExplicitAttributePath($attribute), $this->data
+        );
+
+        $pattern = str_replace('\*', '[^.]+', preg_quote($attribute, '#'));
+
+        return Arr::where(Arr::dot($attributeData), function ($value, $key) use ($pattern) {
+            return (bool) preg_match('#^'.$pattern.'\z#u', $key);
+        });
     }
 
     /**

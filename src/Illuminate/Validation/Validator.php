@@ -98,6 +98,13 @@ class Validator implements ValidatorContract
     protected $after = [];
 
     /**
+     * The cached data for distinct rules.
+     *
+     * @var array
+     */
+    protected $distinctValues = [];
+
+    /**
      * The array of custom error messages.
      *
      * @var array
