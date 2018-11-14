@@ -19,7 +19,7 @@ class QueueTransactionalJobTest extends TestCase
      *
      * @dataProvider jobsDataProvider
      */
-    public function testRunFireInDatabaseTransaction($jobClassname, $isTransactional)
+    public function testRunFireInDatabaseTransaction($jobClassname, $isTransactional, $connectionName)
     {
         $connection = $this->createMock(Connection::class);
         $connection->expects($isTransactional ? $this->once() : $this->never())
@@ -31,6 +31,7 @@ class QueueTransactionalJobTest extends TestCase
         $db = $this->createMock(Manager::class);
         $db->expects($isTransactional ? $this->once() : $this->never())
             ->method('getConnection')
+            ->with($connectionName)
             ->willReturn($connection);
 
         /** @var Container|\PHPUnit_Framework_MockObject_MockObject $container */
@@ -63,8 +64,9 @@ class QueueTransactionalJobTest extends TestCase
     public function jobsDataProvider(): array
     {
         return [
-            [TransactionalJob::class, true],
-            [SimpleJob::class, false],
+            [TransactionalWithCustomConnection::class, true, 'custom'],
+            [TransactionalJob::class, true, null],
+            [SimpleJob::class, false, null],
         ];
     }
 }
@@ -79,4 +81,12 @@ class SimpleJob
 
 class TransactionalJob extends SimpleJob implements Transactional
 {
+}
+
+class TransactionalWithCustomConnection extends TransactionalJob
+{
+    public function dbConnection(): string
+    {
+        return 'custom';
+    }
 }
