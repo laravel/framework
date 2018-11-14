@@ -6,7 +6,6 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Orchestra\Testbench\TestCase;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\RotatingFileHandler;
 use Illuminate\Mail\Transport\LogTransport;
 
 class MailLogTransportTest extends TestCase
