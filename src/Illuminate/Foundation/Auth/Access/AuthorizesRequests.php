@@ -121,6 +121,6 @@ trait AuthorizesRequests
      */
     protected function resourceMethodsWithoutModels()
     {
-        return ['index', 'create', 'store'];
+        return ['create', 'store'];
     }
 }
