@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Contracts\Queue\Transactional;
 use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
@@ -80,7 +81,26 @@ abstract class Job
 
         [$class, $method] = JobName::parse($payload['job']);
 
-        ($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
+        $this->instance = $this->resolve($class);
+
+        $handler = function () use ($method, $payload) {
+            $this->instance->{$method}($this, $payload['data']);
+        };
+
+        if ($this->instance instanceof Transactional) {
+            dump($payload);
+            $handler = function () use ($handler) {
+                $connection = method_exists($this->instance, 'dbConnection') &&  \is_callable([$this->instance, 'dbConnection'])
+                    ? $this->instance->dbConnection()
+                    : null;
+
+                $this->container->make('db')->getConnection($connection)->transaction($handler);
+            };
+        }
+
+        $handler();
+
+        // ($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
     }
 
     /**
