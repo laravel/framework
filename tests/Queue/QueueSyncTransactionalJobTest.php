@@ -79,5 +79,4 @@ class SimpleJob
 
 class TransactionalJob extends SimpleJob implements Transactional
 {
-
 }
