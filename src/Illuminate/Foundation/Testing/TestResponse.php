@@ -454,11 +454,11 @@ class TestResponse
      */
     public function assertExactJson(array $data)
     {
-        $actual = json_encode(Arr::sortRecursive(
+        $actual = json_encode(Arr::sortAssocRecursive(
             (array) $this->decodeResponseJson()
         ));
 
-        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
+        PHPUnit::assertEquals(json_encode(Arr::sortAssocRecursive($data)), $actual);
 
         return $this;
     }
