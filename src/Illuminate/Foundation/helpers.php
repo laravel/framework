@@ -699,6 +699,29 @@ if (! function_exists('redirect')) {
     }
 }
 
+if (! function_exists('repeat')) {
+    /**
+     * Execute a callback the given number of times.
+     *
+     * @param  int  $times
+     * @param  callable  $callback
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    function repeat($times, $callback)
+    {
+        // Check $times is a valid integer
+        if (! is_int($times) || $times < 1 || $times > PHP_INT_MAX) {
+            throw new InvalidArgumentException('$times should be a positive integer.');
+        }
+
+        for ($i = 0; $i < $times; $i++) {
+            $callback();
+        }
+    }
+}
+
 if (! function_exists('report')) {
     /**
      * Report an exception.
