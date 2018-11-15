@@ -127,9 +127,9 @@ trait HasAttributes
 
             $attributes[$key] = empty($attributes[$key])
                 ? ''
-                :  $this->serializeDate(
-                        $this->asDateTime($attributes[$key])
-                   );
+                : $this->serializeDate(
+                      $this->asDateTime($attributes[$key])
+                  );
         }
 
         return $attributes;
