@@ -664,6 +664,51 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($assumedArray, Arr::sortRecursive($array));
     }
 
+    public function testAssocArraySortRecursive()
+    {
+        $array = [
+            'name' => 'bar',
+            'age' => 1
+        ];
+
+        $assumedArray = [
+            'age' => 1,
+            'name' => 'bar',
+        ];
+
+        // Test assoc array
+        $this->assertEquals(json_encode(Arr::sortAssocRecursive($assumedArray)), json_encode(Arr::sortAssocRecursive($array)));
+
+        $array = [
+            [
+                'foo',
+                'bar',
+                'baz',
+            ],
+            [
+                'baz',
+                'foo',
+                'bar',
+            ],
+        ];
+
+        $assumedArray = [
+            [
+                'bar',
+                'baz',
+                'foo',
+            ],
+            [
+                'bar',
+                'baz',
+                'foo',
+            ],
+        ];
+
+        // Test array
+        $this->assertNotEquals(Arr::sortAssocRecursive($array), Arr::sortAssocRecursive($assumedArray));
+    }
+
     public function testArrayWhere()
     {
         $array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8];
