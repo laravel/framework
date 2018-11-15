@@ -951,6 +951,17 @@ class SupportHelpersTest extends TestCase
         putenv('foo=(null)');
         $this->assertEquals('', env('foo'));
     }
+
+    public function testRepeat()
+    {
+        $counter = 0;
+
+        repeat(10, function () use (&$counter) {
+            $counter++;
+        });
+
+        $this->assertEquals(10, $counter);
+    }
 }
 
 trait SupportTestTraitOne

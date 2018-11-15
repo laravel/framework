@@ -203,17 +203,6 @@ class FoundationHelpersTest extends TestCase
         rmdir($directory);
     }
 
-    public function testRepeat()
-    {
-        $counter = 0;
-
-        repeat(10, function () use (&$counter) {
-            $counter++;
-        });
-
-        $this->assertEquals(10, $counter);
-    }
-
     protected function makeHotModuleReloadFile($url, $directory = '')
     {
         app()->singleton('path.public', function () {
