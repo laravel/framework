@@ -595,6 +595,26 @@ class Arr
     }
 
     /**
+     * Recursively sort an assoc array by keys.
+     * @param $array
+     * @return mixed
+     */
+    public static function sortAssocRecursive($array)
+    {
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $value = static::sortAssocRecursive($value);
+            }
+        }
+
+        if (static::isAssoc($array)) {
+            ksort($array);
+        }
+
+        return $array;
+    }
+
+    /**
      * Convert the array into a query string.
      *
      * @param  array  $array
