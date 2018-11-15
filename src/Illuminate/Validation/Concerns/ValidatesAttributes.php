@@ -592,7 +592,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Extract the distinct values from the database.
+     * Extract the distinct values from the data.
      *
      * @param  string  $attribute
      * @return array
