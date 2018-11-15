@@ -304,7 +304,7 @@ class Grammar extends BaseGrammar
     /**
      * Compile a "where in raw" clause.
      *
-     * For safety, this method is only used with integer values as whereInRaw utilizes "intval".
+     * For safety, whereIntegerInRaw ensures this method is only used with integer values.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
