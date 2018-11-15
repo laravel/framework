@@ -98,6 +98,13 @@ class Validator implements ValidatorContract
     protected $after = [];
 
     /**
+     * The cached data for distinct rules.
+     *
+     * @var array
+     */
+    protected $distinctValues = [];
+
+    /**
      * The array of custom error messages.
      *
      * @var array
@@ -257,6 +264,7 @@ class Validator implements ValidatorContract
     public function passes()
     {
         $this->messages = new MessageBag;
+        $this->distinctValues = [];
 
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
