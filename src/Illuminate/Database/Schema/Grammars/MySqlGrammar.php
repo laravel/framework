@@ -26,6 +26,16 @@ class MySqlGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
+     * Compile the query to determine the list of databases.
+     *
+     * @return string
+     */
+    public function compileDatabaseExists()
+    {
+        return 'select * from information_schema.schemata where schema_name = ?';
+    }
+
+    /**
      * Compile the query to determine the list of tables.
      *
      * @return string
@@ -43,6 +53,18 @@ class MySqlGrammar extends Grammar
     public function compileColumnListing()
     {
         return 'select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name = ?';
+    }
+
+    /**
+     * Compile a create database command.
+     *
+     * @param  string $database
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileCreateDatabase($database, $connection)
+    {
+        return sprintf('create database %s', $this->wrap($database));
     }
 
     /**

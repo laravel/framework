@@ -5,6 +5,19 @@ namespace Illuminate\Database\Schema;
 class MySqlBuilder extends Builder
 {
     /**
+     * Determine if the given database exists.
+     *
+     * @param  string  $database
+     * @return bool
+     */
+    public function hasDatabase($database)
+    {
+        return count($this->connection->select(
+            $this->grammar->compileDatabaseExists(), [$database]
+        )) > 0;
+    }
+
+    /**
      * Determine if the given table exists.
      *
      * @param  string  $table
@@ -34,6 +47,19 @@ class MySqlBuilder extends Builder
         );
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
+    }
+
+    /**
+     * Create a new database.
+     *
+     * @param  string  $database
+     * @return void
+     */
+    public function createDatabase($database)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileCreateDatabase($database, $this->connection)
+        );
     }
 
     /**

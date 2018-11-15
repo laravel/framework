@@ -10,6 +10,7 @@ use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Database\Console\DBCreateCommand;
 use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
@@ -93,6 +94,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ClearResets' => 'command.auth.resets.clear',
         'ConfigCache' => 'command.config.cache',
         'ConfigClear' => 'command.config.clear',
+        'DBCreate' => 'command.create',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
         'KeyGenerate' => 'command.key.generate',
@@ -393,6 +395,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.down', function () {
             return new DownCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDBCreateCommand()
+    {
+        $this->app->singleton('command.create', function ($app) {
+            return new DBCreateCommand($app['db']);
         });
     }
 
