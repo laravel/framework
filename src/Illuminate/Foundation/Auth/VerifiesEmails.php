@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 
@@ -22,18 +23,22 @@ trait VerifiesEmails
                         : view('auth.verify');
     }
 
-    /**
-     * Mark the authenticated user's email address as verified.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+	/**
+	 * Mark the authenticated user's email address as verified.
+	 *
+	 * @param  \Illuminate\Http\Request $request
+	 * @return \Illuminate\Http\Response
+	 * @throws AuthorizationException
+	 */
     public function verify(Request $request)
     {
-        if ($request->route('id') == $request->user()->getKey() &&
-            $request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
+		if ($request->route('id') != $request->user()->getKey()) {
+			throw new AuthorizationException();
+		}
+
+		if ($request->user()->markEmailAsVerified()) {
+			event(new Verified($request->user()));
+		}
 
         return redirect($this->redirectPath())->with('verified', true);
     }
