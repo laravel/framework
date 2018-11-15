@@ -125,9 +125,11 @@ trait HasAttributes
                 continue;
             }
 
-            $attributes[$key] = $this->serializeDate(
-                $this->asDateTime($attributes[$key])
-            );
+            $attributes[$key] = empty($attributes[$key])
+                ? ''
+                :  $this->serializeDate(
+                        $this->asDateTime($attributes[$key])
+                   );
         }
 
         return $attributes;
@@ -355,7 +357,7 @@ trait HasAttributes
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
         if (in_array($key, $this->getDates()) &&
-            ! is_null($value)) {
+            ! empty($value)) {
             return $this->asDateTime($value);
         }
 
