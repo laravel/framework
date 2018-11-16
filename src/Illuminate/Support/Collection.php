@@ -331,6 +331,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         (new static(func_get_args()))
             ->push($this)
             ->each(function ($item) {
+                if ($item instanceof \Closure) {
+                    $item = $item($this);
+                }
+
                 VarDumper::dump($item);
             });
 
