@@ -32,7 +32,7 @@ class StorageLinkCommand extends Command
         }
 
         $this->laravel->make('files')->link(
-            storage_path('app/public'), public_path('storage')
+            '../storage/app/public', public_path('storage')
         );
 
         $this->info('The [public/storage] directory has been linked.');
