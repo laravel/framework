@@ -90,6 +90,10 @@ class RouteListCommand extends Command
             $routes = $this->sortRoutes($sort, $routes);
         }
 
+        if (! $this->columns()->isEmpty()) {
+            $routes = $this->filterColumns($routes);
+        }
+
         if ($this->option('reverse')) {
             $routes = array_reverse($routes);
         }
@@ -137,7 +141,64 @@ class RouteListCommand extends Command
      */
     protected function displayRoutes(array $routes)
     {
-        $this->table($this->headers, $routes);
+        $this->table($this->getHeaders(), $routes);
+    }
+
+    /**
+     * Get filtered headers that should be shown
+     *
+     * @return array
+     */
+    protected function getHeaders()
+    {
+        if ($this->columns()->isEmpty()) {
+            return $this->headers;
+        }
+
+        return collect($this->headers)
+            ->filter(function ($header) {
+                return $this->columnsContain($header);
+            });
+    }
+
+    /**
+     * Get the columns that should be shown
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function columns()
+    {
+        return collect(explode(',', $this->option('columns')))->filter();
+    }
+
+    /**
+     * Check if the columns contain a particular value
+     *
+     * @param string $value
+     * @return \Illuminate\Support\Collection
+     */
+    protected function columnsContain(string $value)
+    {
+        return $this->columns()
+            ->contains(function ($column) use ($value) {
+                return Str::lower($value) === $column;
+            });
+    }
+
+    /**
+     * Filter the routes by column
+     *
+     * @param array $routes
+     * @return array
+     */
+    protected function filterColumns(array $routes)
+    {
+        return collect($routes)
+            ->map(function ($route) {
+                return collect($route)
+                    ->only($this->columns())
+                    ->all();
+            })->all();
     }
 
     /**
@@ -185,6 +246,8 @@ class RouteListCommand extends Command
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
 
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
+
+            ['columns', null, InputOption::VALUE_OPTIONAL, 'The column(s) (host, method, uri, name, action, middleware) to display in the output, comma separated'],
 
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (host, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
