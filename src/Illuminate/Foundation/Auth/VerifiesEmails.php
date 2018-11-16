@@ -26,9 +26,9 @@ trait VerifiesEmails
     /**
      * Mark the authenticated user's email address as verified.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
-     * @throws AuthorizationException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function verify(Request $request)
     {
