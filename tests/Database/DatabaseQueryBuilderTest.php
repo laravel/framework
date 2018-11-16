@@ -709,6 +709,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testEmptyWhereIntegerInRaw()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntegerInRaw('id', []);
+        $this->assertEquals('select * from "users" where 0 = 1', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testEmptyWhereIntegerNotInRaw()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntegerNotInRaw('id', []);
+        $this->assertEquals('select * from "users" where 1 = 1', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testBasicWhereColumn()
     {
         $builder = $this->getBuilder();
