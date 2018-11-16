@@ -701,6 +701,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testWhereIntegerNotInRaw()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntegerNotInRaw('id', ['1a', 2]);
+        $this->assertEquals('select * from "users" where "id" not in (1, 2)', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testBasicWhereColumn()
     {
         $builder = $this->getBuilder();
