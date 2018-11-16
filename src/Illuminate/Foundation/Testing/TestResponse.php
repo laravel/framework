@@ -721,8 +721,8 @@ class TestResponse
     /**
      * Parse the given JSON object while preserving empty objects.
      *
-     * @param  StdClass|array  $payload
-     * @return
+     * @param  \stdClass|array  $payload
+     * @return \stdClass|array
      */
     protected function parseJsonWhilePreservingEmptyObjects($payload)
     {
