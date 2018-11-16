@@ -23,13 +23,13 @@ trait VerifiesEmails
                         : view('auth.verify');
     }
 
-	/**
-	 * Mark the authenticated user's email address as verified.
-	 *
-	 * @param  \Illuminate\Http\Request $request
-	 * @return \Illuminate\Http\Response
-	 * @throws AuthorizationException
-	 */
+    /**
+     * Mark the authenticated user's email address as verified.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     * @throws AuthorizationException
+     */
     public function verify(Request $request)
     {
         if ($request->route('id') != $request->user()->getKey()) {
