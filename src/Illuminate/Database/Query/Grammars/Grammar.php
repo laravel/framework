@@ -278,6 +278,24 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where not in raw" clause.
+     *
+     * For safety, whereIntegerInRaw ensures this method is only used with integer values.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotInRaw(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            return $this->wrap($where['column']).' not in ('.implode(', ', $where['values']).')';
+        }
+
+        return '1 = 1';
+    }
+
+    /**
      * Compile a where in sub-select clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
