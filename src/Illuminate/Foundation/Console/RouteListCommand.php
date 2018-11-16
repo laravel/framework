@@ -145,7 +145,7 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Get filtered headers that should be shown
+     * Get filtered headers that should be shown.
      *
      * @return array
      */
@@ -162,7 +162,7 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Get the columns that should be shown
+     * Get the columns that should be shown.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -172,7 +172,7 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Check if the columns contain a particular value
+     * Check if the columns contain a particular value.
      *
      * @param string $value
      * @return \Illuminate\Support\Collection
@@ -186,7 +186,7 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Filter the routes by column
+     * Filter the routes by column.
      *
      * @param array $routes
      * @return array
