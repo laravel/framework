@@ -869,12 +869,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Determine if an item exists in the collection by key.
+     * Determine if all items exist in the collection by their keys.
      *
      * @param  mixed  $key
      * @return bool
      */
-    public function has($key)
+    public function hasAll($key)
     {
         $keys = is_array($key) ? $key : func_get_args();
 
@@ -885,6 +885,70 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return true;
+    }
+
+    /**
+     * Determine if any items exist in the collection by their keys.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    public function hasAny($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if ($this->offsetExists($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if one items is missing in the collection by its key.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    public function doesNotHave($key)
+    {
+        return ! $this->offsetExists($key);
+    }
+
+    /**
+     * Determine if none of the items exist in the collection by their keys.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    public function doesNotHaveAny($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if ($this->offsetExists($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if an item exists in the collection by key.
+     *
+     * @param  mixed  $key
+     * @return bool
+     *
+     * @deprecated use hasAll() instead
+     */
+    public function has($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        return $this->hasAll($keys);
     }
 
     /**

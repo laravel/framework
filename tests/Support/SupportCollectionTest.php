@@ -1095,7 +1095,49 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($data->has('first'));
         $this->assertFalse($data->has('third'));
         $this->assertTrue($data->has(['first', 'second']));
+        $this->assertTrue($data->has('first', 'second'));
         $this->assertFalse($data->has(['third', 'first']));
+        $this->assertFalse($data->has('third', 'first'));
+    }
+
+    public function testHasAll()
+    {
+        $data = new Collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+        $this->assertTrue($data->hasAll('first'));
+        $this->assertFalse($data->hasAll('third'));
+        $this->assertTrue($data->hasAll(['first', 'second']));
+        $this->assertTrue($data->hasAll('first', 'second'));
+        $this->assertFalse($data->hasAll(['third', 'first']));
+        $this->assertFalse($data->hasAll('third', 'first'));
+    }
+
+    public function testHasAny()
+    {
+        $data = new Collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+        $this->assertTrue($data->hasAny('first'));
+        $this->assertFalse($data->hasAny('third'));
+        $this->assertTrue($data->hasAny(['first', 'second']));
+        $this->assertTrue($data->hasAny('first', 'second'));
+        $this->assertTrue($data->hasAny(['third', 'first']));
+        $this->assertTrue($data->hasAny('third', 'first'));
+    }
+
+    public function testDoesNotHave()
+    {
+        $data = new Collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+        $this->assertFalse($data->doesNotHave('first'));
+        $this->assertTrue($data->doesNotHave('third'));
+    }
+
+    public function testDoesNotHaveAny()
+    {
+        $data = new Collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+        $this->assertFalse($data->doesNotHaveAny('first'));
+        $this->assertTrue($data->doesNotHaveAny('third'));
+        $this->assertFalse($data->doesNotHaveAny(['first', 'third']));
+        $this->assertFalse($data->doesNotHaveAny('first', 'third'));
+        $this->assertTrue($data->doesNotHaveAny(['name', 'third']));
+        $this->assertTrue($data->doesNotHaveAny('name', 'third'));
     }
 
     public function testImplode()
