@@ -888,6 +888,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if any of the given keys exist in the collection
+     *
+     * @param  mixed  $keys
+     * @return bool
+     */
+    public function hasAny($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        foreach ($keys as $value) {
+            if ($this->offsetExists($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
