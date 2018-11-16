@@ -596,7 +596,8 @@ class Arr
 
     /**
      * Recursively sort an assoc array by keys.
-     * @param $array
+     *
+     * @param  array  $array
      * @return mixed
      */
     public static function sortAssocRecursive($array)

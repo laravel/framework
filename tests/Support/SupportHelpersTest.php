@@ -668,7 +668,7 @@ class SupportHelpersTest extends TestCase
     {
         $array = [
             'name' => 'bar',
-            'age' => 1
+            'age' => 1,
         ];
 
         $assumedArray = [
