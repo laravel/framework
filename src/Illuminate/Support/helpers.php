@@ -171,6 +171,20 @@ if (! function_exists('array_has')) {
     }
 }
 
+if (! function_exists('array_merge_concat')) {
+    /**
+     * Merge arrays by concatenating the existing key values.
+     *
+     * @param  mixed  $glue
+     * @param  array  ...$arrays
+     * @return array
+     */
+    function array_merge_concat($glue, ...$arrays)
+    {
+        return Arr::mergeConcat($glue, ...$arrays);
+    }
+}
+
 if (! function_exists('array_last')) {
     /**
      * Return the last element in an array passing a given truth test.

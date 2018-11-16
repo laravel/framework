@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
 
 class SupportHelpersTest extends TestCase
@@ -207,6 +208,47 @@ class SupportHelpersTest extends TestCase
     public function testArrayFlatten()
     {
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten([['#foo', '#bar'], ['#baz']]));
+    }
+
+    public function testArrayMergeConcat()
+    {
+        $this->assertEquals(
+            ['id' => 'here', 'class' => 'header sticky'],
+            Arr::mergeConcat(
+                ['id' => 'here', 'class' => 'header'],
+                ['class' => 'sticky']
+            )
+        );
+
+        $this->assertEquals(
+            ['id' => 'here', 'class' => 'header:sticky:no-margin', 'ref' => 'drag:handler:0.25'],
+            Arr::mergeConcat(
+                ':',
+                ['id' => 'here', 'class' => 'header', 'ref' => 'drag'],
+                ['class' => 'sticky', 'ref' => 'handler'],
+                ['class' => 'no-margin', 'ref' => 0.25]
+            )
+        );
+
+        $this->assertEquals(
+            ['here:sticky:no-margin', 'header:handler:0.25', 'drag'],
+            Arr::mergeConcat(
+                ':',
+                ['here', 'header', 'drag'],
+                ['sticky', 'handler'],
+                ['no-margin', 0.25]
+            )
+        );
+
+        $this->assertEquals(
+            ['here:no-margin', 'header:0.25', 'drag', 'class' => 'drop:sticky', 'id' => 'handler'],
+            Arr::mergeConcat(
+                ':',
+                new Collection(['here', 'header', 'drag', 'class' => 'drop']),
+                ['class' => 'sticky', 'id' => 'handler'],
+                new Collection(['no-margin', 0.25])
+            )
+        );
     }
 
     public function testStrIs()

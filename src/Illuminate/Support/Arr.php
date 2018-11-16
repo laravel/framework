@@ -347,6 +347,33 @@ class Arr
     }
 
     /**
+     * Merge arrays by concatenating the existing key values.
+     *
+     * @param  mixed  $glue
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function mergeConcat($glue, ...$arrays)
+    {
+        if (is_array($glue)) {
+            array_unshift($arrays, $glue);
+            $glue = ' ';
+        }
+
+        $result = [];
+
+        foreach ($arrays as $array) {
+            foreach ($array as $key => $value) {
+                $result[$key] = static::exists($result, $key) ?
+                    $result[$key].$glue.$value :
+                    $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Determines if an array is associative.
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
