@@ -23,6 +23,9 @@ use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+/**
+ * @mixin \Illuminate\Routing\RouteRegistrar
+ */
 class Router implements RegistrarContract, BindingRegistrar
 {
     use Macroable {
