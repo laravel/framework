@@ -888,7 +888,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Determine if any of the given keys exist in the collection
+     * Determine if any of the given keys exist in the collection.
      *
      * @param  mixed  $keys
      * @return bool
