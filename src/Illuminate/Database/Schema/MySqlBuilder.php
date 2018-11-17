@@ -53,7 +53,7 @@ class MySqlBuilder extends Builder
      * Create a new database.
      *
      * @param  string  $database
-     * @return void
+     * @return bool
      */
     public function createDatabase($database)
     {

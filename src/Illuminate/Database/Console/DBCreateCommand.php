@@ -31,14 +31,7 @@ class DBCreateCommand extends Command
     protected $resolver;
 
     /**
-     * The database connection
-     * 
-     * @var \Illuminate\Database\ConnectionInterface
-    */
-    protected $connection;
-
-    /**
-     * The default database for supported connections.
+     * The default databases for supported connections.
      *
      * @var array
      */
@@ -49,7 +42,7 @@ class DBCreateCommand extends Command
     ];
 
     /**
-     * Create a new database seed command instance.
+     * Create a new database create command instance.
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @return void
@@ -68,24 +61,32 @@ class DBCreateCommand extends Command
      */
     public function handle()
     {
-        $this->connection = $this->getConnection();
-
         $name = trim($this->input->getArgument('name'));
 
-        $this->createDatabase($name);
-        
-        $this->info('Database created successfully');
+        if (! $this->createDatabase($name)) {
+            $this->error("Could not create database.");
 
-        if ($this->confirm('Do you wish to persist the database name to env file?')) {
-            $this->setDatabaseInEnvironmentFile($name);
+            exit();
         }
 
-        if ($this->confirm('Do you wish to persist the database credentials to env file?')) {
-            $this->setCredentialsInEnvironmentFile($this->getCredentials());
+        $this->info('Database created successfully.');
+
+        if ($this->confirm('Do you wish to persist the database name to env file?')) {
+            $this->setDatabaseInEnvironmentFile(
+                $this->isSQLiteDatabase() ? database_path($name.'.sqlite') : $name
+            );
+        }
+
+        if ($this->hasCredentials() && ! $this->isSQLiteDatabase()) {
+            if ($this->confirm('Do you wish to persist the database credentials to env file?')) {
+                $this->setCredentialsInEnvironmentFile($this->getCredentials());
+            }
         }
 
         if ($this->option('migrate')) {
-            $this->setDatabaseInConfig($name);
+            $this->setDatabaseInConfig(
+                $this->isSQLiteDatabase() ? database_path($name.'.sqlite') : $name
+            );
 
             $this->runMigrations();
 
@@ -96,24 +97,47 @@ class DBCreateCommand extends Command
     }
 
     /**
-     * Drop all of the database tables.
+     * Create the database.
      *
      * @param  string  $database
-     * @return void
+     * @return bool
      */
     protected function createDatabase($database)
     {
-        if ($this->connection->getSchemaBuilder()->hasDatabase($database)) {
-            $this->error("Database '$database' already exists");
+        if ($this->isSQLiteDatabase()) {
+            return $this->createSQLiteDatabase($database);
+        }
+
+        $connection = $this->getConnection();
+
+        if ($connection->getSchemaBuilder()->hasDatabase($database)) {
+            $this->error("Database '$database' already exist.");
 
             exit();
         }
 
-        return $this->connection->getSchemaBuilder()->createDatabase($database);
+        return $connection->getSchemaBuilder()->createDatabase($database);
     }
 
     /**
-     * Get the database connection
+     * Create the database.
+     *
+     * @param  string  $database
+     * @return bool
+     */
+    protected function createSQLiteDatabase($database)
+    {
+       if (file_exists(database_path($database.'.sqlite'))) {
+            $this->error("Database '$database' already exist.");
+
+            exit();
+       }
+
+       return touch(database_path($database.'.sqlite'));
+    }
+
+    /**
+     * Get the database connection.
      *
      * @return \Illuminate\Database\ConnectionInterface
      */
@@ -165,7 +189,7 @@ class DBCreateCommand extends Command
      */
     protected function getDatabase()
     {
-        return $this->input->getOption('database') ?: $this->laravel['config']['database.default'];
+        return strtolower($this->input->getOption('database')) ?: $this->laravel['config']['database.default'];
     }
 
     /**
@@ -176,6 +200,16 @@ class DBCreateCommand extends Command
     protected function getDefaultDatabase()
     {
         return $this->defaultDatabases[$this->getDatabase()];
+    }
+
+    /**
+     * Determine if the database is an SQLite database.
+     * 
+     * @return bool
+    */
+    protected function isSQLiteDatabase()
+    {
+        return $this->getDatabase() === 'sqlite';
     }
     
     /**
@@ -232,7 +266,7 @@ class DBCreateCommand extends Command
     }
 
     /**
-     * Run the database seeder command.
+     * Set the database in configuration.
      * 
      * @param  string $name
      * @return void
