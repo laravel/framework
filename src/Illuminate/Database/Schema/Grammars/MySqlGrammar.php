@@ -26,7 +26,7 @@ class MySqlGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
-     * Compile the query to determine the list of databases.
+     * Compile the query to determine if a database exists.
      *
      * @return string
      */

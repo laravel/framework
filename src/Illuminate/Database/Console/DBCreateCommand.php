@@ -42,6 +42,17 @@ class DBCreateCommand extends Command
     ];
 
     /**
+     * The default ports for supported connections.
+     *
+     * @var array
+     */
+    protected $defaultPorts = [
+        'mysql' => 3306,
+        'pgsql' => 5432,
+        'sqlsrv' => 1433
+    ];
+
+    /**
      * Create a new database create command instance.
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
@@ -72,21 +83,23 @@ class DBCreateCommand extends Command
         $this->info('Database created successfully.');
 
         if ($this->confirm('Do you wish to persist the database name to env file?')) {
-            $this->setDatabaseInEnvironmentFile(
-                $this->isSQLiteDatabase() ? database_path($name.'.sqlite') : $name
-            );
+            $this->updateEnvironmentFile([
+                'database' => $this->isSQLiteDatabase() ? database_path($name.'.sqlite') : $name
+            ]);
         }
 
         if ($this->hasCredentials() && ! $this->isSQLiteDatabase()) {
             if ($this->confirm('Do you wish to persist the database credentials to env file?')) {
-                $this->setCredentialsInEnvironmentFile($this->getCredentials());
+                $this->updateEnvironmentFile($this->getCredentials());
             }
         }
 
         if ($this->option('migrate')) {
-            $this->setDatabaseInConfig(
-                $this->isSQLiteDatabase() ? database_path($name.'.sqlite') : $name
-            );
+            $this->updateConfig([
+                'database' => $this->isSQLiteDatabase() ? database_path($name.'.sqlite') : $name
+            ]);
+
+            $this->purgeConnection();
 
             $this->runMigrations();
 
@@ -144,16 +157,15 @@ class DBCreateCommand extends Command
     protected function getConnection()
     {        
         if ($this->hasCredentials()) {
-            $credentials = $this->getCredentials();
-
-            $this->laravel['config']->set([
-                $this->getConfigurationKey('database') => $this->getDefaultDatabase(),
-                $this->getConfigurationKey('username') => $credentials['username'],
-                $this->getConfigurationKey('password') => $credentials['password']
-            ]);
-
-            $this->resolver->purge($this->getDatabase());
+            $this->updateConfig($this->getCredentials());
         }
+
+        $this->updateConfig([
+            'database' => $this->getDefaultDatabase(),
+            'port' => $this->getDefaultPort()
+        ]);
+
+        $this->purgeConnection();
         
         return $this->resolver->connection($this->getDatabase());
     }
@@ -203,6 +215,16 @@ class DBCreateCommand extends Command
     }
 
     /**
+     * Get the default port for the connection.
+     *
+     * @return int
+     */
+    protected function getDefaultPort()
+    {
+        return $this->defaultPorts[$this->getDatabase()];
+    }
+
+    /**
      * Determine if the database is an SQLite database.
      * 
      * @return bool
@@ -213,30 +235,20 @@ class DBCreateCommand extends Command
     }
     
     /**
-     * Set the credentials in the environment file.
+     * Update the environment file with configuration.
      *
-     * @param  array $credentials  
-     * @return bool
+     * @param  array  $config  
+     * @return void
      */
-    protected function setCredentialsInEnvironmentFile($credentials)
+    protected function updateEnvironmentFile($config)
     {
-        $this->writeNewEnvironmentFileWith('username', $credentials['username']);
-        $this->writeNewEnvironmentFileWith('password', $credentials['password']);
+        if (! is_array($config)) {
+            return;
+        }
 
-        return true;
-    }
-
-    /**
-     * Set the database in the environment file.
-     *
-     * @param  string $name  
-     * @return bool
-     */
-    protected function setDatabaseInEnvironmentFile($name)
-    {
-        $this->writeNewEnvironmentFileWith('database', $name);
-
-        return true;
+        foreach ($config as $key => $value) {
+            $this->writeNewEnvironmentFileWith($key, $value);
+        }
     }
 
     /**
@@ -266,17 +278,31 @@ class DBCreateCommand extends Command
     }
 
     /**
-     * Set the database in configuration.
-     * 
-     * @param  string $name
+     * Update the connections's configuration.
+     *
+     * @param  array  $config  
      * @return void
      */
-    protected function setDatabaseInConfig($name)
+    protected function updateConfig($config)
     {
-        $this->laravel['config']->set([
-            $this->getConfigurationKey('database') => $name,
-        ]);
+        if (! is_array($config)) {
+            return;
+        }
 
+        foreach ($config as $key => $value) {
+            $this->laravel['config']->set([
+                $this->getConfigurationKey($key) => $value,
+            ]);
+        }
+    }
+
+    /**
+     * Disconnect from the database and remove from local cache.
+     *
+     * @return void
+     */
+    protected function purgeConnection()
+    {
         $this->resolver->purge($this->getDatabase());
     }
 

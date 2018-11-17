@@ -36,6 +36,16 @@ class PostgresGrammar extends Grammar
     protected $fluentCommands = ['Comment'];
 
     /**
+     * Compile the query to determine if a database exists.
+     *
+     * @return string
+     */
+    public function compileDatabaseExists()
+    {
+        return 'select * from pg_catalog.pg_database where datname = ?';
+    }
+
+    /**
      * Compile the query to determine if a table exists.
      *
      * @return string
@@ -53,6 +63,18 @@ class PostgresGrammar extends Grammar
     public function compileColumnListing()
     {
         return 'select column_name from information_schema.columns where table_schema = ? and table_name = ?';
+    }
+
+    /**
+     * Compile a create database command.
+     *
+     * @param  string $database
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileCreateDatabase($database, $connection)
+    {
+        return sprintf('create database %s', $this->wrap($database));
     }
 
     /**

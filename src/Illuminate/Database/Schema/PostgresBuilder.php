@@ -5,6 +5,19 @@ namespace Illuminate\Database\Schema;
 class PostgresBuilder extends Builder
 {
     /**
+     * Determine if the given database exists.
+     *
+     * @param  string  $database
+     * @return bool
+     */
+    public function hasDatabase($database)
+    {
+        return count($this->connection->select(
+            $this->grammar->compileDatabaseExists(), [$database]
+        )) > 0;
+    }
+
+    /**
      * Determine if the given table exists.
      *
      * @param  string  $table
@@ -19,6 +32,19 @@ class PostgresBuilder extends Builder
         return count($this->connection->select(
             $this->grammar->compileTableExists(), [$schema, $table]
         )) > 0;
+    }
+
+    /**
+     * Create a new database.
+     *
+     * @param  string  $database
+     * @return bool
+     */
+    public function createDatabase($database)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileCreateDatabase($database, $this->connection)
+        );
     }
 
     /**
