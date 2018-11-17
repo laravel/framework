@@ -29,6 +29,16 @@ class SqlServerGrammar extends Grammar
     protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
 
     /**
+     * Compile the query to determine if a database exists.
+     *
+     * @return string
+     */
+    public function compileDatabaseExists()
+    {
+        return 'select * from master.sys.databases where name = ?';
+    }
+
+    /**
      * Compile the query to determine if a table exists.
      *
      * @return string
@@ -49,6 +59,18 @@ class SqlServerGrammar extends Grammar
         return "select col.name from sys.columns as col
                 join sys.objects as obj on col.object_id = obj.object_id
                 where obj.type = 'U' and obj.name = '$table'";
+    }
+
+    /**
+     * Compile a create database command.
+     *
+     * @param  string $database
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileCreateDatabase($database, $connection)
+    {
+        return sprintf('create database %s', $this->wrap($database));
     }
 
     /**
