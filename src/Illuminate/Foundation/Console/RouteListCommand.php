@@ -91,7 +91,7 @@ class RouteListCommand extends Command
     {
         $routes = collect($this->routes)->map(function ($route) {
             return $this->getRouteInformation($route);
-        })->all();
+        })->filter()->all();
 
         if ($sort = $this->option('sort')) {
             $routes = $this->sortRoutes($sort, $routes);
@@ -101,9 +101,7 @@ class RouteListCommand extends Command
             $routes = array_reverse($routes);
         }
 
-        $routes = $this->pluckColumns($routes);
-
-        return array_filter($routes);
+        return $this->pluckColumns($routes);
     }
 
     /**
