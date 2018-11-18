@@ -144,13 +144,15 @@ trait MakesHttpRequests
     }
 
     /**
-     * Set the referer header to simulate a previous request.
+     * Set the referer header and previous url in the session to simulate a previous request.
      *
      * @param  string  $url
      * @return $this
      */
     public function from(string $url)
     {
+        $this->app['session']->setPreviousUrl($url);
+
         return $this->withHeader('referer', $url);
     }
 
