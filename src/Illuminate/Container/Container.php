@@ -585,18 +585,6 @@ class Container implements ContainerContract
     }
 
     /**
-     * An alias function name for make().
-     *
-     * @param  string  $abstract
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function makeWith($abstract, array $parameters = [])
-    {
-        return $this->make($abstract, $parameters);
-    }
-
-    /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract

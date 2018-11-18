@@ -951,22 +951,6 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
-    public function testMakeWithMethodIsAnAliasForMakeMethod()
-    {
-        $mock = $this->getMockBuilder(Container::class)
-                     ->setMethods(['make'])
-                     ->getMock();
-
-        $mock->expects($this->once())
-             ->method('make')
-             ->with(ContainerDefaultValueStub::class, ['default' => 'laurence'])
-             ->will($this->returnValue(new stdClass));
-
-        $result = $mock->makeWith(ContainerDefaultValueStub::class, ['default' => 'laurence']);
-
-        $this->assertInstanceOf(stdClass::class, $result);
-    }
-
     public function testResolvingWithArrayOfParameters()
     {
         $container = new Container;

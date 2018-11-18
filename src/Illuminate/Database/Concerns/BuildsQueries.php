@@ -138,7 +138,7 @@ trait BuildsQueries
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
-        return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
+        return Container::getInstance()->make(LengthAwarePaginator::class, compact(
             'items', 'total', 'perPage', 'currentPage', 'options'
         ));
     }
@@ -154,7 +154,7 @@ trait BuildsQueries
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options)
     {
-        return Container::getInstance()->makeWith(Paginator::class, compact(
+        return Container::getInstance()->make(Paginator::class, compact(
             'items', 'perPage', 'currentPage', 'options'
         ));
     }
