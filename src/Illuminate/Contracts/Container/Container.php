@@ -158,4 +158,14 @@ interface Container extends ArrayAccess, ContainerInterface
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null);
+
+    /**
+     * Add a contextual binding to the container.
+     *
+     * @param  string  $concrete
+     * @param  string  $abstract
+     * @param  \Closure|string  $implementation
+     * @return void
+     */
+    public function addContextualBinding($concrete, $abstract, $implementation);
 }
