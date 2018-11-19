@@ -21,6 +21,13 @@ interface Validator extends MessageProvider
     public function validated();
 
     /**
+     * Determine if the data passes the validation rules.
+     *
+     * @return bool
+     */
+    public function passes();
+
+    /**
      * Determine if the data fails the validation rules.
      *
      * @return bool
