@@ -132,7 +132,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
     public function test_mail_is_sent_with_locale_updated_listeners_called()
     {
-        Carbon::setTestNow(Carbon::parse('2018-07-25'));
+        Carbon::setTestNow('2018-07-25');
 
         Event::listen(LocaleUpdated::class, function ($event) {
             Carbon::setLocale($event->locale);
