@@ -9,19 +9,22 @@
 - Added ability to set notifcation tries and timeout ([#26493](https://github.com/laravel/framework/pull/26493))
 - Added `mail.log_channel` config for make `log` for mail driver configurable ([#26510](https://github.com/laravel/framework/pull/26510))
 - Allowed `asset` root urls to be configurable via `app.asset_url` ([9172a67](https://github.com/laravel/framework/commit/9172a67b783952c1d3e15452d9c8646dc0b3eb6d))
+- Added `Error while sending QUERY packet` string to `DetectsLostConnections` trait ([#26233](https://github.com/laravel/framework/pull/26560))
 
 ### Fixed
 - Fixed `UNION` aggregate queries with columns ([#26466](https://github.com/laravel/framework/pull/26466))
 - Allowed migration table name to be guessed without `_table` suffix ([#26429](https://github.com/laravel/framework/pull/26429))
 - Fixed `TestResponse::assertExactJson` for empty JSON objects ([#26353](https://github.com/laravel/framework/pull/26353), [e6ebc8d](https://github.com/laravel/framework/commit/e6ebc8d239e53e6daf16c869de3897ffbce6c751), [621d91d](https://github.com/laravel/framework/commit/621d91d802016ab4a64acc5c65f81cb9f5e5f779), [#26508](https://github.com/laravel/framework/pull/26508))
 - Fixed cache repository for PHP from 7.2.12v ([#26495]( https://github.com/laravel/framework/pull/26495))
+- Fixed user authorization check for Email Verification ([#26528](https://github.com/laravel/framework/pull/26528))
 
 ### Changed
-- Improved eager loading performance ([#26434](https://github.com/laravel/framework/pull/26434), [#26453](https://github.com/laravel/framework/pull/26453), [3992140](https://github.com/laravel/framework/commit/3992140064307ef82d23328995e7c59045c231f2), [#26471](https://github.com/laravel/framework/pull/26471), [a3738cf](https://github.com/laravel/framework/commit/a3738cf4e133a4475c56b51f521a12db78e2ecbb))
+- Improved eager loading performance ([#26434](https://github.com/laravel/framework/pull/26434), [#26453](https://github.com/laravel/framework/pull/26453), [3992140](https://github.com/laravel/framework/commit/3992140064307ef82d23328995e7c59045c231f2), [#26471](https://github.com/laravel/framework/pull/26471), [a3738cf](https://github.com/laravel/framework/commit/a3738cf4e133a4475c56b51f521a12db78e2ecbb), [#26531](https://github.com/laravel/framework/pull/26531))
 - Adjusted `mix` missing asset exceptions ([#26431](https://github.com/laravel/framework/pull/26431))
 - Used `asset` helper to generate full path urls in exception views ([#26411](https://github.com/laravel/framework/pull/26411))
 - Changed `Illuminate\Foundation\Testing\Concerns\MocksApplicationServices::withoutJobs` method ([#26437](https://github.com/laravel/framework/pull/26437))
 - Cached `distinct` validation rule data ([#26509](https://github.com/laravel/framework/pull/26509))
+- Improved DNS Prefetching in view files ([#26552](https://github.com/laravel/framework/pull/26552))
 
 
 ## [v5.7.13 (2018-11-07)](https://github.com/laravel/framework/compare/v5.7.12...v5.7.13)
