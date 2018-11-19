@@ -144,7 +144,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Set the referer header and previous url in the session to simulate a previous request.
+     * Set the referer header and previous URL session value in odrer to simulate a previous request.
      *
      * @param  string  $url
      * @return $this
