@@ -309,11 +309,14 @@ if (! function_exists('array_where')) {
      *
      * @param  array  $array
      * @param  callable  $callback
+     * @param  bool  $resetKey
      * @return array
      */
-    function array_where($array, callable $callback)
+    function array_where($array, callable $callback, $resetKey = false)
     {
-        return Arr::where($array, $callback);
+        $filtered = Arr::where($array, $callback);
+
+        return $resetKey ? array_values($filtered) : $filtered;
     }
 }
 
