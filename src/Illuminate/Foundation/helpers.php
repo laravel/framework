@@ -112,13 +112,13 @@ if (! function_exists('app')) {
      * @param  array   $parameters
      * @return mixed|\Illuminate\Contracts\Foundation\Application
      */
-    function app($abstract = null, array $parameters = [])
+    function app($abstract = null)
     {
         if (is_null($abstract)) {
             return Container::getInstance();
         }
 
-        return Container::getInstance()->make($abstract, $parameters);
+        return Container::getInstance()->make($abstract);
     }
 }
 
