@@ -163,7 +163,9 @@ class Grammar extends BaseGrammar
 
             $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
 
-            return trim("{$join->type} join {$table}{$nestedJoins} {$this->compileWheres($join)}");
+            $tableAndNestedJoins = is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
+
+            return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
     }
 

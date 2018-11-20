@@ -1448,7 +1448,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('users.id', 'contacts.id', 'contact_types.id')->from('users')->leftJoin('contacts', function ($j) {
             $j->on('users.id', 'contacts.id')->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id');
         });
-        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join "contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" on "users"."id" = "contacts"."id"', $builder->toSql());
+        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id") on "users"."id" = "contacts"."id"', $builder->toSql());
     }
 
     public function testJoinsWithMultipleNestedJoins()
@@ -1466,7 +1466,7 @@ class DatabaseQueryBuilderTest extends TestCase
                         });
                 });
         });
-        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id", "countrys"."id", "planets"."id" from "users" left join "contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" left join "countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? and "planet"."population" >= ? on "contacts"."country" = "countrys"."country" on "users"."id" = "contacts"."id"', $builder->toSql());
+        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id", "countrys"."id", "planets"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" left join ("countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? and "planet"."population" >= ?) on "contacts"."country" = "countrys"."country") on "users"."id" = "contacts"."id"', $builder->toSql());
         $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
@@ -1486,7 +1486,7 @@ class DatabaseQueryBuilderTest extends TestCase
                         ->where('planet.population', '>=', 10000);
                 });
         });
-        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join "contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" on "users"."id" = "contacts"."id" and exists (select * from "countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? where "contacts"."country" = "countrys"."country" and "planet"."population" >= ?)', $builder->toSql());
+        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id") on "users"."id" = "contacts"."id" and exists (select * from "countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? where "contacts"."country" = "countrys"."country" and "planet"."population" >= ?)', $builder->toSql());
         $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
