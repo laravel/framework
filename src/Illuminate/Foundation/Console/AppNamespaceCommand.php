@@ -8,14 +8,14 @@ use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 
-class AppNameCommand extends Command
+class AppNamespaceCommand extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'app:name';
+    protected $name = 'app:namespace';
 
     /**
      * The console command description.

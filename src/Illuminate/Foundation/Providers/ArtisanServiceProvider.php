@@ -12,7 +12,7 @@ use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
-use Illuminate\Foundation\Console\AppNameCommand;
+use Illuminate\Foundation\Console\AppNamespaceCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
@@ -132,7 +132,7 @@ class ArtisanServiceProvider extends ServiceProvider
      * @var array
      */
     protected $devCommands = [
-        'AppName' => 'command.app.name',
+        'AppNamespace' => 'command.app.namespace',
         'AuthMake' => 'command.auth.make',
         'CacheTable' => 'command.cache.table',
         'ChannelMake' => 'command.channel.make',
@@ -197,10 +197,10 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerAppNameCommand()
+    protected function registerAppNamespaceCommand()
     {
-        $this->app->singleton('command.app.name', function ($app) {
-            return new AppNameCommand($app['composer'], $app['files']);
+        $this->app->singleton('command.app.namespace', function ($app) {
+            return new AppNamespaceCommand($app['composer'], $app['files']);
         });
     }
 
