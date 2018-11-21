@@ -184,9 +184,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected function registerBaseServiceProviders()
     {
         $this->register(new EventServiceProvider($this));
-
         $this->register(new LogServiceProvider($this));
-
         $this->register(new RoutingServiceProvider($this));
     }
 
