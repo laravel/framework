@@ -124,7 +124,6 @@ class BelongsTo extends Relation
         $keys = [];
 
         $keyType = $this->related->getKeyType();
-        
         // First we need to gather all of the keys from the parent models so we know what
         // to query for via the eager loading query. We will add them to an array then
         // execute a "where in" statement to gather up all of those related records.
