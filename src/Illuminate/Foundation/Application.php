@@ -515,10 +515,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        return env(
-            'LARAVEL_RUNNING_IN_CONSOLE',
-            php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg'
-        );
+        if (isset($_ENV['APP_RUNNING_IN_CONSOLE'])) {
+            return $_ENV['APP_RUNNING_IN_CONSOLE'] === 'true';
+        }
+
+        return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
     }
 
     /**
