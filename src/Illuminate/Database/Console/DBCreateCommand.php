@@ -36,9 +36,9 @@ class DBCreateCommand extends Command
      * @var array
      */
     protected $defaultDatabases = [
-        'mysql' => 'mysql',
-        'pgsql' => 'postgres',
-        'sqlsrv' => 'master'
+        "mysql" => "mysql",
+        "pgsql" => "postgres",
+        "sqlsrv" => "master"
     ];
 
     /**
@@ -47,9 +47,9 @@ class DBCreateCommand extends Command
      * @var array
      */
     protected $defaultPorts = [
-        'mysql' => 3306,
-        'pgsql' => 5432,
-        'sqlsrv' => 1433
+        "mysql" => 3306,
+        "pgsql" => 5432,
+        "sqlsrv" => 1433
     ];
 
     /**
