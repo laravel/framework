@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Builder
- */
 class BelongsTo extends Relation
 {
     use SupportsDefaultModels;
@@ -111,7 +108,9 @@ class BelongsTo extends Relation
         // our eagerly loading query so it returns the proper models from execution.
         $key = $this->related->getTable().'.'.$this->ownerKey;
 
-        $this->query->whereIn($key, $this->getEagerModelKeys($models));
+        $whereIn = $this->whereInMethod($this->related, $this->ownerKey);
+
+        $this->query->{$whereIn}($key, $this->getEagerModelKeys($models));
     }
 
     /**
