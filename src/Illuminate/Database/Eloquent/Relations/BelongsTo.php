@@ -130,7 +130,7 @@ class BelongsTo extends Relation
             if (! is_null($value = $model->{$this->foreignKey})) {
                 switch ($this->related->getKeyType()) {
                     case 'string':
-                        $keys[] = (string)$value;
+                        $keys[] = (string) $value;
                         break;
                     default:
                         $keys[] = $value;
