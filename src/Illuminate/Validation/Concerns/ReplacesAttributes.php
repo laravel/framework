@@ -435,6 +435,20 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the date_equals rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceDateEquals($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
      * Replace all place-holders for the dimensions rule.
      *
      * @param  string  $message
