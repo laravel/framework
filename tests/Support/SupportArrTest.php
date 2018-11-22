@@ -337,6 +337,9 @@ class SupportArrTest extends TestCase
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
         $array = Arr::only($array, ['name', 'price']);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
+
+        $invalidKeys = [1.5, null, ['key' => 'value'], new stdClass];
+        $this->assertEmpty(Arr::only($array,$invalidKeys));
     }
 
     public function testPluck()
