@@ -370,7 +370,11 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        return array_intersect_key($array, array_flip((array) $keys));
+        $filteredKeys = array_filter((array) $keys, function($value){
+            return is_string($value) || is_int($value);
+        });
+
+        return array_intersect_key($array, array_flip($filteredKeys));
     }
 
     /**
