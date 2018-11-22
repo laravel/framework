@@ -7,7 +7,7 @@ use IteratorAggregate;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Http\Resources\CollectsResources;
 
-class ResourceCollection extends JsonResource implements IteratorAggregate, Countable
+class ResourceCollection extends JsonResource implements Countable, IteratorAggregate
 {
     use CollectsResources;
 
