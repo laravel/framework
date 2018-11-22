@@ -370,7 +370,7 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        $filteredKeys = array_filter((array) $keys, function($value){
+        $filteredKeys = array_filter((array) $keys, function ($value) {
             return is_string($value) || is_int($value);
         });
 
