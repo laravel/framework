@@ -13,6 +13,6 @@ class ConvertEmptyStringsToNull extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        return is_string($value) && $value === '' ? null : $value;
+        return is_string($value) && ($value === '' || $value === 'null') ? null : $value;
     }
 }
