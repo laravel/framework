@@ -315,6 +315,22 @@ class Validator implements ValidatorContract
             throw new ValidationException($this);
         }
 
+        return $this->validated();
+    }
+
+    /**
+     * Return validated value.
+     *
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validated()
+    {
+        if ($this->invalid()) {
+            throw new ValidationException($this);
+        }
+
         $results = [];
 
         $missingValue = Str::random(10);
