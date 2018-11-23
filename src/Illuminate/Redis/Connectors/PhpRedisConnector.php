@@ -73,6 +73,10 @@ class PhpRedisConnector
                 $client->select($config['database']);
             }
 
+            if (! empty($config['serializer'])) {
+                $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
+            }
+
             if (! empty($config['prefix'])) {
                 $client->setOption(Redis::OPT_PREFIX, $config['prefix']);
             }

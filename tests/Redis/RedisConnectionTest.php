@@ -190,7 +190,6 @@ class RedisConnectionTest extends TestCase
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
             $redis->zincrby('set', 2, 'jeffrey');
             $this->assertEquals(3, $redis->zscore('set', 'jeffrey'));
-
             $redis->flushall();
         }
     }
@@ -528,6 +527,16 @@ class RedisConnectionTest extends TestCase
         );
     }
 
+    public function test_it_set_serializer_option()
+    {
+        $redis = $this->connections()['with_serializer'];
+        $redis->set('set', 1);
+        $result = $redis->executeRaw(['get', 'set']);
+
+        $this->assertSame(serialize(1), $result);
+        $redis->flushall();
+    }
+
     public function connections()
     {
         $connections = [
@@ -563,8 +572,20 @@ class RedisConnectionTest extends TestCase
                 ],
             ]);
 
+            $withSerializerPhpRedis = new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 5,
+                    'options' => ['serializer' => \Redis::SERIALIZER_PHP],
+                    'timeout' => 0.5,
+                ],
+            ]);
+
             $connections[] = $prefixedPhpredis->connection();
             $connections['persistent'] = $persistentPhpRedis->connection();
+            $connections['with_serializer'] = $withSerializerPhpRedis->connection();
         }
 
         return $connections;

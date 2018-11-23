@@ -203,16 +203,17 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zadd($key, ...$dictionary)
     {
+        $newDictionary = [];
+        $newDictionary[] = $key;
+
         if (is_array(end($dictionary))) {
             foreach (array_pop($dictionary) as $member => $score) {
-                $dictionary[] = $score;
-                $dictionary[] = $member;
+                $newDictionary[] = $score;
+                $newDictionary[] = $member;
             }
         }
 
-        $key = $this->applyPrefix($key);
-
-        return $this->executeRaw(array_merge(['zadd', $key], $dictionary));
+        return $this->command('zadd', $newDictionary);
     }
 
     /**
