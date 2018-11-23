@@ -160,7 +160,11 @@ class TransportManager extends Manager
      */
     protected function createLogDriver()
     {
-        return new LogTransport($this->app->make(LoggerInterface::class));
+        $channel = $this->app['config']['mail.log_channel'];
+
+        return new LogTransport(
+            $this->app->make(LoggerInterface::class)->channel($channel)
+        );
     }
 
     /**

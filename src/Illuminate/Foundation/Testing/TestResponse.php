@@ -721,15 +721,19 @@ class TestResponse
     /**
      * Parse the given JSON object while preserving empty objects.
      *
-     * @param  StdClass|array  $payload
-     * @return
+     * @param  \stdClass|array  $payload
+     * @return \stdClass|array
      */
     protected function parseJsonWhilePreservingEmptyObjects($payload)
     {
         if (is_object($payload)) {
-            return ! empty((array) $payload)
-                ? $this->parseJsonWhilePreservingEmptyObjects((array) $payload)
-                : $payload;
+            $originalPayload = $payload;
+
+            $payload = (array) $payload;
+
+            if (empty($payload)) {
+                return $originalPayload;
+            }
         }
 
         foreach ($payload as $key => $item) {

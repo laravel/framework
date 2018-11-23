@@ -43,9 +43,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function test_basic_create_and_retrieve()
     {
-        Carbon::setTestNow(
-            Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
-        );
+        Carbon::setTestNow('2017-10-10 10:10:10');
 
         $post = Post::create(['title' => str_random()]);
 
@@ -110,9 +108,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function test_custom_pivot_class()
     {
-        Carbon::setTestNow(
-            Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
-        );
+        Carbon::setTestNow('2017-10-10 10:10:10');
 
         $post = Post::create(['title' => str_random()]);
 
@@ -431,9 +427,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
 
-        Carbon::setTestNow(
-            Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
-        );
+        Carbon::setTestNow('2017-10-10 10:10:10');
 
         $tag->update(['name' => $tag->name]);
         $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
@@ -451,9 +445,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
         $this->assertNotEquals('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
 
-        Carbon::setTestNow(
-            Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
-        );
+        Carbon::setTestNow('2017-10-10 10:10:10');
 
         $tag->posts()->sync([$post->id]);
 
@@ -470,9 +462,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
         $this->assertNotEquals('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
 
-        Carbon::setTestNow(
-            Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
-        );
+        Carbon::setTestNow('2017-10-10 10:10:10');
 
         $tag->posts()->sync([$post->id]);
 
@@ -513,9 +503,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             ['post_id' => $post->id, 'tag_id' => 400, 'flag' => ''],
         ]);
 
-        Carbon::setTestNow(
-            Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
-        );
+        Carbon::setTestNow('2017-10-10 10:10:10');
 
         $post->tags()->touch();
 

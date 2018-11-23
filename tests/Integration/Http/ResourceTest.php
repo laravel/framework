@@ -576,6 +576,19 @@ class ResourceTest extends TestCase
         });
     }
 
+    public function test_collection_resources_are_countable()
+    {
+        $posts = collect([
+            new Post(['id' => 1, 'title' => 'Test title']),
+            new Post(['id' => 2, 'title' => 'Test title 2']),
+        ]);
+
+        $collection = new PostCollectionResource($posts);
+
+        $this->assertCount(2, $collection);
+        $this->assertSame(2, count($collection));
+    }
+
     public function test_leading_merge__keyed_value_is_merged_correctly()
     {
         $filter = new class {
