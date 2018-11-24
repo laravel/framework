@@ -500,8 +500,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function loadMissing($relations)
     {
-        $relations = is_string($relations) ? func_get_args() : $relations;
-
         $this->newCollection([$this])->loadMissing($relations);
 
         return $this;
