@@ -1,5 +1,15 @@
 # Release Notes for 5.7.x
 
+## Unreleased
+
+### Added
+- Added `date_equals` validation message ([#26584](https://github.com/laravel/framework/pull/26584))
+- Make `ResourceCollection` countable ([#26595](https://github.com/laravel/framework/pull/26595))
+
+### Fixed
+- Fixed duplicate validation issue in `FormRequest::validated` method ([#26604](https://github.com/laravel/framework/pull/26604))
+
+
 ## [v5.7.14 (2018-11-21)](https://github.com/laravel/framework/compare/v5.7.13...v5.7.14)
 
 ### Added
