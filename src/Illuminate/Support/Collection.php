@@ -1219,7 +1219,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function only($keys)
     {
         if (is_null($keys)) {
-            return new static($this->items);
+            return new static;
         }
 
         if ($keys instanceof self) {

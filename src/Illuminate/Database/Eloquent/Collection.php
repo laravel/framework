@@ -358,7 +358,7 @@ class Collection extends BaseCollection implements QueueableCollection
     public function only($keys)
     {
         if (is_null($keys)) {
-            return new static($this->items);
+            return new static;
         }
 
         $dictionary = Arr::only($this->getDictionary(), $keys);

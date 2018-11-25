@@ -287,7 +287,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$one, $two, $three]);
 
-        $this->assertEquals($c, $c->only(null));
+        $this->assertEmpty($c->only(null));
         $this->assertEquals(new Collection([$one]), $c->only(1));
         $this->assertEquals(new Collection([$two, $three]), $c->only([2, 3]));
     }
