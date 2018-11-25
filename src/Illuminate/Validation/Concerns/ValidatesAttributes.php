@@ -1505,6 +1505,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the attribute starts with a given substring.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateStartsWith($attribute, $value, $parameters)
+    {
+        return Str::startsWith($value, $parameters);
+    }
+
+    /**
      * Validate that an attribute is a string.
      *
      * @param  string  $attribute
