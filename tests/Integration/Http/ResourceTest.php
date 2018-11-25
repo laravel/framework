@@ -586,7 +586,6 @@ class ResourceTest extends TestCase
         $collection = new PostCollectionResource($posts);
 
         $this->assertCount(2, $collection);
-        $this->assertSame(2, count($collection));
     }
 
     public function test_leading_merge__keyed_value_is_merged_correctly()
