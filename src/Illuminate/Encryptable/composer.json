@@ -1,0 +1,30 @@
+{
+    "name": "alkhachatryan/encryptable",
+    "description": ":Laravel package to encrypt / decrypt the database tables / columns",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexey Khachatryan",
+            "email": "info@khachatryan.org",
+            "homepage": "https://khachatryan.org"
+        }
+    ],
+    "homepage": "https://github.com/alkhachatryan/encryptable",
+    "keywords": ["Laravel", "Encryptable", "Database encryption"],
+    "require": {
+        "illuminate/support": "~5",
+        "alkhachatryan/encryptable": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Alkhachatryan\\Encryptable\\": ""
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Alkhachatryan\\Encryptable\\EncryptableServiceProvider"
+            ]
+        }
+    }
+}
