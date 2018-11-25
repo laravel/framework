@@ -1,4 +1,5 @@
 <?php
+
 namespace Alkhachatryan\Encryptable;
 
 use Illuminate\Support\Facades\Crypt;
@@ -6,11 +7,11 @@ use Illuminate\Support\Facades\Crypt;
 trait Encryptable
 {
     /**
-     * Decrypt data from DB
+     * Decrypt data from DB.
      *
      * @param mixed $key
      * @return mixed $value
-    */
+     */
     public function getAttribute($key)
     {
         $value = parent::getAttribute($key);
@@ -23,7 +24,7 @@ trait Encryptable
     }
 
     /**
-     * Encrypt data to DB
+     * Encrypt data to DB.
      *
      * @param mixed $key
      * @param mixed $value
