@@ -1,14 +1,16 @@
 # Release Notes for 5.7.x
 
-## Unreleased
+## [v5.7.15 (2018-11-26)](https://github.com/laravel/framework/compare/v5.7.14...v5.7.15)
 
 ### Added
 - Added `date_equals` validation message ([#26584](https://github.com/laravel/framework/pull/26584))
+- Added `starts_with` validation rule ([#26612](https://github.com/laravel/framework/pull/26612))
+- Added Add relationship getters `BelongsToMany::getParentKeyName`, `BelongsToMany::getRelatedKeyName`, `HasManyThrough::getFirstKeyName`, `HasManyThrough::getForeignKeyName`, `HasManyThrough::getSecondLocalKeyName`, `HasOneOrMany::getLocalKeyName`, `MorphToMany::getInverse` ([#26607](https://github.com/laravel/framework/pull/26607))
 - Make `ResourceCollection` countable ([#26595](https://github.com/laravel/framework/pull/26595))
 
 ### Fixed
 - Fixed duplicate validation issue in `FormRequest::validated` method ([#26604](https://github.com/laravel/framework/pull/26604))
-
+- <strong> Prevent breaking eager loading with string keys </strong> ([#26622](https://github.com/laravel/framework/pull/26622))
 
 ## [v5.7.14 (2018-11-21)](https://github.com/laravel/framework/compare/v5.7.13...v5.7.14)
 
