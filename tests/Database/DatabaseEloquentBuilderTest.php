@@ -1061,6 +1061,23 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->oldest('foo');
     }
 
+    public function testWhereInMethodWithEloquentCollection()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $mockModel = m::mock(Model::class);
+        $mockModel->shouldReceive('getKey')->withNoArgs()->andReturn(1);
+        $mockModel2 = m::mock(Model::class);
+        $mockModel2->shouldReceive('getKey')->withNoArgs()->andReturn(2);
+        $collection = new Collection([$mockModel, $mockModel2]);
+        
+
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_bar', [1,2], 'and', false);
+
+        $builder->whereIn('foo_bar', $collection);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';

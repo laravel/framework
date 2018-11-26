@@ -248,6 +248,61 @@ class Builder
     }
 
     /**
+     * Add a "where in" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @param  string  $boolean
+     * @param  bool    $not
+     * @return $this
+     */
+    public function whereIn($column, $values, $boolean = 'and', $not = false)
+    {
+        if ($values instanceof Collection) {
+            $values = $values->modelKeys();
+        }
+        $this->query->whereIn($column, $values, $boolean, $not);
+        return $this;
+    }
+
+    /**
+     * Add an "or where in" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereIn($column, $values)
+    {
+        return $this->whereIn($column, $values, 'or');
+    }
+
+    /**
+     * Add a "where not in" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotIn($column, $values, $boolean = 'and')
+    {
+        return $this->whereIn($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not in" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNotIn($column, $values)
+    {
+        return $this->whereNotIn($column, $values, 'or');
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string  $column
