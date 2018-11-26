@@ -308,7 +308,8 @@ class FoundationTestResponseTest extends TestCase
         $this->assertSame($value, $response->json());
     }
 
-    public function testJsonPrimitiveTypesSupportDataProvider() {
+    public function testJsonPrimitiveTypesSupportDataProvider()
+    {
         // Illuminate\Foundation\TestingTestResponse thinks that `false` and
         // `null` means "decoding failed"...
         return [[true], ['string'], [123]];
