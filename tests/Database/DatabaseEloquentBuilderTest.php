@@ -1071,9 +1071,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $mockModel2 = m::mock(Model::class);
         $mockModel2->shouldReceive('getKey')->withNoArgs()->andReturn(2);
         $collection = new Collection([$mockModel, $mockModel2]);
-        
 
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_bar', [1,2], 'and', false);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_bar', [1, 2], 'and', false);
 
         $builder->whereIn('foo_bar', $collection);
     }
