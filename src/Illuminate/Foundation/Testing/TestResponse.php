@@ -736,9 +736,11 @@ class TestResponse
             }
         }
 
-        foreach ($payload as $key => $item) {
-            if (is_array($item) || is_object($item)) {
-                $payload[$key] = $this->parseJsonWhilePreservingEmptyObjects($item);
+        if (is_array($payload)) {
+            foreach ($payload as $key => $item) {
+                if (is_array($item) || is_object($item)) {
+                    $payload[$key] = $this->parseJsonWhilePreservingEmptyObjects($item);
+                }
             }
         }
 

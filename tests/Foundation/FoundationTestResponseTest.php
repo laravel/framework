@@ -298,6 +298,22 @@ class FoundationTestResponseTest extends TestCase
         ]);
     }
 
+    /**
+     * @dataProvider testJsonPrimitiveTypesSupportDataProvider
+     */
+    public function testJsonPrimitiveTypesSupport($value)
+    {
+        $response = new TestResponse(new JsonResponse($value));
+
+        $this->assertSame($value, $response->json());
+    }
+
+    public function testJsonPrimitiveTypesSupportDataProvider() {
+        // Illuminate\Foundation\TestingTestResponse thinks that `false` and
+        // `null` means "decoding failed"...
+        return [[true], ['string'], [123]];
+    }
+
     public function testAssertJsonMissingExact()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
