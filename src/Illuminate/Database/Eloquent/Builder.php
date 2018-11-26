@@ -262,6 +262,7 @@ class Builder
             $values = $values->modelKeys();
         }
         $this->query->whereIn($column, $values, $boolean, $not);
+
         return $this;
     }
 
