@@ -517,7 +517,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback if the collection is empty.
      *
-     * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed
@@ -530,7 +529,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback if the collection is not empty.
      *
-     * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed
@@ -556,7 +554,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback unless the collection is empty.
      *
-     * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed
@@ -569,7 +566,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback unless the collection is not empty.
      *
-     * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed

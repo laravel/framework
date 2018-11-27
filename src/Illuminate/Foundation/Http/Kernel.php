@@ -66,7 +66,7 @@ class Kernel implements KernelContract
     /**
      * The priority-sorted list of middleware.
      *
-     * Forces the listed middleware to always be in the given order.
+     * Forces non-global middleware to always be in the given order.
      *
      * @var array
      */

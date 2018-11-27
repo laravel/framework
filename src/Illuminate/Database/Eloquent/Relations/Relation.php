@@ -317,8 +317,8 @@ abstract class Relation
     protected function whereInMethod(Model $model, $key)
     {
         return $model->getKeyName() === last(explode('.', $key))
-                    && in_array($model->getKeyType(), ['int', 'integer'])
-                        ? 'whereInRaw'
+                    && $model->getIncrementing()
+                        ? 'whereIntegerInRaw'
                         : 'whereIn';
     }
 

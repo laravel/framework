@@ -857,11 +857,7 @@ class Builder
         // Finally we'll add a binding for each values unless that value is an expression
         // in which case we will just skip over it since it will be the query as a raw
         // string and not as a parameterized place-holder to be replaced by the PDO.
-        foreach ($values as $value) {
-            if (! $value instanceof Expression) {
-                $this->addBinding($value, 'where');
-            }
-        }
+        $this->addBinding($this->cleanBindings($values), 'where');
 
         return $this;
     }
@@ -949,15 +945,15 @@ class Builder
     }
 
     /**
-     * Add a "where in raw" clause to the query.
+     * Add a "where in raw" clause for integer values to the query.
      *
      * @param  string  $column
-     * @param  array   $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
      * @param  string  $boolean
-     * @param  bool    $not
+     * @param  bool  $not
      * @return $this
      */
-    public function whereInRaw($column, array $values, $boolean = 'and', $not = false)
+    public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotInRaw' : 'InRaw';
 
@@ -965,11 +961,26 @@ class Builder
             $values = $values->toArray();
         }
 
-        $values = array_map('intval', $values);
+        foreach ($values as &$value) {
+            $value = (int) $value;
+        }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
         return $this;
+    }
+
+    /**
+     * Add a "where not in raw" clause for integer values to the query.
+     *
+     * @param  string  $column
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
+    {
+        return $this->whereIntegerInRaw($column, $values, $boolean, true);
     }
 
     /**

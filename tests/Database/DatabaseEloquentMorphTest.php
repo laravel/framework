@@ -29,7 +29,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         $relation = $this->getOneRelation();
         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
+        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(false);
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', [1, 2]);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
@@ -53,8 +53,8 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         $relation = $this->getManyRelation();
         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
-        $relation->getQuery()->shouldReceive('whereInRaw')->once()->with('table.morph_id', [1, 2]);
+        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(true);
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('table.morph_id', [1, 2]);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
         $model1 = new EloquentMorphResetModelStub;

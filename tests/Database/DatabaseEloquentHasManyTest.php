@@ -201,8 +201,8 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
-        $relation->getQuery()->shouldReceive('whereInRaw')->once()->with('table.foreign_key', [1, 2]);
+        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(true);
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('table.foreign_key', [1, 2]);
         $model1 = new EloquentHasManyModelStub;
         $model1->id = 1;
         $model2 = new EloquentHasManyModelStub;
@@ -214,7 +214,7 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
+        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(false);
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
         $model1 = new EloquentHasManyModelStub;
         $model1->id = 1;

@@ -19,8 +19,8 @@ class DatabaseEloquentMorphToManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getParent()->shouldReceive('getKeyName')->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->andReturn('int');
-        $relation->getQuery()->shouldReceive('whereInRaw')->once()->with('taggables.taggable_id', [1, 2]);
+        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(true);
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('taggables.taggable_id', [1, 2]);
         $relation->getQuery()->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($relation->getParent()));
         $model1 = new EloquentMorphToManyModelStub;
         $model1->id = 1;
