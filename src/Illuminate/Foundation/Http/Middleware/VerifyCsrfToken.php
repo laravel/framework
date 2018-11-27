@@ -194,6 +194,6 @@ class VerifyCsrfToken
      */
     public static function serialized()
     {
-        return EncryptCookies::serialized('XSRF-TOKEN');
+        return EncryptCookies::serialized();
     }
 }
