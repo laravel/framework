@@ -427,8 +427,22 @@ class Builder
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
+        return tap($this->fillOrNew($attributes, $values), function ($instance) {
+            $instance->save();
+        });
+    }
+    
+    /**
+     * Instantiate or update a record matching the attributes, and fill it with values.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function fillOrNew(array $attributes, array $values = [])
+    {
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values)->save();
+            $instance->fill($values);
         });
     }
 
