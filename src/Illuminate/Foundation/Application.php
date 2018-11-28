@@ -774,7 +774,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // finished. This is useful when ordering the boot-up processes we run.
         $this->fireAppCallbacks($this->bootingCallbacks);
 
-        array_walk($this->serviceProviders, function ($p) {
+        array_walk($this->serviceProviders, function (ServiceProvider $p) {
             $this->bootProvider($p);
         });
 

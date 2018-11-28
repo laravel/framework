@@ -200,7 +200,7 @@ class Redirector
      */
     protected function createRedirect($path, $status, $headers)
     {
-        return tap(new RedirectResponse($path, $status, $headers), function ($redirect) {
+        return tap(new RedirectResponse($path, $status, $headers), function (RedirectResponse $redirect) {
             if (isset($this->session)) {
                 $redirect->setSession($this->session);
             }

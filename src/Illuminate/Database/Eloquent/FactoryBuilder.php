@@ -198,7 +198,7 @@ class FactoryBuilder
      */
     protected function store($results)
     {
-        $results->each(function ($model) {
+        $results->each(function (Model $model) {
             if (! isset($this->connection)) {
                 $model->setConnection($model->newQueryWithoutScopes()->getConnection()->getName());
             }

@@ -150,7 +150,7 @@ class Mailable implements MailableContract, Renderable
         $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
 
-            $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
+            $mailer->send($this->buildView(), $this->buildViewData(), function (Message $message) {
                 $this->buildFrom($message)
                      ->buildRecipients($message)
                      ->buildSubject($message)
@@ -437,7 +437,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function priority($level = 3)
     {
-        $this->callbacks[] = function ($message) use ($level) {
+        $this->callbacks[] = function (Message $message) use ($level) {
             $message->setPriority($level);
         };
 

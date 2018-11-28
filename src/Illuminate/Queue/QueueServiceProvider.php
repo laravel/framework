@@ -10,6 +10,7 @@ use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
@@ -46,11 +47,11 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerManager()
     {
-        $this->app->singleton('queue', function ($app) {
+        $this->app->singleton('queue', function (Application $app) {
             // Once we have an instance of the queue manager, we will register the various
             // resolvers for the queue connectors. These connectors are responsible for
             // creating the classes that accept queue configs and instantiate queues.
-            return tap(new QueueManager($app), function ($manager) {
+            return tap(new QueueManager($app), function (QueueManager $manager) {
                 $this->registerConnectors($manager);
             });
         });
@@ -63,7 +64,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerConnection()
     {
-        $this->app->singleton('queue.connection', function ($app) {
+        $this->app->singleton('queue.connection', function (Application $app) {
             return $app['queue']->connection();
         });
     }

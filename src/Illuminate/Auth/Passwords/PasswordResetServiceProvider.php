@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Passwords;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 
 class PasswordResetServiceProvider extends ServiceProvider
 {
@@ -30,11 +31,11 @@ class PasswordResetServiceProvider extends ServiceProvider
      */
     protected function registerPasswordBroker()
     {
-        $this->app->singleton('auth.password', function ($app) {
+        $this->app->singleton('auth.password', function (Application $app) {
             return new PasswordBrokerManager($app);
         });
 
-        $this->app->bind('auth.password.broker', function ($app) {
+        $this->app->bind('auth.password.broker', function (Application $app) {
             return $app->make('auth.password')->broker();
         });
     }

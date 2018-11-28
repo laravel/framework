@@ -15,7 +15,7 @@ class FileFactory
      */
     public function create($name, $kilobytes = 0)
     {
-        return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
+        return tap(new File($name, tmpfile()), function (File $file) use ($kilobytes) {
             $file->sizeToReport = $kilobytes * 1024;
         });
     }

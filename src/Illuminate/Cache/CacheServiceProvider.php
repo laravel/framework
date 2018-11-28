@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 
 class CacheServiceProvider extends ServiceProvider
 {
@@ -20,11 +21,11 @@ class CacheServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('cache', function ($app) {
+        $this->app->singleton('cache', function (Application $app) {
             return new CacheManager($app);
         });
 
-        $this->app->singleton('cache.store', function ($app) {
+        $this->app->singleton('cache.store', function (Application $app) {
             return $app['cache']->driver();
         });
 

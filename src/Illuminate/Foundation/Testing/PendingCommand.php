@@ -6,6 +6,7 @@ use Mockery;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Question\Question;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Mockery\Exception\NoMatchingExpectationException;
@@ -165,7 +166,7 @@ class PendingCommand
             $mock->shouldReceive('askQuestion')
                 ->once()
                 ->ordered()
-                ->with(Mockery::on(function ($argument) use ($question) {
+                ->with(Mockery::on(function (Question $argument) use ($question) {
                     return $argument->getQuestion() == $question[0];
                 }))
                 ->andReturnUsing(function () use ($question, $i) {

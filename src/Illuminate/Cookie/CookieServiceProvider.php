@@ -3,6 +3,7 @@
 namespace Illuminate\Cookie;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 
 class CookieServiceProvider extends ServiceProvider
 {
@@ -13,7 +14,7 @@ class CookieServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('cookie', function ($app) {
+        $this->app->singleton('cookie', function (Application $app) {
             $config = $app->make('config')->get('session');
 
             return (new CookieJar)->setDefaultPathAndDomain(

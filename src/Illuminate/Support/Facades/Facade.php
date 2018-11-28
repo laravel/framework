@@ -61,7 +61,7 @@ abstract class Facade
      */
     protected static function createFreshMockInstance()
     {
-        return tap(static::createMock(), function ($mock) {
+        return tap(static::createMock(), function (MockInterface $mock) {
             static::swap($mock);
 
             $mock->shouldAllowMockingProtectedMethods();

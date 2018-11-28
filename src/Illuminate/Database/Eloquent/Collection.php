@@ -37,7 +37,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return $this->whereIn($this->first()->getKeyName(), $key);
         }
 
-        return Arr::first($this->items, function ($model) use ($key) {
+        return Arr::first($this->items, function (Model $model) use ($key) {
             return $model->getKey() == $key;
         }, $default);
     }
@@ -80,7 +80,7 @@ class Collection extends BaseCollection implements QueueableCollection
             ->select($this->first()->getKeyName())
             ->withCount(...func_get_args());
 
-        $query->get()->each(function ($model) {
+        $query->get()->each(function (Model $model) {
             $this->find($model->getKey())->forceFill(
                 Arr::except($model->getAttributes(), $model->getKeyName())
             );
@@ -141,7 +141,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $relation = reset($relation);
         }
 
-        $models->filter(function ($model) use ($name) {
+        $models->filter(function (?Model $model) use ($name) {
             return ! is_null($model) && ! $model->relationLoaded($name);
         })->load($relation);
 
@@ -211,12 +211,12 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         if ($key instanceof Model) {
-            return parent::contains(function ($model) use ($key) {
+            return parent::contains(function (Model $model) use ($key) {
                 return $model->is($key);
             });
         }
 
-        return parent::contains(function ($model) use ($key) {
+        return parent::contains(function (Model $model) use ($key) {
             return $model->getKey() == $key;
         });
     }
@@ -228,7 +228,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function modelKeys()
     {
-        return array_map(function ($model) {
+        return array_map(function (Model $model) {
             return $model->getKey();
         }, $this->items);
     }
@@ -285,7 +285,7 @@ class Collection extends BaseCollection implements QueueableCollection
             ->get()
             ->getDictionary();
 
-        return $this->map(function ($model) use ($freshModels) {
+        return $this->map(function (Model $model) use ($freshModels) {
             return $model->exists && isset($freshModels[$model->getKey()])
                     ? $freshModels[$model->getKey()] : null;
         });
@@ -565,7 +565,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $connection = $this->first()->getConnectionName();
 
-        $this->each(function ($model) use ($connection) {
+        $this->each(function (Model $model) use ($connection) {
             if ($model->getConnectionName() !== $connection) {
                 throw new LogicException('Queueing collections with multiple model connections is not supported.');
             }

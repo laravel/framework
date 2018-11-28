@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
@@ -290,7 +291,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     protected function getDefaultInputDefinition()
     {
-        return tap(parent::getDefaultInputDefinition(), function ($definition) {
+        return tap(parent::getDefaultInputDefinition(), function (InputDefinition $definition) {
             $definition->addOption($this->getEnvironmentOption());
         });
     }

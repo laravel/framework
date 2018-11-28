@@ -89,7 +89,7 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $routes = collect($this->routes)->map(function ($route) {
+        $routes = collect($this->routes)->map(function (Route $route) {
             return $this->getRouteInformation($route);
         })->filter()->all();
 

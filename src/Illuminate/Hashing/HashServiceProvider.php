@@ -3,6 +3,7 @@
 namespace Illuminate\Hashing;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 
 class HashServiceProvider extends ServiceProvider
 {
@@ -20,11 +21,11 @@ class HashServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('hash', function ($app) {
+        $this->app->singleton('hash', function (Application $app) {
             return new HashManager($app);
         });
 
-        $this->app->singleton('hash.driver', function ($app) {
+        $this->app->singleton('hash.driver', function (Application $app) {
             return $app['hash']->driver();
         });
     }

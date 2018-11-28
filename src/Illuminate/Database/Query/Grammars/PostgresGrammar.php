@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinClause;
 
 class PostgresGrammar extends Grammar
 {
@@ -238,7 +239,7 @@ class PostgresGrammar extends Grammar
         // When using Postgres, updates with joins list the joined tables in the from
         // clause, which is different than other systems like MySQL. Here, we will
         // compile out the tables that are joined and add them to a from clause.
-        $froms = collect($query->joins)->map(function ($join) {
+        $froms = collect($query->joins)->map(function (JoinClause $join) {
             return $this->wrapTable($join->table);
         })->all();
 
@@ -346,7 +347,7 @@ class PostgresGrammar extends Grammar
      */
     protected function compileDeleteWithJoins($query, $table)
     {
-        $using = ' USING '.collect($query->joins)->map(function ($join) {
+        $using = ' USING '.collect($query->joins)->map(function (JoinClause $join) {
             return $this->wrapTable($join->table);
         })->implode(', ');
 

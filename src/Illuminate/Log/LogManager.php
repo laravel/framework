@@ -98,11 +98,11 @@ class LogManager implements LoggerInterface
     protected function get($name)
     {
         try {
-            return $this->channels[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
+            return $this->channels[$name] ?? with($this->resolve($name), function (LoggerInterface $logger) use ($name) {
                 return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']));
             });
         } catch (Throwable $e) {
-            return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
+            return tap($this->createEmergencyLogger(), function (LoggerInterface $logger) use ($e) {
                 $logger->emergency('Unable to create configured logger. Using emergency logger.', [
                     'exception' => $e,
                 ]);
@@ -371,7 +371,7 @@ class LogManager implements LoggerInterface
      */
     protected function formatter()
     {
-        return tap(new LineFormatter(null, null, true, true), function ($formatter) {
+        return tap(new LineFormatter(null, null, true, true), function (LineFormatter $formatter) {
             $formatter->includeStacktraces();
         });
     }

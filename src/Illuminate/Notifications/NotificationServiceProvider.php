@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 
@@ -31,7 +32,7 @@ class NotificationServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(ChannelManager::class, function ($app) {
+        $this->app->singleton(ChannelManager::class, function (Application $app) {
             return new ChannelManager($app);
         });
 

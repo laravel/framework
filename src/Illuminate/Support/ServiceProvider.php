@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Console\Application as Artisan;
 
 abstract class ServiceProvider
@@ -123,7 +124,7 @@ abstract class ServiceProvider
      */
     protected function loadMigrationsFrom($paths)
     {
-        $this->app->afterResolving('migrator', function ($migrator) use ($paths) {
+        $this->app->afterResolving('migrator', function (Migrator $migrator) use ($paths) {
             foreach ((array) $paths as $path) {
                 $migrator->path($path);
             }
@@ -265,7 +266,7 @@ abstract class ServiceProvider
     {
         $commands = is_array($commands) ? $commands : func_get_args();
 
-        Artisan::starting(function ($artisan) use ($commands) {
+        Artisan::starting(function (Artisan $artisan) use ($commands) {
             $artisan->resolveCommands($commands);
         });
     }

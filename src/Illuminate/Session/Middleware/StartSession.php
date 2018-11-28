@@ -75,7 +75,7 @@ class StartSession
      */
     protected function startSession(Request $request)
     {
-        return tap($this->getSession($request), function ($session) use ($request) {
+        return tap($this->getSession($request), function (Session $session) use ($request) {
             $session->setRequestOnHandler($request);
 
             $session->start();
@@ -90,7 +90,7 @@ class StartSession
      */
     public function getSession(Request $request)
     {
-        return tap($this->manager->driver(), function ($session) use ($request) {
+        return tap($this->manager->driver(), function (Session $session) use ($request) {
             $session->setId($request->cookies->get($session->getName()));
         });
     }

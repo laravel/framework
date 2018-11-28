@@ -181,7 +181,7 @@ class Kernel implements KernelContract
     {
         $command = new ClosureCommand($signature, $callback);
 
-        Artisan::starting(function ($artisan) use ($command) {
+        Artisan::starting(function (Artisan $artisan) use ($command) {
             $artisan->add($command);
         });
 
@@ -217,7 +217,7 @@ class Kernel implements KernelContract
 
             if (is_subclass_of($command, Command::class) &&
                 ! (new ReflectionClass($command))->isAbstract()) {
-                Artisan::starting(function ($artisan) use ($command) {
+                Artisan::starting(function (Artisan $artisan) use ($command) {
                     $artisan->resolve($command);
                 });
             }

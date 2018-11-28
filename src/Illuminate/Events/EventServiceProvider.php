@@ -3,6 +3,7 @@
 namespace Illuminate\Events;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 
 class EventServiceProvider extends ServiceProvider
@@ -14,7 +15,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('events', function ($app) {
+        $this->app->singleton('events', function (Application $app) {
             return (new Dispatcher($app))->setQueueResolver(function () use ($app) {
                 return $app->make(QueueFactoryContract::class);
             });

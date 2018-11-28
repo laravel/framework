@@ -164,7 +164,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // Here we'll set a reconnector callback. This reconnector can be any callable
         // so we will set a Closure to reconnect from this manager with the name of
         // the connection, which will allow us to reconnect from the connections.
-        $connection->setReconnector(function ($connection) {
+        $connection->setReconnector(function (Connection $connection) {
             $this->reconnect($connection->getName());
         });
 

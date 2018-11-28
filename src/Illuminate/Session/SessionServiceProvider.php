@@ -4,6 +4,7 @@ namespace Illuminate\Session;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Contracts\Foundation\Application;
 
 class SessionServiceProvider extends ServiceProvider
 {
@@ -28,7 +29,7 @@ class SessionServiceProvider extends ServiceProvider
      */
     protected function registerSessionManager()
     {
-        $this->app->singleton('session', function ($app) {
+        $this->app->singleton('session', function (Application $app) {
             return new SessionManager($app);
         });
     }
@@ -40,7 +41,7 @@ class SessionServiceProvider extends ServiceProvider
      */
     protected function registerSessionDriver()
     {
-        $this->app->singleton('session.store', function ($app) {
+        $this->app->singleton('session.store', function (Application $app) {
             // First, we will create the session manager which is responsible for the
             // creation of the various session drivers when they are needed by the
             // application instance, and will resolve them on a lazy load basis.

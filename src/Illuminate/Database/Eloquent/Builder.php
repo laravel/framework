@@ -413,7 +413,7 @@ class Builder
             return $instance;
         }
 
-        return tap($this->newModelInstance($attributes + $values), function ($instance) {
+        return tap($this->newModelInstance($attributes + $values), function (Model $instance) {
             $instance->save();
         });
     }
@@ -427,7 +427,7 @@ class Builder
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return tap($this->firstOrNew($attributes), function (Model $instance) use ($values) {
             $instance->fill($values)->save();
         });
     }
@@ -786,7 +786,7 @@ class Builder
      */
     public function create(array $attributes = [])
     {
-        return tap($this->newModelInstance($attributes), function ($instance) {
+        return tap($this->newModelInstance($attributes), function (Model $instance) {
             $instance->save();
         });
     }

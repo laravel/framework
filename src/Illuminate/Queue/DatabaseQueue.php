@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -215,7 +216,7 @@ class DatabaseQueue extends Queue implements QueueContract
         $job = $this->database->table($this->table)
                     ->lockForUpdate()
                     ->where('queue', $this->getQueue($queue))
-                    ->where(function ($query) {
+                    ->where(function (Builder $query) {
                         $this->isAvailable($query);
                         $this->isReservedButExpired($query);
                     })
@@ -233,7 +234,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function isAvailable($query)
     {
-        $query->where(function ($query) {
+        $query->where(function (Builder $query) {
             $query->whereNull('reserved_at')
                   ->where('available_at', '<=', $this->currentTime());
         });
@@ -249,7 +250,7 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $expiration = Carbon::now()->subSeconds($this->retryAfter)->getTimestamp();
 
-        $query->orWhere(function ($query) use ($expiration) {
+        $query->orWhere(function (Builder $query) use ($expiration) {
             $query->where('reserved_at', '<=', $expiration);
         });
     }

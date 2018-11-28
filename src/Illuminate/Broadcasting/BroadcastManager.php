@@ -6,6 +6,7 @@ use Closure;
 use Pusher\Pusher;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -64,7 +65,7 @@ class BroadcastManager implements FactoryContract
 
         $attributes = $attributes ?: ['middleware' => ['web']];
 
-        $this->app['router']->group($attributes, function ($router) {
+        $this->app['router']->group($attributes, function (Registrar $router) {
             $router->match(
                 ['get', 'post'], '/broadcasting/auth',
                 '\\'.BroadcastController::class.'@authenticate'
