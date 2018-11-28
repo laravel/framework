@@ -431,7 +431,7 @@ class Builder
             $instance->save();
         });
     }
-    
+
     /**
      * Instantiate a new instance with the given values or fill a record matching the attributes.
      *
