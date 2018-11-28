@@ -29,9 +29,9 @@ interface Lock
     public function release();
 
     /**
-     * Secures this lock against out of order releases of expired clients.
+     * Secures this lock against out of order releases of expired clients via assigning an owner.
      *
      * @return mixed
      */
-    public function safe();
+    public function owned();
 }

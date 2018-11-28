@@ -49,7 +49,7 @@ class RedisLock extends Lock
      */
     public function release()
     {
-        if ($this->canRelease()) {
+        if ($this->isOwnedByCurrentProcess()) {
             $this->redis->del($this->name);
         }
     }

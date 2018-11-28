@@ -52,15 +52,15 @@ class RedisCacheLockTest extends TestCase
         $this->assertTrue(Cache::store('redis')->lock('foo', 10)->block(1));
     }
 
-    public function test_redis_locks_are_released_safely()
+    public function test_owned_redis_locks_are_released_safely()
     {
         Cache::store('redis')->lock('bar')->release();
 
-        $firstLock = Cache::store('redis')->lock('bar', 1)->safe();
+        $firstLock = Cache::store('redis')->lock('bar', 1)->owned();
         $this->assertTrue($firstLock->acquire());
         sleep(2);
 
-        $secondLock = Cache::store('redis')->lock('bar', 10)->safe();
+        $secondLock = Cache::store('redis')->lock('bar', 10)->owned();
         $this->assertTrue($secondLock->acquire());
 
         $firstLock->release();
@@ -68,25 +68,25 @@ class RedisCacheLockTest extends TestCase
         $this->assertFalse(Cache::store('redis')->lock('bar')->get());
     }
 
-    public function test_safe_redis_locks_are_exclusive()
+    public function test_owned_redis_locks_are_exclusive()
     {
         Cache::store('redis')->lock('bar')->release();
 
-        $firstLock = Cache::store('redis')->lock('bar', 10)->safe();
+        $firstLock = Cache::store('redis')->lock('bar', 10)->owned();
         $this->assertTrue($firstLock->acquire());
 
-        $secondLock = Cache::store('redis')->lock('bar', 10)->safe();
+        $secondLock = Cache::store('redis')->lock('bar', 10)->owned();
         $this->assertFalse($secondLock->acquire());
     }
 
-    public function test_safe_redis_locks_can_be_released_by_original_owner()
+    public function test_owned_redis_locks_can_be_released_by_original_owner()
     {
         Cache::store('redis')->lock('bar')->release();
 
-        $firstLock = Cache::store('redis')->lock('bar', 10)->safe();
+        $firstLock = Cache::store('redis')->lock('bar', 10)->owned();
         $this->assertTrue($firstLock->acquire());
 
-        $secondLock = Cache::store('redis')->lock('bar', 10)->safe();
+        $secondLock = Cache::store('redis')->lock('bar', 10)->owned();
         $this->assertFalse($secondLock->acquire());
 
         $firstLock->release();

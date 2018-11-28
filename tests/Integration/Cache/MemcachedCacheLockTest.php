@@ -81,15 +81,15 @@ class MemcachedCacheLockTest extends TestCase
         }));
     }
 
-    public function test_memcached_locks_are_released_safely()
+    public function test_owned_memcached_locks_are_released_safely()
     {
         Cache::store('memcached')->lock('bar')->release();
 
-        $firstLock = Cache::store('memcached')->lock('bar', 1)->safe();
+        $firstLock = Cache::store('memcached')->lock('bar', 1)->owned();
         $this->assertTrue($firstLock->acquire());
         sleep(2);
 
-        $secondLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $secondLock = Cache::store('memcached')->lock('bar', 10)->owned();
         $this->assertTrue($secondLock->acquire());
 
         $firstLock->release();
@@ -97,25 +97,25 @@ class MemcachedCacheLockTest extends TestCase
         $this->assertTrue(Cache::store('memcached')->has('bar'));
     }
 
-    public function test_safe_memcached_locks_are_exclusive()
+    public function test_owned_memcached_locks_are_exclusive()
     {
         Cache::store('memcached')->lock('bar')->release();
 
-        $firstLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $firstLock = Cache::store('memcached')->lock('bar', 10)->owned();
         $this->assertTrue($firstLock->acquire());
 
-        $secondLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $secondLock = Cache::store('memcached')->lock('bar', 10)->owned();
         $this->assertFalse($secondLock->acquire());
     }
 
-    public function test_safe_memcached_locks_can_be_released_by_original_owner()
+    public function test_owned_memcached_locks_can_be_released_by_original_owner()
     {
         Cache::store('memcached')->lock('bar')->release();
 
-        $firstLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $firstLock = Cache::store('memcached')->lock('bar', 10)->owned();
         $this->assertTrue($firstLock->acquire());
 
-        $secondLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $secondLock = Cache::store('memcached')->lock('bar', 10)->owned();
         $this->assertFalse($secondLock->acquire());
 
         $firstLock->release();

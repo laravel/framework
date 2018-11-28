@@ -30,7 +30,7 @@ abstract class Lock implements LockContract
      *
      * @var string
      */
-    protected $scope;
+    protected $owner;
 
     /**
      * Create a new lock instance.
@@ -118,24 +118,24 @@ abstract class Lock implements LockContract
     }
 
     /**
-     * Secures this lock against out of order releases of expired clients.
+     * Secures this lock against out of order releases of expired clients via assigning an owner.
      *
      * @return Lock
      */
-    public function safe()
+    public function owned()
     {
-        return $this->scoped(Str::random());
+        return $this->setOwner(Str::random());
     }
 
     /**
-     * Secures this lock against out of order releases of expired clients.
+     * Secures this lock against out of order releases of expired clients via assigning an owner.
      *
-     * @param  string $scope
+     * @param  string $owner
      * @return Lock
      */
-    public function scoped($scope)
+    public function setOwner($owner)
     {
-        $this->scope = $scope;
+        $this->owner = $owner;
 
         return $this;
     }
@@ -145,9 +145,9 @@ abstract class Lock implements LockContract
      *
      * @return bool
      */
-    protected function isScoped()
+    protected function isOwned()
     {
-        return ! is_null($this->scope);
+        return ! is_null($this->owner);
     }
 
     /**
@@ -157,7 +157,7 @@ abstract class Lock implements LockContract
      */
     protected function value()
     {
-        return $this->isScoped() ? $this->scope : 1;
+        return $this->isOwned() ? $this->owner : 1;
     }
 
     /**
@@ -165,12 +165,12 @@ abstract class Lock implements LockContract
      *
      * @return bool
      */
-    protected function canRelease()
+    protected function isOwnedByCurrentProcess()
     {
-        if (! $this->isScoped()) {
+        if (! $this->isOwned()) {
             return true;
         }
 
-        return $this->getValue() === $this->scope;
+        return $this->getValue() === $this->owner;
     }
 }
