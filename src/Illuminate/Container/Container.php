@@ -4,7 +4,6 @@ namespace Illuminate\Container;
 
 use Closure;
 use Exception;
-use ArrayAccess;
 use LogicException;
 use ReflectionClass;
 use ReflectionParameter;
@@ -12,7 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
-class Container implements ArrayAccess, ContainerContract
+class Container implements ContainerContract
 {
     /**
      * The current globally available container (if any).
@@ -221,11 +220,11 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function bind($abstract, $concrete = null, $shared = false)
     {
+        $this->dropStaleInstances($abstract);
+
         // If no concrete type was given, we will simply set the concrete type to the
         // abstract type. After that, the concrete type to be registered as shared
         // without being forced to state their classes in both of the parameters.
-        $this->dropStaleInstances($abstract);
-
         if (is_null($concrete)) {
             $concrete = $abstract;
         }
@@ -591,6 +590,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @deprecated The make() method should be used instead. Will be removed in Laravel 5.9.
      */
     public function makeWith($abstract, array $parameters = [])
     {

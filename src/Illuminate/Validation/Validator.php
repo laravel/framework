@@ -91,6 +91,13 @@ class Validator implements ValidatorContract
     protected $implicitAttributes = [];
 
     /**
+     * The cached data for the "distinct" rule.
+     *
+     * @var array
+     */
+    protected $distinctValues = [];
+
+    /**
      * All of the registered "after" callbacks.
      *
      * @var array
@@ -258,6 +265,8 @@ class Validator implements ValidatorContract
     {
         $this->messages = new MessageBag;
 
+        $this->distinctValues = [];
+
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
@@ -303,6 +312,22 @@ class Validator implements ValidatorContract
     public function validate()
     {
         if ($this->fails()) {
+            throw new ValidationException($this);
+        }
+
+        return $this->validated();
+    }
+
+    /**
+     * Get the attributes and values that were validated.
+     *
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validated()
+    {
+        if ($this->invalid()) {
             throw new ValidationException($this);
         }
 
@@ -547,9 +572,13 @@ class Validator implements ValidatorContract
         if (! $rule->passes($attribute, $value)) {
             $this->failedRules[$attribute][get_class($rule)] = [];
 
-            $this->messages->add($attribute, $this->makeReplacements(
-                $rule->message(), $attribute, get_class($rule), []
-            ));
+            $messages = (array) $rule->message();
+
+            foreach ($messages as $message) {
+                $this->messages->add($attribute, $this->makeReplacements(
+                    $message, $attribute, get_class($rule), []
+                ));
+            }
         }
     }
 

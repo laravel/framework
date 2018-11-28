@@ -385,7 +385,6 @@ class Gate implements GateContract
      * Determine if the callback allows guests.
      *
      * @param  callable  $callback
-     * @param  array  $arguments
      * @return bool
      */
     protected function callbackAllowsGuests($callback)

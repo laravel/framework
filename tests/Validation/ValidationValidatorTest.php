@@ -386,10 +386,10 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.email' => ':input is not a valid email'], 'en');
-        $v = new Validator($trans, ['email' => 'a@s'], ['email' => 'email']);
+        $v = new Validator($trans, ['email' => 'a@@s'], ['email' => 'email']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
-        $this->assertEquals('a@s is not a valid email', $v->messages()->first('email'));
+        $this->assertEquals('a@@s is not a valid email', $v->messages()->first('email'));
 
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.email' => ':input is not a valid email'], 'en');
@@ -1790,6 +1790,17 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['cat' => ['sub' => [['prod' => [['id' => 2]]], ['prod' => [['id' => 2]]]]]], ['cat.sub.*.prod.*.id' => 'distinct']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['foo', 'foo'], 'bar' => ['bar', 'baz']], ['foo.*' => 'distinct', 'bar.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertCount(2, $v->messages());
+
+        $v = new Validator($trans, ['foo' => ['foo', 'foo'], 'bar' => ['bar', 'bar']], ['foo.*' => 'distinct', 'bar.*' => 'distinct']);
+        $this->assertFalse($v->passes());
+        $this->assertCount(4, $v->messages());
+
+        $v->setData(['foo' => ['foo', 'bar'], 'bar' => ['foo', 'bar']]);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => ['foo', 'foo']], ['foo.*' => 'distinct'], ['foo.*.distinct' => 'There is a duplication!']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -1966,6 +1977,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => 'foo@gmail.com'], ['x' => 'Email']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateEmailWithInternationalCharacters()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@gmäil.com'], ['x' => 'email']);
         $this->assertTrue($v->passes());
     }
 
@@ -4128,6 +4145,49 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('states.0 must be AR or TX', $v->errors()->get('states.0')[0]);
         $this->assertEquals('states.1 must be AR or TX', $v->errors()->get('states.1')[0]);
         $this->assertEquals('number must be divisible by 4', $v->errors()->get('number')[0]);
+
+        // Test array of messages with failing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 42],
+            ['name' => new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return [':attribute must be taylor', ':attribute must be a first name'];
+                }
+            }]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name must be taylor', $v->errors()->get('name')[0]);
+        $this->assertEquals('name must be a first name', $v->errors()->get('name')[1]);
+
+        // Test array of messages with multiple rules for one attribute case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 42],
+            ['name' => [new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return [':attribute must be taylor', ':attribute must be a first name'];
+                }
+            }, 'string']]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name must be taylor', $v->errors()->get('name')[0]);
+        $this->assertEquals('name must be a first name', $v->errors()->get('name')[1]);
+        $this->assertEquals('validation.string', $v->errors()->get('name')[2]);
     }
 
     public function testImplicitCustomValidationObjects()
@@ -4209,6 +4269,37 @@ class ValidationValidatorTest extends TestCase
         $data = $v->validate();
 
         $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $data);
+    }
+
+    public function testValidateAndValidatedData()
+    {
+        $post = ['first' => 'john',  'preferred'=>'john', 'last' => 'doe', 'type' => 'admin'];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'preferred'=> 'required']);
+        $v->sometimes('type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+        $validatedData = $v->validated();
+
+        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertEquals($data, $validatedData);
+    }
+
+    public function testValidatedNotValidateTwiceData()
+    {
+        $post = ['first' => 'john',  'preferred'=>'john', 'last' => 'doe', 'type' => 'admin'];
+
+        $validateCount = 0;
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'preferred'=> 'required']);
+        $v->after(function () use (&$validateCount) {
+            $validateCount++;
+        });
+        $data = $v->validate();
+        $v->validated();
+
+        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertEquals(1, $validateCount);
     }
 
     /**

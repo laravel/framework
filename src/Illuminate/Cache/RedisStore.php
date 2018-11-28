@@ -2,9 +2,10 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 
-class RedisStore extends TaggableStore
+class RedisStore extends TaggableStore implements LockProvider
 {
     /**
      * The Redis factory implementation.

@@ -81,7 +81,7 @@ interface Repository extends CacheInterface
     public function forever($key, $value);
 
     /**
-     * Get an item from the cache, or store the default value.
+     * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
@@ -91,18 +91,18 @@ interface Repository extends CacheInterface
     public function remember($key, $minutes, Closure $callback);
 
     /**
-     * Get an item from the cache, or store the default value forever.
+     * Get an item from the cache, or execute the given Closure and store the result forever.
      *
-     * @param  string   $key
+     * @param  string  $key
      * @param  \Closure  $callback
      * @return mixed
      */
     public function sear($key, Closure $callback);
 
     /**
-     * Get an item from the cache, or store the default value forever.
+     * Get an item from the cache, or execute the given Closure and store the result forever.
      *
-     * @param  string   $key
+     * @param  string  $key
      * @param  \Closure  $callback
      * @return mixed
      */

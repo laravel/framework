@@ -457,7 +457,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function all($columns = ['*'])
     {
-        return (new static)->newQuery()->get(
+        return static::query()->get(
             is_array($columns) ? $columns : func_get_args()
         );
     }
@@ -470,7 +470,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function with($relations)
     {
-        return (new static)->newQuery()->with(
+        return static::query()->with(
             is_string($relations) ? func_get_args() : $relations
         );
     }
@@ -1277,13 +1277,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getTable()
     {
-        if (! isset($this->table)) {
-            return str_replace(
-                '\\', '', Str::snake(Str::plural(class_basename($this)))
-            );
-        }
-
-        return $this->table;
+        return isset($this->table)
+            ? $this->table
+            : Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**

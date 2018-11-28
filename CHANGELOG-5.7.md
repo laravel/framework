@@ -1,5 +1,57 @@
 # Release Notes for 5.7.x
 
+## [v5.7.14 (2018-11-21)](https://github.com/laravel/framework/compare/v5.7.13...v5.7.14)
+
+### Added
+- Added `Macroable` trait to `Illuminate\Cookie\CookieJar` ([#26445](https://github.com/laravel/framework/pull/26445))
+- Added ability to disable password reset route ([#26459](https://github.com/laravel/framework/pull/26459))
+- Added ability to publish error views ([#26460](https://github.com/laravel/framework/pull/26460))
+- Added ability to set notifcation tries and timeout ([#26493](https://github.com/laravel/framework/pull/26493))
+- Added `mail.log_channel` config for make `log` for mail driver configurable ([#26510](https://github.com/laravel/framework/pull/26510))
+- Allowed `asset` root urls to be configurable via `app.asset_url` ([9172a67](https://github.com/laravel/framework/commit/9172a67b783952c1d3e15452d9c8646dc0b3eb6d))
+- Added `Error while sending QUERY packet` string to `DetectsLostConnections` trait ([#26233](https://github.com/laravel/framework/pull/26560))
+- Added env override for running in console ([a36906a](https://github.com/laravel/framework/commit/a36906ab8a141f1f497a0667196935e41970ae51), [19f2245](https://github.com/laravel/framework/commit/19f2245c6d7c87daf784f94b169f0dd4d98f0ca4))
+
+### Fixed
+- Fixed `UNION` aggregate queries with columns ([#26466](https://github.com/laravel/framework/pull/26466))
+- Allowed migration table name to be guessed without `_table` suffix ([#26429](https://github.com/laravel/framework/pull/26429))
+- Fixed `TestResponse::assertExactJson` for empty JSON objects ([#26353](https://github.com/laravel/framework/pull/26353), [e6ebc8d](https://github.com/laravel/framework/commit/e6ebc8d239e53e6daf16c869de3897ffbce6c751), [621d91d](https://github.com/laravel/framework/commit/621d91d802016ab4a64acc5c65f81cb9f5e5f779), [#26508](https://github.com/laravel/framework/pull/26508))
+- Fixed cache repository for PHP from 7.2.12v ([#26495]( https://github.com/laravel/framework/pull/26495))
+- Fixed user authorization check for Email Verification ([#26528](https://github.com/laravel/framework/pull/26528))
+- Fixed nested JOINs on SQLite ([#26567](https://github.com/laravel/framework/pull/26567))
+
+### Changed
+- Improved eager loading performance ([#26434](https://github.com/laravel/framework/pull/26434), [#26453](https://github.com/laravel/framework/pull/26453), [3992140](https://github.com/laravel/framework/commit/3992140064307ef82d23328995e7c59045c231f2), [#26471](https://github.com/laravel/framework/pull/26471), [a3738cf](https://github.com/laravel/framework/commit/a3738cf4e133a4475c56b51f521a12db78e2ecbb), [#26531](https://github.com/laravel/framework/pull/26531))
+- Adjusted `mix` missing asset exceptions ([#26431](https://github.com/laravel/framework/pull/26431))
+- Used `asset` helper to generate full path urls in exception views ([#26411](https://github.com/laravel/framework/pull/26411))
+- Changed `Illuminate\Foundation\Testing\Concerns\MocksApplicationServices::withoutJobs` method ([#26437](https://github.com/laravel/framework/pull/26437))
+- Cached `distinct` validation rule data ([#26509](https://github.com/laravel/framework/pull/26509))
+- Improved DNS Prefetching in view files ([#26552](https://github.com/laravel/framework/pull/26552))
+
+
+## [v5.7.13 (2018-11-07)](https://github.com/laravel/framework/compare/v5.7.12...v5.7.13)
+
+### Added
+- Added ability to return an array of messages in a custom validation rule ([#26327](https://github.com/laravel/framework/pull/26327))
+- Added `whenEmpty`/ `whenNotEmpty` / `unlessEmpty` / `unlessNotEmpty` methods to `Collection` ([#26345](https://github.com/laravel/framework/pull/26345))
+- Added `Illuminate\Support\Collection::some` method ([#26376](https://github.com/laravel/framework/pull/26376), [8f7e647](https://github.com/laravel/framework/commit/8f7e647dcee5fe13d7fc33a1e0e1ce531ea9f49e))
+- Added `Illuminate\Cache\Repository::missing` method ([#26351](https://github.com/laravel/framework/pull/26351)) 
+- Added `Macroable` trait to `Illuminate\View\Factory` ([#26361](https://github.com/laravel/framework/pull/26361))
+- Added support for UNION aggregate queries ([#26365](https://github.com/laravel/framework/pull/26365))
+
+### Changed
+- Updated `AbstractPaginator::appends` to handle null ([#26326](https://github.com/laravel/framework/pull/26326))
+- Added "guzzlehttp/guzzle": "^6.3", to `composer.json` ([#26328](https://github.com/laravel/framework/pull/26328))
+- Showed exception message on 403 error page when message is available ([#26356](https://github.com/laravel/framework/pull/26356))
+- Don't run TransformsRequest twice on ?query= parameters ([#26366](https://github.com/laravel/framework/pull/26366))
+- Added missing logging options to slack log driver ([#26360](https://github.com/laravel/framework/pull/26360))
+- Use cascade when truncating table in PostgreSQL ([#26389](https://github.com/laravel/framework/pull/26389))
+- Allowed pass absolute parameter in has valid signature request macro ([#26397](https://github.com/laravel/framework/pull/26397))
+
+### Changed realization
+- Used `Request::validate` macro in Auth traits ([#26314](https://github.com/laravel/framework/pull/26314))
+
+
 ## [v5.7.12 (2018-10-30)](https://github.com/laravel/framework/compare/v5.7.11...v5.7.12)
 
 ### Added

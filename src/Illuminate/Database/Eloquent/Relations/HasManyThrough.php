@@ -146,7 +146,9 @@ class HasManyThrough extends Relation
      */
     public function addEagerConstraints(array $models)
     {
-        $this->query->whereIn(
+        $whereIn = $this->whereInMethod($this->farParent, $this->localKey);
+
+        $this->query->{$whereIn}(
             $this->getQualifiedFirstKeyName(), $this->getKeys($models, $this->localKey)
         );
     }

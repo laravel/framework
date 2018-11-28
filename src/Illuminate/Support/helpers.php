@@ -747,11 +747,14 @@ if (! function_exists('retry')) {
      */
     function retry($times, callable $callback, $sleep = 0)
     {
+        $attempts = 0;
         $times--;
 
         beginning:
+        $attempts++;
+
         try {
-            return $callback();
+            return $callback($attempts);
         } catch (Exception $e) {
             if (! $times) {
                 throw $e;
