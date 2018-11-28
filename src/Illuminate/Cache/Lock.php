@@ -5,6 +5,7 @@ namespace Illuminate\Cache;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\Lock as LockContract;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Str;
 
 abstract class Lock implements LockContract
 {
@@ -123,7 +124,7 @@ abstract class Lock implements LockContract
      */
     public function safe()
     {
-        return $this->scoped(uniqid());
+        return $this->scoped(Str::random());
     }
 
     /**
