@@ -157,7 +157,7 @@ abstract class Lock implements LockContract
      */
     protected function value()
     {
-        return $this->isScoped() ? serialize($this->scope) : 1;
+        return $this->isScoped() ? $this->scope : 1;
     }
 
     /**
@@ -171,6 +171,6 @@ abstract class Lock implements LockContract
             return true;
         }
 
-        return unserialize($this->getValue()) === $this->scope;
+        return $this->getValue() === $this->scope;
     }
 }

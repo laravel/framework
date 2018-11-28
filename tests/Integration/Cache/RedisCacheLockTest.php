@@ -65,7 +65,7 @@ class RedisCacheLockTest extends TestCase
 
         $firstLock->release();
 
-        $this->assertTrue(Cache::store('redis')->has('bar'));
+        $this->assertFalse(Cache::store('redis')->lock('bar')->get());
     }
 
     public function test_safe_redis_locks_are_exclusive()
