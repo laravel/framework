@@ -433,7 +433,7 @@ class Builder
     }
     
     /**
-     * Instantiate or update a record matching the attributes, and fill it with values.
+     * Instantiate a new instance with the given values or fill a record matching the attributes.
      *
      * @param  array  $attributes
      * @param  array  $values
