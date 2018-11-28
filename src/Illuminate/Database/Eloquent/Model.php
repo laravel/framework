@@ -508,6 +508,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Eager load relation counts on the model.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadCount($relations)
+    {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        $this->newCollection([$this])->loadCount($relations);
+
+        return $this;
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
