@@ -176,6 +176,7 @@ class DatabaseQueue extends Queue implements QueueContract
         return [
             'queue' => $queue,
             'attempts' => $attempts,
+            'reserved' => false,
             'reserved_at' => null,
             'available_at' => $availableAt,
             'created_at' => $this->currentTime(),
