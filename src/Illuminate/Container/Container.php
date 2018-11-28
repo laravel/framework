@@ -591,7 +591,7 @@ class Container implements ContainerContract
      * @param  array  $parameters
      * @return mixed
      *
-     * @deprecated See make.
+     * @deprecated The make() method should be used instead. Will be removed in Laravel 5.9.
      */
     public function makeWith($abstract, array $parameters = [])
     {
