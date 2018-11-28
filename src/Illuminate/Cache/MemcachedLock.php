@@ -34,7 +34,7 @@ class MemcachedLock extends Lock
     public function acquire()
     {
         return $this->memcached->add(
-            $this->name, 1, $this->seconds
+            $this->name, $this->value(), $this->seconds
         );
     }
 
@@ -45,6 +45,18 @@ class MemcachedLock extends Lock
      */
     public function release()
     {
-        $this->memcached->delete($this->name);
+        if ($this->canRelease()) {
+            $this->memcached->delete($this->name);
+        }
+    }
+
+    /**
+     * Returns the value written into the driver for this lock.
+     *
+     * @return mixed
+     */
+    protected function getValue()
+    {
+        return $this->memcached->get($this->name);
     }
 }

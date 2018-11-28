@@ -33,7 +33,7 @@ class RedisLock extends Lock
      */
     public function acquire()
     {
-        $result = $this->redis->setnx($this->name, 1);
+        $result = $this->redis->setnx($this->name, $this->value());
 
         if ($result === 1 && $this->seconds > 0) {
             $this->redis->expire($this->name, $this->seconds);
@@ -49,6 +49,18 @@ class RedisLock extends Lock
      */
     public function release()
     {
-        $this->redis->del($this->name);
+        if ($this->canRelease()) {
+            $this->redis->del($this->name);
+        }
+    }
+
+    /**
+     * Returns the value written into the driver for this lock.
+     *
+     * @return string
+     */
+    protected function getValue()
+    {
+        return $this->redis->get($this->name);
     }
 }

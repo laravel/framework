@@ -27,4 +27,11 @@ interface Lock
      * @return void
      */
     public function release();
+
+    /**
+     * Secures this lock against out of order releases of expired clients.
+     *
+     * @return mixed
+     */
+    public function safe();
 }

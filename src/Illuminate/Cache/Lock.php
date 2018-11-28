@@ -25,6 +25,13 @@ abstract class Lock implements LockContract
     protected $seconds;
 
     /**
+     * A (usually) random string that acts as scope identifier of this lock.
+     *
+     * @var string
+     */
+    protected $scope;
+
+    /**
      * Create a new lock instance.
      *
      * @param  string  $name
@@ -50,6 +57,13 @@ abstract class Lock implements LockContract
      * @return void
      */
     abstract public function release();
+
+    /**
+     * Returns the value written into the driver for this lock.
+     *
+     * @return mixed
+     */
+    abstract protected function getValue();
 
     /**
      * Attempt to acquire the lock.
@@ -100,5 +114,62 @@ abstract class Lock implements LockContract
         }
 
         return true;
+    }
+
+    /**
+     * Secures this lock against out of order releases of expired clients.
+     *
+     * @return Lock
+     */
+    public function safe()
+    {
+        return $this->scoped(uniqid());
+    }
+
+    /**
+     * Secures this lock against out of order releases of expired clients.
+     *
+     * @param  string $scope
+     * @return Lock
+     */
+    public function scoped($scope)
+    {
+        $this->scope = $scope;
+
+        return $this;
+    }
+
+    /**
+     * Determines whether this is a client scoped lock.
+     *
+     * @return bool
+     */
+    protected function isScoped()
+    {
+        return ! is_null($this->scope);
+    }
+
+    /**
+     * Returns the value that should be written into the cache.
+     *
+     * @return mixed
+     */
+    protected function value()
+    {
+        return $this->isScoped() ? serialize($this->scope) : 1;
+    }
+
+    /**
+     * Determines whether this lock is allowed to release the lock in the driver.
+     *
+     * @return bool
+     */
+    protected function canRelease()
+    {
+        if (! $this->isScoped()) {
+            return true;
+        }
+
+        return unserialize($this->getValue()) === $this->scope;
     }
 }

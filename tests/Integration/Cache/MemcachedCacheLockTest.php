@@ -80,4 +80,45 @@ class MemcachedCacheLockTest extends TestCase
             return 'taylor';
         }));
     }
+
+    public function test_memcached_locks_are_released_safely()
+    {
+        Cache::store('memcached')->lock('bar')->release();
+
+        $firstLock = Cache::store('memcached')->lock('bar', 1)->safe();
+        $this->assertTrue($firstLock->acquire());
+        sleep(2);
+
+        $secondLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $this->assertTrue($secondLock->acquire());
+
+        $firstLock->release();
+
+        $this->assertTrue(Cache::store('memcached')->has('bar'));
+    }
+
+    public function test_safe_memcached_locks_are_exclusive()
+    {
+        Cache::store('memcached')->lock('bar')->release();
+
+        $firstLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $this->assertTrue($firstLock->acquire());
+
+        $secondLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $this->assertFalse($secondLock->acquire());
+    }
+
+    public function test_safe_memcached_locks_can_be_released_by_original_owner()
+    {
+        Cache::store('memcached')->lock('bar')->release();
+
+        $firstLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $this->assertTrue($firstLock->acquire());
+
+        $secondLock = Cache::store('memcached')->lock('bar', 10)->safe();
+        $this->assertFalse($secondLock->acquire());
+
+        $firstLock->release();
+        $this->assertFalse(Cache::store('memcached')->has('bar'));
+    }
 }
