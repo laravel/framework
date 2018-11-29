@@ -24,4 +24,11 @@ interface MustVerifyEmail
      * @return void
      */
     public function sendEmailVerificationNotification();
+
+    /**
+     * Get the email key for the model.
+     *
+     * @return string
+     */
+    public function getEmailFieldName();
 }

@@ -35,4 +35,14 @@ trait MustVerifyEmail
     {
         $this->notify(new Notifications\VerifyEmail);
     }
+
+    /**
+     * Get the email key for the model.
+     *
+     * @return string
+     */
+    public function getEmailFieldName()
+    {
+        return 'email';
+    }
 }

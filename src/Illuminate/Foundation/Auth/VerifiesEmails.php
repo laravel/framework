@@ -32,7 +32,12 @@ trait VerifiesEmails
      */
     public function verify(Request $request)
     {
-        if ($request->route('id') != $request->user()->getKey()) {
+        $emailFieldName = $request->user()->getEmailFieldName();
+
+        if (
+            $request->route('id') != $request->user()->getKey()
+            || $request->user()->getAttribute($emailFieldName) !== $request->query($emailFieldName)
+        ) {
             throw new AuthorizationException;
         }
 
