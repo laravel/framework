@@ -100,6 +100,7 @@ class ManipulateInput extends TransformsRequest
         if ($key === 'beers') {
             $value++;
         }
+
         if ($key === 'age') {
             $value--;
         }
@@ -115,6 +116,7 @@ class ManipulateArrayInput extends TransformsRequest
         if (str_contains($key, 'beers')) {
             $value++;
         }
+
         if (str_contains($key, 'age')) {
             $value--;
         }
