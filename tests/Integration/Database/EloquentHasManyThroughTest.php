@@ -33,7 +33,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
     {
         $user = User::create(['name' => str_random()]);
 
-        $team1 = Team::create(['owner_id' => $user->id]);
+        $team1 = Team::create(['id' => 10, 'owner_id' => $user->id]);
         $team2 = Team::create(['owner_id' => $user->id]);
 
         $mate1 = User::create(['name' => str_random(), 'team_id' => $team1->id]);
@@ -127,5 +127,5 @@ class Team extends Model
 {
     public $table = 'teams';
     public $timestamps = false;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }
