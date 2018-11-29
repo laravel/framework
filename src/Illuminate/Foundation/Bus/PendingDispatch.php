@@ -12,9 +12,9 @@ class PendingDispatch
      * @var mixed
      */
     protected $job;
-    
+
     /**
-     * Whether the dispatch has been cancelled
+     * Whether the dispatch has been cancelled.
      *
      * @var bool
      */
@@ -128,7 +128,7 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        if(! $this->cancelled) {
+        if (! $this->cancelled) {
             app(Dispatcher::class)->dispatch($this->job);
         }
     }
