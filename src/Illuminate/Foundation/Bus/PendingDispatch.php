@@ -12,6 +12,13 @@ class PendingDispatch
      * @var mixed
      */
     protected $job;
+    
+    /**
+     * Whether the dispatch has been cancelled
+     *
+     * @var bool
+     */
+    protected $cancelled = false;
 
     /**
      * Create a new pending job dispatch.
@@ -77,6 +84,18 @@ class PendingDispatch
     }
 
     /**
+     * Cancel the dispatch.
+     *
+     * @return $this
+     */
+    public function cancel()
+    {
+        $this->cancelled = true;
+
+        return $this;
+    }
+
+    /**
      * Set the desired delay for the job.
      *
      * @param  \DateTime|int|null  $delay
@@ -109,6 +128,8 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        app(Dispatcher::class)->dispatch($this->job);
+        if(! $this->cancelled) {
+            app(Dispatcher::class)->dispatch($this->job);
+        }
     }
 }
