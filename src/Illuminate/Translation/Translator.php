@@ -487,9 +487,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $this->loaded = $loaded;
     }
-    
+
     /**
-     * Clear loaded translations
+     * Clear loaded translations.
      */
     public function clearLoaded()
     {
