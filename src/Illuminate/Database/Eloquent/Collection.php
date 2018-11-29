@@ -197,6 +197,21 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Sort the collection using by primary key.
+     *
+     * @param array $ids
+     * @return static
+     */
+    public function sortByIds(array $ids)
+    {
+        $ids = array_flip($ids);
+
+        return $this->sort(function ($a, $b) use ($ids) {
+            return $ids[$a->getKey()] - $ids[$b->getKey()];
+        });
+    }
+
+    /**
      * Determine if a key exists in the collection.
      *
      * @param  mixed  $key

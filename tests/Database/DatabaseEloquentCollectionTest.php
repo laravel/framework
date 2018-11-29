@@ -167,6 +167,22 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['results'], $c->all());
     }
 
+    public function testCollectionSortByIds()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturn(2);
+
+        $three = m::mock(Model::class);
+        $three->shouldReceive('getKey')->andReturn(3);
+
+        $c = new Collection([$one, $two, $three]);
+
+        $this->assertEquals(new Collection([$two, $one, $three]), $c->sortByIds([2, 1, 3])->values());
+    }
+
     public function testCollectionDictionaryReturnsModelKeys()
     {
         $one = m::mock(Model::class);
