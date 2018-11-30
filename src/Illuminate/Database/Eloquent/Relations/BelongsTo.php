@@ -51,13 +51,14 @@ class BelongsTo extends Relation
      * @param  \Illuminate\Database\Eloquent\Model  $child
      * @param  string  $foreignKey
      * @param  string  $ownerKey
-     * @param  string  $relation
+     * @param  string  $relationName
+     *
      * @return void
      */
-    public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
+    public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relationName)
     {
         $this->ownerKey = $ownerKey;
-        $this->relationName = $relation;
+        $this->relationName = $relationName;
         $this->foreignKey = $foreignKey;
 
         // In the underlying base relationship class, this variable is referred to as
