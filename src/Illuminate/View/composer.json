@@ -21,7 +21,7 @@
         "illuminate/events": "5.8.*",
         "illuminate/filesystem": "5.8.*",
         "illuminate/support": "5.8.*",
-        "symfony/debug": "^4.1"
+        "symfony/debug": "^4.2"
     },
     "autoload": {
         "psr-4": {

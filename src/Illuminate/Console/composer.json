@@ -17,8 +17,8 @@
         "php": "^7.1.3",
         "illuminate/contracts": "5.8.*",
         "illuminate/support": "5.8.*",
-        "symfony/console": "^4.1",
-        "symfony/process": "^4.1"
+        "symfony/console": "^4.2",
+        "symfony/process": "^4.2"
     },
     "autoload": {
         "psr-4": {
