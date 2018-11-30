@@ -1855,7 +1855,7 @@ class Builder
     {
         $property = $this->unions ? 'unionOffset' : 'offset';
 
-        $this->$property = max(0, $value);
+        $this->$property = min(max(0, $value), \PHP_INT_MAX);
 
         return $this;
     }
