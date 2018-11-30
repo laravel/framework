@@ -35,7 +35,7 @@ class BelongsTo extends Relation
      *
      * @var string
      */
-    protected $relation;
+    protected $relationName;
 
     /**
      * The count of self joins.
@@ -57,7 +57,7 @@ class BelongsTo extends Relation
     public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
     {
         $this->ownerKey = $ownerKey;
-        $this->relation = $relation;
+        $this->relationName = $relation;
         $this->foreignKey = $foreignKey;
 
         // In the underlying base relationship class, this variable is referred to as
@@ -219,9 +219,9 @@ class BelongsTo extends Relation
         $this->child->setAttribute($this->foreignKey, $ownerKey);
 
         if ($model instanceof Model) {
-            $this->child->setRelation($this->relation, $model);
+            $this->child->setRelation($this->relationName, $model);
         } elseif ($this->child->isDirty($this->foreignKey)) {
-            $this->child->unsetRelation($this->relation);
+            $this->child->unsetRelation($this->relationName);
         }
 
         return $this->child;
@@ -236,7 +236,7 @@ class BelongsTo extends Relation
     {
         $this->child->setAttribute($this->foreignKey, null);
 
-        return $this->child->setRelation($this->relation, null);
+        return $this->child->setRelation($this->relationName, null);
     }
 
     /**
@@ -366,8 +366,8 @@ class BelongsTo extends Relation
      *
      * @return string
      */
-    public function getRelation()
+    public function getRelationName()
     {
-        return $this->relation;
+        return $this->relationName;
     }
 }
