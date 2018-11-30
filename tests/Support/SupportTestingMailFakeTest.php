@@ -139,6 +139,44 @@ class SupportTestingMailFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('Mailables were sent unexpectedly.'));
         }
     }
+
+    public function testAssertSentCount()
+    {
+        $this->fake->assertSentCount(0);
+
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSentCount(1);
+
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSentCount(2);
+
+        try {
+            $this->fake->assertSentCount(3);
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Mailables were sent 2 times instead of 3 times.'));
+        }
+    }
+
+    public function testAssertQueuedCount()
+    {
+        $this->fake->assertQueuedCount(0);
+
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueuedCount(1);
+
+        $this->fake->to('taylor@laravel.com')->send(new QueueableMailableStub());
+
+        $this->fake->assertQueuedCount(2);
+
+        try {
+            $this->fake->assertQueuedCount(3);
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Mailables were queued 2 times instead of 3 times.'));
+        }
+    }
 }
 
 class MailableStub extends Mailable

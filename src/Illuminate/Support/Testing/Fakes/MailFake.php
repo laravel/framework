@@ -50,6 +50,20 @@ class MailFake implements Mailer, MailQueue
     }
 
     /**
+     * Assert if there is given number of sent mailables.
+     *
+     * @param  int  $times
+     * @return void
+     */
+    public function assertSentCount($times)
+    {
+        PHPUnit::assertTrue(
+            ($count = count($this->mailables)) === $times,
+            "Mailables were sent {$count} times instead of {$times} times."
+        );
+    }
+
+    /**
      * Assert if a mailable was sent a number of times.
      *
      * @param  string  $mailable
@@ -105,6 +119,20 @@ class MailFake implements Mailer, MailQueue
         PHPUnit::assertTrue(
             $this->queued($mailable, $callback)->count() > 0,
             "The expected [{$mailable}] mailable was not queued."
+        );
+    }
+
+    /**
+     * Assert if there is given number of queued mailables.
+     *
+     * @param  int  $times
+     * @return void
+     */
+    public function assertQueuedCount($times)
+    {
+        PHPUnit::assertTrue(
+            ($count = count($this->queuedMailables)) === $times,
+            "Mailables were queued {$count} times instead of {$times} times."
         );
     }
 
