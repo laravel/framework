@@ -4,7 +4,6 @@ namespace Illuminate\Notifications;
 
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
-use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
