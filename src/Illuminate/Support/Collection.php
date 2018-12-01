@@ -1408,6 +1408,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Replace a single item based on the specified key.
+     *
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function replace($key, $value) {
+        return $this->forget($key)->put($key, $value);
+    }
+
+    /**
      * Reverse items order.
      *
      * @return static
