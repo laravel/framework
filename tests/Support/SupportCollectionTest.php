@@ -992,6 +992,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor' => 'name', 'laravel' => 'framework'], $data->flip()->toArray());
     }
 
+    public function testReplace()
+    {
+        $data = new Collection(['name' => 'taylor', 'laravel' => 'framework']);
+        $this->assertEquals(['name' => 'taylor', 'laravel' => 'great'], $data->replace('laravel', 'great')->toArray());
+    }
+
     public function testChunk()
     {
         $data = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);

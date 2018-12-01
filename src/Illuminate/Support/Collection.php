@@ -1414,7 +1414,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param $value
      * @return $this
      */
-    public function replace($key, $value) {
+    public function replace($key, $value)
+    {
         return $this->forget($key)->put($key, $value);
     }
 
