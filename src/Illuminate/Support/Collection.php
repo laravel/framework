@@ -248,7 +248,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function some($key, $operator = null, $value = null)
     {
-        return $this->contains($key, $operator, $value);
+        return $this->contains(...func_get_args());
     }
 
     /**
@@ -261,9 +261,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function contains($key, $operator = null, $value = null)
     {
-        $args = array_filter(func_get_args());
-
-        if (count($args) === 1) {
+        if (func_num_args() === 1) {
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass;
 
@@ -273,7 +271,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return in_array($key, $this->items);
         }
 
-        return $this->contains($this->operatorForWhere(...$args));
+        return $this->contains($this->operatorForWhere(...func_get_args()));
     }
 
     /**
