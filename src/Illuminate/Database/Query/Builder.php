@@ -195,6 +195,12 @@ class Builder
     public $useWritePdo = false;
 
     /**
+     * Limits statement execution time ,can timeout by db serve
+     * @var int
+     */
+    public $maxExecutionTime = 0;
+
+    /**
      * Create a new query builder instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -2894,6 +2900,22 @@ class Builder
             }
         });
     }
+
+    /**
+     * set the  MAX_EXECUTION_TIME(ms) for query ,it effect  after mysql5.7.8
+     *
+     * @param int $maxExecutionTime
+     * @return $this
+     */
+    public function setMaxExecutionTime(int $maxExecutionTime=0){
+        if($maxExecutionTime>0){
+            $this->maxExecutionTime = $maxExecutionTime;
+        }else{
+            $this->maxExecutionTime = 0;
+        }
+        return $this;
+    }
+
 
     /**
      * Handle dynamic method calls into the method.

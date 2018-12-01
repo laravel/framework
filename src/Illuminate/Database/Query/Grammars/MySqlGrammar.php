@@ -57,6 +57,55 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the ‘select /*+ MAX_EXECUTION_TIME(1000) *\/" portion of the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @return string|null
+     */
+    protected function compileColumns(Builder $query, $columns)
+    {
+        // If the query is actually performing an aggregating select, we will let that
+        // compiler handle the building of the select clauses, as it will need some
+        // more syntax that is best handled by that function to keep things neat.
+        if (! is_null($query->aggregate)) {
+            return;
+        }
+        // after mysql5.7.8 db serve support for once query MAX_EXECUTION_TIME(ms), it can't effect before mysql5.7.8
+        // before mysql5.7.8 db it no influence
+        $select = $query->maxExecutionTime>0?'select /*+ MAX_EXECUTION_TIME('.$query->maxExecutionTime.') */ ': 'select ';
+        $select .= $query->distinct? "distinct " : "";
+        return $select.$this->columnize($columns);
+    }
+
+    /**
+     * Compile an aggregated select clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $aggregate
+     * @return string
+     */
+    protected function compileAggregate(Builder $query, $aggregate)
+    {
+        $column = $this->columnize($aggregate['columns']);
+
+        // If the query has a "distinct" constraint and we're not asking for all columns
+        // we need to prepend "distinct" onto the column name so that the query takes
+        // it into account when it performs the aggregating operations on the data.
+        if ($query->distinct && $column !== '*') {
+            $column = 'distinct '.$column;
+        }
+        // after mysql5.7.8 db serve support for once query MAX_EXECUTION_TIME(ms), it can't effect before mysql5.7.8
+        // before mysql5.7.8 db it no influence
+        $select = $query->maxExecutionTime>0?'select /*+ MAX_EXECUTION_TIME('.$query->maxExecutionTime.') */ ': 'select ';
+
+        return $select.$aggregate['function'].'('.$column.') as aggregate';
+
+    }
+
+
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column

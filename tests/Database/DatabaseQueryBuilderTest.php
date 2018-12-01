@@ -110,6 +110,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->distinct()->select('foo', 'bar')->from('users');
         $this->assertEquals('select distinct "foo", "bar" from "users"', $builder->toSql());
     }
+    
+    
+    public function testMysqlSelectMaxExecutionTime(){
+        $builder = $this->getMySqlBuilder();
+        $builder->setMaxExecutionTime(10000)->select('foo', 'bar')->from('users');
+        $this->assertEquals('select /*+ MAX_EXECUTION_TIME(10000) */ `foo`, `bar` from `users`', $builder->toSql());
+    }
+
+    public function testMysqlSelectDistinctMaxExecutionTime(){
+        $builder = $this->getMySqlBuilder();
+        $builder->distinct()->setMaxExecutionTime(10000)->select('foo', 'bar')->from('users');
+        $this->assertEquals('select /*+ MAX_EXECUTION_TIME(10000) */ distinct `foo`, `bar` from `users`', $builder->toSql());
+    }
+
+    
 
     public function testBasicAlias()
     {
