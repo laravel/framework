@@ -450,12 +450,13 @@ class TestResponse
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data
+     * @param  bool   $preserveEmptyObjects
      * @return $this
      */
-    public function assertExactJson(array $data)
+    public function assertExactJson(array $data, bool $preserveEmptyObjects = false)
     {
         $actual = json_encode(Arr::sortRecursive(
-            (array) $this->decodeResponseJson()
+            (array) $this->decodeResponseJson(null, $preserveEmptyObjects)
         ));
 
         PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
@@ -682,13 +683,18 @@ class TestResponse
      * Validate and return the decoded response JSON.
      *
      * @param  string|null  $key
+     * @param  bool         $preserveEmptyObjects
      * @return mixed
      */
-    public function decodeResponseJson($key = null)
+    public function decodeResponseJson($key = null, $preserveEmptyObjects = false)
     {
-        $decodedResponse = $this->decodeJsonWhilePreservingEmptyObjects(
-            $this->getContent()
-        );
+        if ($preserveEmptyObjects) {
+            $decodedResponse = $this->decodeJsonWhilePreservingEmptyObjects(
+                $this->getContent()
+            );
+        } else {
+            $decodedResponse = json_decode($this->getContent(), true);
+        }
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {

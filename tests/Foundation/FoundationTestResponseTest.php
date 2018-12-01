@@ -159,6 +159,15 @@ class FoundationTestResponseTest extends TestCase
         $response->assertHeaderMissing('Location');
     }
 
+    public function testAssertJsonWithEmptyObject()
+    {
+        $response = TestResponse::fromBaseResponse(new JsonResponse(new \stdClass));
+
+        $this->expectException(\PHPUnit\Framework\Exception::class);
+        $this->expectExceptionMessageRegExp("/.*\bFailed asserting that an array\b.*/");
+        $response->assertJson(['foo' => 'bar']);
+    }
+
     public function testAssertJsonWithArray()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
@@ -224,6 +233,9 @@ class FoundationTestResponseTest extends TestCase
 
         // Wildcard (repeating structure)
         $response->assertJsonStructure(['bars' => ['*' => ['bar', 'foo']]]);
+
+        // Wildcard (numerical string keys)
+        $response->assertJsonStructure(['nums' => ['*' => ['foo']]]);
 
         // Nested after wildcard
         $response->assertJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]]]);
@@ -295,7 +307,7 @@ class FoundationTestResponseTest extends TestCase
                 ],
                 'updated_at' => '2018-10-05 20:48:11',
             ],
-        ]);
+        ], true);
     }
 
     public function testAssertJsonMissingExact()
@@ -444,6 +456,11 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
                 ['bar' => 'foo 0', 'foo' => 'bar 0'],
                 ['bar' => 'foo 1', 'foo' => 'bar 1'],
                 ['bar' => 'foo 2', 'foo' => 'bar 2'],
+            ],
+            'nums'   => [
+                '10' => ['foo' => 'bar 0'],
+                '11' => ['foo' => 'bar 1'],
+                '12' => ['foo' => 'bar 2'],
             ],
             'baz'    => [
                 ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
