@@ -11,6 +11,32 @@
 |
 */
 
+// Main View
+
 Route::get('/', function () {
     return view('test');
+});
+
+// Login View
+
+Route::get('/login', function(){
+	return view('login');
+});
+
+// Orders View
+
+Route::get('/orders', function(){
+	return view('orders');
+});
+
+// Inventory View
+
+Route::get('/inventory', function(){
+	return view('inventory');
+});
+
+// Profile View
+
+Route::get('/profile', function(){
+	return view('profile');
 });
