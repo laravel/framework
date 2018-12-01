@@ -32,11 +32,13 @@ class ArrayStore extends TaggableStore implements Store
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
         $this->storage[$key] = $value;
+
+        return array_key_exists($key, $this->storage);
     }
 
     /**
@@ -71,11 +73,11 @@ class ArrayStore extends TaggableStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        return $this->put($key, $value, 0);
     }
 
     /**
