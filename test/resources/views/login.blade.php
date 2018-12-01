@@ -79,7 +79,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Login Page
+                    Login Page {{ $keys }}
                 </div>
 
                 <div class="links">
