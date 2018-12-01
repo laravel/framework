@@ -21,7 +21,7 @@ class NullStore extends TaggableStore
      */
     public function get($key)
     {
-        //
+        return null;
     }
 
     /**
@@ -30,11 +30,11 @@ class NullStore extends TaggableStore
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
-        //
+        return false;
     }
 
     /**
@@ -66,22 +66,22 @@ class NullStore extends TaggableStore
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        //
+        return false;
     }
 
     /**
      * Remove an item from the cache.
      *
      * @param  string  $key
-     * @return void
+     * @return bool
      */
     public function forget($key)
     {
-        //
+        return true;
     }
 
     /**

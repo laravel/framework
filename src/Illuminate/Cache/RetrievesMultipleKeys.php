@@ -28,12 +28,16 @@ trait RetrievesMultipleKeys
      *
      * @param  array  $values
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function putMany(array $values, $minutes)
     {
+        $resultMany = null;
         foreach ($values as $key => $value) {
-            $this->put($key, $value, $minutes);
+            $result = $this->put($key, $value, $minutes);
+            $resultMany = is_null($resultMany) ? $result : $result && $resultMany;
         }
+
+        return $resultMany ?: false;
     }
 }

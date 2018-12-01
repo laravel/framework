@@ -54,11 +54,11 @@ class ApcStore extends TaggableStore
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
-        $this->apc->put($this->prefix.$key, $value, (int) ($minutes * 60));
+        return $this->apc->put($this->prefix.$key, $value, (int) ($minutes * 60));
     }
 
     /**
@@ -90,11 +90,11 @@ class ApcStore extends TaggableStore
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        return $this->put($key, $value, 0);
     }
 
     /**

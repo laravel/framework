@@ -132,16 +132,19 @@ class CacheRepositoryTest extends TestCase
     {
         // Alias of PuttingMultiple
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1);
-        $repo->setMultiple(['foo' => 'bar', 'bar' => 'baz'], 1);
+        $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1)->andReturn(true);
+        $result = $repo->setMultiple(['foo' => 'bar', 'bar' => 'baz'], 1);
+        $this->assertTrue($result);
     }
 
     public function testPutWithDatetimeInPastOrZeroSecondsDoesntSaveItem()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->never();
-        $repo->put('foo', 'bar', Carbon::now()->subMinutes(10));
-        $repo->put('foo', 'bar', Carbon::now());
+        $result = $repo->put('foo', 'bar', Carbon::now()->subMinutes(10));
+        $this->assertFalse($result);
+        $result = $repo->put('foo', 'bar', Carbon::now());
+        $this->assertFalse($result);
     }
 
     public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately()
@@ -215,8 +218,9 @@ class CacheRepositoryTest extends TestCase
     public function testSettingCache()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 1);
-        $repo->set($key, $value, 1);
+        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 1)->andReturn(true);
+        $result = $repo->set($key, $value, 1);
+        $this->assertTrue($result);
     }
 
     public function testClearingWholeCache()

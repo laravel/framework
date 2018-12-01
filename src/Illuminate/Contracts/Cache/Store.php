@@ -28,7 +28,7 @@ interface Store
      * @param  string  $key
      * @param  mixed  $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes);
 
@@ -37,7 +37,7 @@ interface Store
      *
      * @param  array  $values
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function putMany(array $values, $minutes);
 
@@ -64,7 +64,7 @@ interface Store
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value);
 
