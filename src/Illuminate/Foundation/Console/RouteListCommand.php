@@ -129,7 +129,7 @@ class RouteListCommand extends Command
      * @param  array  $routes
      * @return array
      */
-    protected function sortRoutes($sort, $routes)
+    protected function sortRoutes($sort, array $routes)
     {
         return Arr::sort($routes, function ($route) use ($sort) {
             return $route[$sort];
@@ -142,7 +142,7 @@ class RouteListCommand extends Command
      * @param  array  $routes
      * @return array
      */
-    protected function pluckColumns($routes)
+    protected function pluckColumns(array $routes)
     {
         return array_map(function ($route) {
             return Arr::only($route, $this->getColumns());
