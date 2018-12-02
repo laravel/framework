@@ -327,7 +327,9 @@ class Repository implements CacheContract, ArrayAccess
     {
         $result = $this->store->forever($this->itemKey($key), $value);
 
-        $this->event(new KeyWritten($key, $value, 0));
+        if ($result) {
+            $this->event(new KeyWritten($key, $value, 0));
+        }
 
         return $result;
     }
