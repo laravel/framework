@@ -207,7 +207,9 @@ class Repository implements CacheContract, ArrayAccess
         if (! is_null($minutes = $this->getMinutes($minutes))) {
             $result = $this->store->put($this->itemKey($key), $value, $minutes);
 
-            $this->event(new KeyWritten($key, $value, $minutes));
+            if ($result) {
+                $this->event(new KeyWritten($key, $value, $minutes));
+            }
 
             return $result;
         }
@@ -235,8 +237,10 @@ class Repository implements CacheContract, ArrayAccess
         if (! is_null($minutes = $this->getMinutes($minutes))) {
             $result = $this->store->putMany($values, $minutes);
 
-            foreach ($values as $key => $value) {
-                $this->event(new KeyWritten($key, $value, $minutes));
+            if ($result) {
+                foreach ($values as $key => $value) {
+                    $this->event(new KeyWritten($key, $value, $minutes));
+                }
             }
 
             return $result;
