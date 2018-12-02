@@ -103,6 +103,7 @@ class DatabaseStore implements Store
             return $this->table()->insert(compact('key', 'value', 'expiration'));
         } catch (Exception $e) {
             $result = $this->table()->where('key', $key)->update(compact('value', 'expiration'));
+
             return $result > 0;
         }
     }
