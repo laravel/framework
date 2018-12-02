@@ -36,7 +36,6 @@ trait DetectsLostConnections
             'TCP Provider: Error code 0x68',
             'Name or service not known',
             'ORA-03114',
-            'Error while sending QUERY packet',
         ]);
     }
 }
