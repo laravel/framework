@@ -36,7 +36,7 @@ class ArrayStore extends TaggableStore
     {
         $this->storage[$key] = $value;
 
-        return array_key_exists($key, $this->storage);
+        return true;
     }
 
     /**
