@@ -1,5 +1,16 @@
 # Release Notes for 5.7.x
 
+## Unreleased 
+
+### Fixed
+- Fixed self-referencing HasManyThrough existence queries ([#26662](https://github.com/laravel/framework/pull/26662))
+- Fixed HasManyThrough existence queries with same parent and through parent table ([#26676](https://github.com/laravel/framework/pull/26676))
+- Fixed breaking eager loading with "incrementing" string keys ([#26688](https://github.com/laravel/framework/pull/26688))
+
+### Changed
+- Changed markdown on auth stub view (`Auth/Console/stubs/make/views/auth/login.stub`) ([#26648](https://github.com/laravel/framework/pull/26648))
+
+
 ## [v5.7.15 (2018-11-26)](https://github.com/laravel/framework/compare/v5.7.14...v5.7.15)
 
 ### Added
