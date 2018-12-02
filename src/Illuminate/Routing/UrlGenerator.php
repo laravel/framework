@@ -62,10 +62,9 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * A cached copy of the URL scheme for the current request.
      *
-     * @deprecated In 5.8, this will change to $cachedScheme
      * @var string|null
      */
-    protected $cachedSchema;
+    protected $cachedScheme;
 
     /**
      * The root namespace being applied to controller actions.
@@ -300,11 +299,11 @@ class UrlGenerator implements UrlGeneratorContract
             return $secure ? 'https://' : 'http://';
         }
 
-        if (is_null($this->cachedSchema)) {
-            $this->cachedSchema = $this->forceScheme ?: $this->request->getScheme().'://';
+        if (is_null($this->cachedScheme)) {
+            $this->cachedScheme = $this->forceScheme ?: $this->request->getScheme().'://';
         }
 
-        return $this->cachedSchema;
+        return $this->cachedScheme;
     }
 
     /**
@@ -584,7 +583,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function forceScheme($scheme)
     {
-        $this->cachedSchema = null;
+        $this->cachedScheme = null;
 
         $this->forceScheme = $scheme.'://';
     }
@@ -661,7 +660,7 @@ class UrlGenerator implements UrlGeneratorContract
         $this->request = $request;
 
         $this->cachedRoot = null;
-        $this->cachedSchema = null;
+        $this->cachedScheme = null;
         $this->routeGenerator = null;
     }
 
