@@ -181,4 +181,14 @@ class MorphToMany extends BelongsToMany
     {
         return $this->morphClass;
     }
+
+    /**
+     * Get the indicator for a reverse relationship.
+     *
+     * @return bool
+     */
+    public function getInverse()
+    {
+        return $this->inverse;
+    }
 }
