@@ -62,7 +62,7 @@ class ApplicationDatabaseResetStub extends Application
         }
     }
 
-    public function environment()
+    public function environment(...$envs)
     {
         return 'development';
     }
