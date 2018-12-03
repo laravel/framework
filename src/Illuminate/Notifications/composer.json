@@ -22,7 +22,9 @@
         "illuminate/filesystem": "5.7.*",
         "illuminate/mail": "5.7.*",
         "illuminate/queue": "5.7.*",
-        "illuminate/support": "5.7.*"
+        "illuminate/support": "5.7.*",
+        "laravel/nexmo-notification-channel": "^1.0",
+        "laravel/slack-notification-channel": "^1.0"
     },
     "autoload": {
         "psr-4": {
