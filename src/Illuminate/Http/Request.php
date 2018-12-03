@@ -184,8 +184,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function is(...$patterns)
     {
+        $path = $this->decodedPath();
+
         foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $this->decodedPath())) {
+            if (Str::is($pattern, $path)) {
                 return true;
             }
         }

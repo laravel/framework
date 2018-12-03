@@ -422,4 +422,14 @@ abstract class HasOneOrMany extends Relation
     {
         return $this->foreignKey;
     }
+
+    /**
+     * Get the local key for the relationship.
+     *
+     * @return string
+     */
+    public function getLocalKeyName()
+    {
+        return $this->localKey;
+    }
 }
