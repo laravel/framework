@@ -23,9 +23,11 @@ interface Application extends Container
     /**
      * Get or check the current application environment.
      *
-     * @return string
+     * @param   void|array|mixed  $envs,... Optional environments to check against
+     * @return  string|bool Whether one of the given environments currently applies
+     *                      or the current environment if no arguments were passed
      */
-    public function environment();
+    public function environment(...$envs);
 
     /**
      * Determine if the application is running in the console.

@@ -472,12 +472,14 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get or check the current application environment.
      *
-     * @return string|bool
+     * @param   void|array|mixed  $envs,... Optional environments to check against
+     * @return  string|bool Whether one of the given environments currently applies
+     *                      or the current environment if no arguments were passed
      */
-    public function environment()
+    public function environment(...$envs)
     {
-        if (func_num_args() > 0) {
-            $patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
+        if (!empty($envs)) {
+            $patterns = is_array($envs[0]) ? $envs[0] : $envs;
 
             return Str::is($patterns, $this['env']);
         }
