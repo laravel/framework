@@ -1085,7 +1085,7 @@ class Validator implements ValidatorContract
      *
      * @throws \RuntimeException
      */
-    protected function getPresenceVerifierFor($connection)
+    public function getPresenceVerifierFor($connection)
     {
         return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
             $verifier->setConnection($connection);
