@@ -1842,6 +1842,44 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
+    public function testSome()
+    {
+        $c = new Collection([1, 3, 5]);
+
+        $this->assertTrue($c->some(1));
+        $this->assertFalse($c->some(2));
+        $this->assertTrue($c->some(function ($value) {
+            return $value < 5;
+        }));
+        $this->assertFalse($c->some(function ($value) {
+            return $value > 5;
+        }));
+
+        $c = new Collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+
+        $this->assertTrue($c->some('v', 1));
+        $this->assertFalse($c->some('v', 2));
+
+        $c = new Collection(['date', 'class', (object) ['foo' => 50]]);
+
+        $this->assertTrue($c->some('date'));
+        $this->assertTrue($c->some('class'));
+        $this->assertFalse($c->some('foo'));
+
+        $c = new Collection([['a' => false, 'b' => false], ['a' => true, 'b' => false]]);
+
+        $this->assertTrue($c->some->a);
+        $this->assertFalse($c->some->b);
+
+        $c = new Collection([
+            null, 1, 2,
+        ]);
+
+        $this->assertTrue($c->some(function ($value) {
+            return is_null($value);
+        }));
+    }
+
     public function testContainsStrict()
     {
         $c = new Collection([1, 3, 5, '02']);

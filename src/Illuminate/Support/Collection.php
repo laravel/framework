@@ -248,7 +248,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function some($key, $operator = null, $value = null)
     {
-        return $this->contains($key, $operator, $value);
+        return $this->contains(...func_get_args());
     }
 
     /**

@@ -1022,6 +1022,16 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Get the parent key for the relationship.
+     *
+     * @return string
+     */
+    public function getParentKeyName()
+    {
+        return $this->parentKey;
+    }
+
+    /**
      * Get the fully qualified parent key name for the relation.
      *
      * @return string
@@ -1029,6 +1039,16 @@ class BelongsToMany extends Relation
     public function getQualifiedParentKeyName()
     {
         return $this->parent->qualifyColumn($this->parentKey);
+    }
+
+    /**
+     * Get the related key for the relationship.
+     *
+     * @return string
+     */
+    public function getRelatedKeyName()
+    {
+        return $this->relatedKey;
     }
 
     /**
