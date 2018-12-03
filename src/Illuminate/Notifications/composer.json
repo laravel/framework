@@ -35,9 +35,7 @@
         }
     },
     "suggest": {
-        "guzzlehttp/guzzle": "Required to use the Slack transport (^6.0)",
-        "illuminate/database": "Required to use the database transport (5.7.*).",
-        "nexmo/client": "Required to use the Nexmo transport (^1.0)."
+        "illuminate/database": "Required to use the database transport (5.7.*)."
     },
     "config": {
         "sort-packages": true
