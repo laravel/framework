@@ -54,6 +54,7 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         $this->assertCount(1, DB::getQueryLog());
         $this->assertSame('2', $posts[0]->comments_count);
         $this->assertSame('0', $posts[1]->comments_count);
+        $this->assertSame('2', $posts[0]->getOriginal('comments_count'));
     }
 
     public function testLoadCountOnDeletedModels()
