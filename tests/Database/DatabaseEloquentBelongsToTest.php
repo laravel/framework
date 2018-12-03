@@ -153,7 +153,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
         $parent->shouldReceive('isDirty')->once()->andReturn(true);
-        $parent->shouldReceive('unsetRelation')->once()->with($relation->getRelation());
+        $parent->shouldReceive('unsetRelation')->once()->with($relation->getRelationName());
         $relation->associate(1);
     }
 
