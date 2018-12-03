@@ -778,7 +778,7 @@ trait ValidatesAttributes
      * @param  string  $table
      * @return array
      */
-    protected function parseTable($table)
+    public function parseTable($table)
     {
         return Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
     }
@@ -790,7 +790,7 @@ trait ValidatesAttributes
      * @param  string  $attribute
      * @return bool
      */
-    protected function getQueryColumn($parameters, $attribute)
+    public function getQueryColumn($parameters, $attribute)
     {
         return isset($parameters[1]) && $parameters[1] !== 'NULL'
                     ? $parameters[1] : $this->guessColumnForQuery($attribute);
@@ -1701,7 +1701,7 @@ trait ValidatesAttributes
      *
      * @throws \InvalidArgumentException
      */
-    protected function requireParameterCount($count, $parameters, $rule)
+    public function requireParameterCount($count, $parameters, $rule)
     {
         if (count($parameters) < $count) {
             throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
