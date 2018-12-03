@@ -560,7 +560,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function unlessEmpty(callable $callback, callable $default = null)
     {
-        return $this->unless($this->isEmpty(), $callback, $default);
+        return $this->whenNotEmpty($callback, $default);
     }
 
     /**
@@ -572,7 +572,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function unlessNotEmpty(callable $callback, callable $default = null)
     {
-        return $this->unless($this->isNotEmpty(), $callback, $default);
+        return $this->whenEmpty($callback, $default);
     }
 
     /**

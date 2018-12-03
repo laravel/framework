@@ -45,7 +45,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         return array_map(function ($value) {
             return $value !== false ? $value : null;
-        }, $this->command('mget', $keys));
+        }, $this->command('mget', [$keys]));
     }
 
     /**
