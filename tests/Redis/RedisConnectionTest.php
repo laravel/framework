@@ -437,6 +437,22 @@ class RedisConnectionTest extends TestCase
         }
     }
 
+    public function test_it_gets_multiple_keys()
+    {
+        $valueSet = ['name' => 'mohamed', 'hobby' => 'diving'];
+
+        foreach ($this->connections() as $redis) {
+            $redis->mset($valueSet);
+
+            $this->assertEquals(
+                array_values($valueSet),
+                $redis->mget(array_keys($valueSet))
+            );
+
+            $redis->flushall();
+        }
+    }
+
     public function test_it_runs_eval()
     {
         foreach ($this->connections() as $redis) {
