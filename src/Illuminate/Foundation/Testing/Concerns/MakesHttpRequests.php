@@ -434,7 +434,7 @@ trait MakesHttpRequests
      * Follow a redirect chain until a non-redirect is received.
      *
      * @param  \Illuminate\Http\Response  $response
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Foundation\Testing\TestResponse
      */
     protected function followRedirects($response)
     {
