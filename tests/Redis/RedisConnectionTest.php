@@ -440,6 +440,7 @@ class RedisConnectionTest extends TestCase
     public function test_it_gets_multiple_keys()
     {
         $valueSet = ['name' => 'mohamed', 'hobby' => 'diving'];
+
         foreach ($this->connections() as $redis) {
             $redis->mset($valueSet);
 
