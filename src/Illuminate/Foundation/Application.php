@@ -478,7 +478,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function environment(...$envs)
     {
-        if (!empty($envs)) {
+        if (! empty($envs)) {
             $patterns = is_array($envs[0]) ? $envs[0] : $envs;
 
             return Str::is($patterns, $this['env']);
