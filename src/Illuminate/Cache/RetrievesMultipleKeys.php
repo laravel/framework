@@ -32,12 +32,14 @@ trait RetrievesMultipleKeys
      */
     public function putMany(array $values, $minutes)
     {
-        $resultMany = null;
+        $manyResult = null;
+
         foreach ($values as $key => $value) {
             $result = $this->put($key, $value, $minutes);
-            $resultMany = is_null($resultMany) ? $result : $result && $resultMany;
+
+            $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
         }
 
-        return $resultMany ?: false;
+        return $manyResult ?: false;
     }
 }

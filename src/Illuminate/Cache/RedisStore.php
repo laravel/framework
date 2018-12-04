@@ -107,15 +107,17 @@ class RedisStore extends TaggableStore implements LockProvider
     {
         $this->connection()->multi();
 
-        $resultMany = null;
+        $manyResult = null;
+
         foreach ($values as $key => $value) {
             $result = $this->put($key, $value, $minutes);
-            $resultMany = is_null($resultMany) ? $result : $result && $resultMany;
+
+            $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
         }
 
         $this->connection()->exec();
 
-        return $resultMany ?: false;
+        return $manyResult ?: false;
     }
 
     /**
