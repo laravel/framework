@@ -10,18 +10,21 @@ class CacheArrayStoreTest extends TestCase
     public function testItemsCanBeSetAndRetrieved()
     {
         $store = new ArrayStore;
-        $store->put('foo', 'bar', 10);
+        $result = $store->put('foo', 'bar', 10);
+        $this->assertTrue($result);
         $this->assertEquals('bar', $store->get('foo'));
     }
 
     public function testMultipleItemsCanBeSetAndRetrieved()
     {
         $store = new ArrayStore;
-        $store->put('foo', 'bar', 10);
-        $store->putMany([
+        $result = $store->put('foo', 'bar', 10);
+        $resultMany = $store->putMany([
             'fizz'  => 'buz',
             'quz'   => 'baz',
         ], 10);
+        $this->assertTrue($result);
+        $this->assertTrue($resultMany);
         $this->assertEquals([
             'foo'   => 'bar',
             'fizz'  => 'buz',
@@ -33,8 +36,11 @@ class CacheArrayStoreTest extends TestCase
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->setMethods(['put'])->getMock();
-        $mock->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0));
-        $mock->forever('foo', 'bar');
+        $mock->expects($this->once())
+            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->willReturn(true);
+        $result = $mock->forever('foo', 'bar');
+        $this->assertTrue($result);
     }
 
     public function testValuesCanBeIncremented()

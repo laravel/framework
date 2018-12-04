@@ -85,13 +85,15 @@ class RedisStore extends TaggableStore implements LockProvider
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
-        $this->connection()->setex(
+        $result = $this->connection()->setex(
             $this->prefix.$key, (int) max(1, $minutes * 60), $this->serialize($value)
         );
+
+        return $result ? true : false;
     }
 
     /**
@@ -99,17 +101,21 @@ class RedisStore extends TaggableStore implements LockProvider
      *
      * @param  array  $values
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function putMany(array $values, $minutes)
     {
         $this->connection()->multi();
 
+        $resultMany = null;
         foreach ($values as $key => $value) {
-            $this->put($key, $value, $minutes);
+            $result = $this->put($key, $value, $minutes);
+            $resultMany = is_null($resultMany) ? $result : $result && $resultMany;
         }
 
         $this->connection()->exec();
+
+        return $resultMany ?: false;
     }
 
     /**
@@ -158,11 +164,13 @@ class RedisStore extends TaggableStore implements LockProvider
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->connection()->set($this->prefix.$key, $this->serialize($value));
+        $result = $this->connection()->set($this->prefix.$key, $this->serialize($value));
+
+        return $result ? true : false;
     }
 
     /**

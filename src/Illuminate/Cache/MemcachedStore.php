@@ -105,11 +105,11 @@ class MemcachedStore extends TaggableStore implements LockProvider
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
-        $this->memcached->set(
+        return $this->memcached->set(
             $this->prefix.$key, $value, $this->calculateExpiration($minutes)
         );
     }
@@ -119,7 +119,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
      *
      * @param  array  $values
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function putMany(array $values, $minutes)
     {
@@ -129,7 +129,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
             $prefixedValues[$this->prefix.$key] = $value;
         }
 
-        $this->memcached->setMulti(
+        return $this->memcached->setMulti(
             $prefixedValues, $this->calculateExpiration($minutes)
         );
     }
@@ -178,11 +178,11 @@ class MemcachedStore extends TaggableStore implements LockProvider
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        return $this->put($key, $value, 0);
     }
 
     /**
