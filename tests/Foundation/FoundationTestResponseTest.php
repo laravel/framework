@@ -167,6 +167,18 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJson($resource->jsonSerialize());
     }
 
+    public function testAssertJsonWithNull()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(null));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Invalid JSON was returned from the route.');
+
+        $resource = new JsonSerializableSingleResourceStub;
+
+        $response->assertJson($resource->jsonSerialize());
+    }
+
     public function testAssertJsonWithMixed()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
