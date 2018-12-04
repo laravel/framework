@@ -2594,6 +2594,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateHex()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'AAFF91aaff'], ['x' => 'hex']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'AAGG91aagg'], ['x' => 'hex']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateTimezone()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -649,6 +649,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid hexadecimal string
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    public function validateHex($attribute, $value)
+    {
+        return ctype_xdigit($value);
+    }
+
+    /**
      * Get the number of records that exist in storage.
      *
      * @param  mixed   $connection
