@@ -21,6 +21,8 @@
         "doctrine/inflector": "^1.1",
         "dragonmantank/cron-expression": "^2.0",
         "erusev/parsedown": "^1.7",
+        "laravel/nexmo-notification-channel": "^1.0",
+        "laravel/slack-notification-channel": "^1.0",
         "league/flysystem": "^1.0.8",
         "monolog/monolog": "^1.12",
         "nesbot/carbon": "^1.26.3",
@@ -38,9 +40,7 @@
         "symfony/routing": "^4.1",
         "symfony/var-dumper": "^4.1",
         "tijsverkoyen/css-to-inline-styles": "^2.2.1",
-        "vlucas/phpdotenv": "^2.2",
-        "laravel/nexmo-notification-channel": "^1.0",
-        "laravel/slack-notification-channel": "^1.0"
+        "vlucas/phpdotenv": "^2.2"
     },
     "replace": {
         "illuminate/auth": "self.version",
