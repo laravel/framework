@@ -37,12 +37,18 @@ abstract class Lock implements LockContract
      *
      * @param  string  $name
      * @param  int  $seconds
+     * @param  string $owner
      * @return void
      */
-    public function __construct($name, $seconds)
+    public function __construct($name, $seconds, $owner = null)
     {
+        if (is_null($owner)) {
+            $owner = Str::random();
+        }
+
         $this->name = $name;
         $this->seconds = $seconds;
+        $this->owner = $owner;
     }
 
     /**
@@ -60,11 +66,11 @@ abstract class Lock implements LockContract
     abstract public function release();
 
     /**
-     * Returns the value written into the driver for this lock.
+     * Returns the owner value written into the driver for this lock.
      *
      * @return mixed
      */
-    abstract protected function getValue();
+    abstract protected function getCurrentOwner();
 
     /**
      * Attempt to acquire the lock.
@@ -118,59 +124,12 @@ abstract class Lock implements LockContract
     }
 
     /**
-     * Secures this lock against out of order releases of expired clients via assigning an owner.
-     *
-     * @return Lock
-     */
-    public function owned()
-    {
-        return $this->setOwner(Str::random());
-    }
-
-    /**
-     * Secures this lock against out of order releases of expired clients via assigning an owner.
-     *
-     * @param  string $owner
-     * @return Lock
-     */
-    public function setOwner($owner)
-    {
-        $this->owner = $owner;
-
-        return $this;
-    }
-
-    /**
-     * Determines whether this is a client scoped lock.
-     *
-     * @return bool
-     */
-    protected function isOwned()
-    {
-        return ! is_null($this->owner);
-    }
-
-    /**
-     * Returns the value that should be written into the cache.
-     *
-     * @return mixed
-     */
-    protected function value()
-    {
-        return $this->isOwned() ? $this->owner : 1;
-    }
-
-    /**
      * Determines whether this lock is allowed to release the lock in the driver.
      *
      * @return bool
      */
     protected function isOwnedByCurrentProcess()
     {
-        if (! $this->isOwned()) {
-            return true;
-        }
-
-        return $this->getValue() === $this->owner;
+        return $this->getCurrentOwner() === $this->owner;
     }
 }

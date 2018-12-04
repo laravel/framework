@@ -17,11 +17,12 @@ class RedisLock extends Lock
      * @param  \Illuminate\Redis\Connections\Connection  $redis
      * @param  string  $name
      * @param  int  $seconds
+     * @param  string $owner
      * @return void
      */
-    public function __construct($redis, $name, $seconds)
+    public function __construct($redis, $name, $seconds, $owner = null)
     {
-        parent::__construct($name, $seconds);
+        parent::__construct($name, $seconds, $owner);
 
         $this->redis = $redis;
     }
@@ -33,7 +34,7 @@ class RedisLock extends Lock
      */
     public function acquire()
     {
-        $result = $this->redis->setnx($this->name, $this->value());
+        $result = $this->redis->setnx($this->name, $this->owner);
 
         if ($result === 1 && $this->seconds > 0) {
             $this->redis->expire($this->name, $this->seconds);
@@ -55,11 +56,21 @@ class RedisLock extends Lock
     }
 
     /**
-     * Returns the value written into the driver for this lock.
+     * Releases this lock in disregard of ownership.
+     *
+     * @return void
+     */
+    public function forceRelease()
+    {
+        $this->redis->del($this->name);
+    }
+
+    /**
+     * Returns the owner value written into the driver for this lock.
      *
      * @return string
      */
-    protected function getValue()
+    protected function getCurrentOwner()
     {
         return $this->redis->get($this->name);
     }

@@ -30,11 +30,15 @@ class RedisCacheLockTest extends TestCase
 
     public function test_redis_locks_can_be_acquired_and_released()
     {
-        Cache::store('redis')->lock('foo')->release();
-        $this->assertTrue(Cache::store('redis')->lock('foo', 10)->get());
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($lock->get());
         $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
-        Cache::store('redis')->lock('foo')->release();
-        $this->assertTrue(Cache::store('redis')->lock('foo', 10)->get());
+        $lock->release();
+
+        $lock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($lock->get());
         $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
         Cache::store('redis')->lock('foo')->release();
     }
@@ -43,53 +47,28 @@ class RedisCacheLockTest extends TestCase
     {
         Carbon::setTestNow();
 
-        Cache::store('redis')->lock('foo')->release();
+        Cache::store('redis')->lock('foo')->forceRelease();
         $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
 
-        Cache::store('redis')->lock('foo')->release();
+        Cache::store('redis')->lock('foo')->forceRelease();
         $this->assertTrue(Cache::store('redis')->lock('foo', 10)->block(1));
     }
 
-    public function test_owned_redis_locks_are_released_safely()
+    public function test_concurrent_redis_locks_are_released_safely()
     {
-        Cache::store('redis')->lock('bar')->release();
+        Cache::store('redis')->lock('foo')->forceRelease();
 
-        $firstLock = Cache::store('redis')->lock('bar', 1)->owned();
-        $this->assertTrue($firstLock->acquire());
+        $firstLock = Cache::store('redis')->lock('foo', 1);
+        $this->assertTrue($firstLock->get());
         sleep(2);
 
-        $secondLock = Cache::store('redis')->lock('bar', 10)->owned();
-        $this->assertTrue($secondLock->acquire());
+        $secondLock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($secondLock->get());
 
         $firstLock->release();
 
-        $this->assertFalse(Cache::store('redis')->lock('bar')->get());
-    }
-
-    public function test_owned_redis_locks_are_exclusive()
-    {
-        Cache::store('redis')->lock('bar')->release();
-
-        $firstLock = Cache::store('redis')->lock('bar', 10)->owned();
-        $this->assertTrue($firstLock->acquire());
-
-        $secondLock = Cache::store('redis')->lock('bar', 10)->owned();
-        $this->assertFalse($secondLock->acquire());
-    }
-
-    public function test_owned_redis_locks_can_be_released_by_original_owner()
-    {
-        Cache::store('redis')->lock('bar')->release();
-
-        $firstLock = Cache::store('redis')->lock('bar', 10)->owned();
-        $this->assertTrue($firstLock->acquire());
-
-        $secondLock = Cache::store('redis')->lock('bar', 10)->owned();
-        $this->assertFalse($secondLock->acquire());
-
-        $firstLock->release();
-        $this->assertFalse(Cache::store('redis')->has('bar'));
+        $this->assertFalse(Cache::store('redis')->lock('foo')->get());
     }
 }
