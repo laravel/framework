@@ -165,9 +165,7 @@ class MailFake implements Mailer, MailQueue
             return true;
         };
 
-        return $this->mailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable);
-        });
+        return $this->mailablesOf($mailable)->filter($callback);
     }
 
     /**
@@ -198,9 +196,7 @@ class MailFake implements Mailer, MailQueue
             return true;
         };
 
-        return $this->queuedMailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable);
-        });
+        return $this->queuedMailablesOf($mailable)->filter($callback);
     }
 
     /**
