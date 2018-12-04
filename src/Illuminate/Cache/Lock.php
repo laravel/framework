@@ -26,9 +26,9 @@ abstract class Lock implements LockContract
     protected $seconds;
 
     /**
-     * A (usually) random string that acts as scope identifier of this lock.
+     * The scope identifier of this lock.
      *
-     * @var string
+     * @var string|null
      */
     protected $owner;
 
@@ -37,7 +37,7 @@ abstract class Lock implements LockContract
      *
      * @param  string  $name
      * @param  int  $seconds
-     * @param  string $owner
+     * @param  string|null  $owner
      * @return void
      */
     public function __construct($name, $seconds, $owner = null)
