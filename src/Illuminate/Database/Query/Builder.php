@@ -2563,6 +2563,7 @@ class Builder
      *
      * @param  array $columns
      * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @return bool
      */
     public function insertSub(array $columns, $query)
     {
