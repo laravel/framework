@@ -23,6 +23,8 @@
         "dragonmantank/cron-expression": "^2.0",
         "egulias/email-validator": "^2.0",
         "erusev/parsedown": "^1.7",
+        "laravel/nexmo-notification-channel": "^1.0",
+        "laravel/slack-notification-channel": "^1.0",
         "league/flysystem": "^1.0.8",
         "monolog/monolog": "^1.12",
         "nesbot/carbon": "^1.26.3 || ^2.0",
