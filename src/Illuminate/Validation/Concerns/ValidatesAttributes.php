@@ -649,7 +649,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is a valid hexadecimal string
+     * Validate that an attribute is a valid hexadecimal string.
      *
      * @param  string  $attribute
      * @param  mixed   $value
