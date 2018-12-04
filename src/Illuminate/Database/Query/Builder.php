@@ -2566,6 +2566,12 @@ class Builder
      */
     public function insertSub(array $columns, $query)
     {
+        [$sql, $bindings] = $this->createSub($query);
+
+        return $this->connection->insert(
+            $this->grammar->compileInsertSub($this, $columns, $sql),
+            $this->cleanBindings($bindings)
+        );
     }
 
     /**

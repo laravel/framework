@@ -1678,11 +1678,11 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertSubMethod()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") select "address" from "emails" where "created_at" > ?', ['2018-01-01'])->andReturn(true);
-        $result = $builder->from('users')->insertSub(
-            ['email'],
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(true);
+        $result = $builder->from('table1')->insertSub(
+            ['foo'],
             function (Builder $query) {
-                $query->from('emails')->select(['address'])->where('created_at', '>', '2018-01-01');
+                $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
             }
         );
         $this->assertTrue($result);

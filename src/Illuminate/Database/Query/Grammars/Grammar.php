@@ -791,6 +791,15 @@ class Grammar extends BaseGrammar
         return $this->compileInsert($query, $values);
     }
 
+    public function compileInsertSub(Builder $query, array $columns, string $sql)
+    {
+        $table = $this->wrapTable($query->from);
+
+        $columns_string = $this->columnize($columns);
+
+        return "insert into $table ($columns_string) $sql";
+    }
+
     /**
      * Compile an update statement into SQL.
      *
