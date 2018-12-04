@@ -2559,6 +2559,16 @@ class Builder
     }
 
     /**
+     * Insert new records from a subquery.
+     *
+     * @param  array $columns
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     */
+    public function insertSub(array $columns, $query)
+    {
+    }
+
+    /**
      * Update a record in the database.
      *
      * @param  array  $values

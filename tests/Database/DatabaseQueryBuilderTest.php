@@ -1675,6 +1675,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testInsertSubMethod()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") select "address" from "emails" where "created_at" > ?', ['2018-01-01'])->andReturn(true);
+        $result = $builder->from('users')->insertSub(
+            ['email'],
+            function (Builder $query) {
+                $query->from('emails')->select(['address'])->where('created_at', '>', '2018-01-01');
+            }
+        );
+        $this->assertTrue($result);
+    }
+
     public function testSQLiteMultipleInserts()
     {
         $builder = $this->getSQLiteBuilder();
