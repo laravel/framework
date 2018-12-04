@@ -475,6 +475,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $value = '1429311541';
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+        $this->assertNull($model->fromDateTime(null));
     }
 
     public function testInsertProcess()
