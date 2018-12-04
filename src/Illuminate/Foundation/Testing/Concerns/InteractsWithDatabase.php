@@ -85,7 +85,7 @@ trait InteractsWithDatabase
     /**
      * Seed a given database connection.
      *
-     * @param  array|string $class
+     * @param  array|string  $class
      * @return $this
      */
     public function seed($class = 'DatabaseSeeder')
