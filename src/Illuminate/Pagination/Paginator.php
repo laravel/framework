@@ -137,13 +137,16 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Get the instance as an array.
      *
+     * @param  bool  $preserveKeys
      * @return array
      */
-    public function toArray()
+    protected function compile($preserveKeys = true)
     {
+        $items = $this->items->toArray();
+
         return [
             'current_page' => $this->currentPage(),
-            'data' => $this->items->toArray(),
+            'data' => $preserveKeys ? $items : array_values($items),
             'first_page_url' => $this->url(1),
             'from' => $this->firstItem(),
             'next_page_url' => $this->nextPageUrl(),
@@ -155,13 +158,23 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     }
 
     /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->compile();
+    }
+
+    /**
      * Convert the object into something JSON serializable.
      *
      * @return array
      */
     public function jsonSerialize()
     {
-        return $this->toArray();
+        return $this->compile(false);
     }
 
     /**

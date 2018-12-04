@@ -97,4 +97,28 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertEquals('http://website.com?key=value%20with%20spaces&foo=2',
                             $this->p->url($this->p->currentPage()));
     }
+
+    public function testPaginatorAlwaysReturnsDataKeyAsArrayWhenTransformingToJson()
+    {
+        $paginator = new LengthAwarePaginator(
+            $array = [1 => 'item1', 'foo' => 'item2', 2 => 'item3', ['bar' => 'item4']], 4, 2, 2
+        );
+
+        $json = json_encode([
+            'current_page' => 2,
+            'data' => ['item1', 'item2', 'item3', ['bar' => 'item4']],
+            'first_page_url' => '/?page=1',
+            'from' => 3,
+            'last_page' => 2,
+            'last_page_url' => '/?page=2',
+            'next_page_url' => null,
+            'path' => '/',
+            'per_page' => 2,
+            'prev_page_url' => '/?page=1',
+            'to' => 6,
+            'total' => 4,
+        ]);
+
+        $this->assertJsonStringEqualsJsonString($json, $paginator->toJson());
+    }
 }

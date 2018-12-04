@@ -46,4 +46,23 @@ class PaginatorTest extends TestCase
 
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
+
+    public function testPaginatorAlwaysMakesDataKeyAnArrayInJson()
+    {
+        $p = new Paginator($array = [1 => 'item1', 'foo' => 'item2', 2 => 'item3', ['bar' => 'item4']], 2, 2);
+
+        $json = json_encode([
+            'current_page' => 2,
+            'data' => ['item1', 'item2'],
+            'first_page_url' => '/?page=1',
+            'from' => 3,
+            'next_page_url' => '/?page=3',
+            'path' => '/',
+            'per_page' => 2,
+            'prev_page_url' => '/?page=1',
+            'to' => 4,
+        ]);
+
+        $this->assertJsonStringEqualsJsonString($json, $p->toJson());
+    }
 }
