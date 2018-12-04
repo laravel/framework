@@ -84,12 +84,14 @@ trait InteractsWithDatabase
     /**
      * Seed a given database connection.
      *
-     * @param  string  $class
+     * @param  string|array $classes
      * @return $this
      */
-    public function seed($class = 'DatabaseSeeder')
+    public function seed($classes = 'DatabaseSeeder')
     {
-        $this->artisan('db:seed', ['--class' => $class, '--no-interaction' => true]);
+        foreach ((array) $classes as $class) {
+            $this->artisan('db:seed', ['--class' => $class, '--no-interaction' => true]);
+        }
 
         return $this;
     }
