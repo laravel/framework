@@ -226,6 +226,8 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
+        $this->mailer->shouldReceive('send')->once();
+
         $user->notify($notification);
     }
 }
@@ -303,10 +305,6 @@ class TestMailNotificationWithMailable extends Notification
 
     public function toMail($notifiable)
     {
-        $mailable = m::mock(Mailable::class);
-
-        $mailable->shouldReceive('send')->once();
-
-        return $mailable;
+        return m::mock(Mailable::class);
     }
 }
