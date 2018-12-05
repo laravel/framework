@@ -167,6 +167,18 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJson($resource->jsonSerialize());
     }
 
+    public function testAssertJsonWithNull()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(null));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Invalid JSON was returned from the route.');
+
+        $resource = new JsonSerializableSingleResourceStub;
+
+        $response->assertJson($resource->jsonSerialize());
+    }
+
     public function testAssertJsonWithMixed()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
@@ -223,6 +235,9 @@ class FoundationTestResponseTest extends TestCase
 
         // Wildcard (repeating structure)
         $response->assertJsonStructure(['bars' => ['*' => ['bar', 'foo']]]);
+
+        // Wildcard (numeric keys)
+        $response->assertJsonStructure(['numeric_keys' => ['*' => ['bar', 'foo']]]);
 
         // Nested after wildcard
         $response->assertJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]]]);
@@ -395,17 +410,17 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'foo'    => 'bar',
+            'foo' => 'bar',
             'foobar' => [
                 'foobar_foo' => 'foo',
                 'foobar_bar' => 'bar',
             ],
-            'bars'   => [
+            'bars' => [
                 ['bar' => 'foo 0', 'foo' => 'bar 0'],
                 ['bar' => 'foo 1', 'foo' => 'bar 1'],
                 ['bar' => 'foo 2', 'foo' => 'bar 2'],
             ],
-            'baz'    => [
+            'baz' => [
                 ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
                 ['foo' => 'bar 1', 'bar' => ['foo' => 'bar 1', 'bar' => 'foo 1']],
             ],
@@ -413,6 +428,11 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
                 ['bar' => ['bar' => 'foo 0']],
                 ['bar' => ['bar' => 'foo 0', 'bar' => 'foo 0']],
                 ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
+            ],
+            'numeric_keys' => [
+                2 => ['bar' => 'foo 0', 'foo' => 'bar 0'],
+                3 => ['bar' => 'foo 1', 'foo' => 'bar 1'],
+                4 => ['bar' => 'foo 2', 'foo' => 'bar 2'],
             ],
         ];
     }

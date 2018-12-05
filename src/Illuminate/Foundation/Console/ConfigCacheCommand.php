@@ -48,6 +48,8 @@ class ConfigCacheCommand extends Command
      * Execute the console command.
      *
      * @return void
+     *
+     * @throws \LogicException
      */
     public function handle()
     {
