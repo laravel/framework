@@ -20,7 +20,7 @@ class FoundationTestResponseTest extends TestCase
         $response = $this->makeMockResponse([
             'render' => 'hello world',
             'getData' => ['foo' => 'bar'],
-            'getName' => 'dir.my-view',
+            'name' => 'dir.my-view',
         ]);
 
         $response->assertViewIs('dir.my-view');
