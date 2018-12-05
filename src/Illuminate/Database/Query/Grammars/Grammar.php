@@ -644,15 +644,15 @@ class Grammar extends BaseGrammar
      */
     protected function compileHavingBetween($having)
     {
-      $between = $having['not'] ? 'not between' : 'between';
+        $between = $having['not'] ? 'not between' : 'between';
 
-      $column = $this->wrap($having['column']);
+        $column = $this->wrap($having['column']);
 
-      $min = $this->parameter(reset($having['values']));
+        $min = $this->parameter(reset($having['values']));
 
-      $max = $this->parameter(end($having['values']));
+        $max = $this->parameter(end($having['values']));
 
-      return $having['boolean']. ' '.$column.' '.$between.' '.$min.' and '.$max;
+        return $having['boolean']. ' '.$column.' '.$between.' '.$min.' and '.$max;
     }
 
     /**
