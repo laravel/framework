@@ -10,7 +10,7 @@
 - Fixed self-referencing HasManyThrough existence queries ([#26662](https://github.com/laravel/framework/pull/26662))
 - Fixed HasManyThrough existence queries with same parent and through parent table ([#26676](https://github.com/laravel/framework/pull/26676))
 - Fixed breaking eager loading with "incrementing" string keys ([#26688](https://github.com/laravel/framework/pull/26688))
-- Remove the Register <li> when the route doesn't exist in `app.stub` ([#26708](https://github.com/laravel/framework/pull/26708))
+- Remove the Register `<li>` when the route doesn't exist in `app.stub` ([#26708](https://github.com/laravel/framework/pull/26708))
 - Fixed `Collection::some` method ([#26696](https://github.com/laravel/framework/pull/26696))
 - <strong> Revert breaking change in `TestResponse::decodeResponseJson` method </strong> ([#26713](https://github.com/laravel/framework/pull/26713))
 - Fixed `PhpRedisConnection::mget` ([#26716](https://github.com/laravel/framework/pull/26716))
