@@ -270,7 +270,7 @@ trait QueriesRelationships
         foreach ($this->parseWithRelations($relations, false) as $name => $constraints) {
             // First we will determine if the name has been aliased using an "as" clause on the name
             // and if it has we will extract the actual relationship name and the desired name of
-            // the resulting column. This allows multiple aggregates on the same relationship name.
+            // the resulting column. This allows multiple aggregates for the same relationship.
             $segments = explode(' ', $name);
 
             unset($alias);
@@ -291,8 +291,8 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             // Here we will get the relationship aggregate query and prepare to add it to the main query
-            // as a sub-select. First, we'll get the "has" query and use that to get the relation
-            // aggregate query. We will normalize the relation name then append _"colum"_"aggregate" as the name.
+             // as a sub-select. First we'll get the "has" query and use that to retrieve the relation
+            // aggregate query. We normalize the relation name, and append _$column_$aggregateName.
             $query = $relation->getRelationExistenceAggregateQuery(
                 $relation->getRelated()->newQuery(), $this, $function, $aggregateColumn ?? '*'
             );
