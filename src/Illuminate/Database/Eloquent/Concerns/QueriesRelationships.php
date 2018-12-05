@@ -241,7 +241,7 @@ trait QueriesRelationships
      * Alias for the "withAvg" method.
      *
      * @param  mixed  $relations
-     * @return mixed
+     * @return $this
      */
     public function withAverage(...$relations)
     {
