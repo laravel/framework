@@ -291,7 +291,7 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             // Here we will get the relationship aggregate query and prepare to add it to the main query
-             // as a sub-select. First we'll get the "has" query and use that to retrieve the relation
+            // as a sub-select. First we'll get the "has" query and use that to retrieve the relation
             // aggregate query. We normalize the relation name, and append _$column_$aggregateName.
             $query = $relation->getRelationExistenceAggregateQuery(
                 $relation->getRelated()->newQuery(), $this, $function, $aggregateColumn ?? '*'
