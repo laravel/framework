@@ -36,6 +36,7 @@ class Grammar extends BaseGrammar
         'offset',
         'unions',
         'lock',
+        'between'
     ];
 
     /**
@@ -636,6 +637,25 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "between" having clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingBetween($having)
+    {
+      $between = $having['not'] ? 'not between' : 'between';
+
+      $column = $this->wrap($having['column']);
+
+      $min = $this->parameter(reset($having['values']));
+
+      $max = $this->parameter(end($having['values']));
+
+      return $having['boolean']. ' '.$column.' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
      * Compile a single having clause.
      *
      * @param  array   $having
@@ -648,6 +668,8 @@ class Grammar extends BaseGrammar
         // clause into SQL based on the components that make it up from builder.
         if ($having['type'] === 'Raw') {
             return $having['boolean'].' '.$having['sql'];
+        } elseif ($having['type'] === 'between') {
+            return $this->compileHavingBetween($having);
         }
 
         return $this->compileBasicHaving($having);

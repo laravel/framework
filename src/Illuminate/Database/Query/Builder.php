@@ -185,6 +185,7 @@ class Builder
         'rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
         'not similar to', 'not ilike', '~~*', '!~~*',
+        'between'
     ];
 
     /**
@@ -1722,6 +1723,27 @@ class Builder
         );
 
         return $this->having($column, $operator, $value, 'or');
+    }
+
+  /**
+   * Add a "or having" clause to the query.
+   *
+   * @param  string $column
+   * @param array $values
+   * @param string $boolean
+   * @param bool $not
+   * @return Builder|static
+   */
+
+    public function havingBetween($column, array $values, $boolean = 'and', $not = false)
+    {
+      $type = 'between';
+
+      $this->havings[] = compact('type', 'column', 'values', 'boolean', 'not');
+
+      $this->addBinding($this->cleanBindings($values), 'having');
+
+      return $this;
     }
 
     /**
