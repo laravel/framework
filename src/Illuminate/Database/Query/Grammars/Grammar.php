@@ -36,7 +36,7 @@ class Grammar extends BaseGrammar
         'offset',
         'unions',
         'lock',
-        'between'
+        'between',
     ];
 
     /**
@@ -652,7 +652,7 @@ class Grammar extends BaseGrammar
 
         $max = $this->parameter(end($having['values']));
 
-        return $having['boolean']. ' '.$column.' '.$between.' '.$min.' and '.$max;
+        return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
     }
 
     /**

@@ -185,7 +185,7 @@ class Builder
         'rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
         'not similar to', 'not ilike', '~~*', '!~~*',
-        'between'
+        'between',
     ];
 
     /**
@@ -1734,7 +1734,6 @@ class Builder
      * @param bool $not
      * @return Builder|static
      */
-
     public function havingBetween($column, array $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
