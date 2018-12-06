@@ -176,7 +176,7 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
 
-            ['apiResource', null, InputOption::VALUE_NONE, 'Create a new API resource for the model']
+            ['apiResource', null, InputOption::VALUE_NONE, 'Create a new API resource for the model'],
         ];
     }
 }
