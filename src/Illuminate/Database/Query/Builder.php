@@ -1725,6 +1725,26 @@ class Builder
     }
 
     /**
+     * Add a "having between " clause to the query.
+     *
+     * @param  string $column
+     * @param array $values
+     * @param string $boolean
+     * @param bool $not
+     * @return Builder|static
+     */
+    public function havingBetween($column, array $values, $boolean = 'and', $not = false)
+    {
+        $type = 'between';
+
+        $this->havings[] = compact('type', 'column', 'values', 'boolean', 'not');
+
+        $this->addBinding($this->cleanBindings($values), 'having');
+
+        return $this;
+    }
+
+    /**
      * Add a raw having clause to the query.
      *
      * @param  string  $sql
