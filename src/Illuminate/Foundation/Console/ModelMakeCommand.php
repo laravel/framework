@@ -58,6 +58,10 @@ class ModelMakeCommand extends GeneratorCommand
         if ($this->option('controller') || $this->option('resource')) {
             $this->createController();
         }
+
+        if ($this->option('apiResource')) {
+            $this->createApiResource();
+        }
     }
 
     /**
@@ -112,6 +116,20 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create a resource for the model.
+     *
+     * @return void
+     */
+    protected function createApiResource()
+    {
+        $resource = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:resource', [
+            'name' => "{$resource}Resource",
+        ]);
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -157,6 +175,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+
+            ['apiResource', null, InputOption::VALUE_NONE, 'Create a new API resource for the model']
         ];
     }
 }
