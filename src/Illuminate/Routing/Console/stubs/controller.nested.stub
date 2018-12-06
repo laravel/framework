@@ -36,7 +36,7 @@ class DummyClass extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, ParentDummyModelClass $ParentDummyModelVariable)
     {
@@ -73,7 +73,7 @@ class DummyClass extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
      * @param  \DummyFullModelClass  $DummyModelVariable
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, ParentDummyModelClass $ParentDummyModelVariable, DummyModelClass $DummyModelVariable)
     {
@@ -85,7 +85,7 @@ class DummyClass extends Controller
      *
      * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
      * @param  \DummyFullModelClass  $DummyModelVariable
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(ParentDummyModelClass $ParentDummyModelVariable, DummyModelClass $DummyModelVariable)
     {
