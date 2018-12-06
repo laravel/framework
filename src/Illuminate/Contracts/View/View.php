@@ -7,13 +7,6 @@ use Illuminate\Contracts\Support\Renderable;
 interface View extends Renderable
 {
     /**
-     * Get the array of view data.
-     *
-     * @return array
-     */
-    public function getData();
-
-    /**
      * Get the name of the view.
      *
      * @return string
@@ -28,4 +21,11 @@ interface View extends Renderable
      * @return $this
      */
     public function with($key, $value = null);
+
+    /**
+     * Get the array of view data.
+     *
+     * @return array
+     */
+    public function getData();
 }
