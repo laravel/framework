@@ -30,6 +30,8 @@ class ViewCacheCommand extends Command
      */
     public function handle()
     {
+        $this->call('view:clear');
+
         $this->paths()->each(function ($path) {
             $this->compileViews($this->bladeFilesIn([$path]));
         });
