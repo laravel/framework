@@ -791,6 +791,14 @@ class Grammar extends BaseGrammar
         return $this->compileInsert($query, $values);
     }
 
+    /**
+     * Compile an insert statement with subquery into SQL.
+     *
+     * @param  Builder  $query
+     * @param  array    $columns
+     * @param  string   $sql
+     * @return string
+     */
     public function compileInsertSub(Builder $query, array $columns, string $sql)
     {
         $table = $this->wrapTable($query->from);
