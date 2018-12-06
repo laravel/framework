@@ -71,7 +71,9 @@ abstract class GeneratorCommand extends Command
 
         $this->files->put($path, $this->buildClass($name));
 
-        $this->info($this->type.' created successfully.');
+        $relativeOrAbsolutePath = Str::replaceFirst(getcwd().DIRECTORY_SEPARATOR, '', $path);
+
+        $this->line("<info>{$this->type} created successfully:</info> {$relativeOrAbsolutePath}");
     }
 
     /**
