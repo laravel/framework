@@ -36,7 +36,6 @@ class Grammar extends BaseGrammar
         'offset',
         'unions',
         'lock',
-        'between',
     ];
 
     /**
