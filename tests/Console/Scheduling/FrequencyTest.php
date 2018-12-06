@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class FrequencyTest extends TestCase
 {
@@ -38,6 +38,66 @@ class FrequencyTest extends TestCase
         $this->assertEquals('0 0 * * *', $this->event->daily()->getExpression());
     }
 
+    public function testDailyAt()
+    {
+        $this->assertEquals('59 12 * * *', $this->event->dailyAt('12:59')->getExpression());
+        $this->assertEquals('0 12 * * *', $this->event->dailyAt('12')->getExpression());
+        $this->assertEquals('0 0 * * *', $this->event->dailyAt('0')->getExpression());
+        $this->assertEquals('0 0 * * *', $this->event->dailyAt(0)->getExpression());
+        $this->assertEquals('0 0 * * *', $this->event->dailyAt('00')->getExpression());
+        $this->assertEquals('0 0 * * *', $this->event->dailyAt('00:00')->getExpression());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDailyAtAcceptInvalidDataExceptionOne()
+    {
+        $this->event->dailyAt('12:abc');
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDailyAtAcceptInvalidDataExceptionTwo()
+    {
+        $this->event->dailyAt('1 :59');
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDailyAtAcceptDatetimeException()
+    {
+        $this->event->dailyAt('2018-12-06 18:06:37');
+
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDailyAtAcceptSecondException()
+    {
+        $this->event->dailyAt('12:59:00');
+
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDailyAtAcceptBoolException()
+    {
+        $this->event->dailyAt(true);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDailyAtAcceptWordException()
+    {
+        $this->event->dailyAt('word');
+    }
+
     public function testTwiceDaily()
     {
         $this->assertEquals('0 3,15 * * *', $this->event->twiceDaily(3, 15)->getExpression());
@@ -52,6 +112,14 @@ class FrequencyTest extends TestCase
     public function testMonthlyOn()
     {
         $this->assertEquals('0 15 4 * *', $this->event->monthlyOn(4, '15:00')->getExpression());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testMonthlyOnAcceptWordException()
+    {
+        $this->event->monthlyOn(1, 'word');
     }
 
     public function testTwiceMonthly()
@@ -77,6 +145,37 @@ class FrequencyTest extends TestCase
     public function testWeekdays()
     {
         $this->assertEquals('* * * * 1-5', $this->event->weekdays()->getExpression());
+    }
+
+    public function testWeeklyOn()
+    {
+        $this->assertEquals('0 8 * * 1', $this->event->weeklyOn(1, '08:00')->getExpression());
+    }
+
+    public function testWeeklyOnWithMinutes()
+    {
+        $this->assertEquals('12 8 * * 1', $this->event->weeklyOn(1, '08:12')->getExpression());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testWeeklyOnAcceptWordException()
+    {
+        $this->event->weeklyOn(1, 'word');
+    }
+
+    public function testAt()
+    {
+        $this->assertEquals('22 13 * * 1', $this->event->weekly()->mondays()->at('13:22')->getExpression());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testAtAcceptWordException()
+    {
+        $this->event->weekly()->mondays()->at('word');
     }
 
     public function testSundays()
