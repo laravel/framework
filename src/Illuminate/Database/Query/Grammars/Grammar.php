@@ -636,25 +636,6 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a "between" having clause.
-     *
-     * @param  array  $having
-     * @return string
-     */
-    protected function compileHavingBetween($having)
-    {
-        $between = $having['not'] ? 'not between' : 'between';
-
-        $column = $this->wrap($having['column']);
-
-        $min = $this->parameter(reset($having['values']));
-
-        $max = $this->parameter(end($having['values']));
-
-        return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
-    }
-
-    /**
      * Compile a single having clause.
      *
      * @param  array   $having
@@ -687,6 +668,25 @@ class Grammar extends BaseGrammar
         $parameter = $this->parameter($having['value']);
 
         return $having['boolean'].' '.$column.' '.$having['operator'].' '.$parameter;
+    }
+
+    /**
+     * Compile a "between" having clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingBetween($having)
+    {
+        $between = $having['not'] ? 'not between' : 'between';
+
+        $column = $this->wrap($having['column']);
+
+        $min = $this->parameter(head($having['values']));
+
+        $max = $this->parameter(last($having['values']));
+
+        return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
     }
 
     /**
