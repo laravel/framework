@@ -795,7 +795,7 @@ class Grammar extends BaseGrammar
      * Compile an insert statement with subquery into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array   $columns
+     * @param  array  $columns
      * @param  string  $sql
      * @return string
      */
