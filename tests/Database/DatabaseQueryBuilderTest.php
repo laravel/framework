@@ -1762,16 +1762,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testInsertSubMethod()
+    public function testInsertUsingMethod()
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(true);
-        $result = $builder->from('table1')->insertSub(
+
+        $result = $builder->from('table1')->insertUsing(
             ['foo'],
             function (Builder $query) {
                 $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
             }
         );
+
         $this->assertTrue($result);
     }
 

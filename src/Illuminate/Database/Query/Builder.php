@@ -2616,18 +2616,18 @@ class Builder
     }
 
     /**
-     * Insert new records from a subquery.
+     * Insert new records into the table using a subquery.
      *
      * @param  array  $columns
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @return bool
      */
-    public function insertSub(array $columns, $query)
+    public function insertUsing(array $columns, $query)
     {
         [$sql, $bindings] = $this->createSub($query);
 
         return $this->connection->insert(
-            $this->grammar->compileInsertSub($this, $columns, $sql),
+            $this->grammar->compileInsertUsing($this, $columns, $sql),
             $this->cleanBindings($bindings)
         );
     }
