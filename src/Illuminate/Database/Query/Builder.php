@@ -2602,7 +2602,7 @@ class Builder
     /**
      * Insert a new record and get the value of the primary key.
      *
-     * @param  array   $values
+     * @param  array  $values
      * @param  string|null  $sequence
      * @return int
      */
@@ -2613,6 +2613,23 @@ class Builder
         $values = $this->cleanBindings($values);
 
         return $this->processor->processInsertGetId($this, $sql, $values, $sequence);
+    }
+
+    /**
+     * Insert new records from a subquery.
+     *
+     * @param  array  $columns
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
+     * @return bool
+     */
+    public function insertSub(array $columns, $query)
+    {
+        [$sql, $bindings] = $this->createSub($query);
+
+        return $this->connection->insert(
+            $this->grammar->compileInsertSub($this, $columns, $sql),
+            $this->cleanBindings($bindings)
+        );
     }
 
     /**
@@ -2651,7 +2668,7 @@ class Builder
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @param  array   $extra
+     * @param  array  $extra
      * @return int
      */
     public function increment($column, $amount = 1, array $extra = [])
@@ -2672,7 +2689,7 @@ class Builder
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @param  array   $extra
+     * @param  array  $extra
      * @return int
      */
     public function decrement($column, $amount = 1, array $extra = [])

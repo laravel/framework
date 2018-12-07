@@ -870,6 +870,23 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile an insert statement with subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @return string
+     */
+    public function compileInsertSub(Builder $query, array $columns, string $sql)
+    {
+        $table = $this->wrapTable($query->from);
+
+        $columns_string = $this->columnize($columns);
+
+        return "insert into $table ($columns_string) $sql";
+    }
+
+    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
