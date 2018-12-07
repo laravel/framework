@@ -117,14 +117,6 @@ class Command extends SymfonyCommand
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function isHidden()
-    {
-        return $this->hidden;
-    }
-
-    /**
      * Configure the console command using a fluent definition.
      *
      * @return void
@@ -549,6 +541,14 @@ class Command extends SymfonyCommand
         }
 
         return $level;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
     }
 
     /**
