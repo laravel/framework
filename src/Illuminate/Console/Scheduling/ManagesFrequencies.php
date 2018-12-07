@@ -7,6 +7,13 @@ use Illuminate\Support\Carbon;
 trait ManagesFrequencies
 {
     /**
+     * valid hour:minute preg_match rule
+     *
+     * @var string
+     */
+    protected $hourMinutePregMatchRule = '/(^((([0-1][0-9])|[0-9]|2[0-3]):([0-5][0-9]|[0-9]))$)|(^(([0-1][0-9])|[0-9]|2[0-3])$)/';
+
+    /**
      * The Cron expression representing the event's frequency.
      *
      * @param  string  $expression
@@ -148,6 +155,7 @@ trait ManagesFrequencies
      *
      * @param  string  $time
      * @return $this
+     * @throws \Exception
      */
     public function at($time)
     {
@@ -159,9 +167,13 @@ trait ManagesFrequencies
      *
      * @param  string  $time
      * @return $this
+     * @throws \Exception
      */
     public function dailyAt($time)
     {
+        if (mb_strlen($time) > 5 || is_bool($time) || preg_match($this->hourMinutePregMatchRule, $time, $matches) !== 1) {
+            throw new \Exception('Function dailyAt() accepted an invalid parameter.It can only be a time e.g(10:00, 19:30, etc)');
+        }
         $segments = explode(':', $time);
 
         return $this->spliceIntoPosition(2, (int) $segments[0])
@@ -291,6 +303,7 @@ trait ManagesFrequencies
      * @param  int  $day
      * @param  string  $time
      * @return $this
+     * @throws \Exception
      */
     public function weeklyOn($day, $time = '0:0')
     {
@@ -317,6 +330,7 @@ trait ManagesFrequencies
      * @param  int  $day
      * @param  string  $time
      * @return $this
+     * @throws \Exception
      */
     public function monthlyOn($day = 1, $time = '0:0')
     {
