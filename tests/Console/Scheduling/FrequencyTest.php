@@ -70,7 +70,6 @@ class FrequencyTest extends TestCase
     public function testDailyAtAcceptDatetimeException()
     {
         $this->event->dailyAt('2018-12-06 18:06:37');
-
     }
 
     /**
@@ -79,7 +78,6 @@ class FrequencyTest extends TestCase
     public function testDailyAtAcceptSecondException()
     {
         $this->event->dailyAt('12:59:00');
-
     }
 
     /**
@@ -88,6 +86,14 @@ class FrequencyTest extends TestCase
     public function testDailyAtAcceptBoolException()
     {
         $this->event->dailyAt(true);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDailyAtAcceptNullException()
+    {
+        $this->event->dailyAt(null);
     }
 
     /**

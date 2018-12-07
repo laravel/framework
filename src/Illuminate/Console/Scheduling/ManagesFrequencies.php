@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 trait ManagesFrequencies
 {
     /**
-     * valid hour:minute preg_match rule
+     * valid hour:minute preg_match rule.
      *
      * @var string
      */
