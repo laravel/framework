@@ -117,6 +117,14 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
+    }
+
+    /**
      * Configure the console command using a fluent definition.
      *
      * @return void
