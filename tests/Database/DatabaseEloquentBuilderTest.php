@@ -6,6 +6,7 @@ use Closure;
 use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\ConnectionInterface;
@@ -634,6 +635,14 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
         $result = $builder->where('foo', '=', 'bar');
         $this->assertEquals($result, $builder);
+    }
+
+    public function testWhereModel()
+    {
+        $user = tap(new User)->forceFill(['id' => 1]);
+        $query = EloquentBuilderTestModelParentStub::query()->where($user);
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "id" = ?', $query->toSql());
+        $this->assertEquals([0 => $user->id], $query->getBindings());
     }
 
     public function testPostgresOperatorsWhere()

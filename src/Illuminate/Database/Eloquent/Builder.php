@@ -211,7 +211,7 @@ class Builder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string|array|\Closure  $column
+     * @param  string|array|\Closure|Model  $column
      * @param  mixed   $operator
      * @param  mixed   $value
      * @param  string  $boolean
@@ -219,6 +219,10 @@ class Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if ($column instanceof Model) {
+            return $this->where($column->getKeyName(), $column->getKey());
+        }
+
         if ($column instanceof Closure) {
             $column($query = $this->model->newModelQuery());
 
