@@ -149,7 +149,7 @@ class Event
      * @param  string  $command
      * @return void
      */
-    public function __construct(EventMutex $mutex, $command, $timezone=null)
+    public function __construct(EventMutex $mutex, $command, $timezone = null)
     {
         $this->mutex = $mutex;
         $this->command = $command;

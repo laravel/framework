@@ -55,9 +55,9 @@ class Schedule
                                 ? $container->make(SchedulingMutex::class)
                                 : $container->make(CacheSchedulingMutex::class);
 
-        if($container->bound('config')){
-            $config = $container->get("config");
-            $this->timezone = $config->get('app.schedular_timezone')?:$config->get('app.timezone');
+        if ($container->bound('config')) {
+            $config = $container->get('config');
+            $this->timezone = $config->get('app.schedular_timezone') ?: $config->get('app.timezone');
         }
 
     }
