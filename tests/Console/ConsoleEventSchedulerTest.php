@@ -11,6 +11,7 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\CacheEventMutex;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Console\Scheduling\CacheSchedulingMutex;
+use Illuminate\Config\Repository as Config;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
@@ -69,6 +70,38 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals("path/to/command --title={$escape}A {$escapeReal}real{$escapeReal} test{$escape}", $events[5]->command);
         $this->assertEquals("path/to/command {$escape}one{$escape} {$escape}two{$escape}", $events[6]->command);
         $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
+
+    }
+    public function testExecCreatesNewCommandWithTimezone(){
+
+        $container = Container::getInstance();
+
+        $config = new Config([
+            'app' => [
+                'timezone' => 'UTC',
+                'schedular_timezone' => null,
+            ],
+        ]);
+
+        $container->instance('config', $config);
+        $schedule = new Schedule(m::mock(EventMutex::class));
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals("UTC", $events[0]->timezone);
+
+        $config = new Config([
+            'app' => [
+                'timezone' => 'UTC',
+                'schedular_timezone' => 'Asia/Tokyo',
+            ],
+        ]);
+
+        $container->instance('config', $config);
+        $schedule = new Schedule(m::mock(EventMutex::class));
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals("Asia/Tokyo", $events[0]->timezone);
+
     }
 
     public function testCommandCreatesNewArtisanCommand()
@@ -97,6 +130,20 @@ class ConsoleEventSchedulerTest extends TestCase
         $events = $schedule->events();
         $binary = $escape.PHP_BINARY.$escape;
         $this->assertEquals($binary.' artisan foo:bar --force', $events[0]->command);
+    }
+    /**
+     * Create a new config repository instance.
+     *
+     * @return \Illuminate\Config\Repository
+     */
+    protected function createConfig()
+    {
+        return new Config([
+            'app' => [
+                'timezone' => 'UTC',
+                'schedular_timezone' => 'Asia/Tokyo',
+            ],
+        ]);
     }
 }
 

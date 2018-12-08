@@ -149,11 +149,12 @@ class Event
      * @param  string  $command
      * @return void
      */
-    public function __construct(EventMutex $mutex, $command)
+    public function __construct(EventMutex $mutex, $command, $timezone=null)
     {
         $this->mutex = $mutex;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
+        $this->timezone = $timezone;
     }
 
     /**
