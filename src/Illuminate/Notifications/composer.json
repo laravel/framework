@@ -35,7 +35,7 @@
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database transport (5.7.*)."
+        "illuminate/database": "Required to use the database transport (5.8.*)."
     },
     "config": {
         "sort-packages": true
