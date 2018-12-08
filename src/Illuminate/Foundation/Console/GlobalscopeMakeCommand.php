@@ -34,7 +34,7 @@ class GlobalscopeMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__ . '/stubs/globalscope.stub';
+        return __DIR__.'/stubs/globalscope.stub';
     }
 
     /**
@@ -45,6 +45,6 @@ class GlobalscopeMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\Scopes';
+        return $rootNamespace.'\Scopes';
     }
 }
