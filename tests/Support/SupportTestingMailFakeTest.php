@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
@@ -141,7 +142,7 @@ class SupportTestingMailFakeTest extends TestCase
     }
 }
 
-class MailableStub extends Mailable
+class MailableStub extends Mailable implements MailableContract
 {
     public $framework = 'Laravel';
 

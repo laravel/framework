@@ -10,7 +10,7 @@ class SendQueuedMailable
     /**
      * The mailable message instance.
      *
-     * @var \Illuminate\Mail\Mailable
+     * @var \Illuminate\Contracts\Mail\Mailable
      */
     public $mailable;
 
