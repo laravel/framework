@@ -1784,6 +1784,10 @@ class Builder
      */
     public function orderBy($column, $direction = 'asc')
     {
+        if (! in_array($direction, ['asc', 'desc'])) {
+            throw new InvalidArgumentException("Invalid orderBy direction: {$direction}.");
+        }
+
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
             'direction' => strtolower($direction) === 'asc' ? 'asc' : 'desc',
