@@ -1781,16 +1781,19 @@ class Builder
      * @param  string  $column
      * @param  string  $direction
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function orderBy($column, $direction = 'asc')
     {
-        if (! in_array(strtolower($direction), ['asc', 'desc'])) {
+        $direction = strtolower($direction);
+        if (! in_array($direction, ['asc', 'desc'])) {
             throw new InvalidArgumentException("Invalid orderBy direction: {$direction}.");
         }
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
-            'direction' => strtolower($direction) === 'asc' ? 'asc' : 'desc',
+            'direction' => $direction === 'asc' ? 'asc' : 'desc',
         ];
 
         return $this;
