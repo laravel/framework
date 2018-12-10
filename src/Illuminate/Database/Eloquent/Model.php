@@ -444,9 +444,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function onWriteConnection()
     {
-        $instance = new static;
-
-        return $instance->newQuery()->useWritePdo();
+        return static::query()->useWritePdo();
     }
 
     /**
