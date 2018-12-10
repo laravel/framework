@@ -28,7 +28,7 @@ abstract class Lock implements LockContract
     /**
      * The scope identifier of this lock.
      *
-     * @var string|null
+     * @var string
      */
     protected $owner;
 
@@ -121,6 +121,16 @@ abstract class Lock implements LockContract
         }
 
         return true;
+    }
+
+    /**
+     * Returns the current owner of the lock.
+     *
+     * @return string
+     */
+    public function getOwner()
+    {
+        return $this->owner;
     }
 
     /**

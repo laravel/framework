@@ -71,4 +71,18 @@ class RedisCacheLockTest extends TestCase
 
         $this->assertFalse(Cache::store('redis')->lock('foo')->get());
     }
+
+    public function test_redis_locks_can_be_released_using_owner_token()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+        $owner = $firstLock->getOwner();
+
+        $secondLock = Cache::store('redis')->lock('foo', 10, $owner);
+        $secondLock->release();
+
+        $this->assertTrue(Cache::store('redis')->lock('foo')->get());
+    }
 }

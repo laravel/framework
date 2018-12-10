@@ -35,7 +35,7 @@ class MemcachedLock extends Lock
     public function acquire()
     {
         return $this->memcached->add(
-            $this->name, $this->value(), $this->seconds
+            $this->name, $this->owner, $this->seconds
         );
     }
 

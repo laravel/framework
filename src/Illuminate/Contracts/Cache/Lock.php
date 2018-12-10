@@ -29,6 +29,13 @@ interface Lock
     public function release();
 
     /**
+     * Returns the current owner of the lock.
+     *
+     * @return string
+     */
+    public function getOwner();
+
+    /**
      * Releases this lock in disregard of ownership.
      *
      * @return void
