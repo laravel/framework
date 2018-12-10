@@ -53,7 +53,9 @@ class ValidationException extends Exception
      */
     public function __construct($validator, $response = null, $errorBag = 'default')
     {
-        parent::__construct(__('The given data was invalid.'));
+        $message = 'The given data was invalid.';
+        
+        parent::__construct(function_exists('__') ? call_user_func('__', $message) : $message);
 
         $this->response = $response;
         $this->errorBag = $errorBag;
