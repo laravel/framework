@@ -168,13 +168,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
-    public function testNewInstanceReturnsNewInstanceWithTableSet()
+    public function testNewInstanceReturnsNewInstanceWithConfigurableStates()
     {
         $model = new EloquentModelStub;
-        $model->setTable('test');
+        $model->setTable('foo_tests');
+        $model->setKeyName('foo_test_id');
+        $model->setKeyType('string');
+        $model->setPerPage(11);
+        $model->setConnection('foo_connection');
+        $model->setIncrementing(false);
         $newInstance = $model->newInstance();
 
-        $this->assertEquals('test', $newInstance->getTable());
+        $this->assertSame('foo_tests', $newInstance->getTable());
+        $this->assertSame('foo_test_id', $newInstance->getKeyName());
+        $this->assertSame('string', $newInstance->getKeyType());
+        $this->assertSame(11, $newInstance->getPerPage());
+        $this->assertSame('foo_connection', $newInstance->getConnectionName());
+        $this->assertFalse($newInstance->getIncrementing());
     }
 
     public function testCreateMethodSavesNewModel()
@@ -1976,11 +1986,6 @@ class EloquentModelSaveStub extends Model
     public function save(array $options = [])
     {
         $_SERVER['__eloquent.saved'] = true;
-    }
-
-    public function setIncrementing($value)
-    {
-        $this->incrementing = $value;
     }
 
     public function getConnection()

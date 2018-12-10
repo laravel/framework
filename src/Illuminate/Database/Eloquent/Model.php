@@ -390,13 +390,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $model->exists = $exists;
 
-        $model->setConnection(
-            $this->getConnectionName()
-        );
-
-        $model->setTable($this->getTable());
-
-        return $model;
+        // Apply all configurable states for the new model instance.
+        return $model
+            ->setTable($this->getTable())
+            ->setKeyName($this->getKeyName())
+            ->setKeyType($this->getKeyType())
+            ->setPerPage($this->getPerPage())
+            ->setConnection($this->getConnectionName())
+            ->setIncrementing($this->getIncrementing());
     }
 
     /**
