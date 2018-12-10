@@ -444,7 +444,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function onWriteConnection()
     {
-        return static::query()->useWritePdo();
+        $instance = new static;
+
+        return $instance->newQuery()->useWritePdo();
     }
 
     /**
@@ -455,7 +457,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function all($columns = ['*'])
     {
-        return static::query()->get(
+        return (new static)->newQuery()->get(
             is_array($columns) ? $columns : func_get_args()
         );
     }
@@ -468,7 +470,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function with($relations)
     {
-        return static::query()->with(
+        return (new static)->newQuery()->with(
             is_string($relations) ? func_get_args() : $relations
         );
     }
