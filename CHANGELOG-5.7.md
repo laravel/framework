@@ -1,5 +1,17 @@
 # Release Notes for 5.7.x
 
+## Unreleased
+
+### Added
+- Added `Database\Query\Builder::insertUsing` method ([#26732](https://github.com/laravel/framework/pull/26732), [8216b46](https://github.com/laravel/framework/commit/8216b4607152f9b01f26efba6b045add5382c625)) 
+- Added `Database\Query\Builder::havingBetween` method ([#26758](https://github.com/laravel/framework/pull/26758))
+- Added `Packets out of order. Expected` string to `DetectsLostConnections` trait ([#26760](https://github.com/laravel/framework/pull/26760))
+
+### TODO
+- https://github.com/laravel/framework/pull/26775
+- https://github.com/laravel/framework/commit/0f9886d0cb17c9d756068e09743f871003cf1b45
+
+
 ## [v5.7.16 (2018-12-05)](https://github.com/laravel/framework/compare/v5.7.15...v5.7.16)
 
 ### Added
