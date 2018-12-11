@@ -456,13 +456,19 @@ class FactoryBuilder
             return $this->macroableCall($method, $parameters);
         }
 
-        $instance = new $this->class();
+        $this->afterCreating[$this->class][$this->name][] = function ($model) use ($relationshipMethod, $parameters) {
+            $instance = new $this->class();
 
-        $relationship = $instance->$relationshipMethod();
+            $relationship = $instance->$relationshipMethod();
 
-        $this->afterCreating[$this->class][$this->name][] = function ($model) use ($relationship,$relationshipMethod) {
+            $amount = $parameters[0] ?? 1;
+
+            $name = isset($parameters[1]) && is_string($parameters[1]) ? $parameters[1] : 'default';
+
+            $states = $parameters[2] ?? isset($parameters[1]) && is_array($parameters[1]) ? $parameters[1] : [];
+
             $model->$relationshipMethod()->saveMany(
-                factory(get_class($relationship->getRelated()), 2)->make()
+                factory(get_class($relationship->getRelated()), $name, $amount)->states($states)->make()
             );
         };
 
