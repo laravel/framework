@@ -63,6 +63,5 @@ trait FileHelpers
         }
 
         return $path.$hash.$extension;
-
     }
 }
