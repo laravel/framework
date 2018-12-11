@@ -8,7 +8,9 @@ use Illuminate\Support\Traits\Macroable;
 
 class FactoryBuilder
 {
-    use Macroable;
+    use Macroable {
+        __call as public macroableCall;
+    }
 
     /**
      * The model definitions in the container.
@@ -444,5 +446,26 @@ class FactoryBuilder
     {
         return isset($this->afterMaking[$this->class][$state]) ||
                isset($this->afterCreating[$this->class][$state]);
+    }
+
+    public function __call($method, $parameters)
+    {
+        $relationshipMethod = lcfirst(str_replace('with', '', $method));
+
+        if (! method_exists($this->class, $relationshipMethod)) {
+            return $this->macroableCall($method, $parameters);
+        }
+
+        $instance = new $this->class();
+
+        $relationship = $instance->$relationshipMethod();
+
+        $this->afterCreating[$this->class][$this->name][] = function ($model) use ($relationship,$relationshipMethod) {
+            $model->$relationshipMethod()->saveMany(
+                factory(get_class($relationship->getRelated()), 2)->make()
+            );
+        };
+
+        return $this;
     }
 }
