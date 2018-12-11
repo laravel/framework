@@ -12,7 +12,7 @@ class PendingMail
     /**
      * The mailer instance.
      *
-     * @var\Illuminate\Contracts\Mail\Mailer  $mailer
+     * @var \Illuminate\Contracts\Mail\Mailer
      */
     protected $mailer;
 
