@@ -31,7 +31,7 @@ class PackageDiscoverCommand extends Command
     {
         $manifest->build();
 
-        if (! empty($manifest->manifest)) {        
+        if (! empty($manifest->manifest)) {
             $this->line("Discovered Packages:");
 
             foreach (array_keys($manifest->manifest) as $package) {
