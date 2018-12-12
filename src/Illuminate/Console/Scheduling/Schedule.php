@@ -59,7 +59,6 @@ class Schedule
             $config = $container->get('config');
             $this->timezone = $config->get('app.scheduler_timezone') ?: $config->get('app.timezone');
         }
-
     }
 
     /**
