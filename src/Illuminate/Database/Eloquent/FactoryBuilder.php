@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
@@ -448,28 +449,64 @@ class FactoryBuilder
                isset($this->afterCreating[$this->class][$state]);
     }
 
+    /**
+     * Dynamically handle calls into the factory builder instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
     public function __call($method, $parameters)
     {
-        $relationshipMethod = lcfirst(str_replace('with', '', $method));
-
-        if (! method_exists($this->class, $relationshipMethod)) {
-            return $this->macroableCall($method, $parameters);
+        if (Str::startsWith($method, 'with') &&
+            method_exists($this->class, $relation = lcfirst(substr($method, 4)))) {
+            return $this->createRelatedModels($relation, $parameters);
         }
 
-        $this->afterCreating[$this->class][$this->name][] = function ($model) use ($relationshipMethod, $parameters) {
-            $instance = new $this->class();
+        if (Str::startsWith($method, 'for') &&
+            method_exists($this->class, $relation = lcfirst(substr($method, 3)))) {
+            return $this->attachToModel($relation, $parameters);
+        }
 
-            $relationship = $instance->$relationshipMethod();
+        return $this->macroableCall($method, $parameters);
+    }
 
-            $amount = $parameters[0] ?? 1;
+
+    /**
+     * Handles creating related models.
+     *
+     * @param  string  $relationMethod
+     * @param  string  $parameters
+     * @return $this
+     */
+    private function createRelatedModels($relationMethod, $parameters)
+    {
+        $this->afterCreating[$this->class][$this->name][] = function ($model) use ($relationMethod, $parameters) {
+            $relationship = (new $this->class())->$relationMethod();
 
             $name = isset($parameters[1]) && is_string($parameters[1]) ? $parameters[1] : 'default';
 
             $states = $parameters[2] ?? isset($parameters[1]) && is_array($parameters[1]) ? $parameters[1] : [];
 
-            $model->$relationshipMethod()->saveMany(
-                factory(get_class($relationship->getRelated()), $name, $amount)->states($states)->make()
+            $model->$relationMethod()->saveMany(
+                factory(get_class($relationship->getRelated()), $name, $parameters[0] ?? 1)->states($states)->make()
             );
+        };
+
+        return $this;
+    }
+
+    /**
+     * Handles attaching to a related model.
+     *
+     * @param  string  $relationMethod
+     * @param  string  $parameters
+     * @return $this
+     */
+    private function attachToModel($relationMethod, $parameters)
+    {
+        $this->afterMaking[$this->class][$this->name][] = function ($model) use ($relationMethod, $parameters) {
+            $model->$relationMethod()->associate($parameters[0]);
         };
 
         return $this;
