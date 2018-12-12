@@ -1047,6 +1047,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Different:baz']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => null], ['foo' => 'Different:baz']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'Different:baz']);
         $this->assertFalse($v->passes());
 
