@@ -1,15 +1,16 @@
 # Release Notes for 5.7.x
 
-## Unreleased
+## [v5.7.17 (2018-12-12)](https://github.com/laravel/framework/compare/v5.7.16...v5.7.17)
 
 ### Added
 - Added `Database\Query\Builder::insertUsing` method ([#26732](https://github.com/laravel/framework/pull/26732), [8216b46](https://github.com/laravel/framework/commit/8216b4607152f9b01f26efba6b045add5382c625)) 
 - Added `Database\Query\Builder::havingBetween` method ([#26758](https://github.com/laravel/framework/pull/26758))
 - Added `Packets out of order. Expected` string to `DetectsLostConnections` trait ([#26760](https://github.com/laravel/framework/pull/26760))
+- Added `NOT VALID` option for skipping validation when adding postgres foreign keys ([#26775](https://github.com/laravel/framework/pull/26775))
 
-### TODO
-- https://github.com/laravel/framework/pull/26775
-- https://github.com/laravel/framework/commit/0f9886d0cb17c9d756068e09743f871003cf1b45
+### Fixed
+- Fixed: Using `store` on an uploaded file when you push an empty file ([#26809](https://github.com/laravel/framework/pull/26809))
+- Fixed hiding for hidden commands ([#26781](https://github.com/laravel/framework/pull/26781))
 
 
 ## [v5.7.16 (2018-12-05)](https://github.com/laravel/framework/compare/v5.7.15...v5.7.16)
