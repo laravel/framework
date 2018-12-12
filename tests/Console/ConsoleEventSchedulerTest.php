@@ -71,6 +71,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals("path/to/command {$escape}one{$escape} {$escape}two{$escape}", $events[6]->command);
         $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
     }
+
     public function testExecCreatesNewCommandWithTimezone()
     {
         $container = Container::getInstance();
