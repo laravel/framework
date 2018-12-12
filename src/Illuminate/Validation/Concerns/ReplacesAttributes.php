@@ -476,7 +476,7 @@ trait ReplacesAttributes
      * @param string $message
      * @param string $attribute
      * @param string $rule
-     * @param array $parameters
+     * @param array  $parameters
      * @return string
      */
     protected function replaceStartsWith($message, $attribute, $rule, $parameters)
