@@ -57,8 +57,7 @@ trait FileHelpers
 
         $hash = $this->hashName ?: $this->hashName = Str::random(40);
 
-        $extension = $this->guessExtension();
-        if ($extension) {
+        if ($extension = $this->guessExtension()) {
             $extension = '.'.$extension;
         }
 
