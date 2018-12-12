@@ -471,7 +471,6 @@ class FactoryBuilder
         return $this->macroableCall($method, $parameters);
     }
 
-
     /**
      * Handles creating related models.
      *
