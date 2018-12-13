@@ -23,6 +23,19 @@ abstract class Facade
     protected static $resolvedInstance;
 
     /**
+     * Run a Closure when the facade has been resolved.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function resolved(Closure $callback)
+    {
+        static::$app->afterResolving(static::getFacadeAccessor(), function ($service) use ($callback) {
+            $callback($service);
+        });
+    }
+
+    /**
      * Convert the facade into a Mockery spy.
      *
      * @return \Mockery\MockInterface
