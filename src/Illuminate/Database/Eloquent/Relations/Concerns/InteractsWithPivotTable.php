@@ -439,6 +439,10 @@ trait InteractsWithPivotTable
     {
         $query = $this->newPivotStatement();
 
+        foreach ($this->pivotOrderBys as $arguments) {
+            call_user_func_array([$query, 'orderBy'], $arguments);
+        }
+
         foreach ($this->pivotWheres as $arguments) {
             call_user_func_array([$query, 'where'], $arguments);
         }

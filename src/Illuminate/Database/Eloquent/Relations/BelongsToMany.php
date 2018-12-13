@@ -63,6 +63,13 @@ class BelongsToMany extends Relation
     protected $pivotColumns = [];
 
     /**
+     * Any pivot table restrictions for orderBy clauses.
+     *
+     * @var array
+     */
+    protected $pivotOrderBys = [];
+
+    /**
      * Any pivot table restrictions for where clauses.
      *
      * @var array
@@ -313,6 +320,22 @@ class BelongsToMany extends Relation
         $this->accessor = $accessor;
 
         return $this;
+    }
+
+    /**
+     * Set an "order by" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function orderByPivot($column, $direction = 'asc')
+    {
+        $this->pivotOrderBys[] = func_get_args();
+
+        return $this->orderBy($this->table.'.'.$column, $direction);
     }
 
     /**
