@@ -144,27 +144,35 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  array  $replace
      * @param  string  $locale
+     * @param  bool  $fallback
      * @return string|array|null
      */
-    public function getFromJson($key, array $replace = [], $locale = null)
+    public function getFromJson($key, array $replace = [], $locale = null, $fallback = true)
     {
         $locale = $locale ?: $this->locale;
+
+        $locales = $fallback ? $this->localeArray($locale)
+                             : [$locale ?: $this->locale];
 
         // For JSON translations, there is only one file per locale, so we will simply load
         // that file and then we will be ready to check the array for the key. These are
         // only one level deep so we do not need to do any fancy searching through it.
-        $this->load('*', '*', $locale);
+        foreach ($locales as $_locale) {
+            $this->load('*', '*', $_locale);
 
-        $line = $this->loaded['*']['*'][$locale][$key] ?? null;
+            if (!is_null($line = $this->loaded['*']['*'][$_locale][$key] ?? null)) {
+                break;
+            }
+        }
 
         // If we can't find a translation for the JSON key, we will attempt to translate it
         // using the typical translation file. This way developers can always just use a
         // helper such as __ instead of having to pick between trans or __ with views.
         if (! isset($line)) {
-            $fallback = $this->get($key, $replace, $locale);
+            $trans = $this->get($key, $replace, $locale, $fallback);
 
-            if ($fallback !== $key) {
-                return $fallback;
+            if ($trans !== $key) {
+                return $trans;
             }
         }
 
