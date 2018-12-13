@@ -6,6 +6,7 @@ use Mockery as m;
 use Illuminate\Console\Command;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\CacheEventMutex;
@@ -69,6 +70,37 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals("path/to/command --title={$escape}A {$escapeReal}real{$escapeReal} test{$escape}", $events[5]->command);
         $this->assertEquals("path/to/command {$escape}one{$escape} {$escape}two{$escape}", $events[6]->command);
         $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
+    }
+
+    public function testExecCreatesNewCommandWithTimezone()
+    {
+        $container = Container::getInstance();
+
+        $config = new Config([
+            'app' => [
+                'timezone' => 'UTC',
+                'scheduler_timezone' => null,
+            ],
+        ]);
+
+        $container->instance('config', $config);
+        $schedule = new Schedule(m::mock(EventMutex::class));
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals('UTC', $events[0]->timezone);
+
+        $config = new Config([
+            'app' => [
+                'timezone' => 'UTC',
+                'scheduler_timezone' => 'Asia/Tokyo',
+            ],
+        ]);
+
+        $container->instance('config', $config);
+        $schedule = new Schedule(m::mock(EventMutex::class));
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals('Asia/Tokyo', $events[0]->timezone);
     }
 
     public function testCommandCreatesNewArtisanCommand()

@@ -32,6 +32,13 @@ class Schedule
     protected $schedulingMutex;
 
     /**
+     * The timezone the date should be evaluated on.
+     *
+     * @var \DateTimeZone|string
+     */
+    public $timezone;
+
+    /**
      * Create a new schedule instance.
      *
      * @return void
@@ -47,6 +54,11 @@ class Schedule
         $this->schedulingMutex = $container->bound(SchedulingMutex::class)
                                 ? $container->make(SchedulingMutex::class)
                                 : $container->make(CacheSchedulingMutex::class);
+
+        if ($container->bound('config')) {
+            $config = $container->get('config');
+            $this->timezone = $config->get('app.scheduler_timezone') ?: $config->get('app.timezone');
+        }
     }
 
     /**
@@ -119,7 +131,7 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($this->eventMutex, $command);
+        $this->events[] = $event = new Event($this->eventMutex, $command, $this->timezone);
 
         return $event;
     }
