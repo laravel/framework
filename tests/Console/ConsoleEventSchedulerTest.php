@@ -74,30 +74,12 @@ class ConsoleEventSchedulerTest extends TestCase
 
     public function testExecCreatesNewCommandWithTimezone()
     {
-        $container = Container::getInstance();
-
-        $config = new Config([
-            'app' => [
-                'timezone' => 'UTC',
-                'scheduler_timezone' => null,
-            ],
-        ]);
-
-        $container->instance('config', $config);
-        $schedule = new Schedule(m::mock(EventMutex::class));
+        $schedule = new Schedule('UTC');
         $schedule->exec('path/to/command');
         $events = $schedule->events();
         $this->assertEquals('UTC', $events[0]->timezone);
 
-        $config = new Config([
-            'app' => [
-                'timezone' => 'UTC',
-                'scheduler_timezone' => 'Asia/Tokyo',
-            ],
-        ]);
-
-        $container->instance('config', $config);
-        $schedule = new Schedule(m::mock(EventMutex::class));
+        $schedule = new Schedule('Asia/Tokyo');
         $schedule->exec('path/to/command');
         $events = $schedule->events();
         $this->assertEquals('Asia/Tokyo', $events[0]->timezone);

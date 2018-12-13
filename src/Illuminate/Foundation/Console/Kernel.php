@@ -98,8 +98,8 @@ class Kernel implements KernelContract
      */
     protected function defineConsoleSchedule()
     {
-        $this->app->singleton(Schedule::class, function () {
-            return new Schedule;
+        $this->app->singleton(Schedule::class, function ($app) {
+            return new Schedule($this->scheduleTimezone());
         });
 
         $schedule = $this->app->make(Schedule::class);
@@ -158,6 +158,18 @@ class Kernel implements KernelContract
     protected function schedule(Schedule $schedule)
     {
         //
+    }
+
+    /**
+     * Get the timezone that should be used by default for scheduled events.
+     *
+     * @return \DateTimeZone|string|null
+     */
+    protected function scheduleTimezone()
+    {
+        $config = $this->app['config'];
+
+        return $config->get('app.scheduler_timezone', $config->get('app.timezone'));
     }
 
     /**

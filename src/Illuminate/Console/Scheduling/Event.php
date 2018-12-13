@@ -155,8 +155,9 @@ class Event
     {
         $this->mutex = $mutex;
         $this->command = $command;
-        $this->output = $this->getDefaultOutput();
         $this->timezone = $timezone;
+
+        $this->output = $this->getDefaultOutput();
     }
 
     /**

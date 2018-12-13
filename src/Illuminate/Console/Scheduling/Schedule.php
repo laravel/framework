@@ -36,15 +36,18 @@ class Schedule
      *
      * @var \DateTimeZone|string
      */
-    public $timezone;
+    protected $timezone;
 
     /**
      * Create a new schedule instance.
      *
+     * @param  \DateTimeZone|string|null  $timezone
      * @return void
      */
-    public function __construct()
+    public function __construct($timezone = null)
     {
+        $this->timezone = $timezone;
+
         $container = Container::getInstance();
 
         $this->eventMutex = $container->bound(EventMutex::class)
@@ -54,11 +57,6 @@ class Schedule
         $this->schedulingMutex = $container->bound(SchedulingMutex::class)
                                 ? $container->make(SchedulingMutex::class)
                                 : $container->make(CacheSchedulingMutex::class);
-
-        if ($container->bound('config')) {
-            $config = $container->get('config');
-            $this->timezone = $config->get('app.scheduler_timezone') ?: $config->get('app.timezone');
-        }
     }
 
     /**
