@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Closure;
 use Mockery;
 use RuntimeException;
 use Mockery\MockInterface;
