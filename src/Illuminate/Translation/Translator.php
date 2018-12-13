@@ -160,7 +160,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         foreach ($locales as $_locale) {
             $this->load('*', '*', $_locale);
 
-            if (!is_null($line = $this->loaded['*']['*'][$_locale][$key] ?? null)) {
+            if (! is_null($line = $this->loaded['*']['*'][$_locale][$key] ?? null)) {
                 break;
             }
         }
