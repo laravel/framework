@@ -600,10 +600,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
         $user->friends()->create(['email' => 'foo@gmail.com']);
 
-        $results = EloquentTestUser::with('friendsOrderedByEmailDesc')->get();
+        $results = EloquentTestUser::with('friendsOrderedByIdDesc')->get();
 
-        $this->assertCount(1, $results);
-        $this->assertEquals('foo@gmail.com', $results->first()->friendsOrderedByEmailDesc->first()->pivot->email);
+        $this->assertCount(3, $results);
+        $this->assertEquals(3, $results->first()->friendsOrderedByIdDesc->first()->pivot->friend_id);
     }
 
     public function testHasOnSelfReferencingBelongsToRelationship()
@@ -1612,9 +1612,9 @@ class EloquentTestUser extends Eloquent
         return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
     }
 
-    public function friendsOrderedByEmailDesc()
+    public function friendsOrderedByIdDesc()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->orderByPivot('email', 'desc');
+        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->orderByPivot('friend_id', 'desc');
     }
 
     public function posts()
