@@ -600,10 +600,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
         $user->friends()->create(['email' => 'foo@gmail.com']);
 
-        $results = EloquentTestUser::has('friendsOrderedByEmailDesc')->get();
+        $results = EloquentTestUser::with('friendsOrderedByEmailDesc')->get();
 
-        $this->assertCount(2, $results);
-        $this->assertEquals('foo@gmail.com', $results->first()->email);
+        $this->assertCount(1, $results);
+        $this->assertEquals('foo@gmail.com', $results->first()->friendsOrderedByEmailDesc->first()->email);
     }
 
     public function testHasOnSelfReferencingBelongsToRelationship()
