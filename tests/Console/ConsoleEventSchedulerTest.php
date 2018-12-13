@@ -6,7 +6,6 @@ use Mockery as m;
 use Illuminate\Console\Command;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\CacheEventMutex;
