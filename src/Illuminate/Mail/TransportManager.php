@@ -5,6 +5,7 @@ namespace Illuminate\Mail;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
+use Illuminate\Log\LogManager;
 use Illuminate\Support\Manager;
 use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
@@ -161,9 +162,10 @@ class TransportManager extends Manager
     protected function createLogDriver()
     {
         $channel = $this->app['config']['mail.log_channel'];
+        $logger = $this->app->make(LoggerInterface::class);
 
         return new LogTransport(
-            $this->app->make(LoggerInterface::class)->channel($channel)
+            $logger instanceof LogManager ? $logger->channel($channel) : $logger
         );
     }
 
