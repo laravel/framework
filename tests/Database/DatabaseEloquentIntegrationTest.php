@@ -603,7 +603,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $results = EloquentTestUser::with('friendsOrderedByEmailDesc')->get();
 
         $this->assertCount(1, $results);
-        $this->assertEquals('foo@gmail.com', $results->first()->friendsOrderedByEmailDesc->first()->email);
+        $this->assertEquals('foo@gmail.com', $results->first()->friendsOrderedByEmailDesc->first()->pivot->email);
     }
 
     public function testHasOnSelfReferencingBelongsToRelationship()
