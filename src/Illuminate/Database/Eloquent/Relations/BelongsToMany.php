@@ -326,9 +326,7 @@ class BelongsToMany extends Relation
      * Set an "order by" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  string  $operator
-     * @param  mixed   $value
-     * @param  string  $boolean
+     * @param  string  $direction
      * @return $this
      */
     public function orderByPivot($column, $direction = 'asc')
