@@ -1211,6 +1211,18 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'starts_with:world,hello']);
         $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.starts_with' => 'The :attribute must start with one of the following values :values'], 'en');
+        $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:http']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The url must start with one of the following values http', $v->messages()->first('url'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.starts_with' => 'The :attribute must start with one of the following values :values'], 'en');
+        $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:http,https']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The url must start with one of the following values http, https', $v->messages()->first('url'));
     }
 
     public function testValidateString()
