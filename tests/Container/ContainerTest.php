@@ -545,7 +545,6 @@ class ContainerTest extends TestCase
         $this->assertEquals('foo', $result[0]);
         $this->assertEquals('bar', $result[1]);
         $this->assertEquals('default c', $result[2]);
-
     }
 
     /**
