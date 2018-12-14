@@ -538,6 +538,14 @@ class ContainerTest extends TestCase
         $this->assertEquals('default a', $result[0]);
         $this->assertEquals('default b', $result[1]);
         $this->assertEquals('default c', $result[2]);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyOnlyC', ['foo', 'bar']);
+
+        $this->assertEquals('foo', $result[0]);
+        $this->assertEquals('bar', $result[1]);
+        $this->assertEquals('default c', $result[2]);
+
     }
 
     /**
@@ -1299,6 +1307,11 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
 class ContainerTestDefaultyParams
 {
     public function defaulty($a = 'default a', $b = 'default b', $c = 'default c')
+    {
+        return func_get_args();
+    }
+
+    public function defaultyOnlyC($a, $b, $c = 'default c')
     {
         return func_get_args();
     }
