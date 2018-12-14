@@ -515,6 +515,22 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertEquals('taylor', $result[1]);
     }
+    
+    public function testWithDefalutParameters()
+    {
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar']);
+        $this->assertEquals(['foo', 'bar', 'default c'], $result);
+        
+        
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar', 'baz']);
+        $this->assertEquals(['foo', 'bar', 'baz'], $result);
+        
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty');
+        $this->assertEquals(['default a', 'default b', 'default c'], $result);
+    }
 
     /**
      * @expectedException \ReflectionException
@@ -1271,3 +1287,14 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
         static::$instantiations++;
     }
 }
+
+
+class ContainerTestDefaultyParams
+{
+    public function defaulty($a = 'default a', $b = 'default b', $c = 'default c')
+    {
+        return func_get_args();
+    }
+}
+
+
