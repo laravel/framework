@@ -47,6 +47,23 @@ trait SerializesModels
         }
     }
 
+    public function __clone()
+    {
+        foreach ((new ReflectionClass($this))->getProperties() as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            $value = $this->getPropertyValue($property);
+
+            if (is_object($value) && in_array(SerializesModels::class, trait_uses_recursive($value))) {
+                $value = clone ($value);
+            }
+
+            $property->setValue($this, $value);
+        }
+    }
+
     /**
      * Get the property value for the given property.
      *
