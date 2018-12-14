@@ -520,15 +520,24 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar']);
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
+       
+        $this->assertEquals('foo', $result[0]);
+        $this->assertEquals('bar', $result[1]);
+        $this->assertEquals('default c', $result[2]);
 
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar', 'baz']);
-        $this->assertEquals(['foo', 'bar', 'baz'], $result);
+        
+        $this->assertEquals('foo', $result[0]);
+        $this->assertEquals('bar', $result[1]);
+        $this->assertEquals('baz', $result[2]);
 
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty');
-        $this->assertEquals(['default a', 'default b', 'default c'], $result);
+        
+        $this->assertEquals('default a', $result[0]);
+        $this->assertEquals('default b', $result[1]);
+        $this->assertEquals('default c', $result[2]);
     }
 
     /**
