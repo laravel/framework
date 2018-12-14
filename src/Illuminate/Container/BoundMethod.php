@@ -116,7 +116,7 @@ class BoundMethod
             static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
         }
 
-        return array_merge($dependencies, $parameters);
+        return array_merge($parameters, $dependencies);
     }
 
     /**
