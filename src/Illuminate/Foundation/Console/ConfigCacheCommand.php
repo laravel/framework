@@ -56,6 +56,7 @@ class ConfigCacheCommand extends Command
         $this->call('config:clear');
 
         $config = $this->getFreshConfiguration();
+
         $configPath = $this->laravel->getCachedConfigPath();
 
         $this->files->put(
