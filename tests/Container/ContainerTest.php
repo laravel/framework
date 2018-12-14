@@ -534,9 +534,24 @@ class ContainerTest extends TestCase
         $this->assertEquals(['default a', 'default b', 'default c'], $result);
 
         $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['foo', 'bar']);
+
+        $this->assertEquals(['foo', 'bar', 'default c'], $result);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['foo']);
+
+        $this->assertEquals(['foo', 'default b', 'default c'], $result);
+
+        $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyOnlyC', ['foo', 'bar']);
 
         $this->assertEquals(['foo', 'bar', 'default c'], $result);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['foo', 'bar', 'baz']);
+
+        $this->assertEquals(['foo', 'bar', 'baz'], $result);
     }
 
     /**
@@ -1302,7 +1317,17 @@ class ContainerTestDefaultyParams
         return func_get_args();
     }
 
+    public function defaultyBandC($a, $b = 'default b', $c = 'default c')
+    {
+        return func_get_args();
+    }
+
     public function defaultyOnlyC($a, $b, $c = 'default c')
+    {
+        return func_get_args();
+    }
+
+    public function noDefault($a, $b, $c)
     {
         return func_get_args();
     }
