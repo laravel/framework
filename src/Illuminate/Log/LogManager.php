@@ -287,8 +287,9 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                Str::snake($this->app['config']['app.name'], '-'), $config['facility'] ?? LOG_USER, $this->level($config))
-            ),
+                Str::snake($this->app['config']['app.name'], '-'),
+                $config['facility'] ?? LOG_USER, $this->level($config)
+            )),
         ]);
     }
 
@@ -302,8 +303,8 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new ErrorLogHandler(
-                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config))
-            ),
+                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config)
+            )),
         ]);
     }
 
@@ -324,7 +325,10 @@ class LogManager implements LoggerInterface
             );
         }
 
-        $with = array_merge($config['with'] ?? [], $config['handler_with'] ?? []);
+        $with = array_merge(
+            $config['with'] ?? [],
+            $config['handler_with'] ?? []
+        );
 
         return new Monolog($this->parseChannel($config), [$this->prepareHandler(
             $this->app->make($config['handler'], $with), $config
