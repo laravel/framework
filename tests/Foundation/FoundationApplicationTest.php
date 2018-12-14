@@ -189,6 +189,63 @@ class FoundationApplicationTest extends TestCase
         $this->assertFalse($app->environment(['qux', 'bar']));
     }
 
+    public function testCachePath()
+    {
+        $app = new Application;
+
+        $this->assertEquals('/bootstrap/cache', $app->cachePath());
+        $this->assertEquals('/bootstrap/cache/test', $app->cachePath('test'));
+
+        $_ENV['APP_CACHE'] = '/custom_dir';
+        $this->assertEquals('/custom_dir', $app->cachePath());
+        $this->assertEquals('/custom_dir/test', $app->cachePath('test'));
+        unset($_ENV['APP_CACHE']);
+    }
+
+    public function testGetCachedServicesPath()
+    {
+        $app = new Application;
+
+        $this->assertEquals('/bootstrap/cache/services.php', $app->getCachedServicesPath());
+
+        $_ENV['APP_CACHE'] = '/custom_dir';
+        $this->assertEquals('/custom_dir/services.php', $app->getCachedServicesPath());
+        unset($_ENV['APP_CACHE']);
+    }
+
+    public function testGetCachedPackagesPath()
+    {
+        $app = new Application;
+
+        $this->assertEquals('/bootstrap/cache/packages.php', $app->getCachedPackagesPath());
+
+        $_ENV['APP_CACHE'] = '/custom_dir';
+        $this->assertEquals('/custom_dir/packages.php', $app->getCachedPackagesPath());
+        unset($_ENV['APP_CACHE']);
+    }
+
+    public function testGetCachedConfigPath()
+    {
+        $app = new Application;
+
+        $this->assertEquals('/bootstrap/cache/config.php', $app->getCachedConfigPath());
+
+        $_ENV['APP_CACHE'] = '/custom_dir';
+        $this->assertEquals('/custom_dir/config.php', $app->getCachedConfigPath());
+        unset($_ENV['APP_CACHE']);
+    }
+
+    public function testGetCachedRoutesPath()
+    {
+        $app = new Application;
+
+        $this->assertEquals('/bootstrap/cache/routes.php', $app->getCachedRoutesPath());
+
+        $_ENV['APP_CACHE'] = '/custom_dir';
+        $this->assertEquals('/custom_dir/routes.php', $app->getCachedRoutesPath());
+        unset($_ENV['APP_CACHE']);
+    }
+
     public function testMethodAfterLoadingEnvironmentAddsClosure()
     {
         $app = new Application;

@@ -279,6 +279,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('path', $this->path());
         $this->instance('path.base', $this->basePath());
         $this->instance('path.lang', $this->langPath());
+        $this->instance('path.cache', $this->cachePath());
         $this->instance('path.config', $this->configPath());
         $this->instance('path.public', $this->publicPath());
         $this->instance('path.storage', $this->storagePath());
@@ -318,6 +319,23 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function bootstrapPath($path = '')
     {
         return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+
+    /**
+     * Get the path to the cache directory.
+     *
+     * @param  string $path Optionally, a path to append to the cache path
+     *
+     * @return string
+     */
+    public function cachePath($path = '')
+    {
+        $envCachePath = $_ENV['APP_CACHE'] ?? null;
+        $pathTransform = $path ? DIRECTORY_SEPARATOR.$path : $path;
+
+        return $envCachePath
+            ? $envCachePath.$pathTransform
+            : $this->bootstrapPath().'/cache'.$pathTransform;
     }
 
     /**
@@ -861,7 +879,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedServicesPath()
     {
-        return $this->bootstrapPath().'/cache/services.php';
+        return $this->cachePath().'/services.php';
     }
 
     /**
@@ -871,7 +889,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedPackagesPath()
     {
-        return $this->bootstrapPath().'/cache/packages.php';
+        return $this->cachePath().'/packages.php';
     }
 
     /**
@@ -891,7 +909,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedConfigPath()
     {
-        return $_ENV['APP_CONFIG_CACHE'] ?? $this->bootstrapPath().'/cache/config.php';
+        return $this->cachePath().'/config.php';
     }
 
     /**
@@ -911,7 +929,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedRoutesPath()
     {
-        return $this->bootstrapPath().'/cache/routes.php';
+        return $this->cachePath().'/routes.php';
     }
 
     /**
