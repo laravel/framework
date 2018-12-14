@@ -11,7 +11,6 @@ use Swift_SmtpTransport as SmtpTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\ArrayTransport;
-use Swift_SendmailTransport as MailTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\MandrillTransport;
 use Illuminate\Mail\Transport\SparkPostTransport;
@@ -105,7 +104,7 @@ class TransportManager extends Manager
      */
     protected function createMailDriver()
     {
-        return new MailTransport;
+        return new SendmailTransport;
     }
 
     /**
