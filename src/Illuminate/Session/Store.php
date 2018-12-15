@@ -642,9 +642,9 @@ class Store implements Session
      * 
      * @return int
      */
-    public function getIdLength()
+    public function getIdSize()
     {
-        return is_numeric(config('session.id_size')) ? config('session.id_size') : 40;
+        return (isset($_ENV['SESSION_ID_SIZE']) && is_numeric($_ENV['SESSION_ID_SIZE'])) ? $_ENV['SESSION_ID_SIZE'] : 40;
     }
 
     /**
