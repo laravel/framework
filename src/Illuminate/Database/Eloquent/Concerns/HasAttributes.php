@@ -222,7 +222,7 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
-        if($this->autoAppend) {
+        if ($this->autoAppend) {
             $this->appendAccessors();
         }
         
@@ -236,11 +236,12 @@ trait HasAttributes
     }
     
     /**
-     * Append all accessors
+     * Append all accessors.
      *
      * @return void
      */
-    public function appendAccessors(){
+    public function appendAccessors()
+    {
         foreach(static::getMutatorMethods(static::class) as $method){
             $accessor = lcfirst(static::$snakeAttributes ? Str::snake($method) : $method);
             $this->append($accessor);
