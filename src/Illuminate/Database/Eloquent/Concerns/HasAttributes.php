@@ -1260,4 +1260,3 @@ trait HasAttributes
         return $matches[1];
     }
 }
-
