@@ -638,7 +638,7 @@ class Store implements Session
     }
 
     /**
-     * Retunrn session id length.
+     * Return session id required size.
      * 
      * @return int
      */
