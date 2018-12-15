@@ -559,7 +559,8 @@ class Store implements Session
      */
     public function isValidId($id)
     {
-        return is_string($id) && ctype_alnum($id) && strlen($id) === 40;
+
+        return is_string($id) && ctype_alnum($id) && strlen($id) === $this->getIdLength();
     }
 
     /**
@@ -569,7 +570,7 @@ class Store implements Session
      */
     protected function generateSessionId()
     {
-        return Str::random(40);
+        return Str::random($this->getIdLength());
     }
 
     /**
@@ -634,6 +635,16 @@ class Store implements Session
     public function getHandler()
     {
         return $this->handler;
+    }
+
+    /**
+     * Retunrn session id length.
+     * 
+     * @return void
+     */
+    public function getIdLength()
+    {
+        return is_numeric(config('session.id_size')) ? config('session.id_size') : 40;
     }
 
     /**
