@@ -560,7 +560,7 @@ class Store implements Session
     public function isValidId($id)
     {
 
-        return is_string($id) && ctype_alnum($id) && strlen($id) === $this->getIdLength();
+        return is_string($id) && ctype_alnum($id) && strlen($id) === $this->getIdSize();
     }
 
     /**
@@ -570,7 +570,7 @@ class Store implements Session
      */
     protected function generateSessionId()
     {
-        return Str::random($this->getIdLength());
+        return Str::random($this->getIdSize());
     }
 
     /**
