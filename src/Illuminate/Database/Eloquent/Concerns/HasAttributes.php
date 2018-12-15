@@ -69,6 +69,13 @@ trait HasAttributes
      * @var bool
      */
     public static $snakeAttributes = true;
+    
+    /**
+     * Indicates whether accessors are automatically appended to model serialization.
+     *
+     * @var bool
+     */
+    protected $autoAppend = false;
 
     /**
      * The cache of the mutated attributes for each class.
@@ -215,6 +222,10 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
+        if($this->autoAppend) {
+            $this->appendAccessors();
+        }
+        
         if (! count($this->appends)) {
             return [];
         }
@@ -222,6 +233,18 @@ trait HasAttributes
         return $this->getArrayableItems(
             array_combine($this->appends, $this->appends)
         );
+    }
+    
+    /**
+     * Append all accessors
+     *
+     * @return void
+     */
+    public function appendAccessors(){
+        foreach(static::getMutatorMethods(static::class) as $method){
+            $accessor = lcfirst(static::$snakeAttributes ? Str::snake($method) : $method);
+            $this->append($accessor);
+        }
     }
 
     /**
