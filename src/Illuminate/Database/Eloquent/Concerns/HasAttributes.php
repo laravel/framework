@@ -69,7 +69,7 @@ trait HasAttributes
      * @var bool
      */
     public static $snakeAttributes = true;
-    
+
     /**
      * Indicates whether accessors are automatically appended to model serialization.
      *
