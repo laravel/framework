@@ -76,7 +76,7 @@ trait HasAttributes
      * @var bool
      */
     protected $autoAppend = false;
-
+    
     /**
      * The cache of the mutated attributes for each class.
      *
@@ -242,7 +242,7 @@ trait HasAttributes
      */
     public function appendAccessors()
     {
-        foreach(static::getMutatorMethods(static::class) as $method){
+        foreach(static::getMutatorMethods(static::class) as $method) {
             $accessor = lcfirst(static::$snakeAttributes ? Str::snake($method) : $method);
             $this->append($accessor);
         }
