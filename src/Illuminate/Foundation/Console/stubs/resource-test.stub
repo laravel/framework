@@ -1,0 +1,50 @@
+<?php
+
+namespace DummyNamespace;
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class DummyClass extends TestCase
+{
+    /**
+     * A test for listing of the resource
+     *
+     * @return void
+     */
+    public function testIndex()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testCreate()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testStore()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testShow()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testEdit()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testUpdate()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testDestroy()
+    {
+        $this->assertTrue(true);
+    }
+}

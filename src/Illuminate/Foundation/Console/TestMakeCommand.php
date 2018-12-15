@@ -12,7 +12,7 @@ class TestMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:test {name : The name of the class} {--unit : Create a unit test}';
+    protected $signature = 'make:test {name : The name of the class} {--unit : Create a unit test} {--resource : Create a resource test} {--api : Create a api test}';
 
     /**
      * The console command description.
@@ -37,6 +37,14 @@ class TestMakeCommand extends GeneratorCommand
     {
         if ($this->option('unit')) {
             return __DIR__.'/stubs/unit-test.stub';
+        }
+
+        if ($this->option('resource')) {
+            return __DIR__.'/stubs/resource-test.stub';
+        }
+
+        if ($this->option('api')) {
+            return __DIR__.'/stubs/api-test.stub';
         }
 
         return __DIR__.'/stubs/test.stub';
