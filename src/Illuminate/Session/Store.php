@@ -640,7 +640,7 @@ class Store implements Session
     /**
      * Retunrn session id length.
      * 
-     * @return void
+     * @return int
      */
     public function getIdLength()
     {
