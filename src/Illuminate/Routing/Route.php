@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use LogicException;
+use ReflectionMethod;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -193,9 +194,12 @@ class Route
     protected function runCallable()
     {
         $callable = $this->action['uses'];
+        $reflection = $callable instanceof Closure ?
+            new ReflectionFunction($callable) :
+            new ReflectionMethod($callable, '__invoke');
 
         return $callable(...array_values($this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+            $this->parametersWithoutNulls(), $reflection
         )));
     }
 

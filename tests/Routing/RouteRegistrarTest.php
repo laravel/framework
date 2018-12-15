@@ -511,6 +511,18 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals('users.index', $this->getRoute()->getName());
     }
 
+    public function testCanUseInvokableObjectAsAction()
+    {
+        $this->router->get('users', new class {
+            public function __invoke()
+            {
+                return 'all-users';
+            }
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+    }
+
     /**
      * Get the last route registered with the router.
      *

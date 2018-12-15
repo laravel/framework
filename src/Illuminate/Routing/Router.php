@@ -488,7 +488,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function actionReferencesController($action)
     {
-        if (! $action instanceof Closure) {
+        if (! (is_object($action) && method_exists($action, '__invoke'))) {
             return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
         }
 
