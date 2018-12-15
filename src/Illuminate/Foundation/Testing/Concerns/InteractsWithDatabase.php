@@ -10,6 +10,8 @@ use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
 
 trait InteractsWithDatabase
 {
+    protected $databaseQueriesExecuted = null;
+
     /**
      * Assert that a given where condition exists in the database.
      *
@@ -93,6 +95,45 @@ trait InteractsWithDatabase
         foreach (Arr::wrap($class) as $class) {
             $this->artisan('db:seed', ['--class' => $class, '--no-interaction' => true]);
         }
+
+        return $this;
+    }
+
+    /**
+     * Start counting executed database queries.
+     *
+     * @return $this
+     */
+    public function startCountingDatabaseQueries()
+    {
+        if ($this->databaseQueriesExecuted === null) {
+            $this->app->make('db')->listen(function ($query) {
+                $this->databaseQueriesExecuted++;
+            });
+        }
+
+        $this->databaseQueriesExecuted = 0;
+
+        return $this;
+    }
+
+    /**
+     * Assert the amount of database queries executed since we started counting.
+     *
+     * @param  int
+     * @return $this
+     */
+    public function assertDatabaseQueriesExecutedCount($expectedCount)
+    {
+        if ($this->databaseQueriesExecuted === null) {
+            $this->fail('You have to call "startCountingDatabaseQueries()" first');
+        }
+
+        $this->assertSame(
+            $expectedCount,
+            $this->databaseQueriesExecuted,
+            "Failed to assert that the amount of executed database queries matched the expected {$expectedCount}"
+        );
 
         return $this;
     }
