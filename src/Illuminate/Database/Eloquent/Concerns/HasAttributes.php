@@ -76,7 +76,7 @@ trait HasAttributes
      * @var bool
      */
     protected $autoAppend = false;
-    
+	
     /**
      * The cache of the mutated attributes for each class.
      *
