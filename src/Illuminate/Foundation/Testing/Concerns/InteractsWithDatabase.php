@@ -120,7 +120,7 @@ trait InteractsWithDatabase
     /**
      * Assert the amount of database queries executed since we started counting.
      *
-     * @param  int
+     * @param  int  $expectedCount
      * @return $this
      */
     public function assertDatabaseQueriesExecutedCount($expectedCount)
