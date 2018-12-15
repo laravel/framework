@@ -76,7 +76,7 @@ trait HasAttributes
      * @var bool
      */
     protected $autoAppend = false;
-	
+
     /**
      * The cache of the mutated attributes for each class.
      *
@@ -225,7 +225,7 @@ trait HasAttributes
         if ($this->autoAppend) {
             $this->appendAccessors();
         }
-        
+
         if (! count($this->appends)) {
             return [];
         }
@@ -234,7 +234,7 @@ trait HasAttributes
             array_combine($this->appends, $this->appends)
         );
     }
-    
+
     /**
      * Append all accessors.
      *
