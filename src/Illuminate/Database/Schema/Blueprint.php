@@ -939,6 +939,18 @@ class Blueprint
     }
 
     /**
+     * Create a new nullable timestamp column on the table.
+     *
+     * @param  string  $column
+     * @param  int  $precision
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function nullableTimestamp($column, $precision = 0)
+    {
+        return $this->timestamp($column, $precision)->nullable();
+    }
+
+    /**
      * Create a new timestamp (with time zone) column on the table.
      *
      * @param  string  $column
