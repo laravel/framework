@@ -553,7 +553,7 @@ class ContainerTest extends TestCase
 
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
     }
-    
+
     public function testWithDefaultParametersAssociativeSyntax()
     {
         $container = new Container;
