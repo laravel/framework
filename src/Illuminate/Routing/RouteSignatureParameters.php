@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Closure;
 use ReflectionMethod;
 use ReflectionFunction;
 use Illuminate\Support\Str;
@@ -17,9 +18,15 @@ class RouteSignatureParameters
      */
     public static function fromAction(array $action, $subClass = null)
     {
-        $parameters = is_string($action['uses'])
-                        ? static::fromClassMethodString($action['uses'])
-                        : (new ReflectionFunction($action['uses']))->getParameters();
+        $uses = $action['uses'];
+
+        if (is_string($uses)) {
+            $parameters = static::fromClassMethodString($uses);
+        } elseif ($uses instanceof Closure) {
+            $parameters = (new ReflectionFunction($uses))->getParameters();
+        } else {
+            $parameters = (new ReflectionMethod($uses, '__invoke'))->getParameters();
+        }
 
         return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
             return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
