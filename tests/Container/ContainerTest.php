@@ -516,7 +516,7 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $result[1]);
     }
 
-    public function testWithDefaultParameters()
+    public function testWithDefaultParametersIndexedArraySyntax()
     {
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar']);
@@ -550,6 +550,39 @@ class ContainerTest extends TestCase
 
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['foo', 'bar', 'baz']);
+
+        $this->assertEquals(['foo', 'bar', 'baz'], $result);
+    }
+    
+    public function testWithDefaultParametersAssociativeSyntax()
+    {
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['a' => 'foo', 'b' => 'bar']);
+
+        $this->assertEquals(['foo', 'bar', 'default c'], $result);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
+
+        $this->assertEquals(['foo', 'bar', 'baz'], $result);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['a' => 'foo', 'b' => 'bar']);
+
+        $this->assertEquals(['foo', 'bar', 'default c'], $result);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['a' => 'foo']);
+
+        $this->assertEquals(['foo', 'default b', 'default c'], $result);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyOnlyC', ['a' => 'foo', 'b' => 'bar']);
+
+        $this->assertEquals(['foo', 'bar', 'default c'], $result);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
 
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
     }
