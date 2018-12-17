@@ -1,20 +1,84 @@
 # Release Notes for 5.7.x
 
-## Unreleased
+## [v5.7.17 (2018-12-12)](https://github.com/laravel/framework/compare/v5.7.16...v5.7.17)
+
+### Added
+- Added `Database\Query\Builder::insertUsing` method ([#26732](https://github.com/laravel/framework/pull/26732), [8216b46](https://github.com/laravel/framework/commit/8216b4607152f9b01f26efba6b045add5382c625)) 
+- Added `Database\Query\Builder::havingBetween` method ([#26758](https://github.com/laravel/framework/pull/26758))
+- Added `Packets out of order. Expected` string to `DetectsLostConnections` trait ([#26760](https://github.com/laravel/framework/pull/26760))
+- Added `NOT VALID` option for skipping validation when adding postgres foreign keys ([#26775](https://github.com/laravel/framework/pull/26775))
+
+### Fixed
+- Fixed: Using `store` on an uploaded file when you push an empty file ([#26809](https://github.com/laravel/framework/pull/26809))
+- Fixed hiding for hidden commands ([#26781](https://github.com/laravel/framework/pull/26781))
+
+
+## [v5.7.16 (2018-12-05)](https://github.com/laravel/framework/compare/v5.7.15...v5.7.16)
+
+### Added
+- Added localization for `403.blade.php` and `503.blade.php` ([#26751](https://github.com/laravel/framework/pull/26751))
+- Changing the Migrator to accept not only migration directory paths, but migration file paths too ([#26642](https://github.com/laravel/framework/pull/26642), [c4b13bf](https://github.com/laravel/framework/commit/c4b13bfd115bcfd54588ad2a5809fea2222d1cdb))
+
+### Fixed
+- Fixed self-referencing HasManyThrough existence queries ([#26662](https://github.com/laravel/framework/pull/26662))
+- Fixed HasManyThrough existence queries with same parent and through parent table ([#26676](https://github.com/laravel/framework/pull/26676))
+- Fixed breaking eager loading with "incrementing" string keys ([#26688](https://github.com/laravel/framework/pull/26688))
+- Remove the Register `<li>` when the route doesn't exist in `app.stub` ([#26708](https://github.com/laravel/framework/pull/26708))
+- Fixed `Collection::some` method ([#26696](https://github.com/laravel/framework/pull/26696))
+- <strong> Revert breaking change in `TestResponse::decodeResponseJson` method </strong> ([#26713](https://github.com/laravel/framework/pull/26713))
+- Fixed `PhpRedisConnection::mget` ([#26716](https://github.com/laravel/framework/pull/26716))
+- Fixed `Eloquent\Collection::loadCount` attribute syncing ([#26714](https://github.com/laravel/framework/pull/26714))
+- Fixed `Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase::seed` for array accepting ([#26734](https://github.com/laravel/framework/pull/26734)) 
+- Fixed `FormRequest` validation triggering twice ([#26731](https://github.com/laravel/framework/pull/26731))
+
+### Changed
+- Changed markdown on auth stub view (`Auth/Console/stubs/make/views/auth/login.stub`) ([#26648](https://github.com/laravel/framework/pull/26648))
+- Moved Slack and Nexmo notification channels to the own packages `laravel/nexmo-notification-channel`, `laravel/slack-notification-channel` ([#26689](https://github.com/laravel/framework/pull/26689), [#26727](https://github.com/laravel/framework/pull/26727))
+
+### Deprecated
+- `$cachedSchema` property in `UrlGenerator` is deprecated. Will be renamed to the `$cachedScheme` in 5.8 ([#26640](https://github.com/laravel/framework/pull/26640))
+
+
+## [v5.7.15 (2018-11-26)](https://github.com/laravel/framework/compare/v5.7.14...v5.7.15)
+
+### Added
+- Added `date_equals` validation message ([#26584](https://github.com/laravel/framework/pull/26584))
+- Added `starts_with` validation rule ([#26612](https://github.com/laravel/framework/pull/26612))
+- Added relationship getters `BelongsToMany::getParentKeyName`, `BelongsToMany::getRelatedKeyName`, `HasManyThrough::getFirstKeyName`, `HasManyThrough::getForeignKeyName`, `HasManyThrough::getSecondLocalKeyName`, `HasOneOrMany::getLocalKeyName`, `MorphToMany::getInverse` ([#26607](https://github.com/laravel/framework/pull/26607))
+- Make `ResourceCollection` countable ([#26595](https://github.com/laravel/framework/pull/26595))
+
+### Fixed
+- Fixed duplicate validation issue in `FormRequest::validated` method ([#26604](https://github.com/laravel/framework/pull/26604))
+- <strong> Prevent breaking eager loading with string keys </strong> ([#26622](https://github.com/laravel/framework/pull/26622))
+
+
+## [v5.7.14 (2018-11-21)](https://github.com/laravel/framework/compare/v5.7.13...v5.7.14)
 
 ### Added
 - Added `Macroable` trait to `Illuminate\Cookie\CookieJar` ([#26445](https://github.com/laravel/framework/pull/26445))
 - Added ability to disable password reset route ([#26459](https://github.com/laravel/framework/pull/26459))
+- Added ability to publish error views ([#26460](https://github.com/laravel/framework/pull/26460))
+- Added ability to set notifcation tries and timeout ([#26493](https://github.com/laravel/framework/pull/26493))
+- Added `mail.log_channel` config for make `log` for mail driver configurable ([#26510](https://github.com/laravel/framework/pull/26510))
+- Allowed `asset` root urls to be configurable via `app.asset_url` ([9172a67](https://github.com/laravel/framework/commit/9172a67b783952c1d3e15452d9c8646dc0b3eb6d))
+- Added `Error while sending QUERY packet` string to `DetectsLostConnections` trait ([#26233](https://github.com/laravel/framework/pull/26560))
+- Added env override for running in console ([a36906a](https://github.com/laravel/framework/commit/a36906ab8a141f1f497a0667196935e41970ae51), [19f2245](https://github.com/laravel/framework/commit/19f2245c6d7c87daf784f94b169f0dd4d98f0ca4))
 
 ### Fixed
 - Fixed `UNION` aggregate queries with columns ([#26466](https://github.com/laravel/framework/pull/26466))
 - Allowed migration table name to be guessed without `_table` suffix ([#26429](https://github.com/laravel/framework/pull/26429))
+- Fixed `TestResponse::assertExactJson` for empty JSON objects ([#26353](https://github.com/laravel/framework/pull/26353), [e6ebc8d](https://github.com/laravel/framework/commit/e6ebc8d239e53e6daf16c869de3897ffbce6c751), [621d91d](https://github.com/laravel/framework/commit/621d91d802016ab4a64acc5c65f81cb9f5e5f779), [#26508](https://github.com/laravel/framework/pull/26508))
+- Fixed cache repository for PHP from 7.2.12v ([#26495]( https://github.com/laravel/framework/pull/26495))
+- Fixed user authorization check for Email Verification ([#26528](https://github.com/laravel/framework/pull/26528))
+- Fixed nested JOINs on SQLite ([#26567](https://github.com/laravel/framework/pull/26567))
 
 ### Changed
-- Improved eager loading performance ([#26434](https://github.com/laravel/framework/pull/26434), [#26453](https://github.com/laravel/framework/pull/26453), [3992140](https://github.com/laravel/framework/commit/3992140064307ef82d23328995e7c59045c231f2))
+- Improved eager loading performance ([#26434](https://github.com/laravel/framework/pull/26434), [#26453](https://github.com/laravel/framework/pull/26453), [3992140](https://github.com/laravel/framework/commit/3992140064307ef82d23328995e7c59045c231f2), [#26471](https://github.com/laravel/framework/pull/26471), [a3738cf](https://github.com/laravel/framework/commit/a3738cf4e133a4475c56b51f521a12db78e2ecbb), [#26531](https://github.com/laravel/framework/pull/26531))
 - Adjusted `mix` missing asset exceptions ([#26431](https://github.com/laravel/framework/pull/26431))
 - Used `asset` helper to generate full path urls in exception views ([#26411](https://github.com/laravel/framework/pull/26411))
 - Changed `Illuminate\Foundation\Testing\Concerns\MocksApplicationServices::withoutJobs` method ([#26437](https://github.com/laravel/framework/pull/26437))
+- Cached `distinct` validation rule data ([#26509](https://github.com/laravel/framework/pull/26509))
+- Improved DNS Prefetching in view files ([#26552](https://github.com/laravel/framework/pull/26552))
 
 
 ## [v5.7.13 (2018-11-07)](https://github.com/laravel/framework/compare/v5.7.12...v5.7.13)

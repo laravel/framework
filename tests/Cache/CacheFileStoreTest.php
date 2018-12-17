@@ -37,11 +37,13 @@ class CacheFileStoreTest extends TestCase
     {
         $files = $this->mockFilesystem();
         $hash = sha1('foo');
+        $contents = '0000000000';
         $full_dir = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2);
         $files->expects($this->once())->method('makeDirectory')->with($this->equalTo($full_dir), $this->equalTo(0777), $this->equalTo(true));
-        $files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$hash));
+        $files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$hash))->willReturn(strlen($contents));
         $store = new FileStore($files, __DIR__);
-        $store->put('foo', '0000000000', 0);
+        $result = $store->put('foo', $contents, 0);
+        $this->assertTrue($result);
     }
 
     public function testExpiredItemsReturnNull()
@@ -72,8 +74,9 @@ class CacheFileStoreTest extends TestCase
         $contents = '1111111111'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents));
-        $store->put('foo', 'Hello World', 10);
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
+        $result = $store->put('foo', 'Hello World', 10);
+        $this->assertTrue($result);
     }
 
     public function testForeversAreStoredWithHighTimestamp()
@@ -82,9 +85,10 @@ class CacheFileStoreTest extends TestCase
         $contents = '9999999999'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents));
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
         $store = new FileStore($files, __DIR__);
-        $store->forever('foo', 'Hello World', 10);
+        $result = $store->forever('foo', 'Hello World', 10);
+        $this->assertTrue($result);
     }
 
     public function testForeversAreNotRemovedOnIncrement()

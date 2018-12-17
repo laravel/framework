@@ -6,7 +6,6 @@ use Mockery as m;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +20,7 @@ class FoundationTestResponseTest extends TestCase
         $response = $this->makeMockResponse([
             'render' => 'hello world',
             'getData' => ['foo' => 'bar'],
-            'getName' => 'dir.my-view',
+            'name' => 'dir.my-view',
         ]);
 
         $response->assertViewIs('dir.my-view');
@@ -168,6 +167,18 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJson($resource->jsonSerialize());
     }
 
+    public function testAssertJsonWithNull()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(null));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Invalid JSON was returned from the route.');
+
+        $resource = new JsonSerializableSingleResourceStub;
+
+        $response->assertJson($resource->jsonSerialize());
+    }
+
     public function testAssertJsonWithMixed()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
@@ -225,6 +236,9 @@ class FoundationTestResponseTest extends TestCase
         // Wildcard (repeating structure)
         $response->assertJsonStructure(['bars' => ['*' => ['bar', 'foo']]]);
 
+        // Wildcard (numeric keys)
+        $response->assertJsonStructure(['numeric_keys' => ['*' => ['bar', 'foo']]]);
+
         // Nested after wildcard
         $response->assertJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]]]);
 
@@ -257,45 +271,6 @@ class FoundationTestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonMissing(['id' => 20]);
-    }
-
-    public function testAssertExactJson()
-    {
-        $response = new TestResponse((new JsonResponse([
-            'payload' => (object) [],
-            'a' => [],
-            'b' => (object) [],
-            'status' => 'success',
-            'data' => [
-                'name' => 'West Fannieland',
-                'updated_at' => '2018-10-05 20:48:11',
-                'created_at' => '2018-10-05 20:48:11',
-                'id' => 1,
-                'b' => (object) [],
-                'c' => [
-                    'b' => (object) [],
-                    'name' => 'albert',
-                ],
-            ],
-        ])));
-
-        $response->assertExactJson([
-            'payload' => (object) [],
-            'b' => (object) [],
-            'a' => [],
-            'status' => 'success',
-            'data' => [
-                'name' => 'West Fannieland',
-                'created_at' => '2018-10-05 20:48:11',
-                'id' => 1,
-                'b' => (object) [],
-                'c' => [
-                    'b' => (object) [],
-                    'name' => 'albert',
-                ],
-                'updated_at' => '2018-10-05 20:48:11',
-            ],
-        ]);
     }
 
     public function testAssertJsonMissingExact()
@@ -435,17 +410,17 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'foo'    => 'bar',
+            'foo' => 'bar',
             'foobar' => [
                 'foobar_foo' => 'foo',
                 'foobar_bar' => 'bar',
             ],
-            'bars'   => [
+            'bars' => [
                 ['bar' => 'foo 0', 'foo' => 'bar 0'],
                 ['bar' => 'foo 1', 'foo' => 'bar 1'],
                 ['bar' => 'foo 2', 'foo' => 'bar 2'],
             ],
-            'baz'    => [
+            'baz' => [
                 ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
                 ['foo' => 'bar 1', 'bar' => ['foo' => 'bar 1', 'bar' => 'foo 1']],
             ],
@@ -453,6 +428,11 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
                 ['bar' => ['bar' => 'foo 0']],
                 ['bar' => ['bar' => 'foo 0', 'bar' => 'foo 0']],
                 ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
+            ],
+            'numeric_keys' => [
+                2 => ['bar' => 'foo 0', 'foo' => 'bar 0'],
+                3 => ['bar' => 'foo 1', 'foo' => 'bar 1'],
+                4 => ['bar' => 'foo 2', 'foo' => 'bar 2'],
             ],
         ];
     }

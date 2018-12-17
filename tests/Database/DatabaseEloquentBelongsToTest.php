@@ -153,7 +153,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
         $parent->shouldReceive('isDirty')->once()->andReturn(true);
-        $parent->shouldReceive('unsetRelation')->once()->with($relation->getRelation());
+        $parent->shouldReceive('unsetRelation')->once()->with($relation->getRelationName());
         $relation->associate(1);
     }
 
@@ -179,8 +179,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation(null, false);
         $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
-        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
-        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', m::mustBe([null]));
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
         $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }

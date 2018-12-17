@@ -163,7 +163,9 @@ class Grammar extends BaseGrammar
 
             $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
 
-            return trim("{$join->type} join {$table}{$nestedJoins} {$this->compileWheres($join)}");
+            $tableAndNestedJoins = is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
+
+            return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
     }
 
@@ -278,6 +280,24 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where not in raw" clause.
+     *
+     * For safety, whereIntegerInRaw ensures this method is only used with integer values.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotInRaw(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            return $this->wrap($where['column']).' not in ('.implode(', ', $where['values']).')';
+        }
+
+        return '1 = 1';
+    }
+
+    /**
      * Compile a where in sub-select clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -304,7 +324,7 @@ class Grammar extends BaseGrammar
     /**
      * Compile a "where in raw" clause.
      *
-     * For safety, this method is only used with integer values as whereInRaw utilizes "intval".
+     * For safety, whereIntegerInRaw ensures this method is only used with integer values.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
@@ -628,6 +648,8 @@ class Grammar extends BaseGrammar
         // clause into SQL based on the components that make it up from builder.
         if ($having['type'] === 'Raw') {
             return $having['boolean'].' '.$having['sql'];
+        } elseif ($having['type'] === 'between') {
+            return $this->compileHavingBetween($having);
         }
 
         return $this->compileBasicHaving($having);
@@ -646,6 +668,25 @@ class Grammar extends BaseGrammar
         $parameter = $this->parameter($having['value']);
 
         return $having['boolean'].' '.$column.' '.$having['operator'].' '.$parameter;
+    }
+
+    /**
+     * Compile a "between" having clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingBetween($having)
+    {
+        $between = $having['not'] ? 'not between' : 'between';
+
+        $column = $this->wrap($having['column']);
+
+        $min = $this->parameter(head($having['values']));
+
+        $max = $this->parameter(last($having['values']));
+
+        return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
     }
 
     /**
@@ -826,6 +867,19 @@ class Grammar extends BaseGrammar
     public function compileInsertGetId(Builder $query, $values, $sequence)
     {
         return $this->compileInsert($query, $values);
+    }
+
+    /**
+     * Compile an insert statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @return string
+     */
+    public function compileInsertUsing(Builder $query, array $columns, string $sql)
+    {
+        return "insert into {$this->wrapTable($query->from)} ({$this->columnize($columns)}) $sql";
     }
 
     /**

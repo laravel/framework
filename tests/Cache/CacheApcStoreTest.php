@@ -43,9 +43,12 @@ class CacheApcStoreTest extends TestCase
     public function testSetMethodProperlyCallsAPC()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->setMethods(['put'])->getMock();
-        $apc->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60));
+        $apc->expects($this->once())
+            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60))
+            ->willReturn(true);
         $store = new ApcStore($apc);
-        $store->put('foo', 'bar', 1);
+        $result = $store->put('foo', 'bar', 1);
+        $this->assertTrue($result);
     }
 
     public function testSetMultipleMethodProperlyCallsAPC()
@@ -57,13 +60,14 @@ class CacheApcStoreTest extends TestCase
             $this->equalTo('baz'), $this->equalTo('qux'), $this->equalTo(60),
         ], [
             $this->equalTo('bar'), $this->equalTo('norf'), $this->equalTo(60),
-        ]);
+        ])->willReturn(true);
         $store = new ApcStore($apc);
-        $store->putMany([
+        $result = $store->putMany([
             'foo'   => 'bar',
             'baz'   => 'qux',
             'bar'   => 'norf',
         ], 1);
+        $this->assertTrue($result);
     }
 
     public function testIncrementMethodProperlyCallsAPC()
@@ -85,17 +89,21 @@ class CacheApcStoreTest extends TestCase
     public function testStoreItemForeverProperlyCallsAPC()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->setMethods(['put'])->getMock();
-        $apc->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0));
+        $apc->expects($this->once())
+            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->willReturn(true);
         $store = new ApcStore($apc);
-        $store->forever('foo', 'bar');
+        $result = $store->forever('foo', 'bar');
+        $this->assertTrue($result);
     }
 
     public function testForgetMethodProperlyCallsAPC()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->setMethods(['delete'])->getMock();
-        $apc->expects($this->once())->method('delete')->with($this->equalTo('foo'));
+        $apc->expects($this->once())->method('delete')->with($this->equalTo('foo'))->willReturn(true);
         $store = new ApcStore($apc);
-        $store->forget('foo');
+        $result = $store->forget('foo');
+        $this->assertTrue($result);
     }
 
     public function testFlushesCached()

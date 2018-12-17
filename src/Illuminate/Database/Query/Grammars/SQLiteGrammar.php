@@ -163,7 +163,11 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * {@inheritdoc}
+     * Compile an insert statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
      */
     public function compileInsert(Builder $query, array $values)
     {

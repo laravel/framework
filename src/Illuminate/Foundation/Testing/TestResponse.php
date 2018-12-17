@@ -686,9 +686,7 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponse = $this->decodeJsonWhilePreservingEmptyObjects(
-            $this->getContent()
-        );
+        $decodedResponse = json_decode($this->getContent(), true);
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
@@ -699,46 +697,6 @@ class TestResponse
         }
 
         return data_get($decodedResponse, $key);
-    }
-
-    /**
-     * Decode the JSON string while preserving empty objects.
-     *
-     * @param  string  $json
-     * @return mixed
-     */
-    public function decodeJsonWhilePreservingEmptyObjects(string $json)
-    {
-        $payload = json_decode($json);
-
-        if ($payload === false) {
-            return $payload;
-        }
-
-        return $this->parseJsonWhilePreservingEmptyObjects($payload);
-    }
-
-    /**
-     * Parse the given JSON object while preserving empty objects.
-     *
-     * @param  StdClass|array  $payload
-     * @return
-     */
-    protected function parseJsonWhilePreservingEmptyObjects($payload)
-    {
-        if (is_object($payload)) {
-            return ! empty((array) $payload)
-                ? $this->parseJsonWhilePreservingEmptyObjects((array) $payload)
-                : $payload;
-        }
-
-        foreach ($payload as $key => $item) {
-            if (is_array($item) || is_object($item)) {
-                $payload[$key] = $this->parseJsonWhilePreservingEmptyObjects($item);
-            }
-        }
-
-        return $payload;
     }
 
     /**
@@ -762,7 +720,7 @@ class TestResponse
     {
         $this->ensureResponseHasView();
 
-        PHPUnit::assertEquals($value, $this->original->getName());
+        PHPUnit::assertEquals($value, $this->original->name());
 
         return $this;
     }
@@ -785,11 +743,11 @@ class TestResponse
         if (is_null($value)) {
             PHPUnit::assertArrayHasKey($key, $this->original->getData());
         } elseif ($value instanceof Closure) {
-            PHPUnit::assertTrue($value($this->original->$key));
+            PHPUnit::assertTrue($value($this->original->getData()[$key]));
         } elseif ($value instanceof Model) {
-            PHPUnit::assertTrue($value->is($this->original->$key));
+            PHPUnit::assertTrue($value->is($this->original->getData()[$key]));
         } else {
-            PHPUnit::assertEquals($value, $this->original->$key);
+            PHPUnit::assertEquals($value, $this->original->getData()[$key]);
         }
 
         return $this;
@@ -824,7 +782,7 @@ class TestResponse
     {
         $this->ensureResponseHasView();
 
-        return $this->original->$key;
+        return $this->original->getData()[$key];
     }
 
     /**
