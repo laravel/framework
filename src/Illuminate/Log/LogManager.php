@@ -23,7 +23,7 @@ class LogManager implements LoggerInterface
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -44,7 +44,7 @@ class LogManager implements LoggerInterface
     /**
      * Create a new Log manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -232,7 +232,7 @@ class LogManager implements LoggerInterface
                 new StreamHandler(
                     $config['path'], $this->level($config),
                     $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-                )
+                ), $config
             ),
         ]);
     }
@@ -246,10 +246,12 @@ class LogManager implements LoggerInterface
     protected function createDailyDriver(array $config)
     {
         return new Monolog($this->parseChannel($config), [
-            $this->prepareHandler(new RotatingFileHandler(
-                $config['path'], $config['days'] ?? 7, $this->level($config),
-                $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-            )),
+            $this->prepareHandler(
+                new RotatingFileHandler(
+                    $config['path'], $config['days'] ?? 7, $this->level($config),
+                    $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
+                ), $config
+            ),
         ]);
     }
 
@@ -286,9 +288,12 @@ class LogManager implements LoggerInterface
     protected function createSyslogDriver(array $config)
     {
         return new Monolog($this->parseChannel($config), [
-            $this->prepareHandler(new SyslogHandler(
-                $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config)
-            )),
+            $this->prepareHandler(
+                new SyslogHandler(
+                    Str::snake($this->app['config']['app.name'], '-'),
+                    $config['facility'] ?? LOG_USER, $this->level($config)
+                ), $config
+            ),
         ]);
     }
 
