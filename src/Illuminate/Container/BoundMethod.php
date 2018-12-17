@@ -116,7 +116,7 @@ class BoundMethod
             static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
         }
 
-        return array_merge($dependencies, $parameters);
+        return $parameters + $dependencies;
     }
 
     /**
@@ -162,6 +162,8 @@ class BoundMethod
             $dependencies[] = $container->make($parameter->getClass()->name);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
+        } else {
+            $dependencies[] = null;
         }
     }
 
