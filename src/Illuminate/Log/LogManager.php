@@ -246,10 +246,12 @@ class LogManager implements LoggerInterface
     protected function createDailyDriver(array $config)
     {
         return new Monolog($this->parseChannel($config), [
-            $this->prepareHandler(new RotatingFileHandler(
-                $config['path'], $config['days'] ?? 7, $this->level($config),
-                $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-            )),
+            $this->prepareHandler(
+                new RotatingFileHandler(
+                    $config['path'], $config['days'] ?? 7, $this->level($config),
+                    $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
+                ), $config
+            ),
         ]);
     }
 
