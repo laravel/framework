@@ -1,6 +1,6 @@
 # Release Notes for 5.7.x
 
-## [v5.7.17 (2018-12-17)](https://github.com/laravel/framework/compare/v5.7.17...v5.7.18)
+## [v5.7.18 (2018-12-17)](https://github.com/laravel/framework/compare/v5.7.17...v5.7.18)
 
 ### Added
 - Added missing `starts_with` validation message ([#26822](https://github.com/laravel/framework/pull/26822))
@@ -13,7 +13,7 @@
 ### Fixed
 - Fixed of using `illuminate/mail` outside of Laravel with driver log ([#26842](https://github.com/laravel/framework/pull/26842))
 - Fixed some bugs for `app()->call()` ([#26852](https://github.com/laravel/framework/pull/26852))
-- Added work around php bug related to [incorrect variable values when Opcache enabled in PHP v 7.3.0](https://github.com/laravel/framework/issues/26819) ([36d3436](https://github.com/laravel/framework/commit/36d343682d25570946ff22397a720727e0c1dcd7))
+- Added workaround for PHP-bug related to [incorrect variable values when Opcache enabled in PHP v 7.3.0](https://github.com/laravel/framework/issues/26819) ([36d3436](https://github.com/laravel/framework/commit/36d343682d25570946ff22397a720727e0c1dcd7))
 
 
 ## [v5.7.17 (2018-12-12)](https://github.com/laravel/framework/compare/v5.7.16...v5.7.17)
