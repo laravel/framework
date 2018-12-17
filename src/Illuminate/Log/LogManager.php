@@ -232,7 +232,7 @@ class LogManager implements LoggerInterface
                 new StreamHandler(
                     $config['path'], $this->level($config),
                     $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-                )
+                ), $config
             ),
         ]);
     }
