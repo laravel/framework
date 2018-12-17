@@ -288,10 +288,12 @@ class LogManager implements LoggerInterface
     protected function createSyslogDriver(array $config)
     {
         return new Monolog($this->parseChannel($config), [
-            $this->prepareHandler(new SyslogHandler(
-                Str::snake($this->app['config']['app.name'], '-'),
-                $config['facility'] ?? LOG_USER, $this->level($config)
-            )),
+            $this->prepareHandler(
+                new SyslogHandler(
+                    Str::snake($this->app['config']['app.name'], '-'),
+                    $config['facility'] ?? LOG_USER, $this->level($config)
+                ), $config
+            ),
         ]);
     }
 

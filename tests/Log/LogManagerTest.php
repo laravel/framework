@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Log;
 
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\SyslogHandler;
 use ReflectionProperty;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
@@ -194,6 +195,46 @@ class LogManagerTest extends TestCase
         $formatter = $handler->getFormatter();
 
         $this->assertInstanceOf(StreamHandler::class, $handler);
+        $this->assertInstanceOf(HtmlFormatter::class, $formatter);
+
+        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat->setAccessible(true);
+
+        $this->assertEquals('Y/m/d--test', $dateFormat->getValue($formatter));
+    }
+
+    public function testLogManagerCreateSyslogDriverWithConfiguredFormatter()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.defaultsyslog', [
+            'driver' => 'syslog',
+            'name' => 'ds',
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('defaultsyslog');
+        $handler = $logger->getLogger()->getHandlers()[0];
+        $formatter = $handler->getFormatter();
+
+        $this->assertInstanceOf(SyslogHandler::class, $handler);
+        $this->assertInstanceOf(LineFormatter::class, $formatter);
+
+        $config->set('logging.channels.formattedsyslog', [
+            'driver' => 'syslog',
+            'name' => 'fs',
+            'formatter' => HtmlFormatter::class,
+            'formatter_with' => [
+                'dateFormat' => 'Y/m/d--test'
+            ]
+        ]);
+
+        $logger = $manager->channel('formattedsyslog');
+        $handler = $logger->getLogger()->getHandlers()[0];
+        $formatter = $handler->getFormatter();
+
+        $this->assertInstanceOf(SyslogHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
 
         $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
