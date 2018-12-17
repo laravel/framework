@@ -115,7 +115,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         [$namespace, $group, $item] = $this->parseKey($key);
 
         // Here we will get the locale that should be used for the language line. If one
-        // was not passed, we will use the default locales which was given to us when
+        // was not passed, we will use the default locale which was given to us when
         // the translator was instantiated. Then, we can load the lines and return.
         $locales = $fallback ? $this->localeArray($locale)
                              : [$locale ?: $this->locale];
