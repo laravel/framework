@@ -835,9 +835,11 @@ class Container implements ArrayAccess, ContainerContract
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            $results[] = is_null($dependency->getClass())
-                            ? $this->resolvePrimitive($dependency)
-                            : $this->resolveClass($dependency);
+            if ( ! is_null($dependency->getClass()) ) {
+                $results[] = $this->resolveClass($dependency);
+            } else if ( ! $dependency->isOptional() ) {
+                $results[] = $this->resolvePrimitive($dependency);
+            }
         }
 
         return $results;
