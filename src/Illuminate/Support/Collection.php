@@ -620,6 +620,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Filter items where the given key between values.
+     * @param $key
+     * @param $values
+     * @return Collection
+     */
+    public function whereBetween($key, $values)
+    {
+        return $this->where($key, '>=', reset($values))->where($key, '<=', end($values));
+    }
+
+    /**
      * Filter items by the given key value pair.
      *
      * @param  string  $key
