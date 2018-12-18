@@ -17,6 +17,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\MaxAttemptsExceededException;
+use Illuminate\Contracts\Queue\Job as QueueJobContract;
 
 class QueueWorkerTest extends TestCase
 {
@@ -348,8 +349,9 @@ class BrokenQueueConnection
     }
 }
 
-class WorkerFakeJob
+class WorkerFakeJob implements QueueJobContract
 {
+    public $id = '';
     public $fired = false;
     public $callback;
     public $deleted = false;
@@ -360,13 +362,20 @@ class WorkerFakeJob
     public $attempts = 0;
     public $failedWith;
     public $failed = false;
-    public $connectionName;
+    public $connectionName = '';
+    public $queue = '';
+    public $rawBody = '';
 
     public function __construct($callback = null)
     {
         $this->callback = $callback ?: function () {
             //
         };
+    }
+
+    public function getJobId()
+    {
+        return $this->id;
     }
 
     public function fire()
@@ -400,26 +409,21 @@ class WorkerFakeJob
         return $this->deleted;
     }
 
-    public function release($delay)
+    public function release($delay = 0)
     {
         $this->released = true;
 
         $this->releaseAfter = $delay;
     }
 
-    public function isReleased()
+    public function isDeletedOrReleased()
     {
-        return $this->released;
+        return $this->deleted || $this->released;
     }
 
     public function attempts()
     {
         return $this->attempts;
-    }
-
-    public function markAsFailed()
-    {
-        $this->failed = true;
     }
 
     public function failed($e)
@@ -429,19 +433,29 @@ class WorkerFakeJob
         $this->failedWith = $e;
     }
 
-    public function hasFailed()
-    {
-        return $this->failed;
-    }
-
-    public function resolveName()
+    public function getName()
     {
         return 'WorkerFakeJob';
     }
 
-    public function setConnectionName($name)
+    public function resolveName()
     {
-        $this->connectionName = $name;
+        return $this->getName();
+    }
+
+    public function getConnectionName()
+    {
+        return $this->connectionName;
+    }
+
+    public function getQueue()
+    {
+        return $this->queue;
+    }
+
+    public function getRawBody()
+    {
+        return $this->rawBody;
     }
 
     public function timeout()
