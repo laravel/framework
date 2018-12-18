@@ -5,6 +5,7 @@ namespace Illuminate\Console;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 abstract class GeneratorCommand extends Command
 {
@@ -46,10 +47,13 @@ abstract class GeneratorCommand extends Command
      * Execute the console command.
      *
      * @return bool|null
+     * @throws InvalidArgumentException
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
     {
+        $this->validateClassName($this->getNameInput());
+
         $name = $this->qualifyClass($this->getNameInput());
 
         $path = $this->getPath($name);
@@ -96,6 +100,21 @@ abstract class GeneratorCommand extends Command
         return $this->qualifyClass(
             $this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name
         );
+    }
+
+    /**
+     * Validates a class name (it should be only alphanum characters or underscores and start with a letter).
+     *
+     * @param $name
+     * @throws InvalidArgumentException
+     */
+    protected function validateClassName($name)
+    {
+        if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $name)) {
+            throw new InvalidArgumentException(
+                sprintf('name "%s" is invalid. It must be a valid class name', $name)
+            );
+        };
     }
 
     /**
