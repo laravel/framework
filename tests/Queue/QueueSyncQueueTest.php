@@ -4,8 +4,12 @@ namespace Illuminate\Tests\Queue;
 
 use Exception;
 use Mockery as m;
+use Illuminate\Queue\SyncQueue;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\QueueableEntity;
 
 class QueueSyncQueueTest extends TestCase
 {
@@ -18,12 +22,12 @@ class QueueSyncQueueTest extends TestCase
     {
         unset($_SERVER['__sync.test']);
 
-        $sync = new \Illuminate\Queue\SyncQueue;
-        $container = new \Illuminate\Container\Container;
+        $sync = new SyncQueue;
+        $container = new Container;
         $sync->setContainer($container);
 
-        $sync->push('Illuminate\Tests\Queue\SyncQueueTestHandler', ['foo' => 'bar']);
-        $this->assertInstanceOf('Illuminate\Queue\Jobs\SyncJob', $_SERVER['__sync.test'][0]);
+        $sync->push(SyncQueueTestHandler::class, ['foo' => 'bar']);
+        $this->assertInstanceOf(SyncJob::class, $_SERVER['__sync.test'][0]);
         $this->assertEquals(['foo' => 'bar'], $_SERVER['__sync.test'][1]);
     }
 
@@ -31,17 +35,17 @@ class QueueSyncQueueTest extends TestCase
     {
         unset($_SERVER['__sync.failed']);
 
-        $sync = new \Illuminate\Queue\SyncQueue;
-        $container = new \Illuminate\Container\Container;
+        $sync = new SyncQueue;
+        $container = new Container;
         Container::setInstance($container);
-        $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events = m::mock(Dispatcher::class);
         $events->shouldReceive('dispatch')->times(3);
         $container->instance('events', $events);
-        $container->instance('Illuminate\Contracts\Events\Dispatcher', $events);
+        $container->instance(Dispatcher::class, $events);
         $sync->setContainer($container);
 
         try {
-            $sync->push('Illuminate\Tests\Queue\FailingSyncQueueTestHandler', ['foo' => 'bar']);
+            $sync->push(FailingSyncQueueTestHandler::class, ['foo' => 'bar']);
         } catch (Exception $e) {
             $this->assertTrue($_SERVER['__sync.failed']);
         }
@@ -50,7 +54,7 @@ class QueueSyncQueueTest extends TestCase
     }
 }
 
-class SyncQueueTestEntity implements \Illuminate\Contracts\Queue\QueueableEntity
+class SyncQueueTestEntity implements QueueableEntity
 {
     public function getQueueableId()
     {

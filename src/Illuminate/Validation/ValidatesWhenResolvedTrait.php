@@ -22,7 +22,7 @@ trait ValidatesWhenResolvedTrait
 
         $instance = $this->getValidatorInstance();
 
-        if (! $instance->passes()) {
+        if ($instance->fails()) {
             $this->failedValidation($instance);
         }
     }

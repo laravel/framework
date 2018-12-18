@@ -3,8 +3,13 @@
 namespace Illuminate\Tests\Routing;
 
 use Mockery as m;
+use Illuminate\Http\Request;
+use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
+use Illuminate\Http\RedirectResponse;
+use Symfony\Component\HttpFoundation\HeaderBag;
 
 class RoutingRedirectorTest extends TestCase
 {
@@ -16,12 +21,17 @@ class RoutingRedirectorTest extends TestCase
 
     public function setUp()
     {
-        $this->headers = m::mock('Symfony\Component\HttpFoundation\HeaderBag');
+        $this->headers = m::mock(HeaderBag::class);
 
-        $this->request = m::mock('Illuminate\Http\Request');
+        $this->request = m::mock(Request::class);
+        $this->request->shouldReceive('isMethod')->andReturn(true)->byDefault();
+        $this->request->shouldReceive('method')->andReturn('GET')->byDefault();
+        $this->request->shouldReceive('route')->andReturn(true)->byDefault();
+        $this->request->shouldReceive('ajax')->andReturn(false)->byDefault();
+        $this->request->shouldReceive('expectsJson')->andReturn(false)->byDefault();
         $this->request->headers = $this->headers;
 
-        $this->url = m::mock('Illuminate\Routing\UrlGenerator');
+        $this->url = m::mock(UrlGenerator::class);
         $this->url->shouldReceive('getRequest')->andReturn($this->request);
         $this->url->shouldReceive('to')->with('bar', [], null)->andReturn('http://foo.com/bar');
         $this->url->shouldReceive('to')->with('bar', [], true)->andReturn('https://foo.com/bar');
@@ -29,7 +39,7 @@ class RoutingRedirectorTest extends TestCase
         $this->url->shouldReceive('to')->with('http://foo.com/bar', [], null)->andReturn('http://foo.com/bar');
         $this->url->shouldReceive('to')->with('/', [], null)->andReturn('http://foo.com/');
 
-        $this->session = m::mock('Illuminate\Session\Store');
+        $this->session = m::mock(Store::class);
 
         $this->redirect = new Redirector($this->url);
         $this->redirect->setSession($this->session);
@@ -44,7 +54,7 @@ class RoutingRedirectorTest extends TestCase
     {
         $response = $this->redirect->to('bar');
 
-        $this->assertInstanceOf('Illuminate\Http\RedirectResponse', $response);
+        $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
         $this->assertEquals(302, $response->getStatusCode());
         $this->assertEquals($this->session, $response->getSession());
@@ -64,6 +74,17 @@ class RoutingRedirectorTest extends TestCase
     {
         $this->url->shouldReceive('full')->andReturn('http://foo.com/bar');
         $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+
+        $response = $this->redirect->guest('login');
+
+        $this->assertEquals('http://foo.com/login', $response->getTargetUrl());
+    }
+
+    public function testGuestPutPreviousUrlInSession()
+    {
+        $this->request->shouldReceive('method')->once()->andReturn('POST');
+        $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+        $this->url->shouldReceive('previous')->once()->andReturn('http://foo.com/bar');
 
         $response = $this->redirect->guest('login');
 

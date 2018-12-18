@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cookie;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
 class CookieTest extends TestCase
@@ -71,11 +72,11 @@ class CookieTest extends TestCase
         $cookie->queue($cookie->make('foo', 'bar'));
         $this->assertArrayHasKey('foo', $cookie->getQueuedCookies());
         $this->assertTrue($cookie->hasQueued('foo'));
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie->queued('foo'));
+        $this->assertInstanceOf(Cookie::class, $cookie->queued('foo'));
         $cookie->queue('qu', 'ux');
         $this->assertArrayHasKey('qu', $cookie->getQueuedCookies());
         $this->assertTrue($cookie->hasQueued('qu'));
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie->queued('qu'));
+        $this->assertInstanceOf(Cookie::class, $cookie->queued('qu'));
     }
 
     public function testUnqueue()

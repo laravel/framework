@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Support\Carbon;
 use Illuminate\Cache\FileStore;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class CacheFileStoreTest extends TestCase
@@ -48,7 +49,7 @@ class CacheFileStoreTest extends TestCase
         $files = $this->mockFilesystem();
         $contents = '0000000000';
         $files->expects($this->once())->method('get')->will($this->returnValue($contents));
-        $store = $this->getMockBuilder('Illuminate\Cache\FileStore')->setMethods(['forget'])->setConstructorArgs([$files, __DIR__])->getMock();
+        $store = $this->getMockBuilder(FileStore::class)->setMethods(['forget'])->setConstructorArgs([$files, __DIR__])->getMock();
         $store->expects($this->once())->method('forget');
         $value = $store->get('foo');
         $this->assertNull($value);
@@ -66,7 +67,7 @@ class CacheFileStoreTest extends TestCase
     public function testStoreItemProperlyStoresValues()
     {
         $files = $this->mockFilesystem();
-        $store = $this->getMockBuilder('Illuminate\Cache\FileStore')->setMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
+        $store = $this->getMockBuilder(FileStore::class)->setMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
         $store->expects($this->once())->method('expiration')->with($this->equalTo(10))->will($this->returnValue(1111111111));
         $contents = '1111111111'.serialize('Hello World');
         $hash = sha1('foo');
@@ -169,6 +170,6 @@ class CacheFileStoreTest extends TestCase
 
     protected function mockFilesystem()
     {
-        return $this->createMock('Illuminate\Filesystem\Filesystem');
+        return $this->createMock(Filesystem::class);
     }
 }

@@ -5,11 +5,15 @@ namespace Illuminate\Notifications;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
 
 class NotificationSender
 {
+    use Localizable;
+
     /**
      * The notification manager instance.
      *
@@ -32,18 +36,27 @@ class NotificationSender
     protected $events;
 
     /**
+     * The locale to be used when sending notifications.
+     *
+     * @var string|null
+     */
+    protected $locale;
+
+    /**
      * Create a new notification sender instance.
      *
      * @param  \Illuminate\Notifications\ChannelManager  $manager
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $bus
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param  string|null  $locale
      * @return void
      */
-    public function __construct($manager, $bus, $events)
+    public function __construct($manager, $bus, $events, $locale = null)
     {
         $this->bus = $bus;
         $this->events = $events;
         $this->manager = $manager;
+        $this->locale = $locale;
     }
 
     /**
@@ -83,12 +96,30 @@ class NotificationSender
                 continue;
             }
 
-            $notificationId = Str::uuid()->toString();
+            $this->withLocale($this->preferredLocale($notifiable, $notification), function () use ($viaChannels, $notifiable, $original) {
+                $notificationId = Str::uuid()->toString();
 
-            foreach ((array) $viaChannels as $channel) {
-                $this->sendToNotifiable($notifiable, $notificationId, clone $original, $channel);
-            }
+                foreach ((array) $viaChannels as $channel) {
+                    $this->sendToNotifiable($notifiable, $notificationId, clone $original, $channel);
+                }
+            });
         }
+    }
+
+    /**
+     * Get the notifiable's preferred locale for the notification.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $notification
+     * @return string|null
+     */
+    protected function preferredLocale($notifiable, $notification)
+    {
+        return $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
+            if ($notifiable instanceof HasLocalePreference) {
+                return $notifiable->preferredLocale();
+            }
+        });
     }
 
     /**
@@ -152,6 +183,10 @@ class NotificationSender
                 $notification = clone $original;
 
                 $notification->id = $notificationId;
+
+                if (! is_null($this->locale)) {
+                    $notification->locale = $this->locale;
+                }
 
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))

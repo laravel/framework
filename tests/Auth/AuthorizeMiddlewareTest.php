@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -19,6 +20,7 @@ class AuthorizeMiddlewareTest extends TestCase
 {
     protected $container;
     protected $user;
+    protected $router;
 
     public function tearDown()
     {
@@ -82,6 +84,42 @@ class AuthorizeMiddlewareTest extends TestCase
         ]);
 
         $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+
+        $this->assertEquals($response->content(), 'success');
+    }
+
+    public function testSimpleAbilityWithStringParameter()
+    {
+        $this->gate()->define('view-dashboard', function ($user, $param) {
+            return $param === 'true';
+        });
+
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':view-dashboard,true',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+
+        $this->assertEquals($response->content(), 'success');
+    }
+
+    public function testSimpleAbilityWithStringParameterFromRouteParameter()
+    {
+        $this->gate()->define('view-dashboard', function ($user, $param) {
+            return $param === 'true';
+        });
+
+        $this->router->get('dashboard/{route_parameter}', [
+            'middleware' => Authorize::class.':view-dashboard,route_parameter',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard/true', 'GET'));
 
         $this->assertEquals($response->content(), 'success');
     }
@@ -184,7 +222,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testModelInstanceAsParameter()
     {
-        $instance = m::mock(\Illuminate\Database\Eloquent\Model::class);
+        $instance = m::mock(Model::class);
 
         $this->gate()->define('success', function ($user, $model) use ($instance) {
             $this->assertSame($model, $instance);

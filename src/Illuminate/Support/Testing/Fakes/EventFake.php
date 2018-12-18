@@ -135,7 +135,7 @@ class EventFake implements Dispatcher
      */
     public function listen($events, $listener)
     {
-        //
+        $this->dispatcher->listen($events, $listener);
     }
 
     /**
@@ -146,7 +146,7 @@ class EventFake implements Dispatcher
      */
     public function hasListeners($eventName)
     {
-        //
+        return $this->dispatcher->hasListeners($eventName);
     }
 
     /**
@@ -169,7 +169,7 @@ class EventFake implements Dispatcher
      */
     public function subscribe($subscriber)
     {
-        //
+        $this->dispatcher->subscribe($subscriber);
     }
 
     /**

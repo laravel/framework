@@ -90,7 +90,7 @@ class VendorPublishCommand extends Command
             return;
         }
 
-        list($this->provider, $this->tags) = [
+        [$this->provider, $this->tags] = [
             $this->option('provider'), (array) $this->option('tag'),
         ];
 
@@ -140,7 +140,7 @@ class VendorPublishCommand extends Command
      */
     protected function parseChoice($choice)
     {
-        list($type, $value) = explode(': ', strip_tags($choice));
+        [$type, $value] = explode(': ', strip_tags($choice));
 
         if ($type == 'Provider') {
             $this->provider = $value;

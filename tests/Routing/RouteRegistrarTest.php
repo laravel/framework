@@ -122,7 +122,7 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterRouteWithControllerAction()
     {
         $this->router->middleware('controller-middleware')
-                     ->get('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub@index');
+                     ->get('users', RouteRegistrarControllerStub::class.'@index');
 
         $this->seeResponse('controller', Request::create('users', 'GET'));
         $this->seeMiddleware('controller-middleware');
@@ -131,7 +131,7 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterRouteWithArrayAndControllerAction()
     {
         $this->router->middleware('controller-middleware')->put('users', [
-            'uses' => 'Illuminate\Tests\Routing\RouteRegistrarControllerStub@index',
+            'uses' => RouteRegistrarControllerStub::class.'@index',
         ]);
 
         $this->seeResponse('controller', Request::create('users', 'PUT'));
@@ -169,6 +169,17 @@ class RouteRegistrarTest extends TestCase
         });
 
         $this->assertEquals('api/users', $this->getRoute()->uri());
+    }
+
+    public function testCanRegisterGroupWithPrefixAndWhere()
+    {
+        $this->router->prefix('foo/{bar}')->where(['bar' => '[0-9]+'])->group(function ($router) {
+            $router->get('here', function () {
+                return 'good';
+            });
+        });
+
+        $this->seeResponse('good', Request::create('foo/12345/here', 'GET'));
     }
 
     public function testCanRegisterGroupWithNamePrefix()
@@ -213,16 +224,81 @@ class RouteRegistrarTest extends TestCase
     public function testCanRegisterResource()
     {
         $this->router->middleware('resource-middleware')
-                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+                     ->resource('users', RouteRegistrarControllerStub::class);
 
         $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
         $this->seeMiddleware('resource-middleware');
     }
 
+    public function testCanRegisterResourcesWithExceptOption()
+    {
+        $this->router->resources([
+            'resource-one'      => RouteRegistrarControllerStubOne::class,
+            'resource-two'      => RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => RouteRegistrarControllerStubThree::class,
+        ], ['except' => ['create', 'show']]);
+
+        $this->assertCount(15, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+        }
+    }
+
+    public function testCanRegisterResourcesWithOnlyOption()
+    {
+        $this->router->resources([
+            'resource-one'      => RouteRegistrarControllerStubOne::class,
+            'resource-two'      => RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => RouteRegistrarControllerStubThree::class,
+        ], ['only' => ['create', 'show']]);
+
+        $this->assertCount(6, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+        }
+    }
+
+    public function testCanRegisterResourcesWithoutOption()
+    {
+        $this->router->resources([
+            'resource-one'      => RouteRegistrarControllerStubOne::class,
+            'resource-two'      => RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => RouteRegistrarControllerStubThree::class,
+        ]);
+
+        $this->assertCount(21, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+        }
+    }
+
     public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
     {
         $resource = $this->router->middleware('resource-middleware')
-                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->resource('users', RouteRegistrarControllerStub::class)
                      ->register();
 
         $this->assertCount(7, $resource->getRoutes());
@@ -238,7 +314,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanLimitMethodsOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->only('index', 'show', 'destroy');
 
         $this->assertCount(3, $this->router->getRoutes());
@@ -250,7 +326,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanExcludeMethodsOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->except(['index', 'create', 'store', 'show', 'edit']);
 
         $this->assertCount(2, $this->router->getRoutes());
@@ -259,9 +335,75 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
+    public function testCanRegisterApiResourcesWithExceptOption()
+    {
+        $this->router->apiResources([
+            'resource-one'      => RouteRegistrarControllerStubOne::class,
+            'resource-two'      => RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => RouteRegistrarControllerStubThree::class,
+        ], ['except' => ['create', 'show']]);
+
+        $this->assertCount(12, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+        }
+    }
+
+    public function testCanRegisterApiResourcesWithOnlyOption()
+    {
+        $this->router->apiResources([
+            'resource-one'      => RouteRegistrarControllerStubOne::class,
+            'resource-two'      => RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => RouteRegistrarControllerStubThree::class,
+        ], ['only' => ['index', 'show']]);
+
+        $this->assertCount(6, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+        }
+    }
+
+    public function testCanRegisterApiResourcesWithoutOption()
+    {
+        $this->router->apiResources([
+            'resource-one'      => RouteRegistrarControllerStubOne::class,
+            'resource-two'      => RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => RouteRegistrarControllerStubThree::class,
+        ]);
+
+        $this->assertCount(15, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+        }
+    }
+
     public function testUserCanRegisterApiResource()
     {
-        $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class);
+        $this->router->apiResource('users', RouteRegistrarControllerStub::class);
 
         $this->assertCount(5, $this->router->getRoutes());
 
@@ -271,7 +413,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testUserCanRegisterApiResourceWithExceptOption()
     {
-        $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class, [
+        $this->router->apiResource('users', RouteRegistrarControllerStub::class, [
             'except' => ['destroy'],
         ]);
 
@@ -284,7 +426,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testUserCanRegisterApiResourceWithOnlyOption()
     {
-        $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class, [
+        $this->router->apiResource('users', RouteRegistrarControllerStub::class, [
             'only' => ['index', 'show'],
         ]);
 
@@ -296,16 +438,16 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanNameRoutesOnRegisteredResource()
     {
-        $this->router->resource('comments', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('comments', RouteRegistrarControllerStub::class)
                      ->only('create', 'store')->names('reply');
 
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->only('create', 'store')->names([
                          'create' => 'user.build',
                          'store' => 'user.save',
                      ]);
 
-        $this->router->resource('posts', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('posts', RouteRegistrarControllerStub::class)
                     ->only('create', 'destroy')
                     ->name('create', 'posts.make')
                     ->name('destroy', 'posts.remove');
@@ -320,10 +462,10 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanOverrideParametersOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->parameters(['users' => 'admin_user']);
 
-        $this->router->resource('posts', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+        $this->router->resource('posts', RouteRegistrarControllerStub::class)
                      ->parameter('posts', 'topic');
 
         $this->assertContains('admin_user', $this->router->getRoutes()->getByName('users.show')->uri);
@@ -332,10 +474,10 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanSetMiddlewareOnRegisteredResource()
     {
-        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
-                     ->middleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->middleware(RouteRegistrarMiddlewareStub::class);
 
-        $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+        $this->seeMiddleware(RouteRegistrarMiddlewareStub::class);
     }
 
     public function testCanSetRouteName()
@@ -411,4 +553,5 @@ class RouteRegistrarControllerStub
 
 class RouteRegistrarMiddlewareStub
 {
+    //
 }

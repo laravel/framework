@@ -2,19 +2,22 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Mockery as m;
+use Illuminate\View\Factory;
+use Illuminate\Mail\Markdown;
 use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
     public function tearDown()
     {
-        \Mockery::close();
+        m::close();
     }
 
     public function testRenderFunctionReturnsHtml()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
-        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
@@ -28,8 +31,8 @@ class MailMarkdownTest extends TestCase
 
     public function testRenderFunctionReturnsHtmlWithCustomTheme()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
-        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
         $markdown->theme('yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
@@ -44,8 +47,8 @@ class MailMarkdownTest extends TestCase
 
     public function testRenderTextReturnsText()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
-        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->markdownComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
@@ -58,8 +61,8 @@ class MailMarkdownTest extends TestCase
 
     public function testParseReturnsParsedMarkdown()
     {
-        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
-        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
 
         $result = $markdown->parse('# Something');
 

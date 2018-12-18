@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 
 class BladeElseGuestStatementsTest extends TestCase
@@ -31,6 +32,6 @@ wheeze
 
     protected function getFiles()
     {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        return m::mock(Filesystem::class);
     }
 }

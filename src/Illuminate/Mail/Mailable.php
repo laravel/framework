@@ -4,13 +4,13 @@ namespace Illuminate\Mail;
 
 use ReflectionClass;
 use ReflectionProperty;
-use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 
 class Mailable implements MailableContract, Renderable
 {
-    use Localizable;
+    use ForwardsCalls, Localizable;
 
     /**
      * The locale of the message.
@@ -133,6 +133,13 @@ class Mailable implements MailableContract, Renderable
     public $callbacks = [];
 
     /**
+     * The callback that should be invoked while building the view data.
+     *
+     * @var callable
+     */
+    public static $viewDataCallback;
+
+    /**
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
@@ -161,7 +168,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function queue(Queue $queue)
     {
-        if (property_exists($this, 'delay')) {
+        if (isset($this->delay)) {
             return $this->later($this->delay, $queue);
         }
 
@@ -196,20 +203,26 @@ class Mailable implements MailableContract, Renderable
      * Render the mailable into a view.
      *
      * @return \Illuminate\View\View
+     *
+     * @throws \ReflectionException
      */
     public function render()
     {
-        Container::getInstance()->call([$this, 'build']);
+        return $this->withLocale($this->locale, function () {
+            Container::getInstance()->call([$this, 'build']);
 
-        return Container::getInstance()->make('mailer')->render(
-            $this->buildView(), $this->buildViewData()
-        );
+            return Container::getInstance()->make('mailer')->render(
+                $this->buildView(), $this->buildViewData()
+            );
+        });
     }
 
     /**
      * Build the view for the message.
      *
      * @return array|string
+     *
+     * @throws \ReflectionException
      */
     protected function buildView()
     {
@@ -237,6 +250,8 @@ class Mailable implements MailableContract, Renderable
      * Build the Markdown view for the message.
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     protected function buildMarkdownView()
     {
@@ -258,10 +273,16 @@ class Mailable implements MailableContract, Renderable
      * Build the view data for the message.
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     public function buildViewData()
     {
         $data = $this->viewData;
+
+        if (static::$viewDataCallback) {
+            $data = array_merge($data, call_user_func(static::$viewDataCallback, $this));
+        }
 
         foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             if ($property->getDeclaringClass()->getName() !== self::class) {
@@ -370,7 +391,7 @@ class Mailable implements MailableContract, Renderable
                 FilesystemFactory::class
             )->disk($attachment['disk']);
 
-            return $message->attachData(
+            $message->attachData(
                 $storage->get($attachment['path']),
                 $attachment['name'] ?? basename($attachment['path']),
                 array_merge(['mime' => $storage->mimeType($attachment['path'])], $attachment['options'])
@@ -794,6 +815,17 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Register a callback to be called while building the view data.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function buildViewDataUsing(callable $callback)
+    {
+        static::$viewDataCallback = $callback;
+    }
+
+    /**
      * Dynamically bind parameters to the message.
      *
      * @param  string  $method
@@ -808,8 +840,6 @@ class Mailable implements MailableContract, Renderable
             return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
         }
 
-        throw new BadMethodCallException(sprintf(
-            'Method %s::%s does not exist.', static::class, $method
-        ));
+        static::throwBadMethodCallException($method);
     }
 }

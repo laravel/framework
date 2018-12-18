@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use PDO;
 use Mockery as m;
 use ReflectionProperty;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
@@ -41,10 +43,10 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     public function testConnectionCanBeCreated()
     {
-        $this->assertInstanceOf('PDO', $this->db->connection()->getPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection()->getReadPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection('read_write')->getPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection('read_write')->getReadPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection()->getPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection()->getReadPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getReadPdo());
     }
 
     public function testSingleConnectionNotCreatedUntilNeeded()
@@ -55,8 +57,8 @@ class DatabaseConnectionFactoryTest extends TestCase
         $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
         $readPdo->setAccessible(true);
 
-        $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
-        $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
     public function testReadWriteConnectionsNotCreatedUntilNeeded()
@@ -67,8 +69,8 @@ class DatabaseConnectionFactoryTest extends TestCase
         $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
         $readPdo->setAccessible(true);
 
-        $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
-        $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
     /**
@@ -77,7 +79,7 @@ class DatabaseConnectionFactoryTest extends TestCase
      */
     public function testIfDriverIsntSetExceptionIsThrown()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock(Container::class));
         $factory->createConnector(['foo']);
     }
 
@@ -87,14 +89,14 @@ class DatabaseConnectionFactoryTest extends TestCase
      */
     public function testExceptionIsThrownOnUnsupportedDriver()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock(Container::class));
         $container->shouldReceive('bound')->once()->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);
     }
 
     public function testCustomConnectorsCanBeResolvedViaContainer()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock(Container::class));
         $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
         $container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
 

@@ -1,9 +1,11 @@
-@extends('errors::layout')
+@extends('errors::illustrated-layout')
 
-@section('title', 'Page Expired')
+@section('code', '419')
+@section('title', __('Page Expired'))
 
-@section('message')
-    The page has expired due to inactivity.
-    <br/><br/>
-    Please refresh and try again.
-@stop
+@section('image')
+<div style="background-image: url('/svg/403.svg');" class="absolute pin bg-cover bg-no-repeat md:bg-left lg:bg-center">
+</div>
+@endsection
+
+@section('message', __('Sorry, your session has expired. Please refresh and try again.'))

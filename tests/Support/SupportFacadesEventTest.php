@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
@@ -13,11 +13,13 @@ use Illuminate\Support\Testing\Fakes\EventFake;
 
 class SupportFacadesEventTest extends TestCase
 {
+    private $events;
+
     protected function setUp()
     {
         parent::setUp();
 
-        $this->events = Mockery::spy(Dispatcher::class);
+        $this->events = m::spy(Dispatcher::class);
 
         $container = new Container;
         $container->instance('events', $this->events);
@@ -29,20 +31,20 @@ class SupportFacadesEventTest extends TestCase
     {
         Event::clearResolvedInstances();
 
-        Mockery::close();
+        m::close();
     }
 
     public function testFakeFor()
     {
         Event::fakeFor(function () {
-            (new FakeForStub())->dispatch();
+            (new FakeForStub)->dispatch();
 
             Event::assertDispatched(EventStub::class);
         });
 
         $this->events->shouldReceive('dispatch')->once();
 
-        (new FakeForStub())->dispatch();
+        (new FakeForStub)->dispatch();
     }
 
     public function testFakeForSwapsDispatchers()

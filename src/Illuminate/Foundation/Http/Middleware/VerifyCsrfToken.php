@@ -8,6 +8,7 @@ use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 
 class VerifyCsrfToken
 {
@@ -72,7 +73,7 @@ class VerifyCsrfToken
             $this->tokensMatch($request)
         ) {
             return tap($next($request), function ($response) use ($request) {
-                if ($this->addHttpCookie) {
+                if ($this->shouldAddXsrfTokenCookie()) {
                     $this->addCookieToResponse($request, $response);
                 }
             });
@@ -149,10 +150,20 @@ class VerifyCsrfToken
         $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
 
         if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
-            $token = $this->encrypter->decrypt($header);
+            $token = $this->encrypter->decrypt($header, static::serialized());
         }
 
         return $token;
+    }
+
+    /**
+     * Determine if the cookie should be added to the response.
+     *
+     * @return bool
+     */
+    public function shouldAddXsrfTokenCookie()
+    {
+        return $this->addHttpCookie;
     }
 
     /**
@@ -174,5 +185,15 @@ class VerifyCsrfToken
         );
 
         return $response;
+    }
+
+    /**
+     * Determine if the cookie contents should be serialized.
+     *
+     * @return bool
+     */
+    public static function serialized()
+    {
+        return EncryptCookies::serialized('XSRF-TOKEN');
     }
 }

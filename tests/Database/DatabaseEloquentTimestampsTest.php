@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class DatabaseEloquentTimestamps extends TestCase
+class DatabaseEloquentTimestampsTest extends TestCase
 {
     public function setUp()
     {
@@ -22,6 +22,7 @@ class DatabaseEloquentTimestamps extends TestCase
         $db->setAsGlobal();
 
         $this->createSchema();
+        Carbon::setTestNow(Carbon::now());
     }
 
     /**

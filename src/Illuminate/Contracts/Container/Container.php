@@ -93,7 +93,7 @@ interface Container extends ContainerInterface
     /**
      * Define a contextual binding.
      *
-     * @param  string  $concrete
+     * @param  string|array  $concrete
      * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
     public function when($concrete);

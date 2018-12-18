@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 
 class PendingMail
 {
@@ -16,7 +17,7 @@ class PendingMail
     /**
      * The locale of the message.
      *
-     * @var array
+     * @var string
      */
     protected $locale;
 
@@ -74,6 +75,10 @@ class PendingMail
     public function to($users)
     {
         $this->to = $users;
+
+        if (! $this->locale && $users instanceof HasLocalePreference) {
+            $this->locale($users->preferredLocale());
+        }
 
         return $this;
     }

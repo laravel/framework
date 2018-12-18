@@ -2,6 +2,7 @@
 
 namespace Illuminate\Container;
 
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
@@ -31,7 +32,7 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      * Create a new contextual binding builder.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @param  string  $concrete
+     * @param  string|array  $concrete
      * @return void
      */
     public function __construct(Container $container, $concrete)
@@ -61,8 +62,8 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      */
     public function give($implementation)
     {
-        $this->container->addContextualBinding(
-            $this->concrete, $this->needs, $implementation
-        );
+        foreach (Arr::wrap($this->concrete) as $concrete) {
+            $this->container->addContextualBinding($concrete, $this->needs, $implementation);
+        }
     }
 }

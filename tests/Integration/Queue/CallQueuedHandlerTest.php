@@ -2,10 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Mockery;
+use Mockery as m;
+use Illuminate\Bus\Dispatcher;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\CallQueuedHandler;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * @group integration
@@ -16,16 +21,16 @@ class CallQueuedHandlerTest extends TestCase
     {
         parent::tearDown();
 
-        Mockery::close();
+        m::close();
     }
 
     public function test_job_can_be_dispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;
 
-        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher(app()));
 
-        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
@@ -43,9 +48,9 @@ class CallQueuedHandlerTest extends TestCase
     {
         Event::fake();
 
-        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher(app()));
 
-        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job = m::mock(Job::class);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('resolveName')->andReturn(__CLASS__);
         $job->shouldReceive('markAsFailed')->once();
@@ -64,9 +69,9 @@ class CallQueuedHandlerTest extends TestCase
     {
         Event::fake();
 
-        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher(app()));
 
-        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job = m::mock(Job::class);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('resolveName')->andReturn(CallQueuedHandlerExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
@@ -84,7 +89,7 @@ class CallQueuedHandlerTest extends TestCase
 
 class CallQueuedHandlerTestJob
 {
-    use \Illuminate\Queue\InteractsWithQueue;
+    use InteractsWithQueue;
 
     public static $handled = false;
 
@@ -105,6 +110,6 @@ class CallQueuedHandlerExceptionThrower
 
     public function __wakeup()
     {
-        throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Foo');
+        throw new ModelNotFoundException('Foo');
     }
 }

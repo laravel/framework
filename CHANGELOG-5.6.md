@@ -1,5 +1,92 @@
 # Release Notes for 5.6.x
 
+## [v5.6.39 (2018-10-04)](https://github.com/laravel/framework/compare/v5.6.38...v5.6.39)
+
+### Fixed
+- Fixed broken email sub-copy template escaping ([#25734](https://github.com/laravel/framework/pull/25734))
+- Fixed required carbon version ([394f79f](https://github.com/laravel/framework/commit/394f79f9a6651b103f6e065cb4470b4b347239ea))
+- Fixed translation escaping ([#25858](https://github.com/laravel/framework/pull/25858), [4c46500](https://github.com/laravel/framework/commit/4c465007bbf51d7f269871cd76b6d99de7df90bb))
+
+
+## [v5.6.38 (2018-09-04)](https://github.com/laravel/framework/compare/v5.6.37...v5.6.38)
+
+### Fixed
+- Fix nullable MorphTo and $touches ([#25438](https://github.com/laravel/framework/pull/25438))
+- Allow load relations with similar keys using strict comparison ([#25429](https://github.com/laravel/framework/pull/25429))
+
+
+## v5.6.37 (2018-09-02)
+
+### Fixed
+- Fixed `MorphTo` lazy loading and `withoutGlobalScopes` method ([#25406](https://github.com/laravel/framework/pull/25406))
+
+
+## v5.6.36 (2018-09-02)
+
+### Changed
+- Use higher order messages in Collection ([#25356](https://github.com/laravel/framework/pull/25356))
+- Use the getAttributes method on insert ([#25355](https://github.com/laravel/framework/pull/25355))
+
+### Fixed
+- `logoutOtherDevices` method in `Illuminate/Auth/SessionGuard.php` class breaks "remember me" cookie ([#25386](https://github.com/laravel/framework/pull/25386))
+- Fix self relation existence queries with custom keys ([#25397](https://github.com/laravel/framework/pull/25397))
+- Fix relationships with global scope columns ([#25368](https://github.com/laravel/framework/pull/25368))
+- Fix: revert model syncing after soft-delete ([#25392](https://github.com/laravel/framework/pull/25392))
+- Fix mailables always being queued for later if using Queueable trait ([#25378](https://github.com/laravel/framework/pull/25378))
+
+### Security
+- escape lang directive echos ([d3c0a36](https://github.com/laravel/framework/commit/d3c0a369057d0b6ebf29b5f51c903b1a85e3e09b))
+
+## v5.6.35 (2018-08-27)
+
+### Added
+- Handle AWS Connection Lost ([#25295](https://github.com/laravel/framework/pull/25295))
+- Support JSON SELECT queries on SQLite ([#25328](https://github.com/laravel/framework/pull/25328))
+
+### Changed
+- Throw exception for has() with MorphTo relationship ([#25337](https://github.com/laravel/framework/pull/25337))
+
+### Fixed
+- Fix MorphTo eager loading and withoutGlobalScopes() ([#25331](https://github.com/laravel/framework/pull/25331))
+- Fix whereTime() on SQL Server ([#25316](https://github.com/laravel/framework/pull/25316))
+
+
+## v5.6.34 (2018-08-21)
+
+### Changed
+- Wrap columns in whereRowValues ([#25179](https://github.com/laravel/framework/pull/25179))
+- Make copyrights line localizable in mail messages ([#25183](https://github.com/laravel/framework/pull/25183))
+- When specifying events to be faked, other events should be normally dispatched ([#25185](https://github.com/laravel/framework/pull/25185))
+
+### Fixed
+- Fix URL validation pattern on PHP 7.3 ([#25194](https://github.com/laravel/framework/pull/25194))
+
+## v5.6.32 & v5.6.33 (2018-08-09)
+
+### Added
+- Added serialization parameters to helper functions decrypt and encrypt ([#25166](https://github.com/laravel/framework/pull/25166))
+
+
+## v5.6.31 (2018-08-09)
+
+### Changed
+- Make Auth/Recaller handle serialized and unserialized cookies ([#25167](https://github.com/laravel/framework/pull/25167))
+
+## v5.6.30 (2018-08-08)
+
+### Added
+- Support passing CC/CBC in array form in mail notification ([#25029](https://github.com/laravel/framework/pull/25029))
+- Added Rule::requiredIf ([#25066](https://github.com/laravel/framework/pull/25066))
+- Support raw expressions in whereRowValues() ([#25117](https://github.com/laravel/framework/pull/25117))
+
+### Changed
+- Stopped serializing csrf cookie / header ([#25121](https://github.com/laravel/framework/pull/25121))
+
+### Fixed
+- Avoid an "Undefined offset: 0" if no job was pulled from redis queue ([#25020](https://github.com/laravel/framework/pull/25020))
+- Updating the Pluralizer class to respect the grammar rule ([#25063](https://github.com/laravel/framework/pull/25063))
+
+
 ## v5.6.29 (2018-07-26)
 
 ### Added
@@ -17,6 +104,7 @@
 ### Fixed
 - Fixed an issue when passing an array to Request::is() ([#24885](https://github.com/laravel/framework/pull/24885))
 - Fixed message string in NotificationFake::assertSentToTimes() ([#24929](https://github.com/laravel/framework/pull/24929))
+
 
 ## v5.6.28 (2018-07-17)
 
@@ -44,6 +132,7 @@
 - Allow accessing the value of the current migrator connection ([#24665](https://github.com/laravel/framework/pull/24665))
 - Check if configuration cache is valid after saving ([#24722](https://github.com/laravel/framework/pull/24722))
 - Except URIs from CheckForMaintenanceMode middleware ([#24740](https://github.com/laravel/framework/pull/24740))
+
 
 ## v5.6.26 (2018-06-20)
 
@@ -121,7 +210,6 @@
 - Fixed an issue with `Cache::increment()` when expiration is `null` ([#24228](https://github.com/laravel/framework/pull/24228))
 - Ignore non-where bindings in nested where constraints ([#24000](https://github.com/laravel/framework/pull/24000))
 - Fixed `withCount()` binding problems ([#24240](https://github.com/laravel/framework/pull/24240))
-
 
 
 ## v5.6.22 (2018-05-15)

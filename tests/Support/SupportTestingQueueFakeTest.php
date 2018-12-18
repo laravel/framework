@@ -11,6 +11,16 @@ use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
+    /**
+     * @var QueueFake
+     */
+    private $fake;
+
+    /**
+     * @var JobStub
+     */
+    private $job;
+
     protected function setUp()
     {
         parent::setUp();
@@ -105,7 +115,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $queue = 'my-test-queue';
         $this->fake->bulk([
             $this->job,
-            new JobStub(),
+            new JobStub,
         ], null, $queue);
 
         $this->fake->assertPushedOn($queue, JobStub::class);

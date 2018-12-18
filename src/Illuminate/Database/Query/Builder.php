@@ -4,7 +4,7 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use RuntimeException;
-use BadMethodCallException;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -13,6 +13,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class Builder
 {
-    use BuildsQueries, Macroable {
+    use BuildsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
@@ -234,7 +235,7 @@ class Builder
      */
     public function selectSub($query, $as)
     {
-        list($query, $bindings) = $this->createSub($query);
+        [$query, $bindings] = $this->createSub($query);
 
         return $this->selectRaw(
             '('.$query.') as '.$this->grammar->wrap($as), $bindings
@@ -270,7 +271,7 @@ class Builder
      */
     public function fromSub($query, $as)
     {
-        list($query, $bindings) = $this->createSub($query);
+        [$query, $bindings] = $this->createSub($query);
 
         return $this->fromRaw('('.$query.') as '.$this->grammar->wrap($as), $bindings);
     }
@@ -372,7 +373,7 @@ class Builder
      * Add a join clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
@@ -412,7 +413,7 @@ class Builder
      * Add a "join where" clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string  $operator
      * @param  string  $second
      * @param  string  $type
@@ -428,7 +429,7 @@ class Builder
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
      * @param  string  $as
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
@@ -439,7 +440,7 @@ class Builder
      */
     public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
-        list($query, $bindings) = $this->createSub($query);
+        [$query, $bindings] = $this->createSub($query);
 
         $expression = '('.$query.') as '.$this->grammar->wrap($as);
 
@@ -452,7 +453,7 @@ class Builder
      * Add a left join to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
@@ -495,7 +496,7 @@ class Builder
      * Add a right join to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
@@ -538,7 +539,7 @@ class Builder
      * Add a "cross join" clause to the query.
      *
      * @param  string  $table
-     * @param  string|null  $first
+     * @param  \Closure|string|null  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
@@ -591,7 +592,7 @@ class Builder
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -606,7 +607,7 @@ class Builder
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
         if ($this->invalidOperator($operator)) {
-            list($value, $operator) = [$operator, '='];
+            [$value, $operator] = [$operator, '='];
         }
 
         // If the value is a Closure, it means the developer is performing an entire
@@ -725,7 +726,7 @@ class Builder
      */
     public function orWhere($column, $operator = null, $value = null)
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -754,7 +755,7 @@ class Builder
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
         if ($this->invalidOperator($operator)) {
-            list($second, $operator) = [$operator, '='];
+            [$second, $operator] = [$operator, '='];
         }
 
         // Finally, we will add this where clause into this array of clauses that we
@@ -1060,15 +1061,19 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('Y-m-d');
+        }
 
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
     }
@@ -1078,12 +1083,12 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereDate($column, $operator, $value = null)
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -1095,15 +1100,19 @@ class Builder
      *
      * @param  string  $column
      * @param  string   $operator
-     * @param  mixed   $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string   $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('H:i:s');
+        }
 
         return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
     }
@@ -1113,12 +1122,12 @@ class Builder
      *
      * @param  string  $column
      * @param  string   $operator
-     * @param  mixed   $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereTime($column, $operator, $value = null)
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -1130,15 +1139,19 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('d');
+        }
 
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
     }
@@ -1148,12 +1161,12 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereDay($column, $operator, $value = null)
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -1165,15 +1178,19 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('m');
+        }
 
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
     }
@@ -1183,12 +1200,12 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereMonth($column, $operator, $value = null)
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -1200,15 +1217,19 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string|int  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('Y');
+        }
 
         return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
     }
@@ -1218,12 +1239,12 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string|int  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereYear($column, $operator, $value = null)
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -1389,7 +1410,7 @@ class Builder
     {
         $type = $not ? 'NotExists' : 'Exists';
 
-        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+        $this->wheres[] = compact('type', 'query', 'boolean');
 
         $this->addBinding($query->getBindings(), 'where');
 
@@ -1415,7 +1436,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'columns', 'operator', 'values', 'boolean');
 
-        $this->addBinding($values);
+        $this->addBinding($this->cleanBindings($values));
 
         return $this;
     }
@@ -1490,6 +1511,49 @@ class Builder
     public function orWhereJsonDoesntContain($column, $value)
     {
         return $this->whereJsonDoesntContain($column, $value, 'or');
+    }
+
+    /**
+     * Add a "where JSON length" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
+    {
+        $type = 'JsonLength';
+
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
+
+        if (! $value instanceof Expression) {
+            $this->addBinding($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a "or where JSON length" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereJsonLength($column, $operator, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
     /**
@@ -1588,7 +1652,7 @@ class Builder
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -1596,7 +1660,7 @@ class Builder
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
         if ($this->invalidOperator($operator)) {
-            list($value, $operator) = [$operator, '='];
+            [$value, $operator] = [$operator, '='];
         }
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
@@ -1618,7 +1682,7 @@ class Builder
      */
     public function orHaving($column, $operator = null, $value = null)
     {
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -2813,8 +2877,6 @@ class Builder
             return $this->dynamicWhere($method, $parameters);
         }
 
-        throw new BadMethodCallException(sprintf(
-            'Method %s::%s does not exist.', static::class, $method
-        ));
+        static::throwBadMethodCallException($method);
     }
 }

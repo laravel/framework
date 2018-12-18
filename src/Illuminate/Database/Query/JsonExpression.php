@@ -27,12 +27,16 @@ class JsonExpression extends Expression
      */
     protected function getJsonBindingParameter($value)
     {
+        if ($value instanceof Expression) {
+            return $value->getValue();
+        }
+
         switch ($type = gettype($value)) {
             case 'boolean':
                 return $value ? 'true' : 'false';
+            case 'NULL':
             case 'integer':
             case 'double':
-                return $value;
             case 'string':
                 return '?';
             case 'object':

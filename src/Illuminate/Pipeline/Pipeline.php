@@ -132,7 +132,7 @@ class Pipeline implements PipelineContract
                     // the appropriate method and arguments, returning the results back out.
                     return $pipe($passable, $stack);
                 } elseif (! is_object($pipe)) {
-                    list($name, $parameters) = $this->parsePipeString($pipe);
+                    [$name, $parameters] = $this->parsePipeString($pipe);
 
                     // If the pipe is a string we will parse the string and resolve the class out
                     // of the dependency injection container. We can then build a callable and
@@ -166,7 +166,7 @@ class Pipeline implements PipelineContract
      */
     protected function parsePipeString($pipe)
     {
-        list($name, $parameters) = array_pad(explode(':', $pipe, 2), 2, []);
+        [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
 
         if (is_string($parameters)) {
             $parameters = explode(',', $parameters);
@@ -179,6 +179,7 @@ class Pipeline implements PipelineContract
      * Get the container instance.
      *
      * @return \Illuminate\Contracts\Container\Container
+     *
      * @throws \RuntimeException
      */
     protected function getContainer()

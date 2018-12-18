@@ -11,6 +11,21 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 class SupportTestingNotificationFakeTest extends TestCase
 {
+    /**
+     * @var NotificationFake
+     */
+    private $fake;
+
+    /**
+     * @var NotificationStub
+     */
+    private $notification;
+
+    /**
+     * @var UserStub
+     */
+    private $user;
+
     protected function setUp()
     {
         parent::setUp();
@@ -49,7 +64,7 @@ class SupportTestingNotificationFakeTest extends TestCase
 
     public function testResettingNotificationId()
     {
-        $notification = new NotificationStub();
+        $notification = new NotificationStub;
 
         $this->fake->send($this->user, $notification);
 
@@ -91,4 +106,5 @@ class NotificationStub extends Notification
 
 class UserStub extends User
 {
+    //
 }

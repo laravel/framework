@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Validation;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Validation\ValidationException;
@@ -15,6 +14,8 @@ trait ValidatesRequests
      * @param  \Illuminate\Contracts\Validation\Validator|array  $validator
      * @param  \Illuminate\Http\Request|null  $request
      * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function validateWith($validator, Request $request = null)
     {
@@ -24,9 +25,7 @@ trait ValidatesRequests
             $validator = $this->getValidationFactory()->make($request->all(), $validator);
         }
 
-        $validator->validate();
-
-        return $this->extractInputFromRules($request, $validator->getRules());
+        return $validator->validate();
     }
 
     /**
@@ -37,29 +36,15 @@ trait ValidatesRequests
      * @param  array  $messages
      * @param  array  $customAttributes
      * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function validate(Request $request, array $rules,
                              array $messages = [], array $customAttributes = [])
     {
-        $this->getValidationFactory()
-             ->make($request->all(), $rules, $messages, $customAttributes)
-             ->validate();
-
-        return $this->extractInputFromRules($request, $rules);
-    }
-
-    /**
-     * Get the request input based on the given validation rules.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $rules
-     * @return array
-     */
-    protected function extractInputFromRules(Request $request, array $rules)
-    {
-        return $request->only(collect($rules)->keys()->map(function ($rule) {
-            return Str::contains($rule, '*') ? explode('.', $rule)[0] : $rule;
-        })->unique()->toArray());
+        return $this->getValidationFactory()->make(
+            $request->all(), $rules, $messages, $customAttributes
+        )->validate();
     }
 
     /**
