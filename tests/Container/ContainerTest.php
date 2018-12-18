@@ -586,6 +586,16 @@ class ContainerTest extends TestCase
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
         $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo', 'default' => 'bar']);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
+        $this->assertEquals('bar', $result[1]);
+
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo']);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
+        $this->assertEquals('taylor', $result[1]);
     }
 
     public function testBindMethodAcceptsAnArray()
