@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Session;
 
 use Mockery;
+use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
@@ -42,7 +43,7 @@ class SessionPersistenceTest extends TestCase
 
         $handler->shouldReceive('render')->andReturn(new Response);
 
-        $app['config']->set('app.key', str_random(32));
+        $app['config']->set('app.key', Str::random(32));
         $app['config']->set('session.driver', 'fake-null');
         $app['config']->set('session.expire_on_close', true);
     }
