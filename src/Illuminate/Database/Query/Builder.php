@@ -662,7 +662,7 @@ class Builder
                 if (is_numeric($key) && is_array($value)) {
                     $query->{$method}(...array_values($value));
                 } else {
-                    $query->$method($key, '=', $value, $boolean);
+                    $query->$method($key, '=', $value, 'and');
                 }
             }
         }, $boolean);
