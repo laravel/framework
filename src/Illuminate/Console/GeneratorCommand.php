@@ -110,11 +110,11 @@ abstract class GeneratorCommand extends Command
      */
     protected function validateClassName($name)
     {
-        if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $name)) {
+        if (! preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $name)) {
             throw new InvalidArgumentException(
                 sprintf('name "%s" is invalid. It must be a valid class name', $name)
             );
-        };
+        }
     }
 
     /**
