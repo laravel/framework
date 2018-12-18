@@ -1097,10 +1097,11 @@ class ContainerTest extends TestCase
 
     public function testClosureCallWithInjectedDependency()
     {
-        app()->call(function (ContainerConcreteStub $stub) {
+        $container = new Container;
+        $container->call(function (ContainerConcreteStub $stub) {
         }, ['foo' => 'bar']);
 
-        app()->call(function (ContainerConcreteStub $stub) {
+        $container->call(function (ContainerConcreteStub $stub) {
         }, ['foo' => 'bar', 'stub' => new ContainerConcreteStub]);
     }
 }
