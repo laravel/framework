@@ -154,6 +154,14 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('one', $t->getFromJson('foo.bar'));
     }
 
+    public function testGetJsonMethodError()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'missing', '*')->andReturn(['bar' => 'one']);
+        $this->assertEquals('missing', $t->getFromJson('missing'));
+    }
+
     public function testGetJsonForNonExistingJsonKeyLooksForRegularKeysAndReplace()
     {
         $t = new Translator($this->getLoader(), 'en');

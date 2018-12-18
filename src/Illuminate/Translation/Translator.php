@@ -94,7 +94,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  array   $replace
      * @param  string  $locale
-     * @return string|array
+     * @return string
      */
     public function trans($key, array $replace = [], $locale = null)
     {
@@ -108,7 +108,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  array   $replace
      * @param  string|null  $locale
      * @param  bool  $fallback
-     * @return string|array
+     * @return string
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
@@ -121,20 +121,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                              : [$locale ?: $this->locale];
 
         foreach ($locales as $locale) {
-            if (! is_null($line = $this->getLine(
-                $namespace, $group, $locale, $item, $replace
-            ))) {
-                break;
+            $line = $this->getLine($namespace, $group, $locale, $item, $replace);
+            if (is_string($line)) {
+                return $line;
             }
         }
 
-        // If the line doesn't exist, we will return back the key which was requested as
-        // that will be quick to spot in the UI if language keys are wrong or missing
-        // from the application's language files. Otherwise we can return the line.
-        if (isset($line)) {
-            return $line;
-        }
-
+        // If the line doesn't exist, we return the key which is requested
+        // as that will be quick to spot in the UI if language keys are
+        // wrong or missing from the application's translation files.
         return $key;
     }
 
@@ -144,7 +139,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  array  $replace
      * @param  string  $locale
-     * @return string|array
+     * @return string
      */
     public function getFromJson($key, array $replace = [], $locale = null)
     {
