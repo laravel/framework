@@ -752,6 +752,7 @@ class Connection implements ConnectionInterface
     {
         if (is_callable($this->reconnector)) {
             $this->doctrineConnection = null;
+            
             return call_user_func($this->reconnector, $this);
         }
 
