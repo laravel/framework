@@ -543,6 +543,16 @@ class SupportCollectionTest extends TestCase
         })->values()->all());
     }
 
+    public function testBetween()
+    {
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+
+        $this->assertEquals([['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
+            $c->whereBetween('v', [2, 4])->values()->all());
+        $this->assertEquals([['v' => 1]], $c->whereBetween('v', [-1, 1])->all());
+        $this->assertEquals([['v' => 3], ['v' => '3']], $c->whereBetween('v', [3, 3])->values()->all());
+    }
+
     public function testFlatten()
     {
         // Flat arrays are unaffected
