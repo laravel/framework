@@ -1094,6 +1094,15 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
+
+    public function testClosureCallWithInjectedDependency()
+    {
+        app()->call(function (ContainerConcreteStub $stub) {
+        }, ['foo' => 'bar']);
+
+        app()->call(function (ContainerConcreteStub $stub) {
+        }, ['foo' => 'bar', 'stub' => new ContainerConcreteStub]);
+    }
 }
 
 class ContainerConcreteStub
