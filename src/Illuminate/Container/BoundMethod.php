@@ -120,13 +120,6 @@ class BoundMethod
             $inputData = self::discardRedundantKeys($inputData, $signature);
         }
 
-        // In case the number of the parameters accepted in the callee signature is not
-        // more than the number of inputData it means that we have data for each and
-        // every parameter and we do not have to inject anything out of the IOC.
-        if (count($signature) <= count($inputData)) {
-            return $inputData;
-        }
-
         return static::addDependencyForCallParameter($container, $signature, $inputData);
     }
 
