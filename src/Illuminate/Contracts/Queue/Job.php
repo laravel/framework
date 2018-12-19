@@ -34,6 +34,13 @@ interface Job
     public function release($delay = 0);
 
     /**
+     * Determine if the job was released back into the queue.
+     *
+     * @return bool
+     */
+    public function isReleased();
+
+    /**
      * Delete the job from the queue.
      *
      * @return void

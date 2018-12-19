@@ -416,6 +416,11 @@ class WorkerFakeJob implements QueueJobContract
         $this->releaseAfter = $delay;
     }
 
+    public function isReleased()
+    {
+        return $this->released;
+    }
+
     public function isDeletedOrReleased()
     {
         return $this->deleted || $this->released;
