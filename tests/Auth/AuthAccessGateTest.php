@@ -373,8 +373,6 @@ class AuthAccessGateTest extends TestCase
         $gate->define('foo', AccessGateTestCustomResourceThatAllowsGuests::class . '@foo');
 
         $this->assertTrue($gate->check('foo'));
-
-        // tk*
     }
 
     public function test_classes_defined_as_callbacks_can_disallow_guests()
@@ -386,8 +384,6 @@ class AuthAccessGateTest extends TestCase
         $gate->define('foo', AccessGateTestCustomResource::class . '@foo');
 
         $this->assertFalse($gate->check('foo'));
-
-        // tk*
     }
 
     public function test_invokable_classes_can_be_defined()
