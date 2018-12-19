@@ -62,6 +62,13 @@ interface Job
     public function attempts();
 
     /**
+     * Mark the job as "failed".
+     *
+     * @return void
+     */
+    public function markAsFailed();
+
+    /**
      * Process an exception that caused the job to fail.
      *
      * @param  \Throwable  $e

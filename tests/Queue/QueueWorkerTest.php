@@ -426,6 +426,11 @@ class WorkerFakeJob implements QueueJobContract
         return $this->attempts;
     }
 
+    public function markAsFailed()
+    {
+        $this->failed = true;
+    }
+
     public function failed($e)
     {
         $this->markAsFailed();
