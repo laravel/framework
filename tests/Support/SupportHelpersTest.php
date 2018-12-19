@@ -270,9 +270,9 @@ class SupportHelpersTest extends TestCase
 
     public function testStrAfter()
     {
-        $this->assertEquals('nah', str_after('hannah', 'han'));
-        $this->assertEquals('nah', str_after('hannah', 'n'));
-        $this->assertEquals('hannah', str_after('hannah', 'xxxx'));
+        $this->assertEquals('nah', Str::after('hannah', 'han'));
+        $this->assertEquals('nah', Str::after('hannah', 'n'));
+        $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
     }
 
     public function testStrContains()

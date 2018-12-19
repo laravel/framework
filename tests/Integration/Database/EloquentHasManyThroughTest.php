@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentHasManyThroughTest;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -43,15 +44,15 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
     public function test_basic_create_and_retrieve()
     {
-        $user = User::create(['name' => str_random()]);
+        $user = User::create(['name' => Str::random()]);
 
         $team1 = Team::create(['id' => 10, 'owner_id' => $user->id]);
         $team2 = Team::create(['owner_id' => $user->id]);
 
-        $mate1 = User::create(['name' => str_random(), 'team_id' => $team1->id]);
-        $mate2 = User::create(['name' => str_random(), 'team_id' => $team2->id]);
+        $mate1 = User::create(['name' => Str::random(), 'team_id' => $team1->id]);
+        $mate2 = User::create(['name' => Str::random(), 'team_id' => $team2->id]);
 
-        User::create(['name' => str_random()]);
+        User::create(['name' => Str::random()]);
 
         $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
         $this->assertEquals([$user->id], User::has('teamMates')->pluck('id')->toArray());
@@ -59,11 +60,11 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
     public function test_global_scope_columns()
     {
-        $user = User::create(['name' => str_random()]);
+        $user = User::create(['name' => Str::random()]);
 
         $team1 = Team::create(['owner_id' => $user->id]);
 
-        User::create(['name' => str_random(), 'team_id' => $team1->id]);
+        User::create(['name' => Str::random(), 'team_id' => $team1->id]);
 
         $teamMates = $user->teamMatesWithGlobalScope;
 
@@ -72,11 +73,11 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
     public function test_has_self()
     {
-        $user = User::create(['name' => str_random()]);
+        $user = User::create(['name' => Str::random()]);
 
         $team = Team::create(['owner_id' => $user->id]);
 
-        User::create(['name' => str_random(), 'team_id' => $team->id]);
+        User::create(['name' => Str::random(), 'team_id' => $team->id]);
 
         $users = User::has('teamMates')->get();
 
@@ -85,11 +86,11 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
     public function test_has_self_custom_owner_key()
     {
-        $user = User::create(['slug' => str_random(), 'name' => str_random()]);
+        $user = User::create(['slug' => Str::random(), 'name' => Str::random()]);
 
         $team = Team::create(['owner_slug' => $user->slug]);
 
-        User::create(['name' => str_random(), 'team_id' => $team->id]);
+        User::create(['name' => Str::random(), 'team_id' => $team->id]);
 
         $users = User::has('teamMatesBySlug')->get();
 

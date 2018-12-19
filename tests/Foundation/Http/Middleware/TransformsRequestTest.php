@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
@@ -113,11 +114,11 @@ class ManipulateArrayInput extends TransformsRequest
 {
     protected function transform($key, $value)
     {
-        if (str_contains($key, 'beers')) {
+        if (Str::contains($key, 'beers')) {
             $value++;
         }
 
-        if (str_contains($key, 'age')) {
+        if (Str::contains($key, 'age')) {
             $value--;
         }
 
