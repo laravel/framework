@@ -1115,8 +1115,6 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
 
-
-
     public function testWithDefaultParametersIndexedArraySyntax()
     {
         $container = new Container;
@@ -1203,7 +1201,6 @@ class ContainerTest extends TestCase
         $container->call(function (ContainerConcreteStub $stub) {
         }, ['foo' => 'bar', 'stub' => new ContainerConcreteStub]);
     }
-
 }
 
 class ContainerConcreteStub
@@ -1217,14 +1214,17 @@ class ContainerTestDefaultyParams
     {
         return func_get_args();
     }
+
     public function defaultyBandC($a, $b = 'default b', $c = 'default c')
     {
         return func_get_args();
     }
+
     public function defaultyOnlyC($a, $b, $c = 'default c')
     {
         return func_get_args();
     }
+
     public function noDefault($a, $b, $c)
     {
         return func_get_args();
