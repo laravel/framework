@@ -107,16 +107,48 @@ class BoundMethod
      * @param  callable|string  $callback
      * @param  array  $parameters
      * @return array
+     * @throws \ReflectionException
      */
-    protected static function getMethodDependencies($container, $callback, array $parameters = [])
+    protected static function getMethodDependencies($container, $callback, array $inputData = [])
     {
-        $dependencies = [];
+        $signature = static::getCallReflector($callback)->getParameters();
 
-        foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
-            static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
+        // In case the method has no explicit input parameter defined
+        // we should call it, with what ever input data available.
+        if (count($signature) === 0) {
+            return $inputData;
         }
 
-        return array_merge($dependencies, $parameters);
+        if (\Illuminate\Support\Arr::isAssoc($inputData)) {
+            $paramNames = [];
+
+            foreach ($signature as $param) {
+                $paramNames[] = $param->getName();
+            }
+
+            foreach ($inputData as $key => $value) {
+                if (class_exists($key)) {
+                    $paramNames[] = $key;
+                }
+            }
+
+            $inputData = array_only($inputData, $paramNames);
+        }
+
+        // In case the number of the parameters accepted in the callee signature is not
+        // more than the number of inputData it means that we have data for each and
+        // every parameter and we do not have to inject anything out of the IOC.
+        if (count($signature) <= count($inputData)) {
+            return $inputData;
+        }
+
+        $resolvedInputData = [];
+        $i = 0;
+        foreach ($signature as $parameter) {
+            $resolvedInputData[] = static::addDependencyForCallParameter($container, $parameter, $inputData, $i);
+        }
+
+        return $resolvedInputData;
     }
 
     /**
@@ -127,7 +159,7 @@ class BoundMethod
      *
      * @throws \ReflectionException
      */
-    protected static function getCallReflector($callback)
+    protected static function getCallReflector($callback): \Reflector
     {
         if (is_string($callback) && strpos($callback, '::') !== false) {
             $callback = explode('::', $callback);
@@ -141,27 +173,31 @@ class BoundMethod
     /**
      * Get the dependency for the given call parameter.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
-     * @param  array  $dependencies
+     * @param  \Illuminate\Container\Container $container
+     * @param  \ReflectionParameter $parameter
+     * @param  array $parameters
+     * @param $i
      * @return mixed
      */
-    protected static function addDependencyForCallParameter($container, $parameter,
-                                                            array &$parameters, &$dependencies)
-    {
+    protected static function addDependencyForCallParameter(
+        $container,
+        $parameter,
+        array &$parameters,
+        &$i
+    ) {
         if (array_key_exists($parameter->name, $parameters)) {
-            $dependencies[] = $parameters[$parameter->name];
-
-            unset($parameters[$parameter->name]);
+            return $parameters[$parameter->name];
         } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $parameters)) {
-            $dependencies[] = $parameters[$parameter->getClass()->name];
-
-            unset($parameters[$parameter->getClass()->name]);
+            return $parameters[$parameter->getClass()->name];
         } elseif ($parameter->getClass()) {
-            $dependencies[] = $container->make($parameter->getClass()->name);
+            return $container->make($parameter->getClass()->name);
+        } elseif (isset($parameters[$i])) {
+            $data = $parameters[$i];
+            $i++;
+
+            return $data;
         } elseif ($parameter->isDefaultValueAvailable()) {
-            $dependencies[] = $parameter->getDefaultValue();
+            return $parameter->getDefaultValue();
         }
     }
 
