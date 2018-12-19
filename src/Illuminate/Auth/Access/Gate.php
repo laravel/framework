@@ -102,7 +102,7 @@ class Gate implements GateContract
         $abilities = is_array($ability) ? $ability : func_get_args();
 
         foreach ($abilities as $ability) {
-            if (!isset($this->abilities[$ability])) {
+            if (! isset($this->abilities[$ability])) {
                 return false;
             }
         }
@@ -145,7 +145,7 @@ class Gate implements GateContract
      */
     public function resource($name, $class, array $abilities = null)
     {
-        $abilities = $abilities ? : [
+        $abilities = $abilities ?: [
             'view' => 'view',
             'create' => 'create',
             'update' => 'update',
@@ -153,7 +153,7 @@ class Gate implements GateContract
         ];
 
         foreach ($abilities as $ability => $method) {
-            $this->define($name . '.' . $ability, $class . '@' . $method);
+            $this->define($name.'.'.$ability, $class.'@'.$method);
         }
 
         return $this;
@@ -188,7 +188,7 @@ class Gate implements GateContract
                 $arguments
             );
 
-            if (!is_null($result)) {
+            if (! is_null($result)) {
                 return $result;
             }
 
@@ -259,7 +259,7 @@ class Gate implements GateContract
      */
     public function denies($ability, $arguments = [])
     {
-        return !$this->allows($ability, $arguments);
+        return ! $this->allows($ability, $arguments);
     }
 
     /**
@@ -273,7 +273,7 @@ class Gate implements GateContract
     {
         return collect($abilities)->every(function ($ability) use ($arguments) {
             try {
-                return (bool)$this->raw($ability, $arguments);
+                return (bool) $this->raw($ability, $arguments);
             } catch (AuthorizationException $e) {
                 return false;
             }
@@ -361,11 +361,11 @@ class Gate implements GateContract
      */
     protected function canBeCalledWithUser($user, $class, $method = null)
     {
-        if (!is_null($user)) {
+        if (! is_null($user)) {
             return true;
         }
 
-        if (!is_null($method)) {
+        if (! is_null($method)) {
             return $this->methodAllowsGuests($class, $method);
         }
 
@@ -428,8 +428,10 @@ class Gate implements GateContract
         $callback = $this->closureCallbacks[$ability];
         if (Str::contains($callback, '@')) {
             [$class, $method] = Str::parseCallback($callback);
+
             return $this->methodAllowsGuests($class, $method);
         }
+
         return false;
     }
 
@@ -472,11 +474,11 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability], [$arguments]);
 
         foreach ($this->beforeCallbacks as $before) {
-            if (!$this->canBeCalledWithUser($user, $before)) {
+            if (! $this->canBeCalledWithUser($user, $before)) {
                 continue;
             }
 
-            if (!is_null($result = $before(...$arguments))) {
+            if (! is_null($result = $before(...$arguments))) {
                 return $result;
             }
         }
@@ -494,7 +496,7 @@ class Gate implements GateContract
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
         foreach ($this->afterCallbacks as $after) {
-            if (!$this->canBeCalledWithUser($user, $after)) {
+            if (! $this->canBeCalledWithUser($user, $after)) {
                 continue;
             }
 
@@ -517,7 +519,7 @@ class Gate implements GateContract
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
         if (isset($arguments[0]) &&
-            !is_null($policy = $this->getPolicyFor($arguments[0])) &&
+            ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
             $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
             return $callback;
         }
@@ -550,7 +552,7 @@ class Gate implements GateContract
             $class = get_class($class);
         }
 
-        if (!is_string($class)) {
+        if (! is_string($class)) {
             return;
         }
 
@@ -587,7 +589,7 @@ class Gate implements GateContract
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
-        if (!is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
+        if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
             return false;
         }
 
@@ -605,7 +607,7 @@ class Gate implements GateContract
             // When we receive a non-null result from this before method, we will return it
             // as the "final" results. This will allow developers to override the checks
             // in this policy to return the result for all rules defined in the class.
-            if (!is_null($result)) {
+            if (! is_null($result)) {
                 return $result;
             }
 
@@ -626,7 +628,7 @@ class Gate implements GateContract
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
-        if (!method_exists($policy, 'before')) {
+        if (! method_exists($policy, 'before')) {
             return null;
         }
 
@@ -653,7 +655,7 @@ class Gate implements GateContract
             array_shift($arguments);
         }
 
-        if (!is_callable([$policy, $method])) {
+        if (! is_callable([$policy, $method])) {
             return null;
         }
 
