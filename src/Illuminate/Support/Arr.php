@@ -315,11 +315,7 @@ class Arr
     {
         $keys = (array) $keys;
 
-        if (! $array) {
-            return false;
-        }
-
-        if ($keys === []) {
+        if (! $array || $keys === []) {
             return false;
         }
 
