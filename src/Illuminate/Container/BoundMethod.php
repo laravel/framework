@@ -103,9 +103,9 @@ class BoundMethod
     /**
      * Get all dependencies for a given method.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  callable|string  $callback
-     * @param  array  $parameters
+     * @param  \Illuminate\Container\Container $container
+     * @param  callable|string $callback
+     * @param array $inputData
      * @return array
      * @throws \ReflectionException
      */
@@ -114,7 +114,7 @@ class BoundMethod
         $signature = static::getCallReflector($callback)->getParameters();
 
         // In case the method has no explicit input parameter defined
-        // we should call it, with what ever input data available.
+        // we should call it, with whatever input data available.
         if (count($signature) === 0) {
             return $inputData;
         }
@@ -142,13 +142,7 @@ class BoundMethod
             return $inputData;
         }
 
-        $resolvedInputData = [];
-        $i = 0;
-        foreach ($signature as $parameter) {
-            $resolvedInputData[] = static::addDependencyForCallParameter($container, $parameter, $inputData, $i);
-        }
-
-        return $resolvedInputData;
+        return static::addDependencyForCallParameter($container, $signature, $inputData);
     }
 
     /**
@@ -174,31 +168,32 @@ class BoundMethod
      * Get the dependency for the given call parameter.
      *
      * @param  \Illuminate\Container\Container $container
-     * @param  \ReflectionParameter $parameter
-     * @param  array $parameters
-     * @param $i
+     * @param  array $signature
+     * @param  array $inputData
      * @return mixed
      */
-    protected static function addDependencyForCallParameter(
-        $container,
-        $parameter,
-        array &$parameters,
-        &$i
-    ) {
-        if (array_key_exists($parameter->name, $parameters)) {
-            return $parameters[$parameter->name];
-        } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $parameters)) {
-            return $parameters[$parameter->getClass()->name];
-        } elseif ($parameter->getClass()) {
-            return $container->make($parameter->getClass()->name);
-        } elseif (isset($parameters[$i])) {
-            $data = $parameters[$i];
-            $i++;
+    protected static function addDependencyForCallParameter($container, array $signature, array $inputData)
+    {
+        $resolvedInputData = [];
+        $i = 0;
 
-            return $data;
-        } elseif ($parameter->isDefaultValueAvailable()) {
-            return $parameter->getDefaultValue();
+        foreach ($signature as $parameter) {
+            if (array_key_exists($parameter->name, $inputData)) {
+                $resolvedInputData[] = $inputData[$parameter->name];
+            } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $inputData)) {
+                $resolvedInputData[] = $inputData[$parameter->getClass()->name];
+            } elseif ($parameter->getClass()) {
+                $resolvedInputData[] = $container->make($parameter->getClass()->name);
+            } elseif (isset($inputData[$i])) {
+                $data = $inputData[$i];
+                $i++;
+                $resolvedInputData[] = $data;
+            } elseif ($parameter->isDefaultValueAvailable()) {
+                $resolvedInputData[] = $parameter->getDefaultValue();
+            }
         }
+
+        return $resolvedInputData;
     }
 
     /**
