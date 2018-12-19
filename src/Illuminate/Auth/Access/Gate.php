@@ -323,9 +323,7 @@ class Gate implements GateContract
         // back a non-null response, we will immediately return that result in order
         // to let the developers override all checks for some authorization cases.
         $result = $this->callBeforeCallbacks(
-            $user,
-            $ability,
-            $arguments
+            $user, $ability, $arguments
         );
 
         if (is_null($result)) {
@@ -432,7 +430,7 @@ class Gate implements GateContract
      */
     protected function parameterAllowsGuests($parameter)
     {
-        return ($parameter->getClass() && $parameter->allowsNull()) || 
+        return ($parameter->getClass() && $parameter->allowsNull()) ||
                ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
     }
 
