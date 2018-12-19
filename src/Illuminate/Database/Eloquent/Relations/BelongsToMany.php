@@ -679,6 +679,29 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Chunk the results of a query by comparing numeric IDs.
+     *
+     * @param  int  $count
+     * @param  callable  $callback
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return bool
+     */
+    public function chunkById($count, callable $callback, $column = null, $alias = null)
+    {
+        $this->query->addSelect($this->shouldSelect());
+
+        $column = $column ?? $this->getQualifiedRelatedPivotKeyName();
+        $alias = $alias ?? $this->getRelatedKeyName();
+
+        return $this->query->chunkById($count, function ($results) use ($callback) {
+            $this->hydratePivotRelation($results->all());
+
+            return $callback($results);
+        }, $column, $alias);
+    }
+
+    /**
      * Execute a callback over each item while chunking.
      *
      * @param  callable  $callback

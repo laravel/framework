@@ -104,6 +104,27 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         $this->assertEquals($post->id, $tag->posts->first()->id);
     }
 
+    public function testChunkById()
+    {
+        $post = EloquentManyToManyPolymorphicTestPost::create();
+        $tag1 = EloquentManyToManyPolymorphicTestTag::create();
+        $tag2 = EloquentManyToManyPolymorphicTestTag::create();
+        $tag3 = EloquentManyToManyPolymorphicTestTag::create();
+        $post->tags()->attach([$tag1->id, $tag2->id, $tag3->id]);
+
+        $count = 0;
+        $iterations = 0;
+        $post->tags()->chunkById(2, function ($tags) use (&$iterations, &$count) {
+            $this->assertInstanceOf(EloquentManyToManyPolymorphicTestTag::class, $tags->first());
+            $count += $tags->count();
+            $iterations++;
+        });
+
+        $this->assertEquals(2, $iterations);
+        $this->assertEquals(3, $count);
+
+    }
+
     /**
      * Helpers...
      */
