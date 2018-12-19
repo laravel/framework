@@ -62,6 +62,13 @@ interface Job
     public function attempts();
 
     /**
+     * Determine if the job has been marked as a failure.
+     *
+     * @return bool
+     */
+    public function hasFailed();
+
+    /**
      * Mark the job as "failed".
      *
      * @return void

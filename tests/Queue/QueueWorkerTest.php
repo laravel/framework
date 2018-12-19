@@ -438,6 +438,11 @@ class WorkerFakeJob implements QueueJobContract
         $this->failedWith = $e;
     }
 
+    public function hasFailed()
+    {
+        return $this->failed;
+    }
+
     public function getName()
     {
         return 'WorkerFakeJob';
