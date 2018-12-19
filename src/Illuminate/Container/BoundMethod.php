@@ -49,16 +49,13 @@ class BoundMethod
         // We will assume an @ sign is used to delimit the class name from the method
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
-        $method = count($segments) === 2
-                        ? $segments[1] : $defaultMethod;
+        $method = count($segments) === 2 ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
             throw new InvalidArgumentException('Method not provided.');
         }
 
-        return static::call(
-            $container, [$container->make($segments[0]), $method], $parameters
-        );
+        return static::call($container, [$container->make($segments[0]), $method], $parameters);
     }
 
     /**
@@ -120,19 +117,7 @@ class BoundMethod
         }
 
         if (\Illuminate\Support\Arr::isAssoc($inputData)) {
-            $paramNames = [];
-
-            foreach ($signature as $param) {
-                $paramNames[] = $param->getName();
-            }
-
-            foreach ($inputData as $key => $value) {
-                if (class_exists($key)) {
-                    $paramNames[] = $key;
-                }
-            }
-
-            $inputData = array_only($inputData, $paramNames);
+            $inputData = self::discardRedundantKeys($inputData, $signature);
         }
 
         // In case the number of the parameters accepted in the callee signature is not
@@ -159,9 +144,7 @@ class BoundMethod
             $callback = explode('::', $callback);
         }
 
-        return is_array($callback)
-                        ? new ReflectionMethod($callback[0], $callback[1])
-                        : new ReflectionFunction($callback);
+        return is_array($callback) ? new ReflectionMethod($callback[0], $callback[1]) : new ReflectionFunction($callback);
     }
 
     /**
@@ -205,5 +188,27 @@ class BoundMethod
     protected static function isCallableWithAtSign($callback)
     {
         return is_string($callback) && strpos($callback, '@') !== false;
+    }
+
+    /**
+     * @param array $inputData
+     * @param $signature
+     * @return array
+     */
+    protected static function discardRedundantKeys(array $inputData, $signature): array
+    {
+        $wantedKeys = [];
+
+        foreach ($signature as $param) {
+            $wantedKeys[] = $param->getName();
+        }
+
+        foreach ($inputData as $key => $value) {
+            if (class_exists($key)) {
+                $wantedKeys[] = $key;
+            }
+        }
+
+        return array_only($inputData, $wantedKeys);
     }
 }
