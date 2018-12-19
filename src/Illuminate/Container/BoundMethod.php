@@ -106,12 +106,12 @@ class BoundMethod
      * @return array
      * @throws \ReflectionException
      */
-    protected static function getMethodDependencies($container, $callback, array $inputData = [])
+    protected static function getMethodDependencies($container, $callback, array $inputData = []) : array
     {
         $signature = static::getCallReflector($callback)->getParameters();
 
-        // In case the method has no explicit input parameter defined
-        // we should call it, with whatever input data available.
+        // In case the method has no explicit input parameters defined
+        // we will call it, with whatever input data available to us.
         if (count($signature) === 0) {
             return $inputData;
         }
@@ -148,14 +148,14 @@ class BoundMethod
     }
 
     /**
-     * Get the dependency for the given call parameter.
+     * Add the dependencies to the input data.
      *
      * @param  \Illuminate\Container\Container $container
      * @param  array $signature
      * @param  array $inputData
-     * @return mixed
+     * @return array
      */
-    protected static function addDependencyForCallParameter($container, array $signature, array $inputData)
+    protected static function addDependencyForCallParameter($container, array $signature, array $inputData): array
     {
         $resolvedInputData = [];
         $i = 0;
@@ -185,17 +185,17 @@ class BoundMethod
      * @param  mixed  $callback
      * @return bool
      */
-    protected static function isCallableWithAtSign($callback)
+    protected static function isCallableWithAtSign($callback): bool
     {
         return is_string($callback) && strpos($callback, '@') !== false;
     }
 
     /**
      * @param array $inputData
-     * @param $signature
+     * @param array $signature
      * @return array
      */
-    protected static function discardRedundantKeys(array $inputData, $signature): array
+    protected static function discardRedundantKeys(array $inputData, array $signature): array
     {
         $wantedKeys = [];
 
@@ -203,6 +203,8 @@ class BoundMethod
             $wantedKeys[] = $param->getName();
         }
 
+        // In case the key is the full class name
+        // we must keep the corresponding value
         foreach ($inputData as $key => $value) {
             if (class_exists($key)) {
                 $wantedKeys[] = $key;
