@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
 /**
@@ -107,7 +107,7 @@ class FoundationHelpersTest extends TestCase
             return __DIR__;
         });
 
-        $path = public_path(str_finish($directory, '/').'mix-manifest.json');
+        $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
 
         touch($path);
 
