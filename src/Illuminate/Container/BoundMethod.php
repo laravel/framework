@@ -34,13 +34,11 @@ class BoundMethod
     /**
      * Call a string reference to a class using Class@method syntax.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  string  $target
-     * @param  array  $parameters
-     * @param  string|null  $defaultMethod
+     * @param  \Illuminate\Container\Container $container
+     * @param  string $target
+     * @param  array $parameters
+     * @param  string|null $defaultMethod
      * @return mixed
-     *
-     * @throws \InvalidArgumentException
      */
     protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
     {
@@ -49,16 +47,13 @@ class BoundMethod
         // We will assume an @ sign is used to delimit the class name from the method
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
-        $method = count($segments) === 2
-                        ? $segments[1] : $defaultMethod;
+        $method = count($segments) === 2 ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
             throw new InvalidArgumentException('Method not provided.');
         }
 
-        return static::call(
-            $container, [$container->make($segments[0]), $method], $parameters
-        );
+        return static::call($container, [$container->make($segments[0]), $method], $parameters);
     }
 
     /**
@@ -103,20 +98,27 @@ class BoundMethod
     /**
      * Get all dependencies for a given method.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  callable|string  $callback
-     * @param  array  $parameters
+     * @param  \Illuminate\Container\Container $container
+     * @param  callable|string $callback
+     * @param array $inputData
      * @return array
+     * @throws \ReflectionException
      */
-    protected static function getMethodDependencies($container, $callback, array $parameters = [])
+    protected static function getMethodDependencies($container, $callback, array $inputData = []) : array
     {
-        $dependencies = [];
+        $signature = static::getCallReflector($callback)->getParameters();
 
-        foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
-            static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
+        // In case the method has no explicit input parameters defined
+        // we will call it, with whatever input data available to us.
+        if (count($signature) === 0) {
+            return $inputData;
         }
 
-        return array_merge($dependencies, $parameters);
+        if (\Illuminate\Support\Arr::isAssoc($inputData)) {
+            $inputData = self::discardRedundantKeys($inputData, $signature);
+        }
+
+        return static::addDependencyForCallParameter($container, $signature, $inputData);
     }
 
     /**
@@ -127,42 +129,45 @@ class BoundMethod
      *
      * @throws \ReflectionException
      */
-    protected static function getCallReflector($callback)
+    protected static function getCallReflector($callback): \Reflector
     {
         if (is_string($callback) && strpos($callback, '::') !== false) {
             $callback = explode('::', $callback);
         }
 
-        return is_array($callback)
-                        ? new ReflectionMethod($callback[0], $callback[1])
-                        : new ReflectionFunction($callback);
+        return is_array($callback) ? new ReflectionMethod($callback[0], $callback[1]) : new ReflectionFunction($callback);
     }
 
     /**
-     * Get the dependency for the given call parameter.
+     * Add the dependencies to the input data.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
-     * @param  array  $dependencies
-     * @return void
+     * @param  \Illuminate\Container\Container $container
+     * @param  array $signature
+     * @param  array $inputData
+     * @return array
      */
-    protected static function addDependencyForCallParameter($container, $parameter,
-                                                            array &$parameters, &$dependencies)
+    protected static function addDependencyForCallParameter($container, array $signature, array $inputData): array
     {
-        if (array_key_exists($parameter->name, $parameters)) {
-            $dependencies[] = $parameters[$parameter->name];
+        $resolvedInputData = [];
+        $i = 0;
 
-            unset($parameters[$parameter->name]);
-        } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $parameters)) {
-            $dependencies[] = $parameters[$parameter->getClass()->name];
-
-            unset($parameters[$parameter->getClass()->name]);
-        } elseif ($parameter->getClass()) {
-            $dependencies[] = $container->make($parameter->getClass()->name);
-        } elseif ($parameter->isDefaultValueAvailable()) {
-            $dependencies[] = $parameter->getDefaultValue();
+        foreach ($signature as $parameter) {
+            if (array_key_exists($parameter->name, $inputData)) {
+                $resolvedInputData[] = $inputData[$parameter->name];
+            } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $inputData)) {
+                $resolvedInputData[] = $inputData[$parameter->getClass()->name];
+            } elseif ($parameter->getClass()) {
+                $resolvedInputData[] = $container->make($parameter->getClass()->name);
+            } elseif (isset($inputData[$i])) {
+                $data = $inputData[$i];
+                $i++;
+                $resolvedInputData[] = $data;
+            } elseif ($parameter->isDefaultValueAvailable()) {
+                $resolvedInputData[] = $parameter->getDefaultValue();
+            }
         }
+
+        return $resolvedInputData;
     }
 
     /**
@@ -171,8 +176,32 @@ class BoundMethod
      * @param  mixed  $callback
      * @return bool
      */
-    protected static function isCallableWithAtSign($callback)
+    protected static function isCallableWithAtSign($callback): bool
     {
         return is_string($callback) && strpos($callback, '@') !== false;
+    }
+
+    /**
+     * @param array $inputData
+     * @param array $signature
+     * @return array
+     */
+    protected static function discardRedundantKeys(array $inputData, array $signature): array
+    {
+        $wantedKeys = [];
+
+        foreach ($signature as $param) {
+            $wantedKeys[$param->getName()] = null;
+        }
+
+        // In case the key is the full class name
+        // we must keep the corresponding value
+        foreach ($inputData as $key => $value) {
+            if (class_exists($key)) {
+                $wantedKeys[$key] = null;
+            }
+        }
+
+        return array_intersect_key($inputData, $wantedKeys);
     }
 }
