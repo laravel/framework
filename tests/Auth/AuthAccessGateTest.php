@@ -54,7 +54,7 @@ class AuthAccessGateTest extends TestCase
             return null;
         });
 
-        $gate->before(function (?StdClass $user) {
+        $gate->before(function (? StdClass $user) {
             return true;
         });
 
@@ -67,7 +67,7 @@ class AuthAccessGateTest extends TestCase
             return null;
         });
 
-        $gate->after(function (?StdClass $user) {
+        $gate->after(function (? StdClass $user) {
             return true;
         });
 
@@ -80,7 +80,7 @@ class AuthAccessGateTest extends TestCase
             return null;
         });
 
-        $gate->define('foo', function (?StdClass $user) {
+        $gate->define('foo', function (? StdClass $user) {
             return true;
         });
 
@@ -144,11 +144,11 @@ class AuthAccessGateTest extends TestCase
             return null;
         });
 
-        $gate->before(function (?StdClass $user) {
+        $gate->before(function (? StdClass $user) {
             $_SERVER['__laravel.gateBefore'] = true;
         });
 
-        $gate->after(function (?StdClass $user) {
+        $gate->after(function (? StdClass $user) {
             $_SERVER['__laravel.gateAfter'] = true;
         });
 
@@ -287,7 +287,7 @@ class AuthAccessGateTest extends TestCase
         });
 
         $gate->after(function ($user, $ability, $result) {
-            return ! $result;
+            return !$result;
         });
 
         $this->assertTrue($gate->allows('allow'));
@@ -303,7 +303,7 @@ class AuthAccessGateTest extends TestCase
         });
 
         $gate->after(function ($user, $ability, $result) {
-            return ! $result;
+            return !$result;
         });
 
         $this->assertTrue($gate->allows('allow'));
@@ -359,9 +359,35 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', AccessGateTestClass::class.'@foo');
+        $gate->define('foo', AccessGateTestClass::class . '@foo');
 
         $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_classes_defined_as_callbacks_can_allow_guests()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->define('foo', AccessGateTestCustomResourceThatAllowsGuests::class . '@foo');
+
+        $this->assertTrue($gate->check('foo'));
+
+        // tk*
+    }
+
+    public function test_classes_defined_as_callbacks_can_disallow_guests()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->define('foo', AccessGateTestCustomResource::class . '@foo');
+
+        $this->assertFalse($gate->check('foo'));
+
+        // tk*
     }
 
     public function test_invokable_classes_can_be_defined()
@@ -491,7 +517,7 @@ class AuthAccessGateTest extends TestCase
             return true;
         });
 
-        $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
+        $this->assertTrue($gate->forUser((object)['id' => 2])->check('foo'));
     }
 
     /**
@@ -560,7 +586,7 @@ class AuthAccessGateTest extends TestCase
     protected function getBasicGate($isAdmin = false)
     {
         return new Gate(new Container, function () use ($isAdmin) {
-            return (object) ['id' => 1, 'isAdmin' => $isAdmin];
+            return (object)['id' => 1, 'isAdmin' => $isAdmin];
         });
     }
 
@@ -711,12 +737,12 @@ class AccessGateTestPolicy
 
     public function updateAny($user, AccessGateTestDummy $dummy)
     {
-        return ! $user->isAdmin;
+        return !$user->isAdmin;
     }
 
     public function update($user, AccessGateTestDummy $dummy)
     {
-        return ! $user->isAdmin;
+        return !$user->isAdmin;
     }
 
     public function updateDash($user, AccessGateTestDummy $dummy)
@@ -774,6 +800,19 @@ class AccessGateTestCustomResource
     }
 }
 
+class AccessGateTestCustomResourceThatAllowsGuests
+{
+    public function foo($user = null)
+    {
+        return true;
+    }
+
+    public function bar($user = null)
+    {
+        return true;
+    }
+}
+
 class AccessGateTestPolicyWithMixedPermissions
 {
     public function edit($user, AccessGateTestDummy $dummy)
@@ -815,12 +854,12 @@ class AccessGateTestPolicyWithAllPermissions
 
 class AccessGateTestPolicyThatAllowsGuests
 {
-    public function before(?StdClass $user)
+    public function before(? StdClass $user)
     {
         $_SERVER['__laravel.testBefore'] = true;
     }
 
-    public function edit(?StdClass $user, AccessGateTestDummy $dummy)
+    public function edit(? StdClass $user, AccessGateTestDummy $dummy)
     {
         return true;
     }
@@ -838,7 +877,7 @@ class AccessGateTestPolicyWithNonGuestBefore
         $_SERVER['__laravel.testBefore'] = true;
     }
 
-    public function edit(?StdClass $user, AccessGateTestDummy $dummy)
+    public function edit(? StdClass $user, AccessGateTestDummy $dummy)
     {
         return true;
     }
