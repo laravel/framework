@@ -75,14 +75,9 @@ class Gate implements GateContract
      * @param  array  $afterCallbacks
      * @return void
      */
-    public function __construct(
-        Container $container,
-        callable $userResolver,
-        array $abilities = [],
-        array $policies = [],
-        array $beforeCallbacks = [],
-        array $afterCallbacks = []
-    ) {
+    public function __construct(Container $container, callable $userResolver, array $abilities = [],
+                                array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [])
+    {
         $this->policies = $policies;
         $this->container = $container;
         $this->abilities = $abilities;
@@ -146,7 +141,7 @@ class Gate implements GateContract
     public function resource($name, $class, array $abilities = null)
     {
         $abilities = $abilities ?: [
-            'view' => 'view',
+            'view'   => 'view',
             'create' => 'create',
             'update' => 'update',
             'delete' => 'delete',
@@ -182,10 +177,7 @@ class Gate implements GateContract
             $user = array_shift($arguments);
 
             $result = $this->callPolicyBefore(
-                $policy,
-                $user,
-                $ability,
-                $arguments
+                $policy, $user, $ability, $arguments
             );
 
             if (! is_null($result)) {
@@ -193,8 +185,8 @@ class Gate implements GateContract
             }
 
             return isset($method)
-                ? $policy->{$method}(...func_get_args())
-                : $policy(...func_get_args());
+                    ? $policy->{$method}(...func_get_args())
+                    : $policy(...func_get_args());
         };
     }
 
@@ -344,10 +336,7 @@ class Gate implements GateContract
         // that are registered with the Gate, which allows a developer to do logging
         // if that is required for this application. Then we'll return the result.
         return $this->callAfterCallbacks(
-            $user,
-            $ability,
-            $arguments,
-            $result
+            $user, $ability, $arguments, $result
         );
     }
 
@@ -443,7 +432,8 @@ class Gate implements GateContract
      */
     protected function parameterAllowsGuests($parameter)
     {
-        return ($parameter->getClass() && $parameter->allowsNull()) || ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
+        return ($parameter->getClass() && $parameter->allowsNull()) || 
+               ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
     }
 
     /**
@@ -598,10 +588,7 @@ class Gate implements GateContract
             // running this policy method if necessary. This is used to when objects are
             // mapped to policy objects in the user's configurations or on this class.
             $result = $this->callPolicyBefore(
-                $policy,
-                $user,
-                $ability,
-                $arguments
+                $policy, $user, $ability, $arguments
             );
 
             // When we receive a non-null result from this before method, we will return it
@@ -688,12 +675,8 @@ class Gate implements GateContract
         };
 
         return new static(
-            $this->container,
-            $callback,
-            $this->abilities,
-            $this->policies,
-            $this->beforeCallbacks,
-            $this->afterCallbacks
+            $this->container, $callback, $this->abilities,
+            $this->policies, $this->beforeCallbacks, $this->afterCallbacks
         );
     }
 
