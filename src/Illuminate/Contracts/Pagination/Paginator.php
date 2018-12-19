@@ -114,4 +114,11 @@ interface Paginator
      * @return string
      */
     public function render($view = null, $data = []);
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray();
 }
