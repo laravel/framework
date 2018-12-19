@@ -54,7 +54,7 @@ class AuthAccessGateTest extends TestCase
             return null;
         });
 
-        $gate->before(function (? StdClass $user) {
+        $gate->before(function (?StdClass $user) {
             return true;
         });
 
@@ -67,7 +67,7 @@ class AuthAccessGateTest extends TestCase
             return null;
         });
 
-        $gate->after(function (? StdClass $user) {
+        $gate->after(function (?StdClass $user) {
             return true;
         });
 
@@ -80,7 +80,7 @@ class AuthAccessGateTest extends TestCase
             return null;
         });
 
-        $gate->define('foo', function (? StdClass $user) {
+        $gate->define('foo', function (?StdClass $user) {
             return true;
         });
 
@@ -144,11 +144,11 @@ class AuthAccessGateTest extends TestCase
             return null;
         });
 
-        $gate->before(function (? StdClass $user) {
+        $gate->before(function (?StdClass $user) {
             $_SERVER['__laravel.gateBefore'] = true;
         });
 
-        $gate->after(function (? StdClass $user) {
+        $gate->after(function (?StdClass $user) {
             $_SERVER['__laravel.gateAfter'] = true;
         });
 
@@ -850,12 +850,12 @@ class AccessGateTestPolicyWithAllPermissions
 
 class AccessGateTestPolicyThatAllowsGuests
 {
-    public function before(? StdClass $user)
+    public function before(?StdClass $user)
     {
         $_SERVER['__laravel.testBefore'] = true;
     }
 
-    public function edit(? StdClass $user, AccessGateTestDummy $dummy)
+    public function edit(?StdClass $user, AccessGateTestDummy $dummy)
     {
         return true;
     }
@@ -873,7 +873,7 @@ class AccessGateTestPolicyWithNonGuestBefore
         $_SERVER['__laravel.testBefore'] = true;
     }
 
-    public function edit(? StdClass $user, AccessGateTestDummy $dummy)
+    public function edit(?StdClass $user, AccessGateTestDummy $dummy)
     {
         return true;
     }
