@@ -114,12 +114,16 @@ class BoundMethod
     {
         $signature = static::getCallReflector($callback)->getParameters();
 
-        // In case the method has no explicit input parameters defined
-        // we will call it, with whatever input data available to us.
+        // In case the method has no explicit input parameters we will
+        // call that with whatever input data available to us since
+        // they may have used func_get_args() to catch the input.
         if (count($signature) === 0) {
             return $inputData;
         }
 
+        // When receive method input as an indexed array and the count of passed arguments
+        // is not less than the declared parameters, it means that we are provided with
+        // everything needed, So the IOC container should not bother about injection.
         if (! Arr::isAssoc($inputData) && (count($signature) <= count($inputData))) {
             return $inputData;
         }
@@ -153,6 +157,7 @@ class BoundMethod
      * @param  array $signature
      * @param  array $inputData
      * @return array
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected static function addDependencyForCallParameter($container, array $signature, array $inputData): array
     {
