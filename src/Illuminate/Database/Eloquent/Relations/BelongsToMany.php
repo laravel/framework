@@ -691,7 +691,10 @@ class BelongsToMany extends Relation
     {
         $this->query->addSelect($this->shouldSelect());
 
-        $column = $column ?? $this->getRelated()->qualifyColumn($this->getRelatedKeyName());
+        $column = $column ?? $this->getRelated()->qualifyColumn(
+            $this->getRelatedKeyName()
+        );
+
         $alias = $alias ?? $this->getRelatedKeyName();
 
         return $this->query->chunkById($count, function ($results) use ($callback) {
