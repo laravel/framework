@@ -241,7 +241,7 @@ trait ManagesTransactions
     }
 
     /**
-     * Evaluates the condition and commits or rollback
+     * Evaluates the condition and commits or rollback.
      *
      * @param  bool $condition
      *
@@ -255,7 +255,7 @@ trait ManagesTransactions
     }
 
     /**
-     * Evaluates the condition and commits or rollback
+     * Evaluates the condition and commits or rollback.
      *
      * @param  bool $condition
      *
@@ -265,11 +265,11 @@ trait ManagesTransactions
      */
     public function commitUnless($condition)
     {
-        $this->commitIf(!$condition);
+        $this->commitIf(! $condition);
     }
 
     /**
-     * Evaluates the condition and commits or rollback
+     * Evaluates the condition and commits or rollback.
      *
      * @param  bool $condition
      * @param  int|null $toLevel
@@ -284,7 +284,7 @@ trait ManagesTransactions
     }
 
     /**
-     * Evaluates the condition and commits or rollback
+     * Evaluates the condition and commits or rollback.
      *
      * @param  bool $condition
      * @param  int|null $toLevel
@@ -295,6 +295,6 @@ trait ManagesTransactions
      */
     public function rollbackUnless($condition, $toLevel = null)
     {
-        $this->rollbackIf(!$condition, $toLevel);
+        $this->rollbackIf(! $condition, $toLevel);
     }
 }
