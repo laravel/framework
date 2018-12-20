@@ -69,7 +69,8 @@ class RedisManager implements Factory
      */
     public function connection($name = null)
     {
-        $name = $name ?: 'default';
+        $default_connection = $this->config['default_connection'] ?: 'default';
+        $name = $name ?: $default_connection;
 
         if (isset($this->connections[$name])) {
             return $this->connections[$name];
