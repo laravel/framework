@@ -239,4 +239,62 @@ trait ManagesTransactions
     {
         return $this->transactions;
     }
+
+    /**
+     * Evaluates the condition and commits or rollback
+     *
+     * @param  bool $condition
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function commitIf($condition)
+    {
+        $condition ? $this->commit() : $this->rollback();
+    }
+
+    /**
+     * Evaluates the condition and commits or rollback
+     *
+     * @param  bool $condition
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function commitUnless($condition)
+    {
+        $this->commitIf(!$condition);
+    }
+
+    /**
+     * Evaluates the condition and commits or rollback
+     *
+     * @param  bool $condition
+     * @param  int|null $toLevel
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function rollbackIf($condition, $toLevel = null)
+    {
+        $condition ? $this->rollback($toLevel) : $this->commit();
+    }
+
+    /**
+     * Evaluates the condition and commits or rollback
+     *
+     * @param  bool $condition
+     * @param  int|null $toLevel
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function rollbackUnless($condition, $toLevel = null)
+    {
+        $this->rollbackIf(!$condition, $toLevel);
+    }
 }
