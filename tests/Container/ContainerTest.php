@@ -1197,14 +1197,46 @@ class ContainerTest extends TestCase
     public function testClosureCallWithInjectedDependency()
     {
         $container = new Container;
-        $container->call(function (ContainerConcreteStub $stub) {
+        $result = $container->call(function (ContainerConcreteStub $stub) {
+            return $stub;
         }, ['foo' => 'bar']);
 
-        $container->call(function (ContainerConcreteStub $stub) {
-        }, [new ContainerConcreteStub]);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result);
 
-        $container->call(function (ContainerConcreteStub $stub) {
-        }, ['foo' => 'bar', 'stub' => new ContainerConcreteStub]);
+        $obj = new ContainerConcreteStub;
+        $result = $container->call(function (ContainerConcreteStub $stub) {
+            return $stub;
+        }, [$obj]);
+        $this->assertSame($obj, $result);
+
+        $obj = new ContainerConcreteStub;
+        $result = $container->call(function (ContainerConcreteStub $stub, $baz = 'taylor') {
+            return [$stub, $baz];
+        }, ['foo' => 'bar', 'stub' => $obj]);
+        $this->assertSame($obj, $result[0]);
+        $this->assertEquals('taylor', $result[1]);
+
+        $obj = new ContainerConcreteStub;
+        $result = $container->call(function ($foo, ContainerConcreteStub $stub) {
+            return [$foo, $stub];
+        }, ['foo', $obj]);
+        $this->assertEquals('foo', $result[0]);
+        $this->assertSame($obj, $result[1]);
+
+
+        $result = $container->call(function ($foo = 'default foo', ContainerConcreteStub $stub) {
+            return [$foo, $stub];
+        }, ['foo']);
+        $this->assertEquals('foo', $result[0]);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[1]);
+
+
+
+        $result = $container->call(function ($foo = 'default foo', ContainerConcreteStub $stub = null) {
+            return [$foo, $stub];
+        }, []);
+        $this->assertEquals('default foo', $result[0]);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[1]);
     }
 }
 
