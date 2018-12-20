@@ -1,5 +1,15 @@
 # Release Notes for 5.7.x
 
+## [v5.7.19 (2018-12-18)](https://github.com/laravel/framework/compare/v5.7.18...v5.7.19)
+
+### Added
+- Added `Illuminate\Support\Collection::whereBetween` method ([#26888](https://github.com/laravel/framework/pull/26888))
+
+### Fixed
+- Reverted changes related to [`app()->call()`](https://github.com/laravel/framework/pull/26852) ([fefaf46](https://github.com/laravel/framework/commit/fefaf46dd147a4caf1dea1712f9797f3db49fea4))
+- Reset doctrineConnection property on Database/Connection when reconnecting ([#26890](https://github.com/laravel/framework/pull/26890))
+
+
 ## [v5.7.18 (2018-12-17)](https://github.com/laravel/framework/compare/v5.7.17...v5.7.18)
 
 ### Added
