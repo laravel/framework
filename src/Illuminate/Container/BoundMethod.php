@@ -128,7 +128,7 @@ class BoundMethod
             return $inputData;
         }
 
-        return static::addDependencyForCallParameter($container, $signature, $inputData);
+        return static::addDependenciesToInputData($container, $signature, $inputData);
     }
 
     /**
@@ -160,7 +160,7 @@ class BoundMethod
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected static function addDependencyForCallParameter($container, array $signature, array $inputData)
+    protected static function addDependenciesToInputData($container, array $signature, array $inputData)
     {
         // Here we iterate through the list of declared parameters (in the method signature) and decide
         // whether it should be invoked with the provided input data, or we should resolve an object
