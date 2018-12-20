@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
@@ -44,6 +45,25 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
+    }
+
+    public function testCreateTableWithComment()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->integer('id');
+        $blueprint->comment = "It's a table with users";
+
+        $pdo = $this->getPdo();
+        $pdo->shouldReceive('quote')->once()->with($blueprint->comment)->andReturn("'It''s an users table'");
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getPdo')->once()->andReturn($pdo);
+        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
+        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn('InnoDB');
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals("create table `users` (`id` int not null) comment = 'It''s an users table' default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB", $statements[0]);
     }
 
     public function testEngineCreateTable()
@@ -966,6 +986,11 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     protected function getConnection()
     {
         return m::mock(Connection::class);
+    }
+
+    protected function getPdo()
+    {
+        return m::mock(PDO::class);
     }
 
     public function getGrammar()
