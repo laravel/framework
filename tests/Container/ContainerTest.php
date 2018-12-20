@@ -1145,6 +1145,10 @@ class ContainerTest extends TestCase
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['foo', 'bar', 'baz']);
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
+
+        $container = new Container;
+        $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['foo', 'bar', 'baz', 'foo2', 'bar2', 'baz2']);
+        $this->assertEquals(['foo', 'bar', 'baz', 'foo2', 'bar2', 'baz2'], $result);
     }
 
     public function testWithDefaultParametersAssociativeSyntax()

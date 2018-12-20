@@ -167,8 +167,7 @@ class BoundMethod
             } elseif ($parameter->getClass()) {
                 $resolvedInputData[] = $container->make($parameter->getClass()->name);
             } elseif (isset($inputData[$i])) {
-                $resolvedInputData[] = $inputData[$i];
-                $i++;
+                $resolvedInputData[] = $inputData[$i++];
             } elseif ($parameter->isDefaultValueAvailable()) {
                 $resolvedInputData[] = $parameter->getDefaultValue();
             }
