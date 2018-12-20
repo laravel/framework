@@ -162,6 +162,9 @@ class BoundMethod
      */
     protected static function addDependencyForCallParameter($container, array $signature, array $inputData)
     {
+        // Here we iterate through the list of declared parameters (in the method signature) and decide
+        // whether it should be invoked with the provided input data, or we should resolve an object
+        // for it (according to it's type-hint) or just call it with it's defined "default" value.
         $resolvedInputData = [];
         $i = 0;
 
