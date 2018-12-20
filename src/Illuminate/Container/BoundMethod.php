@@ -3,9 +3,9 @@
 namespace Illuminate\Container;
 
 use Closure;
-use Illuminate\Support\Arr;
 use ReflectionMethod;
 use ReflectionFunction;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 class BoundMethod
