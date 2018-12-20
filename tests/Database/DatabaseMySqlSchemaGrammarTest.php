@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
 use PDO;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
