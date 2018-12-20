@@ -50,8 +50,7 @@ class BoundMethod
         // We will assume an @ sign is used to delimit the class name from the method
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
-        $method = count($segments) === 2
-                        ? $segments[1] : $defaultMethod;
+        $method = count($segments) === 2 ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
             throw new InvalidArgumentException('Method not provided.');
@@ -106,11 +105,12 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
-     * @param  array $inputData
+     * @param  array  $inputData
      * @return array
+     *
      * @throws \ReflectionException
      */
-    protected static function getMethodDependencies($container, $callback, array $inputData = []) : array
+    protected static function getMethodDependencies($container, $callback, array $inputData = [])
     {
         $signature = static::getCallReflector($callback)->getParameters();
 
@@ -134,12 +134,12 @@ class BoundMethod
     /**
      * Get the proper reflection instance for the given callback.
      *
-     * @param  callable|string $callback
+     * @param  callable|string  $callback
      * @return \ReflectionFunctionAbstract
      *
      * @throws \ReflectionException
      */
-    protected static function getCallReflector($callback): \Reflector
+    protected static function getCallReflector($callback)
     {
         if (is_string($callback) && strpos($callback, '::') !== false) {
             $callback = explode('::', $callback);
@@ -153,13 +153,14 @@ class BoundMethod
     /**
      * Add the dependencies to the input data.
      *
-     * @param  \Illuminate\Container\Container $container
-     * @param  array $signature
-     * @param  array $inputData
+     * @param  \Illuminate\Container\Container  $container
+     * @param  array  $signature
+     * @param  array  $inputData
      * @return array
+     *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected static function addDependencyForCallParameter($container, array $signature, array $inputData): array
+    protected static function addDependencyForCallParameter($container, array $signature, array $inputData)
     {
         $resolvedInputData = [];
         $i = 0;
@@ -184,10 +185,10 @@ class BoundMethod
     /**
      * Determine if the given string is in Class@method syntax.
      *
-     * @param  mixed  $callback
+     * @param  string|callable  $callback
      * @return bool
      */
-    protected static function isCallableWithAtSign($callback): bool
+    protected static function isCallableWithAtSign($callback)
     {
         return is_string($callback) && strpos($callback, '@') !== false;
     }
