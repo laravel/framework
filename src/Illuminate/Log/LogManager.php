@@ -232,7 +232,7 @@ class LogManager implements LoggerInterface
                 new StreamHandler(
                     $config['path'], $this->level($config),
                     $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-                )
+                ), $config
             ),
         ]);
     }
@@ -249,7 +249,7 @@ class LogManager implements LoggerInterface
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config),
                 $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-            )),
+            ), $config),
         ]);
     }
 
@@ -289,7 +289,7 @@ class LogManager implements LoggerInterface
             $this->prepareHandler(new SyslogHandler(
                 Str::snake($this->app['config']['app.name'], '-'),
                 $config['facility'] ?? LOG_USER, $this->level($config)
-            )),
+            ), $config),
         ]);
     }
 
