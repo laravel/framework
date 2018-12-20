@@ -1223,14 +1223,11 @@ class ContainerTest extends TestCase
         $this->assertEquals('foo', $result[0]);
         $this->assertSame($obj, $result[1]);
 
-
         $result = $container->call(function ($foo = 'default foo', ContainerConcreteStub $stub) {
             return [$foo, $stub];
         }, ['foo']);
         $this->assertEquals('foo', $result[0]);
         $this->assertInstanceOf(ContainerConcreteStub::class, $result[1]);
-
-
 
         $result = $container->call(function ($foo = 'default foo', ContainerConcreteStub $stub = null) {
             return [$foo, $stub];
