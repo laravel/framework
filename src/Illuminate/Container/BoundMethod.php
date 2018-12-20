@@ -3,6 +3,7 @@
 namespace Illuminate\Container;
 
 use Closure;
+use Illuminate\Support\Arr;
 use ReflectionMethod;
 use ReflectionFunction;
 use InvalidArgumentException;
@@ -105,7 +106,7 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
-     * @param array $inputData
+     * @param  array $inputData
      * @return array
      * @throws \ReflectionException
      */
@@ -119,8 +120,8 @@ class BoundMethod
             return $inputData;
         }
 
-        if (\Illuminate\Support\Arr::isAssoc($inputData)) {
-            $inputData = self::discardRedundantKeys($inputData, $signature);
+        if (! Arr::isAssoc($inputData) && (count($signature) <= count($inputData))) {
+            return $inputData;
         }
 
         return static::addDependencyForCallParameter($container, $signature, $inputData);
@@ -141,8 +142,8 @@ class BoundMethod
         }
 
         return is_array($callback)
-            ? new ReflectionMethod($callback[0], $callback[1])
-            : new ReflectionFunction($callback);
+                        ? new ReflectionMethod($callback[0], $callback[1])
+                        : new ReflectionFunction($callback);
     }
 
     /**
@@ -166,9 +167,8 @@ class BoundMethod
             } elseif ($parameter->getClass()) {
                 $resolvedInputData[] = $container->make($parameter->getClass()->name);
             } elseif (isset($inputData[$i])) {
-                $data = $inputData[$i];
+                $resolvedInputData[] = $inputData[$i];
                 $i++;
-                $resolvedInputData[] = $data;
             } elseif ($parameter->isDefaultValueAvailable()) {
                 $resolvedInputData[] = $parameter->getDefaultValue();
             }
@@ -186,29 +186,5 @@ class BoundMethod
     protected static function isCallableWithAtSign($callback): bool
     {
         return is_string($callback) && strpos($callback, '@') !== false;
-    }
-
-    /**
-     * @param array $inputData
-     * @param array $signature
-     * @return array
-     */
-    protected static function discardRedundantKeys(array $inputData, array $signature): array
-    {
-        $wantedKeys = [];
-
-        foreach ($signature as $param) {
-            $wantedKeys[$param->getName()] = null;
-        }
-
-        // In case the key is the full class name
-        // we must keep the corresponding value
-        foreach ($inputData as $key => $value) {
-            if (class_exists($key)) {
-                $wantedKeys[$key] = null;
-            }
-        }
-
-        return array_intersect_key($inputData, $wantedKeys);
     }
 }

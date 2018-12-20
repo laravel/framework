@@ -603,9 +603,10 @@ class ContainerTest extends TestCase
         $this->assertEquals('baz', $result[1]);
 
         $container = new Container;
-        $result = $container->call([new ContainerTestCallStub, 'inject'], ['baz', 'foo']);
-        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
-        $this->assertEquals('baz', $result[1]);
+        $object = new ContainerConcreteStub();
+        $result = $container->call([new ContainerTestCallStub, 'inject'], [$object, 'foo']);
+        $this->assertSame($object, $result[0]);
+        $this->assertEquals('foo', $result[1]);
     }
 
     public function testBindMethodAcceptsAnArray()
@@ -1196,7 +1197,7 @@ class ContainerTest extends TestCase
         }, ['foo' => 'bar']);
 
         $container->call(function (ContainerConcreteStub $stub) {
-        }, ['bar']);
+        }, [new ContainerConcreteStub]);
 
         $container->call(function (ContainerConcreteStub $stub) {
         }, ['foo' => 'bar', 'stub' => new ContainerConcreteStub]);
