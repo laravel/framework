@@ -34,11 +34,13 @@ class BoundMethod
     /**
      * Call a string reference to a class using Class@method syntax.
      *
-     * @param  \Illuminate\Container\Container $container
-     * @param  string $target
-     * @param  array $parameters
-     * @param  string|null $defaultMethod
+     * @param  \Illuminate\Container\Container  $container
+     * @param  string  $target
+     * @param  array  $parameters
+     * @param  string|null  $defaultMethod
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
     {
@@ -47,13 +49,16 @@ class BoundMethod
         // We will assume an @ sign is used to delimit the class name from the method
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
-        $method = count($segments) === 2 ? $segments[1] : $defaultMethod;
+        $method = count($segments) === 2
+                        ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
             throw new InvalidArgumentException('Method not provided.');
         }
 
-        return static::call($container, [$container->make($segments[0]), $method], $parameters);
+        return static::call(
+            $container, [$container->make($segments[0]), $method], $parameters
+        );
     }
 
     /**
@@ -98,8 +103,8 @@ class BoundMethod
     /**
      * Get all dependencies for a given method.
      *
-     * @param  \Illuminate\Container\Container $container
-     * @param  callable|string $callback
+     * @param  \Illuminate\Container\Container  $container
+     * @param  callable|string  $callback
      * @param array $inputData
      * @return array
      * @throws \ReflectionException
@@ -135,7 +140,9 @@ class BoundMethod
             $callback = explode('::', $callback);
         }
 
-        return is_array($callback) ? new ReflectionMethod($callback[0], $callback[1]) : new ReflectionFunction($callback);
+        return is_array($callback)
+            ? new ReflectionMethod($callback[0], $callback[1])
+            : new ReflectionFunction($callback);
     }
 
     /**
