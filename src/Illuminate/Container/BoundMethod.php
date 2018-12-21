@@ -173,9 +173,11 @@ class BoundMethod
                 $resolvedInputData[] = $inputData[$parameter->name];
             } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $inputData)) {
                 $resolvedInputData[] = $inputData[$parameter->getClass()->name];
+            } elseif ($parameter->getClass() && isset($inputData[$i]) && is_a($inputData[$i], $parameter->getClass()->name)) {
+                $resolvedInputData[] = $inputData[$i++];
             } elseif ($parameter->getClass()) {
                 $resolvedInputData[] = $container->make($parameter->getClass()->name);
-            } elseif (isset($inputData[$i])) {
+            } elseif (array_key_exists($i, $inputData)) {
                 $resolvedInputData[] = $inputData[$i++];
             } elseif ($parameter->isDefaultValueAvailable()) {
                 $resolvedInputData[] = $parameter->getDefaultValue();
