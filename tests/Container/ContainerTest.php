@@ -1171,7 +1171,7 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
 
         $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['b' => 'bar', 'a' => 'foo',]);
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['b' => 'bar', 'a' => 'foo']);
         $this->assertEquals(['foo', 'bar', 'default c'], $result);
 
         $container = new Container;

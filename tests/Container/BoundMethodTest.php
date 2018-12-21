@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Container;
 
-use Illuminate\Container\BoundMethod;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use Illuminate\Container\BoundMethod;
 
 class BoundMethodAccessor extends BoundMethod
 {
@@ -35,8 +35,7 @@ class BoundMethodTest extends TestCase
     {
         $container = new Container();
 
-        $defaulty = function ($a, $b = 'default b', $c = 'default c')
-        {
+        $defaulty = function ($a, $b = 'default b', $c = 'default c') {
         };
 
         $args = BoundMethodAccessor::getMethodDependencies($container, $defaulty, ['a', 'b', 'c']);

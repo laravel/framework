@@ -18,6 +18,7 @@ class BoundMethod
      * @param  array  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
     {
@@ -42,6 +43,7 @@ class BoundMethod
      * @return mixed
      *
      * @throws \InvalidArgumentException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
     {
@@ -109,6 +111,7 @@ class BoundMethod
      * @return array
      *
      * @throws \ReflectionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected static function getMethodDependencies($container, $callback, array $inputData = [])
     {
