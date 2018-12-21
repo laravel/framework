@@ -62,7 +62,19 @@ class BoundMethodTest extends TestCase
         $this->assertEquals('a', $a);
         $this->assertEquals('default b', $b);
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
+
+        [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $injected, [null, null]);
+        $this->assertNull($a);
+        $this->assertNull($b);
+        $this->assertInstanceOf(ContainerBoundMethodStub::class, $c);
+        $this->assertArrayNotHasKey(4, $args);
+
+        [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $injected, [null, null]);
+        $this->assertNull($a);
+        $this->assertNull($b);
+        $this->assertInstanceOf(ContainerBoundMethodStub::class, $c);
+        $this->assertArrayNotHasKey(4, $args);
 
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $injected, [
             'a' => 'passed a',
@@ -72,7 +84,7 @@ class BoundMethodTest extends TestCase
         $this->assertEquals('passed a', $a);
         $this->assertEquals('value b', $b);
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
 
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $injected, [
             'a' => 'passed a',
@@ -81,7 +93,7 @@ class BoundMethodTest extends TestCase
         $this->assertEquals('passed a', $a);
         $this->assertEquals('default b', $b);
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
     }
 
     public function testCallingWithNoArgs()
@@ -107,38 +119,38 @@ class BoundMethodTest extends TestCase
         $this->assertEquals('passed a', $a);
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $b);
         $this->assertEquals('default c', $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
 
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $callee, ['c' => 'value c', 'junk' => 'junk', 'a' => 'passed a']);
         $this->assertEquals('passed a', $a);
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $b);
         $this->assertEquals('value c', $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
 
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $callee, ['passed a', 'value c']);
         $this->assertEquals('passed a', $a);
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $b);
         $this->assertEquals('value c', $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
 
         $obj = new ContainerBoundMethodStub;
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $callee, ['passed a', $obj]);
         $this->assertEquals('passed a', $a);
         $this->assertSame($obj, $b);
         $this->assertEquals('default c', $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
 
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $callee, ['passed a', $obj, 'passed c']);
         $this->assertEquals('passed a', $a);
         $this->assertSame($obj, $b);
         $this->assertEquals('passed c', $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
 
         $stub2 = new ContainerBoundMethodStub2;
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($container, $callee, ['passed a', $stub2]);
         $this->assertEquals('passed a', $a);
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $b);
         $this->assertSame($stub2, $c);
-        $this->assertFalse(isset($args[4]));
+        $this->assertArrayNotHasKey(4, $args);
     }
 }

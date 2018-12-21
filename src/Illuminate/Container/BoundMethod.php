@@ -15,20 +15,20 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
-     * @param  array  $parameters
+     * @param  array  $inputData
      * @param  string|null  $defaultMethod
      * @return mixed
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
+    public static function call($container, $callback, array $inputData = [], $defaultMethod = null)
     {
         if (static::isCallableWithAtSign($callback) || $defaultMethod) {
-            return static::callClass($container, $callback, $parameters, $defaultMethod);
+            return static::callClass($container, $callback, $inputData, $defaultMethod);
         }
 
-        return static::callBoundMethod($container, $callback, function () use ($container, $callback, $parameters) {
+        return static::callBoundMethod($container, $callback, function () use ($container, $callback, $inputData) {
             return call_user_func_array(
-                $callback, static::getMethodDependencies($container, $callback, $parameters)
+                $callback, static::getMethodDependencies($container, $callback, $inputData)
             );
         });
     }
@@ -111,7 +111,6 @@ class BoundMethod
      * @return array
      *
      * @throws \ReflectionException
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected static function getMethodDependencies($container, $callback, array $inputData = [])
     {
@@ -124,7 +123,7 @@ class BoundMethod
             return $inputData;
         }
 
-        // When receive method input as an indexed array and the count of passed arguments
+        // When we receive the input as an indexed array and the count of passed arguments
         // is not less than the declared parameters, it means that we are provided with
         // everything needed, So the IOC container should not bother about injection.
         if (! Arr::isAssoc($inputData) && (count($signature) <= count($inputData))) {
@@ -160,8 +159,6 @@ class BoundMethod
      * @param  array  $signature
      * @param  array  $inputData
      * @return array
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected static function addDependenciesToInputData($container, array $signature, array $inputData)
     {
@@ -174,12 +171,9 @@ class BoundMethod
         foreach ($signature as $parameter) {
             if (array_key_exists($parameter->name, $inputData)) {
                 $resolvedInputData[] = $inputData[$parameter->name];
-            } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $inputData)) {
-                $resolvedInputData[] = $inputData[$parameter->getClass()->name];
-            } elseif ($parameter->getClass() && isset($inputData[$i]) && is_a($inputData[$i], $parameter->getClass()->name)) {
-                $resolvedInputData[] = $inputData[$i++];
             } elseif ($parameter->getClass()) {
-                $resolvedInputData[] = $container->make($parameter->getClass()->name);
+                $className = $parameter->getClass()->name;
+                $resolvedInputData[] = self::getInstance($container, $inputData, $className, $i);
             } elseif (array_key_exists($i, $inputData)) {
                 $resolvedInputData[] = $inputData[$i++];
             } elseif ($parameter->isDefaultValueAvailable()) {
@@ -199,5 +193,23 @@ class BoundMethod
     protected static function isCallableWithAtSign($callback)
     {
         return is_string($callback) && strpos($callback, '@') !== false;
+    }
+
+    /**
+     * @param $container
+     * @param array $inputData
+     * @param $className
+     * @param $i
+     * @return mixed
+     */
+    protected static function getInstance($container, array $inputData, $className, &$i)
+    {
+        if (array_key_exists($className, $inputData)) {
+            return $inputData[$className];
+        } elseif (isset($inputData[$i]) && is_a($inputData[$i], $className)) {
+            return $inputData[$i++];
+        } else {
+            return $container->make($className);
+        }
     }
 }
