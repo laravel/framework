@@ -11,6 +11,7 @@ use ArrayIterator;
 use CachingIterator;
 use ReflectionClass;
 use JsonSerializable;
+use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
@@ -2934,6 +2935,93 @@ class SupportCollectionTest extends TestCase
     {
         $collection = new Collection([1, 2, 3]);
         $this->assertNull($collection->get(null));
+    }
+
+    public function testDynamicWhereCall()
+    {
+        $collection = new Collection([
+            ['name' => 'Laravel', 'type' => 'backend'],
+            ['name' => 'Tailwind', 'type' => 'frontend'],
+            ['name' => 'Vue', 'type' => 'frontend'],
+        ]);
+
+        $result = $collection->whereType('backend');
+
+        $this->assertCount(1, $result);
+        $this->assertSame('Laravel', $result->first()['name']);
+    }
+
+    public function testDynamicWhereAdjustsToSnakeCase()
+    {
+        $collection = new Collection([
+            ['first_name' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first_name' => 'Abigail', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $result = $collection->whereFirstName('Taylor');
+
+        $this->assertCount(1, $result);
+        $this->assertSame('taylorotwell@gmail.com', $result->first()['email']);
+    }
+
+    public function testIgnoresExtraParametersOnDynamicCall()
+    {
+        $collection = new Collection([
+            ['first_name' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first_name' => 'Abigail', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $result = $collection->whereFirstName('Taylor', 'Abigail');
+
+        $this->assertCount(1, $result);
+        $this->assertSame('taylorotwell@gmail.com', $result->first()['email']);
+    }
+
+    public function testDynamicCallsWithNullValue()
+    {
+        $collection = new Collection([
+            ['first_name' => null, 'email' => 'null@example.com'],
+            ['first_name' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first_name' => 'Abigail', 'email' => 'null@example.com'],
+        ]);
+
+        $result = $collection->whereFirstName(null);
+
+        $this->assertCount(1, $result);
+        $this->assertSame('null@example.com', $result->first()['email']);
+    }
+
+    public function testDynamicCallWithNonExistentKey()
+    {
+        $collection = new Collection([
+            ['first_name' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first_name' => 'Abigail', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $result = $collection->whereLastName('Taylor');
+
+        $this->assertCount(0, $result);
+    }
+
+    public function testAttemptedDynamicCallWithNoValue()
+    {
+        $collection = new Collection([
+            ['framework' => 'Laravel', 'backend' => true],
+            ['framework' => 'Tailwind', 'backend' => false],
+        ]);
+
+        $result = $collection->whereBackend();
+
+        $this->assertCount(1, $result);
+        $this->assertSame('Laravel', $result->first()['framework']);
+    }
+
+    public function testExceptionThrownWhenMethodIsMissing()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Support\Collection::missingMethod()');
+
+        (new Collection)->missingMethod();
     }
 }
 

@@ -15,6 +15,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
  * @property-read HigherOrderCollectionProxy $average
@@ -41,7 +42,9 @@ use Illuminate\Contracts\Support\Arrayable;
  */
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
-    use Macroable;
+    use ForwardsCalls, Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The items contained in the collection.
@@ -1983,6 +1986,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Handles dynamic "where" filters to the collection.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return static
+     */
+    protected function dynamicWhere($method, $parameters)
+    {
+        $key = Str::snake(substr($method, 5));
+
+        if (count($parameters) === 0) {
+            return $this->where($key);
+        }
+
+        return $this->where($key, $parameters[0]);
+    }
+
+    /**
      * Dynamically access collection proxies.
      *
      * @param  string  $key
@@ -1997,5 +2018,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return new HigherOrderCollectionProxy($this, $key);
+    }
+
+    /**
+     * Dynamically handle calls into the collection instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        if (Str::startsWith($method, 'where')) {
+            return $this->dynamicWhere($method, $parameters);
+        }
+
+        static::throwBadMethodCallException($method);
     }
 }
