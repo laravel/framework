@@ -553,6 +553,11 @@ class ContainerTest extends TestCase
         $stub = new ContainerTestCallStub;
         $result = $container->call([$stub, 'work'], ['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $stub = new ContainerTestCallStub;
+        $result = $container->call([$stub, 'work'], ['b' => 'bar', 'a' => 'foo']);
+        $this->assertEquals(['bar', 'foo'], $result);
     }
 
     public function testCallWithStaticMethodNameString()
@@ -1119,10 +1124,6 @@ class ContainerTest extends TestCase
     public function testWithDefaultParametersIndexedArraySyntax()
     {
         $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar']);
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
-
-        $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar', 'baz']);
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
 
@@ -1139,12 +1140,12 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo', 'default b', 'default c'], $result);
 
         $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyOnlyC', ['foo', 'bar']);
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['foo', null]);
+        $this->assertEquals(['foo', null, 'default c'], $result);
 
         $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['foo', 'bar', 'baz']);
-        $this->assertEquals(['foo', 'bar', 'baz'], $result);
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', [null, null, null]);
+        $this->assertEquals([null, null, null], $result);
 
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['foo', 'bar', 'baz', 'foo2', 'bar2', 'baz2']);
@@ -1162,7 +1163,7 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'default c'], $result);
 
         $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['c' => 'baz', 'b' => 'bar', 'a' => 'foo']);
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
 
         $container = new Container;
@@ -1170,7 +1171,7 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
 
         $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['a' => 'foo', 'b' => 'bar']);
+        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['b' => 'bar', 'a' => 'foo',]);
         $this->assertEquals(['foo', 'bar', 'default c'], $result);
 
         $container = new Container;
@@ -1184,10 +1185,6 @@ class ContainerTest extends TestCase
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyOnlyC', ['b' => 'bar', 'a' => 'foo']);
         $this->assertEquals(['foo', 'bar', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
-        $this->assertEquals(['foo', 'bar', 'baz'], $result);
 
         $container = new Container;
         $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['a' => 'foo', 'c' => 'baz', 'b' => 'bar']);
