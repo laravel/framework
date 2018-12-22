@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Illuminate\Auth\Passwords\TokenRepositoryInterface;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
@@ -31,13 +33,39 @@ trait SendsPasswordResetEmails
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
         $response = $this->broker()->sendResetLink(
-            $request->only('email')
+            $request->only('email'),
+            function ($user,$tokenRepository) {
+                $this->checkToken($user,$tokenRepository);
+                return $this->createToken($user,$tokenRepository);
+            }
         );
 
         return $response == Password::RESET_LINK_SENT
                     ? $this->sendResetLinkResponse($request, $response)
                     : $this->sendResetLinkFailedResponse($request, $response);
     }
+
+    /**
+     * Manage existing token
+     *
+     * @param CanResetPassword $user
+     * @param TokenRepositoryInterface $tokenRepository
+     */
+    public function checkToken($user, $tokenRepository){
+        $tokenRepository->delete($user);
+    }
+
+    /**
+     * Return a token
+     *
+     * @param CanResetPassword $user
+     * @param TokenRepositoryInterface $tokenRepository
+     * @return mixed
+     */
+    public function createToken($user, TokenRepositoryInterface $tokenRepository){
+        return $tokenRepository->create($user);
+    }
+
 
     /**
      * Validate the email for the given request.

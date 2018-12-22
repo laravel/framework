@@ -75,8 +75,6 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     {
         $email = $user->getEmailForPasswordReset();
 
-        $this->deleteExisting($user);
-
         // We will create a new, random token for the user so that we can e-mail them
         // a safe link to the password reset form. Then we will insert a record in
         // the database so that we can verify the token within the actual reset.
@@ -86,6 +84,35 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
 
         return $token;
     }
+
+
+    /**
+     * Delete expired token by a given user
+     *
+     * @param CanResetPasswordContract $user
+     */
+    public function deleteExpiredByUser(CanResetPasswordContract $user)
+    {
+        $expiredAt = Carbon::now()->subSeconds($this->expires);
+        $this->getTable()->where('email', $user->getEmailForPasswordReset())
+            ->where('created_at', '<', $expiredAt)
+            ->delete();
+    }
+
+
+    /**
+     * Get existing token by a given user
+     *
+     * @param CanResetPasswordContract $user
+     * @return array
+     */
+    public function existingToken(CanResetPasswordContract $user)
+    {
+        return (array)$record = (array)$this->getTable()->where(
+            'email', $user->getEmailForPasswordReset()
+        )->first();
+    }
+
 
     /**
      * Delete all existing reset tokens from the database.
@@ -119,13 +146,11 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function exists(CanResetPasswordContract $user, $token)
     {
-        $record = (array) $this->getTable()->where(
-            'email', $user->getEmailForPasswordReset()
-        )->first();
+        $record = $this->existingToken($user);
 
         return $record &&
-               ! $this->tokenExpired($record['created_at']) &&
-                 $this->hasher->check($token, $record['token']);
+            !$this->tokenExpired($record['created_at']) &&
+            $this->hasher->check($token, $record['token']);
     }
 
     /**

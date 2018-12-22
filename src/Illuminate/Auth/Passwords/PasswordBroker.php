@@ -49,10 +49,11 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Send a password reset link to a user.
      *
-     * @param  array  $credentials
+     * @param array $credentials
+     * @param Closure $callback
      * @return string
      */
-    public function sendResetLink(array $credentials)
+    public function sendResetLink(array $credentials, Closure $callback)
     {
         // First we will check to see if we found a user at the given credentials and
         // if we did not we will redirect back to this current URI with a piece of
@@ -63,11 +64,13 @@ class PasswordBroker implements PasswordBrokerContract
             return static::INVALID_USER;
         }
 
+        $token = $callback($user, $this->getRepository());
+
         // Once we have the reset token, we are ready to send the message out to this
         // user with a link to reset their password. We will then redirect back to
         // the current URI having nothing set in the session to indicate errors.
         $user->sendPasswordResetNotification(
-            $this->tokens->create($user)
+            $token
         );
 
         return static::RESET_LINK_SENT;
