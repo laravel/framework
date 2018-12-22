@@ -160,7 +160,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If we can't find a translation for the JSON key, we will attempt to translate it
         // using the typical translation file. This way developers can always just use a
         // helper such as __ instead of having to pick between trans or __ with views.
-        if (! isset($line)) {
+
+        // we check to see if the $key has a dot, to be sure that $fallback is not the entire
+        // array within a translation file, in case of $key value is the same as file name
+        if (! isset($line) && mb_strpos($key, '.')) {
             $fallback = $this->get($key, $replace, $locale);
 
             if ($fallback !== $key) {

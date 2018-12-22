@@ -154,6 +154,14 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('one', $t->getFromJson('foo.bar'));
     }
 
+    public function testGetJsonForNonExistingJsonKeyDoesNotLookForRegularKeysIfKeyIsNotNested()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->never()->with('en', 'foo', '*')->andReturn(['bar' => 'one']);
+        $this->assertEquals('foo', $t->getFromJson('foo'));
+    }
+
     public function testGetJsonForNonExistingJsonKeyLooksForRegularKeysAndReplace()
     {
         $t = new Translator($this->getLoader(), 'en');
@@ -166,16 +174,16 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->shouldReceive('load')->once()->with('en', 'Foo that bar', '*')->andReturn([]);
-        $this->assertEquals('Foo that bar', $t->getFromJson('Foo that bar'));
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'Foo', '*')->andReturn([]);
+        $this->assertEquals('Foo.that.bar', $t->getFromJson('Foo.that.bar'));
     }
 
     public function testGetJsonForNonExistingReturnsSameKeyAndReplaces()
     {
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
-        $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'baz', '*')->andReturn([]);
+        $this->assertEquals('baz.foo baz', $t->getFromJson('baz.foo :message', ['message' => 'baz']));
     }
 
     protected function getLoader()
