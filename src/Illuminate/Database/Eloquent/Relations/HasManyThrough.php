@@ -442,7 +442,6 @@ class HasManyThrough extends Relation
         return $this->prepareQueryBuilder()->chunkById($count, $callback, $column, $alias);
     }
 
-
     /**
      * Get a generator for the given query.
      *
