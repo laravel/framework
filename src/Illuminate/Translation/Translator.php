@@ -163,7 +163,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         // we check to see if the $key has a dot, to be sure that $fallback is not the entire
         // array within a translation file, in case of $key value is the same as file name
-        if (! isset($line) && mb_strpos($key, '.')) {
+        if (is_null($line) && mb_strpos($key, '.')) {
             $fallback = $this->get($key, $replace, $locale);
 
             if ($fallback !== $key) {
