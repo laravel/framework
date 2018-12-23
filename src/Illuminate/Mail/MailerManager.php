@@ -1,18 +1,19 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Illuminate\Mail;
 
-use Illuminate\Events\Dispatcher;
-use Illuminate\View\Factory;
 use Swift_Mailer;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\View\Factory;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Manager;
+use Illuminate\Events\Dispatcher;
 use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
 use Illuminate\Mail\Transport\LogTransport;
@@ -28,8 +29,7 @@ use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 
 /**
- * Class MailerManager
- * @package Illuminate\Mail
+ * Class MailerManager.
  * @method \Illuminate\Mail\Mailer driver(string $driver = null)
  */
 class MailerManager extends Manager implements MailerContract, MailQueueContract
@@ -56,7 +56,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
      * @param  \Illuminate\View\Factory  $views
      * @param  \Illuminate\Events\Dispatcher|null  $events
      */
-    public function __construct($app, Factory $views,  Dispatcher $events = null)
+    public function __construct($app, Factory $views, Dispatcher $events = null)
     {
         parent::__construct($app);
 
@@ -77,7 +77,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
         $globalConfig = $this->app['config']->get('mail');
         $config = $this->app['config']->get("mail.mailers.{$driver}");
 
-        if(!empty($config)) {
+        if (! empty($config)) {
             $transport = $this->createTransport($config['transport'], $config);
 
             $mailer = new Mailer(
@@ -87,10 +87,9 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
                 $driver
             );
 
-            if($this->queue) {
+            if ($this->queue) {
                 $mailer->setQueue($this->queue);
             }
-
 
             // Next we will set all of the addresses on this mailer, which allows
             // for easy unification of all "from" addresses as well as easy debugging
@@ -127,7 +126,6 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
 
         throw new InvalidArgumentException("Transport [$driver] not supported.");
     }
-
 
     /**
      * Create an instance of the SMTP Swift Transport driver.
@@ -386,7 +384,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
      */
     public function send($view, array $data = [], $callback = null)
     {
-        return $this->driver()->send($view,  $data, $callback);
+        return $this->driver()->send($view, $data, $callback);
     }
 
     /**

@@ -15,7 +15,7 @@ class MailLogTransportTest extends TestCase
     {
         $this->app['config']->set('mail.mailers.log', [
             'transport' => 'log',
-            'log_channel' => 'mail'
+            'log_channel' => 'mail',
         ]);
 
         $this->app['config']->set('logging.channels.mail', [
@@ -38,9 +38,9 @@ class MailLogTransportTest extends TestCase
 
     public function testGetLogTransportWithPsrLogger()
     {
-         $this->app['config']->set('mail.mailers.log', [
+        $this->app['config']->set('mail.mailers.log', [
             'transport' => 'log',
-            'log_channel' => 'mail'
+            'log_channel' => 'mail',
         ]);
 
         $logger = $this->app->instance('log', new NullLogger());

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Illuminate\Support\ServiceProvider;
 use Swift_DependencyContainer;
+use Illuminate\Support\ServiceProvider;
 
 class MailServiceProvider extends ServiceProvider
 {
@@ -38,7 +38,7 @@ class MailServiceProvider extends ServiceProvider
                     ->register('mime.idgenerator.idright')
                     ->asValue($domain);
             }
-            $manager =  new MailerManager(
+            $manager = new MailerManager(
                 $this->app,
                 $this->app['view'],
                 $this->app['events']
@@ -51,7 +51,7 @@ class MailServiceProvider extends ServiceProvider
             return $manager;
         });
 
-        $this->app->alias('mailer',MailerManager::class);
+        $this->app->alias('mailer', MailerManager::class);
     }
 
     /**
@@ -85,7 +85,7 @@ class MailServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'mailer', Markdown::class, MailerManager::class
+            'mailer', Markdown::class, MailerManager::class,
         ];
     }
 }

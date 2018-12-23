@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Integration\Notifications;
 
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;

@@ -424,7 +424,6 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|null  $queue
      * @param  string|null  $driver
      * @return mixed
-     *
      */
     public function later($delay, $view, $queue = null, $driver = null)
     {
