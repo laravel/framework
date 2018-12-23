@@ -50,6 +50,8 @@ class MailServiceProvider extends ServiceProvider
 
             return $manager;
         });
+
+        $this->app->alias('mailer',MailerManager::class);
     }
 
     /**
@@ -83,7 +85,7 @@ class MailServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'mailer', Markdown::class
+            'mailer', Markdown::class, MailerManager::class
         ];
     }
 }

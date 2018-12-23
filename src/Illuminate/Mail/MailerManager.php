@@ -52,9 +52,9 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * MailerManager constructor.
      *
-     * @param $app
-     * @param \Illuminate\View\Factory $views
-     * @param \Illuminate\Events\Dispatcher|null $events
+     * @param  $app
+     * @param  \Illuminate\View\Factory  $views
+     * @param  \Illuminate\Events\Dispatcher|null  $events
      */
     public function __construct($app, Factory $views,  Dispatcher $events = null)
     {
@@ -78,7 +78,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
         $config = $this->app['config']->get("mail.mailers.{$driver}");
 
         if(!empty($config)) {
-            $transport = $this->createTransport($config['driver'], $config);
+            $transport = $this->createTransport($config['transport'], $config);
 
             $mailer = new Mailer(
                 $this->views,
@@ -109,11 +109,11 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     }
 
     /**
-     * @param  string $driver
-     * @param  array $config
+     * @param  string  $driver
+     * @param  array  $config
      * @return \Swift_Transport
      */
-    protected function createTransport($driver, $config)
+    public function createTransport($driver, $config)
     {
         if (isset($this->customCreators[$driver])) {
             return $this->customCreators[$driver]($this->app, $config);
@@ -132,7 +132,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * Create an instance of the SMTP Swift Transport driver.
      *
-     * @param  array $config
+     * @param  array  $config
      * @return \Swift_SmtpTransport
      */
     protected function createSmtpTransport(array $config)
@@ -168,7 +168,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * Create an instance of the Sendmail Swift Transport driver.
      *
-     * @param  array $config
+     * @param  array  $config
      * @return \Swift_SendmailTransport
      */
     protected function createSendmailTransport(array $config)
@@ -179,7 +179,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * Create an instance of the Amazon SES Swift Transport driver.
      *
-     * @param array $config
+     * @param array  $config
      * @return \Illuminate\Mail\Transport\SesTransport
      */
     protected function createSesTransport(array $config)
@@ -222,7 +222,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * Create an instance of the Mailgun Swift Transport driver.
      *
-     * @param  array $config
+     * @param  array  $config
      * @return \Illuminate\Mail\Transport\MailgunTransport
      */
     protected function createMailgunTransport(array $config)
@@ -240,7 +240,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * Create an instance of the Mandrill Swift Transport driver.
      *
-     * @param  array $config
+     * @param  array  $config
      * @return \Illuminate\Mail\Transport\MandrillTransport
      */
     protected function createMandrillTransport(array $config)
@@ -255,7 +255,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * Create an instance of the SparkPost Swift Transport driver.
      *
-     * @param  array $config
+     * @param  array  $config
      * @return \Illuminate\Mail\Transport\SparkPostTransport
      */
     protected function createSparkPostTransport(array $config)
@@ -270,7 +270,7 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * Create an instance of the Log Swift Transport driver.
      *
-     * @param  array $config
+     * @param  array  $config
      * @return \Illuminate\Mail\Transport\LogTransport
      */
     protected function createLogTransport(array $config)
@@ -310,22 +310,27 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
     /**
      * Queue a new e-mail message for sending.
      *
-     * @param  string|array|\Illuminate\Contracts\Mail\Mailable $view
-     * @param  string $queue
+     * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
+     * @param  string  $queue
+     * @param  string|null  $driver
      * @return mixed
      */
-    public function queue($view, $queue = null)
+    public function queue($view, $queue = null, $driver = null)
     {
-        return $this->driver()->queue($view, $queue);
+        if (! $view instanceof MailableContract) {
+            throw new InvalidArgumentException('Only mailables may be queued.');
+        }
+
+        return $view->queue(is_null($queue) ? $this->queue : $queue, $driver);
     }
 
     /**
      * Queue a new e-mail message for sending after (n) seconds.
      *
-     * @param  \DateTimeInterface|\DateInterval|int $delay
-     * @param  string|array|\Illuminate\Contracts\Mail\Mailable $view
-     * @param  string|null $queue
-     * @param  string|null $driver
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
+     * @param  string|null  $queue
+     * @param  string|null  $driver
      * @return mixed
      */
     public function later($delay, $view, $queue = null, $driver = null)
@@ -335,7 +340,6 @@ class MailerManager extends Manager implements MailerContract, MailQueueContract
         }
 
         return $view->later($delay, is_null($queue) ? $this->queue : $queue, $driver);
-        return $this->driver()->later($delay, $view, $queue);
     }
 
     /**
