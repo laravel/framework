@@ -64,7 +64,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * The queue implementation.
      *
-     * @var \Illuminate\Contracts\Queue\Queue
+     * @var \Illuminate\Contracts\Queue\Factory
      */
     protected $queue;
 
@@ -76,18 +76,24 @@ class Mailer implements MailerContract, MailQueueContract
     protected $failedRecipients = [];
 
     /**
+     * @var string|null
+     */
+    private $driver;
+
+    /**
      * Create a new Mailer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $views
      * @param  \Swift_Mailer  $swift
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
-     * @return void
+     * @param  string|null  $driver
      */
-    public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
+    public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null, $driver = null)
     {
         $this->views = $views;
         $this->swift = $swift;
         $this->events = $events;
+        $this->driver = $driver;
     }
 
     /**
@@ -370,17 +376,18 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  string|null  $queue
+     * @param  string|null  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function queue($view, $queue = null)
+    public function queue($view, $queue = null, $driver = null)
     {
         if (! $view instanceof MailableContract) {
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->queue(is_null($queue) ? $this->queue : $queue);
+        return $view->queue(is_null($queue) ? $this->queue : $queue, $driver ?? $this->driver);
     }
 
     /**
@@ -415,17 +422,17 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  string|null  $queue
+     * @param  string|null  $driver
      * @return mixed
      *
-     * @throws \InvalidArgumentException
      */
-    public function later($delay, $view, $queue = null)
+    public function later($delay, $view, $queue = null, $driver = null)
     {
         if (! $view instanceof MailableContract) {
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->later($delay, is_null($queue) ? $this->queue : $queue);
+        return $view->later($delay, is_null($queue) ? $this->queue : $queue, $driver ?? $this->driver);
     }
 
     /**

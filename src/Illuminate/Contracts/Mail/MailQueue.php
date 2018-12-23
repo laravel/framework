@@ -9,9 +9,10 @@ interface MailQueue
      *
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  string  $queue
+     * @param  string|null $driver
      * @return mixed
      */
-    public function queue($view, $queue = null);
+    public function queue($view, $queue = null, $driver = null);
 
     /**
      * Queue a new e-mail message for sending after (n) seconds.
@@ -19,7 +20,8 @@ interface MailQueue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  string  $queue
+     * @param  string|null  $driver
      * @return mixed
      */
-    public function later($delay, $view, $queue = null);
+    public function later($delay, $view, $queue = null, $driver = null);
 }

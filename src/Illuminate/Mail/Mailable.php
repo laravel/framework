@@ -164,9 +164,10 @@ class Mailable implements MailableContract, Renderable
      * Queue the message for sending.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
+     * @param  string|null  $driver
      * @return mixed
      */
-    public function queue(Queue $queue)
+    public function queue(Queue $queue, $driver = null)
     {
         if (isset($this->delay)) {
             return $this->later($this->delay, $queue);
@@ -176,8 +177,10 @@ class Mailable implements MailableContract, Renderable
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
+        $driver = $driver ?? property_exists($this, 'driver') ? $this->driver : null;
+
         return $queue->connection($connection)->pushOn(
-            $queueName ?: null, new SendQueuedMailable($this)
+            $queueName ?: null, new SendQueuedMailable($this, $driver)
         );
     }
 
@@ -186,16 +189,19 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
+     * @param  string|null  $driver
      * @return mixed
      */
-    public function later($delay, Queue $queue)
+    public function later($delay, Queue $queue, $driver = null)
     {
         $connection = property_exists($this, 'connection') ? $this->connection : null;
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
+        $driver = $driver ?? property_exists($this, 'driver') ? $this->driver : null;
+
         return $queue->connection($connection)->laterOn(
-            $queueName ?: null, $delay, new SendQueuedMailable($this)
+            $queueName ?: null, $delay, new SendQueuedMailable($this, $driver)
         );
     }
 

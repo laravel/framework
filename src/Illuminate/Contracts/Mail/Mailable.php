@@ -18,16 +18,18 @@ interface Mailable
      * Queue the given message.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
+     * @param  string|null  $driver
      * @return mixed
      */
-    public function queue(Queue $queue);
+    public function queue(Queue $queue, $driver = null);
 
     /**
      * Deliver the queued message after the given delay.
      *
-     * @param  \DateTime|int  $delay
-     * @param  \Illuminate\Contracts\Queue\Factory  $queue
+     * @param  \DateTime|int $delay
+     * @param  \Illuminate\Contracts\Queue\Factory $queue
+     * @param  string|null  $driver
      * @return mixed
      */
-    public function later($delay, Queue $queue);
+    public function later($delay, Queue $queue, $driver = null);
 }
