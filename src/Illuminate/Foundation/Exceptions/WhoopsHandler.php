@@ -5,9 +5,20 @@ namespace Illuminate\Foundation\Exceptions;
 use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
 use Whoops\Handler\PrettyPageHandler;
+use Dotenv\Dotenv;
 
 class WhoopsHandler
 {
+    /**
+     * The superglobals to blacklist env keys in.
+     *
+     * @var array
+     */
+    const BLACKLISTED_SUPERGLOBALS = [
+        '_ENV',
+        '_SERVER',
+    ];
+
     /**
      * Create a new Whoops handler for debug mode.
      *
@@ -19,6 +30,7 @@ class WhoopsHandler
             $handler->handleUnconditionally(true);
 
             $this->registerApplicationPaths($handler)
+                 ->registerEnvBlacklist($handler)
                  ->registerBlacklist($handler)
                  ->registerEditor($handler);
         });
@@ -53,7 +65,7 @@ class WhoopsHandler
     }
 
     /**
-     * Register the blacklist with the handler.
+     * Register the app blacklist with the handler.
      *
      * @param  \Whoops\Handler\PrettyPageHandler $handler
      * @return $this
@@ -63,6 +75,30 @@ class WhoopsHandler
         foreach (config('app.debug_blacklist', []) as $key => $secrets) {
             foreach ($secrets as $secret) {
                 $handler->blacklist($key, $secret);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Register the env file blacklist with the handler.
+     *
+     * @param  \Whoops\Handler\PrettyPageHandler $handler
+     * @return $this
+     */
+    protected function registerEnvBlacklist($handler)
+    {
+        $dotenv = new Dotenv(base_path());
+        $dotenv->safeLoad();
+        
+        foreach ($dotenv->getEnvironmentVariableNames() as $key) {
+            if (in_array($key, config('app.debug_whitelist'))) {
+                continue;
+            }
+
+            foreach (self::BLACKLISTED_SUPERGLOBALS as $superglobal) {
+                $handler->blacklist($superglobal, $key);
             }
         }
 
