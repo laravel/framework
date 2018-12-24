@@ -89,6 +89,10 @@ class WhoopsHandler
      */
     protected function registerEnvBlacklist($handler)
     {
+        if (! (config('app.debug_env_blacklist'))) {
+            return $this;
+        }
+
         $dotenv = new Dotenv(base_path());
         $dotenv->safeLoad();
         
