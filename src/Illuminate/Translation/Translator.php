@@ -163,6 +163,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         if (! isset($line)) {
             $fallback = $this->get($key, $replace, $locale);
 
+            // If the '$key' does not contain any dot character, it means that it doesn't
+            // follow the 'file_name.key' pattern and obviously we can not provide any
+            // string fallback within any translation file for it, so we return here
+            if (mb_strpos($key, '.') === false) {
+                return $this->makeReplacements($line ?: $key, $replace);
+            }
+
             if ($fallback !== $key) {
                 return $fallback;
             }

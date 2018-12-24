@@ -178,6 +178,14 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
     }
 
+    public function testGetJsonForNonExistingJsonKeyDoesNotReturnAnArrayIfKeyIsDotless()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->with('en', 'foo', '*')->andReturn(['bar' => 'one']);
+        $this->assertEquals('foo', $t->getFromJson('foo'));
+    }
+
     protected function getLoader()
     {
         return m::mock(Loader::class);
