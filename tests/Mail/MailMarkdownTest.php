@@ -50,7 +50,7 @@ class MailMarkdownTest extends TestCase
         $viewFactory = m::mock(Factory::class);
         $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
-        $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->markdownComponentPaths())->andReturnSelf();
+        $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->textComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->andReturn('text');
 
