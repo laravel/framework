@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Exceptions;
 
+use Dotenv\Dotenv;
 use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
 use Whoops\Handler\PrettyPageHandler;
-use Dotenv\Dotenv;
 
 class WhoopsHandler
 {
@@ -95,7 +95,7 @@ class WhoopsHandler
 
         $dotenv = new Dotenv(base_path());
         $dotenv->safeLoad();
-        
+
         foreach ($dotenv->getEnvironmentVariableNames() as $key) {
             if (in_array($key, config('app.debug_whitelist'))) {
                 continue;
