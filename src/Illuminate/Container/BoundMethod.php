@@ -7,28 +7,36 @@ use ReflectionMethod;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class BoundMethod
 {
     /**
+     * @var ContainerContract
+     */
+    private static $container;
+
+    /**
      * Call the given Closure / class@method and inject its dependencies.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @param  ContainerContract  $container
      * @param  callable|string  $callback
      * @param  array  $inputData
      * @param  string|null  $defaultMethod
      * @return mixed
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public static function call($container, $callback, array $inputData = [], $defaultMethod = null)
+    public static function call(ContainerContract $container, $callback, array $inputData = [], $defaultMethod = null)
     {
+        self::setContainer($container);
+
         if (static::isCallableWithAtSign($callback) || $defaultMethod) {
-            return static::callClass($container, $callback, $inputData, $defaultMethod);
+            return static::callClass($callback, $inputData, $defaultMethod);
         }
 
-        return static::callBoundMethod($container, $callback, function () use ($container, $callback, $inputData) {
+        return static::callBoundMethod($callback, function () use ($callback, $inputData) {
             return call_user_func_array(
-                $callback, static::getMethodDependencies($container, $callback, $inputData)
+                $callback, static::getMethodDependencies($callback, $inputData)
             );
         });
     }
@@ -36,7 +44,6 @@ class BoundMethod
     /**
      * Call a string reference to a class using Class@method syntax.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  string  $target
      * @param  array  $parameters
      * @param  string|null  $defaultMethod
@@ -45,7 +52,7 @@ class BoundMethod
      * @throws \InvalidArgumentException
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
+    protected static function callClass($target, array $parameters = [], $defaultMethod = null)
     {
         $segments = explode('@', $target);
 
@@ -59,19 +66,18 @@ class BoundMethod
         }
 
         return static::call(
-            $container, [$container->make($segments[0]), $method], $parameters
+            self::$container, [self::$container->make($segments[0]), $method], $parameters
         );
     }
 
     /**
      * Call a method that has been bound to the container.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  callable  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    protected static function callBoundMethod($container, $callback, $default)
+    protected static function callBoundMethod($callback, $default)
     {
         if (! is_array($callback)) {
             return $default instanceof Closure ? $default() : $default;
@@ -82,8 +88,8 @@ class BoundMethod
         // method. If there are, we can call this method binding callback immediately.
         $method = static::normalizeMethod($callback);
 
-        if ($container->hasMethodBinding($method)) {
-            return $container->callMethodBinding($method, $callback[0]);
+        if (self::$container->hasMethodBinding($method)) {
+            return self::$container->callMethodBinding($method, $callback[0]);
         }
 
         return $default instanceof Closure ? $default() : $default;
@@ -105,14 +111,13 @@ class BoundMethod
     /**
      * Get all dependencies for a given method.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
      * @param  array  $inputData
      * @return array
      *
      * @throws \ReflectionException
      */
-    protected static function getMethodDependencies($container, $callback, array $inputData = [])
+    protected static function getMethodDependencies($callback, array $inputData = [])
     {
         $signature = static::getCallReflector($callback)->getParameters();
 
@@ -130,7 +135,7 @@ class BoundMethod
             return $inputData;
         }
 
-        return static::addDependenciesToInputData($container, $signature, $inputData);
+        return static::addDependenciesToInputData($signature, $inputData);
     }
 
     /**
@@ -155,12 +160,11 @@ class BoundMethod
     /**
      * Add the dependencies to the input data.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  array  $signature
      * @param  array  $inputData
      * @return array
      */
-    protected static function addDependenciesToInputData($container, array $signature, array $inputData)
+    protected static function addDependenciesToInputData(array $signature, array $inputData)
     {
         // Here we iterate through the list of declared parameters (in the method signature) and decide
         // whether it should be invoked with the provided input data, or we should resolve an object
@@ -171,9 +175,8 @@ class BoundMethod
         foreach ($signature as $parameter) {
             if (array_key_exists($parameter->name, $inputData)) {
                 $resolvedInputData[] = $inputData[$parameter->name];
-            } elseif ($parameter->getClass()) {
-                $className = $parameter->getClass()->name;
-                $resolvedInputData[] = self::getInstance($container, $inputData, $className, $i);
+            } elseif ($class = $parameter->getClass()) {
+                $resolvedInputData[] = self::getInstance($inputData, $class->name, $i);
             } elseif (array_key_exists($i, $inputData)) {
                 $resolvedInputData[] = $inputData[$i++];
             } elseif ($parameter->isDefaultValueAvailable()) {
@@ -196,20 +199,30 @@ class BoundMethod
     }
 
     /**
-     * @param $container
      * @param array $inputData
      * @param $className
      * @param $i
      * @return mixed
      */
-    protected static function getInstance($container, array $inputData, $className, &$i)
+    protected static function getInstance(array $inputData, $className, &$i)
     {
         if (array_key_exists($className, $inputData)) {
+            // gets from associative array input data
             return $inputData[$className];
         } elseif (isset($inputData[$i]) && is_a($inputData[$i], $className)) {
+            // gets from indexed array input data
             return $inputData[$i++];
         } else {
-            return $container->make($className);
+            // resolves a new instance
+            return self::$container->make($className);
         }
+    }
+
+    /**
+     * @param ContainerContract $container
+     */
+    public static function setContainer(ContainerContract $container)
+    {
+        self::$container = $container;
     }
 }
