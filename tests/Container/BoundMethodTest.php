@@ -75,11 +75,12 @@ class BoundMethodTest extends TestCase
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $c);
         $this->assertArrayNotHasKey(4, $args);
 
-        [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($injected, [null, null]);
-        $this->assertNull($a);
-        $this->assertNull($b);
-        $this->assertInstanceOf(ContainerBoundMethodStub::class, $c);
+        $args = BoundMethodAccessor::getMethodDependencies($injected, [null, null, null]);
+        $this->assertSame([null, null, null], $args);
         $this->assertArrayNotHasKey(4, $args);
+
+        $args = BoundMethodAccessor::getMethodDependencies($injected, ['a', 'b', 'c']);
+        $this->assertEquals(['a', 'b', 'c'], $args);
 
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies($injected, [
             'a' => 'passed a',
@@ -99,6 +100,20 @@ class BoundMethodTest extends TestCase
         $this->assertEquals('default b', $b);
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $c);
         $this->assertArrayNotHasKey(4, $args);
+    }
+
+    public function testExtraNumberOfInputArePassedIntoMethod()
+    {
+        BoundMethodAccessor::setContainer(new Container());
+
+        $callable = function ($a, $b) {
+        };
+
+        $args = BoundMethodAccessor::getMethodDependencies($callable, ['a', 'b', 'c', 'd']);
+        $this->assertEquals(['a', 'b', 'c', 'd'], $args);
+
+        $args = BoundMethodAccessor::getMethodDependencies($callable, ['a', 'b', 'c', null]);
+        $this->assertEquals(['a', 'b', 'c', null], $args);
     }
 
     public function testCallingWithNoArgs()

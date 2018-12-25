@@ -1232,6 +1232,15 @@ class ContainerTest extends TestCase
         $this->assertEquals('default foo', $result[0]);
         $this->assertInstanceOf(ContainerConcreteStub::class, $result[1]);
     }
+
+    public function testTypeErrorHappensWhenWrongDataIsPassed()
+    {
+        $callable = function (ContainerConcreteStub $stub) {
+        };
+
+        $this->expectException(\TypeError::class);
+        (new Container)->call($callable, ['foo']);
+    }
 }
 
 class ContainerConcreteStub
