@@ -24,6 +24,7 @@ class BoundMethod
      * @param  array  $inputData
      * @param  string|null  $defaultMethod
      * @return mixed
+     *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public static function call(ContainerContract $container, $callback, array $inputData = [], $defaultMethod = null)
