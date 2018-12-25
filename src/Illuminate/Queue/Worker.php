@@ -200,7 +200,10 @@ class Worker
         }
 
         if ($this->memoryExceeded($options->memory)) {
-            $this->stop(12);
+            gc_collect_cycles();
+            if ($this->memoryExceeded($options->memory)) {
+                $this->stop(12);
+            }
         } elseif ($this->queueShouldRestart($lastRestart)) {
             $this->stop();
         }
