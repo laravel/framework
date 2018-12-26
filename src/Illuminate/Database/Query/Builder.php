@@ -1300,7 +1300,7 @@ class Builder
     }
 
     /**
-     * Add an "where today" statement in the query
+     * Add an "where today" statement in the query.
      *
      * @param  string $column
      * @return \Illuminate\Database\Query\Builder|static
@@ -1311,7 +1311,7 @@ class Builder
     }
 
     /**
-     * Add an "or where today" statement in the query
+     * Add an "or where today" statement in the query.
      *
      * @param  string $column
      * @return \Illuminate\Database\Query\Builder|static
