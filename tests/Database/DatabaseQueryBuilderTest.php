@@ -3085,6 +3085,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+    public function testWhereTodayMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereToday('created_at');
+        $this->assertEquals('select * from `users` where date(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => today()->toDateString()], $builder->getBindings());
+    }
+
     protected function getBuilder()
     {
         $grammar = new Grammar;

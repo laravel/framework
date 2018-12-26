@@ -1300,6 +1300,28 @@ class Builder
     }
 
     /**
+     * Add an "where today" statement in the query
+     *
+     * @param  string $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereToday($column)
+    {
+        return $this->whereDate($column, '=', today());
+    }
+
+    /**
+     * Add an "or where today" statement in the query
+     *
+     * @param  string $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereToday($column)
+    {
+        return $this->orWhereDate($column, '=', today());
+    }
+
+    /**
      * Add a date based (year, month, day, time) statement to the query.
      *
      * @param  string  $type
