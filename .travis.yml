@@ -18,8 +18,6 @@ matrix:
     - php: 7.3
       env: setup=lowest
 
-sudo: false
-
 cache:
   directories:
     - $HOME/.composer/cache
