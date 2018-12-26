@@ -3,21 +3,21 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
-use RuntimeException;
 use DateTimeInterface;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\ConnectionInterface;
-use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use RuntimeException;
 
 class Builder
 {
@@ -1303,22 +1303,26 @@ class Builder
      * Add an "where today" statement in the query.
      *
      * @param  string $column
+     * @param \DateTimeZone|null $timeZone
      * @return \Illuminate\Database\Query\Builder|static
+     * @throws \Exception
      */
-    public function whereToday($column)
+    public function whereToday($column, ?\DateTimeZone $timeZone = null)
     {
-        return $this->whereDate($column, '=', today());
+        return $this->whereDate($column, '=', new \DateTime('now', $timeZone));
     }
 
     /**
      * Add an "or where today" statement in the query.
      *
      * @param  string $column
+     * @param \DateTimeZone|null $timeZone
      * @return \Illuminate\Database\Query\Builder|static
+     * @throws \Exception
      */
-    public function orWhereToday($column)
+    public function orWhereToday($column, ?\DateTimeZone $timeZone = null)
     {
-        return $this->orWhereDate($column, '=', today());
+        return $this->orWhereDate($column, '=', new \DateTime('now', $timeZone));
     }
 
     /**
