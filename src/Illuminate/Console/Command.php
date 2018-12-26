@@ -55,6 +55,13 @@ class Command extends SymfonyCommand
     protected $name;
 
     /**
+     * The command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = [];
+
+    /**
      * The console command description.
      *
      * @var string
@@ -108,6 +115,8 @@ class Command extends SymfonyCommand
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
         $this->setDescription($this->description);
+
+        $this->setAliases($this->aliases);
 
         $this->setHidden($this->isHidden());
 
