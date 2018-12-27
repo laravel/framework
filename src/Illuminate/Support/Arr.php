@@ -39,6 +39,20 @@ class Arr
     }
 
     /**
+     * Conditionally add an element to an array using "dot" notation if it doesn't exist.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $value
+     * @param  mixed   $condition
+     * @return array
+     */
+    public static function addWhen($array, $key, $value, $condition)
+    {
+        return ($condition) ? static::add($array, $key, $value) : $array;
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  array  $array

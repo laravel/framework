@@ -47,6 +47,24 @@ if (! function_exists('array_add')) {
     }
 }
 
+if (!function_exists('array_add_when')) {
+    /**
+     * Condtionally add an element to an array using "dot" notation if it doesn't exist.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $value
+     * @param  mixed   $condition
+     * @return array
+     *
+     * @deprecated Arr::addWhen() should be used directly instead. Will be removed in Laravel 5.9.
+     */
+    function array_add_when($array, $key, $value, $condition)
+    {
+        return Arr::addWhen($array, $key, $value, $condition);
+    }
+}
+
 if (! function_exists('array_collapse')) {
     /**
      * Collapse an array of arrays into a single array.

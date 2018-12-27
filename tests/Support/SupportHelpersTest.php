@@ -732,6 +732,24 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
     }
 
+    public function testArrayAddWhen()
+    {
+        $this->assertEquals(
+            ['surname' => 'Phil'],
+            array_add_when([], 'surname', 'Phil', (1 + 1 === 2))
+        );
+
+        $this->assertEquals(
+            ['developer' => ['name' => 'NK']],
+            array_add_when([], 'developer.name', 'NK', (1 + 1 === 2))
+        );
+
+        $this->assertEquals(
+            [],
+            array_add_when([], 'surname', 'Phil', (1 + 1 === 3))
+        );
+    }
+
     public function testArrayPull()
     {
         $developer = ['firstname' => 'Ferid', 'surname' => 'Mövsümov'];
