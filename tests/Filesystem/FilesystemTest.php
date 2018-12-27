@@ -44,6 +44,10 @@ class FilesystemTest extends TestCase
 
     public function testReplaceStoresFiles()
     {
+        if (DIRECTORY_SEPARATOR == '\\') {
+            $this->markTestSkipped('symlink function has a bug on windows.');
+        }
+
         $tempFile = "{$this->tempDir}/file.txt";
         $symlinkDir = "{$this->tempDir}/symlink_dir";
         $symlink = "{$symlinkDir}/symlink.txt";
