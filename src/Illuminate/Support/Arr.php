@@ -41,13 +41,13 @@ class Arr
     /**
      * Conditionally add an element to an array using "dot" notation if it doesn't exist.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $key
-     * @param  mixed   $value
-     * @param  mixed   $condition
+     * @param  mixed  $value
+     * @param  mixed  $condition
      * @return array
      */
-    public static function addWhen($array, $key, $value, $condition)
+    public static function addWhen($array, $key, $value, $condition = true)
     {
         return ($condition) ? static::add($array, $key, $value) : $array;
     }

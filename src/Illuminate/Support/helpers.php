@@ -51,10 +51,10 @@ if (!function_exists('array_add_when')) {
     /**
      * Condtionally add an element to an array using "dot" notation if it doesn't exist.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $key
-     * @param  mixed   $value
-     * @param  mixed   $condition
+     * @param  mixed  $value
+     * @param  mixed  $condition
      * @return array
      *
      * @deprecated Arr::addWhen() should be used directly instead. Will be removed in Laravel 5.9.

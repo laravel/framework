@@ -35,6 +35,11 @@ class SupportArrTest extends TestCase
     {
         $this->assertEquals(
             ['surname' => 'Phil'],
+            Arr::addWhen([], 'surname', 'Phil')
+        );
+
+        $this->assertEquals(
+            ['surname' => 'Phil'],
             Arr::addWhen([], 'surname', 'Phil', (1 + 1 === 2))
         );
 
