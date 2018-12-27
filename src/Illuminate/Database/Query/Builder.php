@@ -2730,6 +2730,8 @@ class Builder
         foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
             $this->connection->statement($sql, $bindings);
         }
+        
+        return $this;
     }
 
     /**
