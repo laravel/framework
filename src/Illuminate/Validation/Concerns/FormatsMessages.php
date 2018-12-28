@@ -253,6 +253,9 @@ trait FormatsMessages
             return $attribute;
         }
 
+        if (config('app.replace_validation_attribute') === false) {
+            return Str::snake($attribute);
+        }
         return str_replace('_', ' ', Str::snake($attribute));
     }
 
