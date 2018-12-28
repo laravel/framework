@@ -32,9 +32,9 @@ class NotificationChannelManagerTest extends TestCase
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
         $manager->shouldReceive('driver')->andReturn($driver = m::mock());
-        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $events->shouldReceive('until')->with('notification.sending: '.NotificationChannelManagerTestNotification::class, m::type(NotificationSending::class))->andReturn(true);
         $driver->shouldReceive('send')->once();
-        $events->shouldReceive('dispatch')->with(m::type(NotificationSent::class));
+        $events->shouldReceive('dispatch')->with('notification.sent: '.NotificationChannelManagerTestNotification::class, m::type(NotificationSent::class));
 
         $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
     }
@@ -47,11 +47,11 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Dispatcher::class, $events = m::mock());
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
-        $events->shouldReceive('until')->once()->with(m::type(NotificationSending::class))->andReturn(false);
-        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $events->shouldReceive('until')->once()->with('notification.sending: '.NotificationChannelManagerTestNotificationWithTwoChannels::class, m::type(NotificationSending::class))->andReturn(false);
+        $events->shouldReceive('until')->with('notification.sending: '.NotificationChannelManagerTestNotificationWithTwoChannels::class, m::type(NotificationSending::class))->andReturn(true);
         $manager->shouldReceive('driver')->once()->andReturn($driver = m::mock());
         $driver->shouldReceive('send')->once();
-        $events->shouldReceive('dispatch')->with(m::type(NotificationSent::class));
+        $events->shouldReceive('dispatch')->with('notification.sent: '.NotificationChannelManagerTestNotificationWithTwoChannels::class, m::type(NotificationSent::class));
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotificationWithTwoChannels);
     }

@@ -144,6 +144,7 @@ class NotificationSender
         $response = $this->manager->driver($channel)->send($notifiable, $notification);
 
         $this->events->dispatch(
+            'notification.sent: '.get_class($notification),
             new Events\NotificationSent($notifiable, $notification, $channel, $response)
         );
     }
@@ -159,6 +160,7 @@ class NotificationSender
     protected function shouldSendNotification($notifiable, $notification, $channel)
     {
         return $this->events->until(
+            'notification.sending: '.get_class($notification),
             new Events\NotificationSending($notifiable, $notification, $channel)
         ) !== false;
     }
