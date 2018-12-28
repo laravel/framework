@@ -2564,7 +2564,7 @@ class Builder
         
         $this->columns = is_null($original)
             ? $columns
-            : array_merge($columns, $this->columns);
+            : array_unique(array_merge($columns, $this->columns));
 
         $result = $callback();
 
