@@ -1043,7 +1043,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or given attribute(s) have been modified.
+     * Determine if the model or any of the given attribute(s) have been modified.
      *
      * @param  array|string|null  $attributes
      * @return bool
