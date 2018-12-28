@@ -4,6 +4,7 @@ namespace Illuminate\Filesystem;
 
 use RuntimeException;
 use Illuminate\Http\File;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Carbon;
@@ -55,7 +56,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function assertExists($path)
     {
-        $paths = array_wrap($path);
+        $paths = Arr::wrap($path);
 
         foreach ($paths as $path) {
             PHPUnit::assertTrue(
@@ -74,7 +75,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function assertMissing($path)
     {
-        $paths = array_wrap($path);
+        $paths = Arr::wrap($path);
 
         foreach ($paths as $path) {
             PHPUnit::assertFalse(
