@@ -50,7 +50,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Assert that the given file exists.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return $this
      */
     public function assertExists($path)
@@ -69,7 +69,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Assert that the given file does not exist.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return $this
      */
     public function assertMissing($path)
@@ -88,7 +88,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Determine if a file exists.
      *
-     * @param  string|array  $path
+     * @param  string  $path
      * @return bool
      */
     public function exists($path)
@@ -99,7 +99,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get the full path for the file at the given "short" path.
      *
-     * @param  string|array  $path
+     * @param  string  $path
      * @return string
      */
     public function path($path)
