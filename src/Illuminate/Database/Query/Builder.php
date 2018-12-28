@@ -2562,9 +2562,9 @@ class Builder
     {
         $original = $this->columns;
 
-        $this->columns = is_null($original)
-            ? array_unique(array_merge($this->columns, $columns))
-            : $columns;
+        if (is_null($original)) {
+            $this->columns = $columns;
+        }
 
         $result = $callback();
 
