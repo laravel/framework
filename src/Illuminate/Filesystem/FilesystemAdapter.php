@@ -57,7 +57,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         $paths = array_wrap($path);
 
-        foreach($paths as $path) {
+        foreach ($paths as $path) {
             PHPUnit::assertTrue(
                 $this->exists($path), "Unable to find a file at path [{$path}]."
             );
@@ -74,7 +74,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         $paths = array_wrap($path);
 
-        foreach($paths as $path) {
+        foreach ($paths as $path) {
             PHPUnit::assertFalse(
                 $this->exists($path), "Found unexpected file at path [{$path}]."
             );
