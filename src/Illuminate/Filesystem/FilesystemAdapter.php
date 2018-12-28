@@ -51,7 +51,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Assert that the given file exists.
      *
      * @param  string  $path
-     * @return void
+     * @return $this
      */
     public function assertExists($path)
     {
@@ -62,13 +62,15 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
                 $this->exists($path), "Unable to find a file at path [{$path}]."
             );
         }
+
+        return $this;
     }
 
     /**
      * Assert that the given file does not exist.
      *
      * @param  string  $path
-     * @return void
+     * @return $this
      */
     public function assertMissing($path)
     {
@@ -79,6 +81,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
                 $this->exists($path), "Found unexpected file at path [{$path}]."
             );
         }
+
+        return $this;
     }
 
     /**
