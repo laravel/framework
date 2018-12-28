@@ -2561,10 +2561,10 @@ class Builder
     protected function onceWithColumns($columns, $callback)
     {
         $original = $this->columns;
-        
+
         $this->columns = is_null($original)
-            ? $columns
-            : array_unique(array_merge($columns, $this->columns));
+            ? array_unique(array_merge($this->columns, $columns))
+            : $columns;
 
         $result = $callback();
 
