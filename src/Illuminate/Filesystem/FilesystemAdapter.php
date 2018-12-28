@@ -55,9 +55,13 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function assertExists($path)
     {
-        PHPUnit::assertTrue(
-            $this->exists($path), "Unable to find a file at path [{$path}]."
-        );
+        $paths = array_wrap($path);
+
+        foreach($paths as $path) {
+            PHPUnit::assertTrue(
+                $this->exists($path), "Unable to find a file at path [{$path}]."
+            );
+        }
     }
 
     /**
@@ -68,15 +72,19 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function assertMissing($path)
     {
-        PHPUnit::assertFalse(
-            $this->exists($path), "Found unexpected file at path [{$path}]."
-        );
+        $paths = array_wrap($path);
+
+        foreach($paths as $path) {
+            PHPUnit::assertFalse(
+                $this->exists($path), "Found unexpected file at path [{$path}]."
+            );
+        }
     }
 
     /**
      * Determine if a file exists.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return bool
      */
     public function exists($path)
@@ -87,7 +95,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get the full path for the file at the given "short" path.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return string
      */
     public function path($path)
