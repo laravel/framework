@@ -12,11 +12,13 @@ use Illuminate\Filesystem\FilesystemManager;
 
 class FilesystemTest extends TestCase
 {
+    private static $i = 0;
+
     private $tempDir;
 
     public function setUp()
     {
-        $this->tempDir = __DIR__.'/tmp';
+        $this->tempDir = __DIR__.'/tmp'.self::$i++;
         mkdir($this->tempDir);
     }
 
