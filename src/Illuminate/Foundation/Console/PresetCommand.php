@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use InvalidArgumentException;
 use Illuminate\Console\Command;
+use InvalidArgumentException;
 
 class PresetCommand extends Command
 {
@@ -36,7 +36,7 @@ class PresetCommand extends Command
             return call_user_func(static::$macros[$this->argument('type')], $this);
         }
 
-        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react', 'tailwindcss'])) {
+        if (!in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react', 'tailwindcss'])) {
             throw new InvalidArgumentException('Invalid preset.');
         }
 
@@ -94,9 +94,9 @@ class PresetCommand extends Command
         $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
     }
 
-    /** 
+    /**
      * Install the "tailwindcss" preset.
-     * 
+     *
      * @return void
      */
     protected function tailwindcss(Type $var = null)
@@ -104,6 +104,6 @@ class PresetCommand extends Command
         Presets\TailwindCSS::install();
 
         $this->info('Tailwind CSS scaffolding installed succesfully.');
-        $this->info('Please run "npm install && npm run dev" to compile your fresh scaffolding, and ./node_modules/.bin/tailwind init to initialize the config file.');
+        $this->info('Please run "npm install && npm run dev" to compile your fresh scaffolding, and "./node_modules/.bin/tailwind init" to initialize the config file.');
     }
 }
