@@ -25,10 +25,12 @@ class TailwindCSS extends Preset
      *
      * @param  array  $packages
      * @return array
-     */
+     */    
     protected static function updatePackageArray(array $packages)
     {
-        return ['tailwindcss' => '^0.7.3'];
+        return [
+            'tailwindcss' => '^0.7.3',
+        ] + $packages;
     }
 
     /**
