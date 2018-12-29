@@ -13,7 +13,7 @@ class PresetCommand extends Command
      * @var string
      */
     protected $signature = 'preset
-                            { type : The preset type (none, bootstrap, vue, react) }
+                            { type : The preset type (none, bootstrap, vue, react, tailwindcss) }
                             { --option=* : Pass an option to the preset command }';
 
     /**
@@ -36,7 +36,7 @@ class PresetCommand extends Command
             return call_user_func(static::$macros[$this->argument('type')], $this);
         }
 
-        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react'])) {
+        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react', 'tailwindcss'])) {
             throw new InvalidArgumentException('Invalid preset.');
         }
 
@@ -92,5 +92,18 @@ class PresetCommand extends Command
 
         $this->info('React scaffolding installed successfully.');
         $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
+    }
+
+    /** 
+     * Install the "tailwindcss" preset.
+     * 
+     * @return void
+     */
+    protected function tailwindcss(Type $var = null)
+    {
+        Presets\TailwindCSS::install();
+
+        $this->info('Tailwind CSS scaffolding installed succesfully.');
+        $this->info('Please run "npm install && npm run dev" to compile your fresh scaffolding, and ./node_modules/.bin/tailwind init to initialize the config file.');
     }
 }
