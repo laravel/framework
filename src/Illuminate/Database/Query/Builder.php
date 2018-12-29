@@ -77,7 +77,7 @@ class Builder
 
     /**
      * Indicates if the retrieval methods should merge selects.
-     * 
+     *
      * @var bool
      */
     public $mergingSelects = false;
