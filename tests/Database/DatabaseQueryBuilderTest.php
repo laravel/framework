@@ -2525,25 +2525,49 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals($expectedBindings, $builder->getBindings());
     }
 
-    public function testSubSelectWithSelectAllColumns()
+    public function testMergeSelects()
     {
-        $expectedSql = 'select *, (select "baz" from "two" where "subkey" = ?) as "sub" from "one" where "key" = ?';
+        $expectedSql = 'select "foo", "bar", "qux", (select "baz" from "two" where "subkey" = ?) as "sub", (corge - uier) as "grault" from "one" where "key" = ?';
         $expectedBindings = ['subval', 'val'];
 
-        $builder = $this->getPostgresBuilder();
-        $builder->from('one')->select(['*'])->where('key', '=', 'val');
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processSelect');
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) use ($expectedSql) {
+            $this->assertEquals($expectedSql, $sql);
+        });
+
+        $builder->from('one')->where('key', '=', 'val');
+        $builder->select(['qux']);
         $builder->selectSub(function ($query) {
             $query->from('two')->select('baz')->where('subkey', '=', 'subval');
         }, 'sub');
-        $this->assertEquals($expectedSql, $builder->toSql());
-        $this->assertEquals($expectedBindings, $builder->getBindings());
+        $builder->selectSub('corge - uier', 'grault');
+        $builder->mergeSelects();
+        $builder->get(['foo', 'bar']);
 
-        $builder = $this->getPostgresBuilder();
-        $builder->from('one')->select(['*'])->where('key', '=', 'val');
-        $subBuilder = $this->getPostgresBuilder();
-        $subBuilder->from('two')->select('baz')->where('subkey', '=', 'subval');
-        $builder->selectSub($subBuilder, 'sub');
-        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals($expectedBindings, $builder->getBindings());
+    }
+
+    public function testIgnoresSelects()
+    {
+        $expectedSql = 'select "qux", (select "baz" from "two" where "subkey" = ?) as "sub", (corge - uier) as "grault" from "one" where "key" = ?';
+        $expectedBindings = ['subval', 'val'];
+
+        $builder = $this->getBuilder();
+        $builder->getProcessor()->shouldReceive('processSelect');
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) use ($expectedSql) {
+            $this->assertEquals($expectedSql, $sql);
+        });
+
+        $builder->from('one')->where('key', '=', 'val');
+        $builder->select(['qux']);
+        $builder->selectSub(function ($query) {
+            $query->from('two')->select('baz')->where('subkey', '=', 'subval');
+        }, 'sub');
+        $builder->selectSub('corge - uier', 'grault');
+        $builder->ignoreSelects();
+        $builder->get(['foo', 'bar']);
+
         $this->assertEquals($expectedBindings, $builder->getBindings());
     }
 

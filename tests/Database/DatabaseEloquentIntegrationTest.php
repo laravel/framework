@@ -200,17 +200,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')
             ->selectSub('id + '.($rand = rand(1, 99)), 'plusId')
+            ->mergeSelects()
             ->first();
         $this->assertEquals($rand + 1, $model->plusId);
+        $this->assertTrue(isset($model->email));
         $this->assertTrue(isset($model->email));
         $this->assertTrue(isset($model->friends));
 
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')
             ->selectSub('id + '.($rand = rand(1, 99)), 'plusId')
             ->first(['email']);
+
         $this->assertEquals($rand + 1, $model->plusId);
-        $this->assertTrue(isset($model->email));
         $this->assertTrue(isset($model->friends));
+        $this->assertFalse(isset($model->email));
         $this->assertFalse(isset($model->id));
     }
 

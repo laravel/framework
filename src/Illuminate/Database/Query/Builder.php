@@ -76,6 +76,13 @@ class Builder
     public $columns;
 
     /**
+     * Indicates if the retrieval methods should merge selects
+     * 
+     * @var bool 
+     */
+    public $mergeSelects = false;
+
+    /**
      * Indicates if the query returns distinct results.
      *
      * @var bool
@@ -220,6 +227,30 @@ class Builder
     public function select($columns = ['*'])
     {
         $this->columns = is_array($columns) ? $columns : func_get_args();
+
+        return $this;
+    }
+
+    /**
+     * Merge columns on retrieval methods
+     *
+     * @return $this
+     */
+    public function mergeSelects()
+    {
+        $this->mergeSelects = true;
+
+        return $this;
+    }
+
+    /**
+     * Retrieval methods will respect previous select statements
+     *
+     * @return $this
+     */
+    public function ignoreSelects()
+    {
+        $this->mergeSelects = false;
 
         return $this;
     }
@@ -2562,15 +2593,13 @@ class Builder
     {
         $original = $this->columns;
 
-        // If the original columns are not set, we will use the ones issued to this method
-        // to run the callback. When not, we will merge all columns and keep only unique
-        // values. Then we dispose of the '*' selector when we are asking for columns.
-        $this->columns = is_null($original)
-            ? $columns
-            : array_unique(array_merge($columns, $this->columns));
-
-        if (count($this->columns) > 1 && ($all = array_search('*', $this->columns)) !== false) {
-            unset($this->columns[$all]);
+        // If we are allowing the merge of columns, we will use the columns along with the
+        // internal columns. When not, we will discard the columns argument and use only
+        // the internal columns, as long it's not empty, which is the default process.
+        if ($this->mergeSelects) {
+            $this->columns = array_unique(array_merge($columns, $this->columns));
+        } elseif(is_null($original)) {
+            $this->columns = $columns;
         }
 
         $result = $callback();
