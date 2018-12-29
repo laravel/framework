@@ -85,7 +85,7 @@
         "moontoast/math": "^1.1",
         "orchestra/testbench-core": "3.7.*",
         "pda/pheanstalk": "^3.0",
-        "phpunit/phpunit": "^7.0",
+        "phpunit/phpunit": "^7.5",
         "predis/predis": "^1.1.1",
         "symfony/css-selector": "^4.1",
         "symfony/dom-crawler": "^4.1",
