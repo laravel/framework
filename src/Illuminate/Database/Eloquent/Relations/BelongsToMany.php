@@ -559,7 +559,9 @@ class BelongsToMany extends Relation
      */
     public function getResults()
     {
-        return $this->get();
+        return ! is_null($this->parent->{$this->parentKey})
+                ? $this->get()
+                : $this->related->newCollection();
     }
 
     /**

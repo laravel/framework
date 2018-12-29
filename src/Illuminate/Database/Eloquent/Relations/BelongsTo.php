@@ -75,6 +75,10 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
+        if (is_null($this->child->{$this->foreignKey})) {
+            return $this->getDefaultFor($this->parent);
+        }
+
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
