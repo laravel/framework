@@ -1,5 +1,38 @@
 # Release Notes for 5.7.x
 
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.19...5.7)
+
+### Added
+- Added `chunkById` support in `BelongsToMany` and `HasManyThrough` relations ([#26919](https://github.com/laravel/framework/pull/26919))
+- Allowed predefined log channels to change formatter from config ([#26895](https://github.com/laravel/framework/pull/26895))
+
+
+## [v5.7.19 (2018-12-18)](https://github.com/laravel/framework/compare/v5.7.18...v5.7.19)
+
+### Added
+- Added `Illuminate\Support\Collection::whereBetween` method ([#26888](https://github.com/laravel/framework/pull/26888))
+
+### Fixed
+- <strong> Reverted changes related to [`app()->call()`](https://github.com/laravel/framework/pull/26852) </strong> ([fefaf46](https://github.com/laravel/framework/commit/fefaf46dd147a4caf1dea1712f9797f3db49fea4))
+- Reset doctrineConnection property on Database/Connection when reconnecting ([#26890](https://github.com/laravel/framework/pull/26890))
+
+
+## [v5.7.18 (2018-12-17)](https://github.com/laravel/framework/compare/v5.7.17...v5.7.18)
+
+### Added
+- Added missing `starts_with` validation message ([#26822](https://github.com/laravel/framework/pull/26822))
+- Added `Facade::resolved()` method to register pending callback until the service is available. ([#26824](https://github.com/laravel/framework/pull/26824))
+- Added env var `APP_CONFIG_CACHE` to control cache config path ([578bc83](https://github.com/laravel/framework/commit/578bc83f0247b97ec87fefe39a8da7e9bbfd4a66))
+
+### Changed
+- Changed `TransportManager::createMailDriver` ([#26846](https://github.com/laravel/framework/pull/26846))
+
+### Fixed
+- Fixed of using `illuminate/mail` outside of Laravel with driver log ([#26842](https://github.com/laravel/framework/pull/26842))
+- Fixed some bugs for `app()->call()` ([#26852](https://github.com/laravel/framework/pull/26852))
+- Added workaround for PHP-bug related to [incorrect variable values when Opcache enabled in PHP v 7.3.0](https://github.com/laravel/framework/issues/26819) ([36d3436](https://github.com/laravel/framework/commit/36d343682d25570946ff22397a720727e0c1dcd7))
+
+
 ## [v5.7.17 (2018-12-12)](https://github.com/laravel/framework/compare/v5.7.16...v5.7.17)
 
 ### Added

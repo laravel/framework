@@ -516,77 +516,6 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $result[1]);
     }
 
-    public function testWithDefaultParametersIndexedArraySyntax()
-    {
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar']);
-
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['foo', 'bar', 'baz']);
-
-        $this->assertEquals(['foo', 'bar', 'baz'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty');
-
-        $this->assertEquals(['default a', 'default b', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['foo', 'bar']);
-
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['foo']);
-
-        $this->assertEquals(['foo', 'default b', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyOnlyC', ['foo', 'bar']);
-
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['foo', 'bar', 'baz']);
-
-        $this->assertEquals(['foo', 'bar', 'baz'], $result);
-    }
-
-    public function testWithDefaultParametersAssociativeSyntax()
-    {
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['a' => 'foo', 'b' => 'bar']);
-
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaulty', ['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
-
-        $this->assertEquals(['foo', 'bar', 'baz'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['a' => 'foo', 'b' => 'bar']);
-
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyBandC', ['a' => 'foo']);
-
-        $this->assertEquals(['foo', 'default b', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@defaultyOnlyC', ['a' => 'foo', 'b' => 'bar']);
-
-        $this->assertEquals(['foo', 'bar', 'default c'], $result);
-
-        $container = new Container;
-        $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
-
-        $this->assertEquals(['foo', 'bar', 'baz'], $result);
-    }
-
     /**
      * @expectedException \ReflectionException
      * @expectedExceptionMessage Function ContainerTestCallStub() does not exist
@@ -657,6 +586,16 @@ class ContainerTest extends TestCase
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
         $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo', 'default' => 'bar']);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
+        $this->assertEquals('bar', $result[1]);
+
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo']);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
+        $this->assertEquals('taylor', $result[1]);
     }
 
     public function testBindMethodAcceptsAnArray()
@@ -1165,6 +1104,16 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
+
+    public function testClosureCallWithInjectedDependency()
+    {
+        $container = new Container;
+        $container->call(function (ContainerConcreteStub $stub) {
+        }, ['foo' => 'bar']);
+
+        $container->call(function (ContainerConcreteStub $stub) {
+        }, ['foo' => 'bar', 'stub' => new ContainerConcreteStub]);
+    }
 }
 
 class ContainerConcreteStub
@@ -1340,28 +1289,5 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
     public function __construct()
     {
         static::$instantiations++;
-    }
-}
-
-class ContainerTestDefaultyParams
-{
-    public function defaulty($a = 'default a', $b = 'default b', $c = 'default c')
-    {
-        return func_get_args();
-    }
-
-    public function defaultyBandC($a, $b = 'default b', $c = 'default c')
-    {
-        return func_get_args();
-    }
-
-    public function defaultyOnlyC($a, $b, $c = 'default c')
-    {
-        return func_get_args();
-    }
-
-    public function noDefault($a, $b, $c)
-    {
-        return func_get_args();
     }
 }

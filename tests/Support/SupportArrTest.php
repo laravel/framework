@@ -436,31 +436,31 @@ class SupportArrTest extends TestCase
         $this->assertContains($random, ['foo', 'bar', 'baz']);
 
         $random = Arr::random(['foo', 'bar', 'baz'], 0);
-        $this->assertInternalType('array', $random);
+        $this->assertIsArray($random);
         $this->assertCount(0, $random);
 
         $random = Arr::random(['foo', 'bar', 'baz'], 1);
-        $this->assertInternalType('array', $random);
+        $this->assertIsArray($random);
         $this->assertCount(1, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
 
         $random = Arr::random(['foo', 'bar', 'baz'], 2);
-        $this->assertInternalType('array', $random);
+        $this->assertIsArray($random);
         $this->assertCount(2, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
         $this->assertContains($random[1], ['foo', 'bar', 'baz']);
 
         $random = Arr::random(['foo', 'bar', 'baz'], '0');
-        $this->assertInternalType('array', $random);
+        $this->assertIsArray($random);
         $this->assertCount(0, $random);
 
         $random = Arr::random(['foo', 'bar', 'baz'], '1');
-        $this->assertInternalType('array', $random);
+        $this->assertIsArray($random);
         $this->assertCount(1, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
 
         $random = Arr::random(['foo', 'bar', 'baz'], '2');
-        $this->assertInternalType('array', $random);
+        $this->assertIsArray($random);
         $this->assertCount(2, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
         $this->assertContains($random[1], ['foo', 'bar', 'baz']);
@@ -469,11 +469,11 @@ class SupportArrTest extends TestCase
     public function testRandomOnEmptyArray()
     {
         $random = Arr::random([], 0);
-        $this->assertInternalType('array', $random);
+        $this->assertIsArray($random);
         $this->assertCount(0, $random);
 
         $random = Arr::random([], '0');
-        $this->assertInternalType('array', $random);
+        $this->assertIsArray($random);
         $this->assertCount(0, $random);
     }
 
@@ -682,5 +682,18 @@ class SupportArrTest extends TestCase
         $this->assertEquals($array, Arr::wrap($array));
         $this->assertEquals([$object], Arr::wrap($object));
         $this->assertEquals([], Arr::wrap(null));
+        $this->assertEquals([null], Arr::wrap([null]));
+        $this->assertEquals([null, null], Arr::wrap([null, null]));
+        $this->assertEquals([''], Arr::wrap(''));
+        $this->assertEquals([''], Arr::wrap(['']));
+        $this->assertEquals([false], Arr::wrap(false));
+        $this->assertEquals([false], Arr::wrap([false]));
+        $this->assertEquals([0], Arr::wrap(0));
+
+        $obj = new stdClass;
+        $obj->value = 'a';
+        $obj = unserialize(serialize($obj));
+        $this->assertEquals([$obj], Arr::wrap($obj));
+        $this->assertSame($obj, Arr::wrap($obj)[0]);
     }
 }

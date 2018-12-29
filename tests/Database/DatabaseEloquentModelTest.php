@@ -732,7 +732,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setRelation('multi', new BaseCollection);
         $array = $model->toArray();
 
-        $this->assertInternalType('array', $array);
+        $this->assertIsArray($array);
         $this->assertEquals('foo', $array['name']);
         $this->assertEquals('baz', $array['names'][0]['bar']);
         $this->assertEquals('boom', $array['names'][1]['bam']);
@@ -1521,8 +1521,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertIsBool($model->boolAttribute);
         $this->assertIsBool($model->booleanAttribute);
         $this->assertIsObject($model->objectAttribute);
-        $this->assertInternalType('array', $model->arrayAttribute);
-        $this->assertInternalType('array', $model->jsonAttribute);
+        $this->assertIsArray($model->arrayAttribute);
+        $this->assertIsArray($model->jsonAttribute);
         $this->assertTrue($model->boolAttribute);
         $this->assertFalse($model->booleanAttribute);
         $this->assertEquals($obj, $model->objectAttribute);
@@ -1536,14 +1536,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(-14173440, $model->timestampAttribute);
 
         $arr = $model->toArray();
+
         $this->assertIsInt($arr['intAttribute']);
         $this->assertIsFloat($arr['floatAttribute']);
         $this->assertIsString($arr['stringAttribute']);
         $this->assertIsBool($arr['boolAttribute']);
         $this->assertIsBool($arr['booleanAttribute']);
         $this->assertIsObject($arr['objectAttribute']);
-        $this->assertInternalType('array', $arr['arrayAttribute']);
-        $this->assertInternalType('array', $arr['jsonAttribute']);
+        $this->assertIsArray($arr['arrayAttribute']);
+        $this->assertIsArray($arr['jsonAttribute']);
         $this->assertTrue($arr['boolAttribute']);
         $this->assertFalse($arr['booleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
