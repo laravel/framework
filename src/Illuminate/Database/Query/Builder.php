@@ -2569,7 +2569,7 @@ class Builder
             ? $columns
             : array_unique(array_merge($columns, $this->columns));
 
-        if (count($columns) > 1 && ($all = array_search('*', $this->columns)) !== false) {
+        if (count($this->columns) > 1 && ($all = array_search('*', $this->columns)) !== false) {
             unset($this->columns[$all]);
         }
 
