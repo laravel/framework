@@ -80,7 +80,7 @@ class Builder
      * 
      * @var bool
      */
-    public $mergeSelects = false;
+    public $mergingSelects = false;
 
     /**
      * Indicates if the query returns distinct results.
@@ -236,9 +236,9 @@ class Builder
      *
      * @return $this
      */
-    public function mergeSelects()
+    public function mergingSelects()
     {
-        $this->mergeSelects = true;
+        $this->mergingSelects = true;
 
         return $this;
     }
@@ -248,9 +248,9 @@ class Builder
      *
      * @return $this
      */
-    public function ignoreSelects()
+    public function ignoringSelects()
     {
-        $this->mergeSelects = false;
+        $this->mergingSelects = false;
 
         return $this;
     }
@@ -2596,7 +2596,7 @@ class Builder
         // If we are allowing the merge of columns, we will use the columns along with the
         // internal columns. When not, we will discard the columns argument and use only
         // the internal columns, as long it's not empty, which is the default process.
-        if ($this->mergeSelects) {
+        if ($this->mergingSelects) {
             $this->columns = array_unique(array_merge($columns, $this->columns));
         } elseif (is_null($original)) {
             $this->columns = $columns;

@@ -2525,7 +2525,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals($expectedBindings, $builder->getBindings());
     }
 
-    public function testMergeSelects()
+    public function testMergingSelects()
     {
         $expectedSql = 'select "foo", "bar", "qux", (select "baz" from "two" where "subkey" = ?) as "sub", (corge - uier) as "grault" from "one" where "key" = ?';
         $expectedBindings = ['subval', 'val'];
@@ -2542,13 +2542,13 @@ class DatabaseQueryBuilderTest extends TestCase
             $query->from('two')->select('baz')->where('subkey', '=', 'subval');
         }, 'sub');
         $builder->selectSub('corge - uier', 'grault');
-        $builder->mergeSelects();
+        $builder->mergingSelects();
         $builder->get(['foo', 'bar']);
 
         $this->assertEquals($expectedBindings, $builder->getBindings());
     }
 
-    public function testIgnoresSelects()
+    public function testIgnoringSelects()
     {
         $expectedSql = 'select "qux", (select "baz" from "two" where "subkey" = ?) as "sub", (corge - uier) as "grault" from "one" where "key" = ?';
         $expectedBindings = ['subval', 'val'];
@@ -2565,7 +2565,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $query->from('two')->select('baz')->where('subkey', '=', 'subval');
         }, 'sub');
         $builder->selectSub('corge - uier', 'grault');
-        $builder->ignoreSelects();
+        $builder->ignoringSelects();
         $builder->get(['foo', 'bar']);
 
         $this->assertEquals($expectedBindings, $builder->getBindings());
