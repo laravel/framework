@@ -193,6 +193,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
     }
 
+    public function testBasicModelRetrievalWithSelectSub()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')
+            ->selectSub('id + ' . ($rand = rand(1,99)), 'plusId')
+            ->first();
+        $this->assertEquals($rand + 1, $model->plusId);
+        $this->assertTrue(isset($model->email));
+        $this->assertTrue(isset($model->friends));
+
+        $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')
+            ->selectSub('id + ' . ($rand = rand(1,99)), 'plusId')
+            ->first(['email']);
+        $this->assertEquals($rand + 1, $model->plusId);
+        $this->assertTrue(isset($model->email));
+        $this->assertTrue(isset($model->friends));
+        $this->assertFalse(isset($model->id));
+    }
+
     public function testBasicModelCollectionRetrieval()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);

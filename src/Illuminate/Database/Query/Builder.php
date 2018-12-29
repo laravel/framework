@@ -2563,13 +2563,13 @@ class Builder
         $original = $this->columns;
 
         // If the original columns are not set, we will use the ones issued to this method
-        // to run the callback. When not, we will merge both arrays and keep only unique
-        // values and dispose of the '*' selector when asking for more than one column.
+        // to run the callback. When not, we will merge all columns and keep only unique
+        // values. Then we dispose of the '*' selector when we are asking for columns.
         $this->columns = is_null($original)
             ? $columns
             : array_unique(array_merge($columns, $this->columns));
 
-        if (count($this->columns) > 1 && ($all = array_search('*', $this->columns)) !== false) {
+        if (count($columns) > 1 && ($all = array_search('*', $this->columns)) !== false) {
             unset($this->columns[$all]);
         }
 
