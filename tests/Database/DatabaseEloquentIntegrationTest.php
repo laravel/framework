@@ -199,14 +199,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')
-            ->selectSub('id + ' . ($rand = rand(1,99)), 'plusId')
+            ->selectSub('id + '.($rand = rand(1, 99)), 'plusId')
             ->first();
         $this->assertEquals($rand + 1, $model->plusId);
         $this->assertTrue(isset($model->email));
         $this->assertTrue(isset($model->friends));
 
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')
-            ->selectSub('id + ' . ($rand = rand(1,99)), 'plusId')
+            ->selectSub('id + '.($rand = rand(1, 99)), 'plusId')
             ->first(['email']);
         $this->assertEquals($rand + 1, $model->plusId);
         $this->assertTrue(isset($model->email));
