@@ -243,6 +243,24 @@ class Builder
     }
 
     /**
+     * Adds a subselect expression to a select statement.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  string  $as
+     * @return \Illuminate\Database\Query\Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function addSelectSub($query, $as)
+    {
+        if (is_null($this->columns)) {
+            $this->select();
+        }
+
+        return $this->selectSub($query, $as);
+    }
+
+    /**
      * Add a new "raw" select expression to the query.
      *
      * @param  string  $expression

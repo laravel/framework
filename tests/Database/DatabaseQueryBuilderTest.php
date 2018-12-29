@@ -2423,6 +2423,31 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals($expectedBindings, $builder->getBindings());
     }
 
+    public function testAddsSubSelect()
+    {
+        $expectedSql = 'select *, (select "baz" from "two" where "subkey" = ?) as "sub" from "one" where "key" = ?';
+        $expectedBindings = ['subval', 'val'];
+
+        $builder = $this->getPostgresBuilder();
+        $builder->from('one')->where('key', '=', 'val');
+        $builder->addSelectSub(function ($query) {
+            $query->from('two')->select('baz')->where('subkey', '=', 'subval');
+        }, 'sub');
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals($expectedBindings, $builder->getBindings());
+
+        $expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ?) as "sub" from "one" where "key" = ?';
+        $expectedBindings = ['subval', 'val'];
+
+        $builder = $this->getPostgresBuilder();
+        $builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
+        $builder->addSelectSub(function ($query) {
+            $query->from('two')->select('baz')->where('subkey', '=', 'subval');
+        }, 'sub');
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals($expectedBindings, $builder->getBindings());
+    }
+
     public function testSqlServerWhereDate()
     {
         $builder = $this->getSqlServerBuilder();
