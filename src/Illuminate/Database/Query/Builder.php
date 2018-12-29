@@ -76,7 +76,7 @@ class Builder
     public $columns;
 
     /**
-     * Indicates if the retrieval methods should merge selects
+     * Indicates if the retrieval methods should merge selects.
      * 
      * @var bool
      */
