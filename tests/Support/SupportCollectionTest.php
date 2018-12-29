@@ -1453,7 +1453,7 @@ class SupportCollectionTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $groups);
         $this->assertEquals(['A' => [1], 'B' => [2, 4], 'C' => [3]], $groups->toArray());
-        $this->assertInternalType('array', $groups['A']);
+        $this->assertIsArray($groups['A']);
     }
 
     public function testMapToDictionaryWithNumericKeys()
