@@ -78,7 +78,7 @@ class Builder
     /**
      * Indicates if the retrieval methods should merge selects
      * 
-     * @var bool 
+     * @var bool
      */
     public $mergeSelects = false;
 
@@ -232,7 +232,7 @@ class Builder
     }
 
     /**
-     * Merge columns on retrieval methods
+     * Merge columns on retrieval methods.
      *
      * @return $this
      */
@@ -244,7 +244,7 @@ class Builder
     }
 
     /**
-     * Retrieval methods will respect previous select statements
+     * Retrieval methods will respect previous select statements.
      *
      * @return $this
      */
@@ -2598,7 +2598,7 @@ class Builder
         // the internal columns, as long it's not empty, which is the default process.
         if ($this->mergeSelects) {
             $this->columns = array_unique(array_merge($columns, $this->columns));
-        } elseif(is_null($original)) {
+        } elseif (is_null($original)) {
             $this->columns = $columns;
         }
 
