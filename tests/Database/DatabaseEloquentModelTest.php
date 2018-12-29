@@ -1515,12 +1515,12 @@ class DatabaseEloquentModelTest extends TestCase
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
 
-        $this->assertInternalType('int', $model->intAttribute);
-        $this->assertInternalType('float', $model->floatAttribute);
-        $this->assertInternalType('string', $model->stringAttribute);
-        $this->assertInternalType('boolean', $model->boolAttribute);
-        $this->assertInternalType('boolean', $model->booleanAttribute);
-        $this->assertInternalType('object', $model->objectAttribute);
+        $this->assertIsInt($model->intAttribute);
+        $this->assertIsFloat($model->floatAttribute);
+        $this->assertIsString($model->stringAttribute);
+        $this->assertIsBool($model->boolAttribute);
+        $this->assertIsBool($model->booleanAttribute);
+        $this->assertIsObject($model->objectAttribute);
         $this->assertIsArray($model->arrayAttribute);
         $this->assertIsArray($model->jsonAttribute);
         $this->assertTrue($model->boolAttribute);
@@ -1536,12 +1536,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(-14173440, $model->timestampAttribute);
 
         $arr = $model->toArray();
-        $this->assertInternalType('int', $arr['intAttribute']);
-        $this->assertInternalType('float', $arr['floatAttribute']);
-        $this->assertInternalType('string', $arr['stringAttribute']);
-        $this->assertInternalType('boolean', $arr['boolAttribute']);
-        $this->assertInternalType('boolean', $arr['booleanAttribute']);
-        $this->assertInternalType('object', $arr['objectAttribute']);
+
+        $this->assertIsInt($arr['intAttribute']);
+        $this->assertIsFloat($arr['floatAttribute']);
+        $this->assertIsString($arr['stringAttribute']);
+        $this->assertIsBool($arr['boolAttribute']);
+        $this->assertIsBool($arr['booleanAttribute']);
+        $this->assertIsObject($arr['objectAttribute']);
         $this->assertIsArray($arr['arrayAttribute']);
         $this->assertIsArray($arr['jsonAttribute']);
         $this->assertTrue($arr['boolAttribute']);
