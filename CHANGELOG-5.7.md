@@ -3,8 +3,15 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.7.19...5.7)
 
 ### Added
-- Added `chunkById` support in `BelongsToMany` and `HasManyThrough` relations ([#26919](https://github.com/laravel/framework/pull/26919))
+- Added `chunkById` support in relations ([#26919](https://github.com/laravel/framework/pull/26919))
 - Allowed predefined log channels to change formatter from config ([#26895](https://github.com/laravel/framework/pull/26895))
+- Allowed storage assertions (`FilesystemAdapter::assertExists` / `FilesystemAdapter::assertMissing`) to handle multiple files at once ([#26975](https://github.com/laravel/framework/pull/26975))
+
+### Fixed
+- Prevents unnecessary queries when lazy loading empty relationships ([#26992](https://github.com/laravel/framework/pull/26992))
+
+### Changed
+- Changed default error pages ([83ca9a7](https://github.com/laravel/framework/commit/83ca9a7706a8091de9da17cb687a0852c9ef1960))
 
 
 ## [v5.7.19 (2018-12-18)](https://github.com/laravel/framework/compare/v5.7.18...v5.7.19)
