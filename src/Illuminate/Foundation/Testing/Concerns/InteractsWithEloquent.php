@@ -4,14 +4,13 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 trait InteractsWithEloquent
 {
     /**
-     * Return wheter a given model still exists.
+     * Return whether a given model still exists.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return boolean
+     * @return bool
      */
     private function modelExists(Model $model)
     {
