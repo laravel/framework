@@ -32,7 +32,7 @@ class MailableQueuedTest extends TestCase
             ->setMethods(['createMessage', 'to'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub();
+        $mailable = new MailableQueableStub;
         $queueFake->assertNothingPushed();
         $mailer->send($mailable);
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
@@ -46,10 +46,10 @@ class MailableQueuedTest extends TestCase
             ->setMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub();
+        $mailable = new MailableQueableStub;
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
         $mailable->attach('foo.jpg', $attachmentOption);
-        $this->assertInternalType('array', $mailable->attachments);
+        $this->assertIsArray($mailable->attachments);
         $this->assertCount(1, $mailable->attachments);
         $this->assertEquals($mailable->attachments[0]['options'], $attachmentOption);
         $queueFake->assertNothingPushed();
@@ -61,7 +61,7 @@ class MailableQueuedTest extends TestCase
     {
         $app = new Application;
         $container = Container::getInstance();
-        $disk = $this->getMockBuilder(Filesystem::class)
+        $this->getMockBuilder(Filesystem::class)
             ->getMock();
         $filesystemFactory = $this->getMockBuilder(FilesystemManager::class)
             ->setConstructorArgs([$app])
@@ -75,12 +75,12 @@ class MailableQueuedTest extends TestCase
             ->setMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub();
+        $mailable = new MailableQueableStub;
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
 
         $mailable->attachFromStorage('/', 'foo.jpg', $attachmentOption);
 
-        $this->assertInternalType('array', $mailable->diskAttachments);
+        $this->assertIsArray($mailable->diskAttachments);
         $this->assertCount(1, $mailable->diskAttachments);
         $this->assertEquals($mailable->diskAttachments[0]['options'], $attachmentOption);
 

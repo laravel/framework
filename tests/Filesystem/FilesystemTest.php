@@ -42,6 +42,45 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
     }
 
+    public function testReplaceStoresFiles()
+    {
+        $tempFile = "{$this->tempDir}/file.txt";
+        $symlinkDir = "{$this->tempDir}/symlink_dir";
+        $symlink = "{$symlinkDir}/symlink.txt";
+
+        mkdir($symlinkDir);
+        symlink($tempFile, $symlink);
+
+        // Prevent changes to symlink_dir
+        chmod($symlinkDir, 0555);
+
+        // Test with a weird non-standard umask.
+        $umask = 0131;
+        $originalUmask = umask($umask);
+
+        $filesystem = new Filesystem;
+
+        // Test replacing non-existent file.
+        $filesystem->replace($tempFile, 'Hello World');
+        $this->assertStringEqualsFile($tempFile, 'Hello World');
+        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+
+        // Test replacing existing file.
+        $filesystem->replace($tempFile, 'Something Else');
+        $this->assertStringEqualsFile($tempFile, 'Something Else');
+        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+
+        // Test replacing symlinked file.
+        $filesystem->replace($symlink, 'Yet Something Else Again');
+        $this->assertStringEqualsFile($tempFile, 'Yet Something Else Again');
+        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+
+        umask($originalUmask);
+
+        // Reset changes to symlink_dir
+        chmod($symlinkDir, 0777 - $originalUmask);
+    }
+
     public function testSetChmod()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
@@ -460,7 +499,7 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo/2.txt', '2');
         mkdir($this->tempDir.'/foo/bar');
         $files = new Filesystem;
-        $this->assertContainsOnlyInstancesOf(\SplFileInfo::class, $files->files($this->tempDir.'/foo'));
+        $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->files($this->tempDir.'/foo'));
         unset($files);
     }
 
@@ -469,13 +508,12 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         file_put_contents($this->tempDir.'/bar.txt', 'bar');
         $files = new Filesystem;
-        $allFiles = [];
-        $this->assertContainsOnlyInstancesOf(\SplFileInfo::class, $files->allFiles($this->tempDir));
+        $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->allFiles($this->tempDir));
     }
 
     public function testCreateFtpDriver()
     {
-        $filesystem = new FilesystemManager(new Application());
+        $filesystem = new FilesystemManager(new Application);
 
         $driver = $filesystem->createFtpDriver([
             'host' => 'ftp.example.com',
@@ -496,5 +534,17 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $filesystem = new Filesystem;
         $this->assertEquals('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash($this->tempDir.'/foo.txt'));
+    }
+
+    /**
+     * @param string $file
+     * @return int
+     */
+    private function getFilePermissions($file)
+    {
+        $filePerms = fileperms($file);
+        $filePerms = substr(sprintf('%o', $filePerms), -3);
+
+        return (int) base_convert($filePerms, 8, 10);
     }
 }

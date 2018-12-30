@@ -71,6 +71,17 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
+     * Determine if an item doesn't exist in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        return ! $this->has($key);
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
@@ -308,7 +319,7 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
-     * Get an item from the cache, or store the default value.
+     * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
@@ -332,9 +343,9 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
-     * Get an item from the cache, or store the default value forever.
+     * Get an item from the cache, or execute the given Closure and store the result forever.
      *
-     * @param  string   $key
+     * @param  string  $key
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -344,9 +355,9 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
-     * Get an item from the cache, or store the default value forever.
+     * Get an item from the cache, or execute the given Closure and store the result forever.
      *
-     * @param  string   $key
+     * @param  string  $key
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -554,7 +565,7 @@ class Repository implements CacheContract, ArrayAccess
         $duration = $this->parseDateInterval($duration);
 
         if ($duration instanceof DateTimeInterface) {
-            $duration = Carbon::now()->diffInSeconds(Carbon::createFromTimestamp($duration->getTimestamp()), false) / 60;
+            $duration = Carbon::now()->diffInRealSeconds($duration, false) / 60;
         }
 
         return (int) ($duration * 60) > 0 ? $duration : null;

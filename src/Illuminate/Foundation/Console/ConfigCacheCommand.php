@@ -48,12 +48,15 @@ class ConfigCacheCommand extends Command
      * Execute the console command.
      *
      * @return void
+     *
+     * @throws \LogicException
      */
     public function handle()
     {
         $this->call('config:clear');
 
         $config = $this->getFreshConfiguration();
+
         $configPath = $this->laravel->getCachedConfigPath();
 
         $this->files->put(

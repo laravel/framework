@@ -66,7 +66,7 @@ class Kernel implements KernelContract
     /**
      * The priority-sorted list of middleware.
      *
-     * Forces the listed middleware to always be in the given order.
+     * Forces non-global middleware to always be in the given order.
      *
      * @var array
      */
@@ -210,7 +210,7 @@ class Kernel implements KernelContract
                 continue;
             }
 
-            list($name) = $this->parseMiddleware($middleware);
+            [$name] = $this->parseMiddleware($middleware);
 
             $instance = $this->app->make($name);
 
@@ -243,7 +243,7 @@ class Kernel implements KernelContract
      */
     protected function parseMiddleware($middleware)
     {
-        list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
+        [$name, $parameters] = array_pad(explode(':', $middleware, 2), 2, []);
 
         if (is_string($parameters)) {
             $parameters = explode(',', $parameters);
@@ -324,6 +324,16 @@ class Kernel implements KernelContract
     protected function renderException($request, Exception $e)
     {
         return $this->app[ExceptionHandler::class]->render($request, $e);
+    }
+
+    /**
+     * Get the application's route middleware groups.
+     *
+     * @return array
+     */
+    public function getMiddlewareGroups()
+    {
+        return $this->middlewareGroups;
     }
 
     /**

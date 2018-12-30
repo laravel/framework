@@ -6,6 +6,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 
 class FoundationInteractsWithDatabaseTest extends TestCase
@@ -100,7 +101,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
-    public function testSeeSoftDeletedInDatabaseFindsResults()
+    public function testAssertSoftDeletedInDatabaseFindsResults()
     {
         $this->mockCountBuilder(1);
 
@@ -111,13 +112,28 @@ class FoundationInteractsWithDatabaseTest extends TestCase
      * @expectedException \PHPUnit\Framework\ExpectationFailedException
      * @expectedExceptionMessage The table is empty.
      */
-    public function testSeeSoftDeletedInDatabaseDoesNotFindResults()
+    public function testAssertSoftDeletedInDatabaseDoesNotFindResults()
     {
         $builder = $this->mockCountBuilder(0);
 
         $builder->shouldReceive('get')->andReturn(collect());
 
         $this->assertSoftDeleted($this->table, $this->data);
+    }
+
+    /**
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage The table is empty.
+     */
+    public function testAssertSoftDeletedInDatabaseDoesNotFindModelResults()
+    {
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertSoftDeleted(new ProductStub($this->data));
     }
 
     protected function mockCountBuilder($countResult)
@@ -141,4 +157,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         return $this->connection;
     }
+}
+
+class ProductStub extends Model
+{
+    protected $table = 'products';
+
+    protected $guarded = [];
 }

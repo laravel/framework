@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
+use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -167,6 +168,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
+    public function testNewInstanceReturnsNewInstanceWithTableSet()
+    {
+        $model = new EloquentModelStub;
+        $model->setTable('test');
+        $newInstance = $model->newInstance();
+
+        $this->assertEquals('test', $newInstance->getTable());
+    }
+
     public function testCreateMethodSavesNewModel()
     {
         $_SERVER['__eloquent.saved'] = false;
@@ -193,17 +203,17 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testFindMethodUseWritePdo()
     {
-        $result = EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
+        EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
     }
 
     public function testDestroyMethodCallsQueryBuilderCorrectly()
     {
-        $result = EloquentModelDestroyStub::destroy(1, 2, 3);
+        EloquentModelDestroyStub::destroy(1, 2, 3);
     }
 
     public function testDestroyMethodCallsQueryBuilderCorrectlyWithCollection()
     {
-        $result = EloquentModelDestroyStub::destroy(new Collection([1, 2, 3]));
+        EloquentModelDestroyStub::destroy(new Collection([1, 2, 3]));
     }
 
     public function testWithMethodCallsQueryBuilderCorrectly()
@@ -465,6 +475,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $value = '1429311541';
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
+
+        $this->assertNull($model->fromDateTime(null));
     }
 
     public function testInsertProcess()
@@ -720,7 +732,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setRelation('multi', new BaseCollection);
         $array = $model->toArray();
 
-        $this->assertInternalType('array', $array);
+        $this->assertIsArray($array);
         $this->assertEquals('foo', $array['name']);
         $this->assertEquals('baz', $array['names'][0]['bar']);
         $this->assertEquals('boom', $array['names'][1]['bam']);
@@ -1212,7 +1224,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelWithoutTableStub;
         $this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
 
-        $namespacedModel = new \Foo\Bar\EloquentModelNamespacedStub;
+        $namespacedModel = new EloquentModelNamespacedStub;
         $this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
     }
 
@@ -1364,7 +1376,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testGetModelAttributeMethodThrowsExceptionIfNotRelation()
     {
         $model = new EloquentModelStub;
-        $relation = $model->incorrectRelationStub;
+        $model->incorrectRelationStub;
     }
 
     public function testModelIsBootedOnUnserialize()
@@ -1376,7 +1388,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = null;
         EloquentModelBootingTestStub::unboot();
         $this->assertFalse(EloquentModelBootingTestStub::isBooted());
-        $model = unserialize($string);
+        unserialize($string);
         $this->assertTrue(EloquentModelBootingTestStub::isBooted());
     }
 
@@ -1434,13 +1446,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
-        $model = m::mock(EloquentModelStub::class.'[newQuery]');
+        $model = m::mock(EloquentModelStub::class.'[newModelQuery]');
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $model->shouldReceive('newQuery')->andReturn($query = m::mock(stdClass::class));
+        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
@@ -1503,14 +1515,14 @@ class DatabaseEloquentModelTest extends TestCase
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
 
-        $this->assertInternalType('int', $model->intAttribute);
-        $this->assertInternalType('float', $model->floatAttribute);
-        $this->assertInternalType('string', $model->stringAttribute);
-        $this->assertInternalType('boolean', $model->boolAttribute);
-        $this->assertInternalType('boolean', $model->booleanAttribute);
-        $this->assertInternalType('object', $model->objectAttribute);
-        $this->assertInternalType('array', $model->arrayAttribute);
-        $this->assertInternalType('array', $model->jsonAttribute);
+        $this->assertIsInt($model->intAttribute);
+        $this->assertIsFloat($model->floatAttribute);
+        $this->assertIsString($model->stringAttribute);
+        $this->assertIsBool($model->boolAttribute);
+        $this->assertIsBool($model->booleanAttribute);
+        $this->assertIsObject($model->objectAttribute);
+        $this->assertIsArray($model->arrayAttribute);
+        $this->assertIsArray($model->jsonAttribute);
         $this->assertTrue($model->boolAttribute);
         $this->assertFalse($model->booleanAttribute);
         $this->assertEquals($obj, $model->objectAttribute);
@@ -1524,14 +1536,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(-14173440, $model->timestampAttribute);
 
         $arr = $model->toArray();
-        $this->assertInternalType('int', $arr['intAttribute']);
-        $this->assertInternalType('float', $arr['floatAttribute']);
-        $this->assertInternalType('string', $arr['stringAttribute']);
-        $this->assertInternalType('boolean', $arr['boolAttribute']);
-        $this->assertInternalType('boolean', $arr['booleanAttribute']);
-        $this->assertInternalType('object', $arr['objectAttribute']);
-        $this->assertInternalType('array', $arr['arrayAttribute']);
-        $this->assertInternalType('array', $arr['jsonAttribute']);
+
+        $this->assertIsInt($arr['intAttribute']);
+        $this->assertIsFloat($arr['floatAttribute']);
+        $this->assertIsString($arr['stringAttribute']);
+        $this->assertIsBool($arr['boolAttribute']);
+        $this->assertIsBool($arr['booleanAttribute']);
+        $this->assertIsObject($arr['objectAttribute']);
+        $this->assertIsArray($arr['arrayAttribute']);
+        $this->assertIsArray($arr['jsonAttribute']);
         $this->assertTrue($arr['boolAttribute']);
         $this->assertFalse($arr['booleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
@@ -1812,10 +1825,12 @@ class EloquentTestObserverStub
 {
     public function creating()
     {
+        //
     }
 
     public function saved()
     {
+        //
     }
 }
 
@@ -1823,10 +1838,12 @@ class EloquentTestAnotherObserverStub
 {
     public function creating()
     {
+        //
     }
 
     public function saved()
     {
+        //
     }
 }
 
@@ -2049,6 +2066,7 @@ class EloquentModelWithoutRelationStub extends Model
 
 class EloquentModelWithoutTableStub extends Model
 {
+    //
 }
 
 class EloquentModelBootingTestStub extends Model
@@ -2093,30 +2111,37 @@ class EloquentModelGetMutatorsStub extends Model
 
     public function getFirstNameAttribute()
     {
+        //
     }
 
     public function getMiddleNameAttribute()
     {
+        //
     }
 
     public function getLastNameAttribute()
     {
+        //
     }
 
     public function doNotgetFirstInvalidAttribute()
     {
+        //
     }
 
     public function doNotGetSecondInvalidAttribute()
     {
+        //
     }
 
     public function doNotgetThirdInvalidAttributeEither()
     {
+        //
     }
 
     public function doNotGetFourthInvalidAttributeEither()
     {
+        //
     }
 }
 
@@ -2173,6 +2198,7 @@ class EloquentModelNonIncrementingStub extends Model
 
 class EloquentNoConnectionModelStub extends EloquentModelStub
 {
+    //
 }
 
 class EloquentDifferentConnectionModelStub extends EloquentModelStub
@@ -2182,6 +2208,7 @@ class EloquentDifferentConnectionModelStub extends EloquentModelStub
 
 class EloquentModelSavingEventStub
 {
+    //
 }
 
 class EloquentModelEventObjectStub extends Model

@@ -402,11 +402,13 @@ class ContainerTest extends TestCase
 
         $container = new Container;
         $container->bind('foo', function () {
+            //
         });
         $container->rebinding('foo', function () {
             $_SERVER['__test.rebind'] = true;
         });
         $container->bind('foo', function () {
+            //
         });
 
         $this->assertTrue($_SERVER['__test.rebind']);
@@ -418,11 +420,13 @@ class ContainerTest extends TestCase
 
         $container = new Container;
         $container->instance('foo', function () {
+            //
         });
         $container->rebinding('foo', function () {
             $_SERVER['__test.rebind'] = true;
         });
         $container->instance('foo', function () {
+            //
         });
 
         $this->assertTrue($_SERVER['__test.rebind']);
@@ -437,6 +441,7 @@ class ContainerTest extends TestCase
             $_SERVER['__test.rebind'] = true;
         });
         $container->instance('foo', function () {
+            //
         });
 
         $this->assertFalse($_SERVER['__test.rebind']);
@@ -518,7 +523,7 @@ class ContainerTest extends TestCase
     public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
     {
         $container = new Container;
-        $result = $container->call('ContainerTestCallStub');
+        $container->call('ContainerTestCallStub');
     }
 
     public function testCallWithAtSignBasedClassReferences()
@@ -581,6 +586,16 @@ class ContainerTest extends TestCase
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
         $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo', 'default' => 'bar']);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
+        $this->assertEquals('bar', $result[1]);
+
+        $container = new Container;
+        $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo']);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
+        $this->assertEquals('taylor', $result[1]);
     }
 
     public function testBindMethodAcceptsAnArray()
@@ -825,7 +840,7 @@ class ContainerTest extends TestCase
             return new ContainerConcreteStub;
         }, true);
         $container->alias('ConcreteStub', 'ContainerConcreteStub');
-        $concreteStubInstance = $container->make('ConcreteStub');
+        $container->make('ConcreteStub');
         $this->assertTrue($container->resolved('ConcreteStub'));
         $this->assertTrue($container->isAlias('ContainerConcreteStub'));
         $this->assertArrayHasKey('ConcreteStub', $container->getBindings());
@@ -848,7 +863,7 @@ class ContainerTest extends TestCase
         $this->assertFalse($container->resolved('ConcreteStub'));
         $this->assertFalse($container->resolved('foo'));
 
-        $concreteStubInstance = $container->make('ConcreteStub');
+        $container->make('ConcreteStub');
 
         $this->assertTrue($container->resolved('ConcreteStub'));
         $this->assertTrue($container->resolved('foo'));
@@ -1089,22 +1104,36 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
+
+    public function testClosureCallWithInjectedDependency()
+    {
+        $container = new Container;
+        $container->call(function (ContainerConcreteStub $stub) {
+        }, ['foo' => 'bar']);
+
+        $container->call(function (ContainerConcreteStub $stub) {
+        }, ['foo' => 'bar', 'stub' => new ContainerConcreteStub]);
+    }
 }
 
 class ContainerConcreteStub
 {
+    //
 }
 
 interface IContainerContractStub
 {
+    //
 }
 
 class ContainerImplementationStub implements IContainerContractStub
 {
+    //
 }
 
 class ContainerImplementationStubTwo implements IContainerContractStub
 {
+    //
 }
 
 class ContainerDependentStub

@@ -644,7 +644,7 @@ class HttpRequestTest extends TestCase
 
         $baseRequest = SymfonyRequest::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], $invalidFiles);
 
-        $request = Request::createFromBase($baseRequest);
+        Request::createFromBase($baseRequest);
     }
 
     public function testMultipleFileUploadWithEmptyValue()

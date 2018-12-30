@@ -35,14 +35,11 @@ class EloquentWithCountTest extends DatabaseTestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function it_basic()
+    public function test_it_basic()
     {
         $one = Model1::create();
         $two = $one->twos()->Create();
-        $three = $two->threes()->Create();
+        $two->threes()->Create();
 
         $results = Model1::withCount([
             'twos' => function ($query) {

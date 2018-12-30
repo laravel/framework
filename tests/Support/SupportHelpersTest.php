@@ -137,7 +137,7 @@ class SupportHelpersTest extends TestCase
     public function testArrayDivide()
     {
         $array = ['name' => 'taylor'];
-        list($keys, $values) = Arr::divide($array);
+        [$keys, $values] = Arr::divide($array);
         $this->assertEquals(['name'], $keys);
         $this->assertEquals(['taylor'], $values);
     }
@@ -239,7 +239,7 @@ class SupportHelpersTest extends TestCase
     public function testStrRandom()
     {
         $result = Str::random(20);
-        $this->assertInternalType('string', $result);
+        $this->assertIsString($result);
         $this->assertEquals(20, strlen($result));
     }
 
@@ -955,6 +955,7 @@ class SupportHelpersTest extends TestCase
 
 trait SupportTestTraitOne
 {
+    //
 }
 
 trait SupportTestTraitTwo
@@ -969,10 +970,12 @@ class SupportTestClassOne
 
 class SupportTestClassTwo extends SupportTestClassOne
 {
+    //
 }
 
 trait SupportTestTraitThree
 {
+    //
 }
 
 class SupportTestClassThree extends SupportTestClassTwo

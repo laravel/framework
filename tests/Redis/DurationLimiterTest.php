@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Throwable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
@@ -21,10 +22,7 @@ class DurationLimiterTest extends TestCase
         $this->setUpRedis();
     }
 
-    /**
-     * @test
-     */
-    public function it_locks_tasks_when_no_slot_available()
+    public function test_it_locks_tasks_when_no_slot_available()
     {
         $store = [];
 
@@ -40,7 +38,7 @@ class DurationLimiterTest extends TestCase
             (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
                 $store[] = 3;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
@@ -55,10 +53,7 @@ class DurationLimiterTest extends TestCase
         $this->assertEquals([1, 2, 3], $store);
     }
 
-    /**
-     * @test
-     */
-    public function it_fails_immediately_or_retries_for_a_while_based_on_a_given_timeout()
+    public function test_it_fails_immediately_or_retries_for_a_while_based_on_a_given_timeout()
     {
         $store = [];
 
@@ -70,7 +65,7 @@ class DurationLimiterTest extends TestCase
             (new DurationLimiter($this->redis(), 'key', 1, 1))->block(0, function () use (&$store) {
                 $store[] = 2;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 

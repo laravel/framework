@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Migration;
 
+use PDOException;
 use Orchestra\Testbench\TestCase;
 
 class MigratorTest extends TestCase
@@ -18,10 +19,7 @@ class MigratorTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function dont_display_output_when_output_object_is_not_available()
+    public function test_dont_display_output_when_output_object_is_not_available()
     {
         $migrator = $this->app->make('migrator');
 
@@ -36,7 +34,7 @@ class MigratorTest extends TestCase
     {
         try {
             $this->app->make('db')->select("SELECT COUNT(*) FROM $table");
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return false;
         }
 

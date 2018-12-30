@@ -479,6 +479,8 @@ trait HasAttributes
             case 'float':
             case 'double':
                 return $this->fromFloat($value);
+            case 'decimal':
+                return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
             case 'string':
                 return (string) $value;
             case 'bool':
@@ -515,6 +517,10 @@ trait HasAttributes
             return 'custom_datetime';
         }
 
+        if ($this->isDecimalCast($this->getCasts()[$key])) {
+            return 'decimal';
+        }
+
         return trim(strtolower($this->getCasts()[$key]));
     }
 
@@ -528,6 +534,17 @@ trait HasAttributes
     {
         return strncmp($cast, 'date:', 5) === 0 ||
                strncmp($cast, 'datetime:', 9) === 0;
+    }
+
+    /**
+     * Determine if the cast type is a decimal cast.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isDecimalCast($cast)
+    {
+        return strncmp($cast, 'decimal:', 8) === 0;
     }
 
     /**
@@ -613,7 +630,7 @@ trait HasAttributes
      */
     public function fillJsonAttribute($key, $value)
     {
-        list($key, $path) = explode('->', $key, 2);
+        [$key, $path] = explode('->', $key, 2);
 
         $this->attributes[$key] = $this->asJson($this->getArrayAttributeWithValue(
             $path, $key, $value
@@ -681,6 +698,18 @@ trait HasAttributes
     }
 
     /**
+     * Decode the given JSON back into an array or object.
+     *
+     * @param  string  $value
+     * @param  bool  $asObject
+     * @return mixed
+     */
+    public function fromJson($value, $asObject = false)
+    {
+        return json_decode($value, ! $asObject);
+    }
+
+    /**
      * Decode the given float.
      *
      * @param  mixed  $value
@@ -701,15 +730,15 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given JSON back into an array or object.
+     * Return a decimal as string.
      *
-     * @param  string  $value
-     * @param  bool  $asObject
-     * @return mixed
+     * @param  float  $value
+     * @param  int  $decimals
+     * @return string
      */
-    public function fromJson($value, $asObject = false)
+    protected function asDecimal($value, $decimals)
     {
-        return json_decode($value, ! $asObject);
+        return number_format($value, $decimals, '.', '');
     }
 
     /**
@@ -783,8 +812,8 @@ trait HasAttributes
     /**
      * Convert a DateTime to a storable string.
      *
-     * @param  \DateTime|int  $value
-     * @return string
+     * @param  mixed  $value
+     * @return string|null
      */
     public function fromDateTime($value)
     {
@@ -981,7 +1010,22 @@ trait HasAttributes
      */
     public function syncOriginalAttribute($attribute)
     {
-        $this->original[$attribute] = $this->attributes[$attribute];
+        return $this->syncOriginalAttributes($attribute);
+    }
+
+    /**
+     * Sync multiple original attribute with their current values.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function syncOriginalAttributes($attributes)
+    {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        foreach ($attributes as $attribute) {
+            $this->original[$attribute] = $this->attributes[$attribute];
+        }
 
         return $this;
     }
@@ -999,7 +1043,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or given attribute(s) have been modified.
+     * Determine if the model or any of the given attribute(s) have been modified.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1012,7 +1056,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or given attribute(s) have remained the same.
+     * Determine if the model and all the given attribute(s) have remained the same.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1023,7 +1067,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or given attribute(s) have been modified.
+     * Determine if the model or any of the given attribute(s) have been modified.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1036,7 +1080,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the given attributes were changed.
+     * Determine if any of the given attributes were changed.
      *
      * @param  array  $changes
      * @param  array|string|null  $attributes

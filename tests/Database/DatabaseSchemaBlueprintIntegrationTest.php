@@ -97,7 +97,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $queries = $blueprint->toSql($this->db->connection(), new SqlServerGrammar());
+        $queries = $blueprint->toSql($this->db->connection(), new SqlServerGrammar);
 
         $expected = [
             'sp_rename N\'"users"."index1"\', "index2", N\'INDEX\'',
@@ -105,7 +105,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $queries = $blueprint->toSql($this->db->connection(), new MySqlGrammar());
+        $queries = $blueprint->toSql($this->db->connection(), new MySqlGrammar);
 
         $expected = [
             'alter table `users` rename index `index1` to `index2`',
@@ -113,7 +113,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $queries = $blueprint->toSql($this->db->connection(), new PostgresGrammar());
+        $queries = $blueprint->toSql($this->db->connection(), new PostgresGrammar);
 
         $expected = [
             'alter index "index1" rename to "index2"',

@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Builder
- */
 class BelongsTo extends Relation
 {
     use SupportsDefaultModels;
@@ -78,6 +75,10 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
+        if (is_null($this->child->{$this->foreignKey})) {
+            return $this->getDefaultFor($this->parent);
+        }
+
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
@@ -111,7 +112,9 @@ class BelongsTo extends Relation
         // our eagerly loading query so it returns the proper models from execution.
         $key = $this->related->getTable().'.'.$this->ownerKey;
 
-        $this->query->whereIn($key, $this->getEagerModelKeys($models));
+        $whereIn = $this->whereInMethod($this->related, $this->ownerKey);
+
+        $this->query->{$whereIn}($key, $this->getEagerModelKeys($models));
     }
 
     /**
@@ -131,13 +134,6 @@ class BelongsTo extends Relation
             if (! is_null($value = $model->{$this->foreignKey})) {
                 $keys[] = $value;
             }
-        }
-
-        // If there are no keys that were not null we will just return an array with null
-        // so this query wont fail plus returns zero results, which should be what the
-        // developer expects to happen in this situation. Otherwise we'll sort them.
-        if (count($keys) === 0) {
-            return [null];
         }
 
         sort($keys);

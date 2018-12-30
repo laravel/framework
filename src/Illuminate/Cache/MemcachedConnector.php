@@ -78,7 +78,7 @@ class MemcachedConnector
      */
     protected function setCredentials($memcached, $credentials)
     {
-        list($username, $password) = $credentials;
+        [$username, $password] = $credentials;
 
         $memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true);
 

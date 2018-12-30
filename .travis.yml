@@ -1,3 +1,4 @@
+dist: xenial
 language: php
 
 env:
@@ -13,8 +14,9 @@ matrix:
     - php: 7.2
     - php: 7.2
       env: setup=lowest
-
-sudo: false
+    - php: 7.3
+    - php: 7.3
+      env: setup=lowest
 
 cache:
   directories:

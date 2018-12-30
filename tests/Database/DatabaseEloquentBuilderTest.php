@@ -75,7 +75,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $result = $builder->findOrFail('bar', ['column']);
+        $builder->findOrFail('bar', ['column']);
     }
 
     /**
@@ -87,7 +87,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
         $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
-        $result = $builder->findOrFail([1, 2], ['column']);
+        $builder->findOrFail([1, 2], ['column']);
     }
 
     /**
@@ -98,7 +98,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $result = $builder->firstOrFail(['column']);
+        $builder->firstOrFail(['column']);
     }
 
     public function testFindWithMany()
@@ -443,8 +443,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
         $nop1 = function () {
+            //
         };
         $nop2 = function () {
+            //
         };
         $builder->setEagerLoads(['foo' => $nop1, 'foo.bar' => $nop2]);
         $builder->shouldAllowMockingProtectedMethods()->shouldReceive('eagerLoadRelation')->with(['models'], 'foo', $nop1)->andReturn(['foo']);
@@ -482,7 +484,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $relationQuery->shouldReceive('with')->once()->with(['lines' => null, 'lines.details' => null]);
         $builder->setEagerLoads(['orders' => null, 'orders.lines' => null, 'orders.lines.details' => null]);
 
-        $relation = $builder->getRelation('orders');
+        $builder->getRelation('orders');
     }
 
     public function testGetRelationProperlySetsNestedRelationshipsWithSimilarNames()
@@ -501,8 +503,8 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->setEagerLoads(['orders' => null, 'ordersGroups' => null, 'ordersGroups.lines' => null, 'ordersGroups.lines.details' => null]);
 
-        $relation = $builder->getRelation('orders');
-        $relation = $builder->getRelation('ordersGroups');
+        $builder->getRelation('orders');
+        $builder->getRelation('ordersGroups');
     }
 
     /**
@@ -692,6 +694,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         // Remove the global scope so it doesn't interfere with any other tests
         EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', function ($query) {
+            //
         });
 
         $this->assertEquals('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
@@ -871,6 +874,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $model->doesntHave('foo');
 
         $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where not exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id")', $builder->toSql());
+    }
+
+    public function testDoesntHaveNested()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->doesntHave('foo.bar');
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where not exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id"))', $builder->toSql());
     }
 
     public function testOrDoesntHave()
@@ -1167,6 +1179,7 @@ class EloquentBuilderTestModelCloseRelatedStub extends Model
 
 class EloquentBuilderTestModelFarRelatedStub extends Model
 {
+    //
 }
 
 class EloquentBuilderTestModelSelfRelatedStub extends Model

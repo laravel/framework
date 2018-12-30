@@ -148,6 +148,31 @@ class RepositoryTest extends TestCase
         $this->assertSame($this->config, $this->repository->all());
     }
 
+    public function testOffsetExists()
+    {
+        $this->assertTrue(isset($this->repository['foo']));
+        $this->assertFalse(isset($this->repository['not-exist']));
+    }
+
+    public function testOffsetGet()
+    {
+        $this->assertNull($this->repository['not-exist']);
+        $this->assertSame('bar', $this->repository['foo']);
+        $this->assertSame([
+            'x' => 'xxx',
+            'y' => 'yyy',
+        ], $this->repository['associate']);
+    }
+
+    public function testOffsetSet()
+    {
+        $this->assertNull($this->repository['key']);
+
+        $this->repository['key'] = 'value';
+
+        $this->assertSame('value', $this->repository['key']);
+    }
+
     public function testOffsetUnset()
     {
         $this->assertArrayHasKey('associate', $this->repository->all());

@@ -132,7 +132,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1
      */
     public function testFindOrFailThrowsAnException()
     {
@@ -197,6 +197,24 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'updated_at',
                 'country_id', ], array_keys($post->getAttributes()));
         });
+    }
+
+    public function testChunkById()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $i = 0;
+        $count = 0;
+
+        $country->posts()->chunkById(2, function ($collection) use (&$i, &$count) {
+            $i++;
+            $count += $collection->count();
+        });
+
+        $this->assertEquals(3, $i);
+        $this->assertEquals(6, $count);
     }
 
     public function testCursorReturnsCorrectModels()

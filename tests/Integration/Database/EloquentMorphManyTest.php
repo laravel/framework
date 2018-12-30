@@ -33,10 +33,7 @@ class EloquentMorphManyTest extends DatabaseTestCase
         Carbon::setTestNow(null);
     }
 
-    /**
-     * @test
-     */
-    public function update_model_with_default_withCount()
+    public function test_update_model_with_default_withCount()
     {
         $post = Post::create(['title' => str_random()]);
 

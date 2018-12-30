@@ -91,7 +91,7 @@ class ViewFactoryTest extends TestCase
         $factory->getEngineResolver()->shouldReceive('resolve')->with('php')->andReturn($engine = m::mock(Engine::class));
         $factory->getFinder()->shouldReceive('addExtension')->with('php');
         $factory->addExtension('php', 'php');
-        $view = $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);
+        $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);
     }
 
     public function testRenderEachCreatesViewForEachItemInArray()
@@ -651,6 +651,15 @@ class ViewFactoryTest extends TestCase
         $this->assertFalse($factory->getLoopStack()[0]['first']);
         $this->assertNull($factory->getLoopStack()[0]['remaining']);
         $this->assertNull($factory->getLoopStack()[0]['last']);
+    }
+
+    public function testMacro()
+    {
+        $factory = $this->getFactory();
+        $factory->macro('getFoo', function () {
+            return 'Hello World';
+        });
+        $this->assertEquals('Hello World', $factory->getFoo());
     }
 
     protected function getFactory()

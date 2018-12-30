@@ -20,10 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  */
 class EloquentRelationshipsTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function standard_relationships()
+    public function test_standard_relationships()
     {
         $post = new Post;
 
@@ -38,10 +35,7 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(MorphTo::class, $post->postable());
     }
 
-    /**
-     * @test
-     */
-    public function overridden_relationships()
+    public function test_overridden_relationships()
     {
         $post = new CustomPost;
 
@@ -59,6 +53,7 @@ class EloquentRelationshipsTest extends TestCase
 
 class FakeRelationship extends Model
 {
+    //
 }
 
 class Post extends Model
@@ -163,36 +158,45 @@ class CustomPost extends Post
 
 class CustomHasOne extends HasOne
 {
+    //
 }
 
 class CustomBelongsTo extends BelongsTo
 {
+    //
 }
 
 class CustomHasMany extends HasMany
 {
+    //
 }
 
 class CustomMorphOne extends MorphOne
 {
+    //
 }
 
 class CustomMorphMany extends MorphMany
 {
+    //
 }
 
 class CustomBelongsToMany extends BelongsToMany
 {
+    //
 }
 
 class CustomHasManyThrough extends HasManyThrough
 {
+    //
 }
 
 class CustomMorphToMany extends MorphToMany
 {
+    //
 }
 
 class CustomMorphTo extends MorphTo
 {
+    //
 }

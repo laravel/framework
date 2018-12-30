@@ -41,7 +41,6 @@ trait HasRelationships
      */
     public static $manyMethods = [
         'belongsToMany', 'morphToMany', 'morphedByMany',
-        'guessBelongsToManyRelation', 'findFirstMethodThatIsntRelation',
     ];
 
     /**
@@ -91,7 +90,7 @@ trait HasRelationships
     {
         $instance = $this->newRelatedInstance($related);
 
-        list($type, $id) = $this->getMorphs($name, $type, $id);
+        [$type, $id] = $this->getMorphs($name, $type, $id);
 
         $table = $instance->getTable();
 
@@ -183,7 +182,7 @@ trait HasRelationships
         // use that to get both the class and foreign key that will be utilized.
         $name = $name ?: $this->guessBelongsToRelation();
 
-        list($type, $id) = $this->getMorphs(
+        [$type, $id] = $this->getMorphs(
             Str::snake($name), $type, $id
         );
 
@@ -266,7 +265,7 @@ trait HasRelationships
      */
     protected function guessBelongsToRelation()
     {
-        list($one, $two, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        [$one, $two, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 
         return $caller['function'];
     }
@@ -366,7 +365,7 @@ trait HasRelationships
         // Here we will gather up the morph type and ID for the relationship so that we
         // can properly query the intermediate table of a relation. Finally, we will
         // get the table and create the relationship instances for the developers.
-        list($type, $id) = $this->getMorphs($name, $type, $id);
+        [$type, $id] = $this->getMorphs($name, $type, $id);
 
         $table = $instance->getTable();
 
@@ -546,14 +545,17 @@ trait HasRelationships
     }
 
     /**
-     * Get the relationship name of the belongs to many.
+     * Get the relationship name of the belongsToMany relationship.
      *
-     * @return string
+     * @return string|null
      */
     protected function guessBelongsToManyRelation()
     {
         $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
-            return ! in_array($trace['function'], Model::$manyMethods);
+            return ! in_array(
+                $trace['function'],
+                array_merge(static::$manyMethods, ['guessBelongsToManyRelation'])
+            );
         });
 
         return ! is_null($caller) ? $caller['function'] : null;

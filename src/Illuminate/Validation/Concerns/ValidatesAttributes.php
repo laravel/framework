@@ -488,7 +488,7 @@ trait ValidatesAttributes
      */
     public function validateDimensions($attribute, $value, $parameters)
     {
-        if ($this->isValidFileInstance($value) && $value->getClientMimeType() == 'image/svg+xml') {
+        if ($this->isValidFileInstance($value) && $value->getClientMimeType() === 'image/svg+xml') {
             return true;
         }
 
@@ -498,7 +498,7 @@ trait ValidatesAttributes
 
         $this->requireParameterCount(1, $parameters, 'dimensions');
 
-        list($width, $height) = $sizeDetails;
+        [$width, $height] = $sizeDetails;
 
         $parameters = $this->parseNamedParameters($parameters);
 
@@ -542,7 +542,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        list($numerator, $denominator) = array_replace(
+        [$numerator, $denominator] = array_replace(
             [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
         );
 
@@ -561,23 +561,53 @@ trait ValidatesAttributes
      */
     public function validateDistinct($attribute, $value, $parameters)
     {
-        $attributeName = $this->getPrimaryAttribute($attribute);
-
-        $attributeData = ValidationData::extractDataFromPath(
-            ValidationData::getLeadingExplicitAttributePath($attributeName), $this->data
-        );
-
-        $pattern = str_replace('\*', '[^.]+', preg_quote($attributeName, '#'));
-
-        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $pattern) {
-            return $key != $attribute && (bool) preg_match('#^'.$pattern.'\z#u', $key);
-        });
+        $data = Arr::except($this->getDistinctValues($attribute), $attribute);
 
         if (in_array('ignore_case', $parameters)) {
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
         return ! in_array($value, array_values($data));
+    }
+
+    /**
+     * Get the values to distinct between.
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function getDistinctValues($attribute)
+    {
+        $attributeName = $this->getPrimaryAttribute($attribute);
+
+        if (! property_exists($this, 'distinctValues')) {
+            return $this->extractDistinctValues($attributeName);
+        }
+
+        if (! array_key_exists($attributeName, $this->distinctValues)) {
+            $this->distinctValues[$attributeName] = $this->extractDistinctValues($attributeName);
+        }
+
+        return $this->distinctValues[$attributeName];
+    }
+
+    /**
+     * Extract the distinct values from the data.
+     *
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function extractDistinctValues($attribute)
+    {
+        $attributeData = ValidationData::extractDataFromPath(
+            ValidationData::getLeadingExplicitAttributePath($attribute), $this->data
+        );
+
+        $pattern = str_replace('\*', '[^.]+', preg_quote($attribute, '#'));
+
+        return Arr::where(Arr::dot($attributeData), function ($value, $key) use ($pattern) {
+            return (bool) preg_match('#^'.$pattern.'\z#u', $key);
+        });
     }
 
     /**
@@ -604,7 +634,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'exists');
 
-        list($connection, $table) = $this->parseTable($parameters[0]);
+        [$connection, $table] = $this->parseTable($parameters[0]);
 
         // The second parameter position holds the name of the column that should be
         // verified as existing. If this parameter is not specified we will guess
@@ -659,17 +689,17 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'unique');
 
-        list($connection, $table) = $this->parseTable($parameters[0]);
+        [$connection, $table] = $this->parseTable($parameters[0]);
 
         // The second parameter position holds the name of the column that needs to
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
         $column = $this->getQueryColumn($parameters, $attribute);
 
-        list($idColumn, $id) = [null, null];
+        [$idColumn, $id] = [null, null];
 
         if (isset($parameters[2])) {
-            list($idColumn, $id) = $this->getUniqueIds($parameters);
+            [$idColumn, $id] = $this->getUniqueIds($parameters);
         }
 
         // The presence verifier is responsible for counting rows within this store
@@ -713,7 +743,7 @@ trait ValidatesAttributes
             $id = $this->getValue($matches[1]);
         }
 
-        if (strtolower($id) == 'null') {
+        if (strtolower($id) === 'null') {
             $id = null;
         }
 
@@ -955,7 +985,7 @@ trait ValidatesAttributes
                 }
             }
 
-            return count(array_diff($value, $parameters)) == 0;
+            return count(array_diff($value, $parameters)) === 0;
         }
 
         return ! is_array($value) && in_array((string) $value, $parameters);
@@ -1475,6 +1505,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the attribute starts with a given substring.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateStartsWith($attribute, $value, $parameters)
+    {
+        return Str::startsWith($value, $parameters);
+    }
+
+    /**
      * Validate that an attribute is a string.
      *
      * @param  string  $attribute
@@ -1541,6 +1584,22 @@ trait ValidatesAttributes
         $~ixu';
 
         return preg_match($pattern, $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute is a valid UUID.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateUuid($attribute, $value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
     }
 
     /**
@@ -1621,7 +1680,7 @@ trait ValidatesAttributes
     protected function parseNamedParameters($parameters)
     {
         return array_reduce($parameters, function ($result, $item) {
-            list($key, $value) = array_pad(explode('=', $item, 2), 2, null);
+            [$key, $value] = array_pad(explode('=', $item, 2), 2, null);
 
             $result[$key] = $value;
 

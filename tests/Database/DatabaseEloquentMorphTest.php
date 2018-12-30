@@ -22,12 +22,14 @@ class DatabaseEloquentMorphTest extends TestCase
 
     public function testMorphOneSetsProperConstraints()
     {
-        $relation = $this->getOneRelation();
+        $this->getOneRelation();
     }
 
     public function testMorphOneEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getOneRelation();
+        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
+        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(false);
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', [1, 2]);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
@@ -44,13 +46,16 @@ class DatabaseEloquentMorphTest extends TestCase
      */
     public function testMorphManySetsProperConstraints()
     {
-        $relation = $this->getManyRelation();
+        $this->getManyRelation();
     }
 
     public function testMorphManyEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getManyRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', [1, 2]);
+        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
+        $relation->getParent()->shouldReceive('getIncrementing')->once()->andReturn(true);
+        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('table.morph_id', [1, 2]);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
         $model1 = new EloquentMorphResetModelStub;
@@ -303,4 +308,5 @@ class DatabaseEloquentMorphTest extends TestCase
 
 class EloquentMorphResetModelStub extends Model
 {
+    //
 }

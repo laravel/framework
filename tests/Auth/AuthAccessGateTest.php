@@ -230,6 +230,7 @@ class AuthAccessGateTest extends TestCase
             return true;
         });
         $gate->before(function () {
+            //
         });
 
         $this->assertTrue($gate->check('foo'));
@@ -298,7 +299,7 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         $gate->after(function ($user, $ability, $result) {
-            return $ability == 'allow' ? true : false;
+            return $ability == 'allow';
         });
 
         $gate->after(function ($user, $ability, $result) {
@@ -368,6 +369,24 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         $gate->define('foo', AccessGateTestInvokableClass::class);
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_gates_can_be_defined_using_an_array_callback()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', [new AccessGateTestStaticClass, 'foo']);
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_gates_can_be_defined_using_an_array_callback_with_static_method()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', [AccessGateTestStaticClass::class, 'foo']);
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -479,7 +498,7 @@ class AuthAccessGateTest extends TestCase
      * @dataProvider notCallableDataProvider
      * @expectedException \InvalidArgumentException
      */
-    public function test_define_second_parametter_should_be_string_or_callable($callback)
+    public function test_define_second_parameter_should_be_string_or_callable($callback)
     {
         $gate = $this->getBasicGate();
 
@@ -493,7 +512,7 @@ class AuthAccessGateTest extends TestCase
     {
         return [
             [1],
-            [new \stdClass()],
+            [new stdClass],
             [[]],
             [1.1],
         ];
@@ -634,6 +653,14 @@ class AuthAccessGateTest extends TestCase
             [$noAbilities, '', false],
             [$noAbilities, [], true],
         ];
+    }
+}
+
+class AccessGateTestStaticClass
+{
+    public static function foo()
+    {
+        return true;
     }
 }
 

@@ -56,6 +56,7 @@ class LogLoggerTest extends TestCase
     {
         $writer = new Logger($monolog = m::mock(Monolog::class));
         $writer->listen(function () {
+            //
         });
     }
 

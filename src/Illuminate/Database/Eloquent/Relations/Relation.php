@@ -308,6 +308,22 @@ abstract class Relation
     }
 
     /**
+     * Get the name of the "where in" method for eager loading.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @return string
+     */
+    protected function whereInMethod(Model $model, $key)
+    {
+        return $model->getKeyName() === last(explode('.', $key))
+                    && $model->getIncrementing()
+                    && in_array($model->getKeyType(), ['int', 'integer'])
+                        ? 'whereIntegerInRaw'
+                        : 'whereIn';
+    }
+
+    /**
      * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map

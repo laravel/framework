@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notification;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 
 class SupportTestingNotificationFakeTest extends TestCase
 {
@@ -64,7 +65,7 @@ class SupportTestingNotificationFakeTest extends TestCase
 
     public function testResettingNotificationId()
     {
-        $notification = new NotificationStub();
+        $notification = new NotificationStub;
 
         $this->fake->send($this->user, $notification);
 
@@ -94,6 +95,17 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->assertTimesSent(3, NotificationStub::class);
     }
+
+    public function testAssertSentToWhenNotifiableHasPreferredLocale()
+    {
+        $user = new LocalizedUserStub;
+
+        $this->fake->send($user, new NotificationStub);
+
+        $this->fake->assertSentTo($user, NotificationStub::class, function ($notification, $channels, $notifiable, $locale) use ($user) {
+            return $notifiable === $user && $locale === 'au';
+        });
+    }
 }
 
 class NotificationStub extends Notification
@@ -106,4 +118,13 @@ class NotificationStub extends Notification
 
 class UserStub extends User
 {
+    //
+}
+
+class LocalizedUserStub extends User implements HasLocalePreference
+{
+    public function preferredLocale()
+    {
+        return 'au';
+    }
 }

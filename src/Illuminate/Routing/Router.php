@@ -23,6 +23,9 @@ use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+/**
+ * @mixin \Illuminate\Routing\RouteRegistrar
+ */
 class Router implements RegistrarContract, BindingRegistrar
 {
     use Macroable {
@@ -53,7 +56,7 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * The currently dispatched route instance.
      *
-     * @var \Illuminate\Routing\Route
+     * @var \Illuminate\Routing\Route|null
      */
     protected $current;
 
@@ -133,7 +136,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register a new GET route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function get($uri, $action = null)
@@ -145,7 +148,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register a new POST route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function post($uri, $action = null)
@@ -157,7 +160,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register a new PUT route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function put($uri, $action = null)
@@ -169,7 +172,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register a new PATCH route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function patch($uri, $action = null)
@@ -181,7 +184,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register a new DELETE route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function delete($uri, $action = null)
@@ -193,7 +196,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register a new OPTIONS route with the router.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function options($uri, $action = null)
@@ -205,7 +208,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register a new route responding to all verbs.
      *
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function any($uri, $action = null)
@@ -216,7 +219,7 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Register a new Fallback route with the router.
      *
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function fallback($action)
@@ -275,7 +278,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function match($methods, $uri, $action = null)
@@ -381,7 +384,7 @@ class Router implements RegistrarContract, BindingRegistrar
     protected function updateGroupStack(array $attributes)
     {
         if (! empty($this->groupStack)) {
-            $attributes = RouteGroup::merge($attributes, end($this->groupStack));
+            $attributes = $this->mergeWithLastGroup($attributes);
         }
 
         $this->groupStack[] = $attributes;
@@ -436,7 +439,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  \Closure|array|string|null  $action
+     * @param  \Closure|array|string|callable|null  $action
      * @return \Illuminate\Routing\Route
      */
     public function addRoute($methods, $uri, $action)
@@ -1037,7 +1040,7 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Get the currently dispatched route instance.
      *
-     * @return \Illuminate\Routing\Route
+     * @return \Illuminate\Routing\Route|null
      */
     public function current()
     {
@@ -1155,15 +1158,27 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         // Password Reset Routes...
-        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-        $this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
+        if ($options['reset'] ?? true) {
+            $this->resetPassword();
+        }
 
         // Email Verification Routes...
         if ($options['verify'] ?? false) {
             $this->emailVerification();
         }
+    }
+
+    /**
+     * Register the typical reset password routes for an application.
+     *
+     * @return void
+     */
+    public function resetPassword()
+    {
+        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+        $this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
     }
 
     /**
@@ -1251,7 +1266,7 @@ class Router implements RegistrarContract, BindingRegistrar
             return $this->macroCall($method, $parameters);
         }
 
-        if ($method == 'middleware') {
+        if ($method === 'middleware') {
             return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 

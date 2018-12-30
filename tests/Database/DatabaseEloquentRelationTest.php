@@ -200,7 +200,7 @@ class DatabaseEloquentRelationTest extends TestCase
                 $this->assertTrue($related::isIgnoringTouch());
                 $this->assertTrue($relatedChild::isIgnoringTouch());
 
-                throw new Exception();
+                throw new Exception;
             });
 
             $this->fail('Exception was not thrown');
@@ -264,22 +264,27 @@ class EloquentRelationStub extends Relation
 {
     public function addConstraints()
     {
+        //
     }
 
     public function addEagerConstraints(array $models)
     {
+        //
     }
 
     public function initRelation(array $models, $relation)
     {
+        //
     }
 
     public function match(array $models, Collection $results, $relation)
     {
+        //
     }
 
     public function getResults()
     {
+        //
     }
 }
 
@@ -293,6 +298,7 @@ class EloquentNoTouchingModelStub extends Model
 
 class EloquentNoTouchingChildModelStub extends EloquentNoTouchingModelStub
 {
+    //
 }
 
 class EloquentNoTouchingAnotherModelStub extends Model

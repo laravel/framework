@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentLazyEagerLoadingTest;
 
+use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -30,10 +31,7 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function it_basic()
+    public function test_it_basic()
     {
         $one = Model1::create();
         $one->twos()->create();
@@ -44,11 +42,11 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($model->relationLoaded('twos'));
         $this->assertFalse($model->relationLoaded('threes'));
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $model->load('threes');
 
-        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertCount(1, DB::getQueryLog());
 
         $this->assertTrue($model->relationLoaded('threes'));
     }

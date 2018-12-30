@@ -49,7 +49,7 @@ class BoundMethod
         // We will assume an @ sign is used to delimit the class name from the method
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
-        $method = count($segments) == 2
+        $method = count($segments) === 2
                         ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
@@ -122,8 +122,10 @@ class BoundMethod
     /**
      * Get the proper reflection instance for the given callback.
      *
-     * @param  callable|string  $callback
+     * @param  callable|string $callback
      * @return \ReflectionFunctionAbstract
+     *
+     * @throws \ReflectionException
      */
     protected static function getCallReflector($callback)
     {
