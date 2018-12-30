@@ -239,7 +239,7 @@ class SupportHelpersTest extends TestCase
     public function testStrRandom()
     {
         $result = Str::random(20);
-        $this->assertInternalType('string', $result);
+        $this->assertIsString($result);
         $this->assertEquals(20, strlen($result));
     }
 

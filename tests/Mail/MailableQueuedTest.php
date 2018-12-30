@@ -49,7 +49,7 @@ class MailableQueuedTest extends TestCase
         $mailable = new MailableQueableStub;
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
         $mailable->attach('foo.jpg', $attachmentOption);
-        $this->assertInternalType('array', $mailable->attachments);
+        $this->assertIsArray($mailable->attachments);
         $this->assertCount(1, $mailable->attachments);
         $this->assertEquals($mailable->attachments[0]['options'], $attachmentOption);
         $queueFake->assertNothingPushed();
@@ -80,7 +80,7 @@ class MailableQueuedTest extends TestCase
 
         $mailable->attachFromStorage('/', 'foo.jpg', $attachmentOption);
 
-        $this->assertInternalType('array', $mailable->diskAttachments);
+        $this->assertIsArray($mailable->diskAttachments);
         $this->assertCount(1, $mailable->diskAttachments);
         $this->assertEquals($mailable->diskAttachments[0]['options'], $attachmentOption);
 

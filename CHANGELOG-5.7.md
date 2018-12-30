@@ -1,12 +1,19 @@
 # Release Notes for 5.7.x
 
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.19...5.7)
+
+### Added
+- Added `chunkById` support in `BelongsToMany` and `HasManyThrough` relations ([#26919](https://github.com/laravel/framework/pull/26919))
+- Allowed predefined log channels to change formatter from config ([#26895](https://github.com/laravel/framework/pull/26895))
+
+
 ## [v5.7.19 (2018-12-18)](https://github.com/laravel/framework/compare/v5.7.18...v5.7.19)
 
 ### Added
 - Added `Illuminate\Support\Collection::whereBetween` method ([#26888](https://github.com/laravel/framework/pull/26888))
 
 ### Fixed
-- Reverted changes related to [`app()->call()`](https://github.com/laravel/framework/pull/26852) ([fefaf46](https://github.com/laravel/framework/commit/fefaf46dd147a4caf1dea1712f9797f3db49fea4))
+- <strong> Reverted changes related to [`app()->call()`](https://github.com/laravel/framework/pull/26852) </strong> ([fefaf46](https://github.com/laravel/framework/commit/fefaf46dd147a4caf1dea1712f9797f3db49fea4))
 - Reset doctrineConnection property on Database/Connection when reconnecting ([#26890](https://github.com/laravel/framework/pull/26890))
 
 

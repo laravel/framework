@@ -343,7 +343,9 @@ class HasManyThrough extends Relation
      */
     public function getResults()
     {
-        return $this->get();
+        return ! is_null($this->farParent->{$this->localKey})
+                ? $this->get()
+                : $this->related->newCollection();
     }
 
     /**

@@ -1045,7 +1045,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or given attribute(s) have been modified.
+     * Determine if the model or any of the given attribute(s) have been modified.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1058,7 +1058,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or given attribute(s) have remained the same.
+     * Determine if the model and all the given attribute(s) have remained the same.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1069,7 +1069,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or given attribute(s) have been modified.
+     * Determine if the model or any of the given attribute(s) have been modified.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1082,7 +1082,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the given attributes were changed.
+     * Determine if any of the given attributes were changed.
      *
      * @param  array  $changes
      * @param  array|string|null  $attributes
