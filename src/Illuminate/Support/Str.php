@@ -520,6 +520,18 @@ class Str
     {
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
     }
+    
+    /**
+     * Check if two strings are equal, ignoring case.
+     *
+     * @param  string  $a
+     * @param  string  $b
+     * @return bool
+     */
+    public static function equalsIgnoreCase($a, $b)
+    {
+        return static::lower($a) === static::lower($b);
+    }
 
     /**
      * Generate a UUID (version 4).
