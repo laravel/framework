@@ -857,12 +857,18 @@ class Builder
             return $values;
         }
 
-        $column = $this->qualifyColumn($this->model->getUpdatedAtColumn());
+        $column = $this->model->getUpdatedAtColumn();
 
-        return array_merge(
+        $values = array_merge(
             [$column => $this->model->freshTimestampString()],
             $values
         );
+
+        $values[$this->qualifyColumn($column)] = $values[$column];
+
+        unset($values[$column]);
+
+        return $values;
     }
 
     /**
