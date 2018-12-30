@@ -84,4 +84,15 @@ class CacheArrayStoreTest extends TestCase
         $store = new ArrayStore;
         $this->assertEmpty($store->getPrefix());
     }
+
+    public function testGettingBackCachedObjectsByValueNotByReference()
+    {
+        $cacheKey = 'testKey';
+        $store = new ArrayStore;
+        $store->put($cacheKey, new \Illuminate\Support\Collection([1, 2, 3]), 60);
+        $collection1 = $store->get($cacheKey)->push(4);
+        $collection2 = $store->get($cacheKey)->push(5);
+        $this->assertEquals(4, $collection1->last());
+        $this->assertEquals(5, $collection2->last());
+    }
 }
