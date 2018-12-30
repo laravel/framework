@@ -41,8 +41,8 @@ class StartSession
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
      * @return mixed
      *
      * @throws \Exception
@@ -121,7 +121,7 @@ class StartSession
     /**
      * Remove the garbage from the session if necessary.
      *
-     * @param  \Illuminate\Contracts\Session\Session $session
+     * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      *
      * @throws \Exception
@@ -141,7 +141,7 @@ class StartSession
     /**
      * Determine if the configuration odds hit the lottery.
      *
-     * @param  array $config
+     * @param  array  $config
      * @return bool
      *
      * @throws \Exception
