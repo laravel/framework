@@ -235,6 +235,24 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->pjax());
     }
 
+    public function testPrefetchMethod()
+    {
+        $request = Request::create('/', 'GET');
+        $this->assertFalse($request->prefetch());
+
+        $request->server->set('HTTP_X_MOZ', '');
+        $this->assertFalse($request->prefetch());
+        $request->server->set('HTTP_X_MOZ', 'prefetch');
+        $this->assertTrue($request->prefetch());
+
+        $request->server->remove('HTTP_X_MOZ');
+
+        $request->headers->set('Purpose', '');
+        $this->assertFalse($request->prefetch());
+        $request->headers->set('Purpose', 'prefetch');
+        $this->assertTrue($request->prefetch());
+    }
+
     public function testSecureMethod()
     {
         $request = Request::create('http://example.com', 'GET');

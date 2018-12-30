@@ -244,6 +244,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Determine if the request is the result of an prefetch call.
+     *
+     * @return bool
+     */
+    public function prefetch()
+    {
+        return $this->server->get('HTTP_X_MOZ') === 'prefetch' || $this->headers->get('Purpose') === 'prefetch';
+    }
+
+    /**
      * Determine if the request is over HTTPS.
      *
      * @return bool

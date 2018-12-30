@@ -41,9 +41,11 @@ class StartSession
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function handle($request, Closure $next)
     {
@@ -119,8 +121,10 @@ class StartSession
     /**
      * Remove the garbage from the session if necessary.
      *
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  \Illuminate\Contracts\Session\Session $session
      * @return void
+     *
+     * @throws \Exception
      */
     protected function collectGarbage(Session $session)
     {
@@ -137,8 +141,10 @@ class StartSession
     /**
      * Determine if the configuration odds hit the lottery.
      *
-     * @param  array  $config
+     * @param  array $config
      * @return bool
+     *
+     * @throws \Exception
      */
     protected function configHitsLottery(array $config)
     {
@@ -154,7 +160,7 @@ class StartSession
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
+        if ($request->method() === 'GET' && $request->route() && ! $request->ajax() && ! $request->prefetch()) {
             $session->setPreviousUrl($request->fullUrl());
         }
     }
