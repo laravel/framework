@@ -27,7 +27,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
             $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
-            $this->assertInternalType('int', $array['available_at']);
+            $this->assertIsInt($array['available_at']);
         });
 
         $queue->push('foo', ['data']);
@@ -47,7 +47,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
             $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
-            $this->assertInternalType('int', $array['available_at']);
+            $this->assertIsInt($array['available_at']);
         });
 
         $queue->later(10, 'foo', ['data']);

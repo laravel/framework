@@ -200,7 +200,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals(16, strlen(Str::random()));
         $randomInteger = random_int(1, 100);
         $this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
-        $this->assertInternalType('string', Str::random());
+        $this->assertIsString(Str::random());
     }
 
     public function testReplaceArray()

@@ -309,7 +309,7 @@ class RoutingRouteTest extends TestCase
             return 'foo';
         })->name('foo');
 
-        $this->assertInternalType('array', $route->getAction());
+        $this->assertIsArray($route->getAction());
         $this->assertArrayHasKey('as', $route->getAction());
         $this->assertEquals('foo', $route->getAction('as'));
         $this->assertNull($route->getAction('unknown_property'));
