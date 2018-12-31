@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -223,11 +224,25 @@ class Command extends SymfonyCommand
      */
     protected function createInputFromArguments(array $arguments)
     {
-        return tap(new ArrayInput($arguments), function ($input) {
+        return tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
             if ($input->hasParameterOption(['--no-interaction'], true)) {
                 $input->setInteractive(false);
             }
         });
+    }
+
+    /**
+     * Get all of the context passed to the command.
+     *
+     * @return array
+     */
+    protected function context()
+    {
+        $options = Arr::only($this->option(), ['no-interaction', 'ansi', 'no-ansi', 'quiet', 'verbose']);
+        
+        collect($options)->mapWithKeys(function ($value, $key) {
+            return ["--{$key}" => $value];
+        })->all();
     }
 
     /**
