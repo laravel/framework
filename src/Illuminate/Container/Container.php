@@ -134,6 +134,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingCallbacks = [];
 
     /**
+     * All the abstract keys which are bound with class names.
+     *
+     * @var array
+     */
+    protected $boundToClassName = [];
+
+    /**
      * Define a contextual binding.
      *
      * @param  array|string  $concrete
@@ -222,6 +229,7 @@ class Container implements ArrayAccess, ContainerContract
     public function bind($abstract, $concrete = null, $shared = false)
     {
         $this->dropStaleInstances($abstract);
+        $this->isConcreteClassName($abstract, $concrete);
 
         // If no concrete type was given, we will simply set the concrete type to the
         // abstract type. After that, the concrete type to be registered as shared
@@ -674,7 +682,12 @@ class Container implements ArrayAccess, ContainerContract
             $this->instances[$abstract] = $object;
         }
 
-        $this->fireResolvingCallbacks($abstract, $object);
+        // To prevent extra call to resolving callbacks, we don't fire "resolving" callbacks
+        // for interfaces bound with class path syntax, since the callback will be called
+        // later, in a recursive call to make() when the bounded concrete is resolving.
+        if (! $this->isAnInterfaceBoundedWithClassName($abstract)) {
+            $this->fireResolvingCallbacks($abstract, $object);
+        }
 
         // Before returning, we will also set the resolved flag to "true" and pop off
         // the parameter overrides for this build. After those two things are done
@@ -1268,5 +1281,33 @@ class Container implements ArrayAccess, ContainerContract
     public function __set($key, $value)
     {
         $this[$key] = $value;
+    }
+
+    /**
+     * Determine if the abstract is both an interface and is bounded to a class path (not a closure).
+     *
+     * @param  string  $abstract
+     * @return bool
+     */
+    protected function isAnInterfaceBoundedWithClassName($abstract)
+    {
+        return interface_exists($abstract) && array_key_exists($abstract, $this->boundToClassName);
+    }
+
+    /**
+     * Detects whether the concrete param is a closure or a class path.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    protected function isConcreteClassName($abstract, $concrete)
+    {
+        if (! ($concrete instanceof Closure)) {
+            $this->boundToClassName[$abstract] = null;
+        } else {
+            // Needed when rebinding happens.
+            unset($this->boundToClassName[$abstract]);
+        }
     }
 }
