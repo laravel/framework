@@ -240,7 +240,7 @@ class Command extends SymfonyCommand
     {
         $options = Arr::only($this->option(), ['no-interaction', 'ansi', 'no-ansi', 'quiet', 'verbose']);
 
-        collect($options)->mapWithKeys(function ($value, $key) {
+        return collect($options)->mapWithKeys(function ($value, $key) {
             return ["--{$key}" => $value];
         })->all();
     }
