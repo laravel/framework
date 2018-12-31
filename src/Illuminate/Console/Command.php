@@ -242,7 +242,7 @@ class Command extends SymfonyCommand
 
         return collect($options)->mapWithKeys(function ($value, $key) {
             return ["--{$key}" => $value];
-        })->all();
+        })->filter()->all();
     }
 
     /**
