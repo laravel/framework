@@ -23,7 +23,7 @@ class ArrayStore extends TaggableStore
     {
         $value = $this->storage[$key] ?? null;
 
-        if (is_object($value)) {
+        if (gettype($value) === 'object') {
             return clone $value;
         }
 
