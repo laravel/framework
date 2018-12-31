@@ -546,19 +546,19 @@ class Command extends SymfonyCommand
     /**
      * {@inheritdoc}
      */
-    public function setHidden($hidden)
+    public function isHidden()
     {
-        parent::setHidden($this->hidden = $hidden);
-
-        return $this;
+        return $this->hidden;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isHidden()
+    public function setHidden($hidden)
     {
-        return $this->hidden;
+        parent::setHidden($this->hidden = $hidden);
+
+        return $this;
     }
 
     /**
