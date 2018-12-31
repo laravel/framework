@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Support\Collection;
 
 class CacheArrayStoreTest extends TestCase
 {
@@ -89,5 +90,21 @@ class CacheArrayStoreTest extends TestCase
     {
         $store = new ArrayStore;
         $this->assertEmpty($store->getPrefix());
+    }
+
+    public function testGettingBackCachedObjectsByValueNotByReference()
+    {
+        $cacheKey = 'testKey';
+        $store = new ArrayStore;
+        $store->put($cacheKey, new Collection([]), 60);
+
+        $obj1 = $store->get($cacheKey);
+        $obj2 = $store->get($cacheKey);
+
+        $mutatedObj1 = $obj1->push('taylor');
+        $mutatedObj2 = $obj2->push('jeffery');
+
+        $this->assertEquals('taylor', $mutatedObj1->last());
+        $this->assertEquals('jeffery', $mutatedObj2->last());
     }
 }
