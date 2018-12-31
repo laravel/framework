@@ -23,7 +23,13 @@ class ArrayStore extends TaggableStore implements Store
      */
     public function get($key)
     {
-        return $this->storage[$key] ?? null;
+        $value = $this->storage[$key] ?? null;
+
+        if (is_object($value)) {
+            return clone $value;
+        }
+
+        return $value;
     }
 
     /**
