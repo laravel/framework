@@ -293,6 +293,14 @@ class SupportStrTest extends TestCase
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
     }
+
+    public function testEqualsIgnoreCase()
+    {
+        $this->assertFalse(Str::equalsIgnoreCase('', 'foo'));
+        $this->assertFalse(Str::equalsIgnoreCase('bar', 'foo'));
+        $this->assertTrue(Str::equalsIgnoreCase('FoO', 'foo'));
+        $this->assertTrue(Str::equalsIgnoreCase('Мама', 'мама'));
+    }
 }
 
 class StringableObjectStub
