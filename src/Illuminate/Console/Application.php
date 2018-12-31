@@ -178,15 +178,9 @@ class Application extends SymfonyApplication implements ApplicationContract
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
         }
 
-        $this->setCatchExceptions(false);
-
-        $result = $this->run(
+        return $this->run(
             $input, $this->lastOutput = $outputBuffer ?: new BufferedOutput
         );
-
-        $this->setCatchExceptions(true);
-
-        return $result;
     }
 
     /**
