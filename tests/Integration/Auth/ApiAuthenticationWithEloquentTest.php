@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Auth\ApiAuthenticationWithEloquentTest;
 
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\QueryException;
@@ -39,7 +40,15 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
         $this->expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES) (SQL: select * from `users` where `api_token` = whatever limit 1)");
 
-        $this->withoutExceptionHandling()->get('/auth', ['Authorization' => 'Bearer whatever']);
+        try {
+            $this->withoutExceptionHandling()->get('/auth', ['Authorization' => 'Bearer whatever']);
+        } catch (QueryException $e) {
+            if (Str::startsWith($e->getMessage(), 'SQLSTATE[HY000] [2002]')) {
+                $this->markTestSkipped('MySQL instance required.');
+            }
+
+            throw $e;
+        }
     }
 }
 
