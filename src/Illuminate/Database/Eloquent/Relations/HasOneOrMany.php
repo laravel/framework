@@ -311,21 +311,6 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Perform an update on all the related models.
-     *
-     * @param  array  $attributes
-     * @return int
-     */
-    public function update(array $attributes)
-    {
-        if ($this->related->usesTimestamps() && ! is_null($this->relatedUpdatedAt())) {
-            $attributes[$this->relatedUpdatedAt()] = $this->related->freshTimestampString();
-        }
-
-        return $this->query->update($attributes);
-    }
-
-    /**
      * Add the constraints for a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
