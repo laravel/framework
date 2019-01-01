@@ -853,7 +853,8 @@ class Builder
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if (! $this->model->usesTimestamps() || is_null($this->model->getUpdatedAtColumn())) {
+        if (! $this->model->usesTimestamps() || 
+            is_null($this->model->getUpdatedAtColumn())) {
             return $values;
         }
 
