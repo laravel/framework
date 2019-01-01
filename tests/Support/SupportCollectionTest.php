@@ -558,7 +558,7 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
 
         $this->assertEquals([['v' => 1]], $c->whereNotBetween('v', [2, 4])->values()->all());
-        $this->assertEquals([['v' => 2], ['v' => 3], ['v' => 3], ['v' => 4] ], $c->whereNotBetween('v', [-1, 1])->values()->all());
+        $this->assertEquals([['v' => 2], ['v' => 3], ['v' => 3], ['v' => 4]], $c->whereNotBetween('v', [-1, 1])->values()->all());
         $this->assertEquals([['v' => 1], ['v' => '2'], ['v' => '4']], $c->whereNotBetween('v', [3, 3])->values()->all());
     }
 
