@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -47,7 +48,7 @@ class EloquentUpdateTest extends TestCase
     public function testBasicUpdate()
     {
         TestUpdateModel1::create([
-            'name' => str_random(),
+            'name' => Str::random(),
             'title' => 'Ms.',
         ]);
 
@@ -76,7 +77,7 @@ class EloquentUpdateTest extends TestCase
         ]);
 
         TestUpdateModel2::create([
-            'name' => str_random(),
+            'name' => Str::random(),
         ]);
 
         TestUpdateModel2::join('test_model1', function ($join) {
@@ -92,12 +93,12 @@ class EloquentUpdateTest extends TestCase
     public function testSoftDeleteWithJoins()
     {
         TestUpdateModel1::create([
-            'name' => str_random(),
+            'name' => Str::random(),
             'title' => 'Mr.',
         ]);
 
         TestUpdateModel2::create([
-            'name' => str_random(),
+            'name' => Str::random(),
         ]);
 
         TestUpdateModel2::join('test_model1', function ($join) {

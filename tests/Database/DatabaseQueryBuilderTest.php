@@ -44,11 +44,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
             $this->assertEquals('select "foo", "bar" from "users"', $sql);
         });
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select "baz" from "users"', $sql);
+        });
 
         $builder->from('users')->get();
         $this->assertNull($builder->columns);
 
         $builder->from('users')->get(['foo', 'bar']);
+        $this->assertNull($builder->columns);
+
+        $builder->from('users')->get('baz');
         $this->assertNull($builder->columns);
 
         $this->assertEquals('select * from "users"', $builder->toSql());
@@ -1777,14 +1783,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testSQLiteMultipleInserts()
-    {
-        $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email", "name") select ? as "email", ? as "name" union all select ? as "email", ? as "name"', ['foo', 'taylor', 'bar', 'dayle'])->andReturn(true);
-        $result = $builder->from('users')->insert([['email' => 'foo', 'name' => 'taylor'], ['email' => 'bar', 'name' => 'dayle']]);
-        $this->assertTrue($result);
-    }
-
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();
@@ -1911,7 +1909,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ?', ['foo', 'bar', 1])->andReturn(1);
-        $result = $builder->from('users')->where('id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+        $result = $builder->from('users')->where('id', '=', 1)->update(['users.email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
     }
 
@@ -2152,7 +2150,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')
             ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"name","first_name"}\', ?)', ['"John"']);
-        $builder->from('users')->update(['options->name->first_name' => 'John']);
+        $builder->from('users')->update(['users.options->name->first_name' => 'John']);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')
@@ -2164,7 +2162,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->sku', '=', 'foo-bar');
-        $this->assertEquals('select * from `users` where `items`->\'$."sku"\' = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where json_unquote(json_extract(`items`, \'$."sku"\')) = ?', $builder->toSql());
         $this->assertCount(1, $builder->getRawBindings()['where']);
         $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
     }
@@ -2173,37 +2171,28 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price', '=', 1);
-        $this->assertEquals('select * from `users` where `items`->\'$."price"\' = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where json_unquote(json_extract(`items`, \'$."price"\')) = ?', $builder->toSql());
     }
 
     public function testMySqlWrappingJsonWithDouble()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price', '=', 1.5);
-        $this->assertEquals('select * from `users` where `items`->\'$."price"\' = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where json_unquote(json_extract(`items`, \'$."price"\')) = ?', $builder->toSql());
     }
 
     public function testMySqlWrappingJsonWithBoolean()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->available', '=', true);
-        $this->assertEquals('select * from `users` where `items`->\'$."available"\' = true', $builder->toSql());
+        $this->assertEquals('select * from `users` where json_unquote(json_extract(`items`, \'$."available"\')) = true', $builder->toSql());
     }
 
     public function testMySqlWrappingJsonWithBooleanAndIntegerThatLooksLikeOne()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->available', '=', true)->where('items->active', '=', false)->where('items->number_available', '=', 0);
-        $this->assertEquals('select * from `users` where `items`->\'$."available"\' = true and `items`->\'$."active"\' = false and `items`->\'$."number_available"\' = ?', $builder->toSql());
-    }
-
-    public function testMySqlWrappingJsonWithoutQuote()
-    {
-        $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->where('items->>sku', '=', 'foo-bar');
-        $this->assertEquals('select * from `users` where `items`->>\'$."sku"\' = ?', $builder->toSql());
-        $this->assertCount(1, $builder->getRawBindings()['where']);
-        $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
+        $this->assertEquals('select * from `users` where json_unquote(json_extract(`items`, \'$."available"\')) = true and json_unquote(json_extract(`items`, \'$."active"\')) = false and json_unquote(json_extract(`items`, \'$."number_available"\')) = ?', $builder->toSql());
     }
 
     public function testMySqlWrappingJson()
@@ -2214,15 +2203,15 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getMySqlBuilder();
         $builder->select('items->price')->from('users')->where('users.items->price', '=', 1)->orderBy('items->price');
-        $this->assertEquals('select `items`->\'$."price"\' from `users` where `users`.`items`->\'$."price"\' = ? order by `items`->\'$."price"\' asc', $builder->toSql());
+        $this->assertEquals('select json_unquote(json_extract(`items`, \'$."price"\')) from `users` where json_unquote(json_extract(`users`.`items`, \'$."price"\')) = ? order by json_unquote(json_extract(`items`, \'$."price"\')) asc', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
-        $this->assertEquals('select * from `users` where `items`->\'$."price"."in_usd"\' = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where json_unquote(json_extract(`items`, \'$."price"."in_usd"\')) = ?', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
-        $this->assertEquals('select * from `users` where `items`->\'$."price"."in_usd"\' = ? and `items`->\'$."age"\' = ?', $builder->toSql());
+        $this->assertEquals('select * from `users` where json_unquote(json_extract(`items`, \'$."price"."in_usd"\')) = ? and json_unquote(json_extract(`items`, \'$."age"\')) = ?', $builder->toSql());
     }
 
     public function testPostgresWrappingJson()
@@ -2850,12 +2839,12 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereJsonContains('users.options->languages', ['en']);
-        $this->assertEquals('select * from `users` where json_contains(`users`.`options`->\'$."languages"\', ?)', $builder->toSql());
+        $this->assertEquals('select * from `users` where json_contains(`users`.`options`, ?, \'$."languages"\')', $builder->toSql());
         $this->assertEquals(['["en"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContains('options->languages', new Raw("'[\"en\"]'"));
-        $this->assertEquals('select * from `users` where `id` = ? or json_contains(`options`->\'$."languages"\', \'["en"]\')', $builder->toSql());
+        $this->assertEquals('select * from `users` where `id` = ? or json_contains(`options`, \'["en"]\', \'$."languages"\')', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 
@@ -2908,12 +2897,12 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en']);
-        $this->assertEquals('select * from `users` where not json_contains(`options`->\'$."languages"\', ?)', $builder->toSql());
+        $this->assertEquals('select * from `users` where not json_contains(`options`, ?, \'$."languages"\')', $builder->toSql());
         $this->assertEquals(['["en"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContain('options->languages', new Raw("'[\"en\"]'"));
-        $this->assertEquals('select * from `users` where `id` = ? or not json_contains(`options`->\'$."languages"\', \'["en"]\')', $builder->toSql());
+        $this->assertEquals('select * from `users` where `id` = ? or not json_contains(`options`, \'["en"]\', \'$."languages"\')', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 

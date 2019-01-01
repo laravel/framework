@@ -14,6 +14,8 @@ class ImplicitRouteBinding
      * @param  \Illuminate\Container\Container  $container
      * @param  \Illuminate\Routing\Route  $route
      * @return void
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function resolveForRoute($container, $route)
     {

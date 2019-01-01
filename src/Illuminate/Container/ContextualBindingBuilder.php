@@ -3,6 +3,7 @@
 namespace Illuminate\Container;
 
 use Illuminate\Support\Arr;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
@@ -10,14 +11,14 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * The underlying container instance.
      *
-     * @var \Illuminate\Container\Container
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 
     /**
      * The concrete instance.
      *
-     * @var string
+     * @var string|array
      */
     protected $concrete;
 
@@ -31,7 +32,7 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * Create a new contextual binding builder.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  string|array  $concrete
      * @return void
      */

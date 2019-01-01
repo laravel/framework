@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Foundation;
 
 use stdClass;
 use Mockery as m;
+use Illuminate\Support\Str;
+use Illuminate\Foundation\Mix;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 
@@ -209,7 +211,7 @@ class FoundationHelpersTest extends TestCase
             return __DIR__;
         });
 
-        $path = public_path(str_finish($directory, '/').'hot');
+        $path = public_path(Str::finish($directory, '/').'hot');
 
         // Laravel mix when run 'hot' has a new line after the
         // url, so for consistency this "\n" is added.
@@ -224,7 +226,7 @@ class FoundationHelpersTest extends TestCase
             return __DIR__;
         });
 
-        $path = public_path(str_finish($directory, '/').'mix-manifest.json');
+        $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
 
         touch($path);
 
@@ -235,5 +237,14 @@ class FoundationHelpersTest extends TestCase
         file_put_contents($path, $content);
 
         return $path;
+    }
+
+    public function testMixIsSwappableForTests()
+    {
+        (new Application)->instance(Mix::class, function () {
+            return 'expected';
+        });
+
+        $this->assertSame('expected', mix('asset.png'));
     }
 }

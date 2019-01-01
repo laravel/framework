@@ -162,11 +162,9 @@ class SessionManager extends Manager
      */
     protected function buildSession($handler)
     {
-        if ($this->app['config']['session.encrypt']) {
-            return $this->buildEncryptedSession($handler);
-        }
-
-        return new Store($this->app['config']['session.cookie'], $handler);
+        return $this->app['config']['session.encrypt']
+                ? $this->buildEncryptedSession($handler)
+                : new Store($this->app['config']['session.cookie'], $handler);
     }
 
     /**

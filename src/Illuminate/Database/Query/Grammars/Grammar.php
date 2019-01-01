@@ -1065,7 +1065,7 @@ class Grammar extends BaseGrammar
 
         $field = $this->wrap($parts[0]);
 
-        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1], '->') : '';
 
         return [$field, $path];
     }
@@ -1074,11 +1074,12 @@ class Grammar extends BaseGrammar
      * Wrap the given JSON path.
      *
      * @param  string  $value
+     * @param  string  $delimiter
      * @return string
      */
-    protected function wrapJsonPath($value)
+    protected function wrapJsonPath($value, $delimiter = '->')
     {
-        return '\'$."'.str_replace('->', '"."', $value).'"\'';
+        return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
     }
 
     /**

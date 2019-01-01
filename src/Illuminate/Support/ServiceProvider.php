@@ -9,7 +9,7 @@ abstract class ServiceProvider
     /**
      * The application instance.
      *
-     * @var \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -37,7 +37,7 @@ abstract class ServiceProvider
     /**
      * Create a new service provider instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -134,17 +134,19 @@ abstract class ServiceProvider
      * Register paths to be published by the publish command.
      *
      * @param  array  $paths
-     * @param  string  $group
+     * @param  mixed  $groups
      * @return void
      */
-    protected function publishes(array $paths, $group = null)
+    protected function publishes(array $paths, $groups = null)
     {
         $this->ensurePublishArrayInitialized($class = static::class);
 
         static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
 
-        if ($group) {
-            $this->addPublishGroup($group, $paths);
+        if (! is_null($groups)) {
+            foreach ((array) $groups as $group) {
+                $this->addPublishGroup($group, $paths);
+            }
         }
     }
 

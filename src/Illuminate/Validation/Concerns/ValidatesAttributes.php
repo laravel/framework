@@ -12,10 +12,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
+use Egulias\EmailValidator\EmailValidator;
 use Symfony\Component\HttpFoundation\File\File;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 trait ValidatesAttributes
@@ -240,7 +243,7 @@ trait ValidatesAttributes
     {
         try {
             if ($this->isTestingRelativeDateTime($value)) {
-                return new Carbon($value);
+                return Date::parse($value);
             }
 
             return new DateTime($value);
@@ -434,9 +437,13 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'different');
 
         foreach ($parameters as $parameter) {
+            if (! Arr::has($this->data, $parameter)) {
+                return false;
+            }
+
             $other = Arr::get($this->data, $parameter);
 
-            if (is_null($other) || $value === $other) {
+            if ($value === $other) {
                 return false;
             }
         }
@@ -619,7 +626,7 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value)
     {
-        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+        return (new EmailValidator)->isValid($value, new RFCValidation);
     }
 
     /**
@@ -775,7 +782,7 @@ trait ValidatesAttributes
      * @param  string  $table
      * @return array
      */
-    protected function parseTable($table)
+    public function parseTable($table)
     {
         return Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
     }
@@ -787,7 +794,7 @@ trait ValidatesAttributes
      * @param  string  $attribute
      * @return bool
      */
-    protected function getQueryColumn($parameters, $attribute)
+    public function getQueryColumn($parameters, $attribute)
     {
         return isset($parameters[1]) && $parameters[1] !== 'NULL'
                     ? $parameters[1] : $this->guessColumnForQuery($attribute);
@@ -1698,7 +1705,7 @@ trait ValidatesAttributes
      *
      * @throws \InvalidArgumentException
      */
-    protected function requireParameterCount($count, $parameters, $rule)
+    public function requireParameterCount($count, $parameters, $rule)
     {
         if (count($parameters) < $count) {
             throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");

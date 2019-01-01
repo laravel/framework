@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Closure;
 use stdClass;
 use Mockery as m;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -997,6 +998,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKeyNot($collection);
     }
 
+    public function testWhereIn()
+    {
+        $model = new EloquentBuilderTestNestedStub;
+        $this->mockConnectionForModel($model, '');
+        $query = $model->newQuery()->withoutGlobalScopes()->whereIn('foo', $model->newQuery()->select('id'));
+        $expected = 'select * from "table" where "foo" in (select "id" from "table" where "table"."deleted_at" is null)';
+        $this->assertEquals($expected, $query->toSql());
+    }
+
     public function testLatestWithoutColumnWithCreatedAt()
     {
         $model = $this->getMockModel();
@@ -1061,6 +1071,40 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->oldest('foo');
     }
 
+    public function testUpdate()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', $now])->andReturn(1);
+
+        $result = $builder->update(['foo' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        Carbon::setTestNow(null);
+    }
+
+    public function testUpdateWithTimestampValue()
+    {
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', null])->andReturn(1);
+
+        $result = $builder->update(['foo' => 'bar', 'updated_at' => null]);
+        $this->assertEquals(1, $result);
+
+        Carbon::setTestNow(null);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -1095,6 +1139,11 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         return $query;
     }
+}
+
+class EloquentBuilderTestStub extends Model
+{
+    protected $table = 'table';
 }
 
 class EloquentBuilderTestScopeStub extends Model

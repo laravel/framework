@@ -857,10 +857,18 @@ class Builder
             return $values;
         }
 
-        return Arr::add(
-            $values, $this->model->getUpdatedAtColumn(),
-            $this->model->freshTimestampString()
+        $column = $this->model->getUpdatedAtColumn();
+
+        $values = array_merge(
+            [$column => $this->model->freshTimestampString()],
+            $values
         );
+
+        $values[$this->qualifyColumn($column)] = $values[$column];
+
+        unset($values[$column]);
+
+        return $values;
     }
 
     /**

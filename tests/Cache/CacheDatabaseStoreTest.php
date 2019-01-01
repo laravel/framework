@@ -69,9 +69,10 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61]);
+        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
 
-        $store->put('foo', 'bar', 1);
+        $result = $store->put('foo', 'bar', 1);
+        $this->assertTrue($result);
     }
 
     public function testValueIsUpdatedWhenInsertThrowsException()
@@ -84,9 +85,10 @@ class CacheDatabaseStoreTest extends TestCase
             throw new Exception;
         });
         $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
-        $table->shouldReceive('update')->once()->with(['value' => serialize('bar'), 'expiration' => 61]);
+        $table->shouldReceive('update')->once()->with(['value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
 
-        $store->put('foo', 'bar', 1);
+        $result = $store->put('foo', 'bar', 1);
+        $this->assertTrue($result);
     }
 
     public function testValueIsInsertedOnPostgres()
@@ -95,16 +97,18 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61]);
+        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61])->andReturnTrue();
 
-        $store->put('foo', "\0", 1);
+        $result = $store->put('foo', "\0", 1);
+        $this->assertTrue($result);
     }
 
     public function testForeverCallsStoreItemWithReallyLongTime()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['put'])->setConstructorArgs($this->getMocks())->getMock();
-        $store->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(5256000));
-        $store->forever('foo', 'bar');
+        $store->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(5256000))->willReturn(true);
+        $result = $store->forever('foo', 'bar');
+        $this->assertTrue($result);
     }
 
     public function testItemsMayBeRemovedFromCache()

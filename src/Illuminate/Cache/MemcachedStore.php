@@ -4,20 +4,12 @@ namespace Illuminate\Cache;
 
 use Memcached;
 use ReflectionMethod;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\LockProvider;
 
-class MemcachedStore extends TaggableStore implements LockProvider, Store
+class MemcachedStore extends TaggableStore implements LockProvider
 {
     use InteractsWithTime;
-
-    /**
-     * The maximum value that can be specified as an expiration delta.
-     *
-     * @var int
-     */
-    const REALTIME_MAXDELTA_IN_MINUTES = 43200;
 
     /**
      * The Memcached instance.
@@ -106,11 +98,11 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
-        $this->memcached->set(
+        return $this->memcached->set(
             $this->prefix.$key, $value, $this->calculateExpiration($minutes)
         );
     }
@@ -120,7 +112,7 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
      *
      * @param  array  $values
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function putMany(array $values, $minutes)
     {
@@ -130,7 +122,7 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
             $prefixedValues[$this->prefix.$key] = $value;
         }
 
-        $this->memcached->setMulti(
+        return $this->memcached->setMulti(
             $prefixedValues, $this->calculateExpiration($minutes)
         );
     }
@@ -179,11 +171,11 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        return $this->put($key, $value, 0);
     }
 
     /**

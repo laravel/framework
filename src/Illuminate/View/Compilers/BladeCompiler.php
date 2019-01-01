@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -473,6 +474,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function directive($name, callable $handler)
     {
+        if (! preg_match('/^\w+(?:::\w+)?$/x', $name)) {
+            throw new InvalidArgumentException("The directive name [{$name}] is not valid. Directive names must only contain alphanumeric characters and underscores.");
+        }
+
         $this->customDirectives[$name] = $handler;
     }
 

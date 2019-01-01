@@ -173,7 +173,7 @@ class PostgresGrammar extends Grammar
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = $this->compileUpdateColumns($values);
+        $columns = $this->compileUpdateColumns($query, $values);
 
         $from = $this->compileUpdateFrom($query);
 
@@ -185,20 +185,23 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the columns for the update statement.
      *
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array   $values
      * @return string
      */
-    protected function compileUpdateColumns($values)
+    protected function compileUpdateColumns($query, $values)
     {
         // When gathering the columns for an update statement, we'll wrap each of the
         // columns and convert it to a parameter value. Then we will concatenate a
         // list of the columns that can be added into this update query clauses.
-        return collect($values)->map(function ($value, $key) {
+        return collect($values)->map(function ($value, $key) use ($query) {
+            $column = Str::after($key, $query->from.'.');
+
             if ($this->isJsonSelector($key)) {
-                return $this->compileJsonUpdateColumn($key, $value);
+                return $this->compileJsonUpdateColumn($column, $value);
             }
 
-            return $this->wrap($key).' = '.$this->parameter($value);
+            return $this->wrap($column).' = '.$this->parameter($value);
         })->implode(', ');
     }
 
