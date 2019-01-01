@@ -1101,8 +1101,20 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->update(['foo' => 'bar', 'updated_at' => null]);
         $this->assertEquals(1, $result);
+    }
 
-        Carbon::setTestNow(null);
+    public function testUpdateWithoutTimestamp()
+    {
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubWithoutTimestamp;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "foo" = ?', ['bar'])->andReturn(1);
+
+        $result = $builder->update(['foo' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     protected function mockConnectionForModel($model, $database)
@@ -1264,4 +1276,11 @@ class EloquentBuilderTestModelSelfRelatedStub extends Model
     {
         return $this->hasMany(EloquentBuilderTestModelFarRelatedStub::class, 'foreign_key', 'id', 'bar');
     }
+}
+
+class EloquentBuilderTestStubWithoutTimestamp extends Model
+{
+    const UPDATED_AT = null;
+
+    protected $table = 'table';
 }
