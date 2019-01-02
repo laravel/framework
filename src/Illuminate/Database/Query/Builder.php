@@ -1793,8 +1793,9 @@ class Builder
     public function orderBy($column, $direction = 'asc')
     {
         $direction = strtolower($direction);
+
         if (! in_array($direction, ['asc', 'desc'], true)) {
-            throw new InvalidArgumentException('Invalid value of direction.');
+            throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
         }
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [

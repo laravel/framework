@@ -985,7 +985,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testOrderByInvalidDirectionParam()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid value of direction.');
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderBy('age', 'asec');
