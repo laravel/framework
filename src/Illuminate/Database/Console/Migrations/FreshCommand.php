@@ -47,13 +47,13 @@ class FreshCommand extends Command
 
         $this->info('Dropped all tables successfully.');
 
-        $this->call('migrate', [
+        $this->call('migrate', array_filter([
             '--database' => $database,
             '--path' => $this->input->getOption('path'),
             '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
             '--step' => $this->option('step'),
-        ]);
+        ]));
 
         if ($this->needsSeeding()) {
             $this->runSeeder($database);
@@ -104,11 +104,11 @@ class FreshCommand extends Command
      */
     protected function runSeeder($database)
     {
-        $this->call('db:seed', [
+        $this->call('db:seed', array_filter([
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
-            '--force' => $this->option('force'),
-        ]);
+            '--force' => true,
+        ]));
     }
 
     /**
