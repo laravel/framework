@@ -1073,14 +1073,14 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->belongsToStub();
-        $this->assertEquals('belongs_to_stub_id', $relation->getForeignKey());
+        $this->assertEquals('belongs_to_stub_id', $relation->getForeignKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
 
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->belongsToExplicitKeyStub();
-        $this->assertEquals('foo', $relation->getForeignKey());
+        $this->assertEquals('foo', $relation->getForeignKeyName());
     }
 
     public function testMorphToCreatesProperRelation()
@@ -1090,29 +1090,29 @@ class DatabaseEloquentModelTest extends TestCase
 
         // $this->morphTo();
         $relation = $model->morphToStub();
-        $this->assertEquals('morph_to_stub_id', $relation->getForeignKey());
+        $this->assertEquals('morph_to_stub_id', $relation->getForeignKeyName());
         $this->assertEquals('morph_to_stub_type', $relation->getMorphType());
-        $this->assertEquals('morphToStub', $relation->getRelation());
+        $this->assertEquals('morphToStub', $relation->getRelationName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
 
         // $this->morphTo(null, 'type', 'id');
         $relation2 = $model->morphToStubWithKeys();
-        $this->assertEquals('id', $relation2->getForeignKey());
+        $this->assertEquals('id', $relation2->getForeignKeyName());
         $this->assertEquals('type', $relation2->getMorphType());
-        $this->assertEquals('morphToStubWithKeys', $relation2->getRelation());
+        $this->assertEquals('morphToStubWithKeys', $relation2->getRelationName());
 
         // $this->morphTo('someName');
         $relation3 = $model->morphToStubWithName();
-        $this->assertEquals('some_name_id', $relation3->getForeignKey());
+        $this->assertEquals('some_name_id', $relation3->getForeignKeyName());
         $this->assertEquals('some_name_type', $relation3->getMorphType());
-        $this->assertEquals('someName', $relation3->getRelation());
+        $this->assertEquals('someName', $relation3->getRelationName());
 
         // $this->morphTo('someName', 'type', 'id');
         $relation4 = $model->morphToStubWithNameAndKeys();
-        $this->assertEquals('id', $relation4->getForeignKey());
+        $this->assertEquals('id', $relation4->getForeignKeyName());
         $this->assertEquals('type', $relation4->getMorphType());
-        $this->assertEquals('someName', $relation4->getRelation());
+        $this->assertEquals('someName', $relation4->getRelationName());
     }
 
     public function testBelongsToManyCreatesProperRelation()

@@ -4,7 +4,6 @@ namespace Illuminate\Container;
 
 use Closure;
 use Exception;
-use ArrayAccess;
 use LogicException;
 use ReflectionClass;
 use ReflectionParameter;
@@ -12,7 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
-class Container implements ArrayAccess, ContainerContract
+class Container implements ContainerContract
 {
     /**
      * The current globally available container (if any).
@@ -603,6 +602,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function make($abstract, array $parameters = [])
     {
@@ -631,6 +632,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function resolve($abstract, $parameters = [])
     {
@@ -712,7 +715,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the contextual concrete binding for the given abstract.
      *
      * @param  string  $abstract
-     * @return string|null
+     * @return \Closure|string|null
      */
     protected function getContextualConcrete($abstract)
     {
@@ -738,7 +741,7 @@ class Container implements ArrayAccess, ContainerContract
      * Find the concrete binding for the given abstract in the contextual binding array.
      *
      * @param  string  $abstract
-     * @return string|null
+     * @return \Closure|string|null
      */
     protected function findInContextualBindings($abstract)
     {
@@ -817,6 +820,8 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  array  $dependencies
      * @return array
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function resolveDependencies(array $dependencies)
     {

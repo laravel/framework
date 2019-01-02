@@ -15,12 +15,13 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "illuminate/container": "5.7.*",
-        "illuminate/contracts": "5.7.*",
-        "illuminate/events": "5.7.*",
-        "illuminate/filesystem": "5.7.*",
-        "illuminate/support": "5.7.*",
-        "symfony/debug": "^4.1"
+        "ext-json": "*",
+        "illuminate/container": "5.8.*",
+        "illuminate/contracts": "5.8.*",
+        "illuminate/events": "5.8.*",
+        "illuminate/filesystem": "5.8.*",
+        "illuminate/support": "5.8.*",
+        "symfony/debug": "^4.2"
     },
     "autoload": {
         "psr-4": {
@@ -29,7 +30,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.7-dev"
+            "dev-master": "5.8-dev"
         }
     },
     "config": {

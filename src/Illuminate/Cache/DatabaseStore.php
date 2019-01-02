@@ -89,7 +89,7 @@ class DatabaseStore implements Store
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
@@ -100,9 +100,11 @@ class DatabaseStore implements Store
         $expiration = $this->getTime() + (int) ($minutes * 60);
 
         try {
-            $this->table()->insert(compact('key', 'value', 'expiration'));
+            return $this->table()->insert(compact('key', 'value', 'expiration'));
         } catch (Exception $e) {
-            $this->table()->where('key', $key)->update(compact('value', 'expiration'));
+            $result = $this->table()->where('key', $key)->update(compact('value', 'expiration'));
+
+            return $result > 0;
         }
     }
 
@@ -196,11 +198,11 @@ class DatabaseStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 5256000);
+        return $this->put($key, $value, 5256000);
     }
 
     /**

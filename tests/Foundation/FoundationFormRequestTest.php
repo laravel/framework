@@ -71,9 +71,12 @@ class FoundationFormRequestTest extends TestCase
     public function test_validated_method_not_validate_twice()
     {
         $payload = ['name' => 'specified', 'with' => 'extras'];
+
         $request = $this->createRequest($payload, FoundationTestFormRequestTwiceStub::class);
+
         $request->validateResolved();
         $request->validated();
+
         $this->assertEquals(1, FoundationTestFormRequestTwiceStub::$count);
     }
 

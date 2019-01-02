@@ -9,6 +9,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
 class SupportTestingMailFakeTest extends TestCase
 {
@@ -141,11 +142,11 @@ class SupportTestingMailFakeTest extends TestCase
     }
 }
 
-class MailableStub extends Mailable
+class MailableStub extends Mailable implements MailableContract
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.7';
+    protected $version = '5.8';
 
     /**
      * Build the message.
@@ -163,7 +164,7 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.7';
+    protected $version = '5.8';
 
     /**
      * Build the message.

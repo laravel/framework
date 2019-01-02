@@ -40,7 +40,7 @@ class FallbackRouteTest extends TestCase
         $this->assertContains('one', $this->get('/prefix/one')->getContent());
         $this->assertContains('fallback', $this->get('/prefix/non-existing')->getContent());
         $this->assertContains('fallback', $this->get('/prefix/non-existing/with/multiple/segments')->getContent());
-        $this->assertContains('Page Not Found', $this->get('/non-existing')->getContent());
+        $this->assertContains('Not Found', $this->get('/non-existing')->getContent());
     }
 
     public function test_fallback_with_wildcards()

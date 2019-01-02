@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use DateTime;
 use DateTimeInterface;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Carbon\Carbon as BaseCarbon;
@@ -87,7 +88,7 @@ class SupportCarbonTest extends TestCase
 
     public function testCarbonCanSerializeToJson()
     {
-        $this->assertSame([
+        $this->assertSame(class_exists(CarbonImmutable::class) ? '2017-06-27T13:14:15.000000Z' : [
             'date' => '2017-06-27 13:14:15.000000',
             'timezone_type' => 3,
             'timezone' => 'UTC',
