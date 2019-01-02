@@ -238,9 +238,13 @@ class Command extends SymfonyCommand
      */
     protected function context()
     {
-        $options = Arr::only($this->option(), ['no-interaction', 'ansi', 'no-ansi', 'quiet', 'verbose']);
-
-        return collect($options)->mapWithKeys(function ($value, $key) {
+        return collect(Arr::only($this->option(), [
+            'ansi',
+            'no-ansi',
+            'no-interaction',
+            'quiet',
+            'verbose'
+        ]))->mapWithKeys(function ($value, $key) {
             return ["--{$key}" => $value];
         })->filter()->all();
     }
