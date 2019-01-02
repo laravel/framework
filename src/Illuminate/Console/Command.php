@@ -552,6 +552,16 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setHidden($hidden)
+    {
+        parent::setHidden($this->hidden = $hidden);
+
+        return $this;
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array
