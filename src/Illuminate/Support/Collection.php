@@ -679,7 +679,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Filter items where the given key between values.
+     * Filter items such that the value of the given key is between the given values.
      *
      * @param  string  $key
      * @param  array  $values
@@ -691,7 +691,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Filter items where the given key not between values.
+     * Filter items such that the value of the given key is not between the given values.
      *
      * @param  string  $key
      * @param  array  $values
