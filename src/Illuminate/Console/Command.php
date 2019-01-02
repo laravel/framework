@@ -243,7 +243,7 @@ class Command extends SymfonyCommand
             'no-ansi',
             'no-interaction',
             'quiet',
-            'verbose'
+            'verbose',
         ]))->mapWithKeys(function ($value, $key) {
             return ["--{$key}" => $value];
         })->filter()->all();
