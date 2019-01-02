@@ -1792,7 +1792,7 @@ class Builder
      */
     public function orderBy($column, $direction = 'asc')
     {
-        if (!in_array(strtolower($direction), ['asc', 'desc'], true)) {
+        if (! in_array(strtolower($direction), ['asc', 'desc'], true)) {
             throw new InvalidArgumentException('Invalid value of direction.');
         }
 
