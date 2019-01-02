@@ -42,28 +42,26 @@ class RefreshCommand extends Command
 
         $path = $this->input->getOption('path');
 
-        $force = $this->input->getOption('force');
-
         // If the "step" option is specified it means we only want to rollback a small
         // number of migrations before migrating again. For example, the user might
         // only rollback and remigrate the latest four migrations instead of all.
         $step = $this->input->getOption('step') ?: 0;
 
         if ($step > 0) {
-            $this->runRollback($database, $path, $step, $force);
+            $this->runRollback($database, $path, $step);
         } else {
-            $this->runReset($database, $path, $force);
+            $this->runReset($database, $path);
         }
 
         // The refresh command is essentially just a brief aggregate of a few other of
         // the migration commands and just provides a convenient wrapper to execute
         // them in succession. We'll also see if we need to re-seed the database.
-        $this->call('migrate', [
+        $this->call('migrate', array_filter([
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
-            '--force' => $force,
-        ]);
+            '--force' => true,
+        ]));
 
         if ($this->needsSeeding()) {
             $this->runSeeder($database);
@@ -75,19 +73,18 @@ class RefreshCommand extends Command
      *
      * @param  string  $database
      * @param  string  $path
-     * @param  bool  $step
-     * @param  bool  $force
+     * @param  int  $step
      * @return void
      */
-    protected function runRollback($database, $path, $step, $force)
+    protected function runRollback($database, $path, $step)
     {
-        $this->call('migrate:rollback', [
+        $this->call('migrate:rollback', array_filter([
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--step' => $step,
-            '--force' => $force,
-        ]);
+            '--force' => true,
+        ]));
     }
 
     /**
@@ -95,17 +92,16 @@ class RefreshCommand extends Command
      *
      * @param  string  $database
      * @param  string  $path
-     * @param  bool  $force
      * @return void
      */
-    protected function runReset($database, $path, $force)
+    protected function runReset($database, $path)
     {
-        $this->call('migrate:reset', [
+        $this->call('migrate:reset', array_filter([
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
-            '--force' => $force,
-        ]);
+            '--force' => true,
+        ]));
     }
 
     /**
@@ -126,11 +122,11 @@ class RefreshCommand extends Command
      */
     protected function runSeeder($database)
     {
-        $this->call('db:seed', [
+        $this->call('db:seed', array_filter([
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
-            '--force' => $this->option('force'),
-        ]);
+            '--force' => true,
+        ]));
     }
 
     /**
