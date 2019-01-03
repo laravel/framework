@@ -30,4 +30,9 @@ interface Mailable
      * @return mixed
      */
     public function later($delay, Queue $queue);
+
+    /**
+     * @return Mailable
+     */
+    public function build();
 }

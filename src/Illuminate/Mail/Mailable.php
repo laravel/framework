@@ -16,7 +16,7 @@ use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 
-class Mailable implements MailableContract, Renderable
+abstract class Mailable implements MailableContract, Renderable
 {
     use ForwardsCalls, Localizable;
 
@@ -842,4 +842,9 @@ class Mailable implements MailableContract, Renderable
 
         static::throwBadMethodCallException($method);
     }
+
+    /**
+     * @return MailableContract
+     */
+    abstract public function build(): MailableContract;
 }
