@@ -428,14 +428,16 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the given controller action.
      *
-     * @param  string|array  $action
+     * @param  string|callable  $action
      * @return string
      */
     protected function formatAction($action)
     {
-        if (is_array($action)) {
-            $action = '\\'.implode('@', $action);
+        if (is_callable($action, true, $action)) {
+            // convert $action callback into a tuple notation (example: "someClass::someMethod")
         }
+
+        $action = str_replace('::', '@', $action);
 
         if ($this->rootNamespace && strpos($action, '\\') !== 0) {
             return $this->rootNamespace.'\\'.$action;

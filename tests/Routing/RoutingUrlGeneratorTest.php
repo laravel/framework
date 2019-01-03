@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Route;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -226,6 +227,12 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
 
         /*
+         * Controller class instance
+         */
+        $route = new Route(['GET'], 'foo/controller-class', ['controller' => FooControllerStub::class.'@index']);
+        $routes->add($route);
+
+        /*
          * With Default Parameter
          */
         $url->defaults(['locale' => 'en']);
@@ -248,6 +255,9 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
         $this->assertEquals('http://www.foo.com/foo/bam', $url->action(['foo', 'bar']));
         $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
+        $this->assertEquals('http://www.foo.com/foo/controller-class', $url->action([FooControllerStub::class, 'index']));
+        $this->assertEquals('http://www.foo.com/foo/controller-class', $url->action([new FooControllerStub, 'index']));
+        $this->assertEquals('http://www.foo.com/foo/controller-class', $url->action(FooControllerStub::class.'::index'));
         $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
         $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
         $this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', ['baz' => 'åαф']));
@@ -641,5 +651,12 @@ class InvokableActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+}
+
+class FooControllerStub extends Controller
+{
+    public function index()
+    {
     }
 }
