@@ -99,6 +99,13 @@ class Route
     public $compiled;
 
     /**
+     * The matched parameters' original state.
+     *
+     * @var array
+     */
+    protected $originalParameters;
+
+    /**
      * The router instance used by the route.
      *
      * @var \Illuminate\Routing\Router
@@ -300,6 +307,8 @@ class Route
         $this->parameters = (new RouteParameterBinder($this))
                         ->parameters($request);
 
+        $this->originalParameters = $this->parameters;
+
         return $this;
     }
 
@@ -341,6 +350,18 @@ class Route
     }
 
     /**
+     * Get original value of a given parameter from the route.
+     *
+     * @param  string  $name
+     * @param  mixed   $default
+     * @return string|object
+     */
+    public function originalParameter($name, $default = null)
+    {
+        return Arr::get($this->originalParameters(), $name, $default);
+    }
+
+    /**
      * Set a parameter to the given value.
      *
      * @param  string  $name
@@ -378,6 +399,22 @@ class Route
     {
         if (isset($this->parameters)) {
             return $this->parameters;
+        }
+
+        throw new LogicException('Route is not bound.');
+    }
+
+    /**
+     * Get the key / value list of original parameters for the route.
+     *
+     * @return array
+     *
+     * @throws \LogicException
+     */
+    public function originalParameters()
+    {
+        if (isset($this->originalParameters)) {
+            return $this->originalParameters;
         }
 
         throw new LogicException('Route is not bound.');
