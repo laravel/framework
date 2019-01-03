@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Bootstrap;
 
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidFileException;
-use Dotenv\Exception\InvalidPathException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
 
@@ -25,9 +24,7 @@ class LoadEnvironmentVariables
         $this->checkForSpecificEnvironmentFile($app);
 
         try {
-            (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
-        } catch (InvalidPathException $e) {
-            //
+            Dotenv::create($app->environmentPath(), $app->environmentFile())->safeLoad();
         } catch (InvalidFileException $e) {
             echo 'The environment file is invalid: '.$e->getMessage();
             die(1);
