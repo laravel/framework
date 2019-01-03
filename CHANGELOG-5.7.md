@@ -4,15 +4,24 @@
 
 ### Added
 - Added `chunkById` support in relations ([#26919](https://github.com/laravel/framework/pull/26919))
+- Added `Collection::whereNotBetween` method ([#27028](https://github.com/laravel/framework/pull/27028))
 - Allowed predefined log channels to change formatter from config ([#26895](https://github.com/laravel/framework/pull/26895))
 - Allowed storage assertions (`FilesystemAdapter::assertExists` / `FilesystemAdapter::assertMissing`) to handle multiple files at once ([#26975](https://github.com/laravel/framework/pull/26975))
 
 ### Fixed
 - Prevents unnecessary queries when lazy loading empty relationships ([#26992](https://github.com/laravel/framework/pull/26992))
+- Fixed broken `Command::setHidden` method ([#27005](https://github.com/laravel/framework/pull/27005))
+- Fixed `Str::slug` method ([#27002](https://github.com/laravel/framework/pull/27002))
+- Ignore `--seed` option for `artisan migrate --pretend` ([#27015](https://github.com/laravel/framework/pull/27015)) 
+- Fixed `previosUrl` in the session if the call is `prefetch` ([#27017](https://github.com/laravel/framework/pull/27017))
+- Fixed nullable `MorphTo` touching ([#27031](https://github.com/laravel/framework/pull/27031))
 
 ### Changed
-- Changed default error pages ([83ca9a7](https://github.com/laravel/framework/commit/83ca9a7706a8091de9da17cb687a0852c9ef1960))
+- Removed `HasOneOrMany::update()` since `Builder::update()` already adds the `UPDATED_AT` timestamp. ([#27026](https://github.com/laravel/framework/pull/27026))
 
+### Need to add the comment:
+- https://github.com/laravel/framework/pull/27020
+- https://github.com/laravel/framework/pull/27012
 
 ## [v5.7.19 (2018-12-18)](https://github.com/laravel/framework/compare/v5.7.18...v5.7.19)
 
