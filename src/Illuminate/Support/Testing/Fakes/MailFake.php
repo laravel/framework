@@ -292,6 +292,10 @@ class MailFake implements Mailer, MailQueue
             return $this->queue($view, $data);
         }
 
+        if(method_exists($view, 'build')) {
+            $view->build();
+        }
+        
         $this->mailables[] = $view;
     }
 
