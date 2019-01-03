@@ -105,7 +105,7 @@ class MemcachedCacheLockTest extends TestCase
         $this->assertTrue($firstLock->get());
         $owner = $firstLock->getOwner();
 
-        $secondLock = Cache::store('memcached')->lock('foo', 10, $owner);
+        $secondLock = Cache::store('memcached')->restoreLock('foo', $owner);
         $secondLock->release();
 
         $this->assertTrue(Cache::store('memcached')->lock('foo')->get());

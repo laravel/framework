@@ -199,6 +199,18 @@ class MemcachedStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Restore a lock instance using the owner identifier.
+     *
+     * @param  string  $name
+     * @param  string  $owner
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function restoreLock($name, $owner)
+    {
+        return $this->lock($name, 0, $owner);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
