@@ -424,7 +424,7 @@ class LogManager implements LoggerInterface
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string    $driver
+     * @param  string  $driver
      * @param  \Closure  $callback
      * @return $this
      */
@@ -438,9 +438,8 @@ class LogManager implements LoggerInterface
     /**
      * System is unusable.
      *
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function emergency($message, array $context = [])
@@ -454,9 +453,8 @@ class LogManager implements LoggerInterface
      * Example: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
      *
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function alert($message, array $context = [])
@@ -469,9 +467,8 @@ class LogManager implements LoggerInterface
      *
      * Example: Application component unavailable, unexpected exception.
      *
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function critical($message, array $context = [])
@@ -483,9 +480,8 @@ class LogManager implements LoggerInterface
      * Runtime errors that do not require immediate action but should typically
      * be logged and monitored.
      *
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function error($message, array $context = [])
@@ -499,9 +495,8 @@ class LogManager implements LoggerInterface
      * Example: Use of deprecated APIs, poor use of an API, undesirable things
      * that are not necessarily wrong.
      *
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function warning($message, array $context = [])
@@ -512,9 +507,8 @@ class LogManager implements LoggerInterface
     /**
      * Normal but significant events.
      *
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function notice($message, array $context = [])
@@ -527,9 +521,8 @@ class LogManager implements LoggerInterface
      *
      * Example: User logs in, SQL logs.
      *
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function info($message, array $context = [])
@@ -540,9 +533,8 @@ class LogManager implements LoggerInterface
     /**
      * Detailed debug information.
      *
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function debug($message, array $context = [])
@@ -553,10 +545,9 @@ class LogManager implements LoggerInterface
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
-     *
+     * @param  mixed  $level
+     * @param  string  $message
+     * @param  array  $context
      * @return void
      */
     public function log($level, $message, array $context = [])
@@ -568,7 +559,7 @@ class LogManager implements LoggerInterface
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

@@ -19,7 +19,7 @@ interface Repository extends CacheInterface
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null);
@@ -28,7 +28,7 @@ interface Repository extends CacheInterface
      * Retrieve an item from the cache and delete it.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function pull($key, $default = null);
@@ -37,7 +37,7 @@ interface Repository extends CacheInterface
      * Store an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
      * @return void
      */
@@ -47,7 +47,7 @@ interface Repository extends CacheInterface
      * Store an item in the cache if the key does not exist.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
      * @return bool
      */
@@ -75,7 +75,7 @@ interface Repository extends CacheInterface
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function forever($key, $value);
@@ -111,7 +111,7 @@ interface Repository extends CacheInterface
     /**
      * Remove an item from the cache.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     public function forget($key);

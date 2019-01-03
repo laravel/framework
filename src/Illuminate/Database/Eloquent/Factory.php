@@ -144,7 +144,7 @@ class Factory implements ArrayAccess
      *
      * @param  string  $class
      * @param  callable  $callback
-     * @param  string $name
+     * @param  string  $name
      * @return $this
      */
     public function afterCreating($class, callable $callback, $name = 'default')

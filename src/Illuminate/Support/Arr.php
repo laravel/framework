@@ -24,9 +24,9 @@ class Arr
     /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return array
      */
     public static function add($array, $key, $value)
@@ -102,7 +102,7 @@ class Arr
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $prepend
      * @return array
      */
@@ -272,7 +272,7 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public static function get($array, $key, $default = null)
@@ -447,9 +447,9 @@ class Arr
     /**
      * Get a value from the array, and remove it.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public static function pull(&$array, $key, $default = null)
@@ -506,9 +506,9 @@ class Arr
      *
      * If no key is given to the method, the entire array will be replaced.
      *
-     * @param  array   $array
+     * @param  array  $array
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return array
      */
     public static function set(&$array, $key, $value)

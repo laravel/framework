@@ -280,8 +280,8 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a rename index command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
-     * @param  \Illuminate\Support\Fluent $command
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command)

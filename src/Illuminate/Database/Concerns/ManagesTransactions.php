@@ -217,7 +217,8 @@ trait ManagesTransactions
     /**
      * Handle an exception from a rollback.
      *
-     * @param \Exception  $e
+     * @param  \Exception  $e
+     * @return void
      *
      * @throws \Exception
      */

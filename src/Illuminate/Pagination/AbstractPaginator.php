@@ -252,7 +252,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Load a set of relationships onto the mixed relationship collection.
      *
-     * @param  string $relation
+     * @param  string  $relation
      * @param  array  $relations
      * @return $this
      */

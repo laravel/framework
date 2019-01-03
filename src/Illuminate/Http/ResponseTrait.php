@@ -59,7 +59,7 @@ trait ResponseTrait
      *
      * @param  string  $key
      * @param  array|string  $values
-     * @param  bool    $replace
+     * @param  bool  $replace
      * @return $this
      */
     public function header($key, $values, $replace = true)

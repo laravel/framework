@@ -198,7 +198,7 @@ class Logger implements LoggerInterface
      *
      * @param  string  $level
      * @param  string  $message
-     * @param  array   $context
+     * @param  array  $context
      * @return void
      */
     protected function fireLogEvent($level, $message, array $context = [])

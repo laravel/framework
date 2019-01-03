@@ -78,8 +78,9 @@ class sendRawEmailMock
 
     /**
      * Mock the get() call for the sendRawEmail response.
-     * @param  [type] $key [description]
-     * @return [type]      [description]
+     *
+     * @param  string  $key
+     * @return mixed
      */
     public function get($key)
     {

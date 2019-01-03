@@ -199,7 +199,7 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Create a new password reset token for the given user.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword $user
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return string
      */
     public function createToken(CanResetPasswordContract $user)
@@ -210,7 +210,7 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Delete password reset tokens of the given user.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword $user
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return void
      */
     public function deleteToken(CanResetPasswordContract $user)
@@ -221,8 +221,8 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Validate the given password reset token.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword $user
-     * @param  string $token
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @param  string  $token
      * @return bool
      */
     public function tokenExists(CanResetPasswordContract $user, $token)

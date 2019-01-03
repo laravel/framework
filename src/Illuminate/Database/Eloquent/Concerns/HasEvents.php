@@ -43,7 +43,7 @@ trait HasEvents
     /**
      * Register a single observer with the model.
      *
-     * @param  object|string $class
+     * @param  object|string  $class
      * @return void
      */
     protected function registerObserver($class)

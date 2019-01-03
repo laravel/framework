@@ -60,7 +60,7 @@ class MandrillTransport extends Transport
      *
      * Note that Mandrill still respects CC, BCC headers in raw message itself.
      *
-     * @param  \Swift_Mime_SimpleMessage $message
+     * @param  \Swift_Mime_SimpleMessage  $message
      * @return array
      */
     protected function getTo(Swift_Mime_SimpleMessage $message)

@@ -621,9 +621,9 @@ class AuthAccessGateTest extends TestCase
     /**
      * @dataProvider hasAbilitiesTestDataProvider
      *
-     * @param array $abilitiesToSet
-     * @param array|string $abilitiesToCheck
-     * @param bool $expectedHasValue
+     * @param  array  $abilitiesToSet
+     * @param  array|string  $abilitiesToCheck
+     * @param  bool  $expectedHasValue
      */
     public function test_has_abilities($abilitiesToSet, $abilitiesToCheck, $expectedHasValue)
     {

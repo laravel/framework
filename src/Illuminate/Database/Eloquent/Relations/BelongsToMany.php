@@ -220,7 +220,7 @@ class BelongsToMany extends Relation
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  string  $relation
      * @return array
      */
@@ -236,7 +236,7 @@ class BelongsToMany extends Relation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
      * @return array
@@ -320,7 +320,7 @@ class BelongsToMany extends Relation
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -335,9 +335,9 @@ class BelongsToMany extends Relation
      * Set a "where in" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  mixed   $values
+     * @param  mixed  $values
      * @param  string  $boolean
-     * @param  bool    $not
+     * @param  bool  $not
      * @return $this
      */
     public function wherePivotIn($column, $values, $boolean = 'and', $not = false)
@@ -352,7 +352,7 @@ class BelongsToMany extends Relation
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return $this
      */
     public function orWherePivot($column, $operator = null, $value = null)
@@ -392,7 +392,7 @@ class BelongsToMany extends Relation
      * Set an "or where in" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  mixed   $values
+     * @param  mixed  $values
      * @return $this
      */
     public function orWherePivotIn($column, $values)
@@ -436,7 +436,7 @@ class BelongsToMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $joining
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function firstOrCreate(array $attributes, array $joining = [], $touch = true)
@@ -454,7 +454,7 @@ class BelongsToMany extends Relation
      * @param  array  $attributes
      * @param  array  $values
      * @param  array  $joining
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
@@ -525,7 +525,7 @@ class BelongsToMany extends Relation
     /**
      * Execute the query and get the first result.
      *
-     * @param  array   $columns
+     * @param  array  $columns
      * @return mixed
      */
     public function first($columns = ['*'])
@@ -840,7 +840,7 @@ class BelongsToMany extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  array  $pivotAttributes
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function save(Model $model, array $pivotAttributes = [], $touch = true)
@@ -875,7 +875,7 @@ class BelongsToMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $joining
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function create(array $attributes = [], array $joining = [], $touch = true)

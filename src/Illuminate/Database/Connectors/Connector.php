@@ -29,8 +29,8 @@ class Connector
      * Create a new PDO connection.
      *
      * @param  string  $dsn
-     * @param  array   $config
-     * @param  array   $options
+     * @param  array  $config
+     * @param  array  $options
      * @return \PDO
      *
      * @throws \Exception
@@ -89,7 +89,7 @@ class Connector
      * @param  string  $dsn
      * @param  string  $username
      * @param  string  $password
-     * @param  array   $options
+     * @param  array  $options
      * @return \PDO
      *
      * @throws \Exception

@@ -89,7 +89,7 @@ class MorphToMany extends BelongsToMany
     /**
      * Create a new pivot attachment record.
      *
-     * @param  int   $id
+     * @param  int  $id
      * @param  bool  $timed
      * @return array
      */
@@ -129,7 +129,7 @@ class MorphToMany extends BelongsToMany
      * Create a new pivot model instance.
      *
      * @param  array  $attributes
-     * @param  bool   $exists
+     * @param  bool  $exists
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     public function newPivot(array $attributes = [], $exists = false)

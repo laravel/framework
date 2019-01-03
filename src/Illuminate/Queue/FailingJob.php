@@ -13,7 +13,7 @@ class FailingJob
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Queue\Jobs\Job  $job
-     * @param  \Exception $e
+     * @param  \Exception  $e
      * @return void
      */
     public static function handle($connectionName, $job, $e = null)

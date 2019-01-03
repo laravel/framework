@@ -177,7 +177,8 @@ class CacheRepositoryTest extends TestCase
 
     /**
      * @dataProvider dataProviderTestGetMinutes
-     * @param mixed $duration
+     *
+     * @param  mixed  $duration
      */
     public function testGetMinutes($duration)
     {

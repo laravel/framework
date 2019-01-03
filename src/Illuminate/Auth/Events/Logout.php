@@ -25,7 +25,7 @@ class Logout
     /**
      * Create a new event instance.
      *
-     * @param  string $guard
+     * @param  string  $guard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */

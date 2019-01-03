@@ -122,7 +122,7 @@ class BoundMethod
     /**
      * Get the proper reflection instance for the given callback.
      *
-     * @param  callable|string $callback
+     * @param  callable|string  $callback
      * @return \ReflectionFunctionAbstract
      *
      * @throws \ReflectionException

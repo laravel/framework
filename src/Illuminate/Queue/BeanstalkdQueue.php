@@ -62,7 +62,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * Push a new job onto the queue.
      *
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string  $queue
      * @return mixed
      */
@@ -76,7 +76,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @param  string  $payload
      * @param  string  $queue
-     * @param  array   $options
+     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
@@ -91,7 +91,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string  $queue
      * @return mixed
      */

@@ -272,7 +272,7 @@ class Handler implements ExceptionHandlerContract
      * Prepare a response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception $e
+     * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function prepareResponse($request, Exception $e)
@@ -423,7 +423,7 @@ class Handler implements ExceptionHandlerContract
      * Prepare a JSON response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception $e
+     * @param  \Exception  $e
      * @return \Illuminate\Http\JsonResponse
      */
     protected function prepareJsonResponse($request, Exception $e)

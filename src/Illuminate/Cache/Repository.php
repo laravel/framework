@@ -85,7 +85,7 @@ class Repository implements CacheContract, ArrayAccess
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -178,7 +178,7 @@ class Repository implements CacheContract, ArrayAccess
      * Retrieve an item from the cache and delete it.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function pull($key, $default = null)
@@ -192,7 +192,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return void
      */
@@ -249,7 +249,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store an item in the cache if the key does not exist.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
      * @return bool
      */
@@ -308,7 +308,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function forever($key, $value)
@@ -535,7 +535,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store an item in the cache for the default time.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function offsetSet($key, $value)
@@ -575,7 +575,7 @@ class Repository implements CacheContract, ArrayAccess
      * Handle dynamic calls into macros or pass missing methods to the store.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)
