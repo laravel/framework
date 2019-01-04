@@ -261,7 +261,8 @@ class Container implements ArrayAccess, ContainerContract
                 return $container->build($concrete);
             }
 
-            return $container->make($concrete, $parameters);
+            // To prevent extra call to resolving callbacks, we make the object silently.
+            return $container->resolve($concrete, $parameters, true);
         };
     }
 
@@ -630,9 +631,10 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  array  $parameters
+     * @param  bool   $silent
      * @return mixed
      */
-    protected function resolve($abstract, $parameters = [])
+    protected function resolve($abstract, $parameters = [], $silent = false)
     {
         $abstract = $this->getAlias($abstract);
 
@@ -674,8 +676,9 @@ class Container implements ArrayAccess, ContainerContract
             $this->instances[$abstract] = $object;
         }
 
-        $this->fireResolvingCallbacks($abstract, $object);
-
+        if (! $silent) {
+            $this->fireResolvingCallbacks($abstract, $object);
+        }
         // Before returning, we will also set the resolved flag to "true" and pop off
         // the parameter overrides for this build. After those two things are done
         // we will be ready to return back the fully constructed class instance.
