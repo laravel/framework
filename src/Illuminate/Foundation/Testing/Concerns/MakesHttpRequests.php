@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use LogicException;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\TestResponse;
@@ -31,6 +32,13 @@ trait MakesHttpRequests
      * @var bool
      */
     protected $followRedirects = false;
+
+    /**
+     * Indicates whether the application already handled a request in the current test.
+     *
+     * @var bool
+     */
+    protected $wasARequestAlreadyHandled = false;
 
     /**
      * Define additional headers to be sent with the request.
@@ -334,6 +342,10 @@ trait MakesHttpRequests
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
     {
+        if ($this->wasARequestAlreadyHandled) {
+            throw new LogicException('The framework can handle only one request per test.');
+        }
+
         $kernel = $this->app->make(HttpKernel::class);
 
         $files = array_merge($files, $this->extractFilesFromDataArray($parameters));
@@ -352,6 +364,8 @@ trait MakesHttpRequests
         }
 
         $kernel->terminate($request, $response);
+
+        $this->wasARequestAlreadyHandled = true;
 
         return $this->createTestResponse($response);
     }
