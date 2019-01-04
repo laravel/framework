@@ -695,7 +695,7 @@ class ResourceTest extends TestCase
                     'id' => 1,
                     'title' => 'Test Title 1',
                 ]));
-                   
+
                 return $this->filter([
                     new MergeValue($postResource),
                     'user' => 'test user',
