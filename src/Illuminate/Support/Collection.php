@@ -261,17 +261,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() === 1) {
-            if ($this->useAsCallable($key)) {
-                $placeholder = new stdClass;
-
-                return $this->first($key, $placeholder) !== $placeholder;
-            }
-
-            return in_array($key, $this->items);
+        if (func_num_args() !== 1) {
+            return $this->contains($this->operatorForWhere(...func_get_args()));
         }
 
-        return $this->contains($this->operatorForWhere(...func_get_args()));
+        if ($this->useAsCallable($key)) {
+            $placeholder = new stdClass;
+
+            return $this->first($key, $placeholder) !== $placeholder;
+        }
+
+        return in_array($key, $this->items);
     }
 
     /**
