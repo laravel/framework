@@ -1819,13 +1819,23 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([1, 3, 5]);
 
         $this->assertTrue($c->contains(1));
+        $this->assertTrue($c->contains(true));
+        $this->assertTrue($c->contains('1'));
         $this->assertFalse($c->contains(2));
+        $this->assertFalse($c->contains(false));
         $this->assertTrue($c->contains(function ($value) {
             return $value < 5;
         }));
         $this->assertFalse($c->contains(function ($value) {
             return $value > 5;
         }));
+
+        $c = new Collection(['1', '3', '5', 0]);
+        $this->assertTrue($c->contains(1));
+        $this->assertTrue($c->contains(false));
+        $this->assertTrue($c->contains(null));
+        $this->assertTrue($c->contains('1'));
+        $this->assertFalse($c->contains(2));
 
         $c = new Collection([['v' => 1], ['v' => 3], ['v' => 5]]);
 
