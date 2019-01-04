@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -238,15 +237,15 @@ class Command extends SymfonyCommand
      */
     protected function context()
     {
-        return collect(Arr::only($this->option(), [
+        return collect($this->option())->only([
             'ansi',
             'no-ansi',
             'no-interaction',
             'quiet',
             'verbose',
-        ]))->mapWithKeys(function ($value, $key) {
+        ])->filter()->mapWithKeys(function ($value, $key) {
             return ["--{$key}" => $value];
-        })->filter()->all();
+        })->all();
     }
 
     /**
