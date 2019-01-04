@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Support\Deferred;
 
 abstract class ServiceProvider
 {
@@ -297,6 +298,6 @@ abstract class ServiceProvider
      */
     public function isDeferred()
     {
-        return $this->defer;
+        return $this->defer || $this instanceof Deferred;
     }
 }
