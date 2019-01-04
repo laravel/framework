@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Support\Deferred;
+use Illuminate\Console\Application as Artisan;
 
 abstract class ServiceProvider
 {
