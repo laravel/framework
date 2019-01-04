@@ -6,6 +6,7 @@ use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidFileException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class LoadEnvironmentVariables
 {
@@ -26,8 +27,7 @@ class LoadEnvironmentVariables
         try {
             Dotenv::create($app->environmentPath(), $app->environmentFile())->safeLoad();
         } catch (InvalidFileException $e) {
-            echo 'The environment file is invalid: '.$e->getMessage();
-            die(1);
+            $this->writeErrorAndDie($e);
         }
     }
 
@@ -72,5 +72,21 @@ class LoadEnvironmentVariables
         }
 
         return false;
+    }
+
+    /**
+     * Write the error information to the screen and exit.
+     *
+     * @param  \Dotenv\Exception\InvalidFileException  $e
+     * @return void
+     */
+    protected function writeErrorAndDie(InvalidFileException $e)
+    {
+        $output = (new ConsoleOutput())->getErrorOutput();
+
+        $output->writeln('The environment file is invalid!');
+        $output->writeln($e->getMessage());
+
+        die(1);
     }
 }
