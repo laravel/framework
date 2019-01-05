@@ -85,6 +85,13 @@ class Route
     public $parameterNames;
 
     /**
+     * The array of the matched parameters' original values.
+     *
+     * @var array
+     */
+    protected $originalParameters;
+
+    /**
      * The computed gathered middleware.
      *
      * @var array|null
@@ -97,13 +104,6 @@ class Route
      * @var \Symfony\Component\Routing\CompiledRoute
      */
     public $compiled;
-
-    /**
-     * The matched parameters' original state.
-     *
-     * @var array
-     */
-    protected $originalParameters;
 
     /**
      * The router instance used by the route.
@@ -354,7 +354,7 @@ class Route
      *
      * @param  string  $name
      * @param  mixed   $default
-     * @return string|object
+     * @return string
      */
     public function originalParameter($name, $default = null)
     {
