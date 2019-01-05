@@ -1809,7 +1809,27 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([1, 3, 5]);
 
         $this->assertTrue($c->contains(1));
+        $this->assertTrue($c->contains('1'));
         $this->assertFalse($c->contains(2));
+        $this->assertFalse($c->contains('2'));
+
+        $c = new Collection(['1']);
+        $this->assertTrue($c->contains('1'));
+        $this->assertTrue($c->contains(1));
+
+        $c = new Collection([null]);
+        $this->assertTrue($c->contains(false));
+        $this->assertTrue($c->contains(null));
+        $this->assertTrue($c->contains([]));
+        $this->assertTrue($c->contains(0));
+        $this->assertTrue($c->contains(''));
+
+        $c = new Collection([0]);
+        $this->assertTrue($c->contains(0));
+        $this->assertTrue($c->contains('0'));
+        $this->assertTrue($c->contains(false));
+        $this->assertTrue($c->contains(null));
+
         $this->assertTrue($c->contains(function ($value) {
             return $value < 5;
         }));
@@ -1885,8 +1905,10 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([1, 3, 5, '02']);
 
         $this->assertTrue($c->containsStrict(1));
+        $this->assertFalse($c->containsStrict('1'));
         $this->assertFalse($c->containsStrict(2));
         $this->assertTrue($c->containsStrict('02'));
+        $this->assertFalse($c->containsStrict(true));
         $this->assertTrue($c->containsStrict(function ($value) {
             return $value < 5;
         }));
@@ -1894,10 +1916,23 @@ class SupportCollectionTest extends TestCase
             return $value > 5;
         }));
 
+        $c = new Collection([0]);
+        $this->assertTrue($c->containsStrict(0));
+        $this->assertFalse($c->containsStrict('0'));
+
+        $this->assertFalse($c->containsStrict(false));
+        $this->assertFalse($c->containsStrict(null));
+
+        $c = new Collection([1, null]);
+        $this->assertTrue($c->containsStrict(null));
+        $this->assertFalse($c->containsStrict(0));
+        $this->assertFalse($c->containsStrict(false));
+
         $c = new Collection([['v' => 1], ['v' => 3], ['v' => '04'], ['v' => 5]]);
 
         $this->assertTrue($c->containsStrict('v', 1));
         $this->assertFalse($c->containsStrict('v', 2));
+        $this->assertFalse($c->containsStrict('v', '1'));
         $this->assertFalse($c->containsStrict('v', 4));
         $this->assertTrue($c->containsStrict('v', '04'));
 
