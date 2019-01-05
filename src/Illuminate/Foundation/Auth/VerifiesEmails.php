@@ -35,7 +35,7 @@ trait VerifiesEmails
         if ($request->route('id') != $request->user()->getKey()) {
             throw new AuthorizationException;
         }
-        
+
         if ($request->user()->hasVerifiedEmail()) {
             return redirect($this->redirectPath());
         }
