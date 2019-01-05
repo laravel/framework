@@ -684,6 +684,63 @@ class ResourceTest extends TestCase
         ], $results);
     }
 
+    public function test_merge_value_can_merge_json_serializable()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                $postResource = new PostResource(new Post([
+                    'id' => 1,
+                    'title' => 'Test Title 1',
+                ]));
+
+                return $this->filter([
+                    new MergeValue($postResource),
+                    'user' => 'test user',
+                    'age' => 'test age',
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'id' => 1,
+            'title' => 'Test Title 1',
+            'custom' => true,
+            'user' => 'test user',
+            'age' => 'test age',
+        ], $results);
+    }
+
+    public function test_merge_value_can_merge_collection_of_json_serializable()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                $posts = collect([
+                    new Post(['id' => 1, 'title' => 'Test title 1']),
+                    new Post(['id' => 2, 'title' => 'Test title 2']),
+                ]);
+
+                return $this->filter([
+                    new MergeValue(PostResource::collection($posts)),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            ['id' => 1, 'title' => 'Test title 1', 'custom' => true],
+            ['id' => 2, 'title' => 'Test title 2', 'custom' => true],
+        ], $results);
+    }
+
     public function test_all_merge_values_may_be_missing()
     {
         $filter = new class {
