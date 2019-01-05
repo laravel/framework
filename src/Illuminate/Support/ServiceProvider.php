@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Contracts\Support\Deferred;
 use Illuminate\Console\Application as Artisan;
 
 abstract class ServiceProvider
@@ -15,6 +16,8 @@ abstract class ServiceProvider
 
     /**
      * Indicates if loading of the provider is deferred.
+     *
+     * @deprecated 5.8 Implement the \Illuminate\Contracts\Support\Deferred interface instead.
      *
      * @var bool
      */
@@ -297,6 +300,6 @@ abstract class ServiceProvider
      */
     public function isDeferred()
     {
-        return $this->defer;
+        return $this->defer || $this instanceof Deferred;
     }
 }
