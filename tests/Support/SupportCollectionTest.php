@@ -2006,6 +2006,7 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([1, 2, 3, 4, 5, 2, 5, 'foo' => 'bar']);
 
         $this->assertEquals(1, $c->search(2));
+        $this->assertEquals(1, $c->search('2'));
         $this->assertEquals('foo', $c->search('bar'));
         $this->assertEquals(4, $c->search(function ($value) {
             return $value > 4;
@@ -2013,6 +2014,18 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('foo', $c->search(function ($value) {
             return ! is_numeric($value);
         }));
+    }
+
+    public function testSearchInStrictMode()
+    {
+        $c = new Collection([false, 0, 1, [], '']);
+        $this->assertFalse($c->search('false', true));
+        $this->assertFalse($c->search('1', true));
+        $this->assertEquals(0, $c->search(false, true));
+        $this->assertEquals(1, $c->search(0, true));
+        $this->assertEquals(2, $c->search(1, true));
+        $this->assertEquals(3, $c->search([], true));
+        $this->assertEquals(4, $c->search('', true));
     }
 
     public function testSearchReturnsFalseWhenItemIsNotFound()
