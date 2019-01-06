@@ -7,21 +7,26 @@
 - Added `Collection::whereNotBetween` method ([#27028](https://github.com/laravel/framework/pull/27028))
 - Allowed predefined log channels to change formatter from config ([#26895](https://github.com/laravel/framework/pull/26895))
 - Allowed storage assertions (`FilesystemAdapter::assertExists` / `FilesystemAdapter::assertMissing`) to handle multiple files at once ([#26975](https://github.com/laravel/framework/pull/26975))
+- Added `Adaptive Server connection failed` to `DetectsLostConnections` trait ([#27055](https://github.com/laravel/framework/pull/27055))
+- Added `Route::originalParameters()` ([#27056](https://github.com/laravel/framework/pull/27056))
 
 ### Fixed
 - Prevents unnecessary queries when lazy loading empty relationships ([#26992](https://github.com/laravel/framework/pull/26992))
 - Fixed broken `Command::setHidden` method ([#27005](https://github.com/laravel/framework/pull/27005))
 - Fixed `Str::slug` method ([#27002](https://github.com/laravel/framework/pull/27002))
 - Ignore `--seed` option for `artisan migrate --pretend` ([#27015](https://github.com/laravel/framework/pull/27015)) 
-- Fixed `previosUrl` in the session if the call is `prefetch` ([#27017](https://github.com/laravel/framework/pull/27017))
+- Fixed `previousUrl` in the session if the call is `prefetch` ([#27017](https://github.com/laravel/framework/pull/27017))
 - Fixed nullable `MorphTo` touching ([#27031](https://github.com/laravel/framework/pull/27031))
+- Fixed `Collection::loadMissing()` with duplicate relation names ([#27040](https://github.com/laravel/framework/pull/27040))
+- Fixed some commands ([#27020](https://github.com/laravel/framework/pull/27020))
+- Ensured the command `context` is forwarded to calls ([#27012](https://github.com/laravel/framework/pull/27012), [#27065](https://github.com/laravel/framework/pull/27065))
 
 ### Changed
 - Removed `HasOneOrMany::update()` since `Builder::update()` already adds the `UPDATED_AT` timestamp. ([#27026](https://github.com/laravel/framework/pull/27026))
+- Changed `Name or service not known` to `php_network_getaddresses: getaddrinfo failed: Name or service not known` in `DetectsLostConnections` trait ([#27054](https://github.com/laravel/framework/pull/27054), [5459ac1](https://github.com/laravel/framework/commit/5459ac15b56cdee8e176827ddbb30357119ceabb))
+- Changed Eloquent `ApiResource merge()` methods to accept `JsonResource` object  ([#27068](https://github.com/laravel/framework/pull/27068))
+- Stop email re-verification with same link ([#27070](https://github.com/laravel/framework/pull/27070)) 
 
-### Need to add the comment:
-- https://github.com/laravel/framework/pull/27020
-- https://github.com/laravel/framework/pull/27012
 
 ## [v5.7.19 (2018-12-18)](https://github.com/laravel/framework/compare/v5.7.18...v5.7.19)
 
