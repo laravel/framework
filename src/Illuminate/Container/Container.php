@@ -851,9 +851,15 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function hasParameterOverride($dependency)
     {
-        return array_key_exists(
-            $dependency->name, $this->getLastParameterOverride()
-        );
+        // We need to check if the user's trying to override the dependency using the
+        // parameter variable name first. If the parameter was not found using the
+        // variable name then check if they passed through a type hint instead.
+        return array_key_exists($dependency->name, $this->getLastParameterOverride()) ||
+            (
+                ! empty($dependency->getClass()->name)
+                    ? array_key_exists($dependency->getClass()->name, $this->getLastParameterOverride())
+                    : false
+            );
     }
 
     /**
@@ -864,7 +870,8 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getParameterOverride($dependency)
     {
-        return $this->getLastParameterOverride()[$dependency->name];
+        return $this->getLastParameterOverride()[$dependency->name]
+            ?? $this->getLastParameterOverride()[$dependency->getClass()->name];
     }
 
     /**

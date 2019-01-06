@@ -1001,6 +1001,18 @@ class ContainerTest extends TestCase
         $this->assertEquals('laurence', $instance->something);
     }
 
+    public function testResolvingWithTypeHintedParams()
+    {
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $implementation = $container->make(ContainerImplementationStubTwo::class);
+
+        $class = $container->make(ContainerDependentStub::class, [IContainerContractStub::class => $implementation]);
+
+        $this->assertSame($implementation, $class->impl);
+    }
+
     public function testNestedParameterOverride()
     {
         $container = new Container;
