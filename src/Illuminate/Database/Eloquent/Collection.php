@@ -186,8 +186,7 @@ class Collection extends BaseCollection implements QueueableCollection
                 return Arr::has($relations, $className);
             })
             ->each(function ($models, $className) use ($relations) {
-                $className::with($relations[$className])
-                    ->eagerLoadRelations($models->all());
+                static::make($models)->load($relations[$className]);
             });
 
         return $this;
