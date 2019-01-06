@@ -123,5 +123,4 @@ class TestUpdateModel2 extends Model
 
     public $table = 'test_model2';
     protected $fillable = ['name'];
-    protected $dates = ['deleted_at'];
 }
