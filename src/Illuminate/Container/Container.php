@@ -891,7 +891,9 @@ class Container implements ArrayAccess, ContainerContract
             return $concrete instanceof Closure ? $concrete($this) : $concrete;
         }
 
-        if ($parameter->isDefaultValueAvailable()) {
+        if (! empty($this->getLastParameterOverride()['$'.$parameter->name])) {
+            return $this->getLastParameterOverride()['$'.$parameter->name];
+        } elseif ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
         }
 

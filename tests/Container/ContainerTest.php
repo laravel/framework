@@ -983,6 +983,9 @@ class ContainerTest extends TestCase
         $instance = $container->make(ContainerDefaultValueStub::class, ['default' => 'adam']);
         $this->assertEquals('adam', $instance->default);
 
+        $instance = $container->make(ContainerDefaultValueStub::class, ['$default' => 'abigail']);
+        $this->assertEquals('abigail', $instance->default);
+
         $instance = $container->make(ContainerDefaultValueStub::class);
         $this->assertEquals('taylor', $instance->default);
 
