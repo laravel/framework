@@ -182,11 +182,8 @@ class Collection extends BaseCollection implements QueueableCollection
             ->groupBy(function ($model) {
                 return get_class($model);
             })
-            ->filter(function ($models, $className) use ($relations) {
-                return Arr::has($relations, $className);
-            })
             ->each(function ($models, $className) use ($relations) {
-                static::make($models)->load($relations[$className]);
+                static::make($models)->load($relations[$className] ?? []);
             });
 
         return $this;
