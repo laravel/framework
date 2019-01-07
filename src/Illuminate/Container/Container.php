@@ -133,6 +133,20 @@ class Container implements ContainerContract
     protected $afterResolvingCallbacks = [];
 
     /**
+     * All of the decorators for method calls.
+     *
+     * @var array
+     */
+    protected $decorators = [];
+
+    /**
+     * All of the decorator names and definitions.
+     *
+     * @var array
+     */
+    protected $decorations = [];
+
+    /**
      * Define a contextual binding.
      *
      * @param  array|string  $concrete
@@ -569,6 +583,35 @@ class Container implements ContainerContract
     public function call($callback, array $parameters = [], $defaultMethod = null)
     {
         return BoundMethod::call($this, $callback, $parameters, $defaultMethod);
+    }
+
+    public function defineDecorator($name, $callback)
+    {
+        $this->decorators[$name] = $callback;
+    }
+
+    public function callWithDecorators($callback, array $parameters = [], $defaultMethod = null)
+    {
+        $decorations = $this->decorations[$callback] ?? [];
+
+        foreach ($decorations as $decoratorName) {
+            $decorator = $this->decorators[$decoratorName];
+            $callback = $decorator($this, $callback, $parameters);
+        }
+
+        return BoundMethod::call($this, $callback, $parameters, $defaultMethod);
+    }
+
+    /**
+     * Unset the value at a given offset.
+     *
+     * @param  string   $decorated
+     * @param  Callable $decorator
+     * @return void
+     */
+    public function decorate($decorated, $decorator)
+    {
+        $this->decorations[$decorated][] = $decorator;
     }
 
     /**

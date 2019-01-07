@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Container;
 
 use Closure;
-use stdClass;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ContainerTest extends TestCase
 {
@@ -1113,6 +1113,105 @@ class ContainerTest extends TestCase
 
         $container->call(function (ContainerConcreteStub $stub) {
         }, ['foo' => 'bar', 'stub' => new ContainerConcreteStub]);
+    }
+
+    public function testSimpleDecorator()
+    {
+        $container = new Container;
+
+        $container->defineDecorator('stringifyResult', function ($container, $decorated, $params) {
+            return function () use ($container, $decorated, $params) {
+                return (string) $container->call($decorated, $params);
+            };
+        });
+
+        $container->decorate(Calculator::class.'@add', 'stringifyResult');
+
+        $result = $container->callWithDecorators(Calculator::class.'@add', [-10, -10]);
+        $this->assertIsString($result);
+        $this->assertEquals('-20', $result);
+    }
+
+    public function testTwoDecorators()
+    {
+        $container = new Container;
+
+        $container->defineDecorator('stringifyResult', function ($container, $decorated, $params) {
+            return function () use ($container, $decorated, $params) {
+                return (string) $container->call($decorated, $params);
+            };
+        });
+
+        $container->defineDecorator('intifyParams', function ($container, $decorated, $params) {
+            return function () use ($container, $decorated, $params) {
+                $params[0] = (int) $params[0];
+                $params[1] = (int) $params[1];
+
+                return $container->call($decorated, $params);
+            };
+        });
+
+        $container->decorate(Calculator::class.'@add', 'stringifyResult');
+        $container->decorate(Calculator::class.'@add', 'intifyParams');
+
+        $result = $container->callWithDecorators(Calculator::class.'@add', ['-10', '-10']);
+        $this->assertIsString($result);
+        $this->assertEquals('-20', $result);
+    }
+
+    public function testMultipleDecorators()
+    {
+        $container = new Container;
+
+        $container->defineDecorator('noNegativeParam', function ($container, $decorated, $params) {
+            return function () use ($container, $decorated, $params) {
+                $params['x'] = ($params['x'] < 0) ? 0 : $params['x'];
+                $params['y'] = ($params['y'] < 0) ? 0 : $params['y'];
+
+                return $container->call($decorated, $params);
+            };
+        });
+
+        $container->defineDecorator('noPositiveResult', function ($container, $decorated, $params) {
+            return function () use ($container, $decorated, $params) {
+                return abs($container->call($decorated, $params)) * -1;
+            };
+        });
+
+        $container->defineDecorator('stringifyResult', function ($container, $decorated, $params) {
+            return function () use ($container, $decorated, $params) {
+                return (string) $container->call($decorated, $params);
+            };
+        });
+
+        $container->decorate(Calculator::class.'@add', 'noNegativeParam');
+        $container->decorate(Calculator::class.'@add', 'noPositiveResult');
+        $container->decorate(Calculator::class.'@add', 'stringifyResult');
+
+        $result = $container->callWithDecorators(Calculator::class.'@add', ['x' => -100, 'y' => -100]);
+        $this->assertEquals('0', $result);
+        $this->assertIsString($result);
+
+        $result = $container->callWithDecorators(Calculator::class.'@add', ['x' => 2, 'y' => 2]);
+
+        $this->assertEquals('-4', $result);
+        $this->assertIsString($result);
+
+        $result = $container->callWithDecorators(Calculator::class.'@add', ['x' => -200, 'y' => 1]);
+        $this->assertEquals('-1', $result);
+        $this->assertIsString($result);
+
+        $result = $container->callWithDecorators(Calculator::class.'@add', ['x' => -100, 'y' => -100]);
+        $this->assertEquals('0', $result);
+        $this->assertIsString($result);
+    }
+}
+
+class Calculator
+{
+    public function add(int $x, int $y): int
+    {
+        return $x + $y;
     }
 }
 
