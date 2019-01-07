@@ -1883,7 +1883,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Count the number of items in the collection.
-     *`
+     *
      * @return int
      */
     public function count()
