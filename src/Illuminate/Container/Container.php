@@ -13,6 +13,8 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Container implements ContainerContract
 {
+    use DecoratorsTrait;
+
     /**
      * The current globally available container (if any).
      *
