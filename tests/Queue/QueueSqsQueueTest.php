@@ -6,19 +6,19 @@ use Aws\Result;
 use Mockery as m;
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 
 class QueueSqsQueueTest extends TestCase
 {
     /** @var QueueContract */
     private $sqsQueue;
 
-    const QUEUE_NAME = "emails";
-    const URL = "https://sqs.someregion.amazonaws.com/1234567891011/emails-queue";
+    const QUEUE_NAME = 'emails';
+    const URL = 'https://sqs.someregion.amazonaws.com/1234567891011/emails-queue';
 
     private $mockedSqsClient;
     private $mockedJob;
@@ -51,8 +51,8 @@ class QueueSqsQueueTest extends TestCase
             'displayName' => $this->mockedJob,
             'job' => $this->mockedJob,
             'maxTries' => null,
-            "timeout" => null,
-            'data' => $this->mockedData
+            'timeout' => null,
+            'data' => $this->mockedData,
         ]);
 
         $this->mockedDelay = 10;
@@ -93,7 +93,7 @@ class QueueSqsQueueTest extends TestCase
     {
         $this->mockedSqsClient->shouldReceive('receiveMessage')->once()->with([
             'QueueUrl'       => self::URL,
-            'AttributeNames' => ['ApproximateReceiveCount']
+            'AttributeNames' => ['ApproximateReceiveCount'],
         ])->andReturn($this->mockedReceiveMessageResponseModel);
 
         $result = $this->sqsQueue->pop(self::QUEUE_NAME);
@@ -104,7 +104,7 @@ class QueueSqsQueueTest extends TestCase
     {
         $this->mockedSqsClient->shouldReceive('receiveMessage')->once()->with([
             'QueueUrl'       => self::URL,
-            'AttributeNames' => ['ApproximateReceiveCount']
+            'AttributeNames' => ['ApproximateReceiveCount'],
         ])->andReturn($this->mockedReceiveEmptyMessageResponseModel);
 
         $result = $this->sqsQueue->pop(self::QUEUE_NAME);
@@ -118,7 +118,7 @@ class QueueSqsQueueTest extends TestCase
         $this->mockedSqsClient->shouldReceive('sendMessage')->once()->with([
             'QueueUrl'     => self::URL,
             'MessageBody'  => $this->mockedPayload,
-            'DelaySeconds' => 5
+            'DelaySeconds' => 5,
         ])->andReturn($this->mockedSendMessageResponseModel);
 
         $id = $this->sqsQueue->later($now->addSeconds(5), $this->mockedJob, $this->mockedData, self::QUEUE_NAME);
@@ -130,7 +130,7 @@ class QueueSqsQueueTest extends TestCase
         $this->mockedSqsClient->shouldReceive('sendMessage')->once()->with([
             'QueueUrl'     => self::URL,
             'MessageBody'  => $this->mockedPayload,
-            'DelaySeconds' => $this->mockedDelay
+            'DelaySeconds' => $this->mockedDelay,
         ])->andReturn($this->mockedSendMessageResponseModel);
 
         $id = $this->sqsQueue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, self::QUEUE_NAME);
@@ -141,7 +141,7 @@ class QueueSqsQueueTest extends TestCase
     {
         $this->mockedSqsClient->shouldReceive('sendMessage')->once()->with([
             'QueueUrl'    => self::URL,
-            'MessageBody' => $this->mockedPayload
+            'MessageBody' => $this->mockedPayload,
         ])->andReturn($this->mockedSendMessageResponseModel);
 
         $id = $this->sqsQueue->push($this->mockedJob, $this->mockedData, self::QUEUE_NAME);
@@ -152,7 +152,7 @@ class QueueSqsQueueTest extends TestCase
     {
         $this->mockedSqsClient->shouldReceive('getQueueAttributes')->once()->with([
             'QueueUrl'       => self::URL,
-            'AttributeNames' => ['ApproximateNumberOfMessages']
+            'AttributeNames' => ['ApproximateNumberOfMessages'],
         ])->andReturn($this->mockedQueueAttributesResponseModel);
 
         $size = $this->sqsQueue->size(self::QUEUE_NAME);
