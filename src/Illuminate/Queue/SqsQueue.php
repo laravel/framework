@@ -86,7 +86,7 @@ class SqsQueue extends Queue implements QueueContract
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
+            'QueueUrl' => $this->url, 'MessageBody' => $payload,
         ])->get('MessageId');
     }
 
@@ -102,7 +102,7 @@ class SqsQueue extends Queue implements QueueContract
     public function later($delay, $job, $data = '', $queue = null)
     {
         return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue),
+            'QueueUrl' => $this->url,
             'MessageBody' => $this->createPayload($job, $queue ?: $this->name, $data),
             'DelaySeconds' => $this->secondsUntil($delay),
         ])->get('MessageId');
