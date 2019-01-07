@@ -21,8 +21,7 @@ trait CollectsResources
 
         $collects = $this->collects();
 
-        if($resource instanceof AbstractPaginator) {
-
+        if ($resource instanceof AbstractPaginator) {
             $this->collection = $collects && ! $resource->getCollection()->first() instanceof $collects
                 ? $resource->getCollection()->mapInto($collects)
                 : $resource->getCollection()->toBase();

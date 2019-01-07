@@ -501,7 +501,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Get an array of all items
+     * Get an array of all items.
      *
      * @return array
      */
