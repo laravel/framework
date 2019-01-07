@@ -511,6 +511,16 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Items contains item.
+     *
+     * @return bool
+     */
+    public function contains($item)
+    {
+        return $this->items->contains($item);
+    }
+
+    /**
      * Get an iterator for the items.
      *
      * @return \ArrayIterator
