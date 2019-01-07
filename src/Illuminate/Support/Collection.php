@@ -1883,7 +1883,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Count the number of items in the collection.
-     *
+     *`
      * @return int
      */
     public function count()
@@ -1892,16 +1892,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Add an item to the collection.
+     * Add an item to the collection. Alias for the "push" method.
      *
      * @param  mixed  $item
      * @return $this
      */
     public function add($item)
     {
-        $this->items[] = $item;
-
-        return $this;
+        return $this->push($item);
     }
 
     /**
