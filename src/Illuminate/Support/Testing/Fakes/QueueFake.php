@@ -353,7 +353,7 @@ class QueueFake extends QueueManager implements Queue
      *
      * @return array
      */
-    public function getJobs(): array
+    public function getJobs()
     {
         return $this->jobs;
     }
