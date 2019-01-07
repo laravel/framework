@@ -347,7 +347,7 @@ class QueueFake extends QueueManager implements Queue
     {
         return $this;
     }
-    
+
     /**
      * Get the jobs which have been pushed.
      *
