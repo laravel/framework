@@ -465,12 +465,13 @@ class Event
      * Register a callback to ping a given URL before the job runs.
      *
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function pingBefore($url)
+    public function pingBefore($url, $method = 'GET')
     {
-        return $this->before(function () use ($url) {
-            (new HttpClient)->get($url);
+        return $this->before(function () use ($method, $url) {
+            (new HttpClient)->request($method, $url);
         });
     }
 
@@ -479,23 +480,25 @@ class Event
      *
      * @param  bool  $value
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function pingBeforeIf($value, $url)
+    public function pingBeforeIf($value, $url, $method = 'GET')
     {
-        return $value ? $this->pingBefore($url) : $this;
+        return $value ? $this->pingBefore($url, $method) : $this;
     }
 
     /**
      * Register a callback to ping a given URL after the job runs.
      *
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function thenPing($url)
+    public function thenPing($url, $method = 'GET')
     {
-        return $this->then(function () use ($url) {
-            (new HttpClient)->get($url);
+        return $this->then(function () use ($method, $url) {
+            (new HttpClient)->request($method, $url);
         });
     }
 
@@ -504,11 +507,12 @@ class Event
      *
      * @param  bool  $value
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function thenPingIf($value, $url)
+    public function thenPingIf($value, $url, $method = 'GET')
     {
-        return $value ? $this->thenPing($url) : $this;
+        return $value ? $this->thenPing($url, $method) : $this;
     }
 
     /**
