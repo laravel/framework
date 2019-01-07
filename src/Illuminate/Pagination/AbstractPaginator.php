@@ -501,6 +501,16 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Get an array of all items
+     *
+     * @return array
+     */
+    public function all()
+    {
+        return $this->items->all();
+    }
+
+    /**
      * Get an iterator for the items.
      *
      * @return \ArrayIterator

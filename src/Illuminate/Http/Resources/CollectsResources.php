@@ -21,13 +21,20 @@ trait CollectsResources
 
         $collects = $this->collects();
 
-        $this->collection = $collects && ! $resource->first() instanceof $collects
-            ? $resource->mapInto($collects)
-            : $resource->toBase();
+        if($resource instanceof AbstractPaginator) {
 
-        return $resource instanceof AbstractPaginator
-                    ? $resource->setCollection($this->collection)
-                    : $this->collection;
+            $this->collection = $collects && ! $resource->getCollection()->first() instanceof $collects
+                ? $resource->getCollection()->mapInto($collects)
+                : $resource->getCollection()->toBase();
+
+            return $resource->setCollection($this->collection);
+        } else {
+            $this->collection = $collects && ! $resource->first() instanceof $collects
+                ? $resource->mapInto($collects)
+                : $resource->toBase();
+
+            return $this->collection;
+        }
     }
 
     /**
