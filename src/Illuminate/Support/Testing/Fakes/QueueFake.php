@@ -328,6 +328,16 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
+     * Get the jobs that have been pushed.
+     *
+     * @return array
+     */
+    public function pushedJobs()
+    {
+        return $this->jobs;
+    }
+
+    /**
      * Get the connection name for the queue.
      *
      * @return string
@@ -346,15 +356,5 @@ class QueueFake extends QueueManager implements Queue
     public function setConnectionName($name)
     {
         return $this;
-    }
-
-    /**
-     * Get the jobs which have been pushed.
-     *
-     * @return array
-     */
-    public function getJobs()
-    {
-        return $this->jobs;
     }
 }
