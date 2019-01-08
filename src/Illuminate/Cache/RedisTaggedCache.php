@@ -10,6 +10,7 @@ class RedisTaggedCache extends TaggedCache
      * @var string
      */
     const REFERENCE_KEY_FOREVER = 'forever_ref';
+
     /**
      * Standard reference key.
      *
