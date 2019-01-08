@@ -50,9 +50,7 @@ class RedisLock extends Lock
      */
     public function release()
     {
-        if ($this->isOwnedByCurrentProcess()) {
-            $this->redis->del($this->name);
-        }
+        $this->redis->eval(LuaScripts::releaseLock(), 1, $this->name, $this->owner);
     }
 
     /**
