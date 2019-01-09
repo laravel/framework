@@ -742,7 +742,9 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = ($total = $this->toBase()->getCountForPagination($columns))
+        $paginationColumns = $this->query->distinct ? $columns : ['*'];
+
+        $results = ($total = $this->toBase()->getCountForPagination($paginationColumns))
                                     ? $this->forPage($page, $perPage)->get($columns)
                                     : $this->model->newCollection();
 
