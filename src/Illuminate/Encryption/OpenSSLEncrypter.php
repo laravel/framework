@@ -2,13 +2,16 @@
 
 namespace Illuminate\Encryption;
 
-use RuntimeException;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class Encrypter implements EncrypterContract
+class OpenSSLEncrypter implements EncrypterContract
 {
+    const AES_128 = 'AES-128-CBC';
+
+    const AES_256 = 'AES-256-CBC';
+
     /**
      * The encryption key.
      *
@@ -32,16 +35,10 @@ class Encrypter implements EncrypterContract
      *
      * @throws \RuntimeException
      */
-    public function __construct($key, $cipher = 'AES-128-CBC')
+    public function __construct($key, $cipher = self::AES_128)
     {
-        $key = (string) $key;
-
-        if (static::supported($key, $cipher)) {
-            $this->key = $key;
-            $this->cipher = $cipher;
-        } else {
-            throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
-        }
+        $this->key = (string) $key;
+        $this->cipher = $cipher;
     }
 
     /**
@@ -55,8 +52,8 @@ class Encrypter implements EncrypterContract
     {
         $length = mb_strlen($key, '8bit');
 
-        return ($cipher === 'AES-128-CBC' && $length === 16) ||
-               ($cipher === 'AES-256-CBC' && $length === 32);
+        return ($cipher === self::AES_128 && $length === 16) ||
+               ($cipher === self::AES_256 && $length === 32);
     }
 
     /**
@@ -64,10 +61,24 @@ class Encrypter implements EncrypterContract
      *
      * @param  string  $cipher
      * @return string
+     *
+     * @throws \Exception
      */
-    public static function generateKey($cipher)
+    public function generateKey($cipher = null)
     {
-        return random_bytes($cipher === 'AES-128-CBC' ? 16 : 32);
+        $cipher = $cipher ?? $this->cipher;
+
+        return random_bytes($cipher === self::AES_128 ? 16 : 32);
+    }
+
+    /**
+     * Determine if the encrypter is valid.
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return static::supported($this->key, $this->cipher);
     }
 
     /**
@@ -77,10 +88,15 @@ class Encrypter implements EncrypterContract
      * @param  bool  $serialize
      * @return string
      *
+     * @throws \Exception
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
     public function encrypt($value, $serialize = true)
     {
+        if (!$this->isValid()) {
+            throw new EncryptException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+        }
+
         $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
 
         // First we will encrypt the value using OpenSSL. After this is encrypted we
@@ -110,19 +126,6 @@ class Encrypter implements EncrypterContract
     }
 
     /**
-     * Encrypt a string without serialization.
-     *
-     * @param  string  $value
-     * @return string
-     *
-     * @throws \Illuminate\Contracts\Encryption\EncryptException
-     */
-    public function encryptString($value)
-    {
-        return $this->encrypt($value, false);
-    }
-
-    /**
      * Decrypt the given value.
      *
      * @param  mixed  $payload
@@ -133,6 +136,10 @@ class Encrypter implements EncrypterContract
      */
     public function decrypt($payload, $unserialize = true)
     {
+        if (!$this->isValid()) {
+            throw new DecryptException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+        }
+
         $payload = $this->getJsonPayload($payload);
 
         $iv = base64_decode($payload['iv']);
@@ -149,19 +156,6 @@ class Encrypter implements EncrypterContract
         }
 
         return $unserialize ? unserialize($decrypted) : $decrypted;
-    }
-
-    /**
-     * Decrypt the given string without unserialization.
-     *
-     * @param  string  $payload
-     * @return string
-     *
-     * @throws \Illuminate\Contracts\Encryption\DecryptException
-     */
-    public function decryptString($payload)
-    {
-        return $this->decrypt($payload, false);
     }
 
     /**

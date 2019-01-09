@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Encryption;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\OpenSSLEncrypter;
 
-class EncrypterTest extends TestCase
+class OpenSSLEncrypterTest extends TestCase
 {
     public function testEncryption()
     {
-        $e = new Encrypter(str_repeat('a', 16));
+        $e = new OpenSSLEncrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
         $this->assertEquals('foo', $e->decrypt($encrypted));
@@ -17,15 +17,15 @@ class EncrypterTest extends TestCase
 
     public function testRawStringEncryption()
     {
-        $e = new Encrypter(str_repeat('a', 16));
-        $encrypted = $e->encryptString('foo');
+        $e = new OpenSSLEncrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt('foo', false);
         $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decryptString($encrypted));
+        $this->assertEquals('foo', $e->decrypt($encrypted, false));
     }
 
     public function testEncryptionUsingBase64EncodedKey()
     {
-        $e = new Encrypter(random_bytes(16));
+        $e = new OpenSSLEncrypter(random_bytes(16));
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
         $this->assertEquals('foo', $e->decrypt($encrypted));
@@ -33,51 +33,69 @@ class EncrypterTest extends TestCase
 
     public function testWithCustomCipher()
     {
-        $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
+        $e = new OpenSSLEncrypter(str_repeat('b', 32), OpenSSLEncrypter::AES_256);
         $encrypted = $e->encrypt('bar');
         $this->assertNotEquals('bar', $encrypted);
         $this->assertEquals('bar', $e->decrypt($encrypted));
 
-        $e = new Encrypter(random_bytes(32), 'AES-256-CBC');
+        $e = new OpenSSLEncrypter(random_bytes(32), OpenSSLEncrypter::AES_256);
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
         $this->assertEquals('foo', $e->decrypt($encrypted));
     }
 
+    public function testGenerateKey()
+    {
+        $e = new OpenSSLEncrypter('');
+        $f = new OpenSSLEncrypter($e->generateKey());
+        $f->encrypt('bar');
+    }
+
+    public function testGenerateKeyWithCustomCipher()
+    {
+        $e = new OpenSSLEncrypter('');
+        $f = new OpenSSLEncrypter($e->generateKey(OpenSSLEncrypter::AES_256), OpenSSLEncrypter::AES_256);
+        $f->encrypt('bar');
+    }
+
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Illuminate\Contracts\Encryption\EncryptException
      * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
      */
     public function testDoNoAllowLongerKey()
     {
-        new Encrypter(str_repeat('z', 32));
+        $e = new OpenSSLEncrypter(str_repeat('z', 32));
+        $e->encrypt('bar');
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Illuminate\Contracts\Encryption\EncryptException
      * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
      */
     public function testWithBadKeyLength()
     {
-        new Encrypter(str_repeat('a', 5));
+        $e = new OpenSSLEncrypter(str_repeat('a', 5));
+        $e->encrypt('bar');
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Illuminate\Contracts\Encryption\EncryptException
      * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
      */
     public function testWithBadKeyLengthAlternativeCipher()
     {
-        new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
+        $e = new OpenSSLEncrypter(str_repeat('a', 16), 'AES-256-CFB8');
+        $e->encrypt('bar');
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Illuminate\Contracts\Encryption\EncryptException
      * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
      */
     public function testWithUnsupportedCipher()
     {
-        new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
+        $e = new OpenSSLEncrypter(str_repeat('c', 16), 'AES-256-CFB8');
+        $e->encrypt('bar');
     }
 
     /**
@@ -86,7 +104,7 @@ class EncrypterTest extends TestCase
      */
     public function testExceptionThrownWhenPayloadIsInvalid()
     {
-        $e = new Encrypter(str_repeat('a', 16));
+        $e = new OpenSSLEncrypter(str_repeat('a', 16));
         $payload = $e->encrypt('foo');
         $payload = str_shuffle($payload);
         $e->decrypt($payload);
@@ -98,8 +116,8 @@ class EncrypterTest extends TestCase
      */
     public function testExceptionThrownWithDifferentKey()
     {
-        $a = new Encrypter(str_repeat('a', 16));
-        $b = new Encrypter(str_repeat('b', 16));
+        $a = new OpenSSLEncrypter(str_repeat('a', 16));
+        $b = new OpenSSLEncrypter(str_repeat('b', 16));
         $b->decrypt($a->encrypt('baz'));
     }
 
@@ -109,7 +127,7 @@ class EncrypterTest extends TestCase
      */
     public function testExceptionThrownWhenIvIsTooLong()
     {
-        $e = new Encrypter(str_repeat('a', 16));
+        $e = new OpenSSLEncrypter(str_repeat('a', 16));
         $payload = $e->encrypt('foo');
         $data = json_decode(base64_decode($payload), true);
         $data['iv'] .= $data['value'][0];

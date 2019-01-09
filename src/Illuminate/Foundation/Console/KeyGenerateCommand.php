@@ -3,7 +3,8 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\EncryptionManager;
+use Illuminate\Encryption\OpenSSLEncrypter;
 use Illuminate\Console\ConfirmableTrait;
 
 class KeyGenerateCommand extends Command
@@ -46,7 +47,7 @@ class KeyGenerateCommand extends Command
             return;
         }
 
-        $this->laravel['config']['app.key'] = $key;
+        $this->laravel['config']['app.encryption.key'] = $key;
 
         $this->info('Application key set successfully.');
     }
@@ -59,7 +60,7 @@ class KeyGenerateCommand extends Command
     protected function generateRandomKey()
     {
         return 'base64:'.base64_encode(
-            Encrypter::generateKey($this->laravel['config']['app.cipher'])
+            $this->laravel->make('encrypter')->generateKey()
         );
     }
 
@@ -71,7 +72,7 @@ class KeyGenerateCommand extends Command
      */
     protected function setKeyInEnvironmentFile($key)
     {
-        $currentKey = $this->laravel['config']['app.key'];
+        $currentKey = $this->laravel['config']['app.encryption.key'];
 
         if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
             return false;
@@ -104,7 +105,7 @@ class KeyGenerateCommand extends Command
      */
     protected function keyReplacementPattern()
     {
-        $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
+        $escaped = preg_quote('='.$this->laravel['config']['app.encryption.key'], '/');
 
         return "/^APP_KEY{$escaped}/m";
     }

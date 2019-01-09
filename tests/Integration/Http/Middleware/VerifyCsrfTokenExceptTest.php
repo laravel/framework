@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\OpenSSLEncrypter;
 
 class VerifyCsrfTokenExceptTest extends TestCase
 {
@@ -15,7 +15,9 @@ class VerifyCsrfTokenExceptTest extends TestCase
     {
         parent::setUp();
 
-        $this->stub = new VerifyCsrfTokenExceptStub(app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
+        $e = new OpenSSLEncrypter('');
+
+        $this->stub = new VerifyCsrfTokenExceptStub(app(), new OpenSSLEncrypter($e->generateKey()));
         $this->request = Request::create('http://example.com/foo/bar', 'POST');
     }
 

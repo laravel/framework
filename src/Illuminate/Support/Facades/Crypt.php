@@ -6,7 +6,7 @@ namespace Illuminate\Support\Facades;
  * @method static string encrypt(string $value, bool $serialize = true)
  * @method static string decrypt(string $payload, bool $unserialize = true)
  *
- * @see \Illuminate\Encryption\Encrypter
+ * @see \Illuminate\Encryption\EncryptionManager
  */
 class Crypt extends Facade
 {
