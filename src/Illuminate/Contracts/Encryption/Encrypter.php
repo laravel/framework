@@ -21,4 +21,12 @@ interface Encrypter
      * @return mixed
      */
     public function decrypt($payload, $unserialize = true);
+
+    /**
+     * Generate a new key for the chosen cipher.
+     *
+     * @param $cipher
+     * @return mixed
+     */
+    public function generateKey($cipher = null);
 }
