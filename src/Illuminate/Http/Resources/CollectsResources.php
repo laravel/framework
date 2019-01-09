@@ -25,9 +25,13 @@ trait CollectsResources
             ? $resource->mapInto($collects)
             : $resource->toBase();
 
-        return $resource instanceof AbstractPaginator
-                    ? $resource->setCollection($this->collection)
-                    : $this->collection;
+        if($resource instanceof AbstractPaginator) {
+            $this->collection = $resource->getCollection();
+
+            return $resource;
+        }
+
+        return $this->collection;
     }
 
     /**

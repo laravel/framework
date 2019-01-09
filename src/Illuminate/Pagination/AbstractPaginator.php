@@ -511,6 +511,36 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Get first item.
+     *
+     * @return mixed
+     */
+    public function first()
+    {
+        return $this->items->first();
+    }
+
+    /**
+     * Get an array of all items.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        return $this->items->all();
+    }
+
+    /**
+     * Items contains item.
+     *
+     * @return bool
+     */
+    public function contains($item)
+    {
+        return $this->items->contains($item);
+    }
+
+    /**
      * Determine if the list of items is empty.
      *
      * @return bool
@@ -623,11 +653,13 @@ abstract class AbstractPaginator implements Htmlable
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
+     * @return $this
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallTo($this->getCollection(), $method, $parameters);
+        $this->items = $this->forwardCallTo($this->getCollection(), $method, $parameters);
+
+        return $this;
     }
 
     /**
