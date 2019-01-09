@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Encryption;
 
-use Illuminate\Contracts\Encryption\EncryptException;
-use Illuminate\Encryption\EncryptionManager;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Encryption\EncryptionManager;
 use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Contracts\Encryption\EncryptException;
 
 class EncryptionTest extends TestCase
 {
@@ -14,7 +14,7 @@ class EncryptionTest extends TestCase
         $app['config']->set('app.encryption', [
             'driver' => 'openssl',
             'cipher' => 'AES-256-CBC',
-            'key'    => 'base64:IUHRqAQ99pZ0A1MPjbuv1D6ff3jxv0GIvS2qIW4JNU4='
+            'key'    => 'base64:IUHRqAQ99pZ0A1MPjbuv1D6ff3jxv0GIvS2qIW4JNU4=',
         ]);
     }
 

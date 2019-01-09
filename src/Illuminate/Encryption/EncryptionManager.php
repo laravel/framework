@@ -3,8 +3,8 @@
 namespace Illuminate\Encryption;
 
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Support\Manager;
+use Illuminate\Contracts\Encryption\Encrypter;
 
 class EncryptionManager extends Manager implements Encrypter
 {

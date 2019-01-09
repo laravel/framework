@@ -93,7 +93,7 @@ class OpenSSLEncrypter implements EncrypterContract
      */
     public function encrypt($value, $serialize = true)
     {
-        if (!$this->isValid()) {
+        if (! $this->isValid()) {
             throw new EncryptException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
         }
 
@@ -136,7 +136,7 @@ class OpenSSLEncrypter implements EncrypterContract
      */
     public function decrypt($payload, $unserialize = true)
     {
-        if (!$this->isValid()) {
+        if (! $this->isValid()) {
             throw new DecryptException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
         }
 
