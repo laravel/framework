@@ -178,6 +178,33 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
     }
 
+    public function testGetJsonForMultilineKeyLooksForTrimmedKey()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(["foo\nbaz\nbar" => 'foobar']);
+        $this->assertEquals('foobar', $t->getFromJson("foo
+        baz
+bar"));
+        $this->assertEquals('foobar', $t->getFromJson("foo\nbaz\nbar"));
+        $this->assertEquals('foobar', $t->getFromJson('foo
+        baz
+        bar'));
+    }
+
+    public function testGetJsonForMultilineKeyLooksForOriginalKeyInFallbackIfNotFound()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', "foo
+        baz
+bar", '*')->andReturn([]);
+        $this->assertEquals("foo
+        baz
+bar", $t->getFromJson("foo
+        baz
+bar"));
+    }
+
     protected function getLoader()
     {
         return m::mock(Loader::class);

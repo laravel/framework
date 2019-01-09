@@ -155,7 +155,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // only one level deep so we do not need to do any fancy searching through it.
         $this->load('*', '*', $locale);
 
-        $line = $this->loaded['*']['*'][$locale][$key] ?? null;
+        // To avoid looking for multiline keys in JSON, we convert new lines to \n so we can actually look up
+        // "multiline" keys in JSON
+        $trimmedKey = collect(explode("\n", $key))
+            ->map(function ($line) {
+                return trim($line);
+            })
+            ->implode("\n");
+
+        $line = $this->loaded['*']['*'][$locale][$trimmedKey] ?? null;
 
         // If we can't find a translation for the JSON key, we will attempt to translate it
         // using the typical translation file. This way developers can always just use a
