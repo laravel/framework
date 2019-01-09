@@ -57,7 +57,6 @@ class PaginatorTest extends TestCase
         ], 10, 1,
             ['path' => 'http://website.com/test']);
 
-
         $this->assertContains(null, $p->getCollection());
         $this->assertTrue($p->filter() instanceof  Paginator);
         $this->assertNotContains(null, $p->getCollection());
