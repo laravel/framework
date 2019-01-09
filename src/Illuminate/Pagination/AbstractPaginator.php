@@ -513,11 +513,25 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Get first item.
      *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
      * @return mixed
      */
-    public function first()
+    public function first(callable $callback = null, $default = null)
     {
-        return $this->items->first();
+        return $this->items->first($callback, $default);
+    }
+
+    /**
+     * Get last item.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function last(callable $callback = null, $default = null)
+    {
+        return $this->items->last($callback, $default);
     }
 
     /**
