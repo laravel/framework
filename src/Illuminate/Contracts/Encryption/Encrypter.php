@@ -29,4 +29,11 @@ interface Encrypter
      * @return mixed
      */
     public function generateKey($cipher = null);
+
+    /**
+     * Determine whether the encrypter is valid.
+     *
+     * @return bool
+     */
+    public function isValid();
 }
