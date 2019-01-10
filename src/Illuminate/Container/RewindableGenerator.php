@@ -35,7 +35,7 @@ class RewindableGenerator implements Countable, IteratorAggregate
     }
 
     /**
-     * Get an interator from the generator.
+     * Get an iterator from the generator.
      *
      * @return mixed
      */
