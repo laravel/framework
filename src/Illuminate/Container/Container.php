@@ -260,8 +260,9 @@ class Container implements ContainerContract
                 return $container->build($concrete);
             }
 
-            // To prevent extra call to resolving callbacks, we make the object silently.
-            return $container->resolve($concrete, $parameters, true);
+            return $container->resolve(
+                $concrete, $parameters, $raiseEvents = false
+            );
         };
     }
 
@@ -632,12 +633,12 @@ class Container implements ContainerContract
      *
      * @param  string  $abstract
      * @param  array  $parameters
-     * @param  bool   $silent
+     * @param  bool   $raiseEvents
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected function resolve($abstract, $parameters = [], $silent = false)
+    protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
         $abstract = $this->getAlias($abstract);
 
@@ -679,9 +680,10 @@ class Container implements ContainerContract
             $this->instances[$abstract] = $object;
         }
 
-        if (! $silent) {
+        if ($raiseEvents) {
             $this->fireResolvingCallbacks($abstract, $object);
         }
+
         // Before returning, we will also set the resolved flag to "true" and pop off
         // the parameter overrides for this build. After those two things are done
         // we will be ready to return back the fully constructed class instance.
