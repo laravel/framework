@@ -32,8 +32,6 @@ class OpenSSLEncrypter implements EncrypterContract
      * @param  string  $key
      * @param  string  $cipher
      * @return void
-     *
-     * @throws \RuntimeException
      */
     public function __construct($key, $cipher = self::AES_128)
     {
