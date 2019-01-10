@@ -2,9 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use Memcached;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
 

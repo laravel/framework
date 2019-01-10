@@ -124,10 +124,10 @@ class DynamoDbStore implements Store
                     'Keys' => collect($keys)->map(function ($key) {
                         return [
                             $this->keyAttribute => [
-                                'S' => $key
-                            ]
+                                'S' => $key,
+                            ],
                         ];
-                    })->all()
+                    })->all(),
                 ],
             ],
         ]);
@@ -413,7 +413,7 @@ class DynamoDbStore implements Store
      */
     public function flush()
     {
-        throw new RuntimeException("DynamoDb does not support flushing an entire table. Please create a new table.");
+        throw new RuntimeException('DynamoDb does not support flushing an entire table. Please create a new table.');
     }
 
     /**
