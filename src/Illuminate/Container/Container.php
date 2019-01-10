@@ -217,6 +217,9 @@ class Container implements ContainerContract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function bind($abstract, $concrete = null, $shared = false)
     {
@@ -336,6 +339,9 @@ class Container implements ContainerContract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function bindIf($abstract, $concrete = null, $shared = false)
     {
@@ -350,6 +356,9 @@ class Container implements ContainerContract
      * @param  string  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function singleton($abstract, $concrete = null)
     {
@@ -364,6 +373,8 @@ class Container implements ContainerContract
      * @return void
      *
      * @throws \InvalidArgumentException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function extend($abstract, Closure $closure)
     {
@@ -388,6 +399,9 @@ class Container implements ContainerContract
      * @param  string  $abstract
      * @param  mixed   $instance
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function instance($abstract, $instance)
     {
@@ -491,6 +505,9 @@ class Container implements ContainerContract
      * @param  string    $abstract
      * @param  \Closure  $callback
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function rebinding($abstract, Closure $callback)
     {
@@ -508,6 +525,9 @@ class Container implements ContainerContract
      * @param  mixed   $target
      * @param  string  $method
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function refresh($abstract, $target, $method)
     {
@@ -521,6 +541,9 @@ class Container implements ContainerContract
      *
      * @param  string  $abstract
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     protected function rebound($abstract)
     {
@@ -592,6 +615,9 @@ class Container implements ContainerContract
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function makeWith($abstract, array $parameters = [])
     {
@@ -606,6 +632,7 @@ class Container implements ContainerContract
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function make($abstract, array $parameters = [])
     {
@@ -637,6 +664,7 @@ class Container implements ContainerContract
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
@@ -774,6 +802,7 @@ class Container implements ContainerContract
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function build($concrete)
     {
@@ -827,6 +856,7 @@ class Container implements ContainerContract
      * @return array
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     protected function resolveDependencies(array $dependencies)
     {
@@ -915,6 +945,7 @@ class Container implements ContainerContract
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     protected function resolveClass(ReflectionParameter $parameter)
     {
@@ -1226,6 +1257,9 @@ class Container implements ContainerContract
      *
      * @param  string  $key
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function offsetGet($key)
     {
@@ -1238,6 +1272,9 @@ class Container implements ContainerContract
      * @param  string  $key
      * @param  mixed   $value
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \ReflectionException
      */
     public function offsetSet($key, $value)
     {
