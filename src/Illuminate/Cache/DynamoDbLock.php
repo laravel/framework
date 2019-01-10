@@ -2,9 +2,6 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Cache\Lock;
-use Aws\DynamoDb\DynamoDbClient;
-
 class DynamoDbLock extends Lock
 {
     /**
