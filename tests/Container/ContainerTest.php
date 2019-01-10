@@ -792,17 +792,77 @@ class ContainerTest extends TestCase
 
         $this->assertCount(1, $container->tagged('bar'));
         $this->assertCount(2, $container->tagged('foo'));
-        $this->assertInstanceOf(ContainerImplementationStub::class, $container->tagged('foo')[0]);
-        $this->assertInstanceOf(ContainerImplementationStub::class, $container->tagged('bar')[0]);
-        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $container->tagged('foo')[1]);
+
+        $fooResults = [];
+        foreach ($container->tagged('foo') as $foo) {
+            $fooResults[] = $foo;
+        }
+
+        $barResults = [];
+        foreach ($container->tagged('bar') as $bar) {
+            $barResults[] = $bar;
+        }
+
+        $this->assertInstanceOf(ContainerImplementationStub::class, $fooResults[0]);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $barResults[0]);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $fooResults[1]);
 
         $container = new Container;
         $container->tag([ContainerImplementationStub::class, ContainerImplementationStubTwo::class], ['foo']);
         $this->assertCount(2, $container->tagged('foo'));
-        $this->assertInstanceOf(ContainerImplementationStub::class, $container->tagged('foo')[0]);
-        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $container->tagged('foo')[1]);
 
-        $this->assertEmpty($container->tagged('this_tag_does_not_exist'));
+        $fooResults = [];
+        foreach ($container->tagged('foo') as $foo) {
+            $fooResults[] = $foo;
+        }
+
+        $this->assertInstanceOf(ContainerImplementationStub::class, $fooResults[0]);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $fooResults[1]);
+
+        $this->assertCount(0, $container->tagged('this_tag_does_not_exist'));
+    }
+
+    public function testTaggedServicesAreLazyLoaded()
+    {
+        $container = $this->createPartialMock(Container::class, ['make']);
+        $container->expects($this->once())->method('make')->willReturn(new ContainerImplementationStub());
+
+        $container->tag(ContainerImplementationStub::class, ['foo']);
+        $container->tag(ContainerImplementationStubTwo::class, ['foo']);
+
+        $fooResults = [];
+        foreach ($container->tagged('foo') as $foo) {
+            $fooResults[] = $foo;
+            break;
+        }
+
+        $this->assertCount(2, $container->tagged('foo'));
+        $this->assertInstanceOf(ContainerImplementationStub::class, $fooResults[0]);
+    }
+
+    public function testLazyLoadedTaggedServicesCanBeLoopedOverMultipleTimes()
+    {
+        $container = new Container;
+        $container->tag(ContainerImplementationStub::class, 'foo');
+        $container->tag(ContainerImplementationStubTwo::class, ['foo']);
+
+        $services = $container->tagged('foo');
+
+        $fooResults = [];
+        foreach ($services as $foo) {
+            $fooResults[] = $foo;
+        }
+
+        $this->assertInstanceOf(ContainerImplementationStub::class, $fooResults[0]);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $fooResults[1]);
+
+        $fooResults = [];
+        foreach ($services as $foo) {
+            $fooResults[] = $foo;
+        }
+
+        $this->assertInstanceOf(ContainerImplementationStub::class, $fooResults[0]);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $fooResults[1]);
     }
 
     public function testForgetInstanceForgetsInstance()
@@ -959,6 +1019,382 @@ class ContainerTest extends TestCase
         $instance = $container->make('foo');
 
         $this->assertEquals('taylor', $instance->name);
+    }
+
+    public function testResolvingCallbacksAreCalledOnceForImplementation()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
+    }
+
+    public function testGlobalResolvingCallbacksAreCalledOnceForImplementation()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(2, $callCounter);
+    }
+
+    public function testAfterResolvingCallbacksAreCalledOnceForImplementation()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->afterResolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(2, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCalledOnceForSingletonConcretes()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $container->bind(ContainerImplementationStub::class);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(3, $callCounter);
+    }
+
+    public function testResolvingCallbacksCanStillBeAddedAfterTheFirstResolution()
+    {
+        $container = new Container;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(ContainerImplementationStub::class);
+
+        $callCounter = 0;
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCanceledWhenInterfaceGetsBoundToSomeOtherConcrete()
+    {
+        $container = new Container;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $callCounter = 0;
+        $container->resolving(ContainerImplementationStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStubTwo::class);
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(1, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCalledOnceForStringAbstractions()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving('foo', function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind('foo', ContainerImplementationStub::class);
+
+        $container->make('foo');
+        $this->assertEquals(1, $callCounter);
+
+        $container->make('foo');
+        $this->assertEquals(2, $callCounter);
+    }
+
+    public function testResolvingCallbacksForConcretesAreCalledOnceForStringAbstractions()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(ContainerImplementationStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind('foo', ContainerImplementationStub::class);
+        $container->bind('bar', ContainerImplementationStub::class);
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make('foo');
+        $this->assertEquals(2, $callCounter);
+
+        $container->make('bar');
+        $this->assertEquals(3, $callCounter);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(4, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCalledOnceForImplementation2()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, function () {
+            return new ContainerImplementationStub;
+        });
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(3, $callCounter);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(4, $callCounter);
+    }
+
+    public function testRebindingDoesNotAffectResolvingCallbacks()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $container->bind(IContainerContractStub::class, function () {
+            return new ContainerImplementationStub;
+        });
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(3, $callCounter);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(4, $callCounter);
+    }
+
+    public function testParametersPassedIntoResolvingCallbacks()
+    {
+        $container = new Container;
+
+        $container->resolving(IContainerContractStub::class, function ($obj, $app) use ($container) {
+            $this->assertInstanceOf(IContainerContractStub::class, $obj);
+            $this->assertInstanceOf(ContainerImplementationStubTwo::class, $obj);
+            $this->assertSame($container, $app);
+        });
+
+        $container->afterResolving(IContainerContractStub::class, function ($obj, $app) use ($container) {
+            $this->assertInstanceOf(IContainerContractStub::class, $obj);
+            $this->assertInstanceOf(ContainerImplementationStubTwo::class, $obj);
+            $this->assertSame($container, $app);
+        });
+
+        $container->afterResolving(function ($obj, $app) use ($container) {
+            $this->assertInstanceOf(IContainerContractStub::class, $obj);
+            $this->assertInstanceOf(ContainerImplementationStubTwo::class, $obj);
+            $this->assertSame($container, $app);
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStubTwo::class);
+        $container->make(IContainerContractStub::class);
+    }
+
+    public function testResolvingCallbacksAreCallWhenRebindHappenForResolvedAbstract()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStubTwo::class);
+        $this->assertEquals(2, $callCounter);
+
+        $container->make(ContainerImplementationStubTwo::class);
+        $this->assertEquals(3, $callCounter);
+
+        $container->bind(IContainerContractStub::class, function () {
+            return new ContainerImplementationStubTwo();
+        });
+        $this->assertEquals(4, $callCounter);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(5, $callCounter);
+    }
+
+    public function testRebindingDoesNotAffectMultipleResolvingCallbacks()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->resolving(ContainerImplementationStubTwo::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        // it should call the callback for interface
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        // it should call the callback for interface
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
+
+        // should call the callback for the interface it implements
+        // plus the callback for ContainerImplementationStubTwo.
+        $container->make(ContainerImplementationStubTwo::class);
+        $this->assertEquals(4, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCalledForInterfaces()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(IContainerContractStub::class);
+
+        $this->assertEquals(1, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCalledForConcretesWhenAttachedOnInterface()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(ContainerImplementationStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCalledForConcretesWhenAttachedOnConcretes()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(ContainerImplementationStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->make(IContainerContractStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCalledForConcretesWithNoBinding()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(ContainerImplementationStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
+    }
+
+    public function testResolvingCallbacksAreCalledForInterFacesWithNoBinding()
+    {
+        $container = new Container;
+
+        $callCounter = 0;
+        $container->resolving(IContainerContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+        $container->make(ContainerImplementationStub::class);
+        $this->assertEquals(2, $callCounter);
     }
 
     public function testMakeWithMethodIsAnAliasForMakeMethod()
