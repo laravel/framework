@@ -41,9 +41,7 @@ class RewindableGenerator implements Countable, IteratorAggregate
      */
     public function getIterator()
     {
-        $generator = $this->generator;
-
-        return $generator();
+        return ($this->generator)();
     }
 
     /**
