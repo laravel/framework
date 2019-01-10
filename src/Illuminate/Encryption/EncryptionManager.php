@@ -106,6 +106,16 @@ class EncryptionManager extends Manager implements Encrypter
     }
 
     /**
+     * Determine whether the encrypter is valid.
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->driver()->isValid();
+    }
+
+    /**
      * Get the default driver name.
      *
      * @return string
