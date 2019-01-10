@@ -456,19 +456,19 @@ class Container implements ContainerContract
      * Resolve all of the bindings for a given tag.
      *
      * @param  string  $tag
-     * @return array
+     * @return iterable
      */
     public function tagged($tag)
     {
-        $results = [];
-
-        if (isset($this->tags[$tag])) {
-            foreach ($this->tags[$tag] as $abstract) {
-                $results[] = $this->make($abstract);
-            }
+        if (! isset($this->tags[$tag])) {
+            return [];
         }
 
-        return $results;
+        return new RewindableGenerator(function () use ($tag) {
+            foreach ($this->tags[$tag] as $abstract) {
+                yield $this->make($abstract);
+            }
+        }, count($this->tags[$tag]));
     }
 
     /**

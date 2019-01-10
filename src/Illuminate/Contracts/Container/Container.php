@@ -38,7 +38,7 @@ interface Container extends ArrayAccess, ContainerInterface
      * Resolve all of the bindings for a given tag.
      *
      * @param  string  $tag
-     * @return array
+     * @return iterable
      */
     public function tagged($tag);
 
