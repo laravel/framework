@@ -28,17 +28,16 @@ class EncryptionManager extends Manager implements Encrypter
     }
 
     /**
-     * Create a new encryption key for the given driver and cipher.
+     * Create a new encryption key for the cipher.
      *
-     * @param  string  $driver
      * @param  string  $cipher
      * @return string
      *
      * @throws \Exception
      */
-    public function generateKey($driver = null, $cipher = null)
+    public function generateKey($cipher = null)
     {
-        return $this->driver($driver)->generateKey($cipher);
+        return $this->driver()->generateKey($cipher);
     }
 
     /**
