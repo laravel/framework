@@ -613,6 +613,20 @@ class Container implements ContainerContract
     }
 
     /**
+     * Resolve the given type from the container without raising events.
+     *
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function makeSilently($abstract, array $parameters = [])
+    {
+        return $this->resolve($abstract, $parameters, false);
+    }
+
+    /**
      *  {@inheritdoc}
      */
     public function get($id)
