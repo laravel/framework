@@ -32,15 +32,20 @@ trait VerifiesEmails
      */
     public function verify(Request $request)
     {
-        if ($request->route('id') != $request->user()->getKey()) {
-            throw new AuthorizationException;
+        if (!isset($this->forceAuth) || $this->forceAuth) {
+            if ($request->route('id') != $request->user()->getKey()) {
+                throw new AuthorizationException;
+            }
+            $user = $request->user();
+        } else {
+            $user = \App\User::findOrFail($request->route('id'));
         }
 
-        if ($request->user()->hasVerifiedEmail()) {
+        if ($user->hasVerifiedEmail()) {
             return redirect($this->redirectPath());
         }
 
-        if ($request->user()->markEmailAsVerified()) {
+        if ($user->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
 
