@@ -32,7 +32,7 @@ trait VerifiesEmails
      */
     public function verify(Request $request)
     {
-        if (!isset($this->forceAuth) || $this->forceAuth) {
+        if (! isset($this->forceAuth) || $this->forceAuth) {
             if ($request->route('id') != $request->user()->getKey()) {
                 throw new AuthorizationException;
             }
