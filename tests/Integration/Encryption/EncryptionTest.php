@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Encryption;
 
-use Illuminate\Encryption\OpenSslEncrypter;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Encryption\OpenSslEncrypter;
 use Illuminate\Encryption\EncryptionManager;
 use Illuminate\Encryption\EncryptionServiceProvider;
 use Illuminate\Contracts\Encryption\EncryptException;
