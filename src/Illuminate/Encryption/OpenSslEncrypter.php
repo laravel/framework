@@ -2,9 +2,9 @@
 
 namespace Illuminate\Encryption;
 
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
-use Illuminate\Contracts\Encryption\Encrypter;
 
 class OpenSslEncrypter implements Encrypter
 {
