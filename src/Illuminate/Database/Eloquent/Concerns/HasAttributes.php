@@ -1235,4 +1235,14 @@ trait HasAttributes
 
         return $matches[1];
     }
+
+    /**
+     * Get the model's original attributes values that were changed since last sync.
+     *
+     * @return array
+     */
+    public function getOriginalChanged()
+    {
+        return array_intersect_key($this->getOriginal(), $this->getDirty());
+    }
 }
