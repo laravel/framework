@@ -65,12 +65,17 @@ class OpenSslEncrypter implements Encrypter
      * @return string
      *
      * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function generateKey($cipher = null)
     {
         $cipher = $cipher ?? $this->cipher;
 
-        return random_bytes($cipher === self::AES_128 ? 16 : 32);
+        if (! isset(self::KEY_LENGTHS[$cipher])) {
+            throw new \InvalidArgumentException("{$cipher} is not a supported cipher.");
+        }
+
+        return random_bytes(self::KEY_LENGTHS[$cipher]);
     }
 
     /**
