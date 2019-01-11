@@ -10,7 +10,7 @@ use Illuminate\Cookie\CookieJar;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Routing\Controller;
 use Illuminate\Container\Container;
-use Illuminate\Encryption\OpenSSLEncrypter;
+use Illuminate\Encryption\OpenSslEncrypter;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -32,7 +32,7 @@ class EncryptCookiesTest extends TestCase
 
         $container = new Container;
         $container->singleton(EncrypterContract::class, function () {
-            return new OpenSSLEncrypter(str_repeat('a', 16));
+            return new OpenSslEncrypter(str_repeat('a', 16));
         });
 
         $this->router = new Router(new Dispatcher, $container);

@@ -4,13 +4,18 @@ namespace Illuminate\Encryption;
 
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Encryption\Encrypter;
 
-class OpenSSLEncrypter implements EncrypterContract
+class OpenSslEncrypter implements Encrypter
 {
     const AES_128 = 'AES-128-CBC';
 
     const AES_256 = 'AES-256-CBC';
+
+    const KEY_LENGTHS = [
+        self::AES_128 => 16,
+        self::AES_256 => 32,
+    ];
 
     /**
      * The encryption key.
@@ -50,8 +55,7 @@ class OpenSSLEncrypter implements EncrypterContract
     {
         $length = mb_strlen($key, '8bit');
 
-        return ($cipher === self::AES_128 && $length === 16) ||
-               ($cipher === self::AES_256 && $length === 32);
+        return isset(self::KEY_LENGTHS[$cipher]) && $length === self::KEY_LENGTHS[$cipher];
     }
 
     /**
@@ -91,10 +95,6 @@ class OpenSSLEncrypter implements EncrypterContract
      */
     public function encrypt($value, $serialize = true)
     {
-        if (! $this->isValid()) {
-            throw new EncryptException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
-        }
-
         $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
 
         // First we will encrypt the value using OpenSSL. After this is encrypted we
@@ -134,10 +134,6 @@ class OpenSSLEncrypter implements EncrypterContract
      */
     public function decrypt($payload, $unserialize = true)
     {
-        if (! $this->isValid()) {
-            throw new DecryptException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
-        }
-
         $payload = $this->getJsonPayload($payload);
 
         $iv = base64_decode($payload['iv']);

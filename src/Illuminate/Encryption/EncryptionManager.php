@@ -5,15 +5,17 @@ namespace Illuminate\Encryption;
 use Illuminate\Support\Str;
 use Illuminate\Support\Manager;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Contracts\Encryption\EncryptException;
 
 class EncryptionManager extends Manager implements Encrypter
 {
     /**
      * Create an instance of the OpenSSL encryption Driver.
      *
-     * @return \Illuminate\Encryption\OpenSSLEncrypter
+     * @return \Illuminate\Encryption\OpenSslEncrypter
      */
-    public function createOpenSSLDriver()
+    public function createOpenSslDriver()
     {
         $config = $this->app->make('config')->get('app.encryption');
 
@@ -24,7 +26,7 @@ class EncryptionManager extends Manager implements Encrypter
             $key = base64_decode(substr($key, 7));
         }
 
-        return new OpenSSLEncrypter($key, $config['cipher']);
+        return new OpenSslEncrypter($key, $config['cipher']);
     }
 
     /**
@@ -51,6 +53,10 @@ class EncryptionManager extends Manager implements Encrypter
      */
     public function encrypt($value, $serialize = true)
     {
+        if (! $this->isValid()) {
+            throw new EncryptException("The {$this->getDefaultDriver()} driver is invalid.");
+        }
+
         return $this->driver()->encrypt($value, $serialize);
     }
 
@@ -78,6 +84,10 @@ class EncryptionManager extends Manager implements Encrypter
      */
     public function decrypt($payload, $unserialize = true)
     {
+        if (! $this->isValid()) {
+            throw new DecryptException("The {$this->getDefaultDriver()} driver is invalid.");
+        }
+
         return $this->driver()->decrypt($payload, $unserialize);
     }
 
@@ -111,7 +121,7 @@ class EncryptionManager extends Manager implements Encrypter
      */
     public function isValid()
     {
-        return $this->driver()->isValid();
+        return ! empty($this->getKey()) && $this->driver()->isValid();
     }
 
     /**
