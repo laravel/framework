@@ -155,4 +155,19 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    public function testRemoveColumn()
+    {
+        $base = new Blueprint('users', function ($table) {
+            $table->string('foo');
+            $table->string('remove_this');
+            $table->removeColumn('remove_this');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $blueprint->toSql($connection, new MySqlGrammar));
+    }
 }

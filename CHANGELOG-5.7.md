@@ -1,6 +1,8 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.19...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.20...5.7)
+
+## [v5.7.20 (2018-01-08)](https://github.com/laravel/framework/compare/v5.7.19...v5.7.20)
 
 ### Added
 - Added `chunkById` support in relations ([#26919](https://github.com/laravel/framework/pull/26919))
@@ -9,6 +11,7 @@
 - Allowed storage assertions (`FilesystemAdapter::assertExists` / `FilesystemAdapter::assertMissing`) to handle multiple files at once ([#26975](https://github.com/laravel/framework/pull/26975))
 - Added `Adaptive Server connection failed` to `DetectsLostConnections` trait ([#27055](https://github.com/laravel/framework/pull/27055))
 - Added `Route::originalParameters()` ([#27056](https://github.com/laravel/framework/pull/27056))
+- Added `QueueFake::pushedJobs()` ([#27089](https://github.com/laravel/framework/pull/27089), [695ffa1](https://github.com/laravel/framework/commit/695ffa1247a7a44a79ba85442ad9ea311413feae))
 
 ### Fixed
 - Prevents unnecessary queries when lazy loading empty relationships ([#26992](https://github.com/laravel/framework/pull/26992))
@@ -20,6 +23,7 @@
 - Fixed `Collection::loadMissing()` with duplicate relation names ([#27040](https://github.com/laravel/framework/pull/27040))
 - Fixed some commands ([#27020](https://github.com/laravel/framework/pull/27020))
 - Ensured the command `context` is forwarded to calls ([#27012](https://github.com/laravel/framework/pull/27012), [#27065](https://github.com/laravel/framework/pull/27065))
+- Fixed `Collection::loadMorph()` issue relations loading issue ([#27081](https://github.com/laravel/framework/pull/27081))
 
 ### Changed
 - Removed `HasOneOrMany::update()` since `Builder::update()` already adds the `UPDATED_AT` timestamp. ([#27026](https://github.com/laravel/framework/pull/27026))

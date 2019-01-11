@@ -128,6 +128,16 @@ class SessionManager extends Manager
     }
 
     /**
+     * Create an instance of the DynamoDB session driver.
+     *
+     * @return \Illuminate\Session\Store
+     */
+    protected function createDynamodbDriver()
+    {
+        return $this->createCacheBased('dynamodb');
+    }
+
+    /**
      * Create an instance of a cache driven driver.
      *
      * @param  string  $driver
