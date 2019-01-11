@@ -55,10 +55,8 @@ trait InteractsWithRedis
             $this->redis['predis']->connection()->flushdb();
         } catch (Exception $e) {
             if ($host === '127.0.0.1' && $port === 6379 && getenv('REDIS_HOST') === false) {
-                $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
                 static::$connectionFailedOnceWithDefaultsSkip = true;
-
-                return;
+                $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
             }
         }
     }
