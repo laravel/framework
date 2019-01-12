@@ -96,6 +96,11 @@ abstract class Manager
                 return $this->$method();
             }
         }
+        
+        if(!class_exists($driver)) {
+            throw new InvalidArgumentException("Class [$driver] not found.");
+        }
+        
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 
