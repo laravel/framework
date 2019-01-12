@@ -901,6 +901,12 @@ class TestResponse
             return $this->assertSessionMissing('errors');
         }
 
+        if (is_null($this->session()->get('errors'))) {
+            PHPUnit::assertTrue(true);
+
+            return $this;
+        }
+
         $errors = $this->session()->get('errors')->getBag($errorBag);
 
         foreach ($keys as $key => $value) {
