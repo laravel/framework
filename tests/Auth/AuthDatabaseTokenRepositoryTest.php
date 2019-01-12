@@ -41,7 +41,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
 
         $results = $repo->create($user);
 
-        $this->assertInternalType('string', $results);
+        $this->assertIsString($results);
         $this->assertGreaterThan(1, strlen($results));
     }
 

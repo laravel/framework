@@ -118,10 +118,14 @@ class Collection extends BaseCollection implements QueueableCollection
                 $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
             }
 
-            $path = array_combine($segments, $segments);
+            $path = [];
+
+            foreach ($segments as $segment) {
+                $path[] = [$segment => $segment];
+            }
 
             if (is_callable($value)) {
-                $path[end($segments)] = $value;
+                $path[count($segments) - 1][end($segments)] = $value;
             }
 
             $this->loadMissingRelation($this, $path);
@@ -139,7 +143,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     protected function loadMissingRelation(Collection $models, array $path)
     {
-        $relation = array_splice($path, 0, 1);
+        $relation = array_shift($path);
 
         $name = explode(':', key($relation))[0];
 
@@ -178,12 +182,8 @@ class Collection extends BaseCollection implements QueueableCollection
             ->groupBy(function ($model) {
                 return get_class($model);
             })
-            ->filter(function ($models, $className) use ($relations) {
-                return Arr::has($relations, $className);
-            })
             ->each(function ($models, $className) use ($relations) {
-                $className::with($relations[$className])
-                    ->eagerLoadRelations($models->all());
+                static::make($models)->load($relations[$className] ?? []);
             });
 
         return $this;

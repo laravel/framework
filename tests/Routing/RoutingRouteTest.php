@@ -309,7 +309,7 @@ class RoutingRouteTest extends TestCase
             return 'foo';
         })->name('foo');
 
-        $this->assertInternalType('array', $route->getAction());
+        $this->assertIsArray($route->getAction());
         $this->assertArrayHasKey('as', $route->getAction());
         $this->assertEquals('foo', $route->getAction('as'));
         $this->assertNull($route->getAction('unknown_property'));
@@ -1059,6 +1059,29 @@ class RoutingRouteTest extends TestCase
         $routes = $routes->getRoutes();
         $routes[0]->prefix('prefix');
         $this->assertEquals('prefix', $routes[0]->uri());
+    }
+
+    public function testRoutePreservingOriginalParametersState()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->bind('bar', function ($value) {
+            return strlen($value);
+        });
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function ($bar) use ($router, $phpunit) {
+                $route = $router->getCurrentRoute();
+
+                $phpunit->assertEquals('taylor', $route->originalParameter('bar'));
+                $phpunit->assertEquals('default', $route->originalParameter('unexisting', 'default'));
+                $phpunit->assertEquals(['bar' => 'taylor'], $route->originalParameters());
+
+                return $bar;
+            },
+        ]);
+
+        $this->assertEquals(6, $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
     public function testMergingControllerUses()

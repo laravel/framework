@@ -312,7 +312,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $name
      * @param  array  $parameters
-     * @param  \DateTimeInterface|int  $expiration
+     * @param  \DateTimeInterface|\DateInterval|int  $expiration
      * @param  bool  $absolute
      * @return string
      */
@@ -337,7 +337,7 @@ class UrlGenerator implements UrlGeneratorContract
      * Create a temporary signed route URL for a named route.
      *
      * @param  string  $name
-     * @param  \DateTimeInterface|int  $expiration
+     * @param  \DateTimeInterface|\DateInterval|int  $expiration
      * @param  array  $parameters
      * @param  bool  $absolute
      * @return string
@@ -362,7 +362,7 @@ class UrlGenerator implements UrlGeneratorContract
             Arr::except($request->query(), 'signature')
         ), '?');
 
-        $expires = Arr::get($request->query(), 'expires');
+        $expires = $request->query('expires');
 
         $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
 

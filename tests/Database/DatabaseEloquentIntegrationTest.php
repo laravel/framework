@@ -1054,7 +1054,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
 
         $user = EloquentTestUser::first();
-        $this->assertInternalType('int', $user->id);
+        $this->assertIsInt($user->id);
     }
 
     public function testDefaultIncrementingPrimaryKeyIntegerCastCanBeOverwritten()
@@ -1062,7 +1062,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUserWithStringCastId::create(['email' => 'taylorotwell@gmail.com']);
 
         $user = EloquentTestUserWithStringCastId::first();
-        $this->assertInternalType('string', $user->id);
+        $this->assertIsString($user->id);
     }
 
     public function testRelationsArePreloadedInGlobalScope()

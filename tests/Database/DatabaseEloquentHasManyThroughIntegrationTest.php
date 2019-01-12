@@ -199,6 +199,24 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         });
     }
 
+    public function testChunkById()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $i = 0;
+        $count = 0;
+
+        $country->posts()->chunkById(2, function ($collection) use (&$i, &$count) {
+            $i++;
+            $count += $collection->count();
+        });
+
+        $this->assertEquals(3, $i);
+        $this->assertEquals(6, $count);
+    }
+
     public function testCursorReturnsCorrectModels()
     {
         $this->seedData();

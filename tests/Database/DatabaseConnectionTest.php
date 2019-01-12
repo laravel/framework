@@ -73,7 +73,7 @@ class DatabaseConnectionTest extends TestCase
         $log = $mock->getQueryLog();
         $this->assertEquals('foo', $log[0]['query']);
         $this->assertEquals(['foo' => 'bar'], $log[0]['bindings']);
-        $this->assertInternalType('numeric', $log[0]['time']);
+        $this->assertIsNumeric($log[0]['time']);
     }
 
     public function testInsertCallsTheStatementMethod()
@@ -114,7 +114,7 @@ class DatabaseConnectionTest extends TestCase
         $log = $mock->getQueryLog();
         $this->assertEquals('foo', $log[0]['query']);
         $this->assertEquals(['bar'], $log[0]['bindings']);
-        $this->assertInternalType('numeric', $log[0]['time']);
+        $this->assertIsNumeric($log[0]['time']);
     }
 
     public function testAffectingStatementProperlyCallsPDO()
@@ -132,7 +132,7 @@ class DatabaseConnectionTest extends TestCase
         $log = $mock->getQueryLog();
         $this->assertEquals('foo', $log[0]['query']);
         $this->assertEquals(['foo' => 'bar'], $log[0]['bindings']);
-        $this->assertInternalType('numeric', $log[0]['time']);
+        $this->assertIsNumeric($log[0]['time']);
     }
 
     public function testTransactionLevelNotIncrementedOnTransactionException()

@@ -38,8 +38,8 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
 
         $quote = DIRECTORY_SEPARATOR == '\\' ? '"' : "'";
-        $resetCommand->shouldReceive('run')->with(new InputMatcher("--database --path --realpath --force {$quote}migrate:reset{$quote}"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --path --realpath --force migrate'), m::any());
+        $resetCommand->shouldReceive('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), m::any());
+        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
 
         $this->runCommand($command);
     }
@@ -61,8 +61,8 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
 
         $quote = DIRECTORY_SEPARATOR == '\\' ? '"' : "'";
-        $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--database --path --realpath --step=2 --force {$quote}migrate:rollback{$quote}"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--database --path --realpath --force migrate'), m::any());
+        $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--step=2 --force=1 {$quote}migrate:rollback{$quote}"), m::any());
+        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
 
         $this->runCommand($command, ['--step' => 2]);
     }
