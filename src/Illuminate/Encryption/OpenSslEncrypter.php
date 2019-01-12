@@ -61,7 +61,7 @@ class OpenSslEncrypter implements Encrypter
     /**
      * Create a new encryption key for the given cipher.
      *
-     * @param  string  $cipher
+     * @param  string|null  $cipher
      * @return string
      *
      * @throws \Exception

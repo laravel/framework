@@ -32,7 +32,7 @@ class EncryptionManager extends Manager implements Encrypter
     /**
      * Create a new encryption key for the cipher.
      *
-     * @param  string  $cipher
+     * @param  string|null  $cipher
      * @return string
      *
      * @throws \Exception

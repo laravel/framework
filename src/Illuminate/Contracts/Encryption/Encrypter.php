@@ -25,7 +25,7 @@ interface Encrypter
     /**
      * Generate a new key for the chosen cipher.
      *
-     * @param  string  $cipher
+     * @param  string|null  $cipher
      * @return mixed
      */
     public function generateKey($cipher = null);
