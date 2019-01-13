@@ -19,6 +19,13 @@ interface UrlRoutable
     public function getRouteKeyName();
 
     /**
+     * Get the validator for the bound value.
+     *
+     * @return \Illuminate\Validation\Validator|null
+     */
+    public function getRouteKeyValidator();
+
+    /**
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value

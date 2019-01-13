@@ -30,6 +30,16 @@ trait DelegatesToResource
     }
 
     /**
+     * Get the validator for the bound value.
+     *
+     * @return \Illuminate\Validation\Validator|null
+     */
+    public function getRouteKeyValidator()
+    {
+        return null;
+    }
+
+    /**
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value

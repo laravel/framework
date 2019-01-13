@@ -32,6 +32,12 @@ class ImplicitRouteBinding
 
             $instance = $container->make($parameter->getClass()->name);
 
+            if ($validator = $instance->getRouteKeyValidator()) {
+                if ($validator->fails()) {
+                    throw (new ModelNotFoundException)->setModel(get_class($instance));
+                }
+            }
+
             if (! $model = $instance->resolveRouteBinding($parameterValue)) {
                 throw (new ModelNotFoundException)->setModel(get_class($instance));
             }
