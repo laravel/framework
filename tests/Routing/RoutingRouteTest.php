@@ -24,6 +24,9 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Translation\Translator;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Validation\Validator;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class RoutingRouteTest extends TestCase
@@ -1824,7 +1827,8 @@ class RoutingTestUserModel extends Model
 
     public function getRouteKeyValidator($value)
     {
-        return Validator::make(
+        $translator = new Translator(new ArrayLoader, 'en');
+        return new Validator($translator,
             [$this->getRouteKeyName() => $value],
             [$this->getRouteKeyName() => 'string']
         );
