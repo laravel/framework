@@ -1822,6 +1822,14 @@ class RoutingTestUserModel extends Model
         return 'id';
     }
 
+    public function getRouteKeyValidator($value)
+    {
+        return Validator::make(
+            [$this->getRouteKeyName() => $value],
+            [$this->getRouteKeyName() => 'string']
+        );
+    }
+
     public function where($key, $value)
     {
         $this->value = $value;

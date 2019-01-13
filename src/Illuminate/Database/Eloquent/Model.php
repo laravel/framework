@@ -1461,9 +1461,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get the validator for the bound value.
      *
+     * @param  mixed  $value
      * @return \Illuminate\Validation\Validator|null
      */
-    public function getRouteKeyValidator()
+    public function getRouteKeyValidator($value)
     {
         return null;
     }
