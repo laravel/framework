@@ -630,7 +630,7 @@ class RoutableInterfaceStub implements UrlRoutable
         return 'key';
     }
 
-    public function getRouteKeyValidator()
+    public function getRouteKeyValidator($value)
     {
         return null;
     }

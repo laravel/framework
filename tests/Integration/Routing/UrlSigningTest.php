@@ -101,7 +101,7 @@ class RoutableInterfaceStub implements UrlRoutable
         return 'routable';
     }
 
-    public function getRouteKeyValidator()
+    public function getRouteKeyValidator($value)
     {
         return null;
     }
