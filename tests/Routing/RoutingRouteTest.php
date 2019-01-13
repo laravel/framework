@@ -16,7 +16,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\RouteGroup;
 use Illuminate\Container\Container;
+use Illuminate\Validation\Validator;
+use Illuminate\Translation\Translator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Translation\ArrayLoader;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
@@ -24,9 +27,6 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Translation\Translator;
-use Illuminate\Translation\ArrayLoader;
-use Illuminate\Validation\Validator;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class RoutingRouteTest extends TestCase
@@ -1864,6 +1864,7 @@ class RouteModelBindingValidKeyStub extends Model
     public function getRouteKeyValidator($value)
     {
         $translator = new Translator(new ArrayLoader, 'en');
+
         return new Validator($translator,
             [$this->getRouteKeyName() => $value],
             [$this->getRouteKeyName() => 'string']
@@ -1893,6 +1894,7 @@ class RouteModelBindingInvalidKeyStub extends Model
     public function getRouteKeyValidator($value)
     {
         $translator = new Translator(new ArrayLoader, 'en');
+
         return new Validator($translator,
             [$this->getRouteKeyName() => $value],
             [$this->getRouteKeyName() => 'integer']
@@ -2003,6 +2005,7 @@ class RoutingTestValidKeyUserModel extends RoutingTestUserModel
     public function getRouteKeyValidator($value)
     {
         $translator = new Translator(new ArrayLoader, 'en');
+
         return new Validator($translator,
             [$this->getRouteKeyName() => $value],
             [$this->getRouteKeyName() => 'string']
@@ -2015,6 +2018,7 @@ class RoutingTestInvalidKeyUserModel extends RoutingTestUserModel
     public function getRouteKeyValidator($value)
     {
         $translator = new Translator(new ArrayLoader, 'en');
+
         return new Validator($translator,
             [$this->getRouteKeyName() => $value],
             [$this->getRouteKeyName() => 'integer']
