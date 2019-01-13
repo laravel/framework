@@ -807,6 +807,29 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testModelWithValidatorValidKeyBinding()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->model('bar', RouteModelBindingValidKeyStub::class);
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    /**
+     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function testModelWithValidatorInvalidKeyBinding()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+        $router->model('bar', RouteModelBindingInvalidKeyStub::class);
+        $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
      * @expectedExceptionMessage No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].
@@ -1828,6 +1851,64 @@ class RouteModelBindingClosureStub
     public function findAlternate($value)
     {
         return strtolower($value).'alt';
+    }
+}
+
+class RouteModelBindingValidKeyStub extends Model
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function getRouteKeyValidator($value)
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        return new Validator($translator,
+            [$this->getRouteKeyName() => $value],
+            [$this->getRouteKeyName() => 'string']
+        );
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function first()
+    {
+        return strtoupper($this->value);
+    }
+}
+
+class RouteModelBindingInvalidKeyStub extends Model
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function getRouteKeyValidator($value)
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        return new Validator($translator,
+            [$this->getRouteKeyName() => $value],
+            [$this->getRouteKeyName() => 'integer']
+        );
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function first()
+    {
+        return strtoupper($this->value);
     }
 }
 

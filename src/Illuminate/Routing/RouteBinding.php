@@ -65,6 +65,12 @@ class RouteBinding
             // throw a not found exception otherwise we will return the instance.
             $instance = $container->make($class);
 
+            if ($validator = $instance->getRouteKeyValidator($value)) {
+                if ($validator->fails()) {
+                    throw (new ModelNotFoundException)->setModel(get_class($instance));
+                }
+            }
+
             if ($model = $instance->resolveRouteBinding($value)) {
                 return $model;
             }
