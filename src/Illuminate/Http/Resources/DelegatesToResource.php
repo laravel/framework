@@ -35,7 +35,7 @@ trait DelegatesToResource
      * @param  mixed  $value
      * @return \Illuminate\Validation\Validator|null
      */
-    public function getRouteKeyValidator()
+    public function getRouteKeyValidator($value)
     {
         return null;
     }
