@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.7.20...5.7)
 
-## [v5.7.20 (2018-01-08)](https://github.com/laravel/framework/compare/v5.7.19...v5.7.20)
+### Fixed
+- Fixed `Blueprint::removeColumn()` ([#27115](https://github.com/laravel/framework/pull/27115), [#27122](https://github.com/laravel/framework/pull/27122))
+- Fixed allowing of null broadcast connection driver ([#27135](https://github.com/laravel/framework/pull/27135))
+
+### Changed
+- Replaced `get_called_class()` to `static::class` ([#27146](https://github.com/laravel/framework/pull/27146))
+
+
+## [v5.7.20 (2019-01-08)](https://github.com/laravel/framework/compare/v5.7.19...v5.7.20)
 
 ### Added
 - Added `chunkById` support in relations ([#26919](https://github.com/laravel/framework/pull/26919))
