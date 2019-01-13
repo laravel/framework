@@ -1476,6 +1476,22 @@ class RoutingRouteTest extends TestCase
         $router->dispatch(Request::create('foo/nonexisting', 'GET'))->getContent();
     }
 
+    /**
+     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function testImplicitBindingsWithOptionalParameterWithInvalidKeyInUri()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestInvalidKeyUserModel $bar = null) use ($phpunit) {
+                $phpunit->fail('ModelNotFoundException was expected.');
+            },
+        ]);
+        $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent();
+    }
+
     public function testImplicitBindingThroughIOC()
     {
         $phpunit = $this;
@@ -1892,6 +1908,18 @@ class RoutingTestNonExistingUserModel extends RoutingTestUserModel
     public function firstOrFail()
     {
         throw new ModelNotFoundException;
+    }
+}
+
+class RoutingTestInvalidKeyUserModel extends RoutingTestUserModel
+{
+    public function getRouteKeyValidator($value)
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        return new Validator($translator,
+            [$this->getRouteKeyName() => $value],
+            [$this->getRouteKeyName() => 'integer']
+        );
     }
 }
 
