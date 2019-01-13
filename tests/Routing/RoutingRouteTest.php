@@ -1432,6 +1432,21 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsWithValidator()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestValidKeyUserModel $bar) use ($phpunit) {
+                $phpunit->assertInstanceOf(RoutingTestValidKeyUserModel::class, $bar);
+
+                return $bar->value;
+            },
+        ]);
+        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
     {
         $phpunit = $this;
@@ -1841,15 +1856,6 @@ class RoutingTestUserModel extends Model
         return 'id';
     }
 
-    public function getRouteKeyValidator($value)
-    {
-        $translator = new Translator(new ArrayLoader, 'en');
-        return new Validator($translator,
-            [$this->getRouteKeyName() => $value],
-            [$this->getRouteKeyName() => 'string']
-        );
-    }
-
     public function where($key, $value)
     {
         $this->value = $value;
@@ -1908,6 +1914,18 @@ class RoutingTestNonExistingUserModel extends RoutingTestUserModel
     public function firstOrFail()
     {
         throw new ModelNotFoundException;
+    }
+}
+
+class RoutingTestValidKeyUserModel extends RoutingTestUserModel
+{
+    public function getRouteKeyValidator($value)
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        return new Validator($translator,
+            [$this->getRouteKeyName() => $value],
+            [$this->getRouteKeyName() => 'string']
+        );
     }
 }
 
