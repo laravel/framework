@@ -64,7 +64,6 @@ class OpenSslEncrypter implements Encrypter
      * @param  string|null  $cipher
      * @return string
      *
-     * @throws \Exception
      * @throws \InvalidArgumentException
      */
     public function generateKey($cipher = null)
@@ -95,7 +94,6 @@ class OpenSslEncrypter implements Encrypter
      * @param  bool  $serialize
      * @return string
      *
-     * @throws \Exception
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
     public function encrypt($value, $serialize = true)

@@ -34,8 +34,6 @@ class EncryptionManager extends Manager implements Encrypter
      *
      * @param  string|null  $cipher
      * @return string
-     *
-     * @throws \Exception
      */
     public function generateKey($cipher = null)
     {
