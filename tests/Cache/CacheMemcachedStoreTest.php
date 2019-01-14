@@ -74,6 +74,20 @@ class CacheMemcachedStoreTest extends TestCase
         Carbon::setTestNow();
     }
 
+    public function testPutMethodReturnsFalseIfTTLIsNull()
+    {
+        if (! class_exists(Memcached::class)) {
+            $this->markTestSkipped('Memcached module not installed');
+        }
+
+        Carbon::setTestNow($now = Carbon::now());
+        $memcached = $this->getMockBuilder(Memcached::class)->setMethods(['set'])->getMock();
+        $store = new MemcachedStore($memcached);
+        $result = $store->put('foo', 'bar', null);
+        $this->assertFalse($result);
+        Carbon::setTestNow();
+    }
+
     public function testIncrementMethodProperlyCallsMemcache()
     {
         if (! class_exists(Memcached::class)) {

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Cache;
 
 use Closure;
+use Illuminate\Database\ConnectionInterface;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -73,6 +74,17 @@ class CacheDatabaseStoreTest extends TestCase
 
         $result = $store->put('foo', 'bar', 1);
         $this->assertTrue($result);
+    }
+
+    public function testValueIsNotInsertedWithoutTTL()
+    {
+        $connection = m::mock(ConnectionInterface::class);
+        $connection->shouldReceive('table')->never();
+
+        $store = new DatabaseStore($connection, 'table');
+
+        $result = $store->put('foo', 'bar', null);
+        $this->assertFalse($result);
     }
 
     public function testValueIsUpdatedWhenInsertThrowsException()

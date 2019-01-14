@@ -46,6 +46,15 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testPutReturnsFalseForNullTTL()
+    {
+        $files = $this->mockFilesystem();
+        $contents = '0000000000';
+        $store = new FileStore($files, __DIR__);
+        $result = $store->put('foo', $contents, null);
+        $this->assertFalse($result);
+    }
+
     public function testExpiredItemsReturnNull()
     {
         $files = $this->mockFilesystem();

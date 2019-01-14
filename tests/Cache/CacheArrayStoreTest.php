@@ -15,6 +15,14 @@ class CacheArrayStoreTest extends TestCase
         $this->assertEquals('bar', $store->get('foo'));
     }
 
+    public function testAnItemWithNoTTLCannotBeSet()
+    {
+        $store = new ArrayStore;
+        $result = $store->put('foo', 'bar', null);
+        $this->assertFalse($result);
+        $this->assertNull($store->get('foo'));
+    }
+
     public function testMultipleItemsCanBeSetAndRetrieved()
     {
         $store = new ArrayStore;

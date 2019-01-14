@@ -171,11 +171,15 @@ class DynamoDbStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  float|int|null  $minutes
      * @return void
      */
     public function put($key, $value, $minutes)
     {
+        if (is_null($minutes)) {
+            return false;
+        }
+
         $this->dynamo->putItem([
             'TableName' => $this->table,
             'Item' => [

@@ -51,6 +51,16 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testSetMethodWithNullTTLFails()
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->setMethods(['put'])->getMock();
+        $apc->expects($this->never())
+            ->method('put');
+        $store = new ApcStore($apc);
+        $result = $store->put('foo', 'bar', null);
+        $this->assertFalse($result);
+    }
+
     public function testSetMultipleMethodProperlyCallsAPC()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->setMethods(['put'])->getMock();

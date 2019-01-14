@@ -29,11 +29,15 @@ class ArrayStore extends TaggableStore
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  float|int|null  $minutes
      * @return bool
      */
     public function put($key, $value, $minutes)
     {
+        if (is_null($minutes)) {
+            return false;
+        }
+
         $this->storage[$key] = $value;
 
         return true;
