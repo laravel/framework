@@ -133,11 +133,15 @@ class RedisStore extends TaggableStore implements LockProvider
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  float|int|null  $minutes
      * @return bool
      */
     public function add($key, $value, $minutes)
     {
+        if (is_null($minutes)) {
+            return false;
+        }
+
         $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])";
 
         return (bool) $this->connection()->eval(
