@@ -138,6 +138,8 @@ class PendingCommand
             if ($e->getMethodName() === 'askQuestion') {
                 $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
             }
+
+            throw $e;
         }
 
         if ($this->expectedExitCode !== null) {
