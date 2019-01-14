@@ -199,22 +199,22 @@ class Repository implements CacheContract, ArrayAccess
     public function put($key, $value, $minutes = null)
     {
         if (is_array($key)) {
-            $result = $this->putMany($key, $value);
-
-            return $result;
+            return $this->putMany($key, $value);
         }
 
-        if (! is_null($minutes = $this->getMinutes($minutes))) {
-            $result = $this->store->put($this->itemKey($key), $value, $minutes);
+        $minutes = $this->getMinutes($minutes);
 
-            if ($result) {
-                $this->event(new KeyWritten($key, $value, $minutes));
-            }
-
-            return $result;
+        if ($minutes !== null && $minutes <= 0) {
+            return false;
         }
 
-        return false;
+        $result = $this->store->put($this->itemKey($key), $value, $minutes);
+
+        if ($result) {
+            $this->event(new KeyWritten($key, $value, $minutes));
+        }
+
+        return $result;
     }
 
     /**
@@ -229,24 +229,26 @@ class Repository implements CacheContract, ArrayAccess
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return bool
      */
     public function putMany(array $values, $minutes)
     {
-        if (! is_null($minutes = $this->getMinutes($minutes))) {
-            $result = $this->store->putMany($values, $minutes);
+        $minutes = $this->getMinutes($minutes);
 
-            if ($result) {
-                foreach ($values as $key => $value) {
-                    $this->event(new KeyWritten($key, $value, $minutes));
-                }
-            }
-
-            return $result;
+        if ($minutes !== null && $minutes <= 0) {
+            return false;
         }
 
-        return false;
+        $result = $this->store->putMany($values, $minutes);
+
+        if ($result) {
+            foreach ($values as $key => $value) {
+                $this->event(new KeyWritten($key, $value, $minutes));
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -267,7 +269,9 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function add($key, $value, $minutes)
     {
-        if (is_null($minutes = $this->getMinutes($minutes))) {
+        $minutes = $this->getMinutes($minutes);
+
+        if ($minutes !== null && $minutes <= 0) {
             return false;
         }
 
@@ -571,18 +575,22 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Calculate the number of minutes with the given duration.
      *
-     * @param  \DateTimeInterface|\DateInterval|float|int  $duration
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return float|int|null
      */
-    protected function getMinutes($duration)
+    protected function getMinutes($minutes)
     {
-        $duration = $this->parseDateInterval($duration);
+        if ($minutes === null) {
+            return null;
+        }
+
+        $duration = $this->parseDateInterval($minutes);
 
         if ($duration instanceof DateTimeInterface) {
             $duration = Carbon::now()->diffInRealSeconds($duration, false) / 60;
         }
 
-        return (int) ($duration * 60) > 0 ? $duration : null;
+        return $duration;
     }
 
     /**
