@@ -284,9 +284,7 @@ class Repository implements CacheContract, ArrayAccess
         // so it exists for subsequent requests. Then, we will return true so it is
         // easy to know if the value gets added. Otherwise, we will return false.
         if (is_null($this->get($key))) {
-            $this->put($key, $value, $minutes);
-
-            return true;
+            return $this->put($key, $value, $minutes);
         }
 
         return false;
