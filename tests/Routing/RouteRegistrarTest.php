@@ -232,6 +232,17 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals('{account}.myapp.com', $this->getRoute()->getDomain());
     }
 
+    public function testCanRegisterGroupWithSharedNameAttribute()
+    {
+        $this->router->group([
+            'name' => 'api.',
+        ], function ($router) {
+            $router->get('users', 'UsersController@index')->name('users');
+        });
+
+        $this->assertEquals('api.users', $this->getRoute()->getName());
+    }
+
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Method Illuminate\Routing\RouteRegistrar::missing does not exist.
