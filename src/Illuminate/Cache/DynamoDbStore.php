@@ -200,11 +200,15 @@ class DynamoDbStore implements Store
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  float|int  $minutes
+     * @param  float|int|null  $minutes
      * @return void
      */
     public function putMany(array $values, $minutes)
     {
+        if (is_null($minutes)) {
+            return false;
+        }
+
         $expiration = $this->toTimestamp($minutes);
 
         $this->dynamo->batchWriteItem([
