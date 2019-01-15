@@ -176,7 +176,7 @@ class DynamoDbStore implements Store
      */
     public function put($key, $value, $minutes)
     {
-        if (is_null($minutes)) {
+        if ($minutes === null) {
             return false;
         }
 
@@ -205,7 +205,7 @@ class DynamoDbStore implements Store
      */
     public function putMany(array $values, $minutes)
     {
-        if (is_null($minutes)) {
+        if ($minutes === null) {
             return false;
         }
 
@@ -244,7 +244,7 @@ class DynamoDbStore implements Store
      */
     public function add($key, $value, $minutes)
     {
-        if (is_null($minutes)) {
+        if ($minutes === null) {
             return false;
         }
 

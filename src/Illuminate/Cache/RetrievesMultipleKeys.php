@@ -32,7 +32,7 @@ trait RetrievesMultipleKeys
      */
     public function putMany(array $values, $minutes)
     {
-        if (is_null($minutes)) {
+        if ($minutes === null) {
             return false;
         }
 

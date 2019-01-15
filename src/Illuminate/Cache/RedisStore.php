@@ -89,7 +89,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $minutes)
     {
-        if (is_null($minutes)) {
+        if ($minutes === null) {
             return false;
         }
 
@@ -109,7 +109,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function putMany(array $values, $minutes)
     {
-        if (is_null($minutes)) {
+        if ($minutes === null) {
             return false;
         }
 
@@ -138,7 +138,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function add($key, $value, $minutes)
     {
-        if (is_null($minutes)) {
+        if ($minutes === null) {
             return false;
         }
 

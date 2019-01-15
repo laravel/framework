@@ -93,7 +93,7 @@ class DatabaseStore implements Store
      */
     public function put($key, $value, $minutes)
     {
-        if (is_null($minutes)) {
+        if ($minutes === null) {
             return false;
         }
 
