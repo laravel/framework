@@ -679,6 +679,24 @@ class TestResponse
     }
 
     /**
+     * Assert that the response does not have JSON validation errors.
+     *
+     * @return $this
+     */
+    public function assertJsonDoesntHaveValidationErrors()
+    {
+        $errors = $this->json('errors') ?? [];
+
+        PHPUnit::assertEmpty(
+            $errors,
+            'Response has unexpected validation errors: '.PHP_EOL.PHP_EOL.
+            json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        );
+
+        return $this;
+    }
+
+    /**
      * Validate and return the decoded response JSON.
      *
      * @param  string|null  $key

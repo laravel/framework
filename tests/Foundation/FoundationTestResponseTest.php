@@ -11,6 +11,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\AssertionFailedError;
 use Illuminate\Foundation\Testing\TestResponse;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
@@ -355,6 +356,41 @@ class FoundationTestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse($baseResponse);
 
         $response->assertJsonMissingValidationErrors('bar');
+    }
+
+    public function testAssertJsonDoesntHaveValidationErrors()
+    {
+        $data = ['status' => 'ok'];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonDoesntHaveValidationErrors();
+    }
+
+    public function testAssertJsonDoesntHaveValidationErrorsPassesWhenErrorsIsEmpty()
+    {
+        $data = ['status' => 'ok', 'errors' => []];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonDoesntHaveValidationErrors();
+    }
+
+    public function testAssertJsonDoesntHaveValidationErrorsCanFail()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $data = ['errors' => ['foo' => []]];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonDoesntHaveValidationErrors();
     }
 
     public function testMacroable()
