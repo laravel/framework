@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Foundation\Http\Middleware;
 use Mockery as m;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Middleware\TrustHosts;
 
 class TrustHostsTest extends TestCase
@@ -19,6 +18,7 @@ class TrustHostsTest extends TestCase
 
         $middleware = new TrustHosts();
         $middleware->setTrustedHosts($hosts);
-        $middleware->handle($request, function(){});
+        $middleware->handle($request, function(){
+        });
     }
 }

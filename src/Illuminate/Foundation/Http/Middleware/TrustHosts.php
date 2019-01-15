@@ -9,7 +9,7 @@ class TrustHosts
 {
     /**
      * The trusted host names.
-     * 
+     *
      * @var array
      */
     protected $trustedHosts = [];
@@ -27,7 +27,7 @@ class TrustHosts
     /**
      * Sets trusted host names.
      *
-     * @param array $trustedHosts 
+     * @param array $trustedHosts
      */
     public function setTrustedHosts($trustedHosts)
     {
@@ -44,6 +44,7 @@ class TrustHosts
     public function handle(Request $request, Closure $next)
     {
         $request->setTrustedHosts($this->getTrustedHosts());
+
         return $next($request);
     }
 }
