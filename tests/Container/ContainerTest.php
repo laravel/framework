@@ -1036,16 +1036,6 @@ class ContainerMixedPrimitiveStub
     }
 }
 
-class ContainerConstructorParameterLoggingStub
-{
-    public $receivedParameters;
-
-    public function __construct($first, $second)
-    {
-        $this->receivedParameters = func_get_args();
-    }
-}
-
 class ContainerLazyExtendStub
 {
     public static $initialized = false;
