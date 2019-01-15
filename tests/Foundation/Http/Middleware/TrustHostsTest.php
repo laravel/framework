@@ -18,7 +18,7 @@ class TrustHostsTest extends TestCase
 
         $middleware = new TrustHosts();
         $middleware->setTrustedHosts($hosts);
-        $middleware->handle($request, function(){
+        $middleware->handle($request, function () {
         });
     }
 }
