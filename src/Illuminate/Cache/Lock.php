@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\Lock as LockContract;
 use Illuminate\Contracts\Cache\LockTimeoutException;
@@ -25,16 +26,29 @@ abstract class Lock implements LockContract
     protected $seconds;
 
     /**
+     * The scope identifier of this lock.
+     *
+     * @var string
+     */
+    protected $owner;
+
+    /**
      * Create a new lock instance.
      *
      * @param  string  $name
      * @param  int  $seconds
+     * @param  string|null  $owner
      * @return void
      */
-    public function __construct($name, $seconds)
+    public function __construct($name, $seconds, $owner = null)
     {
+        if (is_null($owner)) {
+            $owner = Str::random();
+        }
+
         $this->name = $name;
         $this->seconds = $seconds;
+        $this->owner = $owner;
     }
 
     /**
@@ -50,6 +64,13 @@ abstract class Lock implements LockContract
      * @return void
      */
     abstract public function release();
+
+    /**
+     * Returns the owner value written into the driver for this lock.
+     *
+     * @return mixed
+     */
+    abstract protected function getCurrentOwner();
 
     /**
      * Attempt to acquire the lock.
@@ -100,5 +121,25 @@ abstract class Lock implements LockContract
         }
 
         return true;
+    }
+
+    /**
+     * Returns the current owner of the lock.
+     *
+     * @return string
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * Determines whether this lock is allowed to release the lock in the driver.
+     *
+     * @return bool
+     */
+    protected function isOwnedByCurrentProcess()
+    {
+        return $this->getCurrentOwner() === $this->owner;
     }
 }
