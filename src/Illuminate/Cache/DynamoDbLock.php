@@ -17,11 +17,12 @@ class DynamoDbLock extends Lock
      * @param  \Illuminate\Cache\DynamoDbStore  $dynamo
      * @param  string  $name
      * @param  int  $seconds
+     * @param  string|null  $owner
      * @return void
      */
-    public function __construct(DynamoDbStore $dynamo, $name, $seconds)
+    public function __construct(DynamoDbStore $dynamo, $name, $seconds, $owner = null)
     {
-        parent::__construct($name, $seconds);
+        parent::__construct($name, $seconds, $owner);
 
         $this->dynamo = $dynamo;
     }
@@ -34,7 +35,7 @@ class DynamoDbLock extends Lock
     public function acquire()
     {
         return $this->dynamo->add(
-            $this->name, 1, $this->seconds / 60
+            $this->name, $this->owner, $this->seconds / 60
         );
     }
 
@@ -45,6 +46,28 @@ class DynamoDbLock extends Lock
      */
     public function release()
     {
+        if ($this->isOwnedByCurrentProcess()) {
+            $this->dynamo->forget($this->name);
+        }
+    }
+
+    /**
+     * Release this lock in disregard of ownership.
+     *
+     * @return void
+     */
+    public function forceRelease()
+    {
         $this->dynamo->forget($this->name);
+    }
+
+    /**
+     * Returns the owner value written into the driver for this lock.
+     *
+     * @return mixed
+     */
+    protected function getCurrentOwner()
+    {
+        return $this->dynamo->get($this->name);
     }
 }

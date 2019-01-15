@@ -78,7 +78,7 @@ class RedisCacheLockTest extends TestCase
 
         $firstLock = Cache::store('redis')->lock('foo', 10);
         $this->assertTrue($firstLock->get());
-        $owner = $firstLock->getOwner();
+        $owner = $firstLock->owner();
 
         $secondLock = Cache::store('redis')->restoreLock('foo', $owner);
         $secondLock->release();

@@ -47,8 +47,8 @@ abstract class Lock implements LockContract
         }
 
         $this->name = $name;
-        $this->seconds = $seconds;
         $this->owner = $owner;
+        $this->seconds = $seconds;
     }
 
     /**
@@ -68,7 +68,7 @@ abstract class Lock implements LockContract
     /**
      * Returns the owner value written into the driver for this lock.
      *
-     * @return mixed
+     * @return string
      */
     abstract protected function getCurrentOwner();
 
@@ -128,7 +128,7 @@ abstract class Lock implements LockContract
      *
      * @return string
      */
-    public function getOwner()
+    public function owner()
     {
         return $this->owner;
     }

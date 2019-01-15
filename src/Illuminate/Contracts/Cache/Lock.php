@@ -33,7 +33,7 @@ interface Lock
      *
      * @return string
      */
-    public function getOwner();
+    public function owner();
 
     /**
      * Releases this lock in disregard of ownership.
