@@ -69,9 +69,7 @@ class CacheRedisStoreTest extends TestCase
 
     public function testPutMethodReturnsFalseIfTTLIsNull()
     {
-        $redis = $this->getRedis();
-        $result = $redis->put('foo', 'foo', null);
-        $this->assertFalse($result);
+        $this->assertFalse($this->getRedis()->put('foo', 'foo', null));
     }
 
     public function testSetMultipleMethodProperlyCallsRedis()

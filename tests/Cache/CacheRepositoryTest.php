@@ -161,16 +161,14 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', null)->andReturn(true);
-        $result = $repo->put('foo', 'bar', null);
-        $this->assertTrue($result);
+        $this->assertTrue($repo->put('foo', 'bar', null));
     }
 
     public function testPutManyWorksForNullTTL()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], null)->andReturn(true);
-        $result = $repo->putMany(['foo' => 'bar', 'bar' => 'baz'], null);
-        $this->assertTrue($result);
+        $this->assertTrue($repo->putMany(['foo' => 'bar', 'bar' => 'baz'], null));
     }
 
     public function testAddWorksForNullTTL()
@@ -178,8 +176,7 @@ class CacheRepositoryTest extends TestCase
         $store = m::mock(RedisStore::class);
         $store->shouldReceive('add')->once()->with('foo', 'bar', null)->andReturn(true);
         $repository = new Repository($store);
-        $result = $repository->add('foo', 'bar', null);
-        $this->assertTrue($result);
+        $this->assertTrue($repository->add('foo', 'bar', null));
     }
 
     public function testCacheAddCallsRedisStoreAdd()
