@@ -144,9 +144,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  array  $replace
      * @param  string  $locale
+     * @param  bool  $useFallbackLocale
      * @return string|array
      */
-    public function getFromJson($key, array $replace = [], $locale = null)
+    public function getFromJson($key, array $replace = [], $locale = null, $useFallbackLocale = false)
     {
         $locale = $locale ?: $this->locale;
 
@@ -161,6 +162,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // using the typical translation file. This way developers can always just use a
         // helper such as __ instead of having to pick between trans or __ with views.
         if (! isset($line)) {
+            // Attempt to translate from fallback JSON key
+            if ($useFallbackLocale) {
+                return $this->getFromJson($key, $replace, $this->fallback, false);
+            }
+
             $fallback = $this->get($key, $replace, $locale);
 
             if ($fallback !== $key) {

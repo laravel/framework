@@ -178,6 +178,16 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
     }
 
+    public function testGetJsonMethodFallbackJsonLocale()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->setFallback('lv');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('lv', '*', '*')->andReturn(['foo' => 'foo', 'bar' => 'bar']);
+        $this->assertEquals('foo', $t->getFromJson('foo', [], null, true));
+        $this->assertEquals('bar', $t->getFromJson('bar', [], null, true));
+    }
+
     protected function getLoader()
     {
         return m::mock(Loader::class);
