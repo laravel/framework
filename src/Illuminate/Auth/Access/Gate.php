@@ -4,8 +4,8 @@ namespace Illuminate\Auth\Access;
 
 use Exception;
 use ReflectionClass;
-use ReflectionFunction;
 use ReflectionMethod;
+use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -400,7 +400,7 @@ class Gate implements GateContract
         // we have converted that into a closure with signature like this
         // "function () use ($ability, $callback) {" in the first place
         if ($parameters === [] && array_keys($uses) === ['ability', 'callback']) {
-            [$class, $method] = Str::parseCallback($uses["callback"]);
+            [$class, $method] = Str::parseCallback($uses['callback']);
             $reflection = new ReflectionMethod($class, $method);
         }
 

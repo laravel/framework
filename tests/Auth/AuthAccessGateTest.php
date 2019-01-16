@@ -681,12 +681,14 @@ class AccessGateTestClassForGuest
     public function foo($user = null)
     {
         static::$calledMethod = 'foo';
+
         return true;
     }
 
     public function bar(?stdClass $user)
     {
         static::$calledMethod = 'bar';
+
         return true;
     }
 }
