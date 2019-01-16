@@ -48,7 +48,21 @@ class QueueBeanstalkdQueueTest extends TestCase
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('watchOnly')->once()->with('default')->andReturn($pheanstalk);
         $job = m::mock(Job::class);
-        $pheanstalk->shouldReceive('reserve')->once()->andReturn($job);
+        $pheanstalk->shouldReceive('reserve')->once()->with(0)->andReturn($job);
+
+        $result = $queue->pop();
+
+        $this->assertInstanceOf(BeanstalkdJob::class, $result);
+    }
+
+    public function testBlockingPopProperlyPopsJobOffOfBeanstalkd()
+    {
+        $queue = new BeanstalkdQueue(m::mock(Pheanstalk::class), 'default', 60, 60);
+        $queue->setContainer(m::mock(Container::class));
+        $pheanstalk = $queue->getPheanstalk();
+        $pheanstalk->shouldReceive('watchOnly')->once()->with('default')->andReturn($pheanstalk);
+        $job = m::mock(Job::class);
+        $pheanstalk->shouldReceive('reserve')->once()->with(60)->andReturn($job);
 
         $result = $queue->pop();
 
