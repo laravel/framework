@@ -12,7 +12,7 @@ class EncryptionTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.encryption', [
+        $app['config']->set('encryption', [
             'driver' => 'openssl',
             'cipher' => 'AES-256-CBC',
             'key'    => 'base64:IUHRqAQ99pZ0A1MPjbuv1D6ff3jxv0GIvS2qIW4JNU4=',
@@ -33,7 +33,7 @@ class EncryptionTest extends TestCase
     {
         $e = $this->app->make('encrypter');
 
-        $this->app['config']->set('app.encryption.key', $e->generateKey());
+        $this->app['config']->set('encryption.key', $e->generateKey());
 
         $e = $this->app->make('encrypter');
 
@@ -44,7 +44,7 @@ class EncryptionTest extends TestCase
     {
         $this->expectException(EncryptException::class);
 
-        $this->app['config']->set('app.encryption.key', null);
+        $this->app['config']->set('encryption.key', null);
 
         $e = $this->app->make('encrypter');
 
@@ -55,8 +55,8 @@ class EncryptionTest extends TestCase
     {
         $this->expectException(EncryptException::class);
 
-        $this->app['config']->set('app.encryption.key', str_repeat('z', 32));
-        $this->app['config']->set('app.encryption.cipher', OpenSslEncrypter::AES_128);
+        $this->app['config']->set('encryption.key', str_repeat('z', 32));
+        $this->app['config']->set('encryption.cipher', OpenSslEncrypter::AES_128);
 
         $e = $this->app->make('encrypter');
 
@@ -67,7 +67,7 @@ class EncryptionTest extends TestCase
     {
         $this->expectException(EncryptException::class);
 
-        $this->app['config']->set('app.encryption.key', str_repeat('z', 5));
+        $this->app['config']->set('encryption.key', str_repeat('z', 5));
 
         $e = $this->app->make('encrypter');
 
@@ -78,7 +78,7 @@ class EncryptionTest extends TestCase
     {
         $this->expectException(EncryptException::class);
 
-        $this->app['config']->set('app.encryption.key', str_repeat('z', 16));
+        $this->app['config']->set('encryption.key', str_repeat('z', 16));
 
         $e = $this->app->make('encrypter');
 
@@ -89,8 +89,8 @@ class EncryptionTest extends TestCase
     {
         $this->expectException(EncryptException::class);
 
-        $this->app['config']->set('app.encryption.key', str_repeat('z', 16));
-        $this->app['config']->set('app.encryption.cipher', 'AES-256-CFB8');
+        $this->app['config']->set('encryption.key', str_repeat('z', 16));
+        $this->app['config']->set('encryption.cipher', 'AES-256-CFB8');
 
         $e = $this->app->make('encrypter');
 

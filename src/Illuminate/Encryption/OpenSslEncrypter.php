@@ -127,6 +127,19 @@ class OpenSslEncrypter implements Encrypter
     }
 
     /**
+     * Encrypt a string without serialization.
+     *
+     * @param  string  $value
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
+     */
+    public function encryptString($value)
+    {
+        return $this->encrypt($value, false);
+    }
+
+    /**
      * Decrypt the given value.
      *
      * @param  mixed  $payload
@@ -153,6 +166,19 @@ class OpenSslEncrypter implements Encrypter
         }
 
         return $unserialize ? unserialize($decrypted) : $decrypted;
+    }
+
+    /**
+     * Decrypt the given string without unserialization.
+     *
+     * @param  string  $payload
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
+     */
+    public function decryptString($payload)
+    {
+        return $this->decrypt($payload, false);
     }
 
     /**

@@ -17,7 +17,7 @@ class EncryptionManager extends Manager implements Encrypter
      */
     public function createOpenSslDriver()
     {
-        $config = $this->app->make('config')->get('app.encryption');
+        $config = $this->app->make('config')->get('encryption');
 
         // If the key starts with "base64:", we will need to decode the key before handing
         // it off to the encrypter. Keys may be base-64 encoded for presentation and we
@@ -68,7 +68,7 @@ class EncryptionManager extends Manager implements Encrypter
      */
     public function encryptString($value)
     {
-        return $this->encrypt($value, false);
+        return $this->driver()->encryptString($value);
     }
 
     /**
@@ -99,7 +99,7 @@ class EncryptionManager extends Manager implements Encrypter
      */
     public function decryptString($payload)
     {
-        return $this->decrypt($payload, false);
+        return $this->driver()->decryptString($payload);
     }
 
     /**
@@ -129,6 +129,6 @@ class EncryptionManager extends Manager implements Encrypter
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['app.encryption.driver'] ?? 'openssl';
+        return $this->app['config']['encryption.driver'] ?? 'openssl';
     }
 }

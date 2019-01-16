@@ -12,7 +12,7 @@ class VerifyCsrfTokenExceptTest extends TestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.encryption', [
+        $app['config']->set('encryption', [
             'driver' => 'openssl',
             'cipher' => 'AES-256-CBC',
             'key'    => 'base64:IUHRqAQ99pZ0A1MPjbuv1D6ff3jxv0GIvS2qIW4JNU4=',
