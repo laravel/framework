@@ -357,6 +357,41 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonMissingValidationErrors('bar');
     }
 
+    public function testAssertJsonMissingValidationErrorsWithoutArgument()
+    {
+        $data = ['status' => 'ok'];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonMissingValidationErrors();
+    }
+
+    public function testAssertJsonMissingValidationErrorsWithoutArgumentWhenErrorsIsEmpty()
+    {
+        $data = ['status' => 'ok', 'errors' => []];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonMissingValidationErrors();
+    }
+
+    public function testAssertJsonMissingValidationErrorsWithoutArgumentCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = ['errors' => ['foo' => []]];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonMissingValidationErrors();
+    }
+
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {
