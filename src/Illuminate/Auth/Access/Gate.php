@@ -5,6 +5,7 @@ namespace Illuminate\Auth\Access;
 use Exception;
 use ReflectionClass;
 use ReflectionFunction;
+use ReflectionMethod;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -386,10 +387,24 @@ class Gate implements GateContract
      *
      * @param  callable  $callback
      * @return bool
+     *
+     * @throws \ReflectionException
      */
     protected function callbackAllowsGuests($callback)
     {
-        $parameters = (new ReflectionFunction($callback))->getParameters();
+        $reflection = new ReflectionFunction($callback);
+        $uses = $reflection->getStaticVariables();
+        $parameters = $reflection->getParameters();
+
+        // it means that class@method notation is used in Gate::define() and
+        // we have converted that into a closure with signature like this
+        // "function () use ($ability, $callback) {" in the first place
+        if ($parameters === [] && array_keys($uses) === ['ability', 'callback']) {
+            [$class, $method] = Str::parseCallback($uses["callback"]);
+            $reflection = new ReflectionMethod($class, $method);
+        }
+
+        $parameters = $reflection->getParameters();
 
         return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
     }
