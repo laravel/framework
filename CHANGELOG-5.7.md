@@ -1,13 +1,20 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.20...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.21...5.7)
+
+
+## [v5.7.21 (2019-01-15)](https://github.com/laravel/framework/compare/v5.7.20...v5.7.21)
 
 ### Fixed
 - Fixed `Blueprint::removeColumn()` ([#27115](https://github.com/laravel/framework/pull/27115), [#27122](https://github.com/laravel/framework/pull/27122))
 - Fixed allowing of null broadcast connection driver ([#27135](https://github.com/laravel/framework/pull/27135))
+- Fixed `ModelMakeCommand::handle()` should always return `bool` value ([#27156](https://github.com/laravel/framework/pull/27156))
+- Fixed `TestResponse::assertSessionDoesntHaveErrors()` when there are no errors ([#27145](https://github.com/laravel/framework/pull/27145))
+- Fixed default message is localization twice in `403.blade.php` error page ([4a08120](https://github.com/laravel/framework/commit/4a081204d65a6e01959d795e71770079588bad21))
 
 ### Changed
 - Replaced `get_called_class()` to `static::class` ([#27146](https://github.com/laravel/framework/pull/27146))
+- Re-throw `NoMatchingExpectationException` from `PendingCommand` ([#27158](https://github.com/laravel/framework/pull/27158))
 
 
 ## [v5.7.20 (2019-01-08)](https://github.com/laravel/framework/compare/v5.7.19...v5.7.20)
