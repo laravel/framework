@@ -9,7 +9,7 @@
 - Fixed `Blueprint::removeColumn()` ([#27115](https://github.com/laravel/framework/pull/27115), [#27122](https://github.com/laravel/framework/pull/27122))
 - Fixed allowing of null broadcast connection driver ([#27135](https://github.com/laravel/framework/pull/27135))
 - Fixed `ModelMakeCommand::handle()` should always return `bool` value ([#27156](https://github.com/laravel/framework/pull/27156))
-- Fixed `TestResponse::assertSessionDoesntHaveErrors()` when there is no errors ([#27145](https://github.com/laravel/framework/pull/27145))
+- Fixed `TestResponse::assertSessionDoesntHaveErrors()` when there are no errors ([#27145](https://github.com/laravel/framework/pull/27145))
 - Fixed default message is localization twice in `403.blade.php` error page ([4a08120](https://github.com/laravel/framework/commit/4a081204d65a6e01959d795e71770079588bad21))
 
 ### Changed
