@@ -336,7 +336,7 @@ class Validator implements ValidatorContract
         $missingValue = Str::random(10);
 
         foreach (array_keys($this->getRules()) as $key) {
-            $value = data_get($this->getData(), $key, $missingValue);
+            $value = data_get($this->data, $key, $missingValue);
 
             if ($value !== $missingValue) {
                 Arr::set($results, $key, $value);
@@ -858,7 +858,7 @@ class Validator implements ValidatorContract
      */
     public function sometimes($attribute, $rules, callable $callback)
     {
-        $payload = new Fluent($this->getData());
+        $payload = new Fluent($this->data);
 
         if (call_user_func($callback, $payload)) {
             foreach ((array) $attribute as $key) {
