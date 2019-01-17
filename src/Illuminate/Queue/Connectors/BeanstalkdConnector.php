@@ -17,9 +17,12 @@ class BeanstalkdConnector implements ConnectorInterface
      */
     public function connect(array $config)
     {
-        $retryAfter = $config['retry_after'] ?? Pheanstalk::DEFAULT_TTR;
-
-        return new BeanstalkdQueue($this->pheanstalk($config), $config['queue'], $retryAfter, $config['block_for'] ?? 0);
+        return new BeanstalkdQueue(
+            $this->pheanstalk($config),
+            $config['queue'],
+            $config['retry_after'] ?? Pheanstalk::DEFAULT_TTR,
+            $config['block_for'] ?? 0
+        );
     }
 
     /**

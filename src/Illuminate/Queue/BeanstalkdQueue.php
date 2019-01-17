@@ -49,9 +49,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
     public function __construct(Pheanstalk $pheanstalk, $default, $timeToRun, $blockFor = 0)
     {
         $this->default = $default;
+        $this->blockFor = $blockFor;
         $this->timeToRun = $timeToRun;
         $this->pheanstalk = $pheanstalk;
-        $this->blockFor = $blockFor;
     }
 
     /**
