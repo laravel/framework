@@ -6,7 +6,7 @@ use Illuminate\Support\InteractsWithTime;
 
 class ArrayStore extends TaggableStore
 {
-    use RetrievesMultipleKeys, InteractsWithTime;
+    use InteractsWithTime, RetrievesMultipleKeys;
 
     /**
      * The array of stored values.
@@ -28,7 +28,10 @@ class ArrayStore extends TaggableStore
         }
 
         $item = $this->storage[$key];
-        if ($item['expiresAt'] !== 0 && $this->currentTime() > $item['expiresAt']) {
+
+        $expiresAt = $item['expiresAt'] ?? 0;
+
+        if ($expiresAt !== 0 && $this->currentTime() > $expiresAt) {
             $this->forget($key);
 
             return null;
