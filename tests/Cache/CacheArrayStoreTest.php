@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 
@@ -33,6 +34,19 @@ class CacheArrayStoreTest extends TestCase
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
+    public function testItemsCanExpire(): void
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = new ArrayStore;
+
+        $store->put('foo', 'bar', 10);
+        Carbon::setTestNow(Carbon::now()->addMinutes(10)->addSecond());
+        $result = $store->get('foo');
+
+        $this->assertNull($result);
+        Carbon::setTestNow(null);
+    }
+
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->setMethods(['put'])->getMock();
@@ -47,14 +61,16 @@ class CacheArrayStoreTest extends TestCase
     {
         $store = new ArrayStore;
         $store->put('foo', 1, 10);
-        $store->increment('foo');
+        $result = $store->increment('foo');
+        $this->assertEquals(2, $result);
         $this->assertEquals(2, $store->get('foo'));
     }
 
     public function testNonExistingKeysCanBeIncremented()
     {
         $store = new ArrayStore;
-        $store->increment('foo');
+        $result = $store->increment('foo');
+        $this->assertEquals(1, $result);
         $this->assertEquals(1, $store->get('foo'));
     }
 
@@ -62,7 +78,8 @@ class CacheArrayStoreTest extends TestCase
     {
         $store = new ArrayStore;
         $store->put('foo', 1, 10);
-        $store->decrement('foo');
+        $result = $store->decrement('foo');
+        $this->assertEquals(0, $result);
         $this->assertEquals(0, $store->get('foo'));
     }
 
