@@ -319,7 +319,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Return validated value.
+     * Return validated data.
      *
      * @return array
      *
@@ -335,7 +335,7 @@ class Validator implements ValidatorContract
 
         $missingValue = Str::random(10);
 
-        foreach (array_keys($this->getRules()) as $key) {
+        foreach ($this->validatedKeys() as $key) {
             $value = data_get($this->data, $key, $missingValue);
 
             if ($value !== $missingValue) {
@@ -344,6 +344,35 @@ class Validator implements ValidatorContract
         }
 
         return $results;
+    }
+
+    /**
+     * Compose an array of the validated data keys.
+     *
+     * @return array
+     */
+    protected function validatedKeys()
+    {
+        $keys = array_keys($this->rules);
+
+        return array_filter($keys, function ($key) {
+            return ! $this->validatedKeyHasNestedKeys($key);
+        });
+    }
+
+    /**
+     * Check if the specified validated key has nested keys.
+     *
+     * @param  string  $inspected
+     * @return bool
+     */
+    protected function validatedKeyHasNestedKeys($inspected)
+    {
+        $keys = array_keys($this->rules);
+
+        return (bool) array_first($keys, function ($key) use ($inspected) {
+            return starts_with($key, "{$inspected}.");
+        });
     }
 
     /**
