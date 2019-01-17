@@ -2,9 +2,11 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Support\InteractsWithTime;
+
 class ArrayStore extends TaggableStore
 {
-    use RetrievesMultipleKeys;
+    use RetrievesMultipleKeys, InteractsWithTime;
 
     /**
      * The array of stored values.
@@ -21,7 +23,18 @@ class ArrayStore extends TaggableStore
      */
     public function get($key)
     {
-        return $this->storage[$key] ?? null;
+        if (! isset($this->storage[$key])) {
+            return null;
+        }
+
+        $item = $this->storage[$key];
+        if ($item['expiresAt'] !== 0 && $this->currentTime() > $item['expiresAt']) {
+            $this->forget($key);
+
+            return null;
+        }
+
+        return $item['value'];
     }
 
     /**
@@ -34,7 +47,10 @@ class ArrayStore extends TaggableStore
      */
     public function put($key, $value, $minutes)
     {
-        $this->storage[$key] = $value;
+        $this->storage[$key] = [
+            'value' => $value,
+            'expiresAt' => $this->calculateExpiration($minutes),
+        ];
 
         return true;
     }
@@ -48,10 +64,15 @@ class ArrayStore extends TaggableStore
      */
     public function increment($key, $value = 1)
     {
-        $this->storage[$key] = ! isset($this->storage[$key])
-                ? $value : ((int) $this->storage[$key]) + $value;
+        if (! isset($this->storage[$key])) {
+            $this->forever($key, $value);
 
-        return $this->storage[$key];
+            return $this->storage[$key]['value'];
+        }
+
+        $this->storage[$key]['value'] = ((int) $this->storage[$key]['value']) + $value;
+
+        return $this->storage[$key]['value'];
     }
 
     /**
@@ -111,5 +132,27 @@ class ArrayStore extends TaggableStore
     public function getPrefix()
     {
         return '';
+    }
+
+    /**
+     * Get the expiration time of the key.
+     *
+     * @param  int  $minutes
+     * @return int
+     */
+    protected function calculateExpiration($minutes)
+    {
+        return $this->toTimestamp($minutes);
+    }
+
+    /**
+     * Get the UNIX timestamp for the given number of minutes.
+     *
+     * @param  int  $minutes
+     * @return int
+     */
+    protected function toTimestamp($minutes)
+    {
+        return $minutes > 0 ? $this->availableAt($minutes * 60) : 0;
     }
 }
