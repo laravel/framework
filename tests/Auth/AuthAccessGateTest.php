@@ -654,6 +654,43 @@ class AuthAccessGateTest extends TestCase
             [$noAbilities, [], true],
         ];
     }
+
+    public function test_classes_can_be_defined_as_callbacks_using_at_notation_for_guests()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->define('foo', AccessGateTestClassForGuest::class.'@foo');
+        $gate->define('bar', AccessGateTestClassForGuest::class.'@bar');
+
+        AccessGateTestClassForGuest::$calledMethod = '';
+
+        $this->assertTrue($gate->check('foo'));
+        $this->assertEquals('foo', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('bar'));
+        $this->assertEquals('bar', AccessGateTestClassForGuest::$calledMethod);
+    }
+}
+
+class AccessGateTestClassForGuest
+{
+    public static $calledMethod = '';
+
+    public function foo($user = null)
+    {
+        static::$calledMethod = 'foo';
+
+        return true;
+    }
+
+    public function bar(?stdClass $user)
+    {
+        static::$calledMethod = 'bar';
+
+        return true;
+    }
 }
 
 class AccessGateTestStaticClass
