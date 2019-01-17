@@ -49,7 +49,7 @@ class ArrayStore extends TaggableStore
     {
         $this->storage[$key] = [
             'value' => $value,
-            'expiresAt' => $this->calculateExpiration($minutes)
+            'expiresAt' => $this->calculateExpiration($minutes),
         ];
 
         return true;
