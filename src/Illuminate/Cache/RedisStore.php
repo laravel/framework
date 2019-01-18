@@ -89,11 +89,9 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $minutes)
     {
-        $result = $this->connection()->setex(
+        return (bool) $this->connection()->setex(
             $this->prefix.$key, (int) max(1, $minutes * 60), $this->serialize($value)
         );
-
-        return $result ? true : false;
     }
 
     /**
@@ -170,9 +168,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function forever($key, $value)
     {
-        $result = $this->connection()->set($this->prefix.$key, $this->serialize($value));
-
-        return $result ? true : false;
+        return (bool) $this->connection()->set($this->prefix.$key, $this->serialize($value));
     }
 
     /**
