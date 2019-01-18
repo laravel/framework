@@ -172,7 +172,7 @@ class DynamoDbStore implements Store
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
@@ -190,6 +190,8 @@ class DynamoDbStore implements Store
                 ],
             ],
         ]);
+
+        return true;
     }
 
     /**
