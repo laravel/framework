@@ -9,7 +9,9 @@ use Pheanstalk\Job;
 use Pheanstalk\Pheanstalk;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
+use Illuminate\Contracts\Events\Dispatcher;
 
 class QueueBeanstalkdJobTest extends TestCase
 {

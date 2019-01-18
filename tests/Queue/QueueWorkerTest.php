@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
-use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -151,7 +150,6 @@ class QueueWorkerTest extends TestCase
         $this->assertEquals($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
-        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobFailed::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
@@ -182,7 +180,6 @@ class QueueWorkerTest extends TestCase
         $this->assertEquals($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
-        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobFailed::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
@@ -202,7 +199,6 @@ class QueueWorkerTest extends TestCase
         $this->assertInstanceOf(MaxAttemptsExceededException::class, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with(m::type(MaxAttemptsExceededException::class));
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
-        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobFailed::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
@@ -228,7 +224,6 @@ class QueueWorkerTest extends TestCase
         $this->assertInstanceOf(MaxAttemptsExceededException::class, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with(m::type(MaxAttemptsExceededException::class));
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
-        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobFailed::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
@@ -436,10 +431,17 @@ class WorkerFakeJob implements QueueJobContract
         $this->failed = true;
     }
 
-    public function failed($e)
+    public function fail($e = null)
     {
         $this->markAsFailed();
 
+        $this->delete();
+
+        $this->failed($e);
+    }
+
+    public function failed($e)
+    {
         $this->failedWith = $e;
     }
 

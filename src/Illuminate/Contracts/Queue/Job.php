@@ -83,9 +83,17 @@ interface Job
     public function markAsFailed();
 
     /**
+     * Delete the job, call the "failed" method, and raise the failed job event.
+     *
+     * @param  \Throwable|null $e
+     * @return void
+     */
+    public function fail($e = null);
+
+    /**
      * Process an exception that caused the job to fail.
      *
-     * @param  \Throwable  $e
+     * @param  \Throwable|null $e
      * @return void
      */
     public function failed($e);
