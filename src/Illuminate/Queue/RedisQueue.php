@@ -88,7 +88,16 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        if (is_null($this->blockFor)) {
+            return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        }
+
+        $this->getConnection()->multi();
+        $this->getConnection()->rpush($this->getQueue($queue).':notify', '1');
+        $id = $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
+        $this->getConnection()->exec();
+
+        return $id;
     }
 
     /**
@@ -215,40 +224,13 @@ class RedisQueue extends Queue implements QueueContract
     protected function retrieveNextJob($queue)
     {
         if (! is_null($this->blockFor)) {
-            return $this->blockingPop($queue);
+            $this->getConnection()->blpop([$queue.':notify'], $this->blockFor);
         }
 
         return $this->getConnection()->eval(
             LuaScripts::pop(), 2, $queue, $queue.':reserved',
             $this->availableAt($this->retryAfter)
         );
-    }
-
-    /**
-     * Retrieve the next job by blocking-pop.
-     *
-     * @param  string  $queue
-     * @return array
-     */
-    protected function blockingPop($queue)
-    {
-        $rawBody = $this->getConnection()->blpop($queue, $this->blockFor);
-
-        if (! empty($rawBody)) {
-            $payload = json_decode($rawBody[1], true);
-
-            $payload['attempts']++;
-
-            $reserved = json_encode($payload);
-
-            $this->getConnection()->zadd($queue.':reserved', [
-                $reserved => $this->availableAt($this->retryAfter),
-            ]);
-
-            return [$rawBody[1], $reserved];
-        }
-
-        return [null, null];
     }
 
     /**

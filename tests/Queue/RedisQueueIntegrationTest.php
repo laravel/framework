@@ -161,6 +161,27 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
+    public function testBlockingPopProperlyPopsJobOffOfRedis($driver)
+    {
+        $this->setQueue($driver, 'default', null, 60, 5);
+
+        // Push an item into queue
+        $job = new RedisQueueIntegrationTestJob(10);
+        $this->queue->push($job);
+
+        // Pop and check it is popped correctly
+        /** @var RedisJob $redisJob */
+        $redisJob = $this->queue->pop();
+
+        $this->assertNotNull($redisJob);
+        $this->assertEquals($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
+    }
+
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
     public function testNotExpireJobsWhenExpireNull($driver)
     {
         $this->queue = new RedisQueue($this->redis[$driver], 'default', null, null);
@@ -335,10 +356,14 @@ class RedisQueueIntegrationTest extends TestCase
 
     /**
      * @param string $driver
+     * @param  string  $default
+     * @param  string  $connection
+     * @param  int  $retryAfter
+     * @param  int|null  $blockFor
      */
-    private function setQueue($driver)
+    private function setQueue($driver, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = null)
     {
-        $this->queue = new RedisQueue($this->redis[$driver]);
+        $this->queue = new RedisQueue($this->redis[$driver], $default, $connection, $retryAfter, $blockFor);
         $this->queue->setContainer(m::mock(Container::class));
     }
 }
