@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Closure;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Contracts\Cache\Store;
@@ -225,19 +226,20 @@ class CacheManager implements FactoryContract
      */
     protected function createDynamodbDriver(array $config)
     {
-        $dynamo = DynamoDbClient::factory([
+        $dynamoConfig = [
             'region' => $config['region'],
             'version' => 'latest',
-            'credentials' => array_filter([
-                'key' => $config['key'] ?? null,
-                'secret' => $config['secret'] ?? null,
-                'token' => $config['token'] ?? null,
-            ]),
-        ]);
+        ];
+
+        if ($config['key'] && $config['secret']) {
+            $dynamoConfig['credentials'] = Arr::only(
+                $config, ['key', 'secret', 'token']
+            );
+        }
 
         return $this->repository(
             new DynamoDbStore(
-                $dynamo,
+                DynamoDbClient::factory($dynamoConfig),
                 $config['table'],
                 $config['attributes']['key'] ?? 'key',
                 $config['attributes']['value'] ?? 'value',
