@@ -10,6 +10,11 @@ use InvalidArgumentException;
 class BoundMethod
 {
     /**
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected static $container;
+
+    /**
      * Call the given Closure / class@method and inject its dependencies.
      *
      * @param  \Illuminate\Container\Container  $container
@@ -20,13 +25,15 @@ class BoundMethod
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
     {
+        self::$container = $container;
+
         if (static::isCallableWithAtSign($callback) || $defaultMethod) {
-            return static::callClass($container, $callback, $parameters, $defaultMethod);
+            return static::callClass($callback, $parameters, $defaultMethod);
         }
 
-        return static::callBoundMethod($container, $callback, function () use ($container, $callback, $parameters) {
+        return static::callBoundMethod($callback, function () use ($callback, $parameters) {
             return call_user_func_array(
-                $callback, static::getMethodDependencies($container, $callback, $parameters)
+                $callback, static::getMethodDependencies($callback, $parameters)
             );
         });
     }
@@ -34,7 +41,6 @@ class BoundMethod
     /**
      * Call a string reference to a class using Class@method syntax.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  string  $target
      * @param  array  $parameters
      * @param  string|null  $defaultMethod
@@ -42,7 +48,7 @@ class BoundMethod
      *
      * @throws \InvalidArgumentException
      */
-    protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
+    protected static function callClass($target, array $parameters = [], $defaultMethod = null)
     {
         $segments = explode('@', $target);
 
@@ -57,19 +63,18 @@ class BoundMethod
         }
 
         return static::call(
-            $container, [$container->make($segments[0]), $method], $parameters
+            self::$container, [self::$container->make($segments[0]), $method], $parameters
         );
     }
 
     /**
      * Call a method that has been bound to the container.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  callable  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    protected static function callBoundMethod($container, $callback, $default)
+    protected static function callBoundMethod($callback, $default)
     {
         if (! is_array($callback)) {
             return $default instanceof Closure ? $default() : $default;
@@ -80,8 +85,8 @@ class BoundMethod
         // method. If there are, we can call this method binding callback immediately.
         $method = static::normalizeMethod($callback);
 
-        if ($container->hasMethodBinding($method)) {
-            return $container->callMethodBinding($method, $callback[0]);
+        if (self::$container->hasMethodBinding($method)) {
+            return self::$container->callMethodBinding($method, $callback[0]);
         }
 
         return $default instanceof Closure ? $default() : $default;
@@ -103,17 +108,16 @@ class BoundMethod
     /**
      * Get all dependencies for a given method.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
      * @param  array  $parameters
      * @return array
      */
-    protected static function getMethodDependencies($container, $callback, array $parameters = [])
+    protected static function getMethodDependencies($callback, array $parameters = [])
     {
         $dependencies = [];
 
         foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
-            static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
+            static::addDependencyForCallParameter($parameter, $parameters, $dependencies);
         }
 
         return array_merge($dependencies, $parameters);
@@ -141,14 +145,12 @@ class BoundMethod
     /**
      * Get the dependency for the given call parameter.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
      * @param  array  $dependencies
      * @return void
      */
-    protected static function addDependencyForCallParameter($container, $parameter,
-                                                            array &$parameters, &$dependencies)
+    protected static function addDependencyForCallParameter($parameter, array &$parameters, &$dependencies)
     {
         if (array_key_exists($parameter->name, $parameters)) {
             $dependencies[] = $parameters[$parameter->name];
@@ -159,7 +161,7 @@ class BoundMethod
 
             unset($parameters[$parameter->getClass()->name]);
         } elseif ($parameter->getClass()) {
-            $dependencies[] = $container->make($parameter->getClass()->name);
+            $dependencies[] = self::$container->make($parameter->getClass()->name);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }
