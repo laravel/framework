@@ -11,16 +11,16 @@ use Illuminate\Foundation\Http\Middleware\TrustHosts;
 
 class TrustHostsTest extends TestCase
 {
-    protected static $orignalTrustHosts;
+    protected static $orignalTrustedHosts;
 
     public static function setUpBeforeClass()
     {
-        self::$orignalTrustHosts = Request::getTrustedHosts();
+        self::$orignalTrustedHosts = Request::getTrustedHosts();
     }
 
     public static function tearDownAfterClass()
     {
-        Request::setTrustedHosts(self::$orignalTrustHosts);
+        Request::setTrustedHosts(self::$orignalTrustedHosts);
     }
 
     /**

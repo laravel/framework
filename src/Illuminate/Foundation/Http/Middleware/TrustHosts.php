@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 class TrustHosts
 {
     /**
-     * The trusted host names.
+     * The trusted host patterns.
      *
      * @var array
      */
     protected $trustedHosts = [];
 
     /**
-     * Gets the trusted host names.
+     * Gets the trusted host patterns.
      *
      * @return array
      */
@@ -26,7 +26,7 @@ class TrustHosts
     }
 
     /**
-     * Sets trusted host names.
+     * Sets trusted host patterns.
      *
      * @param array $trustedHosts
      */
