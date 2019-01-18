@@ -241,7 +241,8 @@ class CacheManager implements FactoryContract
                 $config['table'],
                 $config['attributes']['key'] ?? 'key',
                 $config['attributes']['value'] ?? 'value',
-                $config['attributes']['expiration'] ?? 'expires_at'
+                $config['attributes']['expiration'] ?? 'expires_at',
+                $config['prefix'] ?? ''
             )
         );
     }

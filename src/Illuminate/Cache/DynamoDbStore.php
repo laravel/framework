@@ -50,6 +50,13 @@ class DynamoDbStore implements Store
     protected $expirationAttribute;
 
     /**
+     * A string that should be prepended to keys.
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
      * Create a new store instance.
      *
      * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
@@ -57,19 +64,23 @@ class DynamoDbStore implements Store
      * @param  string  $keyAttribute
      * @param  string  $valueAttribute
      * @param  string  $expirationAttribute
+     * @param  string  $prefix
      * @return void
      */
     public function __construct(DynamoDbClient $dynamo,
                                 $table,
                                 $keyAttribute = 'key',
                                 $valueAttribute = 'value',
-                                $expirationAttribute = 'expires_at')
+                                $expirationAttribute = 'expires_at',
+                                $prefix = '')
     {
         $this->table = $table;
         $this->dynamo = $dynamo;
         $this->keyAttribute = $keyAttribute;
         $this->valueAttribute = $valueAttribute;
         $this->expirationAttribute = $expirationAttribute;
+
+        $this->setPrefix($prefix);
     }
 
     /**
@@ -85,7 +96,7 @@ class DynamoDbStore implements Store
             'ConsistentRead' => false,
             'Key' => [
                 $this->keyAttribute => [
-                    'S' => $key,
+                    'S' => $this->prefix.$key,
                 ],
             ],
         ]);
@@ -117,11 +128,15 @@ class DynamoDbStore implements Store
      */
     public function many(array $keys)
     {
+        $prefixedKeys = array_map(function ($key) {
+            return $this->prefix.$key;
+        }, $keys);
+
         $response = $this->dynamo->batchGetItem([
             'RequestItems' => [
                 $this->table => [
                     'ConsistentRead' => false,
-                    'Keys' => collect($keys)->map(function ($key) {
+                    'Keys' => collect($prefixedKeys)->map(function ($key) {
                         return [
                             $this->keyAttribute => [
                                 'S' => $key,
@@ -147,7 +162,7 @@ class DynamoDbStore implements Store
                 );
             }
 
-            return [$response[$this->keyAttribute]['S'] => $value];
+            return [Str::replaceFirst($this->prefix, '', $response[$this->keyAttribute]['S']) => $value];
         })->all());
     }
 
@@ -180,7 +195,7 @@ class DynamoDbStore implements Store
             'TableName' => $this->table,
             'Item' => [
                 $this->keyAttribute => [
-                    'S' => $key,
+                    'S' => $this->prefix.$key,
                 ],
                 $this->valueAttribute => [
                     $this->type($value) => $this->serialize($value),
@@ -212,7 +227,7 @@ class DynamoDbStore implements Store
                         'PutRequest' => [
                             'Item' => [
                                 $this->keyAttribute => [
-                                    'S' => $key,
+                                    'S' => $this->prefix.$key,
                                 ],
                                 $this->valueAttribute => [
                                     $this->type($value) => $this->serialize($value),
@@ -243,7 +258,7 @@ class DynamoDbStore implements Store
                 'TableName' => $this->table,
                 'Item' => [
                     $this->keyAttribute => [
-                        'S' => $key,
+                        'S' => $this->prefix.$key,
                     ],
                     $this->valueAttribute => [
                         $this->type($value) => $this->serialize($value),
@@ -288,7 +303,7 @@ class DynamoDbStore implements Store
                 'TableName' => $this->table,
                 'Key' => [
                     $this->keyAttribute => [
-                        'S' => $key,
+                        'S' => $this->prefix.$key,
                     ],
                 ],
                 'ConditionExpression' => 'attribute_exists(#key) AND #expires_at > :now',
@@ -333,7 +348,7 @@ class DynamoDbStore implements Store
                 'TableName' => $this->table,
                 'Key' => [
                     $this->keyAttribute => [
-                        'S' => $key,
+                        'S' => $this->prefix.$key,
                     ],
                 ],
                 'ConditionExpression' => 'attribute_exists(#key) AND #expires_at > :now',
@@ -386,7 +401,7 @@ class DynamoDbStore implements Store
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new DynamoDbLock($this, $name, $seconds, $owner);
+        return new DynamoDbLock($this, $this->prefix.$name, $seconds, $owner);
     }
 
     /**
@@ -413,7 +428,7 @@ class DynamoDbStore implements Store
             'TableName' => $this->table,
             'Key' => [
                 $this->keyAttribute => [
-                    'S' => $key,
+                    'S' => $this->prefix.$key,
                 ],
             ],
         ]);
@@ -492,6 +507,17 @@ class DynamoDbStore implements Store
      */
     public function getPrefix()
     {
-        return '';
+        return $this->prefix;
+    }
+
+    /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
     }
 }
