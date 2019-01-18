@@ -68,10 +68,6 @@ class Cache extends AbstractCache
     {
         $contents = $this->getForStorage();
 
-        if (! is_null($this->expire)) {
-            $this->repository->put($this->key, $contents, $this->expire);
-        } else {
-            $this->repository->forever($this->key, $contents);
-        }
+        $this->repository->put($this->key, $contents, $this->expire);
     }
 }
