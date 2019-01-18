@@ -13,11 +13,13 @@ class TrustHostsTest extends TestCase
 {
     protected static $orignalTrustHosts;
 
-    public static function setUpBeforeClass(){
+    public static function setUpBeforeClass()
+    {
         self::$orignalTrustHosts = Request::getTrustedHosts();
     }
 
-    public static function tearDownAfterClass(){
+    public static function tearDownAfterClass()
+    {
         Request::setTrustedHosts(self::$orignalTrustHosts);
     }
 
