@@ -11,6 +11,16 @@ use Illuminate\Foundation\Http\Middleware\TrustHosts;
 
 class TrustHostsTest extends TestCase
 {
+    protected static $orignalTrustHosts;
+
+    public static function setUpBeforeClass(){
+        self::$orignalTrustHosts = Request::getTrustedHosts();
+    }
+
+    public static function tearDownAfterClass(){
+        Request::setTrustedHosts(self::$orignalTrustHosts);
+    }
+
     /**
      * @expectedException  Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException
      */
