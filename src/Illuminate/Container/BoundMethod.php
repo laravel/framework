@@ -20,7 +20,7 @@ class BoundMethod
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
     {
-        if (static::isCallableWithAtSign($callback) || $defaultMethod) {
+        if (static::isStrContaining($callback, '@') || $defaultMethod) {
             return static::callClass($container, $callback, $parameters, $defaultMethod);
         }
 
@@ -129,7 +129,7 @@ class BoundMethod
      */
     protected static function getCallReflector($callback)
     {
-        if (is_string($callback) && strpos($callback, '::') !== false) {
+        if (self::isStrContaining($callback, '::')) {
             $callback = explode('::', $callback);
         }
 
@@ -166,13 +166,14 @@ class BoundMethod
     }
 
     /**
-     * Determine if the given string is in Class@method syntax.
+     * Determine if the given parameter is an string and contains the sub-string.
      *
      * @param  mixed  $callback
+     * @param  string  $subStr
      * @return bool
      */
-    protected static function isCallableWithAtSign($callback)
+    protected static function isStrContaining($callback, $subStr)
     {
-        return is_string($callback) && strpos($callback, '@') !== false;
+        return is_string($callback) && strpos($callback, $subStr) !== false;
     }
 }
