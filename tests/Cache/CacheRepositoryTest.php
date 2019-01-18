@@ -137,24 +137,30 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testPutWithDatetimeInPastOrZeroSecondsDoesntSaveItem()
+    public function testPutWithNullTTLRemembersItemForever()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar')->andReturn(true);
+        $this->assertTrue($repo->put('foo', 'bar'));
+    }
+
+    public function testPutWithDatetimeInPastOrZeroSecondsRemovesOldItem()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->never();
+        $repo->getStore()->shouldReceive('forget')->twice()->andReturn(true);
         $result = $repo->put('foo', 'bar', Carbon::now()->subMinutes(10));
-        $this->assertFalse($result);
+        $this->assertTrue($result);
         $result = $repo->put('foo', 'bar', Carbon::now());
-        $this->assertFalse($result);
+        $this->assertTrue($result);
     }
 
-    public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately()
+    public function testPutManyWithNullTTLRemembersItemsForever()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('add', 'get', 'put')->never();
-        $result = $repo->add('foo', 'bar', Carbon::now()->subMinutes(10));
-        $this->assertFalse($result);
-        $result = $repo->add('foo', 'bar', Carbon::now());
-        $this->assertFalse($result);
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar')->andReturn(true);
+        $repo->getStore()->shouldReceive('forever')->with('bar', 'baz')->andReturn(true);
+        $this->assertTrue($repo->putMany(['foo' => 'bar', 'bar' => 'baz']));
     }
 
     public function testAddWithStoreFailureReturnsFalse()
@@ -172,6 +178,24 @@ class CacheRepositoryTest extends TestCase
         $store->shouldReceive('add')->once()->with('k', 'v', 60)->andReturn(true);
         $repository = new Repository($store);
         $this->assertTrue($repository->add('k', 'v', 60));
+    }
+
+    public function testAddWithNullTTLRemembersItemForever()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar')->andReturn(true);
+        $this->assertTrue($repo->add('foo', 'bar'));
+    }
+
+    public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('add', 'get', 'put')->never();
+        $result = $repo->add('foo', 'bar', Carbon::now()->subMinutes(10));
+        $this->assertFalse($result);
+        $result = $repo->add('foo', 'bar', Carbon::now());
+        $this->assertFalse($result);
     }
 
     public function dataProviderTestGetMinutes()

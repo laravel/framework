@@ -21,7 +21,7 @@ interface Repository extends CacheInterface
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return bool
      */
     public function put($key, $value, $minutes);
@@ -31,10 +31,10 @@ interface Repository extends CacheInterface
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return bool
      */
-    public function add($key, $value, $minutes);
+    public function add($key, $value, $minutes = null);
 
     /**
      * Increment the value of an item in the cache.
@@ -67,7 +67,7 @@ interface Repository extends CacheInterface
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @param  \Closure  $callback
      * @return mixed
      */

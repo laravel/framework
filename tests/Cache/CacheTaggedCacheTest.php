@@ -111,6 +111,23 @@ class CacheTaggedCacheTest extends TestCase
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
         $conn->shouldReceive('sadd')->once()->with('prefix:bar:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
         $store->shouldReceive('push')->with(sha1('foo|bar').':key1', 'key1:value');
+        $store->shouldReceive('put')->andReturn(true);
+
+        $redis->put('key1', 'key1:value', 60);
+    }
+
+    public function testRedisCacheTagsPushForeverKeysCorrectlyWithNullTTL()
+    {
+        $store = m::mock(Store::class);
+        $tagSet = m::mock(TagSet::class, [$store, ['foo', 'bar']]);
+        $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
+        $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
+        $redis = new RedisTaggedCache($store, $tagSet);
+        $store->shouldReceive('getPrefix')->andReturn('prefix:');
+        $store->shouldReceive('connection')->andReturn($conn = m::mock(stdClass::class));
+        $conn->shouldReceive('sadd')->once()->with('prefix:foo:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
+        $conn->shouldReceive('sadd')->once()->with('prefix:bar:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
+        $store->shouldReceive('forever')->with(sha1('foo|bar').':key1', 'key1:value');
 
         $redis->put('key1', 'key1:value');
     }

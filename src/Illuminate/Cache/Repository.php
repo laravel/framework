@@ -44,7 +44,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * The default number of minutes to store items.
      *
-     * @var float|int
+     * @var float|int|null
      */
     protected $default = 60;
 
@@ -199,22 +199,26 @@ class Repository implements CacheContract, ArrayAccess
     public function put($key, $value, $minutes = null)
     {
         if (is_array($key)) {
-            $result = $this->putMany($key, $value);
-
-            return $result;
+            return $this->putMany($key, $value);
         }
 
-        if (! is_null($minutes = $this->getMinutes($minutes))) {
-            $result = $this->store->put($this->itemKey($key), $value, $minutes);
-
-            if ($result) {
-                $this->event(new KeyWritten($key, $value, $minutes));
-            }
-
-            return $result;
+        if ($minutes === null) {
+            return $this->forever($key, $value);
         }
 
-        return false;
+        $minutes = $this->getMinutes($minutes);
+
+        if ($minutes <= 0) {
+            return $this->delete($key);
+        }
+
+        $result = $this->store->put($this->itemKey($key), $value, $minutes);
+
+        if ($result) {
+            $this->event(new KeyWritten($key, $value, $minutes));
+        }
+
+        return $result;
     }
 
     /**
@@ -229,24 +233,52 @@ class Repository implements CacheContract, ArrayAccess
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return bool
      */
-    public function putMany(array $values, $minutes)
+    public function putMany(array $values, $minutes = null)
     {
-        if (! is_null($minutes = $this->getMinutes($minutes))) {
-            $result = $this->store->putMany($values, $minutes);
-
-            if ($result) {
-                foreach ($values as $key => $value) {
-                    $this->event(new KeyWritten($key, $value, $minutes));
-                }
-            }
-
-            return $result;
+        if ($minutes === null) {
+            return $this->putManyForever($values);
         }
 
-        return false;
+        $minutes = $this->getMinutes($minutes);
+
+        if ($minutes <= 0) {
+            return $this->deleteMultiple(array_keys($values));
+        }
+
+        $result = $this->store->putMany($values, $minutes);
+
+        if ($result) {
+            foreach ($values as $key => $value) {
+                $this->event(new KeyWritten($key, $value, $minutes));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Store multiple items in the cache indefinitely.
+     *
+     * @param  array  $values
+     * @return bool
+     */
+    protected function putManyForever(array $values)
+    {
+        $result = true;
+
+        // We'll loop over every item and attempt to store it indefinitely.
+        // If we notice that one of the items can't be stored forever we
+        // will return false. Otherwise we'll return a success result.
+        foreach ($values as $key => $value) {
+            if (! $this->forever($key, $value)) {
+                $result = false;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -262,22 +294,26 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return bool
      */
-    public function add($key, $value, $minutes)
+    public function add($key, $value, $minutes = null)
     {
-        if (is_null($minutes = $this->getMinutes($minutes))) {
-            return false;
-        }
+        if ($minutes !== null) {
+            if ($this->getMinutes($minutes) <= 0) {
+                return false;
+            }
 
-        // If the store has an "add" method we will call the method on the store so it
-        // has a chance to override this logic. Some drivers better support the way
-        // this operation should work with a total "atomic" implementation of it.
-        if (method_exists($this->store, 'add')) {
-            return $this->store->add(
-                $this->itemKey($key), $value, $minutes
-            );
+            // If the store has an "add" method we will call the method on the store so it
+            // has a chance to override this logic. Some drivers better support the way
+            // this operation should work with a total "atomic" implementation of it.
+            if (method_exists($this->store, 'add')) {
+                $minutes = $this->getMinutes($minutes);
+
+                return $this->store->add(
+                    $this->itemKey($key), $value, $minutes
+                );
+            }
         }
 
         // If the value did not exist in the cache, we will put the value in the cache
@@ -336,7 +372,7 @@ class Repository implements CacheContract, ArrayAccess
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -479,7 +515,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Set the default cache time in minutes.
      *
-     * @param  float|int  $minutes
+     * @param  float|int|null  $minutes
      * @return $this
      */
     public function setDefaultCacheTime($minutes)
@@ -571,18 +607,18 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Calculate the number of minutes with the given duration.
      *
-     * @param  \DateTimeInterface|\DateInterval|float|int  $duration
-     * @return float|int|null
+     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @return float|int
      */
-    protected function getMinutes($duration)
+    protected function getMinutes($minutes)
     {
-        $duration = $this->parseDateInterval($duration);
+        $duration = $this->parseDateInterval($minutes);
 
         if ($duration instanceof DateTimeInterface) {
             $duration = Carbon::now()->diffInRealSeconds($duration, false) / 60;
         }
 
-        return (int) ($duration * 60) > 0 ? $duration : null;
+        return (int) ($duration * 60) > 0 ? $duration : 0;
     }
 
     /**
