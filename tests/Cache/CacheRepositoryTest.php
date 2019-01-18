@@ -157,6 +157,15 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testAddWithStoreFailureReturnsFalse()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('add')->never();
+        $repo->getStore()->shouldReceive('get')->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->andReturn(false);
+        $this->assertFalse($repo->add('foo', 'bar', 60));
+    }
+
     public function testCacheAddCallsRedisStoreAdd()
     {
         $store = m::mock(RedisStore::class);
