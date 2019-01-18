@@ -211,12 +211,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->when(['key'=>true])->where('email', 'foo');
         $this->assertEquals('select * from "users" where "key" = ? and "email" = ?', $builder->toSql());
-        $this->assertEquals([true,'foo'], $builder->getBindings());
-        
+        $this->assertEquals([true, 'foo'], $builder->getBindings());
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->when(['key'=>'key'])->where('email', 'foo');
         $this->assertEquals('select * from "users" where "key" = ? and "email" = ?', $builder->toSql());
-        $this->assertEquals(['key','foo'], $builder->getBindings());
+        $this->assertEquals(['key', 'foo'], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->when(['key'=>false])->where('email', 'foo');
