@@ -30,14 +30,17 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->fire();
     }
 
-    public function testFailedProperlyCallsTheJobHandler()
+    public function testFailProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(BeanstalkdJobTestFailedTest::class));
+        $job->getPheanstalk()->shouldReceive('delete')->once()->with($job->getPheanstalkJob())->andReturnSelf();
         $handler->shouldReceive('failed')->once()->with(['data'], m::type(Exception::class));
+        $job->getContainer()->shouldReceive('make')->once()->with(Dispatcher::class)->andReturn($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(JobFailed::class))->andReturnNull();
 
-        $job->failed(new Exception);
+        $job->fail(new Exception);
     }
 
     public function testDeleteRemovesTheJobFromBeanstalkd()

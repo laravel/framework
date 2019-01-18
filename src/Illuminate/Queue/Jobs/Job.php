@@ -191,7 +191,7 @@ abstract class Job
      * @param  \Throwable|null $e
      * @return void
      */
-    public function failed($e)
+    protected function failed($e)
     {
         $payload = $this->payload();
 

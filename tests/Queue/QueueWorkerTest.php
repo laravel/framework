@@ -437,11 +437,6 @@ class WorkerFakeJob implements QueueJobContract
 
         $this->delete();
 
-        $this->failed($e);
-    }
-
-    public function failed($e)
-    {
         $this->failedWith = $e;
     }
 

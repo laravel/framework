@@ -91,14 +91,6 @@ interface Job
     public function fail($e = null);
 
     /**
-     * Process an exception that caused the job to fail.
-     *
-     * @param  \Throwable|null $e
-     * @return void
-     */
-    public function failed($e);
-
-    /**
      * Get the number of times to attempt a job.
      *
      * @return int|null
