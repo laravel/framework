@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Illuminate\Foundation\Http\Middleware\TrustHosts;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
-use Illuminate\Routing\RouteCollection;
-use Illuminate\Routing\UrlGenerator;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Routing\UrlGenerator;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Foundation\Http\Middleware\TrustHosts;
 
 class TrustHostsTest extends TestCase
 {
@@ -63,7 +63,7 @@ class TrustHostsTest extends TestCase
         $headers = ['HOST' => 'laravel.com'];
         $servers = [];
         $urlGenerator = $this->createUrlGenerator($trustedHosts, $headers, $servers);
-        $this->assertEquals("http://laravel.com", $urlGenerator->to('/'));
+        $this->assertEquals('http://laravel.com', $urlGenerator->to('/'));
     }
 
     /**
@@ -76,10 +76,10 @@ class TrustHostsTest extends TestCase
         $headers = ['HOST' => 'laravel.com'];
         $servers = [];
         $urlGenerator = $this->createUrlGenerator($trustedHosts, $headers, $servers);
-        $this->assertEquals("http://laravel.com", $urlGenerator->to('/'));
+        $this->assertEquals('http://laravel.com', $urlGenerator->to('/'));
     }
 
-    protected function createUrlGenerator($trustedHosts = array(), $headers = array(), $servers = array())
+    protected function createUrlGenerator($trustedHosts = [], $headers = [], $servers = [])
     {
         $middleware = new TrustHosts;
         $middleware->setTrustedHosts($trustedHosts);
@@ -94,7 +94,8 @@ class TrustHostsTest extends TestCase
             $request->server->set($key, $val);
         }
 
-        $middleware->handle($request, function () {});
+        $middleware->handle($request, function () {
+        });
 
         $routes = new RouteCollection;
         $routes->add(new Route('GET', 'foo', [

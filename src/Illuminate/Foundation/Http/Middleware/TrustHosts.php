@@ -41,12 +41,12 @@ class TrustHosts
      * @param \Illuminate\Http\Request $request
      * @param \Closure                 $next
      * @return mixed
-     * 
+     *
      * @throws \Exception
      */
     public function handle(Request $request, Closure $next)
     {
-        if(empty($hosts = $this->getTrustedHosts())){
+        if (empty($hosts = $this->getTrustedHosts())) {
             throw new Exception('trusted hosts are not set.');
         }
 
