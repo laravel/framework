@@ -241,6 +241,8 @@ class DynamoDbStore implements Store
                 })->values()->all(),
             ],
         ]);
+
+        return true;
     }
 
     /**
@@ -388,7 +390,7 @@ class DynamoDbStore implements Store
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, now()->addYears(5));
+        return $this->put($key, $value, now()->addYears(5));
     }
 
     /**

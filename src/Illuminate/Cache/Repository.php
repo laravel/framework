@@ -269,9 +269,6 @@ class Repository implements CacheContract, ArrayAccess
     {
         $result = true;
 
-        // We'll loop over every item and attempt to store it indefinitely.
-        // If we notice that one of the items can't be stored forever we
-        // will return false. Otherwise we'll return a success result.
         foreach ($values as $key => $value) {
             if (! $this->forever($key, $value)) {
                 $result = false;
