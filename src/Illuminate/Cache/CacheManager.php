@@ -123,7 +123,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the APC cache driver.
      *
      * @param  array $config
-     * @return Repository
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function createApcDriver(array $config)
     {
@@ -135,7 +135,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the array cache driver.
      *
-     * @return Repository
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function createArrayDriver()
     {
@@ -146,7 +146,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the file cache driver.
      *
      * @param  array $config
-     * @return Repository
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function createFileDriver(array $config)
     {
@@ -157,7 +157,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the Memcached cache driver.
      *
      * @param  array $config
-     * @return Repository
+     * @return \Illuminate\Contracts\Cache\Repository
      * @throws \ReflectionException
      */
     protected function createMemcachedDriver(array $config)
@@ -174,7 +174,7 @@ class CacheManager implements FactoryContract
 
     /**
      * Create an instance of the Null cache driver.
-     * @return Repository
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function createNullDriver()
     {
@@ -185,7 +185,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the Redis cache driver.
      *
      * @param  array $config
-     * @return Repository
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function createRedisDriver(array $config)
     {
@@ -200,7 +200,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the database cache driver.
      *
      * @param  array $config
-     * @return Repository
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function createDatabaseDriver(array $config)
     {
@@ -217,7 +217,7 @@ class CacheManager implements FactoryContract
      * Create a new cache repository with the given implementation.
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store
-     * @return \Illuminate\Cache\Repository
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     public function repository(Store $store)
     {
