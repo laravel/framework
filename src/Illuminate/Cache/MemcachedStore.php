@@ -65,8 +65,10 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
      */
     public function get($key)
     {
+        $value = $this->memcached->get($this->prefix.$key);
+
         if ($this->memcached->getResultCode() == 0) {
-            return $this->memcached->get($this->prefix.$key);
+            return $value;
         }
     }
 

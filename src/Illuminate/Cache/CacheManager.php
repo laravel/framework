@@ -106,7 +106,6 @@ class CacheManager implements FactoryContract
             return $this->{$driverMethod}($config);
         }
         throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
-
     }
 
     /**
