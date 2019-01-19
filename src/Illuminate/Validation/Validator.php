@@ -335,7 +335,7 @@ class Validator implements ValidatorContract
 
         $missingValue = Str::random(10);
 
-        foreach (array_keys($this->getRules()) as $key) {
+        foreach ($this->composeValidatedKeys() as $key) {
             $value = data_get($this->getData(), $key, $missingValue);
 
             if ($value !== $missingValue) {
@@ -344,6 +344,39 @@ class Validator implements ValidatorContract
         }
 
         return $results;
+    }
+
+    /**
+     * Compose an array of validated keys.
+     *
+     * @return array
+     */
+    protected function composeValidatedKeys()
+    {
+        $keys = array_keys($this->rules);
+
+        return array_filter($keys, function ($key) {
+            return ! $this->validatedKeyHasNestedKeys($key);
+        });
+    }
+
+    /**
+     * Check if the specified validated key has nested keys.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function validatedKeyHasNestedKeys($key)
+    {
+        $keys = array_keys($this->rules);
+
+        foreach ($keys as $item) {
+            if (starts_with($item, "{$key}.")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
