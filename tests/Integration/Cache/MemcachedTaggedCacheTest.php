@@ -3,8 +3,6 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Memcached;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -34,7 +32,6 @@ class MemcachedTaggedCacheTest extends MemcachedIntegrationTest
         $store->tags(['people', 'authors'])->flush();
         $this->assertNull($store->tags(['people', 'artists'])->get('John'));
     }
-
 
     public function test_memcached_can_store_many_tagged_cache_items()
     {
