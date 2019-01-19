@@ -102,9 +102,7 @@ class RateLimiter
      */
     public function retriesLeft($key, $maxAttempts)
     {
-        $attempts = $this->attempts($key);
-
-        return $maxAttempts - $attempts;
+        return $maxAttempts - $this->attempts($key);
     }
 
     /**

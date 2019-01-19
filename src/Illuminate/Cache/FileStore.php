@@ -127,11 +127,11 @@ class FileStore implements Store
      */
     public function forget($key)
     {
-        if ($this->files->exists($file = $this->path($key))) {
-            return $this->files->delete($file);
+        if (! $this->files->exists($file = $this->path($key))) {
+            return false;
         }
 
-        return false;
+        return $this->files->delete($file);
     }
 
     /**

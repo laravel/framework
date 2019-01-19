@@ -109,9 +109,10 @@ class DatabaseStore implements Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param  string $key
+     * @param  mixed $value
      * @return int|bool
+     * @throws \Throwable
      */
     public function increment($key, $value = 1)
     {
@@ -123,9 +124,10 @@ class DatabaseStore implements Store
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param  string $key
+     * @param  mixed $value
      * @return int|bool
+     * @throws \Throwable
      */
     public function decrement($key, $value = 1)
     {
@@ -137,10 +139,11 @@ class DatabaseStore implements Store
     /**
      * Increment or decrement an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  \Closure  $callback
+     * @param  string $key
+     * @param  mixed $value
+     * @param  \Closure $callback
      * @return int|bool
+     * @throws \Throwable
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
     {

@@ -98,15 +98,15 @@ class CacheManager implements FactoryContract
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
-        } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
-            } else {
-                throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
-            }
         }
+
+        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+
+        if (method_exists($this, $driverMethod)) {
+            return $this->{$driverMethod}($config);
+        }
+        throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
+
     }
 
     /**
@@ -123,8 +123,8 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the APC cache driver.
      *
-     * @param  array  $config
-     * @return \Illuminate\Cache\ApcStore
+     * @param  array $config
+     * @return Repository
      */
     protected function createApcDriver(array $config)
     {
@@ -136,7 +136,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the array cache driver.
      *
-     * @return \Illuminate\Cache\ArrayStore
+     * @return Repository
      */
     protected function createArrayDriver()
     {
@@ -146,8 +146,8 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the file cache driver.
      *
-     * @param  array  $config
-     * @return \Illuminate\Cache\FileStore
+     * @param  array $config
+     * @return Repository
      */
     protected function createFileDriver(array $config)
     {
@@ -157,13 +157,12 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the Memcached cache driver.
      *
-     * @param  array  $config
-     * @return \Illuminate\Cache\MemcachedStore
+     * @param  array $config
+     * @return Repository
+     * @throws \ReflectionException
      */
     protected function createMemcachedDriver(array $config)
     {
-        $prefix = $this->getPrefix($config);
-
         $memcached = $this->app['memcached.connector']->connect(
             $config['servers'],
             $config['persistent_id'] ?? null,
@@ -171,13 +170,12 @@ class CacheManager implements FactoryContract
             array_filter($config['sasl'] ?? [])
         );
 
-        return $this->repository(new MemcachedStore($memcached, $prefix));
+        return $this->repository(new MemcachedStore($memcached, $this->getPrefix($config)));
     }
 
     /**
      * Create an instance of the Null cache driver.
-     *
-     * @return \Illuminate\Cache\NullStore
+     * @return Repository
      */
     protected function createNullDriver()
     {
@@ -187,8 +185,8 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the Redis cache driver.
      *
-     * @param  array  $config
-     * @return \Illuminate\Cache\RedisStore
+     * @param  array $config
+     * @return Repository
      */
     protected function createRedisDriver(array $config)
     {
@@ -202,8 +200,8 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the database cache driver.
      *
-     * @param  array  $config
-     * @return \Illuminate\Cache\DatabaseStore
+     * @param  array $config
+     * @return Repository
      */
     protected function createDatabaseDriver(array $config)
     {
