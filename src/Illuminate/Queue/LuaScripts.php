@@ -76,6 +76,7 @@ LUA;
      *
      * KEYS[1] - The queue we are removing jobs from, for example: queues:foo:reserved
      * KEYS[2] - The queue we are moving jobs to, for example: queues:foo
+     * KEYS[3] - The notification list for the queue we are moving jobs to, for example queues:foo:notify
      * ARGV[1] - The current UNIX timestamp
      *
      * @return string
@@ -94,6 +95,11 @@ if(next(val) ~= nil) then
 
     for i = 1, #val, 100 do
         redis.call('rpush', KEYS[2], unpack(val, i, math.min(i+99, #val)))
+        if KEYS[3] ~= nil then
+            for j = 1, math.min(i+99, #val) do
+                redis.call('rpush', KEYS[3], 1)
+            end
+        end
     end
 end
 
