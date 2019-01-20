@@ -106,4 +106,24 @@ end
 return val
 LUA;
     }
+
+    /**
+     * Get the Lua script for pushing jobs onto the queue.
+     *
+     * KEYS[1] - The queue to push the job onto, for example: queues:foo
+     * KEYS[2] - The notification list fot the queue we are pushing jobs onto, for example: queues:foo:notify
+     * ARGV[1] - The job payload
+     *
+     * @return string
+     */
+    public static function push()
+    {
+        return <<<'LUA'
+redis.call('rpush', KEYS[1], ARGV[1])
+if KEYS[2] ~= nil then
+    redis.call('rpush', KEYS[2], 1)
+end
+return cjson.decode(ARGV[1])['id']
+LUA;
+    }
 }

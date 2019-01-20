@@ -88,16 +88,7 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        if (is_null($this->blockFor)) {
-            return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
-        }
-
-        $this->getConnection()->multi();
-        $this->getConnection()->rpush($this->getQueue($queue).':notify', '1');
-        $id = $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
-        $this->getConnection()->exec();
-
-        return $id;
+        return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
     }
 
     /**
@@ -110,9 +101,10 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $this->getConnection()->rpush($this->getQueue($queue), $payload);
-
-        return json_decode($payload, true)['id'] ?? null;
+        return $this->getConnection()->eval(
+            LuaScripts::push(), 2, $this->getQueue($queue),
+            $this->blockFor ? $this->getQueue($queue).':notify' : null, $payload
+        );
     }
 
     /**
