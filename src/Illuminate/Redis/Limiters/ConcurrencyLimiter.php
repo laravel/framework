@@ -66,6 +66,7 @@ class ConcurrencyLimiter
     public function block($timeout, $callback = null)
     {
         $starting = time();
+
         $id = Str::random(20);
 
         while (! $slot = $this->acquire($id)) {
