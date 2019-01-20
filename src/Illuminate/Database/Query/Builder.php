@@ -693,6 +693,10 @@ class Builder
      */
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
+        if (is_null($operator)) {
+            return [true, '='];
+        }
+
         if ($useDefault) {
             return [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
