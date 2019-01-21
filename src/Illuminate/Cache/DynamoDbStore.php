@@ -169,7 +169,7 @@ class DynamoDbStore implements Store
     /**
      * Determine if the given item is expired.
      *
-     * @param  arary  $item
+     * @param  array  $item
      * @param  \DateTimeInterface|null  $expiration
      * @return bool
      */
