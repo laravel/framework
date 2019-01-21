@@ -247,7 +247,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             foreach ($line as $key => $val) {
                 $line[$key] = $this->makeReplacements($val, $replace);
             }
-            
+
             return $line;
         }
     }
