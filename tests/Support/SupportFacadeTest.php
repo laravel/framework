@@ -70,6 +70,37 @@ class SupportFacadeTest extends TestCase
         FacadeStub::shouldReceive('foo')->once()->andReturn('bar');
         $this->assertEquals('bar', FacadeStub::foo());
     }
+
+    public function testFacadesAreStateful()
+    {
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new StateFulFacadeStub()]);
+
+        FacadeStub::setFacadeApplication($app);
+
+        $this->assertEquals(1, FacadeStub::increment());
+        $this->assertEquals(2, FacadeStub::increment());
+        $this->assertEquals(3, FacadeStub::increment());
+        $this->assertEquals(4, FacadeStub::increment());
+        $this->assertEquals(3, FacadeStub::decrement());
+        $this->assertEquals(2, FacadeStub::decrement());
+        $this->assertEquals(1, FacadeStub::decrement());
+    }
+}
+
+class StatefulFacadeStub
+{
+    protected $counter = 0;
+
+    public function increment()
+    {
+        return ++$this->counter;
+    }
+
+    public function decrement()
+    {
+        return --$this->counter;
+    }
 }
 
 class FacadeStub extends Facade
