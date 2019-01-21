@@ -55,6 +55,20 @@ abstract class Controller
     }
 
     /**
+     * Return a redirect to a method in this Controller.
+     *
+     * @param $method
+     * @param array $parameters
+     * @param int $status
+     * @param array $headers
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function redirectAction($method, $parameters = [], $status = 302, $headers = [])
+    {
+        return redirect()->action([static::class, $method], $parameters, $status, $headers);
+    }
+
+    /**
      * Handle calls to missing methods on the controller.
      *
      * @param  string  $method
