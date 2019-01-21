@@ -31,21 +31,21 @@ class DynamoDbStore implements Store
     /**
      * The name of the attribute that should hold the key.
      *
-     * @var  string
+     * @var string
      */
     protected $keyAttribute;
 
     /**
      * The name of the attribute that should hold the value.
      *
-     * @var  string
+     * @var string
      */
     protected $valueAttribute;
 
     /**
      * The name of the attribute that should hold the expiration timestamp.
      *
-     * @var  string
+     * @var string
      */
     protected $expirationAttribute;
 
@@ -214,7 +214,7 @@ class DynamoDbStore implements Store
      *
      * @param  array  $values
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function putMany(array $values, $minutes)
     {
@@ -256,7 +256,7 @@ class DynamoDbStore implements Store
     public function add($key, $value, $minutes)
     {
         try {
-            $response = $this->dynamo->putItem([
+            $this->dynamo->putItem([
                 'TableName' => $this->table,
                 'Item' => [
                     $this->keyAttribute => [
@@ -295,7 +295,7 @@ class DynamoDbStore implements Store
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -340,7 +340,7 @@ class DynamoDbStore implements Store
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
@@ -385,8 +385,8 @@ class DynamoDbStore implements Store
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param  mixed  $value
+     * @return bool
      */
     public function forever($key, $value)
     {
