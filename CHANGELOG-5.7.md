@@ -1,6 +1,18 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.21...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.22...5.7)
+
+
+## [v5.7.22 (2019-01-22)](https://github.com/laravel/framework/compare/v5.7.21...v5.7.22)
+
+### Fixed
+- Fixed `TestResponse::assertJsonValidationErrors()` when there are no errors ([#27190](https://github.com/laravel/framework/pull/27190))
+
+### Changed
+- Allowed `TestResponse::assertJsonMissingValidationErrors()` to be called without an argument ([#27176](https://github.com/laravel/framework/pull/27176))
+- Updated vue preset's vue-stubs for laravel-mix 4 compatibility ([#27229](https://github.com/laravel/framework/pull/27229))
+- Updated preset to use `@babel/preset-react` ([#27235](https://github.com/laravel/framework/pull/27235))
+- Used `config` to resolve the database value during tests. ([#27240](https://github.com/laravel/framework/pull/27240))
 
 
 ## [v5.7.21 (2019-01-15)](https://github.com/laravel/framework/compare/v5.7.20...v5.7.21)
