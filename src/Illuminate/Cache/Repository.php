@@ -351,7 +351,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
@@ -359,7 +359,7 @@ class Repository implements CacheContract, ArrayAccess
         $result = $this->store->forever($this->itemKey($key), $value);
 
         if ($result) {
-            $this->event(new KeyWritten($key, $value, 0));
+            $this->event(new KeyWritten($key, $value));
         }
 
         return $result;
