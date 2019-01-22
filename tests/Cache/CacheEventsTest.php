@@ -8,6 +8,7 @@ use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\KeyForgotten;
@@ -159,6 +160,18 @@ class CacheEventsTest extends TestCase
 
         $dispatcher->shouldReceive('dispatch')->once()->with($this->assertEventMatches(KeyForgotten::class, ['key' => 'baz', 'tags' => ['taylor']]));
         $this->assertTrue($repository->tags('taylor')->forget('baz'));
+    }
+
+    public function testForgetDoesNotTriggerEventOnFailure()
+    {
+        $dispatcher = $this->getDispatcher();
+        $store = m::mock(Store::class);
+        $store->shouldReceive('forget')->andReturn(false);
+        $repository = new Repository($store);
+        $repository->setEventDispatcher($dispatcher);
+
+        $dispatcher->shouldReceive('dispatch')->never();
+        $this->assertFalse($repository->forget('baz'));
     }
 
     protected function assertEventMatches($eventClass, $properties = [])
