@@ -46,7 +46,7 @@ class CacheManager implements FactoryContract
     }
 
     /**
-     * Get a cache store instance by name.
+     * Get a cache store instance by name, wrapped in a repository.
      *
      * @param  string|null  $name
      * @return \Illuminate\Contracts\Cache\Repository
