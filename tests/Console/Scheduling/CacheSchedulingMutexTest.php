@@ -52,7 +52,7 @@ class CacheSchedulingMutexTest extends TestCase
 
     public function testMutexReceivesCorrectCreate()
     {
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(true);
+        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(true);
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
     }
@@ -60,7 +60,7 @@ class CacheSchedulingMutexTest extends TestCase
     public function testCanUseCustomConnection()
     {
         $this->cacheFactory->shouldReceive('store')->with('test')->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(true);
+        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(true);
         $this->cacheMutex->useStore('test');
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
@@ -68,7 +68,7 @@ class CacheSchedulingMutexTest extends TestCase
 
     public function testPreventsMultipleRuns()
     {
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(false);
+        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->create($this->event, $this->time));
     }
