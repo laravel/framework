@@ -432,8 +432,10 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function forget($key)
     {
-        return tap($this->store->forget($this->itemKey($key)), function () use ($key) {
-            $this->event(new KeyForgotten($key));
+        return tap($this->store->forget($this->itemKey($key)), function ($result) use ($key) {
+            if ($result) {
+                $this->event(new KeyForgotten($key));
+            }
         });
     }
 
