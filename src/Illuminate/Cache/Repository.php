@@ -42,11 +42,11 @@ class Repository implements CacheContract, ArrayAccess
     protected $events;
 
     /**
-     * The default number of minutes to store items.
+     * The default number of seconds to store items.
      *
-     * @var float|int|null
+     * @var int|null
      */
-    protected $default = 60;
+    protected $default = 3600;
 
     /**
      * Create a new cache repository instance.
@@ -193,29 +193,29 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
+     * @param  \DateTimeInterface|\DateInterval|int|null  $seconds
      * @return bool
      */
-    public function put($key, $value, $minutes = null)
+    public function put($key, $value, $seconds = null)
     {
         if (is_array($key)) {
             return $this->putMany($key, $value);
         }
 
-        if ($minutes === null) {
+        if ($seconds === null) {
             return $this->forever($key, $value);
         }
 
-        $minutes = $this->getMinutes($minutes);
+        $seconds = $this->getSeconds($seconds);
 
-        if ($minutes <= 0) {
+        if ($seconds <= 0) {
             return $this->delete($key);
         }
 
-        $result = $this->store->put($this->itemKey($key), $value, $minutes);
+        $result = $this->store->put($this->itemKey($key), $value, $seconds);
 
         if ($result) {
-            $this->event(new KeyWritten($key, $value, $minutes));
+            $this->event(new KeyWritten($key, $value, $seconds));
         }
 
         return $result;
@@ -230,29 +230,29 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
-     * Store multiple items in the cache for a given number of minutes.
+     * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
-     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
+     * @param  \DateTimeInterface|\DateInterval|int|null  $seconds
      * @return bool
      */
-    public function putMany(array $values, $minutes = null)
+    public function putMany(array $values, $seconds = null)
     {
-        if ($minutes === null) {
+        if ($seconds === null) {
             return $this->putManyForever($values);
         }
 
-        $minutes = $this->getMinutes($minutes);
+        $seconds = $this->getSeconds($seconds);
 
-        if ($minutes <= 0) {
+        if ($seconds <= 0) {
             return $this->deleteMultiple(array_keys($values));
         }
 
-        $result = $this->store->putMany($values, $minutes);
+        $result = $this->store->putMany($values, $seconds);
 
         if ($result) {
             foreach ($values as $key => $value) {
-                $this->event(new KeyWritten($key, $value, $minutes));
+                $this->event(new KeyWritten($key, $value, $seconds));
             }
         }
 
@@ -291,13 +291,13 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
+     * @param  \DateTimeInterface|\DateInterval|int|null  $seconds
      * @return bool
      */
-    public function add($key, $value, $minutes = null)
+    public function add($key, $value, $seconds = null)
     {
-        if ($minutes !== null) {
-            if ($this->getMinutes($minutes) <= 0) {
+        if ($seconds !== null) {
+            if ($this->getSeconds($seconds) <= 0) {
                 return false;
             }
 
@@ -305,10 +305,10 @@ class Repository implements CacheContract, ArrayAccess
             // has a chance to override this logic. Some drivers better support the way
             // this operation should work with a total "atomic" implementation of it.
             if (method_exists($this->store, 'add')) {
-                $minutes = $this->getMinutes($minutes);
+                $seconds = $this->getSeconds($seconds);
 
                 return $this->store->add(
-                    $this->itemKey($key), $value, $minutes
+                    $this->itemKey($key), $value, $seconds
                 );
             }
         }
@@ -317,7 +317,7 @@ class Repository implements CacheContract, ArrayAccess
         // so it exists for subsequent requests. Then, we will return true so it is
         // easy to know if the value gets added. Otherwise, we will return false.
         if (is_null($this->get($key))) {
-            return $this->put($key, $value, $minutes);
+            return $this->put($key, $value, $seconds);
         }
 
         return false;
@@ -369,22 +369,22 @@ class Repository implements CacheContract, ArrayAccess
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
+     * @param  \DateTimeInterface|\DateInterval|int|null  $seconds
      * @param  \Closure  $callback
      * @return mixed
      */
-    public function remember($key, $minutes, Closure $callback)
+    public function remember($key, $seconds, Closure $callback)
     {
         $value = $this->get($key);
 
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
-        // given number of minutes so it's available for all subsequent requests.
+        // given number of seconds so it's available for all subsequent requests.
         if (! is_null($value)) {
             return $value;
         }
 
-        $this->put($key, $value = $callback(), $minutes);
+        $this->put($key, $value = $callback(), $seconds);
 
         return $value;
     }
@@ -414,7 +414,7 @@ class Repository implements CacheContract, ArrayAccess
 
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
-        // given number of minutes so it's available for all subsequent requests.
+        // given number of seconds so it's available for all subsequent requests.
         if (! is_null($value)) {
             return $value;
         }
@@ -504,7 +504,7 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Get the default cache time.
      *
-     * @return float|int
+     * @return int
      */
     public function getDefaultCacheTime()
     {
@@ -512,14 +512,14 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
-     * Set the default cache time in minutes.
+     * Set the default cache time in seconds.
      *
-     * @param  float|int|null  $minutes
+     * @param  int|null  $seconds
      * @return $this
      */
-    public function setDefaultCacheTime($minutes)
+    public function setDefaultCacheTime($seconds)
     {
-        $this->default = $minutes;
+        $this->default = $seconds;
 
         return $this;
     }
@@ -604,20 +604,20 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
-     * Calculate the number of minutes with the given duration.
+     * Calculate the number of seconds with the given duration.
      *
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
-     * @return float|int
+     * @param  \DateTimeInterface|\DateInterval|int  $seconds
+     * @return int
      */
-    protected function getMinutes($minutes)
+    protected function getSeconds($seconds)
     {
-        $duration = $this->parseDateInterval($minutes);
+        $duration = $this->parseDateInterval($seconds);
 
         if ($duration instanceof DateTimeInterface) {
-            $duration = Carbon::now()->diffInRealSeconds($duration, false) / 60;
+            $duration = Carbon::now()->diffInRealSeconds($duration, false);
         }
 
-        return (int) ($duration * 60) > 0 ? $duration : 0;
+        return $duration;
     }
 
     /**

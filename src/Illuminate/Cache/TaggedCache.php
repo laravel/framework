@@ -32,19 +32,19 @@ class TaggedCache extends Repository
     }
 
     /**
-     * Store multiple items in the cache for a given number of minutes.
+     * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
-     * @param  float|int|null  $minutes
+     * @param  int|null  $seconds
      * @return bool
      */
-    public function putMany(array $values, $minutes = null)
+    public function putMany(array $values, $seconds = null)
     {
-        if ($minutes === null) {
+        if ($seconds === null) {
             return $this->putManyForever($values);
         }
 
-        return $this->putManyAlias($values, $minutes);
+        return $this->putManyAlias($values, $seconds);
     }
 
     /**

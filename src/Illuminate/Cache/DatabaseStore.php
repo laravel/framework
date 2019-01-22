@@ -84,20 +84,20 @@ class DatabaseStore implements Store
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
         $key = $this->prefix.$key;
 
         $value = $this->serialize($value);
 
-        $expiration = $this->getTime() + (int) ($minutes * 60);
+        $expiration = $this->getTime() + $seconds;
 
         try {
             return $this->table()->insert(compact('key', 'value', 'expiration'));

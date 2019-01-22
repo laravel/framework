@@ -182,14 +182,14 @@ class DynamoDbStore implements Store
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
         $this->dynamo->putItem([
             'TableName' => $this->table,
@@ -201,7 +201,7 @@ class DynamoDbStore implements Store
                     $this->type($value) => $this->serialize($value),
                 ],
                 $this->expirationAttribute => [
-                    'N' => (string) $this->toTimestamp($minutes),
+                    'N' => (string) $this->toTimestamp($seconds),
                 ],
             ],
         ]);
@@ -210,15 +210,15 @@ class DynamoDbStore implements Store
     }
 
     /**
-     * Store multiple items in the cache for a given number of minutes.
+     * Store multiple items in the cache for a given number of $seconds.
      *
      * @param  array  $values
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function putMany(array $values, $minutes)
+    public function putMany(array $values, $seconds)
     {
-        $expiration = $this->toTimestamp($minutes);
+        $expiration = $this->toTimestamp($seconds);
 
         $this->dynamo->batchWriteItem([
             'RequestItems' => [
@@ -250,10 +250,10 @@ class DynamoDbStore implements Store
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function add($key, $value, $minutes)
+    public function add($key, $value, $seconds)
     {
         try {
             $this->dynamo->putItem([
@@ -266,7 +266,7 @@ class DynamoDbStore implements Store
                         $this->type($value) => $this->serialize($value),
                     ],
                     $this->expirationAttribute => [
-                        'N' => (string) $this->toTimestamp($minutes),
+                        'N' => (string) $this->toTimestamp($seconds),
                     ],
                 ],
                 'ConditionExpression' => 'attribute_not_exists(#key) OR #expires_at < :now',
@@ -449,15 +449,15 @@ class DynamoDbStore implements Store
     }
 
     /**
-     * Get the UNIX timestamp for the given number of minutes.
+     * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $minutes
+     * @param  int  $seconds
      * @return int
      */
-    protected function toTimestamp($minutes)
+    protected function toTimestamp($seconds)
     {
-        return $minutes > 0
-                    ? $this->availableAt($minutes * 60)
+        return $seconds > 0
+                    ? $this->availableAt($seconds)
                     : Carbon::now()->getTimestamp();
     }
 
