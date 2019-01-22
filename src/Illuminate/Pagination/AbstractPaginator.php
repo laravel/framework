@@ -73,6 +73,13 @@ abstract class AbstractPaginator implements Htmlable
     public $onEachSide = 3;
 
     /**
+     * The paginator options.
+     *
+     * @var array
+     */
+    protected $options;
+
+    /**
      * The current path resolver callback.
      *
      * @var \Closure
@@ -561,6 +568,16 @@ abstract class AbstractPaginator implements Htmlable
         $this->items = $collection;
 
         return $this;
+    }
+
+    /**
+     * Get the paginator options.
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 
     /**

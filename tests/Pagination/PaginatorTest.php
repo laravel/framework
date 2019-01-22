@@ -46,4 +46,12 @@ class PaginatorTest extends TestCase
 
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
+
+    public function testItRetrievesPaginatorOptions()
+    {
+        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
+            $options = ['path' => 'http://website.com/test']);
+
+        $this->assertSame($p->getOptions(), $options);
+    }
 }
