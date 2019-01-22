@@ -2055,6 +2055,26 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    public function testRejectWithoutAnArgumentRemovesTruthyValues()
+    {
+        $collection1 = new Collection([
+            false,
+            true,
+            new Collection(),
+            0,
+        ]);
+        $this->assertSame([0 => false, 3 => 0], $collection1->reject()->all());
+
+        $collection2 = new Collection([
+            'a' => true,
+            'b' => true,
+            'c' => true,
+        ]);
+        $this->assertTrue(
+            $collection2->reject()->isEmpty()
+        );
+    }
+
     public function testSearchReturnsIndexOfFirstFoundItem()
     {
         $c = new Collection([1, 2, 3, 4, 5, 2, 5, 'foo' => 'bar']);
