@@ -42,11 +42,11 @@ class NullStore extends TaggableStore
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return int
+     * @return int|bool
      */
     public function increment($key, $value = 1)
     {
-        //
+        return false;
     }
 
     /**
@@ -54,11 +54,11 @@ class NullStore extends TaggableStore
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return int
+     * @return int|bool
      */
     public function decrement($key, $value = 1)
     {
-        //
+        return false;
     }
 
     /**
