@@ -15,7 +15,7 @@ use Illuminate\Support\Fluent;
  * @method ColumnDefinition default(mixed $value) Specify a "default" value for the column
  * @method ColumnDefinition first() Place the column "first" in the table (MySQL)
  * @method ColumnDefinition generatedAs(string $expression) Create a SQL compliant identity column (PostgreSQL)
- * @method ColumnDefinition index(string $indexName) Add an index
+ * @method ColumnDefinition index(string $indexName = null) Add an index
  * @method ColumnDefinition nullable(bool $value = true) Allow NULL values to be inserted into the column
  * @method ColumnDefinition primary() Add a primary index
  * @method ColumnDefinition spatialIndex() Add a spatial index
