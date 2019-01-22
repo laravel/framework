@@ -239,7 +239,7 @@ class CacheManager implements FactoryContract
 
         return $this->repository(
             new DynamoDbStore(
-                DynamoDbClient::factory($dynamoConfig),
+                new DynamoDbClient($dynamoConfig),
                 $config['table'],
                 $config['attributes']['key'] ?? 'key',
                 $config['attributes']['value'] ?? 'value',
