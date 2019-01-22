@@ -62,7 +62,7 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
 
         $this->assertTrue(
             json_encode($payload) !== false,
-            'EloquentCollection is not using the QueueableEntity::queueableId() method.'
+            'EloquentCollection is not using the QueueableEntity::getQueueableId() method.'
         );
     }
 }
