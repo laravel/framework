@@ -104,7 +104,7 @@ class LengthAwarePaginatorTest extends TestCase
                             $this->p->url($this->p->currentPage()));
     }
 
-    public function testItRetrievesPaginatorOptions()
+    public function testItRetrievesThePaginatorOptions()
     {
         $this->assertSame($this->options, $this->p->getOptions());
     }
