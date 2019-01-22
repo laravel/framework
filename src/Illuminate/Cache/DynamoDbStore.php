@@ -185,7 +185,7 @@ class DynamoDbStore implements Store
      * Store an item in the cache for a given number of minutes.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  float|int  $minutes
      * @return bool
      */
@@ -249,7 +249,7 @@ class DynamoDbStore implements Store
      * Store an item in the cache if the key doesn't exist.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  float|int  $minutes
      * @return bool
      */
