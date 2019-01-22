@@ -93,28 +93,28 @@ class MemcachedStore extends TaggableStore implements LockProvider
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
         return $this->memcached->set(
-            $this->prefix.$key, $value, $this->calculateExpiration($minutes)
+            $this->prefix.$key, $value, $this->calculateExpiration($seconds)
         );
     }
 
     /**
-     * Store multiple items in the cache for a given number of minutes.
+     * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function putMany(array $values, $minutes)
+    public function putMany(array $values, $seconds)
     {
         $prefixedValues = [];
 
@@ -123,7 +123,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
         }
 
         return $this->memcached->setMulti(
-            $prefixedValues, $this->calculateExpiration($minutes)
+            $prefixedValues, $this->calculateExpiration($seconds)
         );
     }
 
@@ -132,13 +132,13 @@ class MemcachedStore extends TaggableStore implements LockProvider
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function add($key, $value, $minutes)
+    public function add($key, $value, $seconds)
     {
         return $this->memcached->add(
-            $this->prefix.$key, $value, $this->calculateExpiration($minutes)
+            $this->prefix.$key, $value, $this->calculateExpiration($seconds)
         );
     }
 
@@ -227,23 +227,23 @@ class MemcachedStore extends TaggableStore implements LockProvider
     /**
      * Get the expiration time of the key.
      *
-     * @param  int  $minutes
+     * @param  int  $seconds
      * @return int
      */
-    protected function calculateExpiration($minutes)
+    protected function calculateExpiration($seconds)
     {
-        return $this->toTimestamp($minutes);
+        return $this->toTimestamp($seconds);
     }
 
     /**
-     * Get the UNIX timestamp for the given number of minutes.
+     * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $minutes
+     * @param  int  $seconds
      * @return int
      */
-    protected function toTimestamp($minutes)
+    protected function toTimestamp($seconds)
     {
-        return $minutes > 0 ? $this->availableAt($minutes * 60) : 0;
+        return $seconds > 0 ? $this->availableAt($seconds) : 0;
     }
 
     /**

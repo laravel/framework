@@ -71,7 +71,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
         $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
 
-        $result = $store->put('foo', 'bar', 1);
+        $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
     }
 
@@ -87,7 +87,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
 
-        $result = $store->put('foo', 'bar', 1);
+        $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
     }
 
@@ -99,7 +99,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
         $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61])->andReturnTrue();
 
-        $result = $store->put('foo', "\0", 1);
+        $result = $store->put('foo', "\0", 60);
         $this->assertTrue($result);
     }
 

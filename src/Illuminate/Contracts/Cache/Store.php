@@ -23,23 +23,23 @@ interface Store
     public function many(array $keys);
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function put($key, $value, $minutes);
+    public function put($key, $value, $seconds);
 
     /**
-     * Store multiple items in the cache for a given number of minutes.
+     * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function putMany(array $values, $minutes);
+    public function putMany(array $values, $seconds);
 
     /**
      * Increment the value of an item in the cache.

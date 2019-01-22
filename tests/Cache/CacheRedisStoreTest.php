@@ -62,7 +62,7 @@ class CacheRedisStoreTest extends TestCase
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
-        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60 * 60, serialize('foo'))->andReturn('OK');
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60, serialize('foo'))->andReturn('OK');
         $result = $redis->put('foo', 'foo', 60);
         $this->assertTrue($result);
     }
@@ -74,9 +74,9 @@ class CacheRedisStoreTest extends TestCase
         $connection = $redis->getRedis();
         $connection->shouldReceive('connection')->with('default')->andReturn($redis->getRedis());
         $connection->shouldReceive('multi')->once();
-        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60 * 60, serialize('bar'))->andReturn('OK');
-        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:baz', 60 * 60, serialize('qux'))->andReturn('OK');
-        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:bar', 60 * 60, serialize('norf'))->andReturn('OK');
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60, serialize('bar'))->andReturn('OK');
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:baz', 60, serialize('qux'))->andReturn('OK');
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:bar', 60, serialize('norf'))->andReturn('OK');
         $connection->shouldReceive('exec')->once();
 
         $result = $redis->putMany([
@@ -91,7 +91,7 @@ class CacheRedisStoreTest extends TestCase
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
-        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60 * 60, 1);
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60, 1);
         $result = $redis->put('foo', 1, 60);
         $this->assertFalse($result);
     }
