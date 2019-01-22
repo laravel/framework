@@ -452,11 +452,15 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function deleteMultiple($keys)
     {
+        $result = true;
+
         foreach ($keys as $key) {
-            $this->forget($key);
+            if (! $this->forget($key)) {
+                $result = false;
+            }
         }
 
-        return true;
+        return $result;
     }
 
     /**
