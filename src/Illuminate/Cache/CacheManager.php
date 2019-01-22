@@ -222,7 +222,7 @@ class CacheManager implements FactoryContract
      * Create an instance of the DynamoDB cache driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Cache\DynamoDbStore
+     * @return \Illuminate\Cache\Repository
      */
     protected function createDynamodbDriver(array $config)
     {
