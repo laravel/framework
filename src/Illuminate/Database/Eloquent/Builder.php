@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use Exception;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -10,10 +11,12 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Support\HigherOrderBuilderProxy;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
+ * @property-read HigherOrderBuilderProxy $orWhere
  * @mixin \Illuminate\Database\Query\Builder
  */
 class Builder
@@ -1359,5 +1362,22 @@ class Builder
     public function __clone()
     {
         $this->query = clone $this->query;
+    }
+
+    /**
+     * Dynamically access builder proxies.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function __get($key)
+    {
+        if ($key === 'orWhere') {
+            return new HigherOrderBuilderProxy($this, $key);
+        }
+
+        throw new Exception("Property [{$key}] does not exist on this builder instance.");
     }
 }
