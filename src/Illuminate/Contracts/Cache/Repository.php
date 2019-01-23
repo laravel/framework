@@ -24,7 +24,7 @@ interface Repository extends CacheInterface
      * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return bool
      */
-    public function put($key, $value, $minutes);
+    public function put($key, $value, $minutes = null);
 
     /**
      * Store an item in the cache if the key does not exist.
