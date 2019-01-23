@@ -278,7 +278,17 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
         $repo->getStore()->shouldReceive('forget')->once()->with('a-second-key')->andReturn(true);
-        $repo->deleteMultiple(['a-key', 'a-second-key']);
+
+        $this->assertTrue($repo->deleteMultiple(['a-key', 'a-second-key']));
+    }
+
+    public function testRemovingMultipleKeysFailsIfOneFails()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
+        $repo->getStore()->shouldReceive('forget')->once()->with('a-second-key')->andReturn(false);
+
+        $this->assertFalse($repo->deleteMultiple(['a-key', 'a-second-key']));
     }
 
     public function testAllTagsArePassedToTaggableStore()
