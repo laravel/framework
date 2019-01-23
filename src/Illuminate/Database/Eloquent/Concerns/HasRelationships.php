@@ -618,7 +618,7 @@ trait HasRelationships
         foreach ($this->touches as $relation) {
             $relation = $this->$relation();
 
-            if (!$relation) {
+            if (! $relation) {
                 continue;
             }
 
