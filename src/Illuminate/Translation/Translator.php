@@ -244,6 +244,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
         } elseif (is_array($line) && count($line) > 0) {
+            foreach ($line as $key => $val) {
+                $line[$key] = $this->makeReplacements($val, $replace);
+            }
+
             return $line;
         }
     }
