@@ -193,20 +193,20 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|int|null  $seconds
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function put($key, $value, $seconds = null)
+    public function put($key, $value, $ttl = null)
     {
         if (is_array($key)) {
             return $this->putMany($key, $value);
         }
 
-        if ($seconds === null) {
+        if ($ttl === null) {
             return $this->forever($key, $value);
         }
 
-        $seconds = $this->getSeconds($seconds);
+        $seconds = $this->getSeconds($ttl);
 
         if ($seconds <= 0) {
             return $this->delete($key);
@@ -233,16 +233,16 @@ class Repository implements CacheContract, ArrayAccess
      * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
-     * @param  \DateTimeInterface|\DateInterval|int|null  $seconds
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function putMany(array $values, $seconds = null)
+    public function putMany(array $values, $ttl = null)
     {
-        if ($seconds === null) {
+        if ($ttl === null) {
             return $this->putManyForever($values);
         }
 
-        $seconds = $this->getSeconds($seconds);
+        $seconds = $this->getSeconds($ttl);
 
         if ($seconds <= 0) {
             return $this->deleteMultiple(array_keys($values));
@@ -291,13 +291,13 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|int|null  $seconds
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function add($key, $value, $seconds = null)
+    public function add($key, $value, $ttl = null)
     {
-        if ($seconds !== null) {
-            if ($this->getSeconds($seconds) <= 0) {
+        if ($ttl !== null) {
+            if ($this->getSeconds($ttl) <= 0) {
                 return false;
             }
 
@@ -305,7 +305,7 @@ class Repository implements CacheContract, ArrayAccess
             // has a chance to override this logic. Some drivers better support the way
             // this operation should work with a total "atomic" implementation of it.
             if (method_exists($this->store, 'add')) {
-                $seconds = $this->getSeconds($seconds);
+                $seconds = $this->getSeconds($ttl);
 
                 return $this->store->add(
                     $this->itemKey($key), $value, $seconds
@@ -317,7 +317,7 @@ class Repository implements CacheContract, ArrayAccess
         // so it exists for subsequent requests. Then, we will return true so it is
         // easy to know if the value gets added. Otherwise, we will return false.
         if (is_null($this->get($key))) {
-            return $this->put($key, $value, $seconds);
+            return $this->put($key, $value, $ttl);
         }
 
         return false;
@@ -369,11 +369,11 @@ class Repository implements CacheContract, ArrayAccess
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|int|null  $seconds
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure  $callback
      * @return mixed
      */
-    public function remember($key, $seconds, Closure $callback)
+    public function remember($key, $ttl, Closure $callback)
     {
         $value = $this->get($key);
 
@@ -384,7 +384,7 @@ class Repository implements CacheContract, ArrayAccess
             return $value;
         }
 
-        $this->put($key, $value = $callback(), $seconds);
+        $this->put($key, $value = $callback(), $ttl);
 
         return $value;
     }
@@ -608,14 +608,14 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
-     * Calculate the number of seconds with the given duration.
+     * Calculate the number of seconds for the given TTL.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $seconds
+     * @param  \DateTimeInterface|\DateInterval|int  $ttl
      * @return int
      */
-    protected function getSeconds($seconds)
+    protected function getSeconds($ttl)
     {
-        $duration = $this->parseDateInterval($seconds);
+        $duration = $this->parseDateInterval($ttl);
 
         if ($duration instanceof DateTimeInterface) {
             $duration = Carbon::now()->diffInRealSeconds($duration, false);
