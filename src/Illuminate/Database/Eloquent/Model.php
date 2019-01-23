@@ -544,7 +544,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method)
     {
-        $query = $this->newModelQuery();
+        $query = $this->newQueryWithoutRelationships();
 
         if (! $this->exists) {
             return $query->{$method}($column, $amount, $extra);
