@@ -164,6 +164,10 @@ class RedisQueue extends Queue implements QueueContract
     {
         $this->migrate($prefixed = $this->getQueue($queue));
 
+        if (! is_null($this->blockFor)) {
+            $this->resizeNotifications($prefixed);
+        }
+
         if (empty($nextJob = $this->retrieveNextJob($prefixed))) {
             return;
         }
@@ -208,6 +212,17 @@ class RedisQueue extends Queue implements QueueContract
         return $this->getConnection()->eval(
             LuaScripts::migrateExpiredJobs(), 3, $from, $to, $notify, $this->currentTime()
         );
+    }
+
+    /**
+     * Add any missing notifications and remove any excess notifications.
+     *
+     * @param  string $queue
+     * @return void
+     */
+    protected function resizeNotifications($queue)
+    {
+        $this->getConnection()->eval(LuaScripts::resizeNotifications(), 2, $queue, $queue.':notify');
     }
 
     /**

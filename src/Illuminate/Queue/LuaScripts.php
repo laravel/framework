@@ -129,4 +129,28 @@ end
 return cjson.decode(ARGV[1])['id']
 LUA;
     }
+
+    /**
+     * Get the Lua script for resizing the notifications list.
+     *
+     * KEYS[1] The ready queue, for example queues:foo
+     * KEYS[2] The notification list to resize, for example: queues:foo:notify
+     */
+    public static function resizeNotifications()
+    {
+        return <<<'LUA'
+local ready = redis.call('llen', KEYS[1])
+local notifications = redis.call('llen', KEYS[2])
+local diff = ready - notifications
+if diff > 0 then
+    -- Push a notification onto the notification list for every job missing a notification...
+    for i = 1, diff do
+        redis.call('rpush', KEYS[2], 1)
+    end
+elseif diff < 0 then
+    -- Remove any excess notifications from the notification list...
+    redis.call('ltrim', KEYS[2], 0, ready - 1)
+end
+LUA;
+    }
 }

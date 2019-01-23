@@ -207,6 +207,71 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
+    public function testBlockingPopCreatesMissingNotifications($driver)
+    {
+        $this->setQueue($driver, 'default', null, 60, 5);
+
+        $jobs = [
+            new RedisQueueIntegrationTestJob(0),
+            new RedisQueueIntegrationTestJob(1),
+            new RedisQueueIntegrationTestJob(2),
+            new RedisQueueIntegrationTestJob(3),
+        ];
+
+        foreach ($jobs as $job) {
+            $this->queue->push($job);
+        }
+
+        $this->assertEquals(4, $this->redis[$driver]->connection()->llen('queues:default:notify'));
+
+        // Remove all of the notifications
+        $this->redis[$driver]->connection()->del('queues:default:notify');
+
+        // Pop the first job - this should not block at all
+        $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+
+        // Assert the notifications for the remaining jobs were created
+        $this->assertEquals(3, $this->redis[$driver]->connection()->llen('queues:default:notify'));
+    }
+
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testBlockingPopTrimsExcessNotifications($driver)
+    {
+        $this->setQueue($driver, 'default', null, 60, 5);
+
+        $jobs = [
+            new RedisQueueIntegrationTestJob(0),
+            new RedisQueueIntegrationTestJob(1),
+            new RedisQueueIntegrationTestJob(2),
+            new RedisQueueIntegrationTestJob(3),
+        ];
+
+        foreach ($jobs as $job) {
+            $this->queue->push($job);
+        }
+
+        $this->assertEquals(4, $this->redis[$driver]->connection()->llen('queues:default:notify'));
+
+        // Push excess notifications
+        $this->redis[$driver]->connection()->rpush('queues:default:notify', ...array_fill(0, 50, 1));
+        $this->assertEquals(54, $this->redis[$driver]->connection()->llen('queues:default:notify'));
+
+        // Pop the first job
+        $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+
+        // Assert the excess notifications were trimmed
+        $this->assertEquals(3, $this->redis[$driver]->connection()->llen('queues:default:notify'));
+    }
+
+    /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
     public function testNotExpireJobsWhenExpireNull($driver)
     {
         $this->queue = new RedisQueue($this->redis[$driver], 'default', null, null);
