@@ -658,25 +658,25 @@ class AuthAccessGateTest extends TestCase
 
 class AccessGateTestStaticClass
 {
-    public static function foo()
+    public static function foo($user)
     {
-        return true;
+        return $user->id === 1;
     }
 }
 
 class AccessGateTestClass
 {
-    public function foo()
+    public function foo($user)
     {
-        return true;
+        return $user->id === 1;
     }
 }
 
 class AccessGateTestInvokableClass
 {
-    public function __invoke()
+    public function __invoke($user)
     {
-        return true;
+        return $user->id === 1;
     }
 }
 
