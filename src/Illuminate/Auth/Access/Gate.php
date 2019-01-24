@@ -494,6 +494,7 @@ class Gate implements GateContract
 
         if (isset($this->atNotation[$ability])) {
             [$class, $method] = Str::parseCallback($this->atNotation[$ability]);
+            $method = $method ?: '__invoke';
             if ($this->canBeCalledWithUser($user, $class, $method)) {
                 return $this->abilities[$ability];
             }
