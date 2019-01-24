@@ -904,7 +904,7 @@ class Builder
      * Call the given local model scopes.
      *
      * @param  array  $scopes
-     * @return mixed
+     * @return static|mixed
      */
     public function scopes(array $scopes)
     {
@@ -933,7 +933,7 @@ class Builder
     /**
      * Apply the scopes to the Eloquent builder instance and return it.
      *
-     * @return \Illuminate\Database\Eloquent\Builder|static
+     * @return static
      */
     public function applyScopes()
     {
