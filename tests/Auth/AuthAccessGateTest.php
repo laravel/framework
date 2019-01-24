@@ -26,7 +26,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
-    public function test_before_can_take_an_array_callback()
+    public function test_before_can_take_an_array_callback_as_object()
     {
         $gate = new Gate(new Container, function () {
             return null;
@@ -37,13 +37,24 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->check('anything'));
     }
 
+    public function test_before_can_take_an_array_callback_as_object_static()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->before([new AccessGateTestBeforeCallback, 'allowEverythingStatically']);
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
     public function test_before_can_take_an_array_callback_with_static_method()
     {
         $gate = new Gate(new Container, function () {
             return null;
         });
 
-        $gate->before([AccessGateTestBeforeCallback::class, 'allowEverything']);
+        $gate->before([AccessGateTestBeforeCallback::class, 'allowEverythingStatically']);
 
         $this->assertTrue($gate->check('anything'));
     }
@@ -658,25 +669,25 @@ class AuthAccessGateTest extends TestCase
 
 class AccessGateTestStaticClass
 {
-    public static function foo()
+    public static function foo($user)
     {
-        return true;
+        return $user->id === 1;
     }
 }
 
 class AccessGateTestClass
 {
-    public function foo()
+    public function foo($user)
     {
-        return true;
+        return $user->id === 1;
     }
 }
 
 class AccessGateTestInvokableClass
 {
-    public function __invoke()
+    public function __invoke($user)
     {
-        return true;
+        return $user->id === 1;
     }
 }
 
@@ -851,7 +862,7 @@ class AccessGateTestPolicyWithNonGuestBefore
 
 class AccessGateTestBeforeCallback
 {
-    public static function allowEverything($user = null)
+    public function allowEverything($user = null)
     {
         return true;
     }
