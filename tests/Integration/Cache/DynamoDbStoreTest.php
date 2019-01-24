@@ -22,10 +22,10 @@ class DynamoDbStoreTest extends TestCase
 
     public function test_items_can_be_stored_and_retrieved()
     {
-        Cache::driver('dynamodb')->put('name', 'Taylor', 1);
+        Cache::driver('dynamodb')->put('name', 'Taylor', 10);
         $this->assertEquals('Taylor', Cache::driver('dynamodb')->get('name'));
 
-        Cache::driver('dynamodb')->put(['name' => 'Abigail', 'age' => 28], 1);
+        Cache::driver('dynamodb')->put(['name' => 'Abigail', 'age' => 28], 10);
         $this->assertEquals('Abigail', Cache::driver('dynamodb')->get('name'));
         $this->assertEquals(28, Cache::driver('dynamodb')->get('age'));
 
@@ -43,13 +43,13 @@ class DynamoDbStoreTest extends TestCase
     {
         $key = Str::random(6);
 
-        $this->assertTrue(Cache::driver('dynamodb')->add($key, 'Taylor', 1));
-        $this->assertFalse(Cache::driver('dynamodb')->add($key, 'Taylor', 1));
+        $this->assertTrue(Cache::driver('dynamodb')->add($key, 'Taylor', 10));
+        $this->assertFalse(Cache::driver('dynamodb')->add($key, 'Taylor', 10));
     }
 
     public function test_items_can_be_incremented_and_decremented()
     {
-        Cache::driver('dynamodb')->put('counter', 0, 1);
+        Cache::driver('dynamodb')->put('counter', 0, 10);
         Cache::driver('dynamodb')->increment('counter');
         Cache::driver('dynamodb')->increment('counter', 4);
 

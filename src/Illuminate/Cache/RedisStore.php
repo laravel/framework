@@ -131,7 +131,7 @@ class RedisStore extends TaggableStore implements LockProvider
         $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])";
 
         return (bool) $this->connection()->eval(
-            $lua, 1, $this->prefix.$key, $this->serialize($value), $seconds
+            $lua, 1, $this->prefix.$key, $this->serialize($value), (int) max(1, $seconds)
         );
     }
 

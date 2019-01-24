@@ -38,8 +38,8 @@ class Cache extends AbstractCache
     public function __construct(Repository $repository, $key = 'flysystem', $expire = null)
     {
         $this->key = $key;
-        $this->repository = $repository;
         $this->expire = $expire;
+        $this->repository = $repository;
     }
 
     /**
