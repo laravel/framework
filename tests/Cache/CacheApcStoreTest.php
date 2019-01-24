@@ -47,7 +47,7 @@ class CacheApcStoreTest extends TestCase
             ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60))
             ->willReturn(true);
         $store = new ApcStore($apc);
-        $result = $store->put('foo', 'bar', 1);
+        $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
     }
 
@@ -66,7 +66,7 @@ class CacheApcStoreTest extends TestCase
             'foo'   => 'bar',
             'baz'   => 'qux',
             'bar'   => 'norf',
-        ], 1);
+        ], 60);
         $this->assertTrue($result);
     }
 

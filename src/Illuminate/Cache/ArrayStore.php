@@ -41,18 +41,18 @@ class ArrayStore extends TaggableStore
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
         $this->storage[$key] = [
             'value' => $value,
-            'expiresAt' => $this->calculateExpiration($minutes),
+            'expiresAt' => $this->calculateExpiration($seconds),
         ];
 
         return true;
@@ -140,22 +140,22 @@ class ArrayStore extends TaggableStore
     /**
      * Get the expiration time of the key.
      *
-     * @param  int  $minutes
+     * @param  int  $seconds
      * @return int
      */
-    protected function calculateExpiration($minutes)
+    protected function calculateExpiration($seconds)
     {
-        return $this->toTimestamp($minutes);
+        return $this->toTimestamp($seconds);
     }
 
     /**
-     * Get the UNIX timestamp for the given number of minutes.
+     * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $minutes
+     * @param  int  $seconds
      * @return int
      */
-    protected function toTimestamp($minutes)
+    protected function toTimestamp($seconds)
     {
-        return $minutes > 0 ? $this->availableAt($minutes * 60) : 0;
+        return $seconds > 0 ? $this->availableAt($seconds) : 0;
     }
 }

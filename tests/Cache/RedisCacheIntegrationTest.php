@@ -34,8 +34,8 @@ class RedisCacheIntegrationTest extends TestCase
     {
         $store = new RedisStore($this->redis[$driver]);
         $repository = new Repository($store);
-        $this->assertTrue($repository->add('k', 'v', 60));
-        $this->assertFalse($repository->add('k', 'v', 60));
+        $this->assertTrue($repository->add('k', 'v', 3600));
+        $this->assertFalse($repository->add('k', 'v', 3600));
         $this->assertGreaterThan(3500, $this->redis[$driver]->connection()->ttl('k'));
     }
 

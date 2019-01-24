@@ -40,7 +40,7 @@ class CacheArrayStoreTest extends TestCase
         $store = new ArrayStore;
 
         $store->put('foo', 'bar', 10);
-        Carbon::setTestNow(Carbon::now()->addMinutes(10)->addSecond());
+        Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
         $result = $store->get('foo');
 
         $this->assertNull($result);

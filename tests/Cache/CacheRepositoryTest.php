@@ -98,8 +98,8 @@ class CacheRepositoryTest extends TestCase
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
-        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 602 / 60);
-        $repo->getStore()->shouldReceive('put')->once()->with('baz', 'qux', 598 / 60);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 602);
+        $repo->getStore()->shouldReceive('put')->once()->with('baz', 'qux', 598);
         $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), function () {
             return 'bar';
         });
@@ -198,7 +198,7 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderTestGetMinutes()
+    public function dataProviderTestGetSeconds()
     {
         Carbon::setTestNow(Carbon::parse($this->getTestDate()));
 
@@ -207,20 +207,20 @@ class CacheRepositoryTest extends TestCase
             [(new DateTime($this->getTestDate()))->modify('+5 minutes')],
             [(new DateTimeImmutable($this->getTestDate()))->modify('+5 minutes')],
             [new DateInterval('PT5M')],
-            [5],
+            [300],
         ];
     }
 
     /**
-     * @dataProvider dataProviderTestGetMinutes
+     * @dataProvider dataProviderTestGetSeconds
      * @param mixed $duration
      */
-    public function testGetMinutes($duration)
+    public function testGetSeconds($duration)
     {
         Carbon::setTestNow(Carbon::parse($this->getTestDate()));
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 5);
+        $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 300);
         $repo->put($key, $value, $duration);
     }
 

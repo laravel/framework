@@ -22,9 +22,9 @@ class Cache extends AbstractCache
     protected $key;
 
     /**
-     * The cache expiration time in minutes.
+     * The cache expiration time in seconds.
      *
-     * @var int
+     * @var int|null
      */
     protected $expire;
 
@@ -39,10 +39,7 @@ class Cache extends AbstractCache
     {
         $this->key = $key;
         $this->repository = $repository;
-
-        if (! is_null($expire)) {
-            $this->expire = (int) ceil($expire / 60);
-        }
+        $this->expire = $expire;
     }
 
     /**
