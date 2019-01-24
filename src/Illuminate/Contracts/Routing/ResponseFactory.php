@@ -90,6 +90,15 @@ interface ResponseFactory
     public function download($file, $name = null, array $headers = [], $disposition = 'attachment');
 
     /**
+     * Return the raw contents of a binary file.
+     *
+     * @param  \SplFileInfo|string  $file
+     * @param  array  $headers
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function file($file, array $headers = []);
+
+    /**
      * Create a new redirect response to the given path.
      *
      * @param  string  $path
