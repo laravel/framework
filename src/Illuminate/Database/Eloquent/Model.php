@@ -1126,12 +1126,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Reload the current model instance with fresh attributes from the database.
      *
-     * @return $this|null
+     * @return $this
      */
     public function refresh()
     {
         if (! $this->exists) {
-            return;
+            return $this;
         }
 
         $this->setRawAttributes(
