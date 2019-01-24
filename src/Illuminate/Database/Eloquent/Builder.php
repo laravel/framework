@@ -17,6 +17,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
+ *
  * @mixin \Illuminate\Database\Query\Builder
  */
 class Builder
@@ -1285,6 +1286,23 @@ class Builder
     }
 
     /**
+     * Dynamically access builder proxies.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function __get($key)
+    {
+        if ($key === 'orWhere') {
+            return new HigherOrderBuilderProxy($this, $key);
+        }
+
+        throw new Exception("Property [{$key}] does not exist on the Eloquent builder instance.");
+    }
+
+    /**
      * Dynamically handle calls into the query instance.
      *
      * @param  string  $method
@@ -1362,22 +1380,5 @@ class Builder
     public function __clone()
     {
         $this->query = clone $this->query;
-    }
-
-    /**
-     * Dynamically access builder proxies.
-     *
-     * @param  string  $key
-     * @return mixed
-     *
-     * @throws \Exception
-     */
-    public function __get($key)
-    {
-        if ($key === 'orWhere') {
-            return new HigherOrderBuilderProxy($this, $key);
-        }
-
-        throw new Exception("Property [{$key}] does not exist on this builder instance.");
     }
 }
