@@ -90,11 +90,11 @@ abstract class GeneratorCommand extends Command
         if (Str::startsWith($name, $rootNamespace)) {
             return $name;
         }
-        
+
         if (strtolower($name) === $name) {
             $segments = preg_split('/\\\\/', $name);
             $name = '';
-            
+
             foreach ($segments as $bit) {
                 $name .= title_case($bit);
                 $name .= '\\';
