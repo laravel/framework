@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Illuminate\Database\Eloquent\Builder;
-
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
