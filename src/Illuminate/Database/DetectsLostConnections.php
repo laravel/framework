@@ -38,6 +38,7 @@ trait DetectsLostConnections
             'ORA-03114',
             'Packets out of order. Expected',
             'Adaptive Server connection failed',
+            'Communication link failure',
         ]);
     }
 }
