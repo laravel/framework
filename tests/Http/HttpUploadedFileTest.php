@@ -31,7 +31,7 @@ class HttpUploadedFileTest extends TestCase
             null,
             true
         );
-        
+
         $this->assertEquals('pps', $file->extension());
     }
 
@@ -45,7 +45,7 @@ class HttpUploadedFileTest extends TestCase
             null,
             true
         );
-        
+
         $this->assertEquals('txt', $file->extension());
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Http;
 
-use Illuminate\Http\Testing\MimeType;
 use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
+use Illuminate\Http\Testing\MimeType;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
@@ -113,14 +113,14 @@ class UploadedFile extends SymfonyUploadedFile
     {
         $type = $this->getMimeType();
         $clientExtension = $this->getClientOriginalExtension();
-        
-        if(! is_null($clientExtension) && MimeType::get($clientExtension) === $type) {
+
+        if (! is_null($clientExtension) && MimeType::get($clientExtension) === $type) {
             return $clientExtension;
         }
-        
+
         return MimeType::search($type);
     }
-    
+
     /**
      * Get the file's extension supplied by the client.
      *
