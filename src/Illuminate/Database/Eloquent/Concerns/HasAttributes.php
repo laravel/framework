@@ -981,15 +981,7 @@ trait HasAttributes
      */
     public function except($attributes)
     {
-        $results = [];
-
-        foreach (array_keys($this->getAttributes()) as $attribute) {
-            if (! in_array($attribute, is_array($attributes) ? $attributes : func_get_args())) {
-                $results[$attribute] = $this->getAttribute($attribute);
-            }
-        }
-
-        return $results;
+        return Arr::except($this->getAttributes(), is_array($attributes) ? $attributes : func_get_args());
     }
 
     /**
