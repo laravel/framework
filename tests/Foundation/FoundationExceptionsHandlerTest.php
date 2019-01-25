@@ -65,6 +65,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new RuntimeException('Exception message'));
     }
 
+    public function testHandlerCallsReportMethodWithDependencies()
+    {
+        $reporter = m::mock(ReportingService::class);
+        $this->container->instance(ReportingService::class, $reporter);
+        $reporter->shouldReceive('send')->withArgs(['Exception message']);
+
+        $this->handler->report(new ReportableException('Exception message'));
+    }
+
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
@@ -138,4 +147,17 @@ class CustomException extends Exception implements Responsable
     {
         return response()->json(['response' => 'My custom exception response']);
     }
+}
+
+class ReportableException extends Exception
+{
+    public function report(ReportingService $reportingService)
+    {
+        $reportingService->send($this->getMessage());
+    }
+}
+
+interface ReportingService
+{
+    public function send($message);
 }
