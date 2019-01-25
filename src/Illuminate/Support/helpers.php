@@ -259,6 +259,21 @@ if (! function_exists('array_random')) {
     }
 }
 
+if (! function_exists('array_random_by')) {
+    /**
+     * Get a random value from an array with a given key.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  int|null  $num
+     * @return mixed
+     */
+    function array_random_by($array, $key, $num = null)
+    {
+        return Arr::randomBy($array, $key, $num);
+    }
+}
+
 if (! function_exists('array_set')) {
     /**
      * Set an array item to a given value using "dot" notation.

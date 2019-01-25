@@ -1403,6 +1403,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get one or a specified number of items randomly from the collection with a given key.
+     *
+     * @param  string  $key
+     * @param  int|null  $number
+     * @return static|mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function randomBy($key, $number = null)
+    {
+        $items = $this->pluck($key)->all();
+
+        return (new static($items))->random($number);
+    }
+
+    /**
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback

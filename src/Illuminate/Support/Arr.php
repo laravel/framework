@@ -502,6 +502,23 @@ class Arr
     }
 
     /**
+     * Get one or a specified number of random values from an array with a given key.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  int|null  $number
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function randomBy($array, $key, $number = null)
+    {
+        $array = static::pluck($array, $key);
+
+        return static::random($array, $number);
+    }
+
+    /**
      * Set an array item to a given value using "dot" notation.
      *
      * If no key is given to the method, the entire array will be replaced.
