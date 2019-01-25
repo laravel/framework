@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Http\Testing\MimeType;
 use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
@@ -103,6 +104,23 @@ class UploadedFile extends SymfonyUploadedFile
         return file_get_contents($this->getPathname());
     }
 
+    /**
+     * Returns the extension based on the mime type and the client extension.
+     *
+     * @return string|null
+     */
+    public function extension()
+    {
+        $type = $this->getMimeType();
+        $clientExtension = $this->getClientOriginalExtension();
+        
+        if(! is_null($clientExtension) && MimeType::get($clientExtension) === $type) {
+            return $clientExtension;
+        }
+        
+        return MimeType::search($type);
+    }
+    
     /**
      * Get the file's extension supplied by the client.
      *
