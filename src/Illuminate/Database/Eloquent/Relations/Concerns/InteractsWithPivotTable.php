@@ -209,12 +209,21 @@ trait InteractsWithPivotTable
      */
     public function attach($id, array $attributes = [], $touch = true)
     {
-        // Here we will insert the attachment records into the pivot table. Once we have
-        // inserted the records, we will touch the relationships if necessary and the
-        // function will return. We can parse the IDs before inserting the records.
-        $this->newPivotStatement()->insert($this->formatAttachRecords(
-            $this->parseIds($id), $attributes
-        ));
+        if ($this->using) {
+            $records = $this->formatAttachRecords(
+                $this->parseIds($id), $attributes
+            );
+            foreach ($records as $record) {
+                $this->newPivot($record, false)->save();
+            }
+        } else {
+            // Here we will insert the attachment records into the pivot table. Once we have
+            // inserted the records, we will touch the relationships if necessary and the
+            // function will return. We can parse the IDs before inserting the records.
+            $this->newPivotStatement()->insert($this->formatAttachRecords(
+                $this->parseIds($id), $attributes
+            ));
+        }
 
         if ($touch) {
             $this->touchIfTouching();
@@ -355,25 +364,32 @@ trait InteractsWithPivotTable
      */
     public function detach($ids = null, $touch = true)
     {
-        $query = $this->newPivotQuery();
+        if ($this->using) {
+            $results = 0;
+            foreach ($this->parseIds($ids) as $id) {
+                $results += $this->newPivot([$this->relatedPivotKey => $id], true)->delete();
+            }
+        } else {
+            $query = $this->newPivotQuery();
 
-        // If associated IDs were passed to the method we will only delete those
-        // associations, otherwise all of the association ties will be broken.
-        // We'll return the numbers of affected rows when we do the deletes.
-        if (! is_null($ids)) {
-            $ids = $this->parseIds($ids);
+            // If associated IDs were passed to the method we will only delete those
+            // associations, otherwise all of the association ties will be broken.
+            // We'll return the numbers of affected rows when we do the deletes.
+            if (! is_null($ids)) {
+                $ids = $this->parseIds($ids);
 
-            if (empty($ids)) {
-                return 0;
+                if (empty($ids)) {
+                    return 0;
+                }
+
+                $query->whereIn($this->relatedPivotKey, (array) $ids);
             }
 
-            $query->whereIn($this->relatedPivotKey, (array) $ids);
+            // Once we have all of the conditions set on the statement, we are ready
+            // to run the delete on the pivot table. Then, if the touch parameter
+            // is true, we will go ahead and touch all related models to sync.
+            $results = $query->delete();
         }
-
-        // Once we have all of the conditions set on the statement, we are ready
-        // to run the delete on the pivot table. Then, if the touch parameter
-        // is true, we will go ahead and touch all related models to sync.
-        $results = $query->delete();
 
         if ($touch) {
             $this->touchIfTouching();
