@@ -225,7 +225,7 @@ class CacheManager implements FactoryContract
      */
     protected function createDynamodbDriver(array $config)
     {
-        $dynamo = DynamoDbClient::factory([
+        $dynamo = new DynamoDbClient([
             'region' => $config['region'],
             'version' => 'latest',
             'credentials' => array_filter([
