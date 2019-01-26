@@ -62,7 +62,7 @@ trait CompilesIncludes
      */
     protected function compileIncludeUnless($expression)
     {
-        return $this->compileIncludeWhen(!$expression);
+        return $this->compileIncludeWhen(! $expression);
     }
 
     /**
