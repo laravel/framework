@@ -55,6 +55,17 @@ trait CompilesIncludes
     }
 
     /**
+     * Compile the include-unless statements into valid PHP.
+     *
+     * @param  string $expression
+     * @return string
+     */
+    protected function compileIncludeUnless($expression)
+    {
+        return $this->compileIncludeWhen(!$expression);
+    }
+
+    /**
      * Compile the include-first statements into valid PHP.
      *
      * @param  string  $expression
