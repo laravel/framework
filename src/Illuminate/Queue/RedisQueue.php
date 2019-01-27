@@ -101,10 +101,12 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->getConnection()->eval(
+        $this->getConnection()->eval(
             LuaScripts::push(), 2, $this->getQueue($queue),
-            $this->blockFor ? $this->getQueue($queue).':notify' : null, $payload
+            $this->getQueue($queue).':notify', $payload
         );
+
+        return json_decode($payload, true)['id'] ?? null;
     }
 
     /**
@@ -218,14 +220,22 @@ class RedisQueue extends Queue implements QueueContract
      */
     protected function retrieveNextJob($queue)
     {
-        if (! is_null($this->blockFor)) {
+        $nextJob = $this->getConnection()->eval(
+            LuaScripts::pop(), 3, $queue, $queue.':reserved', $queue.':notify',
+            $this->availableAt($this->retryAfter)
+        );
+
+        if (empty($nextJob)) {
+            return [null, null];
+        }
+
+        [$job, $reserved] = $nextJob;
+
+        if (! $job && ! is_null($this->blockFor)) {
             $this->getConnection()->blpop([$queue.':notify'], $this->blockFor);
         }
 
-        return $this->getConnection()->eval(
-            LuaScripts::pop(), 2, $queue, $queue.':reserved',
-            $this->availableAt($this->retryAfter)
-        );
+        return [$job, $reserved];
     }
 
     /**

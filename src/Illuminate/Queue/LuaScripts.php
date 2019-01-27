@@ -25,6 +25,7 @@ LUA;
      *
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo
      * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
+     * KEYS[3] - The notify queue
      * ARGV[1] - The time at which the reserved job will expire
      *
      * @return string
@@ -42,6 +43,7 @@ if(job ~= false) then
     reserved['attempts'] = reserved['attempts'] + 1
     reserved = cjson.encode(reserved)
     redis.call('zadd', KEYS[2], ARGV[1], reserved)
+    redis.call('lpop', KEYS[3])
 end
 
 return {job, reserved}
@@ -123,10 +125,7 @@ LUA;
 -- Push the job onto the queue...
 redis.call('rpush', KEYS[1], ARGV[1])
 -- Push a notification onto the "notify" queue...
-if KEYS[2] ~= nil then
-    redis.call('rpush', KEYS[2], 1)
-end
-return cjson.decode(ARGV[1])['id']
+redis.call('rpush', KEYS[2], 1)
 LUA;
     }
 }
