@@ -2,6 +2,18 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.7.22...5.7)
 
+### Added
+- Added `AbstractPaginator::getOptions()` method ([#27273](https://github.com/laravel/framework/pull/27273))
+- Added `Communication link failure` to `DetectsLostConnections` trait ([#27307](https://github.com/laravel/framework/pull/27307))
+- Added `orWhere()` `proxy` for `scopes` to `EloquentBuilder` ([#27281](https://github.com/laravel/framework/pull/27281), [2e6fe85](https://github.com/laravel/framework/commit/2e6fe855c7d7d9d3cbf34e1fbea17c8059640c5c))
+
+### Fixed
+- Fixed `QueueableCollection` serialization of Eloquent Models when using `Binary IDs` ([#27271](https://github.com/laravel/framework/pull/27271))
+- Replaced `newModelQuery()` with `newQueryWithoutRelationships()` for `UPDATE`/`DELETE` queries ([#27277](https://github.com/laravel/framework/pull/27277))
+
+### Changed
+- Apply parameters to entire localization array ([#27254](https://github.com/laravel/framework/pull/27254))
+
 
 ## [v5.7.22 (2019-01-22)](https://github.com/laravel/framework/compare/v5.7.21...v5.7.22)
 
