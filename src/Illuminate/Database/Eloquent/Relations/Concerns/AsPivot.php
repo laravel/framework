@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -57,7 +58,11 @@ trait AsPivot
 
         $instance->exists = $exists;
 
-        $instance->timestamps = $instance->hasTimestampAttributes();
+        // If this is a subclassed Pivot class, treat it as a model and respect
+        // the $timestamps property
+        if (get_class($instance) === Pivot::class) {
+            $instance->timestamps = $instance->hasTimestampAttributes();
+        }
 
         return $instance;
     }
@@ -77,7 +82,12 @@ trait AsPivot
 
         $instance->setRawAttributes($attributes, true);
 
-        $instance->timestamps = $instance->hasTimestampAttributes();
+        // If this is a subclassed Pivot class, treat it as a model and respect
+        // the $timestamps property
+        if (get_class($instance) === Pivot::class) {
+            $instance->timestamps = $instance->hasTimestampAttributes();
+        }
+
 
         return $instance;
     }
@@ -110,11 +120,22 @@ trait AsPivot
      */
     public function delete()
     {
+        // support for pivot classes that container a non-composite primary key
         if (isset($this->attributes[$this->getKeyName()])) {
-            return parent::delete();
+            return (int) parent::delete();
         }
 
-        return $this->getDeleteQuery()->delete();
+        if ($this->fireModelEvent('deleting') === false) {
+            return 0;
+        }
+
+        $this->touchOwners();
+
+        $this->getDeleteQuery()->delete();
+
+        $this->fireModelEvent('deleted', false);
+
+        return 1;
     }
 
     /**
