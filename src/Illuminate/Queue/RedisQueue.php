@@ -212,10 +212,11 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Retrieve the next job from the queue.
      *
-     * @param  string  $queue
+     * @param  string $queue
+     * @param  bool $block
      * @return array
      */
-    protected function retrieveNextJob($queue)
+    protected function retrieveNextJob($queue, $block = true)
     {
         $nextJob = $this->getConnection()->eval(
             LuaScripts::pop(), 3, $queue, $queue.':reserved', $queue.':notify',
@@ -228,8 +229,9 @@ class RedisQueue extends Queue implements QueueContract
 
         [$job, $reserved] = $nextJob;
 
-        if (! $job && ! is_null($this->blockFor)) {
-            $this->getConnection()->blpop([$queue.':notify'], $this->blockFor);
+        if (! $job && ! is_null($this->blockFor) && $block &&
+            $this->getConnection()->blpop([$queue.':notify'], $this->blockFor)) {
+            return $this->retrieveNextJob($queue, false);
         }
 
         return [$job, $reserved];
