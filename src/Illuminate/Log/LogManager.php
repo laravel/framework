@@ -217,7 +217,7 @@ class LogManager implements LoggerInterface
             return $this->channel($channel)->getHandlers();
         })->all();
 
-        if ($config['lenient'] ?? false) {
+        if ($config['ignore_exceptions'] ?? false) {
             $handlers = [new WhatFailureGroupHandler($handlers)];
         }
 
