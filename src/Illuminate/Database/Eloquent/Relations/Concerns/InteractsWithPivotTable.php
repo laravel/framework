@@ -187,7 +187,7 @@ trait InteractsWithPivotTable
         if ($this->using) {
             $updated = $this->newPivot([
                 $this->foreignPivotKey => $this->parent->getKey(),
-                $this->relatedPivotKey => $this->parseId($id)
+                $this->relatedPivotKey => $this->parseId($id),
             ], true)->fill($attributes)->save();
 
             if ($touch) {
@@ -382,7 +382,7 @@ trait InteractsWithPivotTable
             foreach ($this->parseIds($ids) as $id) {
                 $results += $this->newPivot([
                     $this->foreignPivotKey => $this->parent->getKey(),
-                    $this->relatedPivotKey => $id
+                    $this->relatedPivotKey => $id,
                 ], true)->delete();
             }
         } else {
