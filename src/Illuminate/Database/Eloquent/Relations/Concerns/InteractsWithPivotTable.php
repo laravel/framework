@@ -184,6 +184,19 @@ trait InteractsWithPivotTable
      */
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {
+        if ($this->using) {
+            $updated = $this->newPivot([
+                $this->foreignPivotKey => $this->parent->getKey(),
+                $this->relatedPivotKey => $this->parseId($id)
+            ], true)->fill($attributes)->save();
+
+            if ($touch) {
+                $this->touchIfTouching();
+            }
+
+            return (int) $updated;
+        }
+
         if (in_array($this->updatedAt(), $this->pivotColumns)) {
             $attributes = $this->addTimestampsToAttachment($attributes, true);
         }
@@ -367,7 +380,10 @@ trait InteractsWithPivotTable
         if ($this->using) {
             $results = 0;
             foreach ($this->parseIds($ids) as $id) {
-                $results += $this->newPivot([$this->relatedPivotKey => $id], true)->delete();
+                $results += $this->newPivot([
+                    $this->foreignPivotKey => $this->parent->getKey(),
+                    $this->relatedPivotKey => $id
+                ], true)->delete();
             }
         } else {
             $query = $this->newPivotQuery();
