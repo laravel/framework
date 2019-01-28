@@ -98,10 +98,8 @@ if(next(val) ~= nil) then
     for i = 1, #val, 100 do
         redis.call('rpush', KEYS[2], unpack(val, i, math.min(i+99, #val)))
         -- Push a notification for every job that was migrated...
-        if KEYS[3] ~= nil then
-            for j = 1, math.min(i+99, #val) do
-                redis.call('rpush', KEYS[3], 1)
-            end
+        for j = 1, math.min(i+99, #val) do
+            redis.call('rpush', KEYS[3], 1)
         end
     end
 end
