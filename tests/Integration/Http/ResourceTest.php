@@ -18,6 +18,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithNumericKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
@@ -589,6 +590,25 @@ class ResourceTest extends TestCase
         $this->assertSame(2, count($collection));
     }
 
+    public function test_numeric_keys()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithNumericKeys(new Post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'array' => [1 => 'foo', 2 => 'bar'],
+            ],
+        ]);
+    }
+
     public function test_leading_merge__keyed_value_is_merged_correctly()
     {
         $filter = new class {
@@ -803,60 +823,21 @@ class ResourceTest extends TestCase
 
     public function test_the_resource_can_be_an_array()
     {
-        $this->assertJsonResourceResponse([
-            'user@example.com' => 'John',
-            'admin@example.com' => 'Hank',
-        ], [
-            'data' => [
+        Route::get('/', function () {
+            return new JsonResource([
                 'user@example.com' => 'John',
                 'admin@example.com' => 'Hank',
-            ],
-        ]);
-    }
-
-    public function test_it_strips_numeric_keys()
-    {
-        $this->assertJsonResourceResponse([
-            0 => 'John',
-            1 => 'Hank',
-        ], ['data' => ['John', 'Hank']]);
-
-        $this->assertJsonResourceResponse([
-            0 => 'John',
-            1 => 'Hank',
-            3 => 'Bill',
-        ], ['data' => ['John', 'Hank', 'Bill']]);
-
-        $this->assertJsonResourceResponse([
-            5 => 'John',
-            6 => 'Hank',
-        ], ['data' => ['John', 'Hank']]);
-    }
-
-    public function test_it_strips_all_keys_if_any_of_them_are_numeric()
-    {
-        $this->assertJsonResourceResponse([
-            '5' => 'John',
-            '6' => 'Hank',
-            'a' => 'Bill',
-        ], ['data' => ['John', 'Hank', 'Bill']]);
-
-        $this->assertJsonResourceResponse([
-            5 => 'John',
-            6 => 'Hank',
-            'a' => 'Bill',
-        ], ['data' => ['John', 'Hank', 'Bill']]);
-    }
-
-    private function assertJsonResourceResponse($data, $expectedJson)
-    {
-        Route::get('/', function () use ($data) {
-            return new JsonResource($data);
+            ]);
         });
 
         $this->withoutExceptionHandling()
             ->get('/', ['Accept' => 'application/json'])
             ->assertStatus(200)
-            ->assertExactJson($expectedJson);
+            ->assertJson([
+                'data' => [
+                    'user@example.com' => 'John',
+                    'admin@example.com' => 'Hank',
+                ],
+            ]);
     }
 }
