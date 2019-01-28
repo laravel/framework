@@ -106,7 +106,7 @@ class FoundationFormRequestTest extends TestCase
     public function test_passed_validation_runs_after_validation()
     {
         $request = $this->createRequest([], FoundationTestFormRequestHooks::class);
-        
+
         $request->validateResolved();
 
         $this->assertEquals($request->name, 'Taylor Otwel');

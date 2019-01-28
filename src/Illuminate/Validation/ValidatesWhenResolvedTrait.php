@@ -40,7 +40,7 @@ trait ValidatesWhenResolvedTrait
     }
 
     /**
-     * Runs after validation passed
+     * Runs after validation passed.
      *
      * @return void
      */
