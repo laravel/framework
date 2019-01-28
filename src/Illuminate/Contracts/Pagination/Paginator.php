@@ -114,7 +114,7 @@ interface Paginator
      * @return string
      */
     public function render($view = null, $data = []);
-    
+
     /**
      * Get the paginator's underlying collection.
      *
