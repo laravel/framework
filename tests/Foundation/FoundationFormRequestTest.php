@@ -103,6 +103,15 @@ class FoundationFormRequestTest extends TestCase
         $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
     }
 
+    public function test_passed_validation_runs_after_validation()
+    {
+        $request = $this->createRequest([], FoundationTestFormRequestHooks::class);
+        
+        $request->validateResolved();
+
+        $this->assertEquals($request->name, 'Taylor Otwel');
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -301,5 +310,10 @@ class FoundationTestFormRequestHooks extends FormRequest
     public function prepareForValidation()
     {
         $this->replace(['name' => 'Taylor']);
+    }
+
+    public function passedValidation()
+    {
+        $this->replace(['name' => 'Taylor Otwel']);
     }
 }
