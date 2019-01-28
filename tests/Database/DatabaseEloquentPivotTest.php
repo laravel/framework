@@ -2,6 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +21,8 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesAreSetCorrectly()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
+        $this->addMockConnection($parent);
+
         $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
         $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
@@ -150,6 +156,17 @@ class DatabaseEloquentPivotTest extends TestCase
 
         $this->assertEquals($model->getCreatedAtColumn(), $pivotWithoutParent->getCreatedAtColumn());
         $this->assertEquals($model->getUpdatedAtColumn(), $pivotWithoutParent->getUpdatedAtColumn());
+    }
+
+    protected function addMockConnection($model)
+    {
+        $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(Connection::class));
+        $connection->shouldReceive('getQueryGrammar')->andReturn(m::mock(Grammar::class));
+        // $connection->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
+        // $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
+        //     return new BaseBuilder($connection, $grammar, $processor);
+        // });
     }
 }
 
