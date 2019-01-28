@@ -412,9 +412,9 @@ class Repository implements CacheContract, ArrayAccess
     {
         $value = $this->get($key);
 
-        // If the item exists in the cache we will just return this immediately and if
-        // not we will execute the given Closure and cache the result of that for a
-        // given number of seconds so it's available for all subsequent requests.
+        // If the item exists in the cache we will just return this immediately
+        // and if not we will execute the given Closure and cache the result
+        // of that forever so it is available for all subsequent requests.
         if (! is_null($value)) {
             return $value;
         }
