@@ -1,6 +1,12 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.23...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.24...5.7)
+
+
+## [v5.7.24 (2019-01-30)](https://github.com/laravel/framework/compare/v5.7.23...v5.7.24)
+
+### Fixed
+- Fixed `ResetPassword` notification ([#27351](https://github.com/laravel/framework/pull/27351), [b130771](https://github.com/laravel/framework/commit/b13077164bc6b4cb032b9eec7f5209402b5260eb))
 
 
 ## [v5.7.23 (2019-01-29)](https://github.com/laravel/framework/compare/v5.7.22...v5.7.23)
