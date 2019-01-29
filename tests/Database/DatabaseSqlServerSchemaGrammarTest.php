@@ -770,6 +770,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add "coordinates" geography not null', $statements[0]);
     }
 
+    public function testAddingGeneratedColumn()
+    {
+        $blueprint = new Blueprint('products');
+        $blueprint->integer('price');
+        $blueprint->virtual('discounted_virtual', 'price - 5');
+        $blueprint->virtual('discounted_stored', 'price - 5')->persisted();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "products" add "price" int not null, add "discounted_virtual" as (price - 5), add "discounted_stored" as (price - 5) persisted', $statements[0]);
+    }
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.
