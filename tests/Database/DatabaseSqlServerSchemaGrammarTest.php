@@ -778,7 +778,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->virtual('discounted_stored', 'price - 5')->persisted();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "products" add "price" int not null, add "discounted_virtual" as (price - 5), add "discounted_stored" as (price - 5) persisted', $statements[0]);
+        $this->assertEquals('alter table "products" add "price" int not null, "discounted_virtual" as (price - 5), "discounted_stored" as (price - 5) persisted', $statements[0]);
     }
 
     public function testGrammarsAreMacroable()

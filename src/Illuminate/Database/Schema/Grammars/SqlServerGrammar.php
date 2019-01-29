@@ -733,7 +733,6 @@ class SqlServerGrammar extends Grammar
         return 'geography';
     }
 
-
     /**
      * Create the column definition for a generated virtual column type.
      *
@@ -742,7 +741,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeVirtual(Fluent $column)
     {
-        return " as ({$column->formula})";
+        return "as ({$column->formula})";
     }
 
     /**
@@ -768,7 +767,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
-        if($column->type !== 'virtual') {
+        if ($column->type !== 'virtual') {
             return $column->nullable ? ' null' : ' not null';
         }
     }
