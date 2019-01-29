@@ -95,6 +95,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $deferredServices = [];
 
     /**
+     * The custom application path defined by the developer.
+     *
+     * @var string
+     */
+    protected $appPath;
+
+    /**
      * The custom database path defined by the developer.
      *
      * @var string
@@ -289,12 +296,29 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the path to the application "app" directory.
      *
-     * @param  string  $path Optionally, a path to append to the app path
+     * @param  string  $path
      * @return string
      */
     public function path($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'app'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        $appPath = $this->appPath ?: $this->basePath.DIRECTORY_SEPARATOR.'app';
+
+        return $appPath.($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+
+    /**
+     * Set the application directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useAppPath($path)
+    {
+        $this->appPath = $path;
+
+        $this->instance('path', $path);
+
+        return $this;
     }
 
     /**

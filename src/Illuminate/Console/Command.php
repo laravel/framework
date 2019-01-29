@@ -299,7 +299,7 @@ class Command extends SymfonyCommand
      * Get the value of a command option.
      *
      * @param  string|null  $key
-     * @return string|array|null
+     * @return string|array|bool|null
      */
     public function option($key = null)
     {

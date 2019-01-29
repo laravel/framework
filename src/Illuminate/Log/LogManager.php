@@ -15,6 +15,7 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
+use Monolog\Handler\WhatFailureGroupHandler;
 
 class LogManager implements LoggerInterface
 {
@@ -215,6 +216,10 @@ class LogManager implements LoggerInterface
         $handlers = collect($config['channels'])->flatMap(function ($channel) {
             return $this->channel($channel)->getHandlers();
         })->all();
+
+        if ($config['ignore_exceptions'] ?? false) {
+            $handlers = [new WhatFailureGroupHandler($handlers)];
+        }
 
         return new Monolog($this->parseChannel($config), $handlers);
     }
