@@ -823,6 +823,18 @@ class Blueprint
     }
 
     /**
+     * Create a new generated virtual column on the table.
+     *
+     * @param  string  $column
+     * @param  string  $formula
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function virtual($column, $formula)
+    {
+        return $this->addColumn('virtual', $column, compact('formula'));
+    }
+
+    /**
      * Create a new boolean column on the table.
      *
      * @param  string  $column
