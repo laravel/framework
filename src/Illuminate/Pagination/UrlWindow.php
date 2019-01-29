@@ -73,23 +73,31 @@ class UrlWindow
      */
     protected function getUrlSlider($onEachSide)
     {
-        $window = $onEachSide * 2;
-
         if (! $this->hasPages()) {
             return ['first' => null, 'slider' => null, 'last' => null];
         }
 
+        // Since the number of links on the edges is hardcoded (2), we can't have
+        // $onEachSide <= 2  without making some adjustments.
+
+        $window = max($onEachSide * 2,1); //$window should be at least 1 (in case $onEachSide == 0)
+
+        //Number of pages between the left edge of the $window and the second page
+        $startingGap = $this->currentPage() - $onEachSide - 2;
+        //Number of pages between the right edge of the $window and the second last page.
+        $endingGap = $this->lastPage() - $this->currentPage() - 2 - $onEachSide;
+
         // If the current page is very close to the beginning of the page range, we will
         // just render the beginning of the page range, followed by the last 2 of the
         // links in this list, since we will not have room to create a full slider.
-        if ((in_array($this->currentPage() - $onEachSide - 2, [0,1]) && $this->currentPage() > $window)||$this->currentPage() <= $window) {
+        if ((($startingGap == 0 || $startingGap == 1) && $this->currentPage() > $window)|| $this->currentPage() <= $window) {
             return $this->getSliderTooCloseToBeginning($window);
         }
 
         // If the current page is close to the ending of the page range we will just get
         // this first couple pages, followed by a larger window of these ending pages
         // since we're too close to the end of the list to create a full on slider.
-        elseif ((in_array($this->lastPage() - $this->currentPage() - 2 - $onEachSide, [-1,0]) && $this->currentPage() <= ($this->lastPage() - $window)) || $this->currentPage() > ($this->lastPage() - $window)) {
+        elseif ((($endingGap == -1 || $endingGap == 0) && $this->currentPage() <= ($this->lastPage() - $window)) || $this->currentPage() > ($this->lastPage() - $window)) {
             return $this->getSliderTooCloseToEnding($window);
         }
 
