@@ -80,7 +80,7 @@ class UrlWindow
         // Since the number of links on the edges is hardcoded (2), we can't have
         // $onEachSide <= 2  without making some adjustments.
 
-        $window = max($onEachSide * 2,1); //$window should be at least 1 (in case $onEachSide == 0)
+        $window = max($onEachSide * 2, 1); //$window should be at least 1 (in case $onEachSide == 0)
 
         //Number of pages between the left edge of the $window and the second page
         $startingGap = $this->currentPage() - $onEachSide - 2;
@@ -90,7 +90,7 @@ class UrlWindow
         // If the current page is very close to the beginning of the page range, we will
         // just render the beginning of the page range, followed by the last 2 of the
         // links in this list, since we will not have room to create a full slider.
-        if ((($startingGap == 0 || $startingGap == 1) && $this->currentPage() > $window)|| $this->currentPage() <= $window) {
+        if ((($startingGap == 0 || $startingGap == 1) && $this->currentPage() > $window) || $this->currentPage() <= $window) {
             return $this->getSliderTooCloseToBeginning($window);
         }
 
