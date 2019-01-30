@@ -891,7 +891,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $results[$resolvedKey] = $item;
         }
 
-        return new static($results);
+        return new self($results);
     }
 
     /**
