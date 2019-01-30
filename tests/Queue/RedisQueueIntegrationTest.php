@@ -68,6 +68,31 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
+     * @param $driver
+     *
+     * @throws \Exception
+     */
+    public function testBlockingPop($driver)
+    {
+        $this->tearDownRedis();
+        if ($pid = pcntl_fork() > 0) {
+            $this->setUpRedis();
+            $this->setQueue($driver, 'default', null, 60, 10);
+            $this->assertEquals(12, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command)->i);
+        } elseif ($pid == 0) {
+            $this->setUpRedis();
+            $this->setQueue('predis');
+            sleep(1);
+            $this->queue->push(new RedisQueueIntegrationTestJob(12));
+            die;
+        } else {
+            $this->fail('Cannot fork');
+        }
+    }
+
+    /**
+     * @dataProvider redisDriverProvider
+     *
      * @param string $driver
      */
     public function testPopProperlyPopsJobOffOfRedis($driver)
