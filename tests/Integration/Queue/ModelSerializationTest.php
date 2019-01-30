@@ -187,7 +187,7 @@ class ModelSerializationTest extends TestCase
     }
 
     /**
-     * Regression test for https://github.com/laravel/framework/issues/23068
+     * Regression test for https://github.com/laravel/framework/issues/23068.
      */
     public function test_it_can_unserialize_nested_relationships_without_pivot()
     {
