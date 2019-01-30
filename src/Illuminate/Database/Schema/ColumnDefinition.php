@@ -24,6 +24,7 @@ use Illuminate\Support\Fluent;
  * @method ColumnDefinition unsigned() Set the INTEGER column as UNSIGNED (MySQL)
  * @method ColumnDefinition useCurrent() Set the TIMESTAMP column to use CURRENT_TIMESTAMP as default value
  * @method ColumnDefinition virtualAs(string $expression) Create a virtual generated column (MySQL)
+ * @method ColumnDefinition persisted() Mark the computed generated column as persistent (SQL Server)
  */
 class ColumnDefinition extends Fluent
 {

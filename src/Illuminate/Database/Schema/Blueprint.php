@@ -823,6 +823,18 @@ class Blueprint
     }
 
     /**
+     * Create a new generated computed column on the table.
+     *
+     * @param  string  $column
+     * @param  string  $expression
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function computed($column, $expression)
+    {
+        return $this->addColumn('computed', $column, compact('expression'));
+    }
+
+    /**
      * Create a new boolean column on the table.
      *
      * @param  string  $column
