@@ -385,11 +385,11 @@ trait ReplacesAttributes
      */
     protected function replaceBefore($message, $attribute, $rule, $parameters)
     {
-        if (! (strtotime($parameters[0]))) {
+        if (! strtotime($parameters[0])) {
             return str_replace(':date', $this->getDisplayableAttribute($parameters[0]), $message);
         }
 
-        return str_replace(':date', $parameters[0], $message);
+        return str_replace(':date', $this->getDisplayableValue($attribute, $parameters[0]), $message);
     }
 
     /**

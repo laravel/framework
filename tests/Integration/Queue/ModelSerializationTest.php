@@ -7,6 +7,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @group integration
@@ -58,6 +59,15 @@ class ModelSerializationTest extends TestCase
 
         Schema::create('products', function ($table) {
             $table->increments('id');
+        });
+
+        Schema::create('roles', function ($table) {
+            $table->increments('id');
+        });
+
+        Schema::create('role_user', function ($table) {
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('role_id');
         });
     }
 
@@ -176,6 +186,31 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
     }
 
+    /**
+     * Regression test for https://github.com/laravel/framework/issues/23068.
+     */
+    public function test_it_can_unserialize_nested_relationships_without_pivot()
+    {
+        $user = tap(User::create([
+            'email' => 'taylor@laravel.com',
+        ]), function (User $user) {
+            $user->wasRecentlyCreated = false;
+        });
+
+        $role1 = Role::create();
+        $role2 = Role::create();
+
+        RoleUser::create(['user_id' => $user->id, 'role_id' => $role1->id]);
+        RoleUser::create(['user_id' => $user->id, 'role_id' => $role2->id]);
+
+        $user->roles->each(function ($role) {
+            $role->pivot->load('user', 'role');
+        });
+
+        $serialized = serialize(new ModelSerializationTestClass($user));
+        unserialize($serialized);
+    }
+
     public function test_it_serializes_an_empty_collection()
     {
         $serialized = serialize(new ModelSerializationTestClass(
@@ -229,6 +264,46 @@ class Product extends Model
 {
     public $guarded = ['id'];
     public $timestamps = false;
+}
+
+class User extends Model
+{
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class)
+            ->using(RoleUser::class);
+    }
+}
+
+class Role extends Model
+{
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->using(RoleUser::class);
+    }
+}
+
+class RoleUser extends Pivot
+{
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
 }
 
 class ModelSerializationTestClass
