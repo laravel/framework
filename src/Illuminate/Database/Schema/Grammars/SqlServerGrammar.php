@@ -734,7 +734,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a generated computed column type.
+     * Create the column definition for a generated, computed column type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string|null

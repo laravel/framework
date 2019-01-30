@@ -129,6 +129,19 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Create the column definition for a generated, computed column type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function typeComputed(Fluent $column)
+    {
+        throw new RuntimeException('This database driver does not support the computed type.');
+    }
+
+    /**
      * Add the column modifiers to the definition.
      *
      * @param  string  $sql
@@ -189,18 +202,6 @@ abstract class Grammar extends BaseGrammar
         return array_map(function ($value) use ($prefix) {
             return $prefix.' '.$value;
         }, $values);
-    }
-
-    /**
-     * Create the column definition for a generated computed column type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     *
-     * @throws \RuntimeException
-     */
-    protected function typeComputed(Fluent $column)
-    {
-        throw new RuntimeException('The database driver in use does not support the computed type.');
     }
 
     /**

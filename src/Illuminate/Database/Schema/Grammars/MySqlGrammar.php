@@ -835,15 +835,16 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a generated computed column type.
+     * Create the column definition for a generated, computed column type.
      *
      * @param  \Illuminate\Support\Fluent  $column
+     * @return void
      *
      * @throws \RuntimeException
      */
     protected function typeComputed(Fluent $column)
     {
-        throw new RuntimeException('The database driver in use requires a type, see virtualAs/storedAs modifiers.');
+        throw new RuntimeException('This database driver requires a type, see the virtualAs / storedAs modifiers.');
     }
 
     /**
