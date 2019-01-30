@@ -3,7 +3,10 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @see \Illuminate\Redis\Database
+ * @method static \Illuminate\Redis\Connections\Connection connection(string $name = null)
+ *
+ * @see \Illuminate\Redis\RedisManager
+ * @see \Illuminate\Contracts\Redis\Factory
  */
 class Redis extends Facade
 {

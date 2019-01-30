@@ -9,6 +9,34 @@ use Symfony\Component\Finder\Finder;
 class Factory implements ArrayAccess
 {
     /**
+     * The model definitions in the container.
+     *
+     * @var array
+     */
+    protected $definitions = [];
+
+    /**
+     * The registered model states.
+     *
+     * @var array
+     */
+    protected $states = [];
+
+    /**
+     * The registered after making callbacks.
+     *
+     * @var array
+     */
+    protected $afterMaking = [];
+
+    /**
+     * The registered after creating callbacks.
+     *
+     * @var array
+     */
+    protected $afterCreating = [];
+
+    /**
      * The Faker instance for the builder.
      *
      * @var \Faker\Generator
@@ -25,13 +53,6 @@ class Factory implements ArrayAccess
     {
         $this->faker = $faker;
     }
-
-    /**
-     * The model definitions in the container.
-     *
-     * @var array
-     */
-    protected $definitions = [];
 
     /**
      * Create a new factory container.
@@ -53,7 +74,7 @@ class Factory implements ArrayAccess
      * @param  string  $class
      * @param  string  $name
      * @param  callable  $attributes
-     * @return void
+     * @return $this
      */
     public function defineAs($class, $name, callable $attributes)
     {
@@ -66,11 +87,84 @@ class Factory implements ArrayAccess
      * @param  string  $class
      * @param  callable  $attributes
      * @param  string  $name
-     * @return void
+     * @return $this
      */
     public function define($class, callable $attributes, $name = 'default')
     {
         $this->definitions[$class][$name] = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Define a state with a given set of attributes.
+     *
+     * @param  string  $class
+     * @param  string  $state
+     * @param  callable|array  $attributes
+     * @return $this
+     */
+    public function state($class, $state, $attributes)
+    {
+        $this->states[$class][$state] = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Define a callback to run after making a model.
+     *
+     * @param  string  $class
+     * @param  callable  $callback
+     * @param  string  $name
+     * @return $this
+     */
+    public function afterMaking($class, callable $callback, $name = 'default')
+    {
+        $this->afterMaking[$class][$name][] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Define a callback to run after making a model with given state.
+     *
+     * @param  string  $class
+     * @param  string  $state
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function afterMakingState($class, $state, callable $callback)
+    {
+        return $this->afterMaking($class, $callback, $state);
+    }
+
+    /**
+     * Define a callback to run after creating a model.
+     *
+     * @param  string  $class
+     * @param  callable  $callback
+     * @param  string $name
+     * @return $this
+     */
+    public function afterCreating($class, callable $callback, $name = 'default')
+    {
+        $this->afterCreating[$class][$name][] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Define a callback to run after creating a model with given state.
+     *
+     * @param  string  $class
+     * @param  string  $state
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function afterCreatingState($class, $state, callable $callback)
+    {
+        return $this->afterCreating($class, $callback, $state);
     }
 
     /**
@@ -96,25 +190,6 @@ class Factory implements ArrayAccess
     public function createAs($class, $name, array $attributes = [])
     {
         return $this->of($class, $name)->create($attributes);
-    }
-
-    /**
-     * Load factories from path.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function load($path)
-    {
-        $factory = $this;
-
-        if (is_dir($path)) {
-            foreach (Finder::create()->files()->in($path) as $file) {
-                require $file->getRealPath();
-            }
-        }
-
-        return $factory;
     }
 
     /**
@@ -165,9 +240,9 @@ class Factory implements ArrayAccess
      */
     public function raw($class, array $attributes = [], $name = 'default')
     {
-        $raw = call_user_func($this->definitions[$class][$name], $this->faker);
-
-        return array_merge($raw, $attributes);
+        return array_merge(
+            call_user_func($this->definitions[$class][$name], $this->faker), $attributes
+        );
     }
 
     /**
@@ -179,7 +254,29 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->definitions, $this->faker);
+        return new FactoryBuilder(
+            $class, $name, $this->definitions, $this->states,
+            $this->afterMaking, $this->afterCreating, $this->faker
+        );
+    }
+
+    /**
+     * Load factories from path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function load($path)
+    {
+        $factory = $this;
+
+        if (is_dir($path)) {
+            foreach (Finder::create()->files()->name('*.php')->in($path) as $file) {
+                require $file->getRealPath();
+            }
+        }
+
+        return $factory;
     }
 
     /**
@@ -213,7 +310,7 @@ class Factory implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        return $this->define($offset, $value);
+        $this->define($offset, $value);
     }
 
     /**

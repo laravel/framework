@@ -4,6 +4,7 @@ namespace Illuminate\Auth;
 
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
@@ -44,7 +45,11 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        return $this->createModel()->newQuery()->find($identifier);
+        $model = $this->createModel();
+
+        return $model->newQuery()
+            ->where($model->getAuthIdentifierName(), $identifier)
+            ->first();
     }
 
     /**
@@ -58,16 +63,21 @@ class EloquentUserProvider implements UserProvider
     {
         $model = $this->createModel();
 
-        return $model->newQuery()
-            ->where($model->getAuthIdentifierName(), $identifier)
-            ->where($model->getRememberTokenName(), $token)
-            ->first();
+        $model = $model->where($model->getAuthIdentifierName(), $identifier)->first();
+
+        if (! $model) {
+            return null;
+        }
+
+        $rememberToken = $model->getRememberToken();
+
+        return $rememberToken && hash_equals($rememberToken, $token) ? $model : null;
     }
 
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|\Illuminate\Database\Eloquent\Model  $user
      * @param  string  $token
      * @return void
      */
@@ -75,7 +85,13 @@ class EloquentUserProvider implements UserProvider
     {
         $user->setRememberToken($token);
 
+        $timestamps = $user->timestamps;
+
+        $user->timestamps = false;
+
         $user->save();
+
+        $user->timestamps = $timestamps;
     }
 
     /**
@@ -86,7 +102,9 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (empty($credentials)) {
+        if (empty($credentials) ||
+           (count($credentials) === 1 &&
+            array_key_exists('password', $credentials))) {
             return;
         }
 
@@ -96,7 +114,13 @@ class EloquentUserProvider implements UserProvider
         $query = $this->createModel()->newQuery();
 
         foreach ($credentials as $key => $value) {
-            if (! Str::contains($key, 'password')) {
+            if (Str::contains($key, 'password')) {
+                continue;
+            }
+
+            if (is_array($value) || $value instanceof Arrayable) {
+                $query->whereIn($key, $value);
+            } else {
                 $query->where($key, $value);
             }
         }

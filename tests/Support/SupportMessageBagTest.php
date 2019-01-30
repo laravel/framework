@@ -1,9 +1,13 @@
 <?php
 
-use Illuminate\Support\MessageBag;
-use Mockery as m;
+namespace Illuminate\Tests\Support;
 
-class SupportMessageBagTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Collection;
+use Illuminate\Support\MessageBag;
+
+class SupportMessageBagTest extends TestCase
 {
     public function tearDown()
     {
@@ -31,6 +35,16 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['bust'], $messages['boom']);
     }
 
+    public function testKeys()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('foo', 'baz');
+        $container->add('boom', 'bust');
+        $this->assertEquals(['foo', 'boom'], $container->keys());
+    }
+
     public function testMessagesMayBeMerged()
     {
         $container = new MessageBag(['username' => ['foo']]);
@@ -46,6 +60,15 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => ['bar', 'baz'], 'bar' => ['foo']], $container->getMessages());
     }
 
+    public function testMessageBagsCanConvertToArrays()
+    {
+        $container = new MessageBag([
+            Collection::make(['foo', 'bar']),
+            Collection::make(['baz', 'qux']),
+        ]);
+        $this->assertSame([['foo', 'bar'], ['baz', 'qux']], $container->getMessages());
+    }
+
     public function testGetReturnsArrayOfMessagesByKey()
     {
         $container = new MessageBag;
@@ -55,14 +78,38 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['bar', 'baz'], $container->get('foo'));
     }
 
+    public function testGetReturnsArrayOfMessagesByImplicitKey()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo.1', 'bar');
+        $container->add('foo.2', 'baz');
+        $this->assertEquals(['foo.1' => ['bar'], 'foo.2' => ['baz']], $container->get('foo.*'));
+    }
+
     public function testFirstReturnsSingleMessage()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('foo', 'baz');
-        $messages = $container->getMessages();
         $this->assertEquals('bar', $container->first('foo'));
+    }
+
+    public function testFirstReturnsEmptyStringIfNoMessagesFound()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $this->assertEquals('', $container->first('foo'));
+    }
+
+    public function testFirstReturnsSingleMessageFromDotKeys()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('name.first', 'jon');
+        $container->add('name.last', 'snow');
+        $this->assertEquals('jon', $container->first('name.*'));
     }
 
     public function testHasIndicatesExistence()
@@ -72,6 +119,50 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
         $container->add('foo', 'bar');
         $this->assertTrue($container->has('foo'));
         $this->assertFalse($container->has('bar'));
+    }
+
+    public function testHasWithKeyNull()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $this->assertTrue($container->has(null));
+    }
+
+    public function testHasAnyIndicatesExistence()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('bar', 'foo');
+        $container->add('boom', 'baz');
+        $this->assertTrue($container->hasAny(['foo', 'bar']));
+        $this->assertTrue($container->hasAny('foo', 'bar'));
+        $this->assertTrue($container->hasAny(['boom', 'baz']));
+        $this->assertTrue($container->hasAny('boom', 'baz'));
+        $this->assertFalse($container->hasAny(['baz']));
+        $this->assertFalse($container->hasAny('baz'));
+        $this->assertFalse($container->hasAny('baz', 'biz'));
+    }
+
+    public function testHasIndicatesExistenceOfAllKeys()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('bar', 'foo');
+        $container->add('boom', 'baz');
+        $this->assertTrue($container->has(['foo', 'bar', 'boom']));
+        $this->assertFalse($container->has(['foo', 'bar', 'boom', 'baz']));
+        $this->assertFalse($container->has(['foo', 'baz']));
+    }
+
+    public function testHasIndicatesNoneExistence()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+
+        $this->assertFalse($container->has('foo'));
     }
 
     public function testAllReturnsAllMessages()
@@ -98,6 +189,16 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
 
         $container->setFormat(':key :message');
         $this->assertEquals('foo bar', $container->first('foo'));
+    }
+
+    public function testUnique()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('foo2', 'bar');
+        $container->add('boom', 'baz');
+        $this->assertEquals([0 => 'bar', 2 => 'baz'], $container->unique());
     }
 
     public function testMessageBagReturnsCorrectArray()
@@ -135,7 +236,6 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
     public function testCountable()
     {
         $container = new MessageBag;
-
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
 
@@ -146,5 +246,68 @@ class SupportMessageBagTest extends PHPUnit_Framework_TestCase
     {
         $messageBag = new MessageBag(['country' => 'Azerbaijan', 'capital' => 'Baku']);
         $this->assertEquals(['country' => ['Azerbaijan'], 'capital' => ['Baku']], $messageBag->getMessages());
+    }
+
+    public function testFirstFindsMessageForWildcardKey()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo.bar', 'baz');
+        $this->assertEquals('baz', $container->first('foo.*'));
+    }
+
+    public function testIsEmptyTrue()
+    {
+        $container = new MessageBag;
+        $this->assertTrue($container->isEmpty());
+    }
+
+    public function testIsEmptyFalse()
+    {
+        $container = new MessageBag;
+        $container->add('foo.bar', 'baz');
+        $this->assertFalse($container->isEmpty());
+    }
+
+    public function testIsNotEmptyTrue()
+    {
+        $container = new MessageBag;
+        $container->add('foo.bar', 'baz');
+        $this->assertTrue($container->isNotEmpty());
+    }
+
+    public function testIsNotEmptyFalse()
+    {
+        $container = new MessageBag;
+        $this->assertFalse($container->isNotEmpty());
+    }
+
+    public function testToString()
+    {
+        $container = new MessageBag;
+        $container->add('foo.bar', 'baz');
+        $this->assertEquals('{"foo.bar":["baz"]}', (string) $container);
+    }
+
+    public function testGetFormat()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $this->assertEquals(':message', $container->getFormat());
+    }
+
+    public function testConstructorUniquenessConsistency()
+    {
+        $messageBag = new MessageBag(['messages' => ['first', 'second', 'third', 'third']]);
+        $messages = $messageBag->getMessages();
+        $this->assertEquals(['first', 'second', 'third'], $messages['messages']);
+
+        $messageBag = new MessageBag;
+        $messageBag->add('messages', 'first');
+        $messageBag->add('messages', 'second');
+        $messageBag->add('messages', 'third');
+        $messageBag->add('messages', 'third');
+        $messages = $messageBag->getMessages();
+        $this->assertEquals(['first', 'second', 'third'], $messages['messages']);
     }
 }

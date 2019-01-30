@@ -3,6 +3,12 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static \Illuminate\Database\Schema\Builder create(string $table, \Closure $callback)
+ * @method static \Illuminate\Database\Schema\Builder drop(string $table)
+ * @method static \Illuminate\Database\Schema\Builder dropIfExists(string $table)
+ * @method static \Illuminate\Database\Schema\Builder table(string $table, \Closure $callback)
+ * @method static void defaultStringLength(int $length)
+ *
  * @see \Illuminate\Database\Schema\Builder
  */
 class Schema extends Facade
@@ -19,12 +25,12 @@ class Schema extends Facade
     }
 
     /**
-     * Get a schema builder instance for the default connection.
+     * Get the registered name of the component.
      *
-     * @return \Illuminate\Database\Schema\Builder
+     * @return string
      */
     protected static function getFacadeAccessor()
     {
-        return static::$app['db']->connection()->getSchemaBuilder();
+        return 'db.schema';
     }
 }

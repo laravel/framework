@@ -1,10 +1,15 @@
 <?php
 
-use Mockery as m;
-use Carbon\Carbon;
-use Illuminate\Console\Scheduling\Event;
+namespace Illuminate\Tests\Console;
 
-class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Application;
+use Illuminate\Console\Scheduling\Event;
+use Illuminate\Console\Scheduling\EventMutex;
+
+class ConsoleScheduledEventTest extends TestCase
 {
     /**
      * The default configuration timezone.
@@ -28,56 +33,78 @@ class ConsoleScheduledEventTest extends PHPUnit_Framework_TestCase
 
     public function testBasicCronCompilation()
     {
-        $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
 
-        $event = new Event('php foo');
-        $this->assertEquals('* * * * * *', $event->getExpression());
+        $event = new Event(m::mock(EventMutex::class), 'php foo');
+        $this->assertEquals('* * * * *', $event->getExpression());
         $this->assertTrue($event->isDue($app));
-        $this->assertTrue($event->skip(function () { return true; })->isDue($app));
-        $this->assertFalse($event->skip(function () { return true; })->filtersPass($app));
+        $this->assertTrue($event->skip(function () {
+            return true;
+        })->isDue($app));
+        $this->assertFalse($event->skip(function () {
+            return true;
+        })->filtersPass($app));
 
-        $event = new Event('php foo');
-        $this->assertEquals('* * * * * *', $event->getExpression());
+        $event = new Event(m::mock(EventMutex::class), 'php foo');
+        $this->assertEquals('* * * * *', $event->getExpression());
         $this->assertFalse($event->environments('local')->isDue($app));
 
-        $event = new Event('php foo');
-        $this->assertEquals('* * * * * *', $event->getExpression());
-        $this->assertFalse($event->when(function () { return false; })->filtersPass($app));
+        $event = new Event(m::mock(EventMutex::class), 'php foo');
+        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertFalse($event->when(function () {
+            return false;
+        })->filtersPass($app));
 
-        $event = new Event('php foo');
-        $this->assertEquals('*/5 * * * * *', $event->everyFiveMinutes()->getExpression());
+        $event = new Event(m::mock(EventMutex::class), 'php foo');
+        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertFalse($event->when(false)->filtersPass($app));
 
-        $event = new Event('php foo');
-        $this->assertEquals('0 0 * * * *', $event->daily()->getExpression());
+        // chained rules should be commutative
+        $eventA = new Event(m::mock(EventMutex::class), 'php foo');
+        $eventB = new Event(m::mock(EventMutex::class), 'php foo');
+        $this->assertEquals(
+            $eventA->daily()->hourly()->getExpression(),
+            $eventB->hourly()->daily()->getExpression());
 
-        $event = new Event('php foo');
-        $this->assertEquals('0 3,15 * * * *', $event->twiceDaily(3, 15)->getExpression());
-
-        $event = new Event('php foo');
-        $this->assertEquals('*/5 * * * 3 *', $event->everyFiveMinutes()->wednesdays()->getExpression());
-
-        $event = new Event('php foo');
-        $this->assertEquals('0 * * * * *', $event->everyFiveMinutes()->hourly()->getExpression());
-
-        $event = new Event('php foo');
-        $this->assertEquals('0 15 4 * * *', $event->monthlyOn(4, '15:00')->getExpression());
+        $eventA = new Event(m::mock(EventMutex::class), 'php foo');
+        $eventB = new Event(m::mock(EventMutex::class), 'php foo');
+        $this->assertEquals(
+            $eventA->weekdays()->hourly()->getExpression(),
+            $eventB->hourly()->weekdays()->getExpression());
     }
 
     public function testEventIsDueCheck()
     {
-        $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
 
-        $event = new Event('php foo');
-        $this->assertEquals('* * * * 4 *', $event->thursdays()->getExpression());
+        $event = new Event(m::mock(EventMutex::class), 'php foo');
+        $this->assertEquals('* * * * 4', $event->thursdays()->getExpression());
         $this->assertTrue($event->isDue($app));
 
-        $event = new Event('php foo');
-        $this->assertEquals('0 19 * * 3 *', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
+        $event = new Event(m::mock(EventMutex::class), 'php foo');
+        $this->assertEquals('0 19 * * 3', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
         $this->assertTrue($event->isDue($app));
+    }
+
+    public function testTimeBetweenChecks()
+    {
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
+        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
+        $app->shouldReceive('environment')->andReturn('production');
+        Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo');
+        $event->timezone('UTC');
+        $this->assertTrue($event->between('8:00', '10:00')->filtersPass($app));
+        $this->assertTrue($event->between('9:00', '9:00')->filtersPass($app));
+        $this->assertFalse($event->between('10:00', '11:00')->filtersPass($app));
+
+        $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));
+        $this->assertTrue($event->unlessBetween('10:00', '11:00')->isDue($app));
     }
 }

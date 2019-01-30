@@ -7,6 +7,17 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 class NullQueue extends Queue implements QueueContract
 {
     /**
+     * Get the size of the queue.
+     *
+     * @param  string  $queue
+     * @return int
+     */
+    public function size($queue = null)
+    {
+        return 0;
+    }
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $job
@@ -35,7 +46,7 @@ class NullQueue extends Queue implements QueueContract
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue

@@ -1,8 +1,13 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Foundation;
 
-class FoundationComposerTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Composer;
+use Illuminate\Filesystem\Filesystem;
+
+class FoundationComposerTest extends TestCase
 {
     public function tearDown()
     {
@@ -13,11 +18,11 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $composer = $this->getMock('Illuminate\Support\Composer', ['getProcess'], [$files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__]);
+        $composer = $this->getMockBuilder(Composer::class)->setMethods(['getProcess'])->setConstructorArgs([$files = m::mock(Filesystem::class), __DIR__])->getMock();
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(true);
-        $process = m::mock('stdClass');
+        $process = m::mock(stdClass::class);
         $composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
-        $process->shouldReceive('setCommandLine')->once()->with($escape.PHP_BINARY.$escape.(defined('HHVM_VERSION') ? ' --php' : '').' composer.phar dump-autoload');
+        $process->shouldReceive('setCommandLine')->once()->with($escape.PHP_BINARY.$escape.' composer.phar dump-autoload');
         $process->shouldReceive('run')->once();
 
         $composer->dumpAutoloads();
@@ -25,9 +30,9 @@ class FoundationComposerTest extends PHPUnit_Framework_TestCase
 
     public function testDumpAutoloadRunsTheCorrectCommandWhenComposerIsntPresent()
     {
-        $composer = $this->getMock('Illuminate\Support\Composer', ['getProcess'], [$files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__]);
+        $composer = $this->getMockBuilder(Composer::class)->setMethods(['getProcess'])->setConstructorArgs([$files = m::mock(Filesystem::class), __DIR__])->getMock();
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(false);
-        $process = m::mock('stdClass');
+        $process = m::mock(stdClass::class);
         $composer->expects($this->once())->method('getProcess')->will($this->returnValue($process));
         $process->shouldReceive('setCommandLine')->once()->with('composer dump-autoload');
         $process->shouldReceive('run')->once();

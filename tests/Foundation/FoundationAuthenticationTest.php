@@ -1,6 +1,9 @@
 <?php
 
+namespace Illuminate\Tests\Foundation;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Application;
@@ -8,7 +11,7 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
 
-class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
+class FoundationAuthenticationTest extends TestCase
 {
     use InteractsWithAuthentication;
 
@@ -51,34 +54,42 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testSeeIsAuthenticated()
+    public function testAssertAuthenticated()
     {
         $this->mockGuard()
             ->shouldReceive('check')
             ->once()
             ->andReturn(true);
 
-        $this->seeIsAuthenticated();
+        $this->assertAuthenticated();
     }
 
-    public function testDontSeeIsAuthenticated()
+    public function testAssertGuest()
     {
         $this->mockGuard()
             ->shouldReceive('check')
             ->once()
             ->andReturn(false);
 
-        $this->dontSeeIsAuthenticated();
+        $this->assertGuest();
     }
 
-    public function testSeeIsAuthenticatedAs()
+    public function testAssertAuthenticatedAs()
     {
+        $expected = m::mock(Authenticatable::class);
+        $expected->shouldReceive('getAuthIdentifier')
+            ->andReturn('1');
+
         $this->mockGuard()
             ->shouldReceive('user')
             ->once()
-            ->andReturn('Someone');
+            ->andReturn($expected);
 
-        $this->seeIsAuthenticatedAs('Someone');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthIdentifier')
+            ->andReturn('1');
+
+        $this->assertAuthenticatedAs($user);
     }
 
     protected function setupProvider(array $credentials)
@@ -101,14 +112,14 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
             ->andReturn($provider);
     }
 
-    public function testSeeCredentials()
+    public function testAssertCredentials()
     {
         $this->setupProvider($this->credentials);
 
-        $this->seeCredentials($this->credentials);
+        $this->assertCredentials($this->credentials);
     }
 
-    public function testDontSeeCredentials()
+    public function testAssertCredentialsMissing()
     {
         $credentials = [
             'email' => 'invalid',
@@ -117,6 +128,6 @@ class FoundationAuthenticationTest extends PHPUnit_Framework_TestCase
 
         $this->setupProvider($credentials);
 
-        $this->dontSeeCredentials($credentials);
+        $this->assertInvalidCredentials($credentials);
     }
 }

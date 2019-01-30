@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 
@@ -22,25 +24,36 @@ abstract class Seeder
     protected $command;
 
     /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    abstract public function run();
-
-    /**
      * Seed the given connection from the given path.
      *
-     * @param  string  $class
+     * @param  array|string  $class
+     * @param  bool  $silent
+     * @return $this
+     */
+    public function call($class, $silent = false)
+    {
+        $classes = Arr::wrap($class);
+
+        foreach ($classes as $class) {
+            if ($silent === false && isset($this->command)) {
+                $this->command->getOutput()->writeln("<info>Seeding:</info> $class");
+            }
+
+            $this->resolve($class)->__invoke();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Silently seed the given connection from the given path.
+     *
+     * @param  array|string  $class
      * @return void
      */
-    public function call($class)
+    public function callSilent($class)
     {
-        $this->resolve($class)->run();
-
-        if (isset($this->command)) {
-            $this->command->getOutput()->writeln("<info>Seeded:</info> $class");
-        }
+        $this->call($class, true);
     }
 
     /**
@@ -90,5 +103,23 @@ abstract class Seeder
         $this->command = $command;
 
         return $this;
+    }
+
+    /**
+     * Run the database seeds.
+     *
+     * @return dynamic
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __invoke()
+    {
+        if (! method_exists($this, 'run')) {
+            throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
+        }
+
+        return isset($this->container)
+                    ? $this->container->call([$this, 'run'])
+                    : $this->run();
     }
 }

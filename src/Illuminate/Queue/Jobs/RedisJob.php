@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Support\Arr;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
@@ -17,11 +16,25 @@ class RedisJob extends Job implements JobContract
     protected $redis;
 
     /**
-     * The Redis job payload.
+     * The Redis raw job payload.
      *
      * @var string
      */
     protected $job;
+
+    /**
+     * The JSON decoded version of "$job".
+     *
+     * @var array
+     */
+    protected $decoded;
+
+    /**
+     * The Redis job payload inside the reserved queue.
+     *
+     * @var string
+     */
+    protected $reserved;
 
     /**
      * Create a new job instance.
@@ -29,25 +42,24 @@ class RedisJob extends Job implements JobContract
      * @param  \Illuminate\Container\Container  $container
      * @param  \Illuminate\Queue\RedisQueue  $redis
      * @param  string  $job
+     * @param  string  $reserved
+     * @param  string  $connectionName
      * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container, RedisQueue $redis, $job, $queue)
+    public function __construct(Container $container, RedisQueue $redis, $job, $reserved, $connectionName, $queue)
     {
+        // The $job variable is the original job JSON as it existed in the ready queue while
+        // the $reserved variable is the raw JSON in the reserved queue. The exact format
+        // of the reserved job is required in order for us to properly delete its data.
         $this->job = $job;
         $this->redis = $redis;
         $this->queue = $queue;
+        $this->reserved = $reserved;
         $this->container = $container;
-    }
+        $this->connectionName = $connectionName;
 
-    /**
-     * Fire the job.
-     *
-     * @return void
-     */
-    public function fire()
-    {
-        $this->resolveAndFire(json_decode($this->getRawBody(), true));
+        $this->decoded = $this->payload();
     }
 
     /**
@@ -69,7 +81,7 @@ class RedisJob extends Job implements JobContract
     {
         parent::delete();
 
-        $this->redis->deleteReserved($this->queue, $this->job);
+        $this->redis->deleteReserved($this->queue, $this);
     }
 
     /**
@@ -82,9 +94,7 @@ class RedisJob extends Job implements JobContract
     {
         parent::release($delay);
 
-        $this->delete();
-
-        $this->redis->release($this->queue, $this->job, $delay, $this->attempts() + 1);
+        $this->redis->deleteAndRelease($this->queue, $this, $delay);
     }
 
     /**
@@ -94,7 +104,7 @@ class RedisJob extends Job implements JobContract
      */
     public function attempts()
     {
-        return Arr::get(json_decode($this->job, true), 'attempts');
+        return ($this->decoded['attempts'] ?? null) + 1;
     }
 
     /**
@@ -104,23 +114,13 @@ class RedisJob extends Job implements JobContract
      */
     public function getJobId()
     {
-        return Arr::get(json_decode($this->job, true), 'id');
+        return $this->decoded['id'] ?? null;
     }
 
     /**
-     * Get the IoC container instance.
+     * Get the underlying Redis factory implementation.
      *
-     * @return \Illuminate\Container\Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    /**
-     * Get the underlying queue driver instance.
-     *
-     * @return \Illuminate\Redis\Database
+     * @return \Illuminate\Queue\RedisQueue
      */
     public function getRedisQueue()
     {
@@ -128,12 +128,12 @@ class RedisJob extends Job implements JobContract
     }
 
     /**
-     * Get the underlying Redis job.
+     * Get the underlying reserved Redis job.
      *
      * @return string
      */
-    public function getRedisJob()
+    public function getReservedJob()
     {
-        return $this->job;
+        return $this->reserved;
     }
 }

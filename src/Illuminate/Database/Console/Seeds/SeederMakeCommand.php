@@ -55,9 +55,9 @@ class SeederMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
-        parent::fire();
+        parent::handle();
 
         $this->composer->dumpAutoloads();
     }
@@ -84,12 +84,12 @@ class SeederMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Parse the name and format according to the root namespace.
+     * Parse the class name and format according to the root namespace.
      *
      * @param  string  $name
      * @return string
      */
-    protected function parseName($name)
+    protected function qualifyClass($name)
     {
         return $name;
     }

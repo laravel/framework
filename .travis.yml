@@ -1,29 +1,41 @@
+dist: xenial
 language: php
-
-php:
-  - 5.6
-  - 7.0
-  - hhvm
 
 env:
   global:
-    - setup=basic
+    - setup=stable
 
 matrix:
+  fast_finish: true
   include:
-    - php: 5.6
+    - php: 7.1
+    - php: 7.1
       env: setup=lowest
-    - php: 5.6
-      env: setup=stable
+    - php: 7.2
+    - php: 7.2
+      env: setup=lowest
+    - php: 7.3
+    - php: 7.3
+      env: setup=lowest
 
-sudo: false
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+services:
+  - memcached
+  - redis-server
+  - mysql
 
 before_install:
+  - phpenv config-rm xdebug.ini || true
+  - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - printf "\n" | pecl install -f redis
   - travis_retry composer self-update
+  - mysql -e 'CREATE DATABASE forge;'
 
 install:
-  - if [[ $setup = 'basic' ]]; then travis_retry composer install --no-interaction --prefer-dist; fi
-  - if [[ $setup = 'stable' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-stable; fi
-  - if [[ $setup = 'lowest' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-lowest --prefer-stable; fi
+  - if [[ $setup = 'stable' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-stable --no-suggest; fi
+  - if [[ $setup = 'lowest' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-lowest --prefer-stable --no-suggest; fi
 
 script: vendor/bin/phpunit

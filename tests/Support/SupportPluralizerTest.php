@@ -1,8 +1,11 @@
 <?php
 
-use Illuminate\Support\Str;
+namespace Illuminate\Tests\Support;
 
-class SupportPluralizerTest extends PHPUnit_Framework_TestCase
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
+
+class SupportPluralizerTest extends TestCase
 {
     public function testBasicSingular()
     {
@@ -12,6 +15,7 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase
     public function testBasicPlural()
     {
         $this->assertEquals('children', Str::plural('child'));
+        $this->assertEquals('cod', Str::plural('cod'));
     }
 
     public function testCaseSensitiveSingularUsage()
@@ -34,5 +38,37 @@ class SupportPluralizerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('MatrixFields', Str::plural('MatrixField'));
         $this->assertEquals('IndexFields', Str::plural('IndexField'));
         $this->assertEquals('VertexFields', Str::plural('VertexField'));
+
+        // This is expected behavior, use "Str::pluralStudly" instead.
+        $this->assertSame('RealHumen', Str::plural('RealHuman'));
+    }
+
+    public function testPluralWithNegativeCount()
+    {
+        $this->assertEquals('test', Str::plural('test', 1));
+        $this->assertEquals('tests', Str::plural('test', 2));
+        $this->assertEquals('test', Str::plural('test', -1));
+        $this->assertEquals('tests', Str::plural('test', -2));
+    }
+
+    public function testPluralStudly()
+    {
+        $this->assertPluralStudly('RealHumans', 'RealHuman');
+        $this->assertPluralStudly('Models', 'Model');
+        $this->assertPluralStudly('VortexFields', 'VortexField');
+        $this->assertPluralStudly('MultipleWordsInOneStrings', 'MultipleWordsInOneString');
+    }
+
+    public function testPluralStudlyWithCount()
+    {
+        $this->assertPluralStudly('RealHuman', 'RealHuman', 1);
+        $this->assertPluralStudly('RealHumans', 'RealHuman', 2);
+        $this->assertPluralStudly('RealHuman', 'RealHuman', -1);
+        $this->assertPluralStudly('RealHumans', 'RealHuman', -2);
+    }
+
+    private function assertPluralStudly($expected, $value, $count = 2)
+    {
+        $this->assertSame($expected, Str::pluralStudly($value, $count));
     }
 }

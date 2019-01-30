@@ -1,0 +1,44 @@
+{
+    "name": "illuminate/notifications",
+    "description": "The Illuminate Notifications package.",
+    "license": "MIT",
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "illuminate/broadcasting": "5.8.*",
+        "illuminate/bus": "5.8.*",
+        "illuminate/container": "5.8.*",
+        "illuminate/contracts": "5.8.*",
+        "illuminate/filesystem": "5.8.*",
+        "illuminate/mail": "5.8.*",
+        "illuminate/queue": "5.8.*",
+        "illuminate/support": "5.8.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Notifications\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.8-dev"
+        }
+    },
+    "suggest": {
+        "illuminate/database": "Required to use the database transport (5.8.*)."
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

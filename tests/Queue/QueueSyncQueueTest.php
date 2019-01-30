@@ -1,8 +1,17 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Queue;
 
-class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
+use Exception;
+use Mockery as m;
+use Illuminate\Queue\SyncQueue;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Queue\Jobs\SyncJob;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\QueueableEntity;
+
+class QueueSyncQueueTest extends TestCase
 {
     public function tearDown()
     {
@@ -13,80 +22,53 @@ class QueueSyncQueueTest extends PHPUnit_Framework_TestCase
     {
         unset($_SERVER['__sync.test']);
 
-        /*
-         * Test Synced Closure
-         */
-        $sync = new Illuminate\Queue\SyncQueue;
-        $container = new Illuminate\Container\Container;
-        $encrypter = new Illuminate\Encryption\Encrypter(str_repeat('b', 16));
-        $container->instance('Illuminate\Contracts\Encryption\Encrypter', $encrypter);
+        $sync = new SyncQueue;
+        $container = new Container;
         $sync->setContainer($container);
-        $sync->setEncrypter($encrypter);
-        $sync->push(function ($job) {
-            $_SERVER['__sync.test'] = true;
-            $job->delete();
-        });
 
-        $this->assertTrue($_SERVER['__sync.test']);
-        unset($_SERVER['__sync.test']);
-
-        /*
-         * Test Synced Class Handler
-         */
-        $sync->push('SyncQueueTestHandler', ['foo' => 'bar']);
-        $this->assertInstanceOf('Illuminate\Queue\Jobs\SyncJob', $_SERVER['__sync.test'][0]);
+        $sync->push(SyncQueueTestHandler::class, ['foo' => 'bar']);
+        $this->assertInstanceOf(SyncJob::class, $_SERVER['__sync.test'][0]);
         $this->assertEquals(['foo' => 'bar'], $_SERVER['__sync.test'][1]);
-    }
-
-    public function testQueueableEntitiesAreSerializedAndResolved()
-    {
-        $sync = new Illuminate\Queue\SyncQueue;
-        $sync->setContainer($container = new Illuminate\Container\Container);
-        $container->instance('Illuminate\Contracts\Queue\EntityResolver', $resolver = m::mock('Illuminate\Contracts\Queue\EntityResolver'));
-        $resolver->shouldReceive('resolve')->once()->with('SyncQueueTestEntity', 1)->andReturn(new SyncQueueTestEntity);
-        $sync->push('SyncQueueTestHandler', ['entity' => new SyncQueueTestEntity]);
-
-        $this->assertInstanceOf('SyncQueueTestEntity', $_SERVER['__sync.test'][1]['entity']);
-    }
-
-    public function testQueueableEntitiesAreSerializedAndResolvedWhenPassedAsSingleEntities()
-    {
-        $sync = new Illuminate\Queue\SyncQueue;
-        $sync->setContainer($container = new Illuminate\Container\Container);
-        $container->instance('Illuminate\Contracts\Queue\EntityResolver', $resolver = m::mock('Illuminate\Contracts\Queue\EntityResolver'));
-        $resolver->shouldReceive('resolve')->once()->with('SyncQueueTestEntity', 1)->andReturn(new SyncQueueTestEntity);
-        $sync->push('SyncQueueTestHandler', new SyncQueueTestEntity);
-
-        $this->assertInstanceOf('SyncQueueTestEntity', $_SERVER['__sync.test'][1]);
     }
 
     public function testFailedJobGetsHandledWhenAnExceptionIsThrown()
     {
         unset($_SERVER['__sync.failed']);
 
-        $sync = new Illuminate\Queue\SyncQueue;
-        $container = new Illuminate\Container\Container;
-        $encrypter = new Illuminate\Encryption\Encrypter(str_repeat('c', 16));
-        $container->instance('Illuminate\Contracts\Encryption\Encrypter', $encrypter);
-        $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('fire')->times(3);
+        $sync = new SyncQueue;
+        $container = new Container;
+        Container::setInstance($container);
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->times(3);
         $container->instance('events', $events);
+        $container->instance(Dispatcher::class, $events);
         $sync->setContainer($container);
-        $sync->setEncrypter($encrypter);
 
         try {
-            $sync->push('FailingSyncQueueTestHandler', ['foo' => 'bar']);
+            $sync->push(FailingSyncQueueTestHandler::class, ['foo' => 'bar']);
         } catch (Exception $e) {
             $this->assertTrue($_SERVER['__sync.failed']);
         }
+
+        Container::setInstance();
     }
 }
 
-class SyncQueueTestEntity implements Illuminate\Contracts\Queue\QueueableEntity
+class SyncQueueTestEntity implements QueueableEntity
 {
     public function getQueueableId()
     {
         return 1;
+    }
+
+    public function getQueueableConnection()
+    {
+        //
+    }
+
+    public function getQueueableRelations()
+    {
+        //
     }
 }
 
@@ -102,7 +84,7 @@ class FailingSyncQueueTestHandler
 {
     public function fire($job, $data)
     {
-        throw new Exception();
+        throw new Exception;
     }
 
     public function failed()

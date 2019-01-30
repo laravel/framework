@@ -31,4 +31,4 @@ $queue->push('SendEmail', array('message' => $message));
 Queue::push('SendEmail', array('message' => $message));
 ```
 
-For further documentation on using the queue, consult the [Laravel framework documentation](http://laravel.com/docs).
+For further documentation on using the queue, consult the [Laravel framework documentation](https://laravel.com/docs).

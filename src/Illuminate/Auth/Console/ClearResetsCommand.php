@@ -25,7 +25,7 @@ class ClearResetsCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $this->laravel['auth.password']->broker($this->argument('name'))->getRepository()->deleteExpired();
 

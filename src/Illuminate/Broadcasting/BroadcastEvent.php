@@ -4,49 +4,49 @@ namespace Illuminate\Broadcasting;
 
 use ReflectionClass;
 use ReflectionProperty;
-use Illuminate\Contracts\Queue\Job;
+use Illuminate\Support\Arr;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 
-class BroadcastEvent
+class BroadcastEvent implements ShouldQueue
 {
+    use Queueable;
+
     /**
-     * The broadcaster implementation.
+     * The event instance.
      *
-     * @var \Illuminate\Contracts\Broadcasting\Broadcaster
+     * @var mixed
      */
-    protected $broadcaster;
+    public $event;
 
     /**
      * Create a new job handler instance.
      *
-     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
+     * @param  mixed  $event
      * @return void
      */
-    public function __construct(Broadcaster $broadcaster)
+    public function __construct($event)
     {
-        $this->broadcaster = $broadcaster;
+        $this->event = $event;
     }
 
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  array  $data
+     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
      * @return void
      */
-    public function fire(Job $job, array $data)
+    public function handle(Broadcaster $broadcaster)
     {
-        $event = unserialize($data['event']);
+        $name = method_exists($this->event, 'broadcastAs')
+                ? $this->event->broadcastAs() : get_class($this->event);
 
-        $name = method_exists($event, 'broadcastAs')
-                ? $event->broadcastAs() : get_class($event);
-
-        $this->broadcaster->broadcast(
-            $event->broadcastOn(), $name, $this->getPayloadFromEvent($event)
+        $broadcaster->broadcast(
+            Arr::wrap($this->event->broadcastOn()), $name,
+            $this->getPayloadFromEvent($this->event)
         );
-
-        $job->delete();
     }
 
     /**
@@ -58,7 +58,9 @@ class BroadcastEvent
     protected function getPayloadFromEvent($event)
     {
         if (method_exists($event, 'broadcastWith')) {
-            return $event->broadcastWith();
+            return array_merge(
+                $event->broadcastWith(), ['socket' => data_get($event, 'socket')]
+            );
         }
 
         $payload = [];
@@ -66,6 +68,8 @@ class BroadcastEvent
         foreach ((new ReflectionClass($event))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             $payload[$property->getName()] = $this->formatProperty($property->getValue($event));
         }
+
+        unset($payload['broadcastQueue']);
 
         return $payload;
     }
@@ -83,5 +87,25 @@ class BroadcastEvent
         }
 
         return $value;
+    }
+
+    /**
+     * Get the display name for the queued job.
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        return get_class($this->event);
+    }
+
+    /**
+     * Prepare the instance for cloning.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->event = clone $this->event;
     }
 }

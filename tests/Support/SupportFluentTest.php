@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Support\Fluent;
+namespace Illuminate\Tests\Support;
 
-class SupportFluentTest extends PHPUnit_Framework_TestCase
+use ArrayIterator;
+use ReflectionObject;
+use IteratorAggregate;
+use Illuminate\Support\Fluent;
+use PHPUnit\Framework\TestCase;
+
+class SupportFluentTest extends TestCase
 {
     public function testAttributesAreSetByConstructor()
     {
@@ -17,7 +23,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($array, $fluent->getAttributes());
     }
 
-    public function testAttributesAreSetByConstructorGivenStdClass()
+    public function testAttributesAreSetByConstructorGivenstdClass()
     {
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent((object) $array);
@@ -53,6 +59,18 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
         $this->assertNull($fluent->foo);
     }
 
+    public function testArrayAccessToAttributes()
+    {
+        $fluent = new Fluent(['attributes' => '1']);
+
+        $this->assertTrue(isset($fluent['attributes']));
+        $this->assertEquals($fluent['attributes'], 1);
+
+        $fluent->attributes();
+
+        $this->assertTrue($fluent['attributes']);
+    }
+
     public function testMagicMethodsCanBeUsedToSetAttributes()
     {
         $fluent = new Fluent;
@@ -64,7 +82,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Taylor', $fluent->name);
         $this->assertTrue($fluent->developer);
         $this->assertEquals(25, $fluent->age);
-        $this->assertInstanceOf('Illuminate\Support\Fluent', $fluent->programmer());
+        $this->assertInstanceOf(Fluent::class, $fluent->programmer());
     }
 
     public function testIssetMagicMethod()
@@ -89,7 +107,7 @@ class SupportFluentTest extends PHPUnit_Framework_TestCase
 
     public function testToJsonEncodesTheToArrayResult()
     {
-        $fluent = $this->getMock('Illuminate\Support\Fluent', ['toArray']);
+        $fluent = $this->getMockBuilder(Fluent::class)->setMethods(['toArray'])->getMock();
         $fluent->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
         $results = $fluent->toJson();
 
@@ -103,11 +121,11 @@ class FluentArrayIteratorStub implements IteratorAggregate
 
     public function __construct(array $items = [])
     {
-        $this->items = (array) $items;
+        $this->items = $items;
     }
 
     public function getIterator()
     {
-        return new \ArrayIterator($this->items);
+        return new ArrayIterator($this->items);
     }
 }

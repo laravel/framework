@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Database\Schema\PostgresBuilder;
 use Doctrine\DBAL\Driver\PDOPgSql\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
@@ -17,6 +18,20 @@ class PostgresConnection extends Connection
     protected function getDefaultQueryGrammar()
     {
         return $this->withTablePrefix(new QueryGrammar);
+    }
+
+    /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \Illuminate\Database\Schema\PostgresBuilder
+     */
+    public function getSchemaBuilder()
+    {
+        if (is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+
+        return new PostgresBuilder($this);
     }
 
     /**

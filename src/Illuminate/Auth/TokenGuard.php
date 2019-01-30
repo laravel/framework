@@ -18,7 +18,7 @@ class TokenGuard implements Guard
     protected $request;
 
     /**
-     * The name of the field on the request containing the API token.
+     * The name of the query string item from the request containing the API token.
      *
      * @var string
      */
@@ -36,14 +36,16 @@ class TokenGuard implements Guard
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
      * @param  \Illuminate\Http\Request  $request
+     * @param  string  $inputKey
+     * @param  string  $storageKey
      * @return void
      */
-    public function __construct(UserProvider $provider, Request $request)
+    public function __construct(UserProvider $provider, Request $request, $inputKey = 'api_token', $storageKey = 'api_token')
     {
         $this->request = $request;
         $this->provider = $provider;
-        $this->inputKey = 'api_token';
-        $this->storageKey = 'api_token';
+        $this->inputKey = $inputKey;
+        $this->storageKey = $storageKey;
     }
 
     /**
@@ -78,9 +80,13 @@ class TokenGuard implements Guard
      *
      * @return string
      */
-    protected function getTokenForRequest()
+    public function getTokenForRequest()
     {
-        $token = $this->request->input($this->inputKey);
+        $token = $this->request->query($this->inputKey);
+
+        if (empty($token)) {
+            $token = $this->request->input($this->inputKey);
+        }
 
         if (empty($token)) {
             $token = $this->request->bearerToken();
@@ -101,6 +107,10 @@ class TokenGuard implements Guard
      */
     public function validate(array $credentials = [])
     {
+        if (empty($credentials[$this->inputKey])) {
+            return false;
+        }
+
         $credentials = [$this->storageKey => $credentials[$this->inputKey]];
 
         if ($this->provider->retrieveByCredentials($credentials)) {

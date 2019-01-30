@@ -1,0 +1,136 @@
+<?php
+
+namespace Illuminate\Tests\Database;
+
+use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
+class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
+{
+    public function setUp()
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $this->createSchema();
+    }
+
+    /**
+     * Setup the database schema.
+     *
+     * @return void
+     */
+    public function createSchema()
+    {
+        $this->schema()->create('users', function ($table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+        });
+
+        $this->schema()->create('articles', function ($table) {
+            $table->increments('aid');
+            $table->string('title');
+        });
+
+        $this->schema()->create('article_user', function ($table) {
+            $table->integer('article_id')->unsigned();
+            $table->foreign('article_id')->references('aid')->on('articles');
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users');
+        });
+    }
+
+    public function testBelongsToChunkById()
+    {
+        $this->seedData();
+
+        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
+        $i = 0;
+
+        $user->articles()->chunkById(1, function (Collection $collection) use (&$i) {
+            $i++;
+            $this->assertTrue($collection->first()->aid == $i);
+        });
+
+        $this->assertTrue($i === 3);
+    }
+
+    /**
+     * Tear down the database schema.
+     *
+     * @return void
+     */
+    public function tearDown()
+    {
+        $this->schema()->drop('users');
+        $this->schema()->drop('articles');
+        $this->schema()->drop('article_user');
+    }
+
+    /**
+     * Helpers...
+     */
+    protected function seedData()
+    {
+        $user = BelongsToManyChunkByIdTestTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        BelongsToManyChunkByIdTestTestArticle::query()->insert([
+            ['aid' => 1, 'title' => 'Another title'],
+            ['aid' => 2, 'title' => 'Another title'],
+            ['aid' => 3, 'title' => 'Another title'],
+        ]);
+
+        $user->articles()->sync([3, 1, 2]);
+    }
+
+    /**
+     * Get a database connection instance.
+     *
+     * @return Connection
+     */
+    protected function connection()
+    {
+        return Eloquent::getConnectionResolver()->connection();
+    }
+
+    /**
+     * Get a schema builder instance.
+     *
+     * @return Schema\Builder
+     */
+    protected function schema()
+    {
+        return $this->connection()->getSchemaBuilder();
+    }
+}
+
+class BelongsToManyChunkByIdTestTestUser extends Eloquent
+{
+    protected $table = 'users';
+    protected $fillable = ['id', 'email'];
+    public $timestamps = false;
+
+    public function articles()
+    {
+        return $this->belongsToMany(BelongsToManyChunkByIdTestTestArticle::class, 'article_user', 'user_id', 'article_id');
+    }
+}
+
+class BelongsToManyChunkByIdTestTestArticle extends Eloquent
+{
+    protected $primaryKey = 'aid';
+    protected $table = 'articles';
+    protected $keyType = 'string';
+    public $incrementing = false;
+    public $timestamps = false;
+    protected $fillable = ['aid', 'title'];
+}

@@ -26,32 +26,16 @@ class SyncJob extends Job implements JobContract
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  string  $payload
+     * @param  string  $connectionName
+     * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container, $payload)
+    public function __construct(Container $container, $payload, $connectionName, $queue)
     {
+        $this->queue = $queue;
         $this->payload = $payload;
         $this->container = $container;
-    }
-
-    /**
-     * Fire the job.
-     *
-     * @return void
-     */
-    public function fire()
-    {
-        $this->resolveAndFire(json_decode($this->payload, true));
-    }
-
-    /**
-     * Get the raw body string for the job.
-     *
-     * @return string
-     */
-    public function getRawBody()
-    {
-        return $this->payload;
+        $this->connectionName = $connectionName;
     }
 
     /**
@@ -83,5 +67,25 @@ class SyncJob extends Job implements JobContract
     public function getJobId()
     {
         return '';
+    }
+
+    /**
+     * Get the raw body string for the job.
+     *
+     * @return string
+     */
+    public function getRawBody()
+    {
+        return $this->payload;
+    }
+
+    /**
+     * Get the name of the queue the job belongs to.
+     *
+     * @return string
+     */
+    public function getQueue()
+    {
+        return 'sync';
     }
 }

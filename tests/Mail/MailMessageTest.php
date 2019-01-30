@@ -1,9 +1,14 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Mail\Message;
+namespace Illuminate\Tests\Mail;
 
-class MailMessageTest extends PHPUnit_Framework_TestCase
+use stdClass;
+use Mockery as m;
+use Swift_Mime_Message;
+use Illuminate\Mail\Message;
+use PHPUnit\Framework\TestCase;
+
+class MailMessageTest extends TestCase
 {
     /**
      * @var \Mockery::mock
@@ -95,9 +100,9 @@ class MailMessageTest extends PHPUnit_Framework_TestCase
 
     public function testBasicAttachment()
     {
-        $swift = m::mock('StdClass');
-        $message = $this->getMock('Illuminate\Mail\Message', ['createAttachmentFromPath'], [$swift]);
-        $attachment = m::mock('StdClass');
+        $swift = m::mock(stdClass::class);
+        $message = $this->getMockBuilder(Message::class)->setMethods(['createAttachmentFromPath'])->setConstructorArgs([$swift])->getMock();
+        $attachment = m::mock(stdClass::class);
         $message->expects($this->once())->method('createAttachmentFromPath')->with($this->equalTo('foo.jpg'))->will($this->returnValue($attachment));
         $swift->shouldReceive('attach')->once()->with($attachment);
         $attachment->shouldReceive('setContentType')->once()->with('image/jpeg');
@@ -107,9 +112,9 @@ class MailMessageTest extends PHPUnit_Framework_TestCase
 
     public function testDataAttachment()
     {
-        $swift = m::mock('StdClass');
-        $message = $this->getMock('Illuminate\Mail\Message', ['createAttachmentFromData'], [$swift]);
-        $attachment = m::mock('StdClass');
+        $swift = m::mock(stdClass::class);
+        $message = $this->getMockBuilder(Message::class)->setMethods(['createAttachmentFromData'])->setConstructorArgs([$swift])->getMock();
+        $attachment = m::mock(stdClass::class);
         $message->expects($this->once())->method('createAttachmentFromData')->with($this->equalTo('foo'), $this->equalTo('name'))->will($this->returnValue($attachment));
         $swift->shouldReceive('attach')->once()->with($attachment);
         $attachment->shouldReceive('setContentType')->once()->with('image/jpeg');
