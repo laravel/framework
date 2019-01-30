@@ -823,15 +823,15 @@ class Blueprint
     }
 
     /**
-     * Create a new generated virtual column on the table.
+     * Create a new generated computed column on the table.
      *
      * @param  string  $column
-     * @param  string  $formula
+     * @param  string  $expression
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function virtual($column, $formula)
+    public function computed($column, $expression)
     {
-        return $this->addColumn('virtual', $column, compact('formula'));
+        return $this->addColumn('computed', $column, compact('expression'));
     }
 
     /**

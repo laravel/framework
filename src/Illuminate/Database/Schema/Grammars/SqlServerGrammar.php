@@ -734,14 +734,14 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a generated virtual column type.
+     * Create the column definition for a generated computed column type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string|null
      */
-    protected function typeVirtual(Fluent $column)
+    protected function typeComputed(Fluent $column)
     {
-        return "as ({$column->formula})";
+        return "as ({$column->expression})";
     }
 
     /**
@@ -767,7 +767,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
-        if ($column->type !== 'virtual') {
+        if ($column->type !== 'computed') {
             return $column->nullable ? ' null' : ' not null';
         }
     }

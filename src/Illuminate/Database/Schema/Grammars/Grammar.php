@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use RuntimeException;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
@@ -188,6 +189,18 @@ abstract class Grammar extends BaseGrammar
         return array_map(function ($value) use ($prefix) {
             return $prefix.' '.$value;
         }, $values);
+    }
+
+    /**
+     * Create the column definition for a generated computed column type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     *
+     * @throws \RuntimeException
+     */
+    protected function typeComputed(Fluent $column)
+    {
+        throw new RuntimeException('The database driver in use does not support the computed type.');
     }
 
     /**
