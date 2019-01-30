@@ -58,6 +58,13 @@ class Gate implements GateContract
     protected $afterCallbacks = [];
 
     /**
+     * All of the defined abilities with class@method notation.
+     *
+     * @var array
+     */
+    protected $atNotation = [];
+
+    /**
      * Create a new gate instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -112,6 +119,7 @@ class Gate implements GateContract
         if (is_callable($callback)) {
             $this->abilities[$ability] = $callback;
         } elseif (is_string($callback)) {
+            $this->atNotation[$ability] = $callback;
             $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
         } else {
             throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
@@ -482,6 +490,14 @@ class Gate implements GateContract
             ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
             $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
             return $callback;
+        }
+
+        if (isset($this->atNotation[$ability])) {
+            [$class, $method] = Str::parseCallback($this->atNotation[$ability]);
+            $method = $method ?: '__invoke';
+            if ($this->canBeCalledWithUser($user, $class, $method)) {
+                return $this->abilities[$ability];
+            }
         }
 
         if (isset($this->abilities[$ability]) &&

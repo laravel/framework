@@ -665,6 +665,70 @@ class AuthAccessGateTest extends TestCase
             [$noAbilities, [], true],
         ];
     }
+
+    public function test_classes_can_be_defined_as_callbacks_using_at_notation_for_guests()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->define('foo', AccessGateTestClassForGuest::class.'@foo');
+        $gate->define('obj_foo', [new AccessGateTestClassForGuest, 'foo']);
+        $gate->define('static_foo', [AccessGateTestClassForGuest::class, 'staticFoo']);
+        $gate->define('static_@foo', AccessGateTestClassForGuest::class.'@staticFoo');
+        $gate->define('bar', AccessGateTestClassForGuest::class.'@bar');
+        $gate->define('invokable', AccessGateTestGuestInvokableClass::class);
+        $gate->define('nullable_invokable', AccessGateTestGuestNullableInvokable::class);
+        $gate->define('absent_invokable', 'someAbsentClass');
+
+        AccessGateTestClassForGuest::$calledMethod = '';
+
+        $this->assertTrue($gate->check('foo'));
+        $this->assertEquals('foo was called', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('static_foo'));
+        $this->assertEquals('static foo was invoked', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('bar'));
+        $this->assertEquals('bar got invoked', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('static_@foo'));
+        $this->assertEquals('static foo was invoked', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('invokable'));
+        $this->assertEquals('__invoke was called', AccessGateTestGuestInvokableClass::$calledMethod);
+
+        $this->assertTrue($gate->check('nullable_invokable'));
+        $this->assertEquals('Nullable __invoke was called', AccessGateTestGuestNullableInvokable::$calledMethod);
+
+        $this->assertFalse($gate->check('absent_invokable'));
+    }
+}
+
+class AccessGateTestClassForGuest
+{
+    public static $calledMethod = null;
+
+    public function foo($user = null)
+    {
+        static::$calledMethod = 'foo was called';
+
+        return true;
+    }
+
+    public static function staticFoo($user = null)
+    {
+        static::$calledMethod = 'static foo was invoked';
+
+        return true;
+    }
+
+    public function bar(?stdClass $user)
+    {
+        static::$calledMethod = 'bar got invoked';
+
+        return true;
+    }
 }
 
 class AccessGateTestStaticClass
@@ -688,6 +752,30 @@ class AccessGateTestInvokableClass
     public function __invoke($user)
     {
         return $user->id === 1;
+    }
+}
+
+class AccessGateTestGuestInvokableClass
+{
+    public static $calledMethod = null;
+
+    public function __invoke($user = null)
+    {
+        static::$calledMethod = '__invoke was called';
+
+        return true;
+    }
+}
+
+class AccessGateTestGuestNullableInvokable
+{
+    public static $calledMethod = null;
+
+    public function __invoke(?StdClass $user)
+    {
+        static::$calledMethod = 'Nullable __invoke was called';
+
+        return true;
     }
 }
 
