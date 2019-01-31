@@ -600,7 +600,7 @@ class Builder
         if (empty($column)) {
             throw new InvalidArgumentException('Columns must not be empty');
         }
-        
+
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
