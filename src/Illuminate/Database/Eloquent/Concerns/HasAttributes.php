@@ -780,7 +780,15 @@ trait HasAttributes
         // and format a Carbon object from this timestamp. This allows flexibility
         // when defining your date fields as they might be UNIX timestamps here.
         if (is_numeric($value)) {
-            return Carbon::createFromTimestamp($value);
+            // If this value is longer than 10 bytes, we will assume it is a timestamp
+            // in millisecond.
+            if (strlen($value) > 10) {
+                // This could be happen when you are using datetime field in sqlite3,
+                // which is save the datetime value as a timestamp in millisecond.
+                return Carbon::createFromTimestampMs($value);
+            } else {
+                return Carbon::createFromTimestamp($value);
+            }
         }
 
         // If the value is in simply year, month, day format, we will instantiate the
