@@ -233,7 +233,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create unique index "bar" on "users" ("foo") where "bar" is not null', $statements[0]);
+        $this->assertEquals('create unique index "bar" on "users" ("foo") where "foo" is not null', $statements[0]);
     }
 
     public function testAddingIndex()

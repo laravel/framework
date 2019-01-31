@@ -109,7 +109,7 @@ class SqlServerGrammar extends Grammar
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $this->columnize($command->columns),
-            $this->wrap($command->index)
+            implode(' is not null and ', $command->columns)
         );
     }
 
