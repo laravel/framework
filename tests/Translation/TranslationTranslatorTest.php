@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Translation;
 
-use Illuminate\Support\Facades\Bus;
+use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Support\Collection;
 use Illuminate\Translation\Events\KeyNotTranslated;
+use Illuminate\Translation\MessageSelector;
+use Illuminate\Translation\Translator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
-use Illuminate\Translation\Translator;
-use Illuminate\Translation\MessageSelector;
-use Illuminate\Contracts\Translation\Loader;
 
 class TranslationTranslatorTest extends TestCase
 {
