@@ -103,6 +103,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         if ($fallback === $key) {
             event(new KeyNotTranslated($key));
         }
+
         return $fallback;
     }
 
