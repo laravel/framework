@@ -1136,8 +1136,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapInto($class)
     {
-        return $this->map(function ($value, $key) use ($class) {
-            return new $class($value, $key);
+        return $this->map(function ($value) use ($class) {
+            return new $class($value);
         });
     }
 
