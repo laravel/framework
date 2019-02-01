@@ -16,8 +16,6 @@ trait ConditionallyLoadsAttributes
     {
         $index = -1;
 
-        $numericKeys = array_values($data) === $data;
-
         foreach ($data as $key => $value) {
             $index++;
 
@@ -28,7 +26,7 @@ trait ConditionallyLoadsAttributes
             }
 
             if (is_numeric($key) && $value instanceof MergeValue) {
-                return $this->mergeData($data, $index, $this->filter($value->data), $numericKeys);
+                return $this->mergeData($data, $index, $this->filter($value->data));
             }
 
             if ($value instanceof self && is_null($value->resource)) {
@@ -36,7 +34,22 @@ trait ConditionallyLoadsAttributes
             }
         }
 
-        return $this->removeMissingValues($data, $numericKeys);
+        return $this->removeMissingValues($data, $this->hasNumericKeys($data));
+    }
+
+    /**
+     * Check if the given data has only numeric keys.
+     *
+     * @param  array  $data
+     * @return bool
+     */
+    protected function hasNumericKeys($data)
+    {
+        if (property_exists($this, 'preserveKeys') && ($this->preserveKeys === true)) {
+            return array_values($data) === $data;
+        }
+
+        return ! empty($data) && is_numeric(array_keys($data)[0]);
     }
 
     /**
@@ -45,16 +58,15 @@ trait ConditionallyLoadsAttributes
      * @param  array  $data
      * @param  int  $index
      * @param  array  $merge
-     * @param  bool  $numericKeys
      * @return array
      */
-    protected function mergeData($data, $index, $merge, $numericKeys)
+    protected function mergeData($data, $index, $merge)
     {
-        if ($numericKeys) {
+        if ($this->hasNumericKeys($merge)) {
             return $this->removeMissingValues(array_merge(
                 array_merge(array_slice($data, 0, $index, true), $merge),
                 $this->filter(array_values(array_slice($data, $index + 1, null, true)))
-            ), $numericKeys);
+            ), true);
         }
 
         return $this->removeMissingValues(array_slice($data, 0, $index, true) +
@@ -80,8 +92,7 @@ trait ConditionallyLoadsAttributes
             }
         }
 
-        return ! empty($data) && is_numeric(array_keys($data)[0])
-                        ? array_values($data) : $data;
+        return $numericKeys ? array_values($data) : $data;
     }
 
     /**

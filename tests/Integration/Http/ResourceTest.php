@@ -19,6 +19,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
@@ -587,6 +588,25 @@ class ResourceTest extends TestCase
 
         $this->assertCount(2, $collection);
         $this->assertSame(2, count($collection));
+    }
+
+    public function test_keys_are_preserved_if_flagged()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithPreservedKeys(new Post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'array' => [1 => 'foo', 2 => 'bar'],
+            ],
+        ]);
     }
 
     public function test_leading_merge__keyed_value_is_merged_correctly()
