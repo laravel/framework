@@ -10,6 +10,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
+use Illuminate\Translation\Events\KeyNotTranslated;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
@@ -98,7 +99,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function trans($key, array $replace = [], $locale = null)
     {
-        return $this->get($key, $replace, $locale);
+        $fallback = $this->get($key, $replace, $locale);
+        if ($fallback === $key) {
+            event(new KeyNotTranslated($key));
+        }
+        return $fallback;
     }
 
     /**

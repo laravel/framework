@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Translation;
 
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Translation\Events\KeyNotTranslated;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
@@ -176,6 +178,20 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
         $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
+    }
+
+    public function testKeyNotTranslatedEventDispatched()
+    {
+        $key = 'not_exists_key';
+
+        app()->instance('events', $events = m::mock(\stdClass::class));
+        $events->shouldReceive('dispatch')->with(KeyNotTranslated::class)->andReturn([]);
+
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->with('en', $key, '*')->andReturn($key);
+
+        $fallback = $t->trans($key);
+        $this->assertSame($fallback, $key);
     }
 
     protected function getLoader()
