@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest;
 
+use stdClass;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use stdClass;
 
 /**
  * @group integration
@@ -66,7 +66,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
             'collection_as_json_field' => new Collection(['key1' => 'value1']),
         ]);
 
-        $this->assertInstanceOf(Collection::class,  $user->toArray()['collection_as_json_field']);
+        $this->assertInstanceOf(Collection::class, $user->toArray()['collection_as_json_field']);
         $this->assertEquals('value1', $user->toArray()['collection_as_json_field']->get('key1'));
     }
 }
