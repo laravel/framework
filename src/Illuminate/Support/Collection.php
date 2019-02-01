@@ -1009,6 +1009,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the last item by the given key value pair.
+     *
+     * @param  string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function lastWhere($key, $operator, $value = null)
+    {
+        return $this->last($this->operatorForWhere(...func_get_args()));
+    }
+
+    /**
      * Get the values of a given key.
      *
      * @param  string|array  $value
