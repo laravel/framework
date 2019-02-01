@@ -3,14 +3,14 @@
 namespace Illuminate\Translation;
 
 use Countable;
-use Illuminate\Contracts\Translation\Loader;
-use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Translation\Events\KeyNotTranslated;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
