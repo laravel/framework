@@ -118,7 +118,7 @@ trait MakesHttpRequests
      */
     public function withoutMiddlewareGroups($groups = null)
     {
-        if (is_null($groups) || !is_array($groups)) {
+        if (is_null($groups) || ! is_array($groups)) {
             return $this;
         }
 
@@ -126,7 +126,7 @@ trait MakesHttpRequests
         $middlewares = $kernel->getMiddlewareGroups();
 
         foreach ($groups as $group) {
-            if (!isset($middlewares[$group])) {
+            if (! isset($middlewares[$group])) {
                 continue;
             }
 
