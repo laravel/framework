@@ -97,6 +97,20 @@ class SupportCollectionTest extends TestCase
         $result = $data->last(null, 'default');
         $this->assertEquals('default', $result);
     }
+    
+    public function testLastWhere()
+    {
+        $data = new Collection([
+            ['material' => 'plastic', 'type' => 'pen'],
+            ['material' => 'paper', 'type' => 'book'],
+            ['material' => 'rubber', 'type' => 'gasket'],
+            ['material' => 'plastic', 'type' => 'trashcan'],
+        ]);
+        $this->assertEquals('trashcan', $data->lastWhere('material', 'plastic')['type']);
+        $this->assertEquals('gasket', $data->lastWhere('material', 'rubber')['type']);
+        $this->assertNull($data->lastWhere('material', 'nonexistant'));
+        $this->assertNull($data->lastWhere('nonexistant', 'key'));
+    }
 
     public function testPopReturnsAndRemovesLastItemInCollection()
     {
