@@ -14,7 +14,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Support\Facades\Route prefix(string  $prefix)
  * @method static \Illuminate\Routing\PendingResourceRegistration resource(string $name, string $controller, array $options = [])
  * @method static \Illuminate\Routing\PendingResourceRegistration apiResource(string $name, string $controller, array $options = [])
- * @method static \Illuminate\Support\Facades\Route middleware(array|string|null $middleware)
+ * @method static \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
  * @method static \Illuminate\Support\Facades\Route substituteBindings(\Illuminate\Support\Facades\Route $route)
  * @method static void substituteImplicitBindings(\Illuminate\Support\Facades\Route $route)
  * @method static \Illuminate\Support\Facades\Route as(string $value)
