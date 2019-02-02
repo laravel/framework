@@ -86,10 +86,14 @@ class Application extends SymfonyApplication implements ApplicationContract
             )
         );
 
+        $start = microtime(true);
+
         $exitCode = parent::run($input, $output);
 
+        $time = $this->getElapsedTime($start);
+
         $this->events->dispatch(
-            new Events\CommandFinished($commandName, $input, $output, $exitCode)
+            new Events\CommandFinished($commandName, $input, $output, $exitCode, $time)
         );
 
         return $exitCode;
@@ -292,5 +296,16 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function getLaravel()
     {
         return $this->laravel;
+    }
+
+    /**
+     * Get the elapsed time since a given starting point.
+     *
+     * @param  float  $start
+     * @return float
+     */
+    protected function getElapsedTime($start)
+    {
+        return round((microtime(true) - $start) * 1000, 2);
     }
 }
