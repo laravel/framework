@@ -213,17 +213,17 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
 
-        $counter = 0;
-        $callback1 = function () use (&$counter) {
-            $counter++;
+        $result = [];
+        $callback1 = function () use (&$result) {
+            $result[] = 1;
         };
 
-        $callback2 = function () use (&$counter) {
-            $counter++;
+        $callback2 = function () use (&$result) {
+            $result[] = 2;
         };
 
-        $callback3 = function () use (&$counter) {
-            $counter++;
+        $callback3 = function () use (&$result) {
+            $result[] = 3;
         };
 
         $app->terminating($callback1);
@@ -232,7 +232,7 @@ class FoundationApplicationTest extends TestCase
 
         $app->terminate();
 
-        $this->assertEquals(3, $counter);
+        $this->assertEquals([1, 2, 3], $result);
     }
 
     public function testAfterBootstrappingAddsClosure()
