@@ -79,14 +79,13 @@ trait ConditionallyLoadsAttributes
                 $value->resource instanceof PotentiallyMissing &&
                 $value->isMissing())) {
                 unset($data[$key]);
+            } else {
+                $numericKeys = $numericKeys && is_numeric($key);
             }
-            $numericKeys = $numericKeys && is_numeric($key);
         }
 
         if (property_exists($this, 'preserveKeys') && $this->preserveKeys === true) {
-            $values = array_values($data);
-
-            return $values === $data ? $values : $data;
+            return $data;
         }
 
         return $numericKeys ? array_values($data) : $data;

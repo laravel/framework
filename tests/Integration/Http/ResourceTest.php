@@ -878,6 +878,27 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function test_it_will_return_as_an_array_when_string_keys_are_stripped()
+    {
+        $this->assertJsonResourceResponse([
+            1 => 'John',
+            2 => 'Hank',
+            'foo' => new MissingValue,
+        ], ['data' => ['John', 'Hank']]);
+
+        $this->assertJsonResourceResponse([
+            1 => 'John',
+            'foo' => new MissingValue,
+            3 => 'Hank',
+        ], ['data' => ['John', 'Hank']]);
+
+        $this->assertJsonResourceResponse([
+            'foo' => new MissingValue,
+            2 => 'John',
+            3 => 'Hank',
+        ], ['data' => ['John', 'Hank']]);
+    }
+
     public function test_it_strips_numeric_keys()
     {
         $this->assertJsonResourceResponse([
