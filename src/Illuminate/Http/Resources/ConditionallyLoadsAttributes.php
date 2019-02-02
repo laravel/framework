@@ -16,8 +16,6 @@ trait ConditionallyLoadsAttributes
     {
         $index = -1;
 
-        $numericKeys = array_values($data) === $data;
-
         foreach ($data as $key => $value) {
             $index++;
 
@@ -28,7 +26,10 @@ trait ConditionallyLoadsAttributes
             }
 
             if (is_numeric($key) && $value instanceof MergeValue) {
-                return $this->mergeData($data, $index, $this->filter($value->data), $numericKeys);
+                return $this->mergeData(
+                    $data, $index, $this->filter($value->data),
+                    array_values($value->data) === $value->data
+                );
             }
 
             if ($value instanceof self && is_null($value->resource)) {
@@ -36,7 +37,7 @@ trait ConditionallyLoadsAttributes
             }
         }
 
-        return $this->removeMissingValues($data, $numericKeys);
+        return $this->removeMissingValues($data);
     }
 
     /**
@@ -54,7 +55,7 @@ trait ConditionallyLoadsAttributes
             return $this->removeMissingValues(array_merge(
                 array_merge(array_slice($data, 0, $index, true), $merge),
                 $this->filter(array_values(array_slice($data, $index + 1, null, true)))
-            ), $numericKeys);
+            ));
         }
 
         return $this->removeMissingValues(array_slice($data, 0, $index, true) +
@@ -66,11 +67,12 @@ trait ConditionallyLoadsAttributes
      * Remove the missing values from the filtered data.
      *
      * @param  array  $data
-     * @param  bool  $numericKeys
      * @return array
      */
-    protected function removeMissingValues($data, $numericKeys = false)
+    protected function removeMissingValues($data)
     {
+        $numericKeys = true;
+
         foreach ($data as $key => $value) {
             if (($value instanceof PotentiallyMissing && $value->isMissing()) ||
                 ($value instanceof self &&
@@ -78,10 +80,16 @@ trait ConditionallyLoadsAttributes
                 $value->isMissing())) {
                 unset($data[$key]);
             }
+            $numericKeys = $numericKeys && is_numeric($key);
         }
 
-        return ! empty($data) && is_numeric(array_keys($data)[0])
-                        ? array_values($data) : $data;
+        if (property_exists($this, 'preserveKeys') && $this->preserveKeys === true) {
+            $values = array_values($data);
+
+            return $values === $data ? $values : $data;
+        }
+
+        return $numericKeys ? array_values($data) : $data;
     }
 
     /**

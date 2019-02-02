@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Http;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Resources\MergeValue;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
@@ -17,6 +18,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
+use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
@@ -589,7 +591,45 @@ class ResourceTest extends TestCase
         $this->assertSame(2, count($collection));
     }
 
-    public function test_leading_merge__keyed_value_is_merged_correctly()
+    public function test_keys_are_preserved_if_the_resource_is_flagged_to_preserve_keys()
+    {
+        $data = [
+            'authorBook' => [
+                'byId' => [
+                    1 => [
+                        'id' => 1,
+                        'authorId' => 5,
+                        'bookId' => 22,
+                    ],
+                    2 => [
+                        'id' => 2,
+                        'authorId' => 5,
+                        'bookId' => 15,
+                    ],
+                    3 => [
+                        'id' => 3,
+                        'authorId' => 42,
+                        'bookId' => 12,
+                    ],
+                ],
+                'allIds' => [1, 2, 3],
+            ],
+        ];
+
+        Route::get('/', function () use ($data) {
+            return new ResourceWithPreservedKeys($data);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson(['data' => $data]);
+    }
+
+    public function test_leading_merge_keyed_value_is_merged_correctly()
     {
         $filter = new class {
             use ConditionallyLoadsAttributes;
@@ -598,6 +638,30 @@ class ResourceTest extends TestCase
             {
                 return $this->filter([
                     new MergeValue(['name' => 'mohamed', 'location' => 'hurghada']),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'name' => 'mohamed', 'location' => 'hurghada',
+        ], $results);
+    }
+
+    public function test_leading_merge_keyed_value_is_merged_correctly_when_first_value_is_missing()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    new MergeValue([
+                        0 => new MissingValue,
+                        'name' => 'mohamed',
+                        'location' => 'hurghada',
+                    ]),
                 ]);
             }
         };
@@ -833,19 +897,19 @@ class ResourceTest extends TestCase
         ], ['data' => ['John', 'Hank']]);
     }
 
-    public function test_it_strips_all_keys_if_any_of_them_are_numeric()
+    public function test_it_wont_keys_if_any_of_them_are_strings()
     {
         $this->assertJsonResourceResponse([
             '5' => 'John',
             '6' => 'Hank',
             'a' => 'Bill',
-        ], ['data' => ['John', 'Hank', 'Bill']]);
+        ], ['data' => ['5' => 'John', '6' => 'Hank', 'a' => 'Bill']]);
 
         $this->assertJsonResourceResponse([
-            5 => 'John',
-            6 => 'Hank',
-            'a' => 'Bill',
-        ], ['data' => ['John', 'Hank', 'Bill']]);
+            0 => 10,
+            1 => 20,
+            'total' => 30,
+        ], ['data' => [0 => 10, 1 => 20, 'total' => 30]]);
     }
 
     private function assertJsonResourceResponse($data, $expectedJson)
