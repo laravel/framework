@@ -49,10 +49,10 @@ class CommandFinished
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  int  $exitCode
-     * @param  float  $time
+     * @param  float|null  $time
      * @return void
      */
-    public function __construct($command, InputInterface $input, OutputInterface $output, $exitCode, $time)
+    public function __construct($command, InputInterface $input, OutputInterface $output, $exitCode, $time = null)
     {
         $this->input = $input;
         $this->output = $output;
