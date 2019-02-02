@@ -124,7 +124,7 @@ trait AsPivot
      */
     protected function getDeleteQuery()
     {
-        return $this->newModelQuery()->where([
+        return $this->newQueryWithoutRelationships()->where([
             $this->foreignKey => $this->getOriginal($this->foreignKey, $this->getAttribute($this->foreignKey)),
             $this->relatedKey => $this->getOriginal($this->relatedKey, $this->getAttribute($this->relatedKey)),
         ]);

@@ -28,6 +28,8 @@ interface Job
     /**
      * Release the job back into the queue.
      *
+     * Accepts a delay specified in seconds.
+     *
      * @param  int   $delay
      * @return void
      */
