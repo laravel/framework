@@ -185,6 +185,37 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testMiddlewareWorksIfControllerThrowsHttpResponseException()
+    {
+        // Before calling controller
+        $router = $this->getRouter();
+        $middleware = function ($request, $next) {
+            return 'caught';
+        };
+        $router->get('foo/bar', ['middleware' => $middleware, function () {
+            throw new HttpResponseException(new Response('hello'));
+        }]);
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'))->getContent();
+        $this->assertEquals('caught', $response);
+
+        // After calling controller
+        $router = $this->getRouter();
+
+        $response = new Response('hello');
+
+        $middleware = function ($request, $next) use ($response) {
+            $this->assertSame($response, $next($request));
+
+            return new Response($response->getContent().' caught');
+        };
+        $router->get('foo/bar', ['middleware' => $middleware, function () use ($response) {
+            throw new HttpResponseException($response);
+        }]);
+
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'))->getContent();
+        $this->assertEquals('hello caught', $response);
+    }
+
     public function testDefinedClosureMiddleware()
     {
         $router = $this->getRouter();
