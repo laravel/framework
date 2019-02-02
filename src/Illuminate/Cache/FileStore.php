@@ -50,19 +50,19 @@ class FileStore implements Store
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
         $this->ensureCacheDirectoryExists($path = $this->path($key));
 
         $result = $this->files->put(
-            $path, $this->expiration($minutes).serialize($value), true
+            $path, $this->expiration($seconds).serialize($value), true
         );
 
         return $result !== false && $result > 0;
@@ -188,10 +188,10 @@ class FileStore implements Store
 
         $data = unserialize(substr($contents, 10));
 
-        // Next, we'll extract the number of minutes that are remaining for a cache
+        // Next, we'll extract the number of seconds that are remaining for a cache
         // so that we can properly retain the time for things like the increment
         // operation that may be performed on this cache on a later operation.
-        $time = ($expire - $this->currentTime()) / 60;
+        $time = $expire - $this->currentTime();
 
         return compact('data', 'time');
     }
@@ -220,16 +220,16 @@ class FileStore implements Store
     }
 
     /**
-     * Get the expiration time based on the given minutes.
+     * Get the expiration time based on the given seconds.
      *
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return int
      */
-    protected function expiration($minutes)
+    protected function expiration($seconds)
     {
-        $time = $this->availableAt((int) ($minutes * 60));
+        $time = $this->availableAt($seconds);
 
-        return $minutes === 0 || $time > 9999999999 ? 9999999999 : (int) $time;
+        return $seconds === 0 || $time > 9999999999 ? 9999999999 : $time;
     }
 
     /**

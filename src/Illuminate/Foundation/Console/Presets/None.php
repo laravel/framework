@@ -38,7 +38,7 @@ class None extends Preset
             $packages['jquery'],
             $packages['popper.js'],
             $packages['vue'],
-            $packages['babel-preset-react'],
+            $packages['@babel/preset-react'],
             $packages['react'],
             $packages['react-dom']
         );

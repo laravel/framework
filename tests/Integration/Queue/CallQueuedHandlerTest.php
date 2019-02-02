@@ -46,23 +46,15 @@ class CallQueuedHandlerTest extends TestCase
 
     public function test_job_is_marked_as_failed_if_model_not_found_exception_is_thrown()
     {
-        Event::fake();
-
         $instance = new CallQueuedHandler(new Dispatcher(app()));
 
         $job = m::mock(Job::class);
-        $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('resolveName')->andReturn(__CLASS__);
-        $job->shouldReceive('markAsFailed')->once();
-        $job->shouldReceive('isDeleted')->andReturn(false);
-        $job->shouldReceive('delete')->once();
-        $job->shouldReceive('failed')->once();
+        $job->shouldReceive('fail')->once();
 
         $instance->call($job, [
             'command' => serialize(new CallQueuedHandlerExceptionThrower),
         ]);
-
-        Event::assertDispatched(JobFailed::class);
     }
 
     public function test_job_is_deleted_if_has_delete_property()

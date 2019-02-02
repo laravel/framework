@@ -470,7 +470,7 @@ class Validator implements ValidatorContract
      *
      * @param  object|string  $rule
      * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return bool
      */
     protected function isValidatable($rule, $attribute, $value)
@@ -486,7 +486,7 @@ class Validator implements ValidatorContract
      *
      * @param  object|string  $rule
      * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return bool
      */
     protected function presentOrRuleIsImplicit($rule, $attribute, $value)
@@ -526,7 +526,7 @@ class Validator implements ValidatorContract
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
         return array_key_exists($attribute, $data)
-                    || array_key_exists($attribute, $this->data);
+            || array_key_exists($attribute, $this->data);
     }
 
     /**
@@ -612,7 +612,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  string  $rule
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return void
      */
     public function addFailure($attribute, $rule, $parameters = [])
@@ -931,7 +931,7 @@ class Validator implements ValidatorContract
     /**
      * Register a custom implicit validator extension.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $extension
      * @return void
      */
@@ -945,7 +945,7 @@ class Validator implements ValidatorContract
     /**
      * Register a custom dependent validator extension.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $extension
      * @return void
      */
@@ -1139,7 +1139,7 @@ class Validator implements ValidatorContract
      * Call a custom validator extension.
      *
      * @param  string  $rule
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return bool|null
      */
     protected function callExtension($rule, $parameters)
@@ -1157,7 +1157,7 @@ class Validator implements ValidatorContract
      * Call a class based validator extension.
      *
      * @param  string  $callback
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return bool
      */
     protected function callClassBasedExtension($callback, $parameters)
@@ -1171,7 +1171,7 @@ class Validator implements ValidatorContract
      * Handle dynamic calls to class methods.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      *
      * @throws \BadMethodCallException

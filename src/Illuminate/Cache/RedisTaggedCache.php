@@ -22,14 +22,18 @@ class RedisTaggedCache extends TaggedCache
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|float|int|null  $minutes
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function put($key, $value, $minutes = null)
+    public function put($key, $value, $ttl = null)
     {
+        if ($ttl === null) {
+            return $this->forever($key, $value);
+        }
+
         $this->pushStandardKeys($this->tags->getNamespace(), $key);
 
-        return parent::put($key, $value, $minutes);
+        return parent::put($key, $value, $ttl);
     }
 
     /**

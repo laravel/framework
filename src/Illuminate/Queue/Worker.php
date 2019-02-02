@@ -398,7 +398,7 @@ class Worker
             return;
         }
 
-        $this->failJob($connectionName, $job, $e = new MaxAttemptsExceededException(
+        $this->failJob($job, $e = new MaxAttemptsExceededException(
             $job->resolveName().' has been attempted too many times or run too long. The job may have previously timed out.'
         ));
 
@@ -419,25 +419,24 @@ class Worker
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
         if ($job->timeoutAt() && $job->timeoutAt() <= Carbon::now()->getTimestamp()) {
-            $this->failJob($connectionName, $job, $e);
+            $this->failJob($job, $e);
         }
 
         if ($maxTries > 0 && $job->attempts() >= $maxTries) {
-            $this->failJob($connectionName, $job, $e);
+            $this->failJob($job, $e);
         }
     }
 
     /**
      * Mark the given job as failed and raise the relevant event.
      *
-     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Exception  $e
      * @return void
      */
-    protected function failJob($connectionName, $job, $e)
+    protected function failJob($job, $e)
     {
-        return FailingJob::handle($connectionName, $job, $e);
+        return $job->fail($e);
     }
 
     /**

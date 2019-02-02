@@ -76,7 +76,7 @@ class Factory implements FactoryContract
     /**
      * Create a new Validator factory instance.
      *
-     * @param  \Illuminate\Contracts\Translation\Translator $translator
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
@@ -97,13 +97,13 @@ class Factory implements FactoryContract
      */
     public function make(array $data, array $rules, array $messages = [], array $customAttributes = [])
     {
-        // The presence verifier is responsible for checking the unique and exists data
-        // for the validator. It is behind an interface so that multiple versions of
-        // it may be written besides database. We'll inject it into the validator.
         $validator = $this->resolve(
             $data, $rules, $messages, $customAttributes
         );
 
+        // The presence verifier is responsible for checking the unique and exists data
+        // for the validator. It is behind an interface so that multiple versions of
+        // it may be written besides database. We'll inject it into the validator.
         if (! is_null($this->verifier)) {
             $validator->setPresenceVerifier($this->verifier);
         }
@@ -196,7 +196,7 @@ class Factory implements FactoryContract
     /**
      * Register a custom implicit validator extension.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $extension
      * @param  string  $message
      * @return void
@@ -213,7 +213,7 @@ class Factory implements FactoryContract
     /**
      * Register a custom dependent validator extension.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $extension
      * @param  string  $message
      * @return void
@@ -230,7 +230,7 @@ class Factory implements FactoryContract
     /**
      * Register a custom validator message replacer.
      *
-     * @param  string   $rule
+     * @param  string  $rule
      * @param  \Closure|string  $replacer
      * @return void
      */

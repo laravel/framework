@@ -1,13 +1,44 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.20...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.22...5.7)
+
+### Added
+- Added `AbstractPaginator::getOptions()` method ([#27273](https://github.com/laravel/framework/pull/27273))
+- Added `Communication link failure` to `DetectsLostConnections` trait ([#27307](https://github.com/laravel/framework/pull/27307))
+- Added `orWhere()` `proxy` for `scopes` to `EloquentBuilder` ([#27281](https://github.com/laravel/framework/pull/27281), [2e6fe85](https://github.com/laravel/framework/commit/2e6fe855c7d7d9d3cbf34e1fbea17c8059640c5c))
+
+### Fixed
+- Fixed `QueueableCollection` serialization of Eloquent Models when using `Binary IDs` ([#27271](https://github.com/laravel/framework/pull/27271))
+- Replaced `newModelQuery()` with `newQueryWithoutRelationships()` for `UPDATE`/`DELETE` queries ([#27277](https://github.com/laravel/framework/pull/27277))
+
+### Changed
+- Apply parameters to entire localization array ([#27254](https://github.com/laravel/framework/pull/27254))
+
+
+## [v5.7.22 (2019-01-22)](https://github.com/laravel/framework/compare/v5.7.21...v5.7.22)
+
+### Fixed
+- Fixed `TestResponse::assertJsonValidationErrors()` when there are no errors ([#27190](https://github.com/laravel/framework/pull/27190))
+
+### Changed
+- Allowed `TestResponse::assertJsonMissingValidationErrors()` to be called without an argument ([#27176](https://github.com/laravel/framework/pull/27176))
+- Updated vue preset's vue-stubs for laravel-mix 4 compatibility ([#27229](https://github.com/laravel/framework/pull/27229))
+- Updated preset to use `@babel/preset-react` ([#27235](https://github.com/laravel/framework/pull/27235))
+- Used `config` to resolve the database value during tests. ([#27240](https://github.com/laravel/framework/pull/27240))
+
+
+## [v5.7.21 (2019-01-15)](https://github.com/laravel/framework/compare/v5.7.20...v5.7.21)
 
 ### Fixed
 - Fixed `Blueprint::removeColumn()` ([#27115](https://github.com/laravel/framework/pull/27115), [#27122](https://github.com/laravel/framework/pull/27122))
 - Fixed allowing of null broadcast connection driver ([#27135](https://github.com/laravel/framework/pull/27135))
+- Fixed `ModelMakeCommand::handle()` should always return `bool` value ([#27156](https://github.com/laravel/framework/pull/27156))
+- Fixed `TestResponse::assertSessionDoesntHaveErrors()` when there are no errors ([#27145](https://github.com/laravel/framework/pull/27145))
+- Fixed default message is localization twice in `403.blade.php` error page ([4a08120](https://github.com/laravel/framework/commit/4a081204d65a6e01959d795e71770079588bad21))
 
 ### Changed
 - Replaced `get_called_class()` to `static::class` ([#27146](https://github.com/laravel/framework/pull/27146))
+- Re-throw `NoMatchingExpectationException` from `PendingCommand` ([#27158](https://github.com/laravel/framework/pull/27158))
 
 
 ## [v5.7.20 (2019-01-08)](https://github.com/laravel/framework/compare/v5.7.19...v5.7.20)

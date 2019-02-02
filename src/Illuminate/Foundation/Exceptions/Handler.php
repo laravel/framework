@@ -99,8 +99,8 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
-        if (method_exists($e, 'report')) {
-            return $e->report();
+        if (is_callable($reportCallable = [$e, 'report'])) {
+            return $this->container->call($reportCallable);
         }
 
         try {

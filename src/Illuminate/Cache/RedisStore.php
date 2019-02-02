@@ -80,37 +80,35 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
-        $result = $this->connection()->setex(
-            $this->prefix.$key, (int) max(1, $minutes * 60), $this->serialize($value)
+        return (bool) $this->connection()->setex(
+            $this->prefix.$key, (int) max(1, $seconds), $this->serialize($value)
         );
-
-        return $result ? true : false;
     }
 
     /**
-     * Store multiple items in the cache for a given number of minutes.
+     * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function putMany(array $values, $minutes)
+    public function putMany(array $values, $seconds)
     {
         $this->connection()->multi();
 
         $manyResult = null;
 
         foreach ($values as $key => $value) {
-            $result = $this->put($key, $value, $minutes);
+            $result = $this->put($key, $value, $seconds);
 
             $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
         }
@@ -125,15 +123,15 @@ class RedisStore extends TaggableStore implements LockProvider
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  int  $seconds
      * @return bool
      */
-    public function add($key, $value, $minutes)
+    public function add($key, $value, $seconds)
     {
         $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])";
 
         return (bool) $this->connection()->eval(
-            $lua, 1, $this->prefix.$key, $this->serialize($value), (int) max(1, $minutes * 60)
+            $lua, 1, $this->prefix.$key, $this->serialize($value), (int) max(1, $seconds)
         );
     }
 
@@ -170,9 +168,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function forever($key, $value)
     {
-        $result = $this->connection()->set($this->prefix.$key, $this->serialize($value));
-
-        return $result ? true : false;
+        return (bool) $this->connection()->set($this->prefix.$key, $this->serialize($value));
     }
 
     /**

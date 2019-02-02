@@ -31,23 +31,30 @@ class DynamoDbStore implements Store
     /**
      * The name of the attribute that should hold the key.
      *
-     * @var  string
+     * @var string
      */
     protected $keyAttribute;
 
     /**
      * The name of the attribute that should hold the value.
      *
-     * @var  string
+     * @var string
      */
     protected $valueAttribute;
 
     /**
      * The name of the attribute that should hold the expiration timestamp.
      *
-     * @var  string
+     * @var string
      */
     protected $expirationAttribute;
+
+    /**
+     * A string that should be prepended to keys.
+     *
+     * @var string
+     */
+    protected $prefix;
 
     /**
      * Create a new store instance.
@@ -57,19 +64,23 @@ class DynamoDbStore implements Store
      * @param  string  $keyAttribute
      * @param  string  $valueAttribute
      * @param  string  $expirationAttribute
+     * @param  string  $prefix
      * @return void
      */
     public function __construct(DynamoDbClient $dynamo,
                                 $table,
                                 $keyAttribute = 'key',
                                 $valueAttribute = 'value',
-                                $expirationAttribute = 'expires_at')
+                                $expirationAttribute = 'expires_at',
+                                $prefix = '')
     {
         $this->table = $table;
         $this->dynamo = $dynamo;
         $this->keyAttribute = $keyAttribute;
         $this->valueAttribute = $valueAttribute;
         $this->expirationAttribute = $expirationAttribute;
+
+        $this->setPrefix($prefix);
     }
 
     /**
@@ -85,7 +96,7 @@ class DynamoDbStore implements Store
             'ConsistentRead' => false,
             'Key' => [
                 $this->keyAttribute => [
-                    'S' => $key,
+                    'S' => $this->prefix.$key,
                 ],
             ],
         ]);
@@ -117,11 +128,15 @@ class DynamoDbStore implements Store
      */
     public function many(array $keys)
     {
+        $prefixedKeys = array_map(function ($key) {
+            return $this->prefix.$key;
+        }, $keys);
+
         $response = $this->dynamo->batchGetItem([
             'RequestItems' => [
                 $this->table => [
                     'ConsistentRead' => false,
-                    'Keys' => collect($keys)->map(function ($key) {
+                    'Keys' => collect($prefixedKeys)->map(function ($key) {
                         return [
                             $this->keyAttribute => [
                                 'S' => $key,
@@ -147,14 +162,14 @@ class DynamoDbStore implements Store
                 );
             }
 
-            return [$response[$this->keyAttribute]['S'] => $value];
+            return [Str::replaceFirst($this->prefix, '', $response[$this->keyAttribute]['S']) => $value];
         })->all());
     }
 
     /**
      * Determine if the given item is expired.
      *
-     * @param  arary  $item
+     * @param  array  $item
      * @param  \DateTimeInterface|null  $expiration
      * @return bool
      */
@@ -167,41 +182,43 @@ class DynamoDbStore implements Store
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @param  float|int  $minutes
-     * @return void
+     * @param  mixed  $value
+     * @param  int  $seconds
+     * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
         $this->dynamo->putItem([
             'TableName' => $this->table,
             'Item' => [
                 $this->keyAttribute => [
-                    'S' => $key,
+                    'S' => $this->prefix.$key,
                 ],
                 $this->valueAttribute => [
                     $this->type($value) => $this->serialize($value),
                 ],
                 $this->expirationAttribute => [
-                    'N' => (string) $this->toTimestamp($minutes),
+                    'N' => (string) $this->toTimestamp($seconds),
                 ],
             ],
         ]);
+
+        return true;
     }
 
     /**
-     * Store multiple items in the cache for a given number of minutes.
+     * Store multiple items in the cache for a given number of $seconds.
      *
      * @param  array  $values
-     * @param  float|int  $minutes
-     * @return void
+     * @param  int  $seconds
+     * @return bool
      */
-    public function putMany(array $values, $minutes)
+    public function putMany(array $values, $seconds)
     {
-        $expiration = $this->toTimestamp($minutes);
+        $expiration = $this->toTimestamp($seconds);
 
         $this->dynamo->batchWriteItem([
             'RequestItems' => [
@@ -210,7 +227,7 @@ class DynamoDbStore implements Store
                         'PutRequest' => [
                             'Item' => [
                                 $this->keyAttribute => [
-                                    'S' => $key,
+                                    'S' => $this->prefix.$key,
                                 ],
                                 $this->valueAttribute => [
                                     $this->type($value) => $this->serialize($value),
@@ -224,30 +241,32 @@ class DynamoDbStore implements Store
                 })->values()->all(),
             ],
         ]);
+
+        return true;
     }
 
     /**
      * Store an item in the cache if the key doesn't exist.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param  mixed  $value
+     * @param  int  $seconds
      * @return bool
      */
-    public function add($key, $value, $minutes)
+    public function add($key, $value, $seconds)
     {
         try {
-            $response = $this->dynamo->putItem([
+            $this->dynamo->putItem([
                 'TableName' => $this->table,
                 'Item' => [
                     $this->keyAttribute => [
-                        'S' => $key,
+                        'S' => $this->prefix.$key,
                     ],
                     $this->valueAttribute => [
                         $this->type($value) => $this->serialize($value),
                     ],
                     $this->expirationAttribute => [
-                        'N' => (string) $this->toTimestamp($minutes),
+                        'N' => (string) $this->toTimestamp($seconds),
                     ],
                 ],
                 'ConditionExpression' => 'attribute_not_exists(#key) OR #expires_at < :now',
@@ -276,7 +295,7 @@ class DynamoDbStore implements Store
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -286,7 +305,7 @@ class DynamoDbStore implements Store
                 'TableName' => $this->table,
                 'Key' => [
                     $this->keyAttribute => [
-                        'S' => $key,
+                        'S' => $this->prefix.$key,
                     ],
                 ],
                 'ConditionExpression' => 'attribute_exists(#key) AND #expires_at > :now',
@@ -321,7 +340,7 @@ class DynamoDbStore implements Store
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
@@ -331,7 +350,7 @@ class DynamoDbStore implements Store
                 'TableName' => $this->table,
                 'Key' => [
                     $this->keyAttribute => [
-                        'S' => $key,
+                        'S' => $this->prefix.$key,
                     ],
                 ],
                 'ConditionExpression' => 'attribute_exists(#key) AND #expires_at > :now',
@@ -366,12 +385,12 @@ class DynamoDbStore implements Store
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @return void
+     * @param  mixed  $value
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, now()->addYears(5));
+        return $this->put($key, $value, now()->addYears(5));
     }
 
     /**
@@ -384,7 +403,7 @@ class DynamoDbStore implements Store
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new DynamoDbLock($this, $name, $seconds, $owner);
+        return new DynamoDbLock($this, $this->prefix.$name, $seconds, $owner);
     }
 
     /**
@@ -411,7 +430,7 @@ class DynamoDbStore implements Store
             'TableName' => $this->table,
             'Key' => [
                 $this->keyAttribute => [
-                    'S' => $key,
+                    'S' => $this->prefix.$key,
                 ],
             ],
         ]);
@@ -430,15 +449,15 @@ class DynamoDbStore implements Store
     }
 
     /**
-     * Get the UNIX timestamp for the given number of minutes.
+     * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $minutes
+     * @param  int  $seconds
      * @return int
      */
-    protected function toTimestamp($minutes)
+    protected function toTimestamp($seconds)
     {
-        return $minutes > 0
-                    ? $this->availableAt($minutes * 60)
+        return $seconds > 0
+                    ? $this->availableAt($seconds)
                     : Carbon::now()->getTimestamp();
     }
 
@@ -490,6 +509,17 @@ class DynamoDbStore implements Store
      */
     public function getPrefix()
     {
-        return '';
+        return $this->prefix;
+    }
+
+    /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
     }
 }

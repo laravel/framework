@@ -33,7 +33,7 @@ trait ThrottlesLogins
     protected function incrementLoginAttempts(Request $request)
     {
         $this->limiter()->hit(
-            $this->throttleKey($request), $this->decayMinutes()
+            $this->throttleKey($request), $this->decayMinutes() * 60
         );
     }
 

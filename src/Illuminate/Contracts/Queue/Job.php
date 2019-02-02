@@ -28,6 +28,8 @@ interface Job
     /**
      * Release the job back into the queue.
      *
+     * Accepts a delay specified in seconds.
+     *
      * @param  int   $delay
      * @return void
      */
@@ -83,12 +85,12 @@ interface Job
     public function markAsFailed();
 
     /**
-     * Process an exception that caused the job to fail.
+     * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param  \Throwable  $e
+     * @param  \Throwable|null $e
      * @return void
      */
-    public function failed($e);
+    public function fail($e = null);
 
     /**
      * Get the number of times to attempt a job.
