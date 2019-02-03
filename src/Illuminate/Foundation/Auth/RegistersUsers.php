@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 trait RegistersUsers
 {
@@ -32,7 +33,7 @@ trait RegistersUsers
 
         event(new Registered($user = $this->create($request->all())));
 
-        $this->guard()->login($user);
+        $this->login($user);
 
         return $this->registered($request, $user)
                         ?: redirect($this->redirectPath());
@@ -58,5 +59,15 @@ trait RegistersUsers
     protected function registered(Request $request, $user)
     {
         //
+    }
+
+    /**
+     * Signs the user in.
+     *
+     * @param mixed $user
+     */
+    protected function login($user)
+    {
+        $this->guard()->login($user);
     }
 }
