@@ -2,6 +2,11 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.7.24...5.7)
 
+### TODO:
+- https://github.com/laravel/framework/pull/27341
+- https://github.com/laravel/framework/pull/27346, https://github.com/laravel/framework/commit/1c74d7fe595df223279de55dffc7ae6fc8ac9ca6
+- https://github.com/laravel/framework/pull/27358
+
 
 ## [v5.7.24 (2019-01-30)](https://github.com/laravel/framework/compare/v5.7.23...v5.7.24)
 
