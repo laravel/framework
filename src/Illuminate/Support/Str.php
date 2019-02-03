@@ -85,13 +85,21 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function camel($value)
+    public static function camelCase($value)
     {
         if (isset(static::$camelCache[$value])) {
             return static::$camelCache[$value];
         }
 
         return static::$camelCache[$value] = lcfirst(static::studly($value));
+    }
+
+    /**
+     * Alias for {@see Illuminate\Suppot\Str::camelCase()}.
+     */
+    public static function camel(...$args)
+    {
+        return static::camelCase(...$args);
     }
 
     /**
@@ -188,9 +196,17 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function kebab($value)
+    public static function kebabCase($value)
     {
         return static::snake($value, '-');
+    }
+
+    /**
+     * Alias for {@see Illuminate\Suppot\Str::kebabCase()}.
+     */
+    public static function kebab(...$args)
+    {
+        return static::kebabCase(...$args);
     }
 
     /**
@@ -407,9 +423,17 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function title($value)
+    public static function titleCase($value)
     {
         return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    /**
+     * Alias for {@see Illuminate\Suppot\Str::titleCase()}.
+     */
+    public static function title(...$args)
+    {
+        return static::titleCase(...$args);
     }
 
     /**
@@ -459,7 +483,7 @@ class Str
      * @param  string  $delimiter
      * @return string
      */
-    public static function snake($value, $delimiter = '_')
+    public static function snakeCase($value, $delimiter = '_')
     {
         $key = $value;
 
@@ -474,6 +498,14 @@ class Str
         }
 
         return static::$snakeCache[$key][$delimiter] = $value;
+    }
+
+    /**
+     * Alias for {@see Illuminate\Suppot\Str::snakeCase()}.
+     */
+    public static function snake(...$args)
+    {
+        return static::snakeCase(...$args);
     }
 
     /**
@@ -500,7 +532,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function studly($value)
+    public static function studlyCase($value)
     {
         $key = $value;
 
@@ -511,6 +543,14 @@ class Str
         $value = ucwords(str_replace(['-', '_'], ' ', $value));
 
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
+    }
+
+    /**
+     * Alias for {@see Illuminate\Support\Str::studlyCase()}.
+     */
+    public static function studly(...$args)
+    {
+        return static::studlyCase(...$args);
     }
 
     /**
