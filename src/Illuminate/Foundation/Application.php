@@ -970,7 +970,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Register a terminating callback with the application.
      *
-     * @param  mixed  $callback
+     * @param  callable|string  $callback
      * @return $this
      */
     public function terminating($callback)
