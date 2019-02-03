@@ -83,7 +83,6 @@ abstract class ServiceProvider
     {
         $routeFiles = (new Filesystem())->allFiles($path);
         if ($routeFiles && !$this->app->routesAreCached()) {
-            $routeFiles = $this->getDirContents($path);
             foreach ($routeFiles as $routeFile) {
                 $this->loadRoutesFrom($routeFile);
             }
