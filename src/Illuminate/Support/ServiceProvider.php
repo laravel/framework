@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Console\Application as Artisan;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Console\Application as Artisan;
 
 abstract class ServiceProvider
 {
@@ -75,7 +75,7 @@ abstract class ServiceProvider
 
     /**
      * Recursively scan the directory at the given path
-     * and load any route files found if not already cached
+     * and load any route files found if not already cached.
      *
      * @param  string  $path
      * @return void
@@ -90,7 +90,7 @@ abstract class ServiceProvider
 
     /**
      * Recursively scan the directory at the given path
-     * and return it's files
+     * and return it's files.
      *
      * @param  string  $path
      * @return array

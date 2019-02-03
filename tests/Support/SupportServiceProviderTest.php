@@ -109,8 +109,8 @@ class SupportServiceProviderTest extends TestCase
     public function testLoadAllRoutesFromLoadsRoutesCorrectly()
     {
         $expectedFiles = ['file1.php', 'file2.php'];
-        $app           = m::mock(Application::class)->makePartial();
-        $provider      = m::mock(ServiceProvider::class, [$app])->makePartial();
+        $app = m::mock(Application::class)->makePartial();
+        $provider = m::mock(ServiceProvider::class, [$app])->makePartial();
         $provider->shouldAllowMockingProtectedMethods();
 
         $provider->shouldReceive('getFilesFromPath')
