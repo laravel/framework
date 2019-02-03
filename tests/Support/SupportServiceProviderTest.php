@@ -105,6 +105,28 @@ class SupportServiceProviderTest extends TestCase
         ];
         $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
+
+    public function testLoadAllRoutesFromLoadsRoutesCorrectly()
+    {
+        $expectedFiles = ['file1.php', 'file2.php'];
+        $app           = m::mock(Application::class)->makePartial();
+        $provider      = m::mock(ServiceProvider::class, [$app])->makePartial();
+        $provider->shouldAllowMockingProtectedMethods();
+
+        $provider->shouldReceive('getFilesFromPath')
+            ->once()
+            ->andReturn($expectedFiles);
+
+        $provider->shouldReceive('loadRoutesFrom')
+            ->times(\count($expectedFiles));
+
+        $provider->loadAllRoutesFrom('some/path');
+
+        // count our expected calls as passed assertions
+        $this->addToAssertionCount(
+            \Mockery::getContainer()->mockery_getExpectationCount()
+        );
+    }
 }
 
 class ServiceProviderForTestingOne extends ServiceProvider

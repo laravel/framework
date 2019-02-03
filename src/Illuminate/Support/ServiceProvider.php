@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Filesystem\Filesystem;
 
 abstract class ServiceProvider
 {
@@ -71,7 +72,7 @@ abstract class ServiceProvider
             require $path;
         }
     }
-    
+
     /**
      * Recursively scan the directory at the given path
      * and load any route files found if not already cached
@@ -79,14 +80,24 @@ abstract class ServiceProvider
      * @param  string  $path
      * @return void
      */
-    protected function loadAllRoutesFrom($path): void
+    protected function loadAllRoutesFrom($path)
     {
-        $routeFiles = (new Filesystem())->allFiles($path);
-        if ($routeFiles && !$this->app->routesAreCached()) {
-            foreach ($routeFiles as $routeFile) {
-                $this->loadRoutesFrom($routeFile);
-            }
+        $routeFiles = $this->getFilesFromPath($path);
+        foreach ($routeFiles as $routeFile) {
+            $this->loadRoutesFrom($routeFile);
         }
+    }
+
+    /**
+     * Recursively scan the directory at the given path
+     * and return it's files
+     *
+     * @param  string  $path
+     * @return array
+     */
+    protected function getFilesFromPath($path)
+    {
+        return (new Filesystem())->allFiles($path);
     }
 
     /**
