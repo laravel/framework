@@ -71,6 +71,24 @@ abstract class ServiceProvider
             require $path;
         }
     }
+    
+    /**
+     * Recursively scan the directory at the given path
+     * and load any route files found if not already cached
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function loadAllRoutesFrom($path): void
+    {
+        $routeFiles = (new Filesystem())->allFiles($path);
+        if ($routeFiles && !$this->app->routesAreCached()) {
+            $routeFiles = $this->getDirContents($path);
+            foreach ($routeFiles as $routeFile) {
+                $this->loadRoutesFrom($routeFile);
+            }
+        }
+    }
 
     /**
      * Register a view file namespace.
