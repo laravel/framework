@@ -112,21 +112,18 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the destination class path.
+     * Get the default namespace for the class.
      *
-     * @param  string  $name
+     * @param  string  $rootNamespace
      * @return string
      */
-    protected function getPath($name)
+    protected function getDefaultNamespace($rootNamespace)
     {
-        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
-        $name = str_replace('\\', '/', $name) . '.php';
-
         if ($this->hasModelsFolder()) {
-            return $this->laravel['path'] . '/Models/' . $name;
+            return $rootNamespace . '\Models';
         }
 
-        return $this->laravel['path'] . '/' . $name;
+        return $rootNamespace;
     }
 
     /**
