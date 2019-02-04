@@ -90,6 +90,20 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->assertSame('taylor', $result->username);
     }
 
+    public function testMorphToWithSpecifiedClassDefault()
+    {
+        $parent = new EloquentMorphToModelStub;
+        $parent->relation_type = EloquentMorphToRelatedStub::class;
+
+        $relation = $parent->relation()->withDefault();
+
+        $newModel = new EloquentMorphToRelatedStub;
+
+        $result = $relation->getResults();
+
+        $this->assertEquals($newModel, $result);
+    }
+
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
         $parent = m::mock(Model::class);
@@ -171,4 +185,9 @@ class EloquentMorphToModelStub extends Model
     public function relation() {
         return $this->morphTo();
     }
+}
+
+class EloquentMorphToRelatedStub extends Model
+{
+    public $table = 'eloquent_morph_to_related_stubs';
 }
