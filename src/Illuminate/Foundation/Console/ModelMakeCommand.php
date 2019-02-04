@@ -112,6 +112,24 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the destination class path.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function getPath($name)
+    {
+        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
+        $name = str_replace('\\', '/', $name) . '.php';
+
+        if ($this->hasModelsFolder()) {
+            return $this->laravel['path'] . '/Models/' . $name;
+        }
+
+        return $this->laravel['path'] . '/' . $name;
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -147,5 +165,15 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
         ];
+    }
+
+    /**
+     * Check whether the app\Models directory exists.
+     *
+     * @return bool
+     */
+    protected function hasModelsFolder()
+    {
+        return $this->files->exists($this->laravel['path'] . '/Models');
     }
 }
