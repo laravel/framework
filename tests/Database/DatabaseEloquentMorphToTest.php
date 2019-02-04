@@ -53,9 +53,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         $newModel = new EloquentMorphToModelStub;
 
-        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
-
-        $this->assertSame($newModel, $relation->getResults());
+        $this->assertEquals($newModel, $relation->getResults());
     }
 
     public function testMorphToWithDynamicDefault()
@@ -67,12 +65,13 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
         $newModel = new EloquentMorphToModelStub;
+        $newModel->username = 'taylor';
 
-        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+        $result = $relation->getResults();
 
-        $this->assertSame($newModel, $relation->getResults());
+        $this->assertEquals($newModel, $result);
 
-        $this->assertSame('taylor', $newModel->username);
+        $this->assertSame('taylor', $result->username);
     }
 
     public function testMorphToWithArrayDefault()
@@ -82,12 +81,13 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
         $newModel = new EloquentMorphToModelStub;
+        $newModel->username = 'taylor';
 
-        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+        $result = $relation->getResults();
 
-        $this->assertSame($newModel, $relation->getResults());
+        $this->assertEquals($newModel, $result);
 
-        $this->assertSame('taylor', $newModel->username);
+        $this->assertSame('taylor', $result->username);
     }
 
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
@@ -165,4 +165,10 @@ class DatabaseEloquentMorphToTest extends TestCase
 class EloquentMorphToModelStub extends Model
 {
     public $foreign_key = 'foreign.value';
+
+    public $table = 'eloquent_morph_to_model_stubs';
+
+    public function relation() {
+        return $this->morphTo();
+    }
 }
