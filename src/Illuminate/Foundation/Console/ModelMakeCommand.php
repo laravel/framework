@@ -120,7 +120,7 @@ class ModelMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         if ($this->hasModelsFolder()) {
-            return $rootNamespace . '\Models';
+            return $rootNamespace.'\Models';
         }
 
         return $rootNamespace;
@@ -171,6 +171,6 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function hasModelsFolder()
     {
-        return $this->files->exists($this->laravel['path'] . '/Models');
+        return $this->files->exists($this->laravel['path'].'/Models');
     }
 }
