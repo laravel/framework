@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Compilers;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -106,6 +107,29 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $rawBlocks = [];
 
     /**
+     * Provide debug info in the compiled views.
+     *
+     * @var boolean
+     */
+    protected $debugInfo;
+
+    /**
+     * Create a new compiler instance.
+     *
+     * @param  Filesystem  $files
+     * @param  string  $cachePath
+     * @param  boolean  $debugInfo
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct(Filesystem $files, $cachePath, $debugInfo = false)
+    {
+        parent::__construct($files, $cachePath);
+        $this->debugInfo = $debugInfo;
+    }
+
+    /**
      * Compile the view at the given path.
      *
      * @param  string  $path
@@ -119,7 +143,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         if (! is_null($this->cachePath)) {
             $contents = $this->compileString($this->files->get($this->getPath()));
-
+            if ($this->debugInfo) {
+                $contents .= $this->generateDebugInfo();
+            }
             $this->files->put($this->getCompiledPath($this->getPath()), $contents);
         }
     }
@@ -520,5 +546,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function withoutDoubleEncoding()
     {
         $this->setEchoFormat('e(%s, false)');
+    }
+
+    /**
+     * Generate debug info for the file.
+     *
+     * @return string
+     */
+    protected function generateDebugInfo()
+    {
+        return "\n /* {$this->getPath()} */";
     }
 }

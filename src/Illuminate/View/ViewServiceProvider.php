@@ -138,7 +138,7 @@ class ViewServiceProvider extends ServiceProvider
         // instance to pass into the engine so it can compile the views properly.
         $this->app->singleton('blade.compiler', function () {
             return new BladeCompiler(
-                $this->app['files'], $this->app['config']['view.compiled']
+                $this->app['files'], $this->app['config']['view.compiled'], $this->app['config']['view.debugInfo']
             );
         });
 

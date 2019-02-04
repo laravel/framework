@@ -93,6 +93,14 @@ class ViewBladeCompilerTest extends TestCase
         }}'));
     }
 
+    public function testIncludeDebugInfo()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, true);
+        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "Hello World\n /* foo */");
+        $compiler->compile('foo');
+    }
+
     protected function getFiles()
     {
         return m::mock(Filesystem::class);
