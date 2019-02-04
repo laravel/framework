@@ -22,6 +22,8 @@ interface Container extends ArrayAccess, ContainerInterface
      * @param  string  $abstract
      * @param  string  $alias
      * @return void
+     *
+     * @throws \LogicException
      */
     public function alias($abstract, $alias);
 

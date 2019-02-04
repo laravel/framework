@@ -342,13 +342,11 @@ class ContainerTest extends TestCase
 
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
     {
-        $container = new Container;
-        $container->alias('name', 'name');
-
         $this->expectException('LogicException');
         $this->expectExceptionMessage('[name] is aliased to itself.');
 
-        $container->getAlias('name');
+        $container = new Container;
+        $container->alias('name', 'name');
     }
 
     public function testContainerGetFactory()
