@@ -2157,6 +2157,14 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([1, 2, 3, 4, 5]);
         $c = $c->pad(4, 0);
         $this->assertEquals([1, 2, 3, 4, 5], $c->all());
+
+        $c = new Collection([1, 2, 3]);
+        $c = $c->pad(-4, 0);
+        $this->assertEquals([0, 1, 2, 3], $c->all());
+
+        $c = new Collection([1, 2, 3, 4, 5]);
+        $c = $c->pad(-4, 0);
+        $this->assertEquals([1, 2, 3, 4, 5], $c->all());
     }
 
     public function testGettingMaxItemsFromCollection()
