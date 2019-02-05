@@ -62,7 +62,9 @@ class StatusCommand extends BaseCommand
         if (count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
             $this->table(['Ran?', 'Migration', 'Batch'], $migrations);
         } else {
-            $this->error('No migrations found');
+            $this->option('failed')
+                ? $this->error('No failed migrations found')
+                : $this->error('No migrations found');
         }
     }
 
@@ -78,11 +80,17 @@ class StatusCommand extends BaseCommand
         return Collection::make($this->getAllMigrationFiles())
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
+                        if($this->option('failed')) {
+                            return in_array($migrationName, $ran)
+                                ? []
+                                : ['<fg=red>No</fg=red>', $migrationName];
+
+                        }
 
                         return in_array($migrationName, $ran)
                                 ? ['<info>Yes</info>', $migrationName, $batches[$migrationName]]
                                 : ['<fg=red>No</fg=red>', $migrationName];
-                    });
+                    })->filter();
     }
 
     /**
@@ -107,7 +115,9 @@ class StatusCommand extends BaseCommand
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations files to use'],
 
-            ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
+            ['failed', 'f', InputOption::VALUE_NONE, 'Indicate if only show status of failed migrations'],
+
+            ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths']
         ];
     }
 }
