@@ -398,6 +398,16 @@ class ResourceRegistrar
         // the resource action. Otherwise we'll just use an empty string for here.
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
+        // If a star is set as the key in the names array
+        // we will prefix all the routes with that value
+        if (isset($options['names']['*'])) {
+            $prefix = $options['names']['*'];
+
+            if (Str::contains($prefix, '*')) {
+                $prefix = trim($prefix, '*');
+            };
+        }
+
         return trim(sprintf('%s%s.%s', $prefix, $name, $method), '.');
     }
 
