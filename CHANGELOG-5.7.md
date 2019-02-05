@@ -1,11 +1,21 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.24...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.25...5.7)
 
-### TODO:
-- https://github.com/laravel/framework/pull/27341
-- https://github.com/laravel/framework/pull/27346, https://github.com/laravel/framework/commit/1c74d7fe595df223279de55dffc7ae6fc8ac9ca6
-- https://github.com/laravel/framework/pull/27358
+
+## [v5.7.25 (2019-02-05)](https://github.com/laravel/framework/compare/v5.7.24...v5.7.25)
+
+### Added
+- Allowed specifying custom translation for date relative messages ([#27341](https://github.com/laravel/framework/pull/27341))
+- Add computed support to SQL Server schema grammar ([#27346](https://github.com/laravel/framework/pull/27346), [1c74d7f](https://github.com/laravel/framework/commit/1c74d7fe595df223279de55dffc7ae6fc8ac9ca6))
+- Allowed `ENV` to control paths of `cache files` for `services`, `packages` and `routes` ([#27389](https://github.com/laravel/framework/pull/27389))
+
+### Fixed
+- Fixed `BelongsToMany` pivot relationship child with loaded relations wakeup ([#27358](https://github.com/laravel/framework/pull/27358))
+- Fixed wrong class being used when eager loading nullable `MorphTo` with `withDefault()` ([#27411](https://github.com/laravel/framework/pull/27411))
+
+### Changed
+- Removed `php_network_getaddresses: getaddrinfo failed: Name or service not known` in `DetectsLostConnections` trait ([#27418](https://github.com/laravel/framework/pull/27418))
 
 
 ## [v5.7.24 (2019-01-30)](https://github.com/laravel/framework/compare/v5.7.23...v5.7.24)
