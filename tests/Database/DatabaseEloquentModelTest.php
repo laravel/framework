@@ -1338,6 +1338,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = EloquentModelSaveStub::withoutEventDispatcher(function () {
             $model = new EloquentModelSaveStub;
             $model->save();
+
             return $model;
         });
 
