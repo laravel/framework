@@ -84,7 +84,6 @@ class StatusCommand extends BaseCommand
                             return in_array($migrationName, $ran)
                                 ? []
                                 : ['<fg=red>No</fg=red>', $migrationName];
-
                         }
 
                         return in_array($migrationName, $ran)
