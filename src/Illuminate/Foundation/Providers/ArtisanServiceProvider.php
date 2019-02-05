@@ -53,6 +53,7 @@ use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
+use Illuminate\Routing\Console\GenerateControllersCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
@@ -138,6 +139,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ChannelMake' => 'command.channel.make',
         'ConsoleMake' => 'command.console.make',
         'ControllerMake' => 'command.controller.make',
+        'ControllerGenerate' => 'command.controllers.generate',
         'EventGenerate' => 'command.event.generate',
         'EventMake' => 'command.event.make',
         'ExceptionMake' => 'command.exception.make',
@@ -1008,6 +1010,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.view.clear', function ($app) {
             return new ViewClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerControllerGenerateCommand()
+    {
+        $this->app->singleton('command.controllers.generate', function () {
+            return new GenerateControllersCommand();
         });
     }
 

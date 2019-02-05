@@ -348,4 +348,14 @@ class RouteCollection implements Countable, IteratorAggregate
     {
         return count($this->getRoutes());
     }
+
+    /**
+     * Get the list of Actions.
+     *
+     * @return array
+     */
+    public function getActionList()
+    {
+        return $this->actionList;
+    }
 }
