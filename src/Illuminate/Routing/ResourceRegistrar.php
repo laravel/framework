@@ -405,7 +405,7 @@ class ResourceRegistrar
 
             if (Str::contains($prefix, '*')) {
                 $prefix = trim($prefix, '*');
-            };
+            }
         }
 
         return trim(sprintf('%s%s.%s', $prefix, $name, $method), '.');
