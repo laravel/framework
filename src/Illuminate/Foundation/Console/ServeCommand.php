@@ -51,8 +51,6 @@ class ServeCommand extends Command
             return $this->handle();
         }
 
-        echo $status;
-
         return $status;
     }
 
