@@ -92,7 +92,7 @@ class ServeCommand extends Command
     }
 
     /**
-     * Check if command has reached its max amount of port tries
+     * Check if command has reached its max amount of port tries.
      *
      * @return bool
      */
