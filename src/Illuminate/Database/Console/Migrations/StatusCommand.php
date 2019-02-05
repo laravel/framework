@@ -80,7 +80,7 @@ class StatusCommand extends BaseCommand
         return Collection::make($this->getAllMigrationFiles())
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
-                        if($this->option('failed')) {
+                        if ($this->option('failed')) {
                             return in_array($migrationName, $ran)
                                 ? []
                                 : ['<fg=red>No</fg=red>', $migrationName];
@@ -117,7 +117,7 @@ class StatusCommand extends BaseCommand
 
             ['failed', 'f', InputOption::VALUE_NONE, 'Indicate if only show status of failed migrations'],
 
-            ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths']
+            ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
         ];
     }
 }
