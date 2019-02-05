@@ -54,7 +54,6 @@ class GenerateControllersCommand extends Command
             $allRoutes
         );
 
-
         $cachedControllers = [];
 
         // Loop over all actions
