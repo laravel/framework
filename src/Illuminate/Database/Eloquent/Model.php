@@ -15,7 +15,6 @@ use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
@@ -1045,11 +1044,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function newBaseQueryBuilder()
     {
-        $connection = $this->getConnection();
-
-        return new QueryBuilder(
-            $connection, $connection->getQueryGrammar(), $connection->getPostProcessor()
-        );
+        return $this->getConnection()->query();
     }
 
     /**
