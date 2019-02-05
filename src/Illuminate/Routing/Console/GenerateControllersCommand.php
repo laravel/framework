@@ -46,6 +46,7 @@ class GenerateControllersCommand extends Command
         // No route are found
         if (count($allRoutes) === 0) {
             $this->warn('No Routes are found');
+
             return;
         }
 
@@ -63,9 +64,9 @@ class GenerateControllersCommand extends Command
             if (! in_array($controller[0], $cachedControllers)) {
                 $cachedControllers [] = $controller[0];
 
-                if(! class_exists($controller[0])) {
+                if (! class_exists($controller[0])) {
                     \Illuminate\Support\Facades\Artisan::call('make:controller', [
-                        'name' => $controller[0]
+                        'name' => $controller[0],
                     ]);
 
                     $this->info("{$controller[0]} Controller has been created.");
