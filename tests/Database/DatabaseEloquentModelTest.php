@@ -1342,9 +1342,15 @@ class DatabaseEloquentModelTest extends TestCase
         });
 
         $model->withoutEventDispatcher(function () use ($model) {
-            $model->name = 'Taylor';
+            $model->first_name = 'Taylor';
             $model->save();
         });
+
+        $events->shouldReceive('until')->once()->with('eloquent.saving: Illuminate\Tests\Database\EloquentModelSaveStub', $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelSaveStub', $model);
+
+        $model->last_name = 'Otwell';
+        $model->save();
 
         EloquentModelSaveStub::flushEventListeners();
     }
