@@ -24,6 +24,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseEloquentModelTest extends TestCase
 {
@@ -677,9 +678,10 @@ class DatabaseEloquentModelTest extends TestCase
         $conn = m::mock(Connection::class);
         $grammar = m::mock(Grammar::class);
         $processor = m::mock(Processor::class);
-        $conn->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
-        $conn->shouldReceive('getPostProcessor')->once()->andReturn($processor);
         EloquentModelStub::setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
+        $conn->shouldReceive('query')->andReturnUsing(function () use ($conn, $grammar, $processor) {
+            return new BaseBuilder($conn, $grammar, $processor);
+        });
         $resolver->shouldReceive('connection')->andReturn($conn);
         $model = new EloquentModelStub;
         $builder = $model->newQuery();
@@ -1815,9 +1817,12 @@ class DatabaseEloquentModelTest extends TestCase
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
-        $resolver->shouldReceive('connection')->andReturn(m::mock(Connection::class));
-        $model->getConnection()->shouldReceive('getQueryGrammar')->andReturn(m::mock(Grammar::class));
-        $model->getConnection()->shouldReceive('getPostProcessor')->andReturn(m::mock(Processor::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(Connection::class));
+        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
+        $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
+            return new BaseBuilder($connection, $grammar, $processor);
+        });
     }
 }
 
@@ -1987,9 +1992,12 @@ class EloquentModelSaveStub extends Model
     public function getConnection()
     {
         $mock = m::mock(Connection::class);
-        $mock->shouldReceive('getQueryGrammar')->andReturn(m::mock(Grammar::class));
-        $mock->shouldReceive('getPostProcessor')->andReturn(m::mock(Processor::class));
+        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
+        $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
         $mock->shouldReceive('getName')->andReturn('name');
+        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
+            return new BaseBuilder($mock, $grammar, $processor);
+        });
 
         return $mock;
     }

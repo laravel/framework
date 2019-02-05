@@ -218,6 +218,16 @@ class FoundationApplicationTest extends TestCase
         $app->afterBootstrapping(RegisterFacades::class, $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
     }
+
+    public function testTerminationCallbacksCanAcceptAtNotation()
+    {
+        $app = new Application;
+        $app->terminating(ConcreteTerminator::class.'@terminate');
+
+        $app->terminate();
+
+        $this->assertEquals(1, ConcreteTerminator::$counter);
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
@@ -306,4 +316,14 @@ abstract class AbstractClass
 class ConcreteClass extends AbstractClass
 {
     //
+}
+
+class ConcreteTerminator
+{
+    public static $counter = 0;
+
+    public function terminate()
+    {
+        return self::$counter++;
+    }
 }
