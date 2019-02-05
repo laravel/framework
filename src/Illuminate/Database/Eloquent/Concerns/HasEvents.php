@@ -351,4 +351,27 @@ trait HasEvents
     {
         static::$dispatcher = null;
     }
+
+    /**
+     * Execute a callback without the event dispatcher.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function withoutEventDispatcher(callable $callback)
+    {
+        $dispatcher = static::getEventDispatcher();
+
+        static::unsetEventDispatcher();
+
+        try {
+            $result = $callback();
+        } finally {
+            if ($dispatcher) {
+                static::setEventDispatcher($dispatcher);
+            }
+        }
+
+        return $result;
+    }
 }
