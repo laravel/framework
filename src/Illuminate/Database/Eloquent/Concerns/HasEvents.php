@@ -365,13 +365,11 @@ trait HasEvents
         static::unsetEventDispatcher();
 
         try {
-            $result = $callback();
+            return $callback();
         } finally {
             if ($dispatcher) {
                 static::setEventDispatcher($dispatcher);
             }
         }
-
-        return $result;
     }
 }
