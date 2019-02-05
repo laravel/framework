@@ -24,10 +24,11 @@ class ServeCommand extends Command
     protected $description = 'Serve the application on the PHP development server';
 
     /**
-     * The current addition to the port (used with maxTries)
+     * The current port offset.
+     *
      * @var int
      */
-    protected $addPort = 0;
+    protected $portOffset = 0;
 
     /**
      * Execute the console command.
@@ -45,7 +46,8 @@ class ServeCommand extends Command
         passthru($this->serverCommand(), $status);
 
         if ($status && $this->canTryAnotherPort()) {
-            $this->addPort += 1;
+            $this->portOffset += 1;
+
             return $this->handle();
         }
 
@@ -86,7 +88,7 @@ class ServeCommand extends Command
      */
     protected function port()
     {
-        return $this->input->getOption('port') + $this->addPort;
+        return $this->input->getOption('port') + $this->portOffset;
     }
 
     /**
@@ -96,7 +98,7 @@ class ServeCommand extends Command
      */
     protected function canTryAnotherPort()
     {
-        return $this->input->getOption('maxTries') > $this->addPort;
+        return $this->input->getOption('tries') > $this->portOffset;
     }
 
     /**
@@ -111,7 +113,7 @@ class ServeCommand extends Command
 
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', 8000],
 
-            ['maxTries', null, InputOption::VALUE_OPTIONAL, 'The max number of times to try connecting to a port', 10],
+            ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
         ];
     }
 }
