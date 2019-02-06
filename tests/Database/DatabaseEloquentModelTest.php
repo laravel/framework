@@ -1325,6 +1325,37 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::flushEventListeners();
     }
 
+    public function testWithoutEventDispatcher()
+    {
+        EloquentModelSaveStub::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@saved');
+        $events->shouldNotReceive('until');
+        $events->shouldNotReceive('dispatch');
+        $events->shouldReceive('forget');
+        EloquentModelSaveStub::observe(EloquentTestObserverStub::class);
+
+        $model = EloquentModelSaveStub::withoutEventDispatcher(function () {
+            $model = new EloquentModelSaveStub;
+            $model->save();
+
+            return $model;
+        });
+
+        $model->withoutEventDispatcher(function () use ($model) {
+            $model->first_name = 'Taylor';
+            $model->save();
+        });
+
+        $events->shouldReceive('until')->once()->with('eloquent.saving: Illuminate\Tests\Database\EloquentModelSaveStub', $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelSaveStub', $model);
+
+        $model->last_name = 'Otwell';
+        $model->save();
+
+        EloquentModelSaveStub::flushEventListeners();
+    }
+
     public function testSetObservableEvents()
     {
         $class = new EloquentModelStub;
@@ -1976,7 +2007,13 @@ class EloquentModelSaveStub extends Model
 
     public function save(array $options = [])
     {
+        if ($this->fireModelEvent('saving') === false) {
+            return false;
+        }
+
         $_SERVER['__eloquent.saved'] = true;
+
+        $this->fireModelEvent('saved', false);
     }
 
     public function setIncrementing($value)
