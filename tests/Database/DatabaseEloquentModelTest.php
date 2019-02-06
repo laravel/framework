@@ -1335,14 +1335,14 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('forget');
         EloquentModelSaveStub::observe(EloquentTestObserverStub::class);
 
-        $model = EloquentModelSaveStub::withoutEventDispatcher(function () {
+        $model = EloquentModelSaveStub::withoutEvents(function () {
             $model = new EloquentModelSaveStub;
             $model->save();
 
             return $model;
         });
 
-        $model->withoutEventDispatcher(function () use ($model) {
+        $model->withoutEvents(function () use ($model) {
             $model->first_name = 'Taylor';
             $model->save();
         });
