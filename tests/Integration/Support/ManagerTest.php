@@ -7,7 +7,6 @@ use Orchestra\Testbench\TestCase;
 
 class ManagerTest extends TestCase
 {
-
     public function testDefaultDriverCannotBeNull()
     {
         $this->expectException(InvalidArgumentException::class);

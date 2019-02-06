@@ -10,7 +10,6 @@ use Illuminate\Container\Container;
 
 class ContainerCallTest extends TestCase
 {
-
     public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
     {
         $this->expectException(ReflectionException::class);
