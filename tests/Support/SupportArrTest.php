@@ -211,26 +211,35 @@ class SupportArrTest extends TestCase
     {
         $array = ['products.desk' => ['price' => 100]];
         $this->assertEquals(['price' => 100], Arr::get($array, 'products.desk'));
+        $this->assertEquals(['price' => 100], Arr::get($array, ['products', 'desk']));
 
         $array = ['products' => ['desk' => ['price' => 100]]];
         $value = Arr::get($array, 'products.desk');
+        $this->assertEquals(['price' => 100], $value);
+        $value = Arr::get($array, ['products', 'desk']);
         $this->assertEquals(['price' => 100], $value);
 
         // Test null array values
         $array = ['foo' => null, 'bar' => ['baz' => null]];
         $this->assertNull(Arr::get($array, 'foo', 'default'));
+        $this->assertNull(Arr::get($array, ['foo'], 'default'));
         $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
+        $this->assertNull(Arr::get($array, ['bar', 'baz'], 'default'));
 
         // Test direct ArrayAccess object
         $array = ['products' => ['desk' => ['price' => 100]]];
         $arrayAccessObject = new ArrayObject($array);
         $value = Arr::get($arrayAccessObject, 'products.desk');
         $this->assertEquals(['price' => 100], $value);
+        $value = Arr::get($arrayAccessObject, ['products', 'desk']);
+        $this->assertEquals(['price' => 100], $value);
 
         // Test array containing ArrayAccess object
         $arrayAccessChild = new ArrayObject(['products' => ['desk' => ['price' => 100]]]);
         $array = ['child' => $arrayAccessChild];
         $value = Arr::get($array, 'child.products.desk');
+        $this->assertEquals(['price' => 100], $value);
+        $value = Arr::get($array, ['child', 'products', 'desk']);
         $this->assertEquals(['price' => 100], $value);
 
         // Test array containing multiple nested ArrayAccess objects
@@ -239,6 +248,8 @@ class SupportArrTest extends TestCase
         $array = ['parent' => $arrayAccessParent];
         $value = Arr::get($array, 'parent.child.products.desk');
         $this->assertEquals(['price' => 100], $value);
+        $value = Arr::get($array, ['parent', 'child', 'products', 'desk']);
+        $this->assertEquals(['price' => 100], $value);
 
         // Test missing ArrayAccess object field
         $arrayAccessChild = new ArrayObject(['products' => ['desk' => ['price' => 100]]]);
@@ -246,17 +257,39 @@ class SupportArrTest extends TestCase
         $array = ['parent' => $arrayAccessParent];
         $value = Arr::get($array, 'parent.child.desk');
         $this->assertNull($value);
+        $value = Arr::get($array, ['parent', 'child', 'desk']);
+        $this->assertNull($value);
 
         // Test missing ArrayAccess object field
         $arrayAccessObject = new ArrayObject(['products' => ['desk' => null]]);
         $array = ['parent' => $arrayAccessObject];
         $value = Arr::get($array, 'parent.products.desk.price');
         $this->assertNull($value);
+        $value = Arr::get($array, ['parent', 'products', 'desk', 'price']);
+        $this->assertNull($value);
 
         // Test null ArrayAccess object fields
         $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
         $this->assertNull(Arr::get($array, 'foo', 'default'));
+        $this->assertNull(Arr::get($array, ['foo'], 'default'));
         $this->assertNull(Arr::get($array, 'bar.baz', 'default'));
+        $this->assertNull(Arr::get($array, ['bar', 'baz'], 'default'));
+
+        // Test numeric keys
+        $array = [
+            'products' => [
+                ['name' => '1st product'],
+                ['name' => '2nd product'],
+                ['name' => '3rd product']
+            ]
+        ];
+        $this->assertEquals('2nd product', Arr::get($array, 'products.1.name'));
+        $this->assertEquals('2nd product', Arr::get($array, ['products', '1', 'name']));
+
+        // Test combination of dot-notation + array of keys
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $value = Arr::get($array, ['products.desk', 'price']);
+        $this->assertEquals(100, $value);
 
         // Test null key returns the whole array
         $array = ['foo', 'bar'];

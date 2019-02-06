@@ -268,10 +268,10 @@ class Arr
     }
 
     /**
-     * Get an item from an array using "dot" notation.
+     * Get an item from an array using "dot" notation or array of keys.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -283,6 +283,8 @@ class Arr
 
         if (is_null($key)) {
             return $array;
+        } elseif (is_array($key)) {
+            $key = implode('.', $key);
         }
 
         if (static::exists($array, $key)) {

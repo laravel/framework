@@ -160,10 +160,10 @@ if (! function_exists('array_forget')) {
 
 if (! function_exists('array_get')) {
     /**
-     * Get an item from an array using "dot" notation.
+     * Get an item from an array using "dot" notation or array of keys.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed   $default
      * @return mixed
      *
