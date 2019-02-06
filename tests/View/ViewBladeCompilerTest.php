@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\View;
 
 use Mockery as m;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -21,12 +22,11 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Please provide a valid cache path.
-     */
     public function testCannotConstructWithBadCachePath()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Please provide a valid cache path.');
+
         new BladeCompiler($this->getFiles(), null);
     }
 

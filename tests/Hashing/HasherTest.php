@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Hashing;
 
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
@@ -50,11 +51,10 @@ class HasherTest extends TestCase
         $this->assertSame('argon2id', password_get_info($value)['algoName']);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testBasicBcryptVerification()
     {
+        $this->expectException(RuntimeException::class);
+
         if (! defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
@@ -64,21 +64,19 @@ class HasherTest extends TestCase
         (new BcryptHasher(['verify' => true]))->check('password', $argonHashed);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testBasicArgon2iVerification()
     {
+        $this->expectException(RuntimeException::class);
+
         $bcryptHasher = new BcryptHasher(['verify' => true]);
         $bcryptHashed = $bcryptHasher->make('password');
         (new ArgonHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testBasicArgon2idVerification()
     {
+        $this->expectException(RuntimeException::class);
+
         $bcryptHasher = new BcryptHasher(['verify' => true]);
         $bcryptHashed = $bcryptHasher->make('password');
         (new Argon2IdHasher(['verify' => true]))->check('password', $bcryptHashed);

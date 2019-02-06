@@ -6,6 +6,7 @@ use DateTime;
 use Mockery as m;
 use DateTimeImmutable;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
@@ -16,6 +17,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Validation\ValidationData;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Validation\PresenceVerifierInterface;
@@ -73,11 +75,10 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    /**
-     * @expectedException \Illuminate\Validation\ValidationException
-     */
     public function testValidateThrowsOnFail()
     {
+        $this->expectException(ValidationException::class);
+
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar'], ['baz' => 'required']);
 
@@ -3262,12 +3263,11 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Validation rule required_if requires at least 2 parameters.
-     */
     public function testExceptionThrownOnIncorrectParameterCount()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Validation rule required_if requires at least 2 parameters.');
+
         $trans = $this->getTranslator();
         $v = new Validator($trans, [], ['foo' => 'required_if:foo']);
         $v->passes();

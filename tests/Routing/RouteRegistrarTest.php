@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use Mockery as m;
+use BadMethodCallException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
@@ -210,12 +211,11 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals('api.users', $this->getRoute()->getName());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method Illuminate\Routing\RouteRegistrar::missing does not exist.
-     */
     public function testRegisteringNonApprovedAttributesThrows()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Illuminate\\Routing\\RouteRegistrar::missing does not exist.');
+
         $this->router->domain('foo')->missing('bar')->group(function ($router) {
             //
         });

@@ -11,6 +11,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\AssertionFailedError;
 use Illuminate\Foundation\Testing\TestResponse;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
@@ -143,12 +144,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertHeader('Location', '/bar');
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage Unexpected header [Location] is present on response.
-     */
     public function testAssertHeaderMissing()
     {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected header [Location] is present on response.');
+
         $baseResponse = tap(new Response, function ($response) {
             $response->header('Location', '/foo');
         });

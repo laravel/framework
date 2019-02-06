@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Log;
 
 use Mockery as m;
+use RuntimeException;
 use Illuminate\Log\Logger;
 use Monolog\Logger as Monolog;
 use PHPUnit\Framework\TestCase;
@@ -48,12 +49,11 @@ class LogLoggerTest extends TestCase
         unset($_SERVER['__log.context']);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Events dispatcher has not been set.
-     */
     public function testListenShortcutFailsWithNoDispatcher()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Events dispatcher has not been set.');
+
         $writer = new Logger($monolog = m::mock(Monolog::class));
         $writer->listen(function () {
             //

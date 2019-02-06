@@ -79,11 +79,10 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command, ['store' => 'foo']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testClearWithInvalidStoreArgument()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->files->shouldReceive('files')->andReturn([]);
 
         $this->cacheManager->shouldReceive('store')->once()->with('bar')->andThrow(InvalidArgumentException::class);

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use stdClass;
+use Exception;
 use Mockery as m;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Mix;
@@ -41,12 +42,11 @@ class FoundationHelpersTest extends TestCase
         $this->assertEquals('default', cache('baz', 'default'));
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage You must specify an expiration time when setting a value in the cache.
-     */
     public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('You must specify an expiration time when setting a value in the cache.');
+
         cache(['foo' => 'bar']);
     }
 
@@ -98,12 +98,11 @@ class FoundationHelpersTest extends TestCase
         unlink($manifest);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage The Mix manifest does not exist.
-     */
     public function testMixMissingManifestThrowsException()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('The Mix manifest does not exist.');
+
         mix('unversioned.css', 'missing');
     }
 

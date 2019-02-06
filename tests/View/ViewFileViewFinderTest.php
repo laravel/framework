@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\View;
 
 use Mockery as m;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\View\FileViewFinder;
 use Illuminate\Filesystem\Filesystem;
@@ -74,11 +75,10 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertEquals(__DIR__.'/bar/bar/baz.blade.php', $finder->find('foo::bar.baz'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionThrownWhenViewNotFound()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $finder = $this->getFinder();
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.php')->andReturn(false);
@@ -87,22 +87,20 @@ class ViewFileViewFinderTest extends TestCase
         $finder->find('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No hint path defined for [name].
-     */
     public function testExceptionThrownOnInvalidViewName()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No hint path defined for [name].');
+
         $finder = $this->getFinder();
         $finder->find('name::');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No hint path defined for [name].
-     */
     public function testExceptionThrownWhenNoHintPathIsRegistered()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No hint path defined for [name].');
+
         $finder = $this->getFinder();
         $finder->find('name::foo');
     }
