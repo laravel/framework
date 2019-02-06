@@ -353,12 +353,12 @@ trait HasEvents
     }
 
     /**
-     * Execute a callback without firing any model events for this model type.
+     * Execute a callback without firing any model events for any model type.
      *
      * @param  callable  $callback
      * @return mixed
      */
-    public static function withoutEventDispatcher(callable $callback)
+    public static function withoutEvents(callable $callback)
     {
         $dispatcher = static::getEventDispatcher();
 
