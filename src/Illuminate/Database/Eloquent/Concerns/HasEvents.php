@@ -353,7 +353,7 @@ trait HasEvents
     }
 
     /**
-     * Execute a callback without the event dispatcher.
+     * Execute a callback without firing any model events for this model type.
      *
      * @param  callable  $callback
      * @return mixed
