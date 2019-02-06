@@ -73,6 +73,24 @@ class EventFakeTest extends TestCase
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
+
+    public function testNonFakedHaltedEventGetsProperlyDispatchedAndReturnsResponse()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return 'two';
+        });
+        Event::listen('test', function () {
+            $this->fail('should not be called');
+        });
+
+        $this->assertEquals('two', Event::until('test'));
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
 }
 
 class Post extends Model
