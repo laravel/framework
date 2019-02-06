@@ -315,14 +315,10 @@ class Builder
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id) || $id instanceof Arrayable) {
-            return $this->findMany($id, $columns);
-        }
-
         return $this->whereKey($id)->first($columns);
     }
 
