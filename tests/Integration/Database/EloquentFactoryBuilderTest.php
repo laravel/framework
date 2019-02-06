@@ -171,8 +171,8 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertInstanceOf(Collection::class, $instances);
         $this->assertCount(3, $users);
         $this->assertCount(3, $instances);
-        $this->assertCount(3, FactoryBuildableUser::find($users->pluck('id')->toArray()));
-        $this->assertCount(0, FactoryBuildableUser::find($instances->pluck('id')->toArray()));
+        $this->assertCount(3, FactoryBuildableUser::findMany($users->pluck('id')->toArray()));
+        $this->assertCount(0, FactoryBuildableUser::findMany($instances->pluck('id')->toArray()));
     }
 
     public function test_creating_models_with_callable_state()

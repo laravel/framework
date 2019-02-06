@@ -430,7 +430,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $single = EloquentTestUser::findOrFail(1);
-        $multiple = EloquentTestUser::findOrFail([1, 2]);
+        $multiple = EloquentTestUser::findManyOrFail([1, 2]);
 
         $this->assertInstanceOf(EloquentTestUser::class, $single);
         $this->assertEquals('taylorotwell@gmail.com', $single->email);

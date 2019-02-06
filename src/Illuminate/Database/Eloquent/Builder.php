@@ -326,7 +326,7 @@ class Builder
      * Find multiple models by their primary keys.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
-     * @param  array  $columns
+     * @param  array $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findMany($ids, $columns = ['*'])
@@ -336,6 +336,23 @@ class Builder
         }
 
         return $this->whereKey($ids)->get($columns);
+    }
+
+    /**
+     * Find multiple models by their primary keys or throw an exception.
+     * @param array $ids
+     * @param array $columns
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function findManyOrFail($ids, $columns = ['*'])
+    {
+        $results = $this->findMany($ids, $columns);
+
+        if (count($results) === count(array_unique($ids))) {
+            return $results;
+        }
+
+        throw (new ModelNotFoundException)->setModel(get_class($this->model), $ids);
     }
 
     /**
@@ -351,11 +368,7 @@ class Builder
     {
         $result = $this->find($id, $columns);
 
-        if (is_array($id)) {
-            if (count($result) === count(array_unique($id))) {
-                return $result;
-            }
-        } elseif (! is_null($result)) {
+        if (! is_null($result)) {
             return $result;
         }
 
