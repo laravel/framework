@@ -103,7 +103,7 @@ class EloquentFactoryBuilderTest extends TestCase
         });
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

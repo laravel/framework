@@ -12,7 +12,7 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class LogLoggerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

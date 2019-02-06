@@ -21,7 +21,7 @@ use Illuminate\Contracts\Encryption\Encrypter;
 
 class AuthGuardTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

@@ -14,14 +14,14 @@ class RedisCacheLockTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->setUpRedis();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

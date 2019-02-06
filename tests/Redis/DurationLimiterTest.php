@@ -15,7 +15,7 @@ class DurationLimiterTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -13,14 +13,14 @@ class RedisBroadcasterTest extends TestCase
      */
     public $broadcaster;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->broadcaster = m::mock(RedisBroadcaster::class)->makePartial();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

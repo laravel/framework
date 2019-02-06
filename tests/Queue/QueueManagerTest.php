@@ -10,7 +10,7 @@ use Illuminate\Contracts\Encryption\Encrypter;
 
 class QueueManagerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

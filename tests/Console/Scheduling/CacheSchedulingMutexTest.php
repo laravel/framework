@@ -38,7 +38,7 @@ class CacheSchedulingMutexTest extends TestCase
      */
     protected $cacheRepository;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

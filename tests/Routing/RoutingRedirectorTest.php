@@ -19,7 +19,7 @@ class RoutingRedirectorTest extends TestCase
     protected $session;
     protected $redirect;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->headers = m::mock(HeaderBag::class);
 
@@ -45,7 +45,7 @@ class RoutingRedirectorTest extends TestCase
         $this->redirect->setSession($this->session);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

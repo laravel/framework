@@ -14,13 +14,13 @@ class FilesystemTest extends TestCase
 {
     private $tempDir;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tempDir = __DIR__.'/tmp';
         mkdir($this->tempDir);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
 

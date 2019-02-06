@@ -11,7 +11,7 @@ use Illuminate\Database\Schema\Blueprint;
  */
 class EloquentWhereTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -29,7 +29,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     protected $request;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->config = m::mock(Config::class);
 
@@ -51,7 +51,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler = new Handler($this->container);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
