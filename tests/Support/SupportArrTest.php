@@ -280,7 +280,7 @@ class SupportArrTest extends TestCase
             'products' => [
                 ['name' => '1st product'],
                 ['name' => '2nd product'],
-                ['name' => '3rd product']
+                ['name' => '3rd product'],
             ]
         ];
         $this->assertEquals('2nd product', Arr::get($array, 'products.1.name'));
