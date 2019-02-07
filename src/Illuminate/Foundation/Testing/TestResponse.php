@@ -429,6 +429,22 @@ class TestResponse
     }
 
     /**
+     * Assert that the response is a superset of given JSONP
+     *
+     * @param  string  $callback
+     * @param  array  $data
+     * @param  bool  $strict
+     * @return $this
+     */
+    public function assertJsonp(string $callback, array $data, $strict = false)
+    {
+        PHPUnit::assertEquals($callback, $this->getCallback());
+        $this->assertJson($data, $strict);
+
+        return $this;
+    }
+
+    /**
      * Get the assertion message for assertJson.
      *
      * @param  array  $data
@@ -694,7 +710,11 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponse = json_decode($this->getContent(), true);
+        if (is_null($this->getCallback())) {
+            $decodedResponse = json_decode($this->getContent(), true);
+        } else {
+            $decodedResponse = $this->getOriginalContent();
+        }
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {

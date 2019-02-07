@@ -43,6 +43,16 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
+     * Get the JSONP callback.
+     *
+     * @return  string|null
+     */
+    public function getCallback()
+    {
+        return $this->callback;
+    }
+
+    /**
      * Get the json_decoded data from the response.
      *
      * @param  bool  $assoc
