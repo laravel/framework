@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use UnexpectedValueException;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +27,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RoutingRouteTest extends TestCase
 {

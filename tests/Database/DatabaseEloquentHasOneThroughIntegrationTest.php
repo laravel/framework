@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 {

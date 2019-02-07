@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use LogicException;
 use Mockery as m;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
