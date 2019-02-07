@@ -43,6 +43,16 @@ trait ResponseTrait
     }
 
     /**
+     * Get the callback of the response.
+     *
+     * @return string|null
+     */
+    public function getCallback()
+    {
+        return $this->callback ?? null;
+    }
+
+    /**
      * Get the original response content.
      *
      * @return mixed
