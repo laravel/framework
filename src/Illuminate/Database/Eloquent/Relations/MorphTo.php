@@ -223,6 +223,17 @@ class MorphTo extends BelongsTo
     }
 
     /**
+     * Make a new related instance for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected function newRelatedInstanceFor(Model $parent)
+    {
+        return $parent->{$this->relation}()->getRelated()->newInstance();
+    }
+
+    /**
      * Get the foreign key "type" name.
      *
      * @return string
