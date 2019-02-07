@@ -17,7 +17,7 @@ abstract class ServiceProvider
     /**
      * Indicates if loading of the provider is deferred.
      *
-     * @deprecated 5.8 Implement the \Illuminate\Contracts\Support\DeferrableProvider interface instead.
+     * @deprecated Implement the \Illuminate\Contracts\Support\DeferrableProvider interface instead. Will be removed in Laravel 5.9.
      *
      * @var bool
      */
