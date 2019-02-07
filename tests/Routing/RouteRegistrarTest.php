@@ -479,8 +479,8 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('posts', RouteRegistrarControllerStub::class)
                      ->parameter('posts', 'topic');
 
-        $this->assertContains('admin_user', $this->router->getRoutes()->getByName('users.show')->uri);
-        $this->assertContains('topic', $this->router->getRoutes()->getByName('posts.show')->uri);
+        $this->assertStringContainsString('admin_user', $this->router->getRoutes()->getByName('users.show')->uri);
+        $this->assertStringContainsString('topic', $this->router->getRoutes()->getByName('posts.show')->uri);
     }
 
     public function testCanSetMiddlewareOnRegisteredResource()

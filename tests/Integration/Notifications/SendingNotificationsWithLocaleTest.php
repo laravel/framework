@@ -73,7 +73,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         NotificationFacade::send($user, new GreetingMailNotification);
 
-        $this->assertContains('hello',
+        $this->assertStringContainsString('hello',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -87,7 +87,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -107,11 +107,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         NotificationFacade::send($users, (new GreetingMailNotification)->locale('fr'));
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[1]->getBody()
         );
     }
@@ -125,7 +125,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotificationWithMailable);
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -145,7 +145,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         $user->notify((new GreetingMailNotification)->locale('fr'));
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
 
@@ -167,7 +167,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         $recipient->notify(new GreetingMailNotification);
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -192,13 +192,13 @@ class SendingNotificationsWithLocaleTest extends TestCase
             $recipients, new GreetingMailNotification
         );
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
-        $this->assertContains('hola',
+        $this->assertStringContainsString('hola',
             app('swift.transport')->messages()[1]->getBody()
         );
-        $this->assertContains('hi',
+        $this->assertStringContainsString('hi',
             app('swift.transport')->messages()[2]->getBody()
         );
     }
@@ -214,7 +214,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             (new GreetingMailNotification)->locale('fr')
         );
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -230,7 +230,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             $recipient, new GreetingMailNotification
         );
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }

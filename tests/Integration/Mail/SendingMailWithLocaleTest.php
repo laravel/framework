@@ -55,7 +55,7 @@ class SendingMailWithLocaleTest extends TestCase
     {
         Mail::to('test@mail.com')->send(new TestMail);
 
-        $this->assertContains('name',
+        $this->assertStringContainsString('name',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -64,7 +64,7 @@ class SendingMailWithLocaleTest extends TestCase
     {
         Mail::to('test@mail.com')->locale('ar')->send(new TestMail);
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -95,7 +95,7 @@ class SendingMailWithLocaleTest extends TestCase
 
         Mail::to($recipient)->send(new TestMail);
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -109,7 +109,7 @@ class SendingMailWithLocaleTest extends TestCase
 
         Mail::to($recipient)->locale('ar')->send(new TestMail);
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -128,7 +128,7 @@ class SendingMailWithLocaleTest extends TestCase
 
         Mail::to($toRecipient)->cc($ccRecipient)->send(new TestMail);
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -148,7 +148,7 @@ class SendingMailWithLocaleTest extends TestCase
 
         Mail::to($recipients)->send(new TestMail);
 
-        $this->assertContains('name',
+        $this->assertStringContainsString('name',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -160,11 +160,11 @@ class SendingMailWithLocaleTest extends TestCase
 
         $this->assertEquals('en', app('translator')->getLocale());
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
 
-        $this->assertContains('name',
+        $this->assertStringContainsString('name',
             app('swift.transport')->messages()[1]->getBody()
         );
     }

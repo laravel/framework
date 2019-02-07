@@ -879,7 +879,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $sql = preg_replace($aliasRegex, $alias, $sql);
 
-        $this->assertContains('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
+        $this->assertStringContainsString('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
     }
 
     public function testDoesntHave()
