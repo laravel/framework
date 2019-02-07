@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use InvalidArgumentException;
 use PDO;
 use Mockery as m;
 use ReflectionProperty;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;

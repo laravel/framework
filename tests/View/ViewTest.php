@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\View;
 
-use BadMethodCallException;
 use Closure;
 use ArrayAccess;
 use Mockery as m;
 use Illuminate\View\View;
+use BadMethodCallException;
 use Illuminate\View\Factory;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;

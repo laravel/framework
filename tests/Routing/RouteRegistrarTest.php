@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Routing;
 
-use BadMethodCallException;
 use Mockery as m;
+use BadMethodCallException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
