@@ -14,7 +14,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
  */
 class ThrottleRequestsTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         Carbon::setTestNow(null);

@@ -10,7 +10,7 @@ use Illuminate\Support\Collection as BaseCollection;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

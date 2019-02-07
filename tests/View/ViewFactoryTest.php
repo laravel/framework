@@ -22,7 +22,7 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class ViewFactoryTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
  */
 class EloquentPivotSerializationTest extends DatabaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

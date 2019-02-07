@@ -9,7 +9,7 @@ use Illuminate\Database\Migrations\MigrationCreator;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

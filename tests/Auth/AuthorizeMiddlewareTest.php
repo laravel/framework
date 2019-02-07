@@ -22,12 +22,7 @@ class AuthorizeMiddlewareTest extends TestCase
     protected $user;
     protected $router;
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -46,6 +41,11 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->container->singleton(Registrar::class, function () {
             return $this->router;
         });
+    }
+
+    public function tearDown(): void
+    {
+        m::close();
     }
 
     /**

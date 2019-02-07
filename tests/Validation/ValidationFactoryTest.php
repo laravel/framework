@@ -11,7 +11,7 @@ use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
 
 class ValidationFactoryTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

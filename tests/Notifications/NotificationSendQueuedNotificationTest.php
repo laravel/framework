@@ -9,7 +9,7 @@ use Illuminate\Notifications\SendQueuedNotifications;
 
 class NotificationSendQueuedNotificationTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

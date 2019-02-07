@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -84,7 +84,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         Carbon::setTestNow(null);
 

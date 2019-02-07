@@ -14,7 +14,7 @@ class DatabaseConnectionFactoryTest extends TestCase
 {
     protected $db;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = new DB;
 
@@ -36,7 +36,7 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->db->setAsGlobal();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

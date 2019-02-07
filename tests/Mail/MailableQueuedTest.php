@@ -19,7 +19,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
 
 class MailableQueuedTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

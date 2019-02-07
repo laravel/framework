@@ -8,7 +8,7 @@ use Illuminate\View\Engines\PhpEngine;
 
 class ViewPhpEngineTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

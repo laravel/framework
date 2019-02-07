@@ -13,7 +13,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

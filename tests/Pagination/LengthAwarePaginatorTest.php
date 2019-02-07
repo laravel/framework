@@ -17,13 +17,13 @@ class LengthAwarePaginatorTest extends TestCase
      */
     private $options;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->options = ['onEachSide' => 5];
         $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, $this->options);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->p);
     }

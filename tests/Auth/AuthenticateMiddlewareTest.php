@@ -18,12 +18,7 @@ class AuthenticateMiddlewareTest extends TestCase
 {
     protected $auth;
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
-    public function setUp()
+    public function setUp(): void
     {
         $container = Container::setInstance(new Container);
 
@@ -32,6 +27,11 @@ class AuthenticateMiddlewareTest extends TestCase
         $container->singleton('config', function () {
             return $this->createConfig();
         });
+    }
+
+    public function tearDown(): void
+    {
+        m::close();
     }
 
     /**

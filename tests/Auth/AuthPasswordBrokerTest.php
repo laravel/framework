@@ -14,7 +14,7 @@ use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 
 class AuthPasswordBrokerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

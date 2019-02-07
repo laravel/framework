@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $db = new DB;
 
@@ -70,7 +70,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->schema()->drop('users');
         $this->schema()->drop('articles');

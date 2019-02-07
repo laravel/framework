@@ -25,7 +25,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseConnectionTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

@@ -49,7 +49,7 @@ class FoundationAuthenticationTest extends TestCase
         return $guard;
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

@@ -23,7 +23,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = $db = new DB;
 
@@ -59,7 +59,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);

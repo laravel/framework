@@ -12,7 +12,7 @@ use Illuminate\Foundation\Bootstrap\RegisterFacades;
 
 class FoundationApplicationTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

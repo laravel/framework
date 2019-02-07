@@ -9,7 +9,7 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class ViewBladeCompilerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

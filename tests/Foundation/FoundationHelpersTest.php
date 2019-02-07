@@ -11,7 +11,7 @@ use Illuminate\Foundation\Application;
 
 class FoundationHelpersTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

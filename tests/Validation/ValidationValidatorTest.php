@@ -24,7 +24,7 @@ use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
 class ValidationValidatorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Carbon::setTestNow();
         m::close();

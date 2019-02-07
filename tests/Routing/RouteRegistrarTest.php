@@ -16,14 +16,14 @@ class RouteRegistrarTest extends TestCase
      */
     protected $router;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

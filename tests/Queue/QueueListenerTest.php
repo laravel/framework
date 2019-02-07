@@ -10,7 +10,7 @@ use Symfony\Component\Process\Process;
 
 class QueueListenerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

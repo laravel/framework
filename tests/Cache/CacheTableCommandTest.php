@@ -14,7 +14,7 @@ use Illuminate\Database\Migrations\MigrationCreator;
 
 class CacheTableCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

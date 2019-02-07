@@ -18,7 +18,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
  */
 class SendingMailWithLocaleTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,7 +46,7 @@ class SendingMailWithLocaleTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }

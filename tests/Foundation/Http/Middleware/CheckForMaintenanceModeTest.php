@@ -26,7 +26,7 @@ class CheckForMaintenanceModeTest extends TestCase
      */
     protected $files;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (is_null($this->files)) {
             $this->files = new Filesystem;
@@ -38,7 +38,7 @@ class CheckForMaintenanceModeTest extends TestCase
         $this->files->makeDirectory($this->storagePath.'/framework', 0755, true);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->files->deleteDirectory($this->storagePath);
 
