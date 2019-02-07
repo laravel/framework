@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use DateTime;
 use Carbon\Factory;
 use Carbon\CarbonImmutable;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\DateFactory;
@@ -85,11 +86,10 @@ class DateFacadeTest extends TestCase
         DateFactory::use(Carbon::class);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testUseInvalidHandler()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         DateFactory::use(42);
     }
 }

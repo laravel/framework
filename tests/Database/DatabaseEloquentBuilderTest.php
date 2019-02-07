@@ -6,6 +6,7 @@ use Closure;
 use stdClass;
 use Mockery as m;
 use Carbon\Carbon;
+use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,6 +18,8 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
@@ -67,11 +70,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertInstanceOf(Model::class, $result);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFindOrFailMethodThrowsModelNotFoundException()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
@@ -79,11 +81,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrFail('bar', ['column']);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
@@ -91,11 +92,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrFail([1, 2], ['column']);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
@@ -416,12 +416,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Call to undefined method Illuminate\Database\Eloquent\Builder::missingMacro()
-     */
     public function testMissingStaticMacrosThrowsProperException()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Database\Eloquent\Builder::missingMacro()');
+
         Builder::missingMacro();
     }
 
@@ -508,11 +507,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getRelation('ordersGroups');
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\RelationNotFoundException
-     */
     public function testGetRelationThrowsException()
     {
+        $this->expectException(RelationNotFoundException::class);
+
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
 

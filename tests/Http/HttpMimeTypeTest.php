@@ -30,7 +30,8 @@ class HttpMimeTypeTest extends TestCase
     public function testGetAllMimeTypes()
     {
         $this->assertIsArray(MimeType::get());
-        $this->assertArraySubset(['jpg' => 'image/jpeg'], MimeType::get());
+        $this->assertArrayHasKey('jpg', MimeType::get());
+        $this->assertEquals('image/jpeg', MimeType::get()['jpg']);
     }
 
     public function testSearchExtensionFromMimeType()

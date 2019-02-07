@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -228,11 +229,10 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($tag->name, $post->tags()->first()->name);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function test_firstOrFail_method()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         $post = Post::create(['title' => Str::random()]);
 
         $post->tags()->firstOrFail(['id' => 10]);
@@ -251,11 +251,10 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(2, $post->tags()->findMany([$tag->id, $tag2->id]));
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function test_findOrFail_method()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         $post = Post::create(['title' => Str::random()]);
 
         Tag::create(['name' => Str::random()]);

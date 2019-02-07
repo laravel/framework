@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
@@ -66,12 +67,11 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo', 'baz', true);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A MigrationCreatorFakeMigration class already exists.
-     */
     public function testTableUpdateMigrationWontCreateDuplicateClass()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A MigrationCreatorFakeMigration class already exists.');
+
         $creator = $this->getCreator();
 
         $creator->create('migration_creator_fake_migration', 'foo');

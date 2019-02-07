@@ -3,11 +3,13 @@
 namespace Illuminate\Tests\Auth;
 
 use stdClass;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class AuthAccessGateTest extends TestCase
 {
@@ -507,10 +509,11 @@ class AuthAccessGateTest extends TestCase
 
     /**
      * @dataProvider notCallableDataProvider
-     * @expectedException \InvalidArgumentException
      */
     public function test_define_second_parameter_should_be_string_or_callable($callback)
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $gate = $this->getBasicGate();
 
         $gate->define('foo', $callback);
@@ -529,12 +532,11 @@ class AuthAccessGateTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage You are not an admin.
-     */
     public function test_authorize_throws_unauthorized_exception()
     {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('You are not an admin.');
+
         $gate = $this->getBasicGate();
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);

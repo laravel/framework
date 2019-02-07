@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use InvalidArgumentException;
 use PDO;
 use Mockery as m;
 use ReflectionProperty;
@@ -73,22 +74,20 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A driver must be specified.
-     */
     public function testIfDriverIsntSetExceptionIsThrown()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A driver must be specified.');
+
         $factory = new ConnectionFactory($container = m::mock(Container::class));
         $factory->createConnector(['foo']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsupported driver [foo]
-     */
     public function testExceptionIsThrownOnUnsupportedDriver()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported driver [foo]');
+
         $factory = new ConnectionFactory($container = m::mock(Container::class));
         $container->shouldReceive('bound')->once()->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);

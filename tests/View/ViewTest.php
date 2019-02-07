@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use BadMethodCallException;
 use Closure;
 use ArrayAccess;
 use Mockery as m;
@@ -170,12 +171,11 @@ class ViewTest extends TestCase
         $this->assertFalse($view->offsetExists('foo'));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method Illuminate\View\View::badMethodCall does not exist.
-     */
     public function testViewBadMethod()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Illuminate\View\View::badMethodCall does not exist.');
+
         $view = $this->getView();
         $view->badMethodCall();
     }

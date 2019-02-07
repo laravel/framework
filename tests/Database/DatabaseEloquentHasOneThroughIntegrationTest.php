@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -115,23 +116,21 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->assertCount(1, $position);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasOneThroughTestContract].
-     */
     public function testFirstOrFailThrowsAnException()
     {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasOneThroughTestContract].');
+
         HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
             ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
 
         HasOneThroughTestPosition::first()->contract()->firstOrFail();
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFindOrFailThrowsAnException()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
             ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
 

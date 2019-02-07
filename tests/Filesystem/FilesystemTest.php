@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use SplFileInfo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -259,11 +260,10 @@ class FilesystemTest extends TestCase
         $this->assertFalse($files->moveDirectory($this->tempDir.'/tmp', $this->tempDir.'/tmp2', true));
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
     public function testGetThrowsExceptionNonexisitingFile()
     {
+        $this->expectException(FileNotFoundException::class);
+
         $files = new Filesystem;
         $files->get($this->tempDir.'/unknown-file.txt');
     }
@@ -275,11 +275,10 @@ class FilesystemTest extends TestCase
         $this->assertEquals('Howdy?', $files->getRequire($this->tempDir.'/file.php'));
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
-    public function testGetRequireThrowsExceptionNonexisitingFile()
+    public function testGetRequireThrowsExceptionNonExistingFile()
     {
+        $this->expectException(FileNotFoundException::class);
+
         $files = new Filesystem;
         $files->getRequire($this->tempDir.'/file.php');
     }

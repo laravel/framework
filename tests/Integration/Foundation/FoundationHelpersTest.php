@@ -66,12 +66,11 @@ class FoundationHelpersTest extends TestCase
     //     unlink($manifest);
     // }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Unable to locate Mix file: /missing.js.
-     */
     // public function testMixThrowsExceptionWhenAssetIsMissingFromManifestWhenInDebugMode()
     // {
+    //     $this->expectException(Exception::class);
+    //     $this->expectExceptionMessage('Unable to locate Mix file: /missing.js.');
+
     //     $this->app['config']->set('app.debug', true);
     //     $manifest = $this->makeManifest();
 

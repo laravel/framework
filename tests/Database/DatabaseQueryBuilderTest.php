@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use stdClass;
 use Mockery as m;
+use RuntimeException;
+use BadMethodCallException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Builder;
@@ -2363,11 +2365,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertCount(2, $builder->wheres);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
     {
+        $this->expectException(BadMethodCallException::class);
+
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select');
         $builder->getProcessor()->shouldReceive('processSelect')->andReturn([]);
@@ -2874,11 +2875,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1], $builder->getBindings());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testWhereJsonContainsSqlite()
     {
+        $this->expectException(RuntimeException::class);
+
         $builder = $this->getSQLiteBuilder();
         $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en'])->toSql();
     }
@@ -2927,11 +2927,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1], $builder->getBindings());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testWhereJsonDoesntContainSqlite()
     {
+        $this->expectException(RuntimeException::class);
+
         $builder = $this->getSQLiteBuilder();
         $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en'])->toSql();
     }

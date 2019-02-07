@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
 use Illuminate\Support\Arr;
+use UnexpectedValueException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -28,12 +29,11 @@ class AuthPasswordBrokerTest extends TestCase
         $this->assertEquals(PasswordBrokerContract::INVALID_USER, $broker->sendResetLink(['credentials']));
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage User must implement CanResetPassword interface.
-     */
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
     {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('User must implement CanResetPassword interface.');
+
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn('bar');
 

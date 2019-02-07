@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Cache;
 use Memcached;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 /**
  * @group integration
@@ -43,11 +44,10 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
         }));
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Cache\LockTimeoutException
-     */
     public function test_locks_throw_timeout_if_block_expires()
     {
+        $this->expectException(LockTimeoutException::class);
+
         Carbon::setTestNow();
 
         Cache::store('memcached')->lock('foo')->release();

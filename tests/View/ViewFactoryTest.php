@@ -5,6 +5,7 @@ namespace Illuminate\Tests\View;
 use Closure;
 use stdClass;
 use Mockery as m;
+use ErrorException;
 use ReflectionFunction;
 use Illuminate\View\View;
 use Illuminate\View\Factory;
@@ -80,11 +81,10 @@ class ViewFactoryTest extends TestCase
         unset($_SERVER['__test.view']);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testFirstThrowsInvalidArgumentExceptionIfNoneFound()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andThrow(InvalidArgumentException::class);
         $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andThrow(InvalidArgumentException::class);
@@ -474,22 +474,20 @@ class ViewFactoryTest extends TestCase
         $factory->make('vendor/package::foo.bar');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionIsThrownForUnknownExtension()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('view.foo');
         $factory->make('view');
     }
 
-    /**
-     * @expectedException \ErrorException
-     * @expectedExceptionMessage section exception message
-     */
     public function testExceptionsInSectionsAreThrown()
     {
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessage('section exception message');
+
         $engine = new CompilerEngine(m::mock(CompilerInterface::class));
         $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
             return $path;
@@ -504,12 +502,11 @@ class ViewFactoryTest extends TestCase
         $factory->make('view')->render();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot end a section without first starting one.
-     */
     public function testExtraStopSectionCallThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot end a section without first starting one.');
+
         $factory = $this->getFactory();
         $factory->startSection('foo');
         $factory->stopSection();
@@ -517,12 +514,11 @@ class ViewFactoryTest extends TestCase
         $factory->stopSection();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot end a section without first starting one.
-     */
     public function testExtraAppendSectionCallThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot end a section without first starting one.');
+
         $factory = $this->getFactory();
         $factory->startSection('foo');
         $factory->stopSection();

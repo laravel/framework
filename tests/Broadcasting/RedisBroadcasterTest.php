@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Broadcasting;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcasterTest extends TestCase
 {
@@ -39,11 +40,10 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse()
     {
+        $this->expectException(AccessDeniedHttpException::class);
+
         $this->broadcaster->channel('test', function () {
             return false;
         });
@@ -53,11 +53,10 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
+        $this->expectException(AccessDeniedHttpException::class);
+
         $this->broadcaster->channel('test', function () {
             return true;
         });
@@ -82,11 +81,10 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
     public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull()
     {
+        $this->expectException(AccessDeniedHttpException::class);
+
         $this->broadcaster->channel('test', function () {
         });
 
@@ -95,11 +93,10 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
     public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound()
     {
+        $this->expectException(AccessDeniedHttpException::class);
+
         $this->broadcaster->channel('test', function () {
             return [1, 2, 3, 4];
         });

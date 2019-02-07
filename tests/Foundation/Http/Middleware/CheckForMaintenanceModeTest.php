@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Foundation\Http\Exceptions\MaintenanceModeException;
 
 class CheckForMaintenanceModeTest extends TestCase
 {
@@ -88,12 +89,11 @@ class CheckForMaintenanceModeTest extends TestCase
         $this->assertSame('Allowing [2001:0db8:85a3:0000:0000:8a2e:0370:7334]', $result);
     }
 
-    /**
-     * @expectedException \Illuminate\Foundation\Http\Exceptions\MaintenanceModeException
-     * @expectedExceptionMessage This application is down for maintenance.
-     */
     public function testApplicationDeniesSomeIPs()
     {
+        $this->expectException(MaintenanceModeException::class);
+        $this->expectExceptionMessage('This application is down for maintenance.');
+
         $middleware = new CheckForMaintenanceMode($this->createMaintenanceApplication());
 
         $result = $middleware->handle(Request::create('/'), function ($request) {
@@ -120,12 +120,11 @@ class CheckForMaintenanceModeTest extends TestCase
         $this->assertSame('Excepting /foo/bar', $result);
     }
 
-    /**
-     * @expectedException \Illuminate\Foundation\Http\Exceptions\MaintenanceModeException
-     * @expectedExceptionMessage This application is down for maintenance.
-     */
     public function testApplicationDeniesSomeURIs()
     {
+        $this->expectException(MaintenanceModeException::class);
+        $this->expectExceptionMessage('This application is down for maintenance.');
+
         $middleware = new CheckForMaintenanceMode($this->createMaintenanceApplication());
 
         $result = $middleware->handle(Request::create('/foo/bar'), function ($request) {
