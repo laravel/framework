@@ -218,6 +218,27 @@ class FoundationApplicationTest extends TestCase
         $app->afterBootstrapping(RegisterFacades::class, $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
     }
+
+    public function testBootingCallbacks()
+    {
+        $app = new Application;
+
+        $counter = 0;
+        $closure = function ($app) use (&$counter) {
+            $counter++;
+            $this->assertInstanceOf(Application::class, $app);
+        };
+
+        $closure2 = function ($app) use (&$counter) {
+            $counter++;
+            $this->assertInstanceOf(Application::class, $app);
+        };
+
+        $app->booting($closure);
+        $app->booting($closure2);
+        $app->boot();
+        $this->assertEquals(2, $counter);
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
