@@ -182,8 +182,7 @@ class EloquentMorphToModelStub extends Model
 
     public $table = 'eloquent_morph_to_model_stubs';
 
-    public function relation()
-    {
+    public function relation() {
         return $this->morphTo();
     }
 }
