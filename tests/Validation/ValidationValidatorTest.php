@@ -429,6 +429,15 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
 
+        //date_equals:tomorrow
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.date_equals' => 'The :attribute must be a date equal to :date.'], 'en');
+        $trans->addLines(['validation.values.date.tomorrow' => 'the day after today'], 'en');
+        $v = new Validator($trans, ['date' => date('Y-m-d')], ['date' => 'date_equals:tomorrow']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('The date must be a date equal to the day after today.', $v->messages()->first('date'));
+
         // test addCustomValues
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.in' => ':attribute must be included in :values.'], 'en');

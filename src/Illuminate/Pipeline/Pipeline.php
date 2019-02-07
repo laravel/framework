@@ -105,6 +105,18 @@ class Pipeline implements PipelineContract
     }
 
     /**
+     * Run the pipeline and return the result.
+     *
+     * @return mixed
+     */
+    public function thenReturn()
+    {
+        return $this->then(function ($passable) {
+            return $passable;
+        });
+    }
+
+    /**
      * Get the final piece of the Closure onion.
      *
      * @param  \Closure  $destination

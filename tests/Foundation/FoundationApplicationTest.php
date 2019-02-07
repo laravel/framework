@@ -209,6 +209,32 @@ class FoundationApplicationTest extends TestCase
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades'));
     }
 
+    public function testTerminationTests()
+    {
+        $app = new Application;
+
+        $result = [];
+        $callback1 = function () use (&$result) {
+            $result[] = 1;
+        };
+
+        $callback2 = function () use (&$result) {
+            $result[] = 2;
+        };
+
+        $callback3 = function () use (&$result) {
+            $result[] = 3;
+        };
+
+        $app->terminating($callback1);
+        $app->terminating($callback2);
+        $app->terminating($callback3);
+
+        $app->terminate();
+
+        $this->assertEquals([1, 2, 3], $result);
+    }
+
     public function testAfterBootstrappingAddsClosure()
     {
         $app = new Application;
@@ -217,6 +243,16 @@ class FoundationApplicationTest extends TestCase
         };
         $app->afterBootstrapping(RegisterFacades::class, $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
+    }
+
+    public function testTerminationCallbacksCanAcceptAtNotation()
+    {
+        $app = new Application;
+        $app->terminating(ConcreteTerminator::class.'@terminate');
+
+        $app->terminate();
+
+        $this->assertEquals(1, ConcreteTerminator::$counter);
     }
 }
 
@@ -306,4 +342,14 @@ abstract class AbstractClass
 class ConcreteClass extends AbstractClass
 {
     //
+}
+
+class ConcreteTerminator
+{
+    public static $counter = 0;
+
+    public function terminate()
+    {
+        return self::$counter++;
+    }
 }
