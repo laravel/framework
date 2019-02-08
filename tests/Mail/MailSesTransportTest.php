@@ -32,7 +32,7 @@ class MailSesTransportTest extends TestCase
         $transport = $manager->driver('ses');
 
         /** @var SesClient $ses */
-        $ses = $this->readAttribute($transport, 'ses');
+        $ses = $transport->ses();
 
         $this->assertEquals('us-east-1', $ses->getRegion());
     }
