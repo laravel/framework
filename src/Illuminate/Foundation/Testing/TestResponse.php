@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 
 /**
- * @mixin \Illuminate\Http\Response
+ * @mixin \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
  */
 class TestResponse
 {
