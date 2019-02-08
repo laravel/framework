@@ -73,6 +73,60 @@ class EventFakeTest extends TestCase
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
+
+    public function testNonFakedEventGetsProperlyDispatchedAndReturnsResponses()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return 'two';
+        });
+        Event::listen('test', function () {
+            //
+        });
+
+        $this->assertEquals([null, 'two', null], Event::dispatch('test'));
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testNonFakedEventGetsProperlyDispatchedAndCancelsFutureListeners()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return false;
+        });
+        Event::listen('test', function () {
+            $this->fail('should not be called');
+        });
+
+        $this->assertEquals([null], Event::dispatch('test'));
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testNonFakedHaltedEventGetsProperlyDispatchedAndReturnsResponse()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return 'two';
+        });
+        Event::listen('test', function () {
+            $this->fail('should not be called');
+        });
+
+        $this->assertEquals('two', Event::until('test'));
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
 }
 
 class Post extends Model

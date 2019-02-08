@@ -3,20 +3,20 @@ language: php
 
 env:
   global:
-    - setup=stable
+    - SETUP=stable
 
 matrix:
   fast_finish: true
   include:
     - php: 7.1
     - php: 7.1
-      env: setup=lowest
+      env: SETUP=lowest
     - php: 7.2
     - php: 7.2
-      env: setup=lowest
+      env: SETUP=lowest
     - php: 7.3
     - php: 7.3
-      env: setup=lowest
+      env: SETUP=lowest
 
 cache:
   directories:
@@ -35,7 +35,7 @@ before_install:
   - mysql -e 'CREATE DATABASE forge;'
 
 install:
-  - if [[ $setup = 'stable' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-stable --no-suggest; fi
-  - if [[ $setup = 'lowest' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-lowest --prefer-stable --no-suggest; fi
+  - if [[ $SETUP = 'stable' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-stable --no-suggest; fi
+  - if [[ $SETUP = 'lowest' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-lowest --prefer-stable --no-suggest; fi
 
 script: vendor/bin/phpunit

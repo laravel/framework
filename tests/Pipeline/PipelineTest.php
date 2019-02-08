@@ -162,6 +162,19 @@ class PipelineTest extends TestCase
                 return $piped;
             });
     }
+
+    public function testPipelineThenReturnMethodRunsPipelineThenReturnsPassable()
+    {
+        $result = (new Pipeline(new Container))
+                    ->send('foo')
+                    ->through([PipelineTestPipeOne::class])
+                    ->thenReturn();
+
+        $this->assertEquals('foo', $result);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
 }
 
 class PipelineTestPipeOne

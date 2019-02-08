@@ -94,4 +94,14 @@ class TaggedCache extends Repository
     {
         parent::event($event->setTags($this->tags->getNames()));
     }
+
+    /**
+     * Get the tag set instance.
+     *
+     * @return \Illuminate\Cache\TagSet
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
 }
