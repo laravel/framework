@@ -89,6 +89,12 @@ class HttpResponseTest extends TestCase
         $this->assertEquals('bar', $cookies[0]->getValue());
     }
 
+    public function testGetCallback()
+    {
+        $response = new Response;
+        $this->assertNull($response->getCallback());
+    }
+
     public function testGetOriginalContent()
     {
         $arr = ['foo' => 'bar'];

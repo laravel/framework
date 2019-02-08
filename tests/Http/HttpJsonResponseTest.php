@@ -44,6 +44,14 @@ class HttpJsonResponseTest extends TestCase
         $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
     }
 
+    public function testGetCallback(): void
+    {
+        $response = new JsonResponse;
+        $this->assertNull($response->getCallback());
+        $response->withCallback('callback');
+        $this->assertEquals('callback', $response->getCallback());
+    }
+
     public function testSetAndRetrieveOptions()
     {
         $response = new JsonResponse(['foo' => 'bar']);
