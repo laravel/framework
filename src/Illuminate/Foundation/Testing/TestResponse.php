@@ -25,7 +25,7 @@ class TestResponse
     /**
      * The response to delegate to.
      *
-     * @var \Illuminate\Http\Response
+     * @var \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public $baseResponse;
 
@@ -39,7 +39,7 @@ class TestResponse
     /**
      * Create a new test response instance.
      *
-     * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\Response|\Illuminate\Http\JsonResponse  $response
      * @return void
      */
     public function __construct($response)
