@@ -85,6 +85,16 @@ class TaggedCache extends Repository
     }
 
     /**
+     * Get the tag set instance.
+     *
+     * @return \Illuminate\Cache\TagSet
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
      * Fire an event for this cache instance.
      *
      * @param  string  $event
