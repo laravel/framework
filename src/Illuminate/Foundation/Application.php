@@ -55,14 +55,14 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * The array of booting callbacks.
      *
-     * @var array
+     * @var callable[]
      */
     protected $bootingCallbacks = [];
 
     /**
      * The array of booted callbacks.
      *
-     * @var array
+     * @var callable[]
      */
     protected $bootedCallbacks = [];
 
@@ -823,7 +823,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Register a new boot listener.
      *
-     * @param  mixed  $callback
+     * @param  callable  $callback
      * @return void
      */
     public function booting($callback)
@@ -834,7 +834,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Register a new "booted" listener.
      *
-     * @param  mixed  $callback
+     * @param  callable  $callback
      * @return void
      */
     public function booted($callback)
@@ -849,7 +849,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Call the booting callbacks for the application.
      *
-     * @param  array  $callbacks
+     * @param  callable[]  $callbacks
      * @return void
      */
     protected function fireAppCallbacks(array $callbacks)
