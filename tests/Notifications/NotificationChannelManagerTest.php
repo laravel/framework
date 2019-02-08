@@ -18,7 +18,7 @@ use Illuminate\Notifications\Events\NotificationSending;
 
 class NotificationChannelManagerTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

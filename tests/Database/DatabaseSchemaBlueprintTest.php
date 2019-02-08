@@ -13,7 +13,7 @@ use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

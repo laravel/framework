@@ -19,7 +19,7 @@ class ConsoleEventSchedulerTest extends TestCase
      */
     private $schedule;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $container->instance(Schedule::class, $this->schedule = new Schedule(m::mock(EventMutex::class)));
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

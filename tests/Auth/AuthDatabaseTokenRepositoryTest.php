@@ -13,14 +13,14 @@ use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

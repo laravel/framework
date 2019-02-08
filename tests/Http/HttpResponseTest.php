@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HttpResponseTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

@@ -27,7 +27,7 @@ class SupportFacadesEventTest extends TestCase
         Facade::setFacadeApplication($container);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Event::clearResolvedInstances();
 

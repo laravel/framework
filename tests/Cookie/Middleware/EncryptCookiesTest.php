@@ -26,7 +26,7 @@ class EncryptCookiesTest extends TestCase
     protected $setCookiePath = 'cookie/set';
     protected $queueCookiePath = 'cookie/queue';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

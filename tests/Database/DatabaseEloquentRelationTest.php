@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

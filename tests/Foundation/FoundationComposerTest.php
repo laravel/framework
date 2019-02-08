@@ -9,7 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class FoundationComposerTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

@@ -10,7 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class ViewFileViewFinderTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

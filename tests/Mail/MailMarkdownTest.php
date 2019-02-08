@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

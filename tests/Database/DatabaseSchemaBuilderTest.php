@@ -10,7 +10,7 @@ use Illuminate\Database\Schema\Builder;
 
 class DatabaseSchemaBuilderTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

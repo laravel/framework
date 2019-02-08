@@ -11,7 +11,7 @@ use Illuminate\Contracts\Redis\Factory;
 
 class QueueRedisQueueTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

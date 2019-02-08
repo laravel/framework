@@ -10,7 +10,7 @@ use Orchestra\Testbench\TestCase;
  */
 abstract class MemcachedIntegrationTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

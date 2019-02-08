@@ -13,7 +13,7 @@ use Illuminate\Database\PostgresConnection;
 
 class CacheDatabaseStoreTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

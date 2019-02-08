@@ -16,7 +16,7 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 
 class DatabaseMigrationRefreshCommandTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

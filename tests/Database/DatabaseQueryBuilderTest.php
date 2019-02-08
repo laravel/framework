@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class DatabaseQueryBuilderTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

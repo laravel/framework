@@ -18,7 +18,7 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -159,7 +159,7 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->schema('default')->drop('users');
     }

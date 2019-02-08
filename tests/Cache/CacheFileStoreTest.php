@@ -10,14 +10,14 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class CacheFileStoreTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

@@ -14,7 +14,7 @@ use Illuminate\Database\Migrations\MigrationCreator;
 
 class SessionTableCommandTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

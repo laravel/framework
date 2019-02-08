@@ -16,7 +16,7 @@ use Illuminate\Contracts\Support\Renderable;
 
 class ViewTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

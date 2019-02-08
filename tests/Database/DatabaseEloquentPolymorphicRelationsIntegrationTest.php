@@ -14,7 +14,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -58,7 +58,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         foreach (['default'] as $connection) {
             $this->schema($connection)->drop('posts');

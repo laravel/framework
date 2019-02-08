@@ -9,7 +9,7 @@ use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEventTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

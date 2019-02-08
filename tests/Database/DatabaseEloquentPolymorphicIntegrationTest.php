@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -66,7 +66,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->schema()->drop('users');
         $this->schema()->drop('posts');

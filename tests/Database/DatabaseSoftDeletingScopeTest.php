@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

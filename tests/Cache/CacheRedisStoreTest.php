@@ -9,7 +9,7 @@ use Illuminate\Contracts\Redis\Factory;
 
 class CacheRedisStoreTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

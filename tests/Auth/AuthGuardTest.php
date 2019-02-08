@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthGuardTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

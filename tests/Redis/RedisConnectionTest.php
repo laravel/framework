@@ -14,7 +14,7 @@ class RedisConnectionTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->setUpRedis();
@@ -28,7 +28,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->tearDownRedis();

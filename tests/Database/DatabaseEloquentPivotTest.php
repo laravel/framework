@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DatabaseEloquentPivotTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

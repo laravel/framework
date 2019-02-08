@@ -11,7 +11,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }
