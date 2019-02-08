@@ -254,6 +254,28 @@ class FoundationApplicationTest extends TestCase
 
         $this->assertEquals(1, ConcreteTerminator::$counter);
     }
+
+    public function testBootedCallbacksAtNotation()
+    {
+        $application = new Application;
+
+        $application->booting(ApplicationBootingStub::class.'@method');
+        $application->booted(ApplicationBootingStub::class.'@method');
+
+        $application->boot();
+
+        $this->assertEquals(2, ApplicationBootingStub::$counter);
+    }
+}
+
+class ApplicationBootingStub
+{
+    public static $counter = 0;
+
+    public function method()
+    {
+        self::$counter++;
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
