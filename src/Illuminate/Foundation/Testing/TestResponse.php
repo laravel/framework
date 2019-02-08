@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 
 /**
- * @mixin \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+ * @mixin \Illuminate\Http\Response
  */
 class TestResponse
 {
@@ -25,7 +25,7 @@ class TestResponse
     /**
      * The response to delegate to.
      *
-     * @var \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @var \Illuminate\Http\Response
      */
     public $baseResponse;
 
@@ -39,7 +39,7 @@ class TestResponse
     /**
      * Create a new test response instance.
      *
-     * @param  \Illuminate\Http\Response|\Illuminate\Http\JsonResponse  $response
+     * @param  \Illuminate\Http\Response  $response
      * @return void
      */
     public function __construct($response)
