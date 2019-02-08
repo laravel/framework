@@ -823,7 +823,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Register a new boot listener.
      *
-     * @param  callable  $callback
+     * @param  callable|string  $callback
      * @return void
      */
     public function booting($callback)
@@ -834,7 +834,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Register a new "booted" listener.
      *
-     * @param  callable  $callback
+     * @param  callable|string  $callback
      * @return void
      */
     public function booted($callback)
@@ -855,7 +855,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected function fireAppCallbacks(array $callbacks)
     {
         foreach ($callbacks as $callback) {
-            call_user_func($callback, $this);
+            $this->call($callback, [$this]);
         }
     }
 
