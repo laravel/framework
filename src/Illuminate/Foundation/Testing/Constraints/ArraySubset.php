@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Testing\Constraints;
 
 use ArrayObject;
+use Traversable;
 use PHPUnit\Framework\Constraint\Constraint;
 use SebastianBergmann\Comparator\ComparisonFailure;
-use Traversable;
 
 class ArraySubset extends Constraint
 {
@@ -80,7 +80,7 @@ class ArraySubset extends Constraint
      */
     public function toString(): string
     {
-        return 'has the subset ' . $this->exporter()->export($this->subset);
+        return 'has the subset '.$this->exporter()->export($this->subset);
     }
 
     /**
@@ -95,7 +95,7 @@ class ArraySubset extends Constraint
      */
     protected function failureDescription($other): string
     {
-        return 'an array ' . $this->toString();
+        return 'an array '.$this->toString();
     }
 
     private function toArray(iterable $other): array
