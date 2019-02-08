@@ -11,7 +11,7 @@ use Illuminate\Database\Schema\Blueprint;
  */
 class EloquentPushTest extends DatabaseTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

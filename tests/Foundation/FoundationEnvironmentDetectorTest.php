@@ -8,7 +8,7 @@ use Illuminate\Foundation\EnvironmentDetector;
 
 class FoundationEnvironmentDetectorTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

@@ -13,7 +13,7 @@ use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

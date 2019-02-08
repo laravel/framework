@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\RelationNotFoundException;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

@@ -14,7 +14,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class EventsDispatcherTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

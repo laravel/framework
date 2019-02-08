@@ -15,7 +15,7 @@ use Illuminate\Contracts\Support\MessageProvider;
 
 class HttpRedirectResponseTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

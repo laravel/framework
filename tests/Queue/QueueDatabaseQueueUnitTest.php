@@ -12,7 +12,7 @@ use Illuminate\Queue\DatabaseQueue;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

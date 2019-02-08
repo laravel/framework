@@ -9,7 +9,7 @@ use Illuminate\View\Compilers\CompilerInterface;
 
 class ViewCompilerEngineTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

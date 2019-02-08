@@ -9,7 +9,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseEloquentIrregularPluralTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -53,7 +53,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         });
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->schema()->drop('irregular_plural_tokens');
         $this->schema()->drop('irregular_plural_humans');

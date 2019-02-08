@@ -30,7 +30,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -130,7 +130,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');

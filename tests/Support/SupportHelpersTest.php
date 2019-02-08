@@ -14,7 +14,7 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class SupportHelpersTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

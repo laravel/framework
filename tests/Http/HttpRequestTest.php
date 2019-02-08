@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class HttpRequestTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

@@ -9,7 +9,7 @@ use Illuminate\Translation\FileLoader;
 
 class TranslationFileLoaderTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

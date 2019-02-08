@@ -11,7 +11,7 @@ use Illuminate\Database\Query\Processors\Processor;
 
 class DatabaseProcessorTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

@@ -14,7 +14,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     protected $related;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

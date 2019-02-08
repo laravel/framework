@@ -9,7 +9,7 @@ use Illuminate\Support\MessageBag;
 
 class SupportMessageBagTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }

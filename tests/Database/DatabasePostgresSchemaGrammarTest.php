@@ -10,7 +10,7 @@ use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         m::close();
     }
