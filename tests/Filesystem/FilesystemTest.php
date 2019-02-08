@@ -432,6 +432,10 @@ class FilesystemTest extends TestCase
      */
     public function testSharedGet()
     {
+        if (PHP_OS == 'Darwin') {
+            $this->markTestSkipped('Skipping on MacOS');
+        }
+
         if (! function_exists('pcntl_fork')) {
             $this->markTestSkipped('Skipping since the pcntl extension is not available');
         }
