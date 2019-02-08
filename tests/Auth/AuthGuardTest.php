@@ -14,14 +14,16 @@ use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthGuardTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -50,11 +52,10 @@ class AuthGuardTest extends TestCase
         $guard->basic('email');
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
-     */
     public function testBasicReturnsResponseOnFailure()
     {
+        $this->expectException(UnauthorizedHttpException::class);
+
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $guard = m::mock(SessionGuard::class.'[check,attempt]', ['default', $provider, $session]);
         $guard->shouldReceive('check')->once()->andReturn(false);
@@ -188,12 +189,11 @@ class AuthGuardTest extends TestCase
         $guard->setUser($user);
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\AuthenticationException
-     * @expectedExceptionMessage Unauthenticated.
-     */
     public function testAuthenticateThrowsWhenUserIsNull()
     {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Unauthenticated.');
+
         $guard = $this->getGuard();
         $guard->getSession()->shouldReceive('get')->once()->andReturn(null);
 

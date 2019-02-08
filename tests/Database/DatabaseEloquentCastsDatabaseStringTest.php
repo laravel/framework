@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentCastsDatabaseStringTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $db = new DB;
 
@@ -45,7 +45,7 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->schema()->drop('casting_table');
     }

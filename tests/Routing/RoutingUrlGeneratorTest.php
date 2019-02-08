@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class RoutingUrlGeneratorTest extends TestCase
@@ -485,11 +486,10 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
-    /**
-     * @expectedException \Illuminate\Routing\Exceptions\UrlGenerationException
-     */
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
+        $this->expectException(UrlGenerationException::class);
+
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com:8080/')
@@ -551,12 +551,11 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals($url->to('/foo'), $url->previous('/foo'));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Route [not_exists_route] not defined.
-     */
     public function testRouteNotDefinedException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Route [not_exists_route] not defined.');
+
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com/')

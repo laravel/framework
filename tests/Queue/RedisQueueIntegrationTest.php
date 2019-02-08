@@ -20,14 +20,14 @@ class RedisQueueIntegrationTest extends TestCase
      */
     private $queue;
 
-    public function setUp()
+    public function setUp(): void
     {
         Carbon::setTestNow(Carbon::now());
         parent::setUp();
         $this->setUpRedis();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Carbon::setTestNow(null);
         parent::tearDown();
@@ -190,6 +190,7 @@ class RedisQueueIntegrationTest extends TestCase
             $command = unserialize(json_decode($payload)->data->command);
             $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $command);
             $this->assertContains($command->i, [10, -20]);
+
             if ($command->i == 10) {
                 $this->assertLessThanOrEqual($score, $before);
                 $this->assertGreaterThanOrEqual($score, $after);

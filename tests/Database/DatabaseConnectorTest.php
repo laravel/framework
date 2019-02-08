@@ -13,7 +13,7 @@ use Illuminate\Database\Connectors\SqlServerConnector;
 
 class DatabaseConnectorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

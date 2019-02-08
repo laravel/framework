@@ -25,7 +25,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseConnectionTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -240,12 +240,11 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals($mock, $result);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\QueryException
-     * @expectedExceptionMessage Deadlock found when trying to get lock (SQL: )
-     */
     public function testTransactionMethodRetriesOnDeadlock()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Deadlock found when trying to get lock (SQL: )');
+
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->setMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
         $pdo->expects($this->exactly(3))->method('beginTransaction');
@@ -272,12 +271,11 @@ class DatabaseConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException \Illuminate\Database\QueryException
-     * @expectedExceptionMessage server has gone away (SQL: foo)
-     */
     public function testOnLostConnectionPDOIsNotSwappedWithinATransaction()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('server has gone away (SQL: foo)');
+
         $pdo = m::mock(PDO::class);
         $pdo->shouldReceive('beginTransaction')->once();
         $statement = m::mock(PDOStatement::class);
@@ -326,12 +324,11 @@ class DatabaseConnectionTest extends TestCase
         }]);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\QueryException
-     * @expectedExceptionMessage  (SQL: ) (SQL: )
-     */
     public function testRunMethodNeverRetriesIfWithinTransaction()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('(SQL: ) (SQL: )');
+
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
         $method->setAccessible(true);
 

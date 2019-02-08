@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use PDO;
 use Mockery as m;
 use ReflectionProperty;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -14,7 +15,7 @@ class DatabaseConnectionFactoryTest extends TestCase
 {
     protected $db;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = new DB;
 
@@ -36,7 +37,7 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->db->setAsGlobal();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -73,22 +74,20 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A driver must be specified.
-     */
     public function testIfDriverIsntSetExceptionIsThrown()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A driver must be specified.');
+
         $factory = new ConnectionFactory($container = m::mock(Container::class));
         $factory->createConnector(['foo']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsupported driver [foo]
-     */
     public function testExceptionIsThrownOnUnsupportedDriver()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported driver [foo]');
+
         $factory = new ConnectionFactory($container = m::mock(Container::class));
         $container->shouldReceive('bound')->once()->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);

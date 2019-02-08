@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use Mockery as m;
+use BadMethodCallException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
@@ -16,14 +17,14 @@ class RouteRegistrarTest extends TestCase
      */
     protected $router;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -210,12 +211,11 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals('api.users', $this->getRoute()->getName());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method Illuminate\Routing\RouteRegistrar::missing does not exist.
-     */
     public function testRegisteringNonApprovedAttributesThrows()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Illuminate\Routing\RouteRegistrar::missing does not exist.');
+
         $this->router->domain('foo')->missing('bar')->group(function ($router) {
             //
         });
@@ -479,8 +479,8 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('posts', RouteRegistrarControllerStub::class)
                      ->parameter('posts', 'topic');
 
-        $this->assertContains('admin_user', $this->router->getRoutes()->getByName('users.show')->uri);
-        $this->assertContains('topic', $this->router->getRoutes()->getByName('posts.show')->uri);
+        $this->assertStringContainsString('admin_user', $this->router->getRoutes()->getByName('users.show')->uri);
+        $this->assertStringContainsString('topic', $this->router->getRoutes()->getByName('posts.show')->uri);
     }
 
     public function testCanSetMiddlewareOnRegisteredResource()

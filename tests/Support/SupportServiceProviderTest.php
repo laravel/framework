@@ -9,7 +9,7 @@ use Illuminate\Support\ServiceProvider;
 
 class SupportServiceProviderTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
@@ -21,7 +21,7 @@ class SupportServiceProviderTest extends TestCase
         $two->boot();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

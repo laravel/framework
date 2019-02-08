@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  */
 class CallQueuedHandlerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

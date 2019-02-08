@@ -18,7 +18,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 
 class MailMailerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

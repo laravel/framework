@@ -12,7 +12,7 @@ use Illuminate\Queue\Jobs\BeanstalkdJob;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

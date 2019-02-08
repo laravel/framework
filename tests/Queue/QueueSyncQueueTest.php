@@ -13,7 +13,7 @@ use Illuminate\Contracts\Queue\QueueableEntity;
 
 class QueueSyncQueueTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

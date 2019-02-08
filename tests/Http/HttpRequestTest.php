@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Http;
 
 use Mockery as m;
+use RuntimeException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
@@ -13,7 +14,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class HttpRequestTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -844,12 +845,11 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->accepts('text/html'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Session store not set on request.
-     */
     public function testSessionMethod()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Session store not set on request.');
+
         $request = Request::create('/', 'GET');
         $request->session();
     }
@@ -876,12 +876,11 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(40, mb_strlen($request->fingerprint()));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to generate fingerprint. Route unavailable.
-     */
     public function testFingerprintWithoutRoute()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to generate fingerprint. Route unavailable.');
+
         $request = Request::create('/', 'GET', [], [], [], []);
         $request->fingerprint();
     }

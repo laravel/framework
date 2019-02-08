@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http;
 
 use Mockery as m;
 use JsonSerializable;
+use BadMethodCallException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Session\Store;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HttpResponseTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -196,12 +197,11 @@ class HttpResponseTest extends TestCase
         $response->withFoo('bar');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Call to undefined method Illuminate\Http\RedirectResponse::doesNotExist()
-     */
     public function testMagicCallException()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Http\RedirectResponse::doesNotExist()');
+
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }

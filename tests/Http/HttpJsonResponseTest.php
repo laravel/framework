@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http;
 
 use stdClass;
 use JsonSerializable;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Support\Jsonable;
@@ -68,14 +69,12 @@ class HttpJsonResponseTest extends TestCase
     }
 
     /**
-     * @param mixed $data
-     *
-     * @expectedException \InvalidArgumentException
-     *
      * @dataProvider jsonErrorDataProvider
      */
     public function testInvalidArgumentExceptionOnJsonError($data)
     {
+        $this->expectException(InvalidArgumentException::class);
+
         new JsonResponse(['data' => $data]);
     }
 

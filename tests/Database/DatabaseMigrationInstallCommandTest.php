@@ -12,7 +12,7 @@ use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 
 class DatabaseMigrationInstallCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

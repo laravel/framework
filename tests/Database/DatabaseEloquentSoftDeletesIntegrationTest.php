@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use BadMethodCallException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Pagination\Paginator;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -84,7 +85,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         Carbon::setTestNow(null);
 
@@ -621,11 +622,10 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals($abigail->email, $comment->owner->email);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testMorphToWithBadMethodCall()
     {
+        $this->expectException(BadMethodCallException::class);
+
         $this->createUsers();
 
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();

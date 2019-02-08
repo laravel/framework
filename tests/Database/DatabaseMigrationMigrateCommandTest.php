@@ -12,7 +12,7 @@ use Illuminate\Database\Console\Migrations\MigrateCommand;
 
 class DatabaseMigrationMigrateCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

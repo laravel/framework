@@ -11,7 +11,7 @@ use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class SupportTestingEventFakeTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new EventFake(m::mock(Dispatcher::class));

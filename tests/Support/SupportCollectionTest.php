@@ -11,6 +11,7 @@ use ArrayIterator;
 use CachingIterator;
 use ReflectionClass;
 use JsonSerializable;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
@@ -2384,11 +2385,10 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $data = new Collection([1, 2, 3]);
         $data->random(4);
     }

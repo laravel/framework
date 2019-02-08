@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
+use Error;
+use BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Traits\ForwardsCalls;
 
@@ -21,39 +23,35 @@ class ForwardsCallsTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $results);
     }
 
-    /**
-     * @expectedException  \BadMethodCallException
-     * @expectedExceptionMessage  Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::missingMethod()
-     */
     public function testMissingForwardedCallThrowsCorrectError()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::missingMethod()');
+
         (new ForwardsCallsOne)->missingMethod('foo', 'bar');
     }
 
-    /**
-     * @expectedException  \BadMethodCallException
-     * @expectedExceptionMessage  Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::this1_shouldWork_too()
-     */
     public function testMissingAlphanumericForwardedCallThrowsCorrectError()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::this1_shouldWork_too()');
+
         (new ForwardsCallsOne)->this1_shouldWork_too('foo', 'bar');
     }
 
-    /**
-     * @expectedException  \Error
-     * @expectedExceptionMessage  Call to undefined method Illuminate\Tests\Support\ForwardsCallsBase::missingMethod()
-     */
     public function testNonForwardedErrorIsNotTamperedWith()
     {
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsBase::missingMethod()');
+
         (new ForwardsCallsOne)->baseError('foo', 'bar');
     }
 
-    /**
-     * @expectedException  \BadMethodCallException
-     * @expectedExceptionMessage  Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::test()
-     */
     public function testThrowBadMethodCallException()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::test()');
+
         (new ForwardsCallsOne)->throwTestException('test');
     }
 }

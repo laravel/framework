@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
+use RuntimeException;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends TestCase
@@ -26,7 +30,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $db = new DB;
 
@@ -126,7 +130,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
@@ -439,21 +443,19 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(EloquentTestUser::class, $multiple[1]);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1
-     */
     public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
     {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1');
+
         EloquentTestUser::findOrFail(1);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2
-     */
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
     {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2');
+
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::findOrFail([1, 2]);
     }
@@ -718,11 +720,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals($questionMarksCount, $bindingsCount);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testHasOnMorphToRelationship()
     {
+        $this->expectException(RuntimeException::class);
+
         EloquentTestPhoto::has('imageable')->get();
     }
 
@@ -923,12 +924,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(['x' => 0, 'y' => 1, 'a' => ['b' => 3]], $model->json);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\QueryException
-     * @expectedExceptionMessage SQLSTATE[23000]:
-     */
     public function testSaveOrFailWithDuplicatedEntry()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('SQLSTATE[23000]:');
+
         $date = '1970-01-01';
         EloquentTestPost::create([
             'id' => 1, 'user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date,
@@ -1244,11 +1244,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testTimestampsUsingOldSqlServerDateFormatFailInEdgeCases()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $model = new EloquentTestUser;
         $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
         $model->setRawAttributes([

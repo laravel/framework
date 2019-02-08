@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BroadcasterTest extends TestCase
 {
@@ -16,14 +18,14 @@ class BroadcasterTest extends TestCase
      */
     public $broadcaster;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->broadcaster = new FakeBroadcaster;
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -78,11 +80,10 @@ class BroadcasterTest extends TestCase
         $this->assertEquals(['model.1.instance', 'something'], $parameters);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testUnknownChannelAuthHandlerTypeThrowsException()
     {
+        $this->expectException(Exception::class);
+
         $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', 123);
     }
 
@@ -95,11 +96,10 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
-     */
     public function testNotFoundThrowsHttpException()
     {
+        $this->expectException(HttpException::class);
+
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
             //
         };

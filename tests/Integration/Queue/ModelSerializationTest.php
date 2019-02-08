@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Schema;
+use LogicException;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +34,7 @@ class ModelSerializationTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -125,12 +126,11 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals('taylor@laravel.com', $unSerialized->user[1]->email);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage  Queueing collections with multiple model connections is not supported.
-     */
     public function test_it_fails_if_models_on_multi_connections()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Queueing collections with multiple model connections is not supported.');
+
         $user = ModelSerializationTestUser::on('custom')->create([
             'email' => 'mohamed@laravel.com',
         ]);

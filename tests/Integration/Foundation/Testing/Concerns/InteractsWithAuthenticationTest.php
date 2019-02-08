@@ -23,7 +23,7 @@ class InteractsWithAuthenticationTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

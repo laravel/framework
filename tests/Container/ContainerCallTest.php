@@ -4,17 +4,17 @@ namespace Illuminate\Tests\Container;
 
 use Closure;
 use stdClass;
+use ReflectionException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 
 class ContainerCallTest extends TestCase
 {
-    /**
-     * @expectedException \ReflectionException
-     * @expectedExceptionMessage Function ContainerTestCallStub() does not exist
-     */
     public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
     {
+        $this->expectException(ReflectionException::class);
+        $this->expectExceptionMessage('Function ContainerTestCallStub() does not exist');
+
         $container = new Container;
         $container->call('ContainerTestCallStub');
     }

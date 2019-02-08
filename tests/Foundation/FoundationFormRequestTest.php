@@ -11,7 +11,9 @@ use Illuminate\Routing\UrlGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 
@@ -19,7 +21,7 @@ class FoundationFormRequestTest extends TestCase
 {
     protected $mocks = [];
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
 
@@ -80,11 +82,10 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(1, FoundationTestFormRequestTwiceStub::$count);
     }
 
-    /**
-     * @expectedException \Illuminate\Validation\ValidationException
-     */
     public function test_validate_throws_when_validation_fails()
     {
+        $this->expectException(ValidationException::class);
+
         $request = $this->createRequest(['no' => 'name']);
 
         $this->mocks['redirect']->shouldReceive('withInput->withErrors');
@@ -92,12 +93,11 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage This action is unauthorized.
-     */
     public function test_validate_method_throws_when_authorization_fails()
     {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
 

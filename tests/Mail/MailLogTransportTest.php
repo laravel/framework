@@ -24,7 +24,7 @@ class MailLogTransportTest extends TestCase
         $transport = $manager->driver('log');
         $this->assertInstanceOf(LogTransport::class, $transport);
 
-        $logger = $this->readAttribute($transport, 'logger');
+        $logger = $transport->logger();
         $this->assertInstanceOf(LoggerInterface::class, $logger);
 
         $this->assertInstanceOf(Logger::class, $monolog = $logger->getLogger());
@@ -38,6 +38,6 @@ class MailLogTransportTest extends TestCase
 
         $manager = $this->app['swift.transport'];
 
-        $this->assertAttributeEquals($logger, 'logger', $manager->driver('log'));
+        $this->assertEquals($logger, $manager->driver('log')->logger());
     }
 }

@@ -13,7 +13,7 @@ use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Http;
 
 use Mockery as m;
+use BadMethodCallException;
 use Illuminate\Http\Request;
 use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +15,7 @@ use Illuminate\Contracts\Support\MessageProvider;
 
 class HttpRedirectResponseTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -124,12 +125,11 @@ class HttpRedirectResponseTest extends TestCase
         $response->withFoo('bar');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Call to undefined method Illuminate\Http\RedirectResponse::doesNotExist()
-     */
     public function testMagicCallException()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Http\RedirectResponse::doesNotExist()');
+
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
