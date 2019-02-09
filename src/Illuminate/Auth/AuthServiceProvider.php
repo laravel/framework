@@ -86,5 +86,13 @@ class AuthServiceProvider extends ServiceProvider
                 return call_user_func($app['auth']->userResolver(), $guard);
             });
         });
+
+        $this->app->rebinding('events', function ($app, $dispatcher) {
+            $guard = $app['auth']->guard();
+
+            if (method_exists($guard, 'setDispatcher')) {
+                $guard->setDispatcher($dispatcher);
+            }
+        });
     }
 }

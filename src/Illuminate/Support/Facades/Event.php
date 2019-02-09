@@ -31,8 +31,6 @@ class Event extends Facade
         static::swap($fake = new EventFake(static::getFacadeRoot(), $eventsToFake));
 
         Model::setEventDispatcher($fake);
-
-        self::setDispatcherOnAuth($fake);
     }
 
     /**
@@ -52,7 +50,6 @@ class Event extends Facade
             static::swap($originalDispatcher);
 
             Model::setEventDispatcher($originalDispatcher);
-            self::setDispatcherOnAuth($originalDispatcher);
         });
     }
 
@@ -64,16 +61,5 @@ class Event extends Facade
     protected static function getFacadeAccessor()
     {
         return 'events';
-    }
-
-    /**
-     * @param $fake
-     */
-    protected static function setDispatcherOnAuth($fake)
-    {
-        $guard = Auth::guard();
-        if (method_exists($guard, 'setDispatcher')) {
-            $guard->setDispatcher($fake);
-        }
     }
 }
