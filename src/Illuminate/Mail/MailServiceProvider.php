@@ -7,16 +7,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Swift_DependencyContainer;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Support\DeferrableProvider;
 
-class MailServiceProvider extends ServiceProvider
+class MailServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     /**
      * Register the service provider.
      *
