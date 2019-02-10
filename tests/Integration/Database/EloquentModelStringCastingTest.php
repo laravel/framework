@@ -1,13 +1,17 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Integration\Database;
 
 use stdClass;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class DatabaseEloquentCastsDatabaseStringTest extends TestCase
+/**
+ * @group integration
+ */
+class EloquentModelStringCastingTest extends TestCase
 {
     public function setUp()
     {
@@ -31,7 +35,7 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
      */
     public function createSchema()
     {
-        $this->schema()->create('casting_table', function ($table) {
+        $this->schema()->create('casting_table', function (Blueprint $table) {
             $table->increments('id');
             $table->string('array_attributes');
             $table->string('json_attributes');
@@ -55,8 +59,8 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
      */
     public function testSavingCastedAttributesToDatabase()
     {
-        /** @var TableForCasting $model */
-        $model = TableForCasting::create([
+        /** @var StringCasts $model */
+        $model = StringCasts::create([
             'array_attributes' => ['key1'=>'value1'],
             'json_attributes' => ['json_key'=>'json_value'],
             'object_attributes' => ['json_key'=>'json_value'],
@@ -75,8 +79,8 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
 
     public function testSavingCastedEmptyAttributesToDatabase()
     {
-        /** @var TableForCasting $model */
-        $model = TableForCasting::create([
+        /** @var StringCasts $model */
+        $model = StringCasts::create([
             'array_attributes' => [],
             'json_attributes' => [],
             'object_attributes' => [],
@@ -115,7 +119,7 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
 /**
  * Eloquent Models...
  */
-class TableForCasting extends Eloquent
+class StringCasts extends Eloquent
 {
     /**
      * @var string
