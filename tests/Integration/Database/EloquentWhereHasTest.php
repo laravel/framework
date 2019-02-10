@@ -1,11 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentWhereHasTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration
@@ -32,18 +31,18 @@ class EloquentWhereHasTest extends DatabaseTestCase
             $table->integer('commentable_id');
         });
 
-        $user = User::create();
+        $user = User6::create();
         $post = tap((new Post(['public' => true]))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
 
-        $user = User::create();
+        $user = User6::create();
         $post = tap((new Post(['public' => false]))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
     }
 
     public function test_with_count()
     {
-        $users = User::whereHas('posts', function ($query) {
+        $users = User6::whereHas('posts', function ($query) {
             $query->where('public', true);
         })->get();
 
@@ -76,11 +75,11 @@ class Post extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User6::class);
     }
 }
 
-class User extends Model
+class User6 extends Model
 {
     public $timestamps = false;
 

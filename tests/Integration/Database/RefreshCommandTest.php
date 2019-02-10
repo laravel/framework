@@ -4,6 +4,9 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group integration
+ */
 class RefreshCommandTest extends DatabaseTestCase
 {
     public function test_refresh_without_realpath()

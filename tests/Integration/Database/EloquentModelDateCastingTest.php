@@ -1,11 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration

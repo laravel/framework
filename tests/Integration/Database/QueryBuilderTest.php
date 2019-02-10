@@ -1,11 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration

@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentRelationshipsTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Eloquent\Model;

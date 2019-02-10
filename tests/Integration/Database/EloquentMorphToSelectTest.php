@@ -1,11 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentMorphToSelectTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration

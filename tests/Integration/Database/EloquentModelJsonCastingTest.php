@@ -1,12 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use stdClass;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration

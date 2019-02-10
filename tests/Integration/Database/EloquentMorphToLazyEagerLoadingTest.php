@@ -1,12 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentMorphToLazyEagerLoadingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration
@@ -36,7 +35,7 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
             $table->integer('commentable_id');
         });
 
-        $user = User::create();
+        $user = User5::create();
 
         $post = tap((new Post)->user()->associate($user))->save();
 
@@ -79,11 +78,11 @@ class Post extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User5::class);
     }
 }
 
-class User extends Model
+class User5 extends Model
 {
     public $timestamps = false;
 }

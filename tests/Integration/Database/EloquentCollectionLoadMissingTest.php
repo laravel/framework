@@ -1,12 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration
@@ -37,7 +36,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
             $table->unsignedInteger('comment_id');
         });
 
-        User::create();
+        User3::create();
 
         Post::create(['user_id' => 1]);
 
@@ -121,7 +120,7 @@ class Post extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User3::class);
     }
 }
 
@@ -132,7 +131,7 @@ class Revision extends Model
     protected $guarded = ['id'];
 }
 
-class User extends Model
+class User3 extends Model
 {
     public $timestamps = false;
 }

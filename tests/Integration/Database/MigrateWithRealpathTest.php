@@ -4,6 +4,9 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * @group integration
+ */
 class MigrateWithRealpathTest extends DatabaseTestCase
 {
     protected function setUp()

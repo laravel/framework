@@ -1,10 +1,9 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentBelongsToTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration
@@ -22,26 +21,26 @@ class EloquentBelongsToTest extends DatabaseTestCase
             $table->string('parent_slug')->nullable();
         });
 
-        $user = User::create(['slug' => str_random()]);
-        User::create(['parent_id' => $user->id, 'parent_slug' => $user->slug]);
+        $user = User1::create(['slug' => str_random()]);
+        User1::create(['parent_id' => $user->id, 'parent_slug' => $user->slug]);
     }
 
     public function test_has_self()
     {
-        $users = User::has('parent')->get();
+        $users = User1::has('parent')->get();
 
         $this->assertEquals(1, $users->count());
     }
 
     public function test_has_self_custom_owner_key()
     {
-        $users = User::has('parentBySlug')->get();
+        $users = User1::has('parentBySlug')->get();
 
         $this->assertEquals(1, $users->count());
     }
 }
 
-class User extends Model
+class User1 extends Model
 {
     public $timestamps = false;
     protected $guarded = ['id'];

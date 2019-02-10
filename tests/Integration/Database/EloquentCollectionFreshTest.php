@@ -22,20 +22,20 @@ class EloquentCollectionFreshTest extends DatabaseTestCase
 
     public function test_eloquent_collection_fresh()
     {
-        User::insert([
+        User2::insert([
             ['email' => 'laravel@framework.com'],
             ['email' => 'laravel@laravel.com'],
         ]);
 
-        $collection = User::all();
+        $collection = User2::all();
 
-        User::whereKey($collection->pluck('id')->toArray())->delete();
+        User2::whereKey($collection->pluck('id')->toArray())->delete();
 
         $this->assertEmpty($collection->fresh()->filter());
     }
 }
 
-class User extends Model
+class User2 extends Model
 {
     protected $guarded = [];
 }
