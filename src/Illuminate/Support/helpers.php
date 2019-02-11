@@ -6,6 +6,7 @@ use Illuminate\Support\Optional;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HigherOrderTapProxy;
+use Dotenv\Environment\Adapter\ServerConstAdapter;
 
 if (! function_exists('append_config')) {
     /**
@@ -635,32 +636,29 @@ if (! function_exists('env')) {
      */
     function env($key, $default = null)
     {
-        $value = getenv($key);
+        return (new ServerConstAdapter)
+            ->get($key)
+            ->map(function ($value) {
+                switch (strtolower($value)) {
+                    case 'true':
+                    case '(true)':
+                        return true;
+                    case 'false':
+                    case '(false)':
+                        return false;
+                    case 'empty':
+                    case '(empty)':
+                        return '';
+                    case 'null':
+                    case '(null)':
+                        return;
+                }
 
-        if ($value === false) {
-            return value($default);
-        }
-
-        switch (strtolower($value)) {
-            case 'true':
-            case '(true)':
-                return true;
-            case 'false':
-            case '(false)':
-                return false;
-            case 'empty':
-            case '(empty)':
-                return '';
-            case 'null':
-            case '(null)':
-                return;
-        }
-
-        if (($valueLength = strlen($value)) > 1 && $value[0] === '"' && $value[$valueLength - 1] === '"') {
-            return substr($value, 1, -1);
-        }
-
-        return $value;
+                return $value;
+            })
+            ->getOrCall(function () use ($default) {
+                return value($default);
+            });
     }
 }
 
