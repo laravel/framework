@@ -11,6 +11,8 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
 {
     protected function setUp(): void
     {
+        parent::setUp();
+
         $db = new DB;
 
         $db->addConnection([

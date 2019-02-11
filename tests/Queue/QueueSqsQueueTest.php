@@ -20,6 +20,8 @@ class QueueSqsQueueTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock(SqsClient::class);
 

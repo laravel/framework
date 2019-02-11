@@ -18,6 +18,8 @@ class FilesystemAdapterTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->tempDir = __DIR__.'/tmp';
         $this->filesystem = new Filesystem(new Local($this->tempDir));
     }

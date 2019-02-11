@@ -13,8 +13,9 @@ abstract class AbstractBladeTestCase extends TestCase
 
     protected function setUp(): void
     {
-        $this->compiler = new BladeCompiler(m::mock(Filesystem::class), __DIR__);
         parent::setUp();
+
+        $this->compiler = new BladeCompiler(m::mock(Filesystem::class), __DIR__);
     }
 
     protected function tearDown(): void

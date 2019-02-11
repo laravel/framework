@@ -17,6 +17,8 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->db = new DB;
 
         $this->db->addConnection([

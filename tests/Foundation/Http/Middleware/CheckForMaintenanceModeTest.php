@@ -29,6 +29,8 @@ class CheckForMaintenanceModeTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         if (is_null($this->files)) {
             $this->files = new Filesystem;
         }

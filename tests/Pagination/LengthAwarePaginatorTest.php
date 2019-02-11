@@ -19,6 +19,8 @@ class LengthAwarePaginatorTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->options = ['onEachSide' => 5];
         $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, $this->options);
     }

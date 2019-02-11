@@ -23,6 +23,8 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
      */
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->db = $db = new DB;
 
         $db->addConnection([

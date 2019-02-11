@@ -20,6 +20,8 @@ class AuthenticateMiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $container = Container::setInstance(new Container);
 
         $this->auth = new AuthManager($container);

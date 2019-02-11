@@ -11,6 +11,8 @@ class SupportServiceProviderTest extends TestCase
 {
     protected function setUp(): void
     {
+        parent::setUp();
+
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
 
