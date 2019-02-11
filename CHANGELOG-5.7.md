@@ -2,6 +2,19 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.7.25...5.7)
 
+### Added
+- Added `Illuminate\Pipeline\Pipeline::thenReturn()` ([#27429](https://github.com/laravel/framework/pull/27429)) 
+- Added `Illuminate\Cache\TaggedCache::getTags()` ([#27445](https://github.com/laravel/framework/pull/27445))
+
+### Reverted
+- Revert of "Fixed wrong class being used when eager loading nullable `MorphTo` with `withDefault()` ([#27411](https://github.com/laravel/framework/pull/27411))"([9bbf644](https://github.com/laravel/framework/commit/9bbf6443e2709d846367f04ebed9a41823ebcc34))
+
+
+### TODO:
+- https://github.com/laravel/framework/pull/27419, https://github.com/laravel/framework/commit/5c5d6b24f6156768575ae49aa84d7b1d004f23fe
+- https://github.com/laravel/framework/pull/27430
+- https://github.com/laravel/framework/pull/27450
+
 
 ## [v5.7.25 (2019-02-05)](https://github.com/laravel/framework/compare/v5.7.24...v5.7.25)
 

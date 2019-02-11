@@ -254,6 +254,61 @@ class FoundationApplicationTest extends TestCase
 
         $this->assertEquals(1, ConcreteTerminator::$counter);
     }
+
+    public function testBootingCallbacks()
+    {
+        $application = new Application;
+
+        $counter = 0;
+        $closure = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $closure2 = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $application->booting($closure);
+        $application->booting($closure2);
+
+        $application->boot();
+
+        $this->assertEquals(2, $counter);
+    }
+
+    public function testBootedCallbacks()
+    {
+        $application = new Application;
+
+        $counter = 0;
+        $closure = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $closure2 = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $closure3 = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $application->booting($closure);
+        $application->booted($closure);
+        $application->booted($closure2);
+        $application->boot();
+
+        $this->assertEquals(3, $counter);
+
+        $application->booted($closure3);
+
+        $this->assertEquals(4, $counter);
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider

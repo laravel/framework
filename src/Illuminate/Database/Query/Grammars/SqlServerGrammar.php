@@ -416,16 +416,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Determine if the grammar supports savepoints.
-     *
-     * @return bool
-     */
-    public function supportsSavepoints()
-    {
-        return true;
-    }
-
-    /**
      * Compile the SQL statement to define a savepoint.
      *
      * @param  string  $name

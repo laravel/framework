@@ -272,6 +272,16 @@ class SupportArrTest extends TestCase
         // Test $array is empty and key is null
         $this->assertEmpty(Arr::get([], null));
         $this->assertEmpty(Arr::get([], null, 'default'));
+
+        // Test numeric keys
+        $array = [
+            'products' => [
+                ['name' => 'desk'],
+                ['name' => 'chair'],
+            ],
+        ];
+        $this->assertEquals('desk', Arr::get($array, 'products.0.name'));
+        $this->assertEquals('chair', Arr::get($array, 'products.1.name'));
     }
 
     public function testHas()
@@ -318,6 +328,14 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::has($array, ['foo']));
         $this->assertFalse(Arr::has($array, []));
         $this->assertFalse(Arr::has($array, ['products.desk', 'products.price']));
+
+        $array = [
+            'products' => [
+                ['name' => 'desk'],
+            ],
+        ];
+        $this->assertTrue(Arr::has($array, 'products.0.name'));
+        $this->assertFalse(Arr::has($array, 'products.0.price'));
 
         $this->assertFalse(Arr::has([], [null]));
         $this->assertFalse(Arr::has(null, [null]));
