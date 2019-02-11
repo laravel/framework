@@ -53,6 +53,8 @@ class EloquentModelStringCastingTest extends TestCase
      */
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         $this->schema()->drop('casting_table');
     }
 

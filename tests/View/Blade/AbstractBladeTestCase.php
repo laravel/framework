@@ -20,8 +20,8 @@ abstract class AbstractBladeTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         parent::tearDown();
+
+        m::close();
     }
 }

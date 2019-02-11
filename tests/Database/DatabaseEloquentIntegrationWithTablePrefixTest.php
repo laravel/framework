@@ -70,6 +70,8 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
      */
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         foreach (['default'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');

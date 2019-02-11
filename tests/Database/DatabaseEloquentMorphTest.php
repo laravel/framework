@@ -15,6 +15,8 @@ class DatabaseEloquentMorphTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         Relation::morphMap([], false);
 
         m::close();

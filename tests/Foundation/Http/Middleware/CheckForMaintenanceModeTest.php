@@ -43,6 +43,8 @@ class CheckForMaintenanceModeTest extends TestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         $this->files->deleteDirectory($this->storagePath);
 
         m::close();

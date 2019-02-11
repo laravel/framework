@@ -67,6 +67,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('countries');
