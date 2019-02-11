@@ -222,10 +222,10 @@ class FactoryBuilder
         }
 
         if ($this->amount < 1) {
-            return (new $this->class)->newCollection();
+            return $this->class::newCollection();
         }
 
-        $instances = (new $this->class)->newCollection(array_map(function () use ($attributes) {
+        $instances = $this->class::newCollection(array_map(function () use ($attributes) {
             return $this->makeInstance($attributes);
         }, range(1, $this->amount)));
 
