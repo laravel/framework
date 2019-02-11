@@ -130,7 +130,9 @@ class AuthManager implements FactoryContract
         }
 
         if (method_exists($guard, 'setDispatcher')) {
-            $guard->setDispatcher($this->app['events']);
+            $guard->setDispatcher(function () {
+                return $this->app['events'];
+            });
         }
 
         if (method_exists($guard, 'setRequest')) {
