@@ -10,6 +10,7 @@ use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class WorkCommand extends Command
 {
@@ -151,11 +152,11 @@ class WorkCommand extends Command
     {
         switch ($status) {
             case 'starting':
-                return $this->writeStatus($job, 'Processing', 'comment');
+                return $this->writeStatus($job, 'Processing', 'comment', OutputInterface::VERBOSITY_VERY_VERBOSE);
             case 'success':
-                return $this->writeStatus($job, 'Processed', 'info');
+                return $this->writeStatus($job, 'Processed', 'info', OutputInterface::VERBOSITY_VERBOSE);
             case 'failed':
-                return $this->writeStatus($job, 'Failed', 'error');
+                return $this->writeStatus($job, 'Failed', 'error', OutputInterface::VERBOSITY_NORMAL);
         }
     }
 
@@ -165,16 +166,17 @@ class WorkCommand extends Command
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  string  $status
      * @param  string  $type
+     * @param  int     $options A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as OutputInterface::OUTPUT_NORMAL | OutputInterface::VERBOSITY_NORMAL
      * @return void
      */
-    protected function writeStatus(Job $job, $status, $type)
+    protected function writeStatus(Job $job, $status, $type, $options = 0)
     {
         $this->output->writeln(sprintf(
             "<{$type}>[%s][%s] %s</{$type}> %s",
             Carbon::now()->format('Y-m-d H:i:s'),
             $job->getJobId(),
             str_pad("{$status}:", 11), $job->resolveName()
-        ));
+        ), $options);
     }
 
     /**
