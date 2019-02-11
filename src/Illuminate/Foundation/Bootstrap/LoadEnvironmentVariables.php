@@ -80,7 +80,6 @@ class LoadEnvironmentVariables
      * Create a Dotenv instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     *
      * @return \Dotenv\Dotenv
      */
     protected function createDotenv($app)
