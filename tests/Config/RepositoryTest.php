@@ -38,7 +38,6 @@ class RepositoryTest extends TestCase
                 'z' => 'zoo',
             ],
         ]);
-
     }
 
     public function testConstruct()
