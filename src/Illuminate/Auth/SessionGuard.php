@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
@@ -67,7 +66,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var callable
      */
     protected $events;
 
@@ -705,16 +704,16 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function getDispatcher()
     {
-        return ($this->events)();
+        return call_user_func($this->events);
     }
 
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Closure  $events
+     * @param  callable  $events
      * @return void
      */
-    public function setDispatcher(\Closure $events)
+    public function setDispatcher(callable $events)
     {
         $this->events = $events;
     }
