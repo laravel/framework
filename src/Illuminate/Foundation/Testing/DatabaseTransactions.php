@@ -19,7 +19,10 @@ trait DatabaseTransactions
 
         $this->beforeApplicationDestroyed(function () use ($database) {
             foreach ($this->connectionsToTransact() as $name) {
-                $database->connection($name)->rollBack();
+                $connection = $database->connection($name);
+
+                $connection->rollBack();
+                $connection->disconnect();
             }
         });
     }

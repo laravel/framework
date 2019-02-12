@@ -1,13 +1,16 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use \Illuminate\Queue\DatabaseQueue;
-use Carbon\Carbon;
-use Illuminate\Container\Container;
+namespace Illuminate\Tests\Queue;
 
-class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
+class QueueDatabaseQueueIntegrationTest extends TestCase
 {
     /**
      * @var DatabaseQueue The queue instance.
@@ -24,7 +27,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
      */
     protected $container;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -80,7 +83,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Illuminate\Database\Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema()
     {
@@ -92,7 +95,7 @@ class QueueDatabaseQueueIntegrationTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema()->drop('jobs');
     }

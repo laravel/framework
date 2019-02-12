@@ -2,7 +2,9 @@
 
 namespace Illuminate\Contracts\Config;
 
-interface Repository
+use ArrayAccess;
+
+interface Repository extends ArrayAccess
 {
     /**
      * Determine if the given configuration value exists.
@@ -15,7 +17,7 @@ interface Repository
     /**
      * Get the specified configuration value.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed   $default
      * @return mixed
      */

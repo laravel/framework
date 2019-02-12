@@ -2,13 +2,14 @@
 
 namespace Illuminate\Queue\Console;
 
-use Carbon\Carbon;
 use Illuminate\Queue\Worker;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Queue\WorkerOptions;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 
 class WorkCommand extends Command
 {
@@ -18,11 +19,12 @@ class WorkCommand extends Command
      * @var string
      */
     protected $signature = 'queue:work
-                            {connection? : The name of connection}
-                            {--queue= : The queue to listen on}
+                            {connection? : The name of the queue connection to work}
+                            {--queue= : The names of the queues to work}
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
-                            {--delay=0 : Amount of time to delay failed jobs}
+                            {--stop-when-empty : Stop when the queue is empty}
+                            {--delay=0 : The number of seconds to delay failed jobs}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
@@ -44,7 +46,7 @@ class WorkCommand extends Command
     protected $worker;
 
     /**
-     * Create a new queue listen command.
+     * Create a new queue work command.
      *
      * @param  \Illuminate\Queue\Worker  $worker
      * @return void
@@ -61,7 +63,7 @@ class WorkCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if ($this->downForMaintenance() && $this->option('once')) {
             return $this->worker->sleep($this->option('sleep'));
@@ -80,7 +82,7 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        $response = $this->runWorker(
+        $this->runWorker(
             $connection, $queue
         );
     }
@@ -111,7 +113,8 @@ class WorkCommand extends Command
         return new WorkerOptions(
             $this->option('delay'), $this->option('memory'),
             $this->option('timeout'), $this->option('sleep'),
-            $this->option('tries')
+            $this->option('tries'), $this->option('force'),
+            $this->option('stop-when-empty')
         );
     }
 
@@ -122,12 +125,16 @@ class WorkCommand extends Command
      */
     protected function listenForEvents()
     {
+        $this->laravel['events']->listen(JobProcessing::class, function ($event) {
+            $this->writeOutput($event->job, 'starting');
+        });
+
         $this->laravel['events']->listen(JobProcessed::class, function ($event) {
-            $this->writeOutput($event->job, false);
+            $this->writeOutput($event->job, 'success');
         });
 
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
-            $this->writeOutput($event->job, true);
+            $this->writeOutput($event->job, 'failed');
 
             $this->logFailedJob($event);
         });
@@ -137,22 +144,43 @@ class WorkCommand extends Command
      * Write the status output for the queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  bool  $failed
+     * @param  string $status
      * @return void
      */
-    protected function writeOutput(Job $job, $failed)
+    protected function writeOutput(Job $job, $status)
     {
-        if ($failed) {
-            $this->output->writeln('<error>['.Carbon::now()->format('Y-m-d H:i:s').'] Failed:</error> '.$job->resolveName());
-        } else {
-            $this->output->writeln('<info>['.Carbon::now()->format('Y-m-d H:i:s').'] Processed:</info> '.$job->resolveName());
+        switch ($status) {
+            case 'starting':
+                return $this->writeStatus($job, 'Processing', 'comment');
+            case 'success':
+                return $this->writeStatus($job, 'Processed', 'info');
+            case 'failed':
+                return $this->writeStatus($job, 'Failed', 'error');
         }
+    }
+
+    /**
+     * Format the status output for the queue worker.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  string  $status
+     * @param  string  $type
+     * @return void
+     */
+    protected function writeStatus(Job $job, $status, $type)
+    {
+        $this->output->writeln(sprintf(
+            "<{$type}>[%s][%s] %s</{$type}> %s",
+            Carbon::now()->format('Y-m-d H:i:s'),
+            $job->getJobId(),
+            str_pad("{$status}:", 11), $job->resolveName()
+        ));
     }
 
     /**
      * Store a failed job event.
      *
-     * @param  JobFailed  $event
+     * @param  \Illuminate\Queue\Events\JobFailed  $event
      * @return void
      */
     protected function logFailedJob(JobFailed $event)

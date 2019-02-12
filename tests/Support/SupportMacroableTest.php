@@ -1,19 +1,22 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Traits\Macroable;
 
-class SupportMacroableTest extends PHPUnit_Framework_TestCase
+class SupportMacroableTest extends TestCase
 {
     private $macroable;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->macroable = $this->createObjectForTrait();
     }
 
     private function createObjectForTrait()
     {
-        return $this->getObjectForTrait(Macroable::class);
+        return new EmptyMacroable;
     }
 
     public function testRegisterMacro()
@@ -50,6 +53,18 @@ class SupportMacroableTest extends PHPUnit_Framework_TestCase
         $result = TestMacroable::tryStatic();
         $this->assertEquals('static', $result);
     }
+
+    public function testClassBasedMacros()
+    {
+        TestMacroable::mixin(new TestMixin);
+        $instance = new TestMacroable;
+        $this->assertEquals('instance-Adam', $instance->methodOne('Adam'));
+    }
+}
+
+class EmptyMacroable
+{
+    use Macroable;
 }
 
 class TestMacroable
@@ -61,5 +76,22 @@ class TestMacroable
     protected static function getProtectedStatic()
     {
         return 'static';
+    }
+}
+
+class TestMixin
+{
+    public function methodOne()
+    {
+        return function ($value) {
+            return $this->methodTwo($value);
+        };
+    }
+
+    protected function methodTwo()
+    {
+        return function ($value) {
+            return $this->protectedVariable.'-'.$value;
+        };
     }
 }

@@ -2,7 +2,22 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
+
 /**
+ * @method static \Illuminate\Http\Response make(string $content = '', int $status = 200, array $headers = [])
+ * @method static \Illuminate\Http\Response view(string $view, array $data = [], int $status = 200, array $headers = [])
+ * @method static \Illuminate\Http\JsonResponse json(string|array $data = [], int $status = 200, array $headers = [], int $options = 0)
+ * @method static \Illuminate\Http\JsonResponse jsonp(string $callback, string|array $data = [], int $status = 200, array $headers = [], int $options = 0)
+ * @method static \Symfony\Component\HttpFoundation\StreamedResponse stream(\Closure $callback, int $status = 200, array $headers = [])
+ * @method static \Symfony\Component\HttpFoundation\StreamedResponse streamDownload(\Closure $callback, string|null $name = null, array $headers = [], string|null $disposition = 'attachment')
+ * @method static \Symfony\Component\HttpFoundation\BinaryFileResponse download(\SplFileInfo|string $file, string|null $name = null, array $headers = [], string|null $disposition = 'attachment')
+ * @method static \Illuminate\Http\RedirectResponse redirectTo(string $path, int $status = 302, array $headers = [], bool|null $secure = null)
+ * @method static \Illuminate\Http\RedirectResponse redirectToRoute(string $route, array $parameters = [], int $status = 302, array $headers = [])
+ * @method static \Illuminate\Http\RedirectResponse redirectToAction(string $action, array $parameters = [], int $status = 302, array $headers = [])
+ * @method static \Illuminate\Http\RedirectResponse redirectGuest(string $path, int $status = 302, array $headers = [], bool|null $secure = null)
+ * @method static \Illuminate\Http\RedirectResponse redirectToIntended(string $default = '/', int $status = 302, array $headers = [], bool|null $secure = null)
+ *
  * @see \Illuminate\Contracts\Routing\ResponseFactory
  */
 class Response extends Facade
@@ -14,6 +29,6 @@ class Response extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'Illuminate\Contracts\Routing\ResponseFactory';
+        return ResponseFactoryContract::class;
     }
 }

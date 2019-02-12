@@ -1,8 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Config;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Config\Repository;
 
-class RepositoryTest extends PHPUnit_Framework_TestCase
+class RepositoryTest extends TestCase
 {
     /**
      * @var \Illuminate\Config\Repository
@@ -14,11 +17,12 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
      */
     protected $config;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->repository = new Repository($this->config = [
             'foo' => 'bar',
             'bar' => 'baz',
+            'baz' => 'bat',
             'null' => null,
             'associate' => [
                 'x' => 'xxx',
@@ -27,6 +31,9 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
             'array' => [
                 'aaa',
                 'zzz',
+            ],
+            'x' => [
+                'z' => 'zoo',
             ],
         ]);
 
@@ -43,7 +50,7 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->repository->has('foo'));
     }
 
-    public function testHasIsTFalse()
+    public function testHasIsFalse()
     {
         $this->assertFalse($this->repository->has('not-exist'));
     }
@@ -51,6 +58,56 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
     public function testGet()
     {
         $this->assertSame('bar', $this->repository->get('foo'));
+    }
+
+    public function testGetWithArrayOfKeys()
+    {
+        $this->assertSame([
+            'foo' => 'bar',
+            'bar' => 'baz',
+            'none' => null,
+        ], $this->repository->get([
+            'foo',
+            'bar',
+            'none',
+        ]));
+
+        $this->assertSame([
+            'x.y' => 'default',
+            'x.z' => 'zoo',
+            'bar' => 'baz',
+            'baz' => 'bat',
+        ], $this->repository->get([
+            'x.y' => 'default',
+            'x.z' => 'default',
+            'bar' => 'default',
+            'baz',
+        ]));
+    }
+
+    public function testGetMany()
+    {
+        $this->assertSame([
+            'foo' => 'bar',
+            'bar' => 'baz',
+            'none' => null,
+        ], $this->repository->getMany([
+            'foo',
+            'bar',
+            'none',
+        ]));
+
+        $this->assertSame([
+            'x.y' => 'default',
+            'x.z' => 'zoo',
+            'bar' => 'baz',
+            'baz' => 'bat',
+        ], $this->repository->getMany([
+            'x.y' => 'default',
+            'x.z' => 'default',
+            'bar' => 'default',
+            'baz',
+        ]));
     }
 
     public function testGetWithDefault()
@@ -84,5 +141,46 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
     {
         $this->repository->push('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.2'));
+    }
+
+    public function testAll()
+    {
+        $this->assertSame($this->config, $this->repository->all());
+    }
+
+    public function testOffsetExists()
+    {
+        $this->assertTrue(isset($this->repository['foo']));
+        $this->assertFalse(isset($this->repository['not-exist']));
+    }
+
+    public function testOffsetGet()
+    {
+        $this->assertNull($this->repository['not-exist']);
+        $this->assertSame('bar', $this->repository['foo']);
+        $this->assertSame([
+            'x' => 'xxx',
+            'y' => 'yyy',
+        ], $this->repository['associate']);
+    }
+
+    public function testOffsetSet()
+    {
+        $this->assertNull($this->repository['key']);
+
+        $this->repository['key'] = 'value';
+
+        $this->assertSame('value', $this->repository['key']);
+    }
+
+    public function testOffsetUnset()
+    {
+        $this->assertArrayHasKey('associate', $this->repository->all());
+        $this->assertSame($this->config['associate'], $this->repository->get('associate'));
+
+        unset($this->repository['associate']);
+
+        $this->assertArrayHasKey('associate', $this->repository->all());
+        $this->assertNull($this->repository->get('associate'));
     }
 }

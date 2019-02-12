@@ -1,15 +1,21 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
+use PDO;
 use Mockery as m;
-use Illuminate\Database\Connection;
+use ReflectionProperty;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
-class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
+class DatabaseConnectionFactoryTest extends TestCase
 {
     protected $db;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->db = new DB;
 
@@ -31,17 +37,17 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
         $this->db->setAsGlobal();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
     public function testConnectionCanBeCreated()
     {
-        $this->assertInstanceOf('PDO', $this->db->connection()->getPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection()->getReadPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection('read_write')->getPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection('read_write')->getReadPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection()->getPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection()->getReadPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getReadPdo());
     }
 
     public function testSingleConnectionNotCreatedUntilNeeded()
@@ -52,8 +58,8 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
         $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
         $readPdo->setAccessible(true);
 
-        $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
-        $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
     public function testReadWriteConnectionsNotCreatedUntilNeeded()
@@ -64,35 +70,48 @@ class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase
         $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
         $readPdo->setAccessible(true);
 
-        $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
-        $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testIfDriverIsntSetExceptionIsThrown()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A driver must be specified.');
+
+        $factory = new ConnectionFactory($container = m::mock(Container::class));
         $factory->createConnector(['foo']);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testExceptionIsThrownOnUnsupportedDriver()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported driver [foo]');
+
+        $factory = new ConnectionFactory($container = m::mock(Container::class));
         $container->shouldReceive('bound')->once()->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);
     }
 
     public function testCustomConnectorsCanBeResolvedViaContainer()
     {
-        $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
+        $factory = new ConnectionFactory($container = m::mock(Container::class));
         $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
         $container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
 
         $this->assertEquals('connector', $factory->createConnector(['driver' => 'foo']));
+    }
+
+    public function testSqliteForeignKeyConstraints()
+    {
+        $this->db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'foreign_key_constraints' => true,
+        ], 'constraints_set');
+
+        $this->assertEquals(0, $this->db->connection()->select('PRAGMA foreign_keys')[0]->foreign_keys);
+
+        $this->assertEquals(1, $this->db->connection('constraints_set')->select('PRAGMA foreign_keys')[0]->foreign_keys);
     }
 }

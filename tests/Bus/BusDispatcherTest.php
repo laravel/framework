@@ -1,12 +1,21 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Bus\Dispatcher;
-use Illuminate\Container\Container;
+namespace Illuminate\Tests\Bus;
 
-class BusDispatcherTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use RuntimeException;
+use Illuminate\Bus\Queueable;
+use Illuminate\Bus\Dispatcher;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Config\Repository as Config;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+class BusDispatcherTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -15,20 +24,20 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
-            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
 
             return $mock;
         });
 
-        $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldQueue'));
+        $dispatcher->dispatch(m::mock(ShouldQueue::class));
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
-            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
 
             return $mock;
@@ -41,8 +50,8 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
-            $mock = m::mock('Illuminate\Contracts\Queue\Queue');
-            $mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type('BusDispatcherTestSpecificQueueAndDelayCommand'));
+            $mock = m::mock(Queue::class);
+            $mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type(BusDispatcherTestSpecificQueueAndDelayCommand::class));
 
             return $mock;
         });
@@ -53,7 +62,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
     public function testDispatchNowShouldNeverQueue()
     {
         $container = new Container;
-        $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+        $mock = m::mock(Queue::class);
         $mock->shouldReceive('push')->never();
         $dispatcher = new Dispatcher($container, function () use ($mock) {
             return $mock;
@@ -65,7 +74,7 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
     public function testDispatcherCanDispatchStandAloneHandler()
     {
         $container = new Container;
-        $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+        $mock = m::mock(Queue::class);
         $dispatcher = new Dispatcher($container, function () use ($mock) {
             return $mock;
         });
@@ -76,10 +85,37 @@ class BusDispatcherTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(StandAloneCommand::class, $response);
     }
+
+    public function testOnConnectionOnJobWhenDispatching()
+    {
+        $container = new Container;
+        $container->singleton('config', function () {
+            return new Config([
+                'queue' => [
+                    'default' => 'null',
+                    'connections' => [
+                        'null' => ['driver' => 'null'],
+                    ],
+                ],
+            ]);
+        });
+
+        $dispatcher = new Dispatcher($container, function () {
+            $mock = m::mock(Queue::class);
+            $mock->shouldReceive('push')->once();
+
+            return $mock;
+        });
+
+        $job = (new ShouldNotBeDispatched)->onConnection('null');
+
+        $dispatcher->dispatch($job);
+    }
 }
 
 class BusInjectionStub
 {
+    //
 }
 
 class BusDispatcherBasicCommand
@@ -97,7 +133,7 @@ class BusDispatcherBasicCommand
     }
 }
 
-class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\ShouldQueue
+class BusDispatcherTestCustomQueueCommand implements ShouldQueue
 {
     public function queue($queue, $command)
     {
@@ -105,7 +141,7 @@ class BusDispatcherTestCustomQueueCommand implements Illuminate\Contracts\Queue\
     }
 }
 
-class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contracts\Queue\ShouldQueue
+class BusDispatcherTestSpecificQueueAndDelayCommand implements ShouldQueue
 {
     public $queue = 'foo';
     public $delay = 10;
@@ -113,6 +149,7 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements Illuminate\Contra
 
 class StandAloneCommand
 {
+    //
 }
 
 class StandAloneHandler
@@ -120,5 +157,15 @@ class StandAloneHandler
     public function handle(StandAloneCommand $command)
     {
         return $command;
+    }
+}
+
+class ShouldNotBeDispatched implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable;
+
+    public function handle()
+    {
+        throw new RuntimeException('This should not be run');
     }
 }

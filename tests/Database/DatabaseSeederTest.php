@@ -1,7 +1,14 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use Mockery as m;
+use Mockery\Mock;
+use Illuminate\Console\Command;
 use Illuminate\Database\Seeder;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class TestSeeder extends Seeder
 {
@@ -13,15 +20,15 @@ class TestSeeder extends Seeder
 
 class TestDepsSeeder extends Seeder
 {
-    public function run(Mockery\Mock $someDependency)
+    public function run(Mock $someDependency)
     {
         //
     }
 }
 
-class DatabaseSeederTest extends PHPUnit_Framework_TestCase
+class DatabaseSeederTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -29,10 +36,10 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase
     public function testCallResolveTheClassAndCallsRun()
     {
         $seeder = new TestSeeder;
-        $seeder->setContainer($container = m::mock('Illuminate\Container\Container'));
-        $output = m::mock('Symfony\Component\Console\Output\OutputInterface');
+        $seeder->setContainer($container = m::mock(Container::class));
+        $output = m::mock(OutputInterface::class);
         $output->shouldReceive('writeln')->once()->andReturn('foo');
-        $command = m::mock('Illuminate\Console\Command');
+        $command = m::mock(Command::class);
         $command->shouldReceive('getOutput')->once()->andReturn($output);
         $seeder->setCommand($command);
         $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
@@ -46,20 +53,20 @@ class DatabaseSeederTest extends PHPUnit_Framework_TestCase
     public function testSetContainer()
     {
         $seeder = new TestSeeder;
-        $container = m::mock('Illuminate\Container\Container');
+        $container = m::mock(Container::class);
         $this->assertEquals($seeder->setContainer($container), $seeder);
     }
 
     public function testSetCommand()
     {
         $seeder = new TestSeeder;
-        $command = m::mock('Illuminate\Console\Command');
+        $command = m::mock(Command::class);
         $this->assertEquals($seeder->setCommand($command), $seeder);
     }
 
     public function testInjectDependenciesOnRunMethod()
     {
-        $container = m::mock('Illuminate\Container\Container');
+        $container = m::mock(Container::class);
         $container->shouldReceive('call');
 
         $seeder = new TestDepsSeeder;

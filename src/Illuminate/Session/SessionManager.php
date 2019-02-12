@@ -3,7 +3,6 @@
 namespace Illuminate\Session;
 
 use Illuminate\Support\Manager;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 
 class SessionManager extends Manager
 {
@@ -35,9 +34,9 @@ class SessionManager extends Manager
      */
     protected function createCookieDriver()
     {
-        $lifetime = $this->app['config']['session.lifetime'];
-
-        return $this->buildSession(new CookieSessionHandler($this->app['cookie'], $lifetime));
+        return $this->buildSession(new CookieSessionHandler(
+            $this->app['cookie'], $this->app['config']['session.lifetime']
+        ));
     }
 
     /**
@@ -57,11 +56,11 @@ class SessionManager extends Manager
      */
     protected function createNativeDriver()
     {
-        $path = $this->app['config']['session.files'];
-
         $lifetime = $this->app['config']['session.lifetime'];
 
-        return $this->buildSession(new FileSessionHandler($this->app['files'], $path, $lifetime));
+        return $this->buildSession(new FileSessionHandler(
+            $this->app['files'], $this->app['config']['session.files'], $lifetime
+        ));
     }
 
     /**
@@ -71,13 +70,13 @@ class SessionManager extends Manager
      */
     protected function createDatabaseDriver()
     {
-        $connection = $this->getDatabaseConnection();
-
         $table = $this->app['config']['session.table'];
 
         $lifetime = $this->app['config']['session.lifetime'];
 
-        return $this->buildSession(new DatabaseSessionHandler($connection, $table, $lifetime, $this->app));
+        return $this->buildSession(new DatabaseSessionHandler(
+            $this->getDatabaseConnection(), $table, $lifetime, $this->app
+        ));
     }
 
     /**
@@ -113,16 +112,6 @@ class SessionManager extends Manager
     }
 
     /**
-     * Create an instance of the Wincache session driver.
-     *
-     * @return \Illuminate\Session\Store
-     */
-    protected function createWincacheDriver()
-    {
-        return $this->createCacheBased('wincache');
-    }
-
-    /**
      * Create an instance of the Redis session driver.
      *
      * @return \Illuminate\Session\Store
@@ -131,9 +120,21 @@ class SessionManager extends Manager
     {
         $handler = $this->createCacheHandler('redis');
 
-        $handler->getCache()->getStore()->setConnection($this->app['config']['session.connection']);
+        $handler->getCache()->getStore()->setConnection(
+            $this->app['config']['session.connection']
+        );
 
         return $this->buildSession($handler);
+    }
+
+    /**
+     * Create an instance of the DynamoDB session driver.
+     *
+     * @return \Illuminate\Session\Store
+     */
+    protected function createDynamodbDriver()
+    {
+        return $this->createCacheBased('dynamodb');
     }
 
     /**
@@ -157,9 +158,10 @@ class SessionManager extends Manager
     {
         $store = $this->app['config']->get('session.store') ?: $driver;
 
-        $minutes = $this->app['config']['session.lifetime'];
-
-        return new CacheBasedSessionHandler(clone $this->app['cache']->store($store), $minutes);
+        return new CacheBasedSessionHandler(
+            clone $this->app['cache']->store($store),
+            $this->app['config']['session.lifetime']
+        );
     }
 
     /**
@@ -170,13 +172,22 @@ class SessionManager extends Manager
      */
     protected function buildSession($handler)
     {
-        if ($this->app['config']['session.encrypt']) {
-            return new EncryptedStore(
-                $this->app['config']['session.cookie'], $handler, $this->app['encrypter']
-            );
-        } else {
-            return new Store($this->app['config']['session.cookie'], $handler);
-        }
+        return $this->app['config']['session.encrypt']
+                ? $this->buildEncryptedSession($handler)
+                : new Store($this->app['config']['session.cookie'], $handler);
+    }
+
+    /**
+     * Build the encrypted session instance.
+     *
+     * @param  \SessionHandlerInterface  $handler
+     * @return \Illuminate\Session\EncryptedStore
+     */
+    protected function buildEncryptedSession($handler)
+    {
+        return new EncryptedStore(
+            $this->app['config']['session.cookie'], $handler, $this->app['encrypter']
+        );
     }
 
     /**

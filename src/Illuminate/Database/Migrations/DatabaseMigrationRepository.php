@@ -41,7 +41,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Get the ran migrations.
+     * Get the completed migrations.
      *
      * @return array
      */
@@ -63,7 +63,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     {
         $query = $this->table()->where('batch', '>=', '1');
 
-        return $query->orderBy('migration', 'desc')->take($steps)->get()->all();
+        return $query->orderBy('batch', 'desc')
+                     ->orderBy('migration', 'desc')
+                     ->take($steps)->get()->all();
     }
 
     /**
@@ -79,10 +81,23 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
+     * Get the completed migrations with their batch numbers.
+     *
+     * @return array
+     */
+    public function getMigrationBatches()
+    {
+        return $this->table()
+                ->orderBy('batch', 'asc')
+                ->orderBy('migration', 'asc')
+                ->pluck('batch', 'migration')->all();
+    }
+
+    /**
      * Log that a migration was run.
      *
      * @param  string  $file
-     * @param  int     $batch
+     * @param  int  $batch
      * @return void
      */
     public function log($file, $batch)
@@ -137,9 +152,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             // migrations have actually run for the application. We'll create the
             // table to hold the migration file's path as well as the batch ID.
             $table->increments('id');
-
             $table->string('migration');
-
             $table->integer('batch');
         });
     }
@@ -163,7 +176,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     protected function table()
     {
-        return $this->getConnection()->table($this->table);
+        return $this->getConnection()->table($this->table)->useWritePdo();
     }
 
     /**

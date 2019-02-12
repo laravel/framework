@@ -49,7 +49,7 @@ class ResetCommand extends BaseCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (! $this->confirmToProceed()) {
             return;
@@ -64,16 +64,9 @@ class ResetCommand extends BaseCommand
             return $this->comment('Migration table not found.');
         }
 
-        $this->migrator->reset(
+        $this->migrator->setOutput($this->output)->reset(
             $this->getMigrationPaths(), $this->option('pretend')
         );
-
-        // Once the migrator has run we will grab the note output and send it out to
-        // the console screen, since the migrator itself functions without having
-        // any instances of the OutputInterface contract passed into the class.
-        foreach ($this->migrator->getNotes() as $note) {
-            $this->output->writeln($note);
-        }
     }
 
     /**
@@ -84,13 +77,15 @@ class ResetCommand extends BaseCommand
     protected function getOptions()
     {
         return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
+            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
 
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
 
-            ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
+            ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to be executed'],
 
-            ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+            ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
+
+            ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run'],
         ];
     }
 }

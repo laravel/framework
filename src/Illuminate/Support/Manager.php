@@ -10,7 +10,7 @@ abstract class Manager
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -31,7 +31,7 @@ abstract class Manager
     /**
      * Create a new manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -51,10 +51,18 @@ abstract class Manager
      *
      * @param  string  $driver
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function driver($driver = null)
     {
         $driver = $driver ?: $this->getDefaultDriver();
+
+        if (is_null($driver)) {
+            throw new InvalidArgumentException(sprintf(
+                'Unable to resolve NULL driver for [%s].', static::class
+            ));
+        }
 
         // If the given driver has not been created before, we will create the instances
         // here and cache it so we can return it next time very quickly. If there is
@@ -76,17 +84,18 @@ abstract class Manager
      */
     protected function createDriver($driver)
     {
-        $method = 'create'.Str::studly($driver).'Driver';
-
-        // We'll check to see if a creator method exists for the given driver. If not we
-        // will check for a custom driver creator, which allows developers to create
-        // drivers using their own customized driver creator Closure to create it.
+        // First, we will determine if a custom driver creator exists for the given driver and
+        // if it does not we will check for a creator method for the driver. Custom creator
+        // callbacks allow developers to build their own "drivers" easily using Closures.
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($driver);
-        } elseif (method_exists($this, $method)) {
-            return $this->$method();
-        }
+        } else {
+            $method = 'create'.Str::studly($driver).'Driver';
 
+            if (method_exists($this, $method)) {
+                return $this->$method();
+            }
+        }
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 

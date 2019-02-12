@@ -1,14 +1,33 @@
 <?php
 
+namespace Illuminate\Tests\Cache;
+
+use Illuminate\Support\Carbon;
 use Illuminate\Cache\FileStore;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
-class CacheFileStoreTest extends PHPUnit_Framework_TestCase
+class CacheFileStoreTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::now());
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow(null);
+    }
+
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('get')->will($this->throwException(new FileNotFoundException()));
+        $files->expects($this->once())->method('get')->will($this->throwException(new FileNotFoundException));
         $store = new FileStore($files, __DIR__);
         $value = $store->get('foo');
         $this->assertNull($value);
@@ -18,11 +37,13 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
     {
         $files = $this->mockFilesystem();
         $hash = sha1('foo');
+        $contents = '0000000000';
         $full_dir = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2);
         $files->expects($this->once())->method('makeDirectory')->with($this->equalTo($full_dir), $this->equalTo(0777), $this->equalTo(true));
-        $files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$hash));
+        $files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$hash))->willReturn(strlen($contents));
         $store = new FileStore($files, __DIR__);
-        $store->put('foo', '0000000000', 0);
+        $result = $store->put('foo', $contents, 0);
+        $this->assertTrue($result);
     }
 
     public function testExpiredItemsReturnNull()
@@ -30,7 +51,7 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
         $files = $this->mockFilesystem();
         $contents = '0000000000';
         $files->expects($this->once())->method('get')->will($this->returnValue($contents));
-        $store = $this->getMockBuilder('Illuminate\Cache\FileStore')->setMethods(['forget'])->setConstructorArgs([$files, __DIR__])->getMock();
+        $store = $this->getMockBuilder(FileStore::class)->setMethods(['forget'])->setConstructorArgs([$files, __DIR__])->getMock();
         $store->expects($this->once())->method('forget');
         $value = $store->get('foo');
         $this->assertNull($value);
@@ -48,13 +69,14 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
     public function testStoreItemProperlyStoresValues()
     {
         $files = $this->mockFilesystem();
-        $store = $this->getMockBuilder('Illuminate\Cache\FileStore')->setMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
+        $store = $this->getMockBuilder(FileStore::class)->setMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
         $store->expects($this->once())->method('expiration')->with($this->equalTo(10))->will($this->returnValue(1111111111));
         $contents = '1111111111'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents));
-        $store->put('foo', 'Hello World', 10);
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
+        $result = $store->put('foo', 'Hello World', 10);
+        $this->assertTrue($result);
     }
 
     public function testForeversAreStoredWithHighTimestamp()
@@ -63,9 +85,10 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
         $contents = '9999999999'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents));
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
         $store = new FileStore($files, __DIR__);
-        $store->forever('foo', 'Hello World', 10);
+        $result = $store->forever('foo', 'Hello World', 10);
+        $this->assertTrue($result);
     }
 
     public function testForeversAreNotRemovedOnIncrement()
@@ -82,7 +105,7 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
     public function testIncrementDoesNotExtendCacheLife()
     {
         $files = $this->mockFilesystem();
-        $expiration = time() + 59;
+        $expiration = Carbon::now()->addSeconds(50)->getTimestamp();
         $initialValue = $expiration.serialize(1);
         $valueAfterIncrement = $expiration.serialize(2);
         $store = new FileStore($files, __DIR__);
@@ -151,6 +174,6 @@ class CacheFileStoreTest extends PHPUnit_Framework_TestCase
 
     protected function mockFilesystem()
     {
-        return $this->createMock('Illuminate\Filesystem\Filesystem');
+        return $this->createMock(Filesystem::class);
     }
 }

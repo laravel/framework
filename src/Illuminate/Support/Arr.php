@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
+use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr
@@ -61,6 +62,33 @@ class Arr
     }
 
     /**
+     * Cross join the given arrays, returning all possible permutations.
+     *
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function crossJoin(...$arrays)
+    {
+        $results = [[]];
+
+        foreach ($arrays as $index => $array) {
+            $append = [];
+
+            foreach ($results as $product) {
+                foreach ($array as $item) {
+                    $product[$index] = $item;
+
+                    $append[] = $product;
+                }
+            }
+
+            $results = $append;
+        }
+
+        return $results;
+    }
+
+    /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
      * @param  array  $array
@@ -94,7 +122,7 @@ class Arr
     }
 
     /**
-     * Get all of the given array except for a specified array of items.
+     * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
      * @param  array|string  $keys
@@ -178,17 +206,21 @@ class Arr
      */
     public static function flatten($array, $depth = INF)
     {
-        return array_reduce($array, function ($result, $item) use ($depth) {
+        $result = [];
+
+        foreach ($array as $item) {
             $item = $item instanceof Collection ? $item->all() : $item;
 
             if (! is_array($item)) {
-                return array_merge($result, [$item]);
+                $result[] = $item;
             } elseif ($depth === 1) {
-                return array_merge($result, array_values($item));
+                $result = array_merge($result, array_values($item));
             } else {
-                return array_merge($result, static::flatten($item, $depth - 1));
+                $result = array_merge($result, static::flatten($item, $depth - 1));
             }
-        }, []);
+        }
+
+        return $result;
     }
 
     /**
@@ -257,6 +289,10 @@ class Arr
             return $array[$key];
         }
 
+        if (strpos($key, '.') === false) {
+            return $array[$key] ?? value($default);
+        }
+
         foreach (explode('.', $key) as $segment) {
             if (static::accessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];
@@ -277,17 +313,9 @@ class Arr
      */
     public static function has($array, $keys)
     {
-        if (is_null($keys)) {
-            return false;
-        }
-
         $keys = (array) $keys;
 
-        if (! $array) {
-            return false;
-        }
-
-        if ($keys === []) {
+        if (! $array || $keys === []) {
             return false;
         }
 
@@ -349,7 +377,7 @@ class Arr
     {
         $results = [];
 
-        list($value, $key) = static::explodePluckParameters($value, $key);
+        [$value, $key] = static::explodePluckParameters($value, $key);
 
         foreach ($array as $item) {
             $itemValue = data_get($item, $value);
@@ -361,6 +389,10 @@ class Arr
                 $results[] = $itemValue;
             } else {
                 $itemKey = data_get($item, $key);
+
+                if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
+                    $itemKey = (string) $itemKey;
+                }
 
                 $results[$itemKey] = $itemValue;
             }
@@ -422,6 +454,46 @@ class Arr
     }
 
     /**
+     * Get one or a specified number of random values from an array.
+     *
+     * @param  array  $array
+     * @param  int|null  $number
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function random($array, $number = null)
+    {
+        $requested = is_null($number) ? 1 : $number;
+
+        $count = count($array);
+
+        if ($requested > $count) {
+            throw new InvalidArgumentException(
+                "You requested {$requested} items, but there are only {$count} items available."
+            );
+        }
+
+        if (is_null($number)) {
+            return $array[array_rand($array)];
+        }
+
+        if ((int) $number === 0) {
+            return [];
+        }
+
+        $keys = array_rand($array, $number);
+
+        $results = [];
+
+        foreach ((array) $keys as $key) {
+            $results[] = $array[$key];
+        }
+
+        return $results;
+    }
+
+    /**
      * Set an array item to a given value using "dot" notation.
      *
      * If no key is given to the method, the entire array will be replaced.
@@ -458,13 +530,35 @@ class Arr
     }
 
     /**
+     * Shuffle the given array and return the result.
+     *
+     * @param  array  $array
+     * @param  int|null  $seed
+     * @return array
+     */
+    public static function shuffle($array, $seed = null)
+    {
+        if (is_null($seed)) {
+            shuffle($array);
+        } else {
+            srand($seed);
+
+            usort($array, function () {
+                return rand(-1, 1);
+            });
+        }
+
+        return $array;
+    }
+
+    /**
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
-     * @param  callable|string  $callback
+     * @param  callable|string|null  $callback
      * @return array
      */
-    public static function sort($array, $callback)
+    public static function sort($array, $callback = null)
     {
         return Collection::make($array)->sortBy($callback)->all();
     }
@@ -493,6 +587,17 @@ class Arr
     }
 
     /**
+     * Convert the array into a query string.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function query($array)
+    {
+        return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
@@ -502,5 +607,20 @@ class Arr
     public static function where($array, callable $callback)
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * If the given value is not an array and not null, wrap it in one.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function wrap($value)
+    {
+        if (is_null($value)) {
+            return [];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 }

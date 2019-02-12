@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceUser;
+use NamespacedDummyUserModel;
 use NamespacedDummyModel;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -11,48 +11,72 @@ class DummyClass
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view the dummyModelName.
+     * Determine whether the user can view the DocDummyModel.
      *
-     * @param  \DummyRootNamespaceUser  $user
-     * @param  \DummyRootNamespaceDummyModel  $dummyModelName
+     * @param  \NamespacedDummyUserModel  $user
+     * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function view(User $user, DummyModel $dummyModelName)
+    public function view(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }
 
     /**
-     * Determine whether the user can create dummyPluralModelName.
+     * Determine whether the user can create DocDummyPluralModel.
      *
-     * @param  \DummyRootNamespaceUser  $user
+     * @param  \NamespacedDummyUserModel  $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(DummyUser $user)
     {
         //
     }
 
     /**
-     * Determine whether the user can update the dummyModelName.
+     * Determine whether the user can update the DocDummyModel.
      *
-     * @param  \DummyRootNamespaceUser  $user
-     * @param  \DummyRootNamespaceDummyModel  $dummyModelName
+     * @param  \NamespacedDummyUserModel  $user
+     * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function update(User $user, DummyModel $dummyModelName)
+    public function update(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }
 
     /**
-     * Determine whether the user can delete the dummyModelName.
+     * Determine whether the user can delete the DocDummyModel.
      *
-     * @param  \DummyRootNamespaceUser  $user
-     * @param  \DummyRootNamespaceDummyModel  $dummyModelName
+     * @param  \NamespacedDummyUserModel  $user
+     * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function delete(User $user, DummyModel $dummyModelName)
+    public function delete(DummyUser $user, DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can restore the DocDummyModel.
+     *
+     * @param  \NamespacedDummyUserModel  $user
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return mixed
+     */
+    public function restore(DummyUser $user, DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can permanently delete the DocDummyModel.
+     *
+     * @param  \NamespacedDummyUserModel  $user
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return mixed
+     */
+    public function forceDelete(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }

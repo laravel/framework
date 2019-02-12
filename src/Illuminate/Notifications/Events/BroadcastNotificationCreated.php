@@ -2,14 +2,14 @@
 
 namespace Illuminate\Notifications\Events;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class BroadcastNotificationCreated implements ShouldBroadcast
 {
-    use SerializesModels;
+    use Queueable, SerializesModels;
 
     /**
      * The notifiable entity who received the notification.
@@ -54,20 +54,13 @@ class BroadcastNotificationCreated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return [new PrivateChannel($this->channelName())];
-    }
+        $channels = $this->notification->broadcastOn();
 
-    /**
-     * Get the data that should be sent with the broadcasted event.
-     *
-     * @return array
-     */
-    public function broadcastWith()
-    {
-        return array_merge($this->data, [
-            'id' => $this->notification->id,
-            'type' => get_class($this->notification),
-        ]);
+        if (! empty($channels)) {
+            return $channels;
+        }
+
+        return [new PrivateChannel($this->channelName())];
     }
 
     /**
@@ -84,5 +77,30 @@ class BroadcastNotificationCreated implements ShouldBroadcast
         $class = str_replace('\\', '.', get_class($this->notifiable));
 
         return $class.'.'.$this->notifiable->getKey();
+    }
+
+    /**
+     * Get the data that should be sent with the broadcasted event.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return array_merge($this->data, [
+            'id' => $this->notification->id,
+            'type' => $this->broadcastType(),
+        ]);
+    }
+
+    /**
+     * Get the type of the notification being broadcast.
+     *
+     * @return string
+     */
+    public function broadcastType()
+    {
+        return method_exists($this->notification, 'broadcastType')
+                    ? $this->notification->broadcastType()
+                    : get_class($this->notification);
     }
 }

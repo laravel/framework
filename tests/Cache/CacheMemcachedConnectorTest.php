@@ -1,10 +1,15 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Cache;
 
-class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
+use Memcached;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Cache\MemcachedConnector;
+
+class CacheMemcachedConnectorTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -21,21 +26,6 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
         $result = $this->connect($connector);
 
         $this->assertSame($result, $memcached);
-    }
-
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testExceptionThrownOnBadConnection()
-    {
-        $memcached = $this->memcachedMockWithAddServer(['255.255.255']);
-
-        $connector = $this->connectorMock();
-        $connector->expects($this->once())
-            ->method('createMemcachedInstance')
-            ->will($this->returnValue($memcached));
-
-        $this->connect($connector);
     }
 
     public function testServersAreAddedCorrectlyWithPersistentConnection()
@@ -103,9 +93,8 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
 
     protected function memcachedMockWithAddServer($returnedVersion = [])
     {
-        $memcached = m::mock('stdClass');
+        $memcached = m::mock(stdClass::class);
         $memcached->shouldReceive('addServer')->once()->with($this->getHost(), $this->getPort(), $this->getWeight());
-        $memcached->shouldReceive('getVersion')->once()->andReturn($returnedVersion);
         $memcached->shouldReceive('getServerList')->once()->andReturn([]);
 
         return $memcached;
@@ -113,7 +102,7 @@ class CacheMemcachedConnectorTest extends PHPUnit_Framework_TestCase
 
     protected function connectorMock()
     {
-        return $this->getMockBuilder('Illuminate\Cache\MemcachedConnector')->setMethods(['createMemcachedInstance'])->getMock();
+        return $this->getMockBuilder(MemcachedConnector::class)->setMethods(['createMemcachedInstance'])->getMock();
     }
 
     protected function connect(

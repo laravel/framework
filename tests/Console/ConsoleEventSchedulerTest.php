@@ -1,13 +1,48 @@
 <?php
 
-use Mockery as m;
-use Illuminate\Console\Scheduling\Schedule;
+namespace Illuminate\Tests\Console;
 
-class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
+use Mockery as m;
+use Illuminate\Console\Command;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Console\Scheduling\CacheEventMutex;
+use Illuminate\Console\Scheduling\SchedulingMutex;
+use Illuminate\Console\Scheduling\CacheSchedulingMutex;
+
+class ConsoleEventSchedulerTest extends TestCase
 {
-    public function tearDown()
+    /**
+     * @var Schedule
+     */
+    private $schedule;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $container = Container::getInstance();
+
+        $container->instance(EventMutex::class, m::mock(CacheEventMutex::class));
+
+        $container->instance(SchedulingMutex::class, m::mock(CacheSchedulingMutex::class));
+
+        $container->instance(Schedule::class, $this->schedule = new Schedule(m::mock(EventMutex::class)));
+    }
+
+    protected function tearDown(): void
     {
         m::close();
+    }
+
+    public function testMutexCanReceiveCustomStore()
+    {
+        Container::getInstance()->make(EventMutex::class)->shouldReceive('useStore')->once()->with('test');
+        Container::getInstance()->make(SchedulingMutex::class)->shouldReceive('useStore')->once()->with('test');
+
+        $this->schedule->useCache('test');
     }
 
     public function testExecCreatesNewCommand()
@@ -15,7 +50,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
         $escapeReal = '\\' === DIRECTORY_SEPARATOR ? '\\"' : '"';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->exec('path/to/command');
         $schedule->exec('path/to/command -f --foo="bar"');
         $schedule->exec('path/to/command', ['-f']);
@@ -36,11 +71,24 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
     }
 
+    public function testExecCreatesNewCommandWithTimezone()
+    {
+        $schedule = new Schedule('UTC');
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals('UTC', $events[0]->timezone);
+
+        $schedule = new Schedule('Asia/Tokyo');
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals('Asia/Tokyo', $events[0]->timezone);
+    }
+
     public function testCommandCreatesNewArtisanCommand()
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->command('queue:listen');
         $schedule->command('queue:listen --tries=3');
         $schedule->command('queue:listen', ['--tries' => 3]);
@@ -56,7 +104,7 @@ class ConsoleEventSchedulerTest extends PHPUnit_Framework_TestCase
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
-        $schedule = new Schedule;
+        $schedule = $this->schedule;
         $schedule->command(ConsoleCommandStub::class, ['--force']);
 
         $events = $schedule->events();
@@ -75,7 +123,7 @@ class FooClassStub
     }
 }
 
-class ConsoleCommandStub extends Illuminate\Console\Command
+class ConsoleCommandStub extends Command
 {
     protected $signature = 'foo:bar';
 

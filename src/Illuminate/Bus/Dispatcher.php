@@ -71,9 +71,9 @@ class Dispatcher implements QueueingDispatcher
     {
         if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
             return $this->dispatchToQueue($command);
-        } else {
-            return $this->dispatchNow($command);
         }
+
+        return $this->dispatchNow($command);
     }
 
     /**
@@ -145,7 +145,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchToQueue($command)
     {
-        $connection = isset($command->connection) ? $command->connection : null;
+        $connection = $command->connection ?? null;
 
         $queue = call_user_func($this->queueResolver, $connection);
 
@@ -155,9 +155,9 @@ class Dispatcher implements QueueingDispatcher
 
         if (method_exists($command, 'queue')) {
             return $command->queue($queue, $command);
-        } else {
-            return $this->pushCommandToQueue($queue, $command);
         }
+
+        return $this->pushCommandToQueue($queue, $command);
     }
 
     /**

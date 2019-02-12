@@ -8,7 +8,7 @@ interface Kernel
      * Handle an incoming console command.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $output
      * @return int
      */
     public function handle($input, $output = null);
@@ -18,16 +18,17 @@ interface Kernel
      *
      * @param  string  $command
      * @param  array  $parameters
+     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
      * @return int
      */
-    public function call($command, array $parameters = []);
+    public function call($command, array $parameters = [], $outputBuffer = null);
 
     /**
      * Queue an Artisan console command by name.
      *
      * @param  string  $command
      * @param  array  $parameters
-     * @return int
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public function queue($command, array $parameters = []);
 
@@ -44,4 +45,13 @@ interface Kernel
      * @return string
      */
     public function output();
+
+    /**
+     * Terminate the application.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  int  $status
+     * @return void
+     */
+    public function terminate($input, $status);
 }

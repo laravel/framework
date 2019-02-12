@@ -2,15 +2,49 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+
 trait InteractsWithAuthentication
 {
     /**
-     * Assert that the user is authenticated.
+     * Set the currently logged in user for the application.
      *
-     * @param string|null  $guard
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string|null  $driver
      * @return $this
      */
-    public function seeIsAuthenticated($guard = null)
+    public function actingAs(UserContract $user, $driver = null)
+    {
+        return $this->be($user, $driver);
+    }
+
+    /**
+     * Set the currently logged in user for the application.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string|null  $driver
+     * @return $this
+     */
+    public function be(UserContract $user, $driver = null)
+    {
+        if (isset($user->wasRecentlyCreated) && $user->wasRecentlyCreated) {
+            $user->wasRecentlyCreated = false;
+        }
+
+        $this->app['auth']->guard($driver)->setUser($user);
+
+        $this->app['auth']->shouldUse($driver);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the user is authenticated.
+     *
+     * @param  string|null  $guard
+     * @return $this
+     */
+    public function assertAuthenticated($guard = null)
     {
         $this->assertTrue($this->isAuthenticated($guard), 'The user is not authenticated');
 
@@ -23,7 +57,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function dontSeeIsAuthenticated($guard = null)
+    public function assertGuest($guard = null)
     {
         $this->assertFalse($this->isAuthenticated($guard), 'The user is authenticated');
 
@@ -44,13 +78,15 @@ trait InteractsWithAuthentication
     /**
      * Assert that the user is authenticated as the given user.
      *
-     * @param  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string|null  $guard
      * @return $this
      */
-    public function seeIsAuthenticatedAs($user, $guard = null)
+    public function assertAuthenticatedAs($user, $guard = null)
     {
         $expected = $this->app->make('auth')->guard($guard)->user();
+
+        $this->assertNotNull($expected, 'The current user is not authenticated.');
 
         $this->assertInstanceOf(
             get_class($expected), $user,
@@ -72,7 +108,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function seeCredentials(array $credentials, $guard = null)
+    public function assertCredentials(array $credentials, $guard = null)
     {
         $this->assertTrue(
             $this->hasCredentials($credentials, $guard), 'The given credentials are invalid.'
@@ -88,7 +124,7 @@ trait InteractsWithAuthentication
      * @param  string|null  $guard
      * @return $this
      */
-    public function dontSeeCredentials(array $credentials, $guard = null)
+    public function assertInvalidCredentials(array $credentials, $guard = null)
     {
         $this->assertFalse(
             $this->hasCredentials($credentials, $guard), 'The given credentials are valid.'
@@ -98,9 +134,9 @@ trait InteractsWithAuthentication
     }
 
     /**
-     * Return true is the credentials are valid, false otherwise.
+     * Return true if the credentials are valid, false otherwise.
      *
-     * @param  array $credentials
+     * @param  array  $credentials
      * @param  string|null  $guard
      * @return bool
      */

@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Support\Arrayable;
 
 class Rule
 {
@@ -34,23 +35,42 @@ class Rule
     /**
      * Get an in constraint builder instance.
      *
-     * @param  array  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
      * @return \Illuminate\Validation\Rules\In
      */
-    public static function in(array $values)
+    public static function in($values)
     {
-        return new Rules\In($values);
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        return new Rules\In(is_array($values) ? $values : func_get_args());
     }
 
     /**
      * Get a not_in constraint builder instance.
      *
-     * @param  array  $values
-     * @return \Illuminate\Validation\Rules\In
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
+     * @return \Illuminate\Validation\Rules\NotIn
      */
-    public static function notIn(array $values)
+    public static function notIn($values)
     {
-        return new Rules\NotIn($values);
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        return new Rules\NotIn(is_array($values) ? $values : func_get_args());
+    }
+
+    /**
+     * Get a required_if constraint builder instance.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Validation\Rules\RequiredIf
+     */
+    public static function requiredIf($callback)
+    {
+        return new Rules\RequiredIf($callback);
     }
 
     /**

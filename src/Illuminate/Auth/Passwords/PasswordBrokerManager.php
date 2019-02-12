@@ -6,12 +6,15 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
 
+/**
+ * @mixin \Illuminate\Contracts\Auth\PasswordBroker
+ */
 class PasswordBrokerManager implements FactoryContract
 {
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -25,7 +28,7 @@ class PasswordBrokerManager implements FactoryContract
     /**
      * Create a new PasswordBroker manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -36,7 +39,7 @@ class PasswordBrokerManager implements FactoryContract
     /**
      * Attempt to get the broker from the local cache.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Contracts\Auth\PasswordBroker
      */
     public function broker($name = null)
@@ -69,7 +72,7 @@ class PasswordBrokerManager implements FactoryContract
         // aggregate service of sorts providing a convenient interface for resets.
         return new PasswordBroker(
             $this->createTokenRepository($config),
-            $this->app['auth']->createUserProvider($config['provider'])
+            $this->app['auth']->createUserProvider($config['provider'] ?? null)
         );
     }
 
@@ -87,10 +90,11 @@ class PasswordBrokerManager implements FactoryContract
             $key = base64_decode(substr($key, 7));
         }
 
-        $connection = isset($config['connection']) ? $config['connection'] : null;
+        $connection = $config['connection'] ?? null;
 
         return new DatabaseTokenRepository(
             $this->app['db']->connection($connection),
+            $this->app['hash'],
             $config['table'],
             $key,
             $config['expire']

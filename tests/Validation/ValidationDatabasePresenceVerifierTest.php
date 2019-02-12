@@ -1,20 +1,27 @@
 <?php
 
-use Mockery as m;
+namespace Illuminate\Tests\Validation;
 
-class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
+use Closure;
+use stdClass;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Database\ConnectionResolverInterface;
+
+class ValidationDatabasePresenceVerifierTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
     public function testBasicCount()
     {
-        $verifier = new Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));
         $verifier->setConnection('connection');
-        $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
-        $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));
+        $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock(stdClass::class));
+        $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock(stdClass::class));
         $builder->shouldReceive('useWritePdo')->once()->andReturn($builder);
         $builder->shouldReceive('where')->with('column', '=', 'value')->andReturn($builder);
         $extra = ['foo' => 'NULL', 'bar' => 'NOT_NULL', 'baz' => 'taylor', 'faz' => true, 'not' => '!admin'];
@@ -30,10 +37,10 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
 
     public function testBasicCountWithClosures()
     {
-        $verifier = new Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));
         $verifier->setConnection('connection');
-        $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock('StdClass'));
-        $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock('StdClass'));
+        $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock(stdClass::class));
+        $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock(stdClass::class));
         $builder->shouldReceive('useWritePdo')->once()->andReturn($builder);
         $builder->shouldReceive('where')->with('column', '=', 'value')->andReturn($builder);
         $closure = function ($query) {
@@ -45,7 +52,7 @@ class ValidationDatabasePresenceVerifierTest extends PHPUnit_Framework_TestCase
         $builder->shouldReceive('where')->with('baz', 'taylor');
         $builder->shouldReceive('where')->with('faz', true);
         $builder->shouldReceive('where')->with('not', '!=', 'admin');
-        $builder->shouldReceive('where')->with(m::type('Closure'))->andReturnUsing(function () use ($builder, $closure) {
+        $builder->shouldReceive('where')->with(m::type(Closure::class))->andReturnUsing(function () use ($builder, $closure) {
             $closure($builder);
         });
         $builder->shouldReceive('where')->with('closure', 1);

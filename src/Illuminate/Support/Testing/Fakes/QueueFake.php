@@ -2,10 +2,11 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Illuminate\Queue\QueueManager;
 use Illuminate\Contracts\Queue\Queue;
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert as PHPUnit;
 
-class QueueFake implements Queue
+class QueueFake extends QueueManager implements Queue
 {
     /**
      * All of the jobs that have been pushed.
@@ -18,14 +19,33 @@ class QueueFake implements Queue
      * Assert if a job was pushed based on a truth-test callback.
      *
      * @param  string  $job
-     * @param  callable|null  $callback
+     * @param  callable|int|null  $callback
      * @return void
      */
     public function assertPushed($job, $callback = null)
     {
+        if (is_numeric($callback)) {
+            return $this->assertPushedTimes($job, $callback);
+        }
+
         PHPUnit::assertTrue(
             $this->pushed($job, $callback)->count() > 0,
             "The expected [{$job}] job was not pushed."
+        );
+    }
+
+    /**
+     * Assert if a job was pushed a number of times.
+     *
+     * @param  string  $job
+     * @param  int  $times
+     * @return void
+     */
+    protected function assertPushedTimes($job, $times = 1)
+    {
+        PHPUnit::assertTrue(
+            ($count = $this->pushed($job)->count()) === $times,
+            "The expected [{$job}] job was pushed {$count} times instead of {$times} times."
         );
     }
 
@@ -44,11 +64,90 @@ class QueueFake implements Queue
                 return false;
             }
 
-            if ($callback) {
-                return $callback(...func_get_args());
-            }
+            return $callback ? $callback(...func_get_args()) : true;
+        });
+    }
 
-            return true;
+    /**
+     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     *
+     * @param  string $job
+     * @param  array $expectedChain
+     * @param  callable|null $callback
+     * @return void
+     */
+    public function assertPushedWithChain($job, $expectedChain = [], $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)->isNotEmpty(),
+            "The expected [{$job}] job was not pushed."
+        );
+
+        PHPUnit::assertTrue(
+            collect($expectedChain)->isNotEmpty(),
+            'The expected chain can not be empty.'
+        );
+
+        $this->isChainOfObjects($expectedChain)
+                ? $this->assertPushedWithChainOfObjects($job, $expectedChain, $callback)
+                : $this->assertPushedWithChainOfClasses($job, $expectedChain, $callback);
+    }
+
+    /**
+     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     *
+     * @param  string $job
+     * @param  array $expectedChain
+     * @param  callable|null $callback
+     * @return void
+     */
+    protected function assertPushedWithChainOfObjects($job, $expectedChain, $callback)
+    {
+        $chain = collect($expectedChain)->map(function ($job) {
+            return serialize($job);
+        })->all();
+
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)->filter(function ($job) use ($chain) {
+                return $job->chained == $chain;
+            })->isNotEmpty(),
+            'The expected chain was not pushed.'
+        );
+    }
+
+    /**
+     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     *
+     * @param  string $job
+     * @param  array $expectedChain
+     * @param  callable|null $callback
+     * @return void
+     */
+    protected function assertPushedWithChainOfClasses($job, $expectedChain, $callback)
+    {
+        $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
+            return collect($chain)->map(function ($job) {
+                return get_class(unserialize($job));
+            });
+        })->filter(function ($chain) use ($expectedChain) {
+            return $chain->all() === $expectedChain;
+        });
+
+        PHPUnit::assertTrue(
+            $matching->isNotEmpty(), 'The expected chain was not pushed.'
+        );
+    }
+
+    /**
+     * Determine if the given chain is entirely composed of objects.
+     *
+     * @param  array  $chain
+     * @return bool
+     */
+    protected function isChainOfObjects($chain)
+    {
+        return ! collect($chain)->contains(function ($job) {
+            return ! is_object($job);
         });
     }
 
@@ -65,6 +164,16 @@ class QueueFake implements Queue
             $this->pushed($job, $callback)->count() === 0,
             "The unexpected [{$job}] job was pushed."
         );
+    }
+
+    /**
+     * Assert that no jobs were pushed.
+     *
+     * @return void
+     */
+    public function assertNothingPushed()
+    {
+        PHPUnit::assertEmpty($this->jobs, 'Jobs were pushed unexpectedly.');
     }
 
     /**
@@ -103,7 +212,7 @@ class QueueFake implements Queue
     /**
      * Resolve a queue connection instance.
      *
-     * @param  string  $name
+     * @param  mixed  $value
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($value = null)
@@ -119,7 +228,7 @@ class QueueFake implements Queue
      */
     public function size($queue = null)
     {
-        return 0;
+        return count($this->jobs);
     }
 
     /**
@@ -132,7 +241,7 @@ class QueueFake implements Queue
      */
     public function push($job, $data = '', $queue = null)
     {
-        $this->jobs[get_class($job)][] = [
+        $this->jobs[is_object($job) ? get_class($job) : $job][] = [
             'job' => $job,
             'queue' => $queue,
         ];
@@ -201,5 +310,51 @@ class QueueFake implements Queue
     public function pop($queue = null)
     {
         //
+    }
+
+    /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array $jobs
+     * @param  mixed $data
+     * @param  string $queue
+     * @return mixed
+     */
+    public function bulk($jobs, $data = '', $queue = null)
+    {
+        foreach ($jobs as $job) {
+            $this->push($job, $data, $queue);
+        }
+    }
+
+    /**
+     * Get the jobs that have been pushed.
+     *
+     * @return array
+     */
+    public function pushedJobs()
+    {
+        return $this->jobs;
+    }
+
+    /**
+     * Get the connection name for the queue.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        //
+    }
+
+    /**
+     * Set the connection name for the queue.
+     *
+     * @param  string $name
+     * @return $this
+     */
+    public function setConnectionName($name)
+    {
+        return $this;
     }
 }

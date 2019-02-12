@@ -56,7 +56,7 @@ class JoinClause extends Builder
      *
      * will produce the following SQL:
      *
-     * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
+     * on `contacts`.`user_id` = `users`.`id` and `contacts`.`info_id` = `info`.`id`
      *
      * @param  \Closure|string  $first
      * @param  string|null  $operator
@@ -96,5 +96,15 @@ class JoinClause extends Builder
     public function newQuery()
     {
         return new static($this->parentQuery, $this->type, $this->table);
+    }
+
+    /**
+     * Create a new query instance for sub-query.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function forSubQuery()
+    {
+        return $this->parentQuery->newQuery();
     }
 }

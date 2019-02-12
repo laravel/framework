@@ -4,14 +4,15 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Exception;
-use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Support\InteractsWithTime;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class DatabaseStore implements Store
 {
-    use RetrievesMultipleKeys;
+    use InteractsWithTime, RetrievesMultipleKeys;
 
     /**
      * The database connection instance.
@@ -19,13 +20,6 @@ class DatabaseStore implements Store
      * @var \Illuminate\Database\ConnectionInterface
      */
     protected $connection;
-
-    /**
-     * The encrypter instance.
-     *
-     * @var \Illuminate\Contracts\Encryption\Encrypter
-     */
-    protected $encrypter;
 
     /**
      * The name of the cache table.
@@ -45,16 +39,14 @@ class DatabaseStore implements Store
      * Create a new database store.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      * @param  string  $table
      * @param  string  $prefix
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, EncrypterContract $encrypter, $table, $prefix = '')
+    public function __construct(ConnectionInterface $connection, $table, $prefix = '')
     {
         $this->table = $table;
         $this->prefix = $prefix;
-        $this->encrypter = $encrypter;
         $this->connection = $connection;
     }
 
@@ -73,44 +65,46 @@ class DatabaseStore implements Store
         // If we have a cache record we will check the expiration time against current
         // time on the system and see if the record has expired. If it has, we will
         // remove the records from the database table so it isn't returned again.
-        if (! is_null($cache)) {
-            if (is_array($cache)) {
-                $cache = (object) $cache;
-            }
-
-            if (Carbon::now()->getTimestamp() >= $cache->expiration) {
-                $this->forget($key);
-
-                return;
-            }
-
-            return $this->encrypter->decrypt($cache->value);
+        if (is_null($cache)) {
+            return;
         }
+
+        $cache = is_array($cache) ? (object) $cache : $cache;
+
+        // If this cache expiration date is past the current time, we will remove this
+        // item from the cache. Then we will return a null value since the cache is
+        // expired. We will use "Carbon" to make this comparison with the column.
+        if ($this->currentTime() >= $cache->expiration) {
+            $this->forget($key);
+
+            return;
+        }
+
+        return $this->unserialize($cache->value);
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
-     * @return void
+     * @param  int  $seconds
+     * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
         $key = $this->prefix.$key;
 
-        // All of the cached values in the database are encrypted in case this is used
-        // as a session data store by the consumer. We'll also calculate the expire
-        // time and place that on the table so we will check it on our retrieval.
-        $value = $this->encrypter->encrypt($value);
+        $value = $this->serialize($value);
 
-        $expiration = $this->getTime() + (int) ($minutes * 60);
+        $expiration = $this->getTime() + $seconds;
 
         try {
-            $this->table()->insert(compact('key', 'value', 'expiration'));
+            return $this->table()->insert(compact('key', 'value', 'expiration'));
         } catch (Exception $e) {
-            $this->table()->where('key', '=', $key)->update(compact('value', 'expiration'));
+            $result = $this->table()->where('key', $key)->update(compact('value', 'expiration'));
+
+            return $result > 0;
         }
     }
 
@@ -155,25 +149,34 @@ class DatabaseStore implements Store
         return $this->connection->transaction(function () use ($key, $value, $callback) {
             $prefixed = $this->prefix.$key;
 
-            $cache = $this->table()->where('key', $prefixed)->lockForUpdate()->first();
+            $cache = $this->table()->where('key', $prefixed)
+                        ->lockForUpdate()->first();
 
+            // If there is no value in the cache, we will return false here. Otherwise the
+            // value will be decrypted and we will proceed with this function to either
+            // increment or decrement this value based on the given action callbacks.
             if (is_null($cache)) {
                 return false;
             }
 
-            if (is_array($cache)) {
-                $cache = (object) $cache;
-            }
+            $cache = is_array($cache) ? (object) $cache : $cache;
 
-            $current = $this->encrypter->decrypt($cache->value);
+            $current = $this->unserialize($cache->value);
+
+            // Here we'll call this callback function that was given to the function which
+            // is used to either increment or decrement the function. We use a callback
+            // so we do not have to recreate all this logic in each of the functions.
             $new = $callback((int) $current, $value);
 
             if (! is_numeric($current)) {
                 return false;
             }
 
+            // Here we will update the values in the table. We will also encrypt the value
+            // since database cache values are encrypted by default with secure storage
+            // that can't be easily read. We will return the new value after storing.
             $this->table()->where('key', $prefixed)->update([
-                'value' => $this->encrypter->encrypt($new),
+                'value' => $this->serialize($new),
             ]);
 
             return $new;
@@ -187,7 +190,7 @@ class DatabaseStore implements Store
      */
     protected function getTime()
     {
-        return Carbon::now()->getTimestamp();
+        return $this->currentTime();
     }
 
     /**
@@ -195,11 +198,11 @@ class DatabaseStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 5256000);
+        return $this->put($key, $value, 5256000);
     }
 
     /**
@@ -222,7 +225,9 @@ class DatabaseStore implements Store
      */
     public function flush()
     {
-        return (bool) $this->table()->delete();
+        $this->table()->delete();
+
+        return true;
     }
 
     /**
@@ -246,16 +251,6 @@ class DatabaseStore implements Store
     }
 
     /**
-     * Get the encrypter instance.
-     *
-     * @return \Illuminate\Contracts\Encryption\Encrypter
-     */
-    public function getEncrypter()
-    {
-        return $this->encrypter;
-    }
-
-    /**
      * Get the cache key prefix.
      *
      * @return string
@@ -263,5 +258,37 @@ class DatabaseStore implements Store
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * Serialize the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function serialize($value)
+    {
+        $result = serialize($value);
+
+        if ($this->connection instanceof PostgresConnection && Str::contains($result, "\0")) {
+            $result = base64_encode($result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Unserialize the given value.
+     *
+     * @param  string  $value
+     * @return mixed
+     */
+    protected function unserialize($value)
+    {
+        if ($this->connection instanceof PostgresConnection && ! Str::contains($value, [':', ';'])) {
+            $value = base64_decode($value);
+        }
+
+        return unserialize($value);
     }
 }

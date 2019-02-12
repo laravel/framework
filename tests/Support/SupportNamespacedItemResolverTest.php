@@ -1,8 +1,11 @@
 <?php
 
+namespace Illuminate\Tests\Support;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\NamespacedItemResolver;
 
-class SupportNamespacedItemResolverTest extends PHPUnit_Framework_TestCase
+class SupportNamespacedItemResolverTest extends TestCase
 {
     public function testResolution()
     {
@@ -16,7 +19,7 @@ class SupportNamespacedItemResolverTest extends PHPUnit_Framework_TestCase
 
     public function testParsedItemsAreCached()
     {
-        $r = $this->getMockBuilder('Illuminate\Support\NamespacedItemResolver')->setMethods(['parseBasicSegments', 'parseNamespacedSegments'])->getMock();
+        $r = $this->getMockBuilder(NamespacedItemResolver::class)->setMethods(['parseBasicSegments', 'parseNamespacedSegments'])->getMock();
         $r->setParsedKey('foo.bar', ['foo']);
         $r->expects($this->never())->method('parseBasicSegments');
         $r->expects($this->never())->method('parseNamespacedSegments');

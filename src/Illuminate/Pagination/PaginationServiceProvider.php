@@ -17,7 +17,7 @@ class PaginationServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/resources/views' => resource_path('views/vendor/pagination'),
+                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/pagination'),
             ], 'laravel-pagination');
         }
     }
@@ -41,7 +41,7 @@ class PaginationServiceProvider extends ServiceProvider
             $page = $this->app['request']->input($pageName);
 
             if (filter_var($page, FILTER_VALIDATE_INT) !== false && (int) $page >= 1) {
-                return $page;
+                return (int) $page;
             }
 
             return 1;

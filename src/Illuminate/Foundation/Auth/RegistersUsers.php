@@ -35,7 +35,7 @@ trait RegistersUsers
         $this->guard()->login($user);
 
         return $this->registered($request, $user)
-            ?: redirect($this->redirectPath());
+                        ?: redirect($this->redirectPath());
     }
 
     /**
@@ -57,5 +57,6 @@ trait RegistersUsers
      */
     protected function registered(Request $request, $user)
     {
+        //
     }
 }

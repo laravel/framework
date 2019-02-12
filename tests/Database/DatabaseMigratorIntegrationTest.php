@@ -1,20 +1,29 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
+use Mockery as m;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Console\OutputStyle;
+use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
-class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
+class DatabaseMigratorIntegrationTest extends TestCase
 {
     protected $db;
+    protected $migrator;
 
     /**
      * Bootstrap Eloquent.
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->db = $db = new DB;
 
@@ -25,9 +34,14 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
 
         $db->setAsGlobal();
 
-        $container = new Illuminate\Container\Container;
+        $container = new Container;
         $container->instance('db', $db->getDatabaseManager());
-        Illuminate\Support\Facades\Facade::setFacadeApplication($container);
+
+        $container->bind('db.schema', function ($c) {
+            return $c['db']->connection()->getSchemaBuilder();
+        });
+
+        Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
@@ -35,15 +49,20 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
             new Filesystem
         );
 
+        $output = m::mock(OutputStyle::class);
+        $output->shouldReceive('writeln');
+
+        $this->migrator->setOutput($output);
+
         if (! $repository->repositoryExists()) {
             $repository->createRepository();
         }
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
-        Illuminate\Support\Facades\Facade::clearResolvedInstances();
-        Illuminate\Support\Facades\Facade::setFacadeApplication(null);
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
     }
 
     public function testBasicMigrationOfSingleFolder()
@@ -53,8 +72,8 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->db->schema()->hasTable('users'));
         $this->assertTrue($this->db->schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($ran[0], 'users'));
-        $this->assertTrue(str_contains($ran[1], 'password_resets'));
+        $this->assertTrue(Str::contains($ran[0], 'users'));
+        $this->assertTrue(Str::contains($ran[1], 'password_resets'));
     }
 
     public function testMigrationsCanBeRolledBack()
@@ -66,23 +85,8 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->db->schema()->hasTable('users'));
         $this->assertFalse($this->db->schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
-    }
-
-    public function testMigrationsCanBeRolledBackWithFetchAssocEnabled()
-    {
-        $this->db->getConnection()->setFetchMode(\PDO::FETCH_ASSOC);
-
-        $this->migrator->run([__DIR__.'/migrations/one']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
-        $rolledBack = $this->migrator->rollback([__DIR__.'/migrations/one']);
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
-
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertTrue(Str::contains($rolledBack[0], 'password_resets'));
+        $this->assertTrue(Str::contains($rolledBack[1], 'users'));
     }
 
     public function testMigrationsCanBeReset()
@@ -94,8 +98,8 @@ class DatabaseMigratorIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->db->schema()->hasTable('users'));
         $this->assertFalse($this->db->schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertTrue(Str::contains($rolledBack[0], 'password_resets'));
+        $this->assertTrue(Str::contains($rolledBack[1], 'users'));
     }
 
     public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()

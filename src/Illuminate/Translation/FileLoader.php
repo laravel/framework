@@ -2,9 +2,11 @@
 
 namespace Illuminate\Translation;
 
+use RuntimeException;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Translation\Loader;
 
-class FileLoader implements LoaderInterface
+class FileLoader implements Loader
 {
     /**
      * The filesystem instance.
@@ -19,6 +21,13 @@ class FileLoader implements LoaderInterface
      * @var string
      */
     protected $path;
+
+    /**
+     * All of the registered paths to JSON translation files.
+     *
+     * @var array
+     */
+    protected $jsonPaths = [];
 
     /**
      * All of the namespace hints.
@@ -50,7 +59,11 @@ class FileLoader implements LoaderInterface
      */
     public function load($locale, $group, $namespace = null)
     {
-        if (is_null($namespace) || $namespace == '*') {
+        if ($group === '*' && $namespace === '*') {
+            return $this->loadJsonPaths($locale);
+        }
+
+        if (is_null($namespace) || $namespace === '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
 
@@ -114,6 +127,32 @@ class FileLoader implements LoaderInterface
     }
 
     /**
+     * Load a locale from the given JSON file path.
+     *
+     * @param  string  $locale
+     * @return array
+     *
+     * @throws \RuntimeException
+     */
+    protected function loadJsonPaths($locale)
+    {
+        return collect(array_merge($this->jsonPaths, [$this->path]))
+            ->reduce(function ($output, $path) use ($locale) {
+                if ($this->files->exists($full = "{$path}/{$locale}.json")) {
+                    $decoded = json_decode($this->files->get($full), true);
+
+                    if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+                        throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
+                    }
+
+                    $output = array_merge($output, $decoded);
+                }
+
+                return $output;
+            }, []);
+    }
+
+    /**
      * Add a new namespace to the loader.
      *
      * @param  string  $namespace
@@ -123,5 +162,26 @@ class FileLoader implements LoaderInterface
     public function addNamespace($namespace, $hint)
     {
         $this->hints[$namespace] = $hint;
+    }
+
+    /**
+     * Add a new JSON path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addJsonPath($path)
+    {
+        $this->jsonPaths[] = $path;
+    }
+
+    /**
+     * Get an array of all the registered namespaces.
+     *
+     * @return array
+     */
+    public function namespaces()
+    {
+        return $this->hints;
     }
 }

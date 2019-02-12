@@ -5,9 +5,15 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
-use Illuminate\Contracts\Events\Dispatcher;
+use ReflectionClass;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Console\Command;
+use Symfony\Component\Finder\Finder;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -55,13 +61,13 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $bootstrappers = [
-        'Illuminate\Foundation\Bootstrap\DetectEnvironment',
-        'Illuminate\Foundation\Bootstrap\LoadConfiguration',
-        'Illuminate\Foundation\Bootstrap\HandleExceptions',
-        'Illuminate\Foundation\Bootstrap\RegisterFacades',
-        'Illuminate\Foundation\Bootstrap\SetRequestForConsole',
-        'Illuminate\Foundation\Bootstrap\RegisterProviders',
-        'Illuminate\Foundation\Bootstrap\BootProviders',
+        \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
+        \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+        \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+        \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        \Illuminate\Foundation\Bootstrap\SetRequestForConsole::class,
+        \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
+        \Illuminate\Foundation\Bootstrap\BootProviders::class,
     ];
 
     /**
@@ -92,9 +98,11 @@ class Kernel implements KernelContract
      */
     protected function defineConsoleSchedule()
     {
-        $this->app->instance(
-            'Illuminate\Console\Scheduling\Schedule', $schedule = new Schedule
-        );
+        $this->app->singleton(Schedule::class, function ($app) {
+            return new Schedule($this->scheduleTimezone());
+        });
+
+        $schedule = $this->app->make(Schedule::class);
 
         $this->schedule($schedule);
     }
@@ -110,12 +118,6 @@ class Kernel implements KernelContract
     {
         try {
             $this->bootstrap();
-
-            if (! $this->commandsLoaded) {
-                $this->commands();
-
-                $this->commandsLoaded = true;
-            }
 
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
@@ -159,6 +161,18 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Get the timezone that should be used by default for scheduled events.
+     *
+     * @return \DateTimeZone|string|null
+     */
+    protected function scheduleTimezone()
+    {
+        $config = $this->app['config'];
+
+        return $config->get('app.schedule_timezone', $config->get('app.timezone'));
+    }
+
+    /**
      * Register the Closure based commands for the application.
      *
      * @return void
@@ -172,7 +186,7 @@ class Kernel implements KernelContract
      * Register a Closure based command with the application.
      *
      * @param  string  $signature
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return \Illuminate\Foundation\Console\ClosureCommand
      */
     public function command($signature, Closure $callback)
@@ -184,6 +198,42 @@ class Kernel implements KernelContract
         });
 
         return $command;
+    }
+
+    /**
+     * Register all of the commands in the given directory.
+     *
+     * @param  array|string  $paths
+     * @return void
+     */
+    protected function load($paths)
+    {
+        $paths = array_unique(Arr::wrap($paths));
+
+        $paths = array_filter($paths, function ($path) {
+            return is_dir($path);
+        });
+
+        if (empty($paths)) {
+            return;
+        }
+
+        $namespace = $this->app->getNamespace();
+
+        foreach ((new Finder)->in($paths)->files() as $command) {
+            $command = $namespace.str_replace(
+                ['/', '.php'],
+                ['\\', ''],
+                Str::after($command->getPathname(), app_path().DIRECTORY_SEPARATOR)
+            );
+
+            if (is_subclass_of($command, Command::class) &&
+                ! (new ReflectionClass($command))->isAbstract()) {
+                Artisan::starting(function ($artisan) use ($command) {
+                    $artisan->resolve($command);
+                });
+            }
+        }
     }
 
     /**
@@ -202,19 +252,16 @@ class Kernel implements KernelContract
      *
      * @param  string  $command
      * @param  array  $parameters
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $outputBuffer
      * @return int
+     *
+     * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
      */
-    public function call($command, array $parameters = [])
+    public function call($command, array $parameters = [], $outputBuffer = null)
     {
         $this->bootstrap();
 
-        if (! $this->commandsLoaded) {
-            $this->commands();
-
-            $this->commandsLoaded = true;
-        }
-
-        return $this->getArtisan()->call($command, $parameters);
+        return $this->getArtisan()->call($command, $parameters, $outputBuffer);
     }
 
     /**
@@ -222,13 +269,11 @@ class Kernel implements KernelContract
      *
      * @param  string  $command
      * @param  array   $parameters
-     * @return void
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public function queue($command, array $parameters = [])
     {
-        $this->app['Illuminate\Contracts\Queue\Queue']->push(
-            'Illuminate\Foundation\Console\QueuedJob', func_get_args()
-        );
+        return QueuedCommand::dispatch(func_get_args());
     }
 
     /**
@@ -266,10 +311,13 @@ class Kernel implements KernelContract
             $this->app->bootstrapWith($this->bootstrappers());
         }
 
-        // If we are calling an arbitrary command from within the application, we'll load
-        // all of the available deferred providers which will make all of the commands
-        // available to an application. Otherwise the command will not be available.
         $this->app->loadDeferredProviders();
+
+        if (! $this->commandsLoaded) {
+            $this->commands();
+
+            $this->commandsLoaded = true;
+        }
     }
 
     /**
@@ -316,11 +364,11 @@ class Kernel implements KernelContract
      */
     protected function reportException(Exception $e)
     {
-        $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->report($e);
+        $this->app[ExceptionHandler::class]->report($e);
     }
 
     /**
-     * Report the exception to the exception handler.
+     * Render the given exception.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  \Exception  $e
@@ -328,6 +376,6 @@ class Kernel implements KernelContract
      */
     protected function renderException($output, Exception $e)
     {
-        $this->app['Illuminate\Contracts\Debug\ExceptionHandler']->renderForConsole($output, $e);
+        $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
     }
 }

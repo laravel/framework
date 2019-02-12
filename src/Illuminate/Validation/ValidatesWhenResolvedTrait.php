@@ -12,15 +12,29 @@ trait ValidatesWhenResolvedTrait
      *
      * @return void
      */
-    public function validate()
+    public function validateResolved()
     {
-        $instance = $this->getValidatorInstance();
+        $this->prepareForValidation();
 
         if (! $this->passesAuthorization()) {
             $this->failedAuthorization();
-        } elseif (! $instance->passes()) {
+        }
+
+        $instance = $this->getValidatorInstance();
+
+        if ($instance->fails()) {
             $this->failedValidation($instance);
         }
+    }
+
+    /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        // no default action
     }
 
     /**

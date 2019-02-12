@@ -3,7 +3,8 @@
 namespace Illuminate\Foundation\Http\Exceptions;
 
 use Exception;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class MaintenanceModeException extends ServiceUnavailableHttpException
@@ -11,21 +12,21 @@ class MaintenanceModeException extends ServiceUnavailableHttpException
     /**
      * When the application was put in maintenance mode.
      *
-     * @var int
+     * @var \Illuminate\Support\Carbon
      */
     public $wentDownAt;
 
     /**
      * The number of seconds to wait before retrying.
      *
-     * @var \Carbon\Carbon
+     * @var int
      */
     public $retryAfter;
 
     /**
      * When the application should next be available.
      *
-     * @var \Carbon\Carbon
+     * @var \Illuminate\Support\Carbon
      */
     public $willBeAvailableAt;
 
@@ -43,12 +44,12 @@ class MaintenanceModeException extends ServiceUnavailableHttpException
     {
         parent::__construct($retryAfter, $message, $previous, $code);
 
-        $this->wentDownAt = Carbon::createFromTimestamp($time);
+        $this->wentDownAt = Date::createFromTimestamp($time);
 
         if ($retryAfter) {
             $this->retryAfter = $retryAfter;
 
-            $this->willBeAvailableAt = $this->wentDownAt->addSeconds($this->retryAfter);
+            $this->willBeAvailableAt = Date::instance(Carbon::createFromTimestamp($time)->addRealSeconds($this->retryAfter));
         }
     }
 }

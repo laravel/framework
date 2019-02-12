@@ -40,7 +40,7 @@ class FileViewFinder implements ViewFinderInterface
      *
      * @var array
      */
-    protected $extensions = ['blade.php', 'php'];
+    protected $extensions = ['blade.php', 'php', 'css'];
 
     /**
      * Create a new file view loader instance.
@@ -53,7 +53,7 @@ class FileViewFinder implements ViewFinderInterface
     public function __construct(Filesystem $files, array $paths, array $extensions = null)
     {
         $this->files = $files;
-        $this->paths = $paths;
+        $this->paths = array_map([$this, 'resolvePath'], $paths);
 
         if (isset($extensions)) {
             $this->extensions = $extensions;
@@ -73,7 +73,7 @@ class FileViewFinder implements ViewFinderInterface
         }
 
         if ($this->hasHintInformation($name = trim($name))) {
-            return $this->views[$name] = $this->findNamedPathView($name);
+            return $this->views[$name] = $this->findNamespacedView($name);
         }
 
         return $this->views[$name] = $this->findInPaths($name, $this->paths);
@@ -85,9 +85,9 @@ class FileViewFinder implements ViewFinderInterface
      * @param  string  $name
      * @return string
      */
-    protected function findNamedPathView($name)
+    protected function findNamespacedView($name)
     {
-        list($namespace, $view) = $this->getNamespaceSegments($name);
+        [$namespace, $view] = $this->parseNamespaceSegments($name);
 
         return $this->findInPaths($view, $this->hints[$namespace]);
     }
@@ -100,12 +100,12 @@ class FileViewFinder implements ViewFinderInterface
      *
      * @throws \InvalidArgumentException
      */
-    protected function getNamespaceSegments($name)
+    protected function parseNamespaceSegments($name)
     {
         $segments = explode(static::HINT_PATH_DELIMITER, $name);
 
-        if (count($segments) != 2) {
-            throw new InvalidArgumentException("View [$name] has an invalid name.");
+        if (count($segments) !== 2) {
+            throw new InvalidArgumentException("View [{$name}] has an invalid name.");
         }
 
         if (! isset($this->hints[$segments[0]])) {
@@ -134,7 +134,7 @@ class FileViewFinder implements ViewFinderInterface
             }
         }
 
-        throw new InvalidArgumentException("View [$name] not found.");
+        throw new InvalidArgumentException("View [{$name}] not found.");
     }
 
     /**
@@ -158,7 +158,7 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function addLocation($location)
     {
-        $this->paths[] = $location;
+        $this->paths[] = $this->resolvePath($location);
     }
 
     /**
@@ -169,7 +169,18 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function prependLocation($location)
     {
-        array_unshift($this->paths, $location);
+        array_unshift($this->paths, $this->resolvePath($location));
+    }
+
+    /**
+     * Resolve the path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function resolvePath($path)
+    {
+        return realpath($path) ?: $path;
     }
 
     /**
@@ -209,6 +220,18 @@ class FileViewFinder implements ViewFinderInterface
     }
 
     /**
+     * Replace the namespace hints for the given namespace.
+     *
+     * @param  string  $namespace
+     * @param  string|array  $hints
+     * @return void
+     */
+    public function replaceNamespace($namespace, $hints)
+    {
+        $this->hints[$namespace] = (array) $hints;
+    }
+
+    /**
      * Register an extension with the view finder.
      *
      * @param  string  $extension
@@ -224,7 +247,7 @@ class FileViewFinder implements ViewFinderInterface
     }
 
     /**
-     * Returns whether or not the view specify a hint information.
+     * Returns whether or not the view name has any hint information.
      *
      * @param  string  $name
      * @return bool
@@ -232,6 +255,16 @@ class FileViewFinder implements ViewFinderInterface
     public function hasHintInformation($name)
     {
         return strpos($name, static::HINT_PATH_DELIMITER) > 0;
+    }
+
+    /**
+     * Flush the cache of located views.
+     *
+     * @return void
+     */
+    public function flush()
+    {
+        $this->views = [];
     }
 
     /**

@@ -3,26 +3,10 @@
 namespace Illuminate\Contracts\Cache;
 
 use Closure;
+use Psr\SimpleCache\CacheInterface;
 
-interface Repository
+interface Repository extends CacheInterface
 {
-    /**
-     * Determine if an item exists in the cache.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function has($key);
-
-    /**
-     * Retrieve an item from the cache by key.
-     *
-     * @param  string  $key
-     * @param  mixed   $default
-     * @return mixed
-     */
-    public function get($key, $default = null);
-
     /**
      * Retrieve an item from the cache and delete it.
      *
@@ -37,20 +21,20 @@ interface Repository
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|float|int  $minutes
-     * @return void
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return bool
      */
-    public function put($key, $value, $minutes);
+    public function put($key, $value, $ttl = null);
 
     /**
      * Store an item in the cache if the key does not exist.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function add($key, $value, $minutes);
+    public function add($key, $value, $ttl = null);
 
     /**
      * Increment the value of an item in the cache.
@@ -75,33 +59,33 @@ interface Repository
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value);
 
     /**
-     * Get an item from the cache, or store the default value.
+     * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
-     * @param  \DateTime|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure  $callback
      * @return mixed
      */
-    public function remember($key, $minutes, Closure $callback);
+    public function remember($key, $ttl, Closure $callback);
 
     /**
-     * Get an item from the cache, or store the default value forever.
+     * Get an item from the cache, or execute the given Closure and store the result forever.
      *
-     * @param  string   $key
+     * @param  string  $key
      * @param  \Closure  $callback
      * @return mixed
      */
     public function sear($key, Closure $callback);
 
     /**
-     * Get an item from the cache, or store the default value forever.
+     * Get an item from the cache, or execute the given Closure and store the result forever.
      *
-     * @param  string   $key
+     * @param  string  $key
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -114,4 +98,11 @@ interface Repository
      * @return bool
      */
     public function forget($key);
+
+    /**
+     * Get the cache store implementation.
+     *
+     * @return \Illuminate\Contracts\Cache\Store
+     */
+    public function getStore();
 }

@@ -1,12 +1,16 @@
 <?php
 
+namespace Illuminate\Tests\Foundation;
+
+use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
-class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
+class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
     public function test_basic_gate_check()
     {
@@ -14,30 +18,30 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
 
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function () {
+        $gate->define('baz', function () {
             $_SERVER['_test.authorizes.trait'] = true;
 
             return true;
         });
 
-        $response = (new FoundationTestAuthorizeTraitClass)->authorize('foo');
+        $response = (new FoundationTestAuthorizeTraitClass)->authorize('baz');
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($_SERVER['_test.authorizes.trait']);
     }
 
-    /**
-     * @expectedException Illuminate\Auth\Access\AuthorizationException
-     */
     public function test_exception_is_thrown_if_gate_check_fails()
     {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function () {
+        $gate->define('baz', function () {
             return false;
         });
 
-        (new FoundationTestAuthorizeTraitClass)->authorize('foo');
+        (new FoundationTestAuthorizeTraitClass)->authorize('baz');
     }
 
     public function test_policies_may_be_called()
@@ -54,7 +58,7 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
-    public function test_policy_method_may_be_guessed()
+    public function test_policy_method_may_be_guessed_passing_model_instance()
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
@@ -62,7 +66,21 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
 
         $gate->policy(FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
 
-        $response = (new FoundationTestAuthorizeTraitClass)->authorize([new FoundationAuthorizesRequestTestClass]);
+        $response = (new FoundationTestAuthorizeTraitClass)->authorize(new FoundationAuthorizesRequestTestClass);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
+    }
+
+    public function test_policy_method_may_be_guessed_passing_class_name()
+    {
+        unset($_SERVER['_test.authorizes.trait.policy']);
+
+        $gate = $this->getBasicGate();
+
+        $gate->policy('\\'.FoundationAuthorizesRequestTestClass::class, FoundationAuthorizesRequestTestPolicy::class);
+
+        $response = (new FoundationTestAuthorizeTraitClass)->authorize('\\'.FoundationAuthorizesRequestTestClass::class);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
@@ -97,6 +115,7 @@ class FoundationAuthorizesRequestsTraitTest extends PHPUnit_Framework_TestCase
 
 class FoundationAuthorizesRequestTestClass
 {
+    //
 }
 
 class FoundationAuthorizesRequestTestPolicy
@@ -115,7 +134,14 @@ class FoundationAuthorizesRequestTestPolicy
         return true;
     }
 
-    public function test_policy_method_may_be_guessed()
+    public function test_policy_method_may_be_guessed_passing_model_instance()
+    {
+        $_SERVER['_test.authorizes.trait.policy'] = true;
+
+        return true;
+    }
+
+    public function test_policy_method_may_be_guessed_passing_class_name()
     {
         $_SERVER['_test.authorizes.trait.policy'] = true;
 

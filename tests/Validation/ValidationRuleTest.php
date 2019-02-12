@@ -1,8 +1,11 @@
 <?php
 
-use Illuminate\Validation\Rule;
+namespace Illuminate\Tests\Validation;
 
-class ValidationRuleTest extends PHPUnit_Framework_TestCase
+use Illuminate\Validation\Rule;
+use PHPUnit\Framework\TestCase;
+
+class ValidationRuleTest extends TestCase
 {
     public function testMacroable()
     {

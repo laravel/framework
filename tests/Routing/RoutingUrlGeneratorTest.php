@@ -1,12 +1,18 @@
 <?php
 
+namespace Illuminate\Tests\Routing;
+
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
+class RoutingUrlGeneratorTest extends TestCase
 {
     public function testBasicGeneration()
     {
@@ -40,6 +46,123 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
         $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
+    }
+
+    public function testBasicGenerationWithHostFormatting()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
+        $routes->add($route);
+
+        $url->formatHostUsing(function ($host) {
+            return str_replace('foo.com', 'foo.org', $host);
+        });
+
+        $this->assertEquals('http://www.foo.org/foo/bar', $url->to('foo/bar'));
+        $this->assertEquals('/named-route', $url->route('plain', [], false));
+    }
+
+    public function testBasicGenerationWithRequestBaseUrlWithSubfolder()
+    {
+        $request = Request::create('http://www.foo.com/subfolder/foo/bar/subfolder/');
+
+        $request->server->set('SCRIPT_FILENAME', '/var/www/laravel-project/public/subfolder/index.php');
+        $request->server->set('PHP_SELF', '/subfolder/index.php');
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request
+        );
+
+        $route = new Route(['GET'], 'foo/bar/subfolder', ['as' => 'foobar']);
+        $routes->add($route);
+
+        $this->assertEquals('/subfolder', $request->getBaseUrl());
+        $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
+    }
+
+    public function testBasicGenerationWithRequestBaseUrlWithSubfolderAndFileSuffix()
+    {
+        $request = Request::create('http://www.foo.com/subfolder/index.php');
+
+        $request->server->set('SCRIPT_FILENAME', '/var/www/laravel-project/public/subfolder/index.php');
+        $request->server->set('PHP_SELF', '/subfolder/index.php');
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request
+        );
+
+        $route = new Route(['GET'], 'foo/bar/subfolder', ['as' => 'foobar']);
+        $routes->add($route);
+
+        $this->assertEquals('/subfolder', $request->getBasePath());
+        $this->assertEquals('/subfolder/index.php', $request->getBaseUrl());
+        $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
+    }
+
+    public function testBasicGenerationWithRequestBaseUrlWithFileSuffix()
+    {
+        $request = Request::create('http://www.foo.com/other.php');
+
+        $request->server->set('SCRIPT_FILENAME', '/var/www/laravel-project/public/other.php');
+        $request->server->set('PHP_SELF', '/other.php');
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request
+        );
+
+        $route = new Route(['GET'], 'foo/bar/subfolder', ['as' => 'foobar']);
+        $routes->add($route);
+
+        $this->assertEquals('', $request->getBasePath());
+        $this->assertEquals('/other.php', $request->getBaseUrl());
+        $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
+    }
+
+    public function testBasicGenerationWithPathFormatting()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
+        $routes->add($route);
+
+        $url->formatPathUsing(function ($path) {
+            return '/something'.$path;
+        });
+
+        $this->assertEquals('http://www.foo.com/something/foo/bar', $url->to('foo/bar'));
+        $this->assertEquals('/something/named-route', $url->route('plain', [], false));
+    }
+
+    public function testUrlFormattersShouldReceiveTargetRoute()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://abc.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/bar', ['as' => 'plain', 'root' => 'bar.com', 'path' => 'foo']);
+        $routes->add($namedRoute);
+
+        $url->formatHostUsing(function ($root, $route) {
+            return $route ? 'http://'.$route->getAction('root') : $root;
+        });
+
+        $url->formatPathUsing(function ($path, $route) {
+            return $route ? '/'.$route->getAction('path') : $path;
+        });
+
+        $this->assertEquals('http://abc.com/foo/bar', $url->to('foo/bar'));
+        $this->assertEquals('http://bar.com/foo', $url->route('plain'));
     }
 
     public function testBasicRouteGeneration()
@@ -103,6 +226,15 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $route = new Route(['GET'], 'foo/invoke', ['controller' => 'InvokableActionStub']);
         $routes->add($route);
 
+        /*
+         * With Default Parameter
+         */
+        $url->defaults(['locale' => 'en']);
+        $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {
+            //
+        }]);
+        $routes->add($route);
+
         $this->assertEquals('/', $url->route('plain', [], false));
         $this->assertEquals('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
         $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
@@ -115,6 +247,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall'], false));
         $this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz'));
         $this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
+        $this->assertEquals('http://www.foo.com/foo/bam', $url->action(['foo', 'bar']));
         $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
         $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
         $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
@@ -122,6 +255,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/bar#derp', $url->route('fragment', [], false));
         $this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));
         $this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф'], false));
+        $this->assertEquals('http://en.example.com/foo', $url->route('defaults'));
     }
 
     public function testFluentRouteNameDefinitions()
@@ -339,7 +473,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 
     public function testRoutesWithDomainsThroughProxy()
     {
-        Request::setTrustedProxies(['10.0.0.1']);
+        Request::setTrustedProxies(['10.0.0.1'], SymfonyRequest::HEADER_X_FORWARDED_ALL);
 
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -352,17 +486,17 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
-    /**
-     * @expectedException Illuminate\Routing\Exceptions\UrlGenerationException
-     */
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
+        $this->expectException(UrlGenerationException::class);
+
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com:8080/')
         );
 
         $route = new Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {
+            //
         }]);
         $routes->add($route);
 
@@ -391,7 +525,7 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
             $request = Request::create('http://www.foo.com/')
         );
 
-        $url->forceSchema('https');
+        $url->forceScheme('https');
         $route = new Route(['GET'], '/foo', ['as' => 'plain']);
         $routes->add($route);
 
@@ -416,6 +550,69 @@ class RoutingUrlGeneratorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($url->to('/foo'), $url->previous('/foo'));
     }
+
+    public function testRouteNotDefinedException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Route [not_exists_route] not defined.');
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $url->route('not_exists_route');
+    }
+
+    public function testSignedUrl()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $request = Request::create($url->signedRoute('foo'));
+
+        $this->assertTrue($url->hasValidSignature($request));
+
+        $request = Request::create($url->signedRoute('foo').'?tempered=true');
+
+        $this->assertFalse($url->hasValidSignature($request));
+    }
+
+    public function testSignedRelativeUrl()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $result = $url->signedRoute('foo', [], null, false);
+
+        $request = Request::create($result);
+
+        $this->assertTrue($url->hasValidSignature($request, false));
+
+        $request = Request::create($url->signedRoute('foo', [], null, false).'?tempered=true');
+
+        $this->assertFalse($url->hasValidSignature($request, false));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
@@ -430,6 +627,11 @@ class RoutableInterfaceStub implements UrlRoutable
     public function getRouteKeyName()
     {
         return 'key';
+    }
+
+    public function resolveRouteBinding($routeKey)
+    {
+        //
     }
 }
 
