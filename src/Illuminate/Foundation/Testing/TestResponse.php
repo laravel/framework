@@ -638,13 +638,22 @@ class TestResponse
      */
     public function assertJsonValidationErrors($keys)
     {
+        $keys = Arr::wrap($keys);
+
+        PHPUnit::assertNotEmpty($keys, 'You need to provide at least one expected key');
+
         $errors = $this->json()['errors'] ?? [];
 
-        foreach (Arr::wrap($keys) as $key) {
+        $errorMessage = $errors
+            ? 'Response has the following JSON validation errors: '.
+            PHP_EOL.PHP_EOL.json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            : 'Response does not have JSON validation errors';
+
+        foreach ($keys as $key) {
             PHPUnit::assertArrayHasKey(
                 $key,
                 $errors,
-                "Failed to find a validation error in the response for key: '{$key}'"
+                "Failed to find a validation error in the response for key: '{$key}'".PHP_EOL.PHP_EOL.$errorMessage
             );
         }
 
