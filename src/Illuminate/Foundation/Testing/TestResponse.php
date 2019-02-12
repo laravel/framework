@@ -647,7 +647,7 @@ class TestResponse
         $errorMessage = $errors
             ? 'Response has the following JSON validation errors: '.
             PHP_EOL.PHP_EOL.json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
-            : 'Response did not have JSON validation errors';
+            : 'Response does not have JSON validation errors';
 
         foreach ($keys as $key) {
             PHPUnit::assertArrayHasKey(
