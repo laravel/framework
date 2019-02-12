@@ -156,7 +156,7 @@ class TestResponse
     }
 
     /**
-     * Assert whether the validation failed
+     * Assert whether the validation failed.
      *
      * @return $this
      */
