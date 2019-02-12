@@ -1,19 +1,23 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.25...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.26...5.7)
+
+
+## [v5.7.26 (2019-02-12)](https://github.com/laravel/framework/compare/v5.7.25...v5.7.26)
 
 ### Added
 - Added `Illuminate\Pipeline\Pipeline::thenReturn()` ([#27429](https://github.com/laravel/framework/pull/27429)) 
 - Added `Illuminate\Cache\TaggedCache::getTags()` ([#27445](https://github.com/laravel/framework/pull/27445))
+- Added `Illuminate\Http\ResponseTrait::getCallback()` ([#27464](https://github.com/laravel/framework/pull/27464))
+- Added  license file to each component ([9e57e8b](https://github.com/laravel/framework/commit/9e57e8bea04638d5bafec62db1051fbc2ce39e3a))
+- Added `Model::withoutEventDispatcher()` method ([#27419](https://github.com/laravel/framework/pull/27419), [5c5d6b2](https://github.com/laravel/framework/commit/5c5d6b24f6156768575ae49aa84d7b1d004f23fe))
 
 ### Reverted
 - Revert of "Fixed wrong class being used when eager loading nullable `MorphTo` with `withDefault()` ([#27411](https://github.com/laravel/framework/pull/27411))"([9bbf644](https://github.com/laravel/framework/commit/9bbf6443e2709d846367f04ebed9a41823ebcc34))
 
-
-### TODO:
-- https://github.com/laravel/framework/pull/27419, https://github.com/laravel/framework/commit/5c5d6b24f6156768575ae49aa84d7b1d004f23fe
-- https://github.com/laravel/framework/pull/27430
-- https://github.com/laravel/framework/pull/27450
+### Changed
+- Improved error message in `Illuminate\Foundation\Testing\TestResponse::assertJsonValidationErrors()` ([#27495](https://github.com/laravel/framework/pull/27495), [98010da](https://github.com/laravel/framework/commit/98010da996de264c1487bbd1c145741169691b95))
+- `Illuminate\Support\Testing\Fakes\EventFake::dispatch()` will return response ([#27430](https://github.com/laravel/framework/pull/27430))
 
 
 ## [v5.7.25 (2019-02-05)](https://github.com/laravel/framework/compare/v5.7.24...v5.7.25)
