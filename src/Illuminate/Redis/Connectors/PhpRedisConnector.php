@@ -2,12 +2,12 @@
 
 namespace Illuminate\Redis\Connectors;
 
-use Illuminate\Redis\Connections\PhpRedisArrayConnection;
 use Redis;
 use RedisArray;
 use RedisCluster;
 use Illuminate\Support\Arr;
 use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Redis\Connections\PhpRedisArrayConnection;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 
 class PhpRedisConnector
@@ -81,7 +81,7 @@ class PhpRedisConnector
      */
     protected function buildArrayConnectionString(array $server)
     {
-        return $server['host'] . ':' . $server['port'];
+        return $server['host'].':'.$server['port'];
     }
 
     /**

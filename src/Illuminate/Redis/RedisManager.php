@@ -2,10 +2,10 @@
 
 namespace Illuminate\Redis;
 
-use Illuminate\Redis\Connectors\PhpRedisConnector;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\Connectors\PhpRedisConnector;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
