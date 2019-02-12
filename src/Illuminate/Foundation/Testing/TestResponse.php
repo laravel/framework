@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Foundation\Testing\Assert as PHPUnit;
+use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 
@@ -151,6 +151,18 @@ class TestResponse
         if (! is_null($uri)) {
             $this->assertLocation($uri);
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert whether the validation failed
+     *
+     * @return $this
+     */
+    public function assertValidationFailed()
+    {
+        PHPUnit::assertEquals($this->getStatusCode(), 422, 'Response status code ['.$this->getStatusCode().'] is not a failed validation status code.');
 
         return $this;
     }
@@ -342,7 +354,7 @@ class TestResponse
      */
     public function assertSee($value)
     {
-        PHPUnit::assertStringContainsString((string) $value, $this->getContent());
+        PHPUnit::assertContains((string) $value, $this->getContent());
 
         return $this;
     }
@@ -368,7 +380,7 @@ class TestResponse
      */
     public function assertSeeText($value)
     {
-        PHPUnit::assertStringContainsString((string) $value, strip_tags($this->getContent()));
+        PHPUnit::assertContains((string) $value, strip_tags($this->getContent()));
 
         return $this;
     }
@@ -394,7 +406,7 @@ class TestResponse
      */
     public function assertDontSee($value)
     {
-        PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
+        PHPUnit::assertNotContains((string) $value, $this->getContent());
 
         return $this;
     }
@@ -407,7 +419,7 @@ class TestResponse
      */
     public function assertDontSeeText($value)
     {
-        PHPUnit::assertStringNotContainsString((string) $value, strip_tags($this->getContent()));
+        PHPUnit::assertNotContains((string) $value, strip_tags($this->getContent()));
 
         return $this;
     }
@@ -587,7 +599,7 @@ class TestResponse
 
         foreach ($structure as $key => $value) {
             if (is_array($value) && $key === '*') {
-                PHPUnit::assertIsArray($responseData);
+                PHPUnit::assertInternalType('array', $responseData);
 
                 foreach ($responseData as $responseDataItem) {
                     $this->assertJsonStructure($structure['*'], $responseDataItem);
@@ -728,7 +740,7 @@ class TestResponse
     {
         $this->ensureResponseHasView();
 
-        PHPUnit::assertEquals($value, $this->original->name());
+        PHPUnit::assertEquals($value, $this->original->getName());
 
         return $this;
     }
@@ -751,11 +763,11 @@ class TestResponse
         if (is_null($value)) {
             PHPUnit::assertArrayHasKey($key, $this->original->getData());
         } elseif ($value instanceof Closure) {
-            PHPUnit::assertTrue($value($this->original->getData()[$key]));
+            PHPUnit::assertTrue($value($this->original->$key));
         } elseif ($value instanceof Model) {
-            PHPUnit::assertTrue($value->is($this->original->getData()[$key]));
+            PHPUnit::assertTrue($value->is($this->original->$key));
         } else {
-            PHPUnit::assertEquals($value, $this->original->getData()[$key]);
+            PHPUnit::assertEquals($value, $this->original->$key);
         }
 
         return $this;
@@ -790,7 +802,7 @@ class TestResponse
     {
         $this->ensureResponseHasView();
 
-        return $this->original->getData()[$key];
+        return $this->original->$key;
     }
 
     /**
