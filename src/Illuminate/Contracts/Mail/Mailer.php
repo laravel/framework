@@ -21,7 +21,7 @@ interface Mailer
     public function bcc($users);
 
     /**
-     * Send a new message when only a raw text part.
+     * Send a new message with only a raw text part.
      *
      * @param  string  $text
      * @param  mixed  $callback

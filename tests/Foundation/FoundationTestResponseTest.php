@@ -344,6 +344,17 @@ class FoundationTestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors('bar');
     }
 
+    public function testAssertJsonValidationErrorsFailsWhenGivenAnEmptyArray()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode(['errors' => ['foo' => 'oops']]))
+        );
+
+        $testResponse->assertJsonValidationErrors([]);
+    }
+
     public function testAssertJsonMissingValidationErrors()
     {
         $baseResponse = tap(new Response, function ($response) {
