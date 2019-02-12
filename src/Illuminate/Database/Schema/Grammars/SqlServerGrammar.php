@@ -322,7 +322,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDefaultSchema()
     {
-        return "select SCHEMA_NAME()";
+        return 'select SCHEMA_NAME()';
     }
 
     /**

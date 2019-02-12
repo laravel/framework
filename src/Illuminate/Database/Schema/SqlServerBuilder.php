@@ -71,6 +71,7 @@ class SqlServerBuilder extends Builder
 
             $schema = head($schema);
         }
+
         return [$schema ?: $this->getDefaultSchema(), implode('.', $table)];
     }
 
@@ -79,6 +80,7 @@ class SqlServerBuilder extends Builder
         $results = $this->connection->select(
             $this->grammar->compileDefaultSchema()
         );
+
         return head($this->connection->getPostProcessor()->processDefaultSchema($results));
     }
 }
