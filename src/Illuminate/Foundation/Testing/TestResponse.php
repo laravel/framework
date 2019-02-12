@@ -156,6 +156,18 @@ class TestResponse
     }
 
     /**
+     * Assert whether the validation failed.
+     *
+     * @return $this
+     */
+    public function assertValidationFailed()
+    {
+        PHPUnit::assertEquals($this->getStatusCode(), 422, 'Response status code ['.$this->getStatusCode().'] is not a failed validation status code.');
+
+        return $this;
+    }
+
+    /**
      * Asserts that the response contains the given header and equals the optional value.
      *
      * @param  string  $headerName
