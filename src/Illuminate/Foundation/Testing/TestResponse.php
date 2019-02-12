@@ -640,14 +640,14 @@ class TestResponse
     {
         $keys = Arr::wrap($keys);
 
-        PHPUnit::assertNotEmpty($keys, 'You need to provide at least one expected key');
+        PHPUnit::assertNotEmpty($keys, 'No keys were provided.');
 
         $errors = $this->json()['errors'] ?? [];
 
         $errorMessage = $errors
-            ? 'Response has the following JSON validation errors: '.
-            PHP_EOL.PHP_EOL.json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
-            : 'Response does not have JSON validation errors';
+                ? 'Response has the following JSON validation errors:'.
+                        PHP_EOL.PHP_EOL.json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
+                : 'Response does not have JSON validation errors.';
 
         foreach ($keys as $key) {
             PHPUnit::assertArrayHasKey(
