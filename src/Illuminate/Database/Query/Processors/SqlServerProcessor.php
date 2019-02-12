@@ -66,4 +66,17 @@ class SqlServerProcessor extends Processor
             return ((object) $result)->name;
         }, $results);
     }
+
+    /**
+     * Process the results of a default schema query.
+     *
+     * @param  array  $results
+     * @return array
+     */
+    public function processDefaultSchema($results)
+    {
+        return array_map(function ($result) {
+            return ((object) $result)->computed;
+        }, $results);
+    }
 }

@@ -35,7 +35,9 @@ class SqlServerGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from sysobjects where type = 'U' and name = ?";
+        return "select * from sys.objects as obj
+                join sys.schemas as schemas on obj.schema_id = schemas.schema_id
+                where obj.type = 'U' and schemas.name = ? and obj.name = ?";
     }
 
     /**
@@ -44,11 +46,12 @@ class SqlServerGrammar extends Grammar
      * @param  string  $table
      * @return string
      */
-    public function compileColumnListing($table)
+    public function compileColumnListing()
     {
         return "select col.name from sys.columns as col
                 join sys.objects as obj on col.object_id = obj.object_id
-                where obj.type = 'U' and obj.name = '$table'";
+                join sys.schemas as schemas ON obj.schema_id = schemas.schema_id
+                where obj.type = 'U' and schemas.name = ? and obj.name = ?";
     }
 
     /**
@@ -310,6 +313,16 @@ class SqlServerGrammar extends Grammar
     public function compileDisableForeignKeyConstraints()
     {
         return 'EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all";';
+    }
+
+    /**
+     * Compile the command to get the default schema for a connection.
+     *
+     * @return string
+     */
+    public function compileDefaultSchema()
+    {
+        return "select SCHEMA_NAME()";
     }
 
     /**
