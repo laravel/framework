@@ -160,7 +160,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Send a new message with only a HTML part.
+     * Send a new message with only an HTML part.
      *
      * @param  string  $html
      * @param  mixed  $callback
