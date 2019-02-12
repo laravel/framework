@@ -53,7 +53,7 @@ class ConsoleApplicationTest extends TestCase
     public function testCallFullyStringCommandLine()
     {
         $app = new Application(
-            $app = m::mock(ApplicationContract::class, ['version' => '5.8']),
+            $app = m::mock(ApplicationContract::class, ['version' => '5.9']),
             $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
             'testing'
         );
@@ -72,7 +72,7 @@ class ConsoleApplicationTest extends TestCase
 
     protected function getMockConsole(array $methods)
     {
-        $app = m::mock(ApplicationContract::class, ['version' => '5.8']);
+        $app = m::mock(ApplicationContract::class, ['version' => '5.9']);
         $events = m::mock(Dispatcher::class, ['dispatch' => null]);
 
         return $this->getMockBuilder(Application::class)->setMethods($methods)->setConstructorArgs([
