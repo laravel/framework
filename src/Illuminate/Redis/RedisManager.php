@@ -6,7 +6,6 @@ use Illuminate\Redis\Connectors\PhpRedisConnector;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
-use RuntimeException;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
@@ -131,11 +130,13 @@ class RedisManager implements Factory
      *
      * @param  string $name
      * @return \Illuminate\Redis\Connections\Connection
+     *
+     * @throws \InvalidArgumentException
      */
     protected function resolveArray($name)
     {
         if (! $this->connector() instanceof PhpRedisConnector) {
-            throw new RuntimeException('Redis array configuration is compatible only with phpredis client');
+            throw new InvalidArgumentException('Redis array configuration is compatible only with phpredis client');
         }
         $arrayOptions = $this->config['array']['options'] ?? [];
 
