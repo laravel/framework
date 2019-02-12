@@ -48,7 +48,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('watchOnly')->once()->with('default')->andReturn($pheanstalk);
         $job = m::mock(Job::class);
-        $pheanstalk->shouldReceive('reserve')->once()->with(0)->andReturn($job);
+        $pheanstalk->shouldReceive('reserveWithTimeout')->once()->with(0)->andReturn($job);
 
         $result = $queue->pop();
 
@@ -62,7 +62,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('watchOnly')->once()->with('default')->andReturn($pheanstalk);
         $job = m::mock(Job::class);
-        $pheanstalk->shouldReceive('reserve')->once()->with(60)->andReturn($job);
+        $pheanstalk->shouldReceive('reserveWithTimeout')->once()->with(60)->andReturn($job);
 
         $result = $queue->pop();
 
