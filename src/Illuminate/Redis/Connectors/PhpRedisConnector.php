@@ -2,7 +2,9 @@
 
 namespace Illuminate\Redis\Connectors;
 
+use Illuminate\Redis\Connections\PhpRedisArrayConnection;
 use Redis;
+use RedisArray;
 use RedisCluster;
 use Illuminate\Support\Arr;
 use Illuminate\Redis\Connections\PhpRedisConnection;
@@ -52,6 +54,34 @@ class PhpRedisConnector
         return $server['host'].':'.$server['port'].'?'.Arr::query(Arr::only($server, [
             'database', 'password', 'prefix', 'read_timeout',
         ]));
+    }
+
+    /**
+     * Create a new PhpRedis array connection.
+     *
+     * @param  array $config
+     * @param  array $arrayOptions
+     * @param  array $options
+     * @return \Illuminate\Redis\Connections\PhpRedisArrayConnection
+     */
+    public function connectToArray(array $config, array $arrayOptions, array $options)
+    {
+        $options = array_merge($options, $arrayOptions, Arr::pull($config, 'options', []));
+
+        return new PhpRedisArrayConnection($this->createRedisArrayInstance(
+            array_map([$this, 'buildArrayConnectionString'], $config), $options
+        ));
+    }
+
+    /**
+     * Build a PhpRedis hosts array.
+     *
+     * @param  array  $server
+     * @return string
+     */
+    protected function buildArrayConnectionString(array $server)
+    {
+        return $server['host'] . ':' . $server['port'];
     }
 
     /**
@@ -125,5 +155,39 @@ class PhpRedisConnector
             $options['read_timeout'] ?? 0,
             isset($options['persistent']) && $options['persistent']
         );
+    }
+
+    /**
+     * Create a new redis array instance.
+     *
+     * @param  array $servers
+     * @param  array $options
+     * @return \RedisArray
+     */
+    protected function createRedisArrayInstance(array $servers, array $options)
+    {
+        $client = new RedisArray($servers, Arr::only($options, [
+            'function',
+            'previous',
+            'retry_interval',
+            'lazy_connect',
+            'connect_timeout',
+            'read_timeout',
+            'distributor',
+        ]));
+
+        if (! empty($options['password'])) {
+            $client->auth((string) $options['password']);
+        }
+
+        if (! empty($options['database'])) {
+            $client->select((int) $options['database']);
+        }
+
+        if (! empty($options['prefix'])) {
+            $client->setOption(Redis::OPT_PREFIX, (string) $options['prefix']);
+        }
+
+        return $client;
     }
 }
