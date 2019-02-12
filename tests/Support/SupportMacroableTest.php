@@ -60,6 +60,19 @@ class SupportMacroableTest extends TestCase
         $instance = new TestMacroable;
         $this->assertEquals('instance-Adam', $instance->methodOne('Adam'));
     }
+
+    public function testClassBasedMacrosNoReplace()
+    {
+        TestMacroable::macro('methodThree', function () {
+            return 'bar';
+        });
+        TestMacroable::mixin(new TestMixin, false);
+        $instance = new TestMacroable;
+        $this->assertEquals('bar', $instance->methodThree());
+
+        TestMacroable::mixin(new TestMixin);
+        $this->assertEquals('foo', $instance->methodThree());
+    }
 }
 
 class EmptyMacroable
@@ -92,6 +105,13 @@ class TestMixin
     {
         return function ($value) {
             return $this->protectedVariable.'-'.$value;
+        };
+    }
+
+    protected function methodThree()
+    {
+        return function () {
+            return 'foo';
         };
     }
 }
