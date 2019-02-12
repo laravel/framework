@@ -32,11 +32,10 @@ class BeanstalkdConnector implements ConnectorInterface
      */
     protected function pheanstalk(array $config)
     {
-        return new Pheanstalk(
+        return Pheanstalk::connect(
             $config['host'],
             $config['port'] ?? Pheanstalk::DEFAULT_PORT,
-            $config['timeout'] ?? Connection::DEFAULT_CONNECT_TIMEOUT,
-            $config['persistent'] ?? false
+            $config['timeout'] ?? Connection::DEFAULT_CONNECT_TIMEOUT
         );
     }
 }
