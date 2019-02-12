@@ -29,7 +29,8 @@ services:
 
 before_install:
   - phpenv config-rm xdebug.ini || true
-  - printf "\n" | pecl install -f memcached redis
+  - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - printf "\n" | pecl install -f redis
   - travis_retry composer self-update
   - mysql -e 'CREATE DATABASE forge;'
 
