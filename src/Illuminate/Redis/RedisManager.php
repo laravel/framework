@@ -135,12 +135,13 @@ class RedisManager implements Factory
      */
     protected function resolveArray($name)
     {
-        if (! $this->connector() instanceof PhpRedisConnector) {
+        $connector = $this->connector();
+        if (! $connector instanceof PhpRedisConnector) {
             throw new InvalidArgumentException('Redis array configuration is compatible only with phpredis client');
         }
         $arrayOptions = $this->config['array']['options'] ?? [];
 
-        return $this->connector()->connectToArray(
+        return $connector->connectToArray(
             $this->config['array'][$name], $arrayOptions, $this->config['options'] ?? []
         );
     }
