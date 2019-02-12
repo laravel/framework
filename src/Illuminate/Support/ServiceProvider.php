@@ -15,15 +15,6 @@ abstract class ServiceProvider
     protected $app;
 
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @deprecated Implement the \Illuminate\Contracts\Support\DeferrableProvider interface instead. Will be removed in Laravel 5.9.
-     *
-     * @var bool
-     */
-    protected $defer = false;
-
-    /**
      * The paths that should be published.
      *
      * @var array
@@ -300,6 +291,6 @@ abstract class ServiceProvider
      */
     public function isDeferred()
     {
-        return $this->defer || $this instanceof DeferrableProvider;
+        return $this instanceof DeferrableProvider;
     }
 }
