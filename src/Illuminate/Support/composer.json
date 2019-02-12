@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2",
         "ext-json": "*",
         "ext-mbstring": "*",
         "doctrine/inflector": "^1.1",
