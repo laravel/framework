@@ -198,8 +198,8 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Migrate the delayed jobs that are ready to the regular queue.
      *
-     * @param  string $from
-     * @param  string $to
+     * @param  string  $from
+     * @param  string  $to
      * @return array
      */
     public function migrateExpiredJobs($from, $to)
@@ -212,8 +212,8 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Retrieve the next job from the queue.
      *
-     * @param  string $queue
-     * @param  bool $block
+     * @param  string  $queue
+     * @param  bool  $block
      * @return array
      */
     protected function retrieveNextJob($queue, $block = true)

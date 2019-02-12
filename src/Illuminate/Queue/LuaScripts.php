@@ -21,6 +21,25 @@ LUA;
     }
 
     /**
+     * Get the Lua script for pushing jobs onto the queue.
+     *
+     * KEYS[1] - The queue to push the job onto, for example: queues:foo
+     * KEYS[2] - The notification list fot the queue we are pushing jobs onto, for example: queues:foo:notify
+     * ARGV[1] - The job payload
+     *
+     * @return string
+     */
+    public static function push()
+    {
+        return <<<'LUA'
+-- Push the job onto the queue...
+redis.call('rpush', KEYS[1], ARGV[1])
+-- Push a notification onto the "notify" queue...
+redis.call('rpush', KEYS[2], 1)
+LUA;
+    }
+
+    /**
      * Get the Lua script for popping the next job off of the queue.
      *
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo
@@ -105,25 +124,6 @@ if(next(val) ~= nil) then
 end
 
 return val
-LUA;
-    }
-
-    /**
-     * Get the Lua script for pushing jobs onto the queue.
-     *
-     * KEYS[1] - The queue to push the job onto, for example: queues:foo
-     * KEYS[2] - The notification list fot the queue we are pushing jobs onto, for example: queues:foo:notify
-     * ARGV[1] - The job payload
-     *
-     * @return string
-     */
-    public static function push()
-    {
-        return <<<'LUA'
--- Push the job onto the queue...
-redis.call('rpush', KEYS[1], ARGV[1])
--- Push a notification onto the "notify" queue...
-redis.call('rpush', KEYS[2], 1)
 LUA;
     }
 }
