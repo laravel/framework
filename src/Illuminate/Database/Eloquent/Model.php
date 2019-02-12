@@ -1053,7 +1053,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $models
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function newCollection(array $models = [])
+    public static function newCollection(array $models = [])
     {
         return new Collection($models);
     }
