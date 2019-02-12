@@ -2,9 +2,11 @@
 
 namespace Illuminate\Redis;
 
+use Illuminate\Redis\Connectors\PhpRedisConnector;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
+use RuntimeException;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
@@ -102,6 +104,10 @@ class RedisManager implements Factory
             return $this->resolveCluster($name);
         }
 
+        if (isset($this->config['array'][$name])) {
+            return $this->resolveArray($name);
+        }
+
         throw new InvalidArgumentException("Redis connection [{$name}] not configured.");
     }
 
@@ -117,6 +123,24 @@ class RedisManager implements Factory
 
         return $this->connector()->connectToCluster(
             $this->config['clusters'][$name], $clusterOptions, $this->config['options'] ?? []
+        );
+    }
+
+    /**
+     * Resolve the given array connection by name.
+     *
+     * @param  string $name
+     * @return \Illuminate\Redis\Connections\Connection
+     */
+    protected function resolveArray($name)
+    {
+        if (! $this->connector() instanceof PhpRedisConnector) {
+            throw new RuntimeException('Redis array configuration is compatible only with phpredis client');
+        }
+        $arrayOptions = $this->config['array']['options'] ?? [];
+
+        return $this->connector()->connectToArray(
+            $this->config['array'][$name], $arrayOptions, $this->config['options'] ?? []
         );
     }
 
