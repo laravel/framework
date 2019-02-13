@@ -162,7 +162,7 @@ class FactoryBuilder
     }
 
     /**
-     * Disable after callbacks
+     * Disable after callbacks.
      *
      * @return $this
      */
