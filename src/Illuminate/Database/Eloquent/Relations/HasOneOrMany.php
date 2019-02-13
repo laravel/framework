@@ -23,7 +23,7 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
-     * The name of the relationship
+     * The name of the relationship.
      *
      * @var string
      */
@@ -434,7 +434,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Set the relationship on the parent model
+     * Set the relationship on the parent model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      */

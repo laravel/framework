@@ -67,7 +67,7 @@ class HasOne extends HasOneOrMany
     }
 
     /**
-     * Set the relationship on the parent model
+     * Set the relationship on the parent model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      */
