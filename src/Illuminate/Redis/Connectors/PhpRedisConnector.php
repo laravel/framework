@@ -7,7 +7,6 @@ use RedisArray;
 use RedisCluster;
 use Illuminate\Support\Arr;
 use Illuminate\Redis\Connections\PhpRedisConnection;
-use Illuminate\Redis\Connections\PhpRedisArrayConnection;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 
 class PhpRedisConnector
@@ -38,8 +37,16 @@ class PhpRedisConnector
     {
         $options = array_merge($options, $clusterOptions, Arr::pull($config, 'options', []));
 
-        return new PhpRedisClusterConnection($this->createRedisClusterInstance(
-            array_map([$this, 'buildClusterConnectionString'], $config), $options
+        // Use native Redis clustering
+        if (Arr::get($options, 'cluster') === 'redis') {
+            return new PhpRedisClusterConnection($this->createRedisClusterInstance(
+                array_map([$this, 'buildClusterConnectionString'], $config), $options
+            ));
+        }
+
+        // Use client-side sharding
+        return new PhpRedisClusterConnection($this->createRedisArrayInstance(
+            array_map([$this, 'buildRedisArrayConnectionString'], $config), $options
         ));
     }
 
@@ -57,29 +64,12 @@ class PhpRedisConnector
     }
 
     /**
-     * Create a new PhpRedis array connection.
-     *
-     * @param  array $config
-     * @param  array $arrayOptions
-     * @param  array $options
-     * @return \Illuminate\Redis\Connections\PhpRedisArrayConnection
-     */
-    public function connectToArray(array $config, array $arrayOptions, array $options)
-    {
-        $options = array_merge($options, $arrayOptions, Arr::pull($config, 'options', []));
-
-        return new PhpRedisArrayConnection($this->createRedisArrayInstance(
-            array_map([$this, 'buildArrayConnectionString'], $config), $options
-        ));
-    }
-
-    /**
      * Build a PhpRedis hosts array.
      *
      * @param  array  $server
      * @return string
      */
-    protected function buildArrayConnectionString(array $server)
+    protected function buildRedisArrayConnectionString(array $server)
     {
         return $server['host'].':'.$server['port'];
     }
@@ -167,13 +157,8 @@ class PhpRedisConnector
     protected function createRedisArrayInstance(array $servers, array $options)
     {
         $client = new RedisArray($servers, Arr::only($options, [
-            'function',
-            'previous',
-            'retry_interval',
-            'lazy_connect',
-            'connect_timeout',
-            'read_timeout',
-            'distributor',
+            'function', 'previous', 'retry_interval', 'lazy_connect',
+            'connect_timeout', 'read_timeout', 'distributor',
         ]));
 
         if (! empty($options['password'])) {
