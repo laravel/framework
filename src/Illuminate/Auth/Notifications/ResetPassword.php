@@ -9,14 +9,14 @@ use Illuminate\Notifications\Messages\MailMessage;
 class ResetPassword extends Notification
 {
     /**
-     * Route to reset password
+     * Route to reset password.
      *
      * @var string
      */
     public $resetPasswordRoute = 'password.reset';
 
     /**
-     * Config path to password's reset link expiration ttl
+     * Config path to password's reset link expiration time.
      *
      * @var string
      */
