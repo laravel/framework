@@ -249,12 +249,29 @@ class EloquentFactoryBuilderTest extends TestCase
     }
 
     /** @test **/
+    public function can_disable_callback_when_creating_models_with_after_callback()
+    {
+        $team = factory(FactoryBuildableTeam::class)->withoutCallbacks()->create();
+
+        $this->assertFalse($team->users->contains($team->owner));
+    }
+
+    /** @test **/
     public function creating_models_with_after_callback_state()
     {
         $user = factory(FactoryBuildableUser::class)->state('with_callable_server')->create();
 
         $this->assertNotNull($user->profile);
         $this->assertNotNull($user->servers->where('status', 'callable')->first());
+    }
+
+    /** @test **/
+    public function can_disable_callback_when_creating_models_with_after_callback_state()
+    {
+        $user = factory(FactoryBuildableUser::class)->withoutCallbacks()->state('with_callable_server')->create();
+
+        $this->assertNull($user->profile);
+        $this->assertNull($user->servers->where('status', 'callable')->first());
     }
 
     /** @test */
@@ -276,12 +293,29 @@ class EloquentFactoryBuilderTest extends TestCase
     }
 
     /** @test **/
+    public function can_disable_making_models_with_after_callback()
+    {
+        $user = factory(FactoryBuildableUser::class)->withoutCallbacks()->make();
+
+        $this->assertNull($user->profile);
+    }
+
+    /** @test **/
     public function making_models_with_after_callback_state()
     {
         $user = factory(FactoryBuildableUser::class)->state('with_callable_server')->make();
 
         $this->assertNotNull($user->profile);
         $this->assertNotNull($user->servers->where('status', 'callable')->first());
+    }
+
+    /** @test **/
+    public function can_disable_callbacks_when_making_models_with_after_callback_state()
+    {
+        $user = factory(FactoryBuildableUser::class)->withoutCallbacks()->state('with_callable_server')->make();
+
+        $this->assertNull($user->profile);
+        $this->assertNull($user->servers->where('status', 'callable')->first());
     }
 }
 
