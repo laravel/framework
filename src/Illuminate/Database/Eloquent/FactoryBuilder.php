@@ -60,6 +60,13 @@ class FactoryBuilder
     protected $afterCreating = [];
 
     /**
+     * If should run after callbacks
+     *
+     * @var boolean
+     */
+    protected $shouldRunAfterCallbacks = true;
+
+    /**
      * The states to apply.
      *
      * @var array
@@ -150,6 +157,18 @@ class FactoryBuilder
     public function connection($name)
     {
         $this->connection = $name;
+
+        return $this;
+    }
+
+    /**
+     * Disable after callbacks
+     *
+     * @return $this
+     */
+    public function withoutCallbacks()
+    {
+        $this->shouldRunAfterCallbacks = false;
 
         return $this;
     }
@@ -406,13 +425,15 @@ class FactoryBuilder
      */
     protected function callAfter(array $afterCallbacks, $models)
     {
-        $states = array_merge([$this->name], $this->activeStates);
+        if($this->shouldRunAfterCallbacks) {
+            $states = array_merge([$this->name], $this->activeStates);
 
-        $models->each(function ($model) use ($states, $afterCallbacks) {
-            foreach ($states as $state) {
-                $this->callAfterCallbacks($afterCallbacks, $model, $state);
-            }
-        });
+            $models->each(function ($model) use ($states, $afterCallbacks) {
+                foreach ($states as $state) {
+                    $this->callAfterCallbacks($afterCallbacks, $model, $state);
+                }
+            });
+        }
     }
 
     /**
