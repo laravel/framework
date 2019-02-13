@@ -114,14 +114,10 @@ class RedisManager implements Factory
     protected function resolveCluster($name)
     {
         $clusterOptions = $this->config['clusters']['options'] ?? [];
-        $options = $this->config['options'] ?? [];
-        $name = $this->config['clusters'][$name];
 
-        if (empty($this->config['options']['cluster']) && $this->driver === 'phpredis') {
-            return $this->connector()->connectToArray($name, $clusterOptions, $options);
-        }
-
-        return $this->connector()->connectToCluster($name, $clusterOptions, $options);
+        return $this->connector()->connectToCluster(
+            $this->config['clusters'][$name], $clusterOptions, $this->config['options'] ?? []
+        );
     }
 
     /**
