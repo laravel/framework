@@ -658,7 +658,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function getPathPrefix()
     {
-        return $this->getDriver()->getAdapter()->getPathPrefix();
+        return $this->driver->getAdapter()->getPathPrefix();
     }
 
     /**
