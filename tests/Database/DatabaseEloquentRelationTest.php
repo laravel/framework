@@ -47,7 +47,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $builder->shouldReceive('whereNotNull');
         $builder->shouldReceive('where');
         $builder->shouldReceive('withoutGlobalScopes')->andReturn($builder);
-        $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
+        $relation = new HasOne($builder, $parent, 'foreign_key', 'id', 'relation');
         $related->shouldReceive('getTable')->andReturn('table');
         $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         $now = Carbon::now();
@@ -77,7 +77,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder->shouldReceive('whereNotNull');
             $builder->shouldReceive('where');
             $builder->shouldReceive('withoutGlobalScopes')->andReturn($builder);
-            $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
+            $relation = new HasOne($builder, $parent, 'foreign_key', 'id', 'relation');
             $builder->shouldReceive('update')->never();
 
             $relation->touch();
@@ -109,7 +109,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder->shouldReceive('whereNotNull');
             $builder->shouldReceive('where');
             $builder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
-            $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
+            $relation = new HasOne($builder, $parent, 'foreign_key', 'id', 'relation');
             $builder->shouldReceive('update')->never();
 
             $relation->touch();
@@ -159,7 +159,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder->shouldReceive('whereNotNull');
             $builder->shouldReceive('where');
             $builder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
-            $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
+            $relation = new HasOne($builder, $parent, 'foreign_key', 'id', 'relation');
             $builder->shouldReceive('update')->never();
 
             $relation->touch();
@@ -172,7 +172,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherBuilder->shouldReceive('whereNotNull');
             $anotherBuilder->shouldReceive('where');
             $anotherBuilder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
-            $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id');
+            $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id', 'relation');
             $anotherBuilder->shouldReceive('update')->never();
 
             $anotherRelation->touch();

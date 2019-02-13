@@ -265,7 +265,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
 
-        return new HasMany($builder, $parent, 'table.foreign_key', 'id');
+        return new HasMany($builder, $parent, 'table.foreign_key', 'id', 'relations');
     }
 
     protected function expectNewModel($relation, $attributes = null)

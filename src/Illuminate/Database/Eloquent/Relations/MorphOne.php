@@ -65,4 +65,14 @@ class MorphOne extends MorphOneOrMany
                     ->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey})
                     ->setAttribute($this->getMorphType(), $this->morphClass);
     }
+
+    /**
+     * Set the relationship on the parent model
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     */
+    protected function setRelation($model)
+    {
+        $this->parent->setRelation($this->relation, $model);
+    }
 }

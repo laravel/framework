@@ -111,24 +111,24 @@ class CustomPost extends Post
         return new CustomBelongsTo($query, $child, $foreignKey, $ownerKey, $relation);
     }
 
-    protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey)
+    protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey, $relation)
     {
-        return new CustomHasMany($query, $parent, $foreignKey, $localKey);
+        return new CustomHasMany($query, $parent, $foreignKey, $localKey, $relation);
     }
 
-    protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey)
+    protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey, $relation)
     {
-        return new CustomHasOne($query, $parent, $foreignKey, $localKey);
+        return new CustomHasOne($query, $parent, $foreignKey, $localKey, $relation);
     }
 
-    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey, $relation)
     {
-        return new CustomMorphOne($query, $parent, $type, $id, $localKey);
+        return new CustomMorphOne($query, $parent, $type, $id, $localKey, $relation);
     }
 
-    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey, $relation)
     {
-        return new CustomMorphMany($query, $parent, $type, $id, $localKey);
+        return new CustomMorphMany($query, $parent, $type, $id, $localKey, $relation);
     }
 
     protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,

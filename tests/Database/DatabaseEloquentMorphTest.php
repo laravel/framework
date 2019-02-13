@@ -266,7 +266,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
 
-        return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+        return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id', 'relation');
     }
 
     protected function getManyRelation()
@@ -281,7 +281,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
 
-        return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+        return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id', 'relations');
     }
 
     protected function getNamespacedRelation($alias)
@@ -302,7 +302,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $parent->shouldReceive('getMorphClass')->andReturn($alias);
         $builder->shouldReceive('where')->once()->with('table.morph_type', $alias);
 
-        return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+        return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id', 'relation');
     }
 }
 

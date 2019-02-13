@@ -49,9 +49,10 @@ trait HasRelationships
      * @param  string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function hasOne($related, $foreignKey = null, $localKey = null)
+    public function hasOne($related, $foreignKey = null, $localKey = null, $relation = null)
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -59,7 +60,11 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return $this->newHasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        $relation = $relation ?: $this->guessBelongsToRelation();
+
+        return $this->newHasOne(
+            $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey, $relation
+        );
     }
 
     /**
@@ -69,11 +74,12 @@ trait HasRelationships
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey)
+    protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey, $relation)
     {
-        return new HasOne($query, $parent, $foreignKey, $localKey);
+        return new HasOne($query, $parent, $foreignKey, $localKey, $relation);
     }
 
     /**
@@ -84,9 +90,10 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
+     * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
-    public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
+    public function morphOne($related, $name, $type = null, $id = null, $localKey = null, $relation = null)
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -96,7 +103,11 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return $this->newMorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+        $relation = $relation ?: $this->guessBelongsToRelation();
+
+        return $this->newMorphOne(
+            $instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey, $relation
+        );
     }
 
     /**
@@ -107,11 +118,12 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
+     * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
-    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey, $relation)
     {
-        return new MorphOne($query, $parent, $type, $id, $localKey);
+        return new MorphOne($query, $parent, $type, $id, $localKey, $relation);
     }
 
     /**
@@ -276,9 +288,10 @@ trait HasRelationships
      * @param  string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function hasMany($related, $foreignKey = null, $localKey = null)
+    public function hasMany($related, $foreignKey = null, $localKey = null, $relation = null)
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -286,8 +299,10 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
+        $relation = $relation ?: $this->guessBelongsToRelation();
+
         return $this->newHasMany(
-            $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey
+            $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey, $relation
         );
     }
 
@@ -298,11 +313,12 @@ trait HasRelationships
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey)
+    protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey, $relation)
     {
-        return new HasMany($query, $parent, $foreignKey, $localKey);
+        return new HasMany($query, $parent, $foreignKey, $localKey, $relation);
     }
 
     /**
@@ -356,9 +372,10 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
+     * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
+    public function morphMany($related, $name, $type = null, $id = null, $localKey = null, $relation = null)
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -371,7 +388,11 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return $this->newMorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+        $relation = $relation ?: $this->guessBelongsToRelation();
+
+        return $this->newMorphMany(
+            $instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey, $relation
+        );
     }
 
     /**
@@ -382,11 +403,12 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
+     * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey, $relation)
     {
-        return new MorphMany($query, $parent, $type, $id, $localKey);
+        return new MorphMany($query, $parent, $type, $id, $localKey, $relation);
     }
 
     /**

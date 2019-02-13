@@ -46,4 +46,14 @@ class MorphMany extends MorphOneOrMany
     {
         return $this->matchMany($models, $results, $relation);
     }
+
+    /**
+     * Set the relationship on the parent model
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     */
+    protected function setRelation($model)
+    {
+        $this->parent->{$this->relation}->add($model);
+    }
 }
