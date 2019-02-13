@@ -102,10 +102,6 @@ class RedisManager implements Factory
             return $this->resolveCluster($name);
         }
 
-        if (isset($this->config['array'][$name])) {
-            return $this->resolveArray($name);
-        }
-
         throw new InvalidArgumentException("Redis connection [{$name}] not configured.");
     }
 
@@ -118,30 +114,14 @@ class RedisManager implements Factory
     protected function resolveCluster($name)
     {
         $clusterOptions = $this->config['clusters']['options'] ?? [];
+        $options = $this->config['options'] ?? [];
+        $name = $this->config['clusters'][$name];
 
-        return $this->connector()->connectToCluster(
-            $this->config['clusters'][$name], $clusterOptions, $this->config['options'] ?? []
-        );
-    }
-
-    /**
-     * Resolve the given array connection by name.
-     *
-     * @param  string $name
-     * @return \Illuminate\Redis\Connections\Connection
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function resolveArray($name)
-    {
-        if ($this->driver !== 'phpredis') {
-            throw new InvalidArgumentException('Redis array configuration is compatible only with phpredis client');
+        if (empty($this->config['options']['cluster']) && $this->driver === 'phpredis') {
+            return $this->connector()->connectToArray($name, $clusterOptions, $options);
         }
-        $arrayOptions = $this->config['array']['options'] ?? [];
 
-        return $this->connector()->connectToArray(
-            $this->config['array'][$name], $arrayOptions, $this->config['options'] ?? []
-        );
+        return $this->connector()->connectToCluster($name, $clusterOptions, $options);
     }
 
     /**
