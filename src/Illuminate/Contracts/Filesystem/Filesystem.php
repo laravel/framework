@@ -195,4 +195,19 @@ interface Filesystem
      * @return bool
      */
     public function deleteDirectory($directory);
+
+    /**
+     * Get the current path prefix.
+     *
+     * @return string
+     */
+    public function getPathPrefix();
+
+    /**
+     * Set a new path prefix.
+     *
+     * @param  string  $path
+     * @return bool
+    */
+    public function setPathPrefix($path);
 }

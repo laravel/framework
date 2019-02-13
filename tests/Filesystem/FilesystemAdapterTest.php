@@ -191,4 +191,17 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }
+
+    public function testGetPathPrefix()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $this->assertEquals($this->tempDir.'/', $filesystemAdapter->getPathPrefix());
+    }
+
+    public function testSetPathPrefix()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->setPathPrefix('teams/1');
+        $this->assertEquals($this->tempDir.'/teams/1/', $filesystemAdapter->getPathPrefix());
+    }
 }
