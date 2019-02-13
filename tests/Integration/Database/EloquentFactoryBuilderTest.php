@@ -249,7 +249,7 @@ class EloquentFactoryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function can_disable_callback_when_creating_models_with_after_callback()
+    public function can_disable_callbacks_when_creating_models_with_after_callback()
     {
         $team = factory(FactoryBuildableTeam::class)->withoutCallbacks()->create();
 
@@ -266,7 +266,7 @@ class EloquentFactoryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function can_disable_callback_when_creating_models_with_after_callback_state()
+    public function can_disable_callbacks_when_creating_models_with_after_callback_state()
     {
         $user = factory(FactoryBuildableUser::class)->withoutCallbacks()->state('with_callable_server')->create();
 
@@ -293,7 +293,7 @@ class EloquentFactoryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function can_disable_making_models_with_after_callback()
+    public function can_disable_callbacks_when_making_models_with_after_callback()
     {
         $user = factory(FactoryBuildableUser::class)->withoutCallbacks()->make();
 
