@@ -478,7 +478,7 @@ class Builder
      * Get a single column's value from the first result of a query.
      *
      * @param  string  $column
-     * @parma  mixed  $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function value($column, $default = null)
