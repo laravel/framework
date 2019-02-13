@@ -122,7 +122,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherBuilder->shouldReceive('whereNotNull');
             $anotherBuilder->shouldReceive('where');
             $anotherBuilder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
-            $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id');
+            $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id', 'relation');
             $now = Carbon::now();
             $anotherRelated->shouldReceive('freshTimestampString')->andReturn($now);
             $anotherBuilder->shouldReceive('update')->once()->with(['updated_at' => $now]);

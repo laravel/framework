@@ -65,4 +65,14 @@ class HasOne extends HasOneOrMany
             $this->getForeignKeyName(), $parent->{$this->localKey}
         );
     }
+
+    /**
+     * Set the relationship on the parent model
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     */
+    protected function setRelation($model)
+    {
+        $this->parent->setRelation($this->relation, $model);
+    }
 }

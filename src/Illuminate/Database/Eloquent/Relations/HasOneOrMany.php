@@ -23,6 +23,13 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
+     * The name of the relationship
+     *
+     * @var string
+     */
+    protected $relation;
+
+    /**
      * The count of self joins.
      *
      * @var int
@@ -36,12 +43,14 @@ abstract class HasOneOrMany extends Relation
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string  $relation
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $relation)
     {
         $this->localKey = $localKey;
         $this->foreignKey = $foreignKey;
+        $this->relation = $relation;
 
         parent::__construct($query, $parent);
     }
@@ -249,7 +258,13 @@ abstract class HasOneOrMany extends Relation
     {
         $this->setForeignAttributesForCreate($model);
 
-        return $model->save() ? $model : false;
+        if ($model->save()) {
+            $this->setRelation($model);
+
+            return $model;
+        }
+
+        return false;
     }
 
     /**
@@ -417,4 +432,11 @@ abstract class HasOneOrMany extends Relation
     {
         return $this->localKey;
     }
+
+    /**
+     * Set the relationship on the parent model
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     */
+    abstract protected function setRelation($model);
 }

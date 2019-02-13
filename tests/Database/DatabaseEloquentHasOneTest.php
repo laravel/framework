@@ -210,6 +210,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $this->parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         $this->parent->shouldReceive('newQueryWithoutScopes')->andReturn($this->builder);
+        $this->parent->shouldReceive('setRelation');
 
         return new HasOne($this->builder, $this->parent, 'table.foreign_key', 'id', 'relation');
     }
