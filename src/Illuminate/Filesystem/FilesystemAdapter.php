@@ -663,7 +663,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
     /**
      * Set a new path prefix.
-     * 
+     *
      * @param  string  $path
      * @return void
      */
