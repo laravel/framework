@@ -197,7 +197,7 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertEquals($this->tempDir.'/', $filesystemAdapter->getPathPrefix());
     }
-    
+
     public function testSetPathPrefix()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);

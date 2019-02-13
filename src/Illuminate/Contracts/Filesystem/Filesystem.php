@@ -202,7 +202,7 @@ interface Filesystem
      * @return string
      */
     public function getPathPrefix();
-    
+
     /**
      * Set a new path prefix.
      *
