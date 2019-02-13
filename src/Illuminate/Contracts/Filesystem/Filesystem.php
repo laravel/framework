@@ -208,6 +208,6 @@ interface Filesystem
      *
      * @param  string  $path
      * @return bool
-    */
+     */
     public function setPathPrefix($path);
 }
