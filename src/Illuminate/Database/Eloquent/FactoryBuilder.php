@@ -60,9 +60,9 @@ class FactoryBuilder
     protected $afterCreating = [];
 
     /**
-     * If should run after callbacks
+     * If callbacks should run.
      *
-     * @var boolean
+     * @var bool
      */
     protected $shouldRunAfterCallbacks = true;
 
@@ -425,7 +425,7 @@ class FactoryBuilder
      */
     protected function callAfter(array $afterCallbacks, $models)
     {
-        if($this->shouldRunAfterCallbacks) {
+        if ($this->shouldRunAfterCallbacks) {
             $states = array_merge([$this->name], $this->activeStates);
 
             $models->each(function ($model) use ($states, $afterCallbacks) {
