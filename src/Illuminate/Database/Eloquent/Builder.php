@@ -478,13 +478,16 @@ class Builder
      * Get a single column's value from the first result of a query.
      *
      * @param  string  $column
+     * @parma  mixed  $default
      * @return mixed
      */
-    public function value($column)
+    public function value($column, $default = null)
     {
         if ($result = $this->first([$column])) {
             return $result->{$column};
         }
+
+        return value($default);
     }
 
     /**

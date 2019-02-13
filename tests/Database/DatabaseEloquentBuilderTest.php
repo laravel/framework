@@ -189,6 +189,14 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertNull($builder->value('name'));
     }
 
+    public function testValueMethodWithModelNotFoundAndDefaultValue()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('first')->with(['name'])->andReturn(null);
+
+        $this->assertSame('default_value', $builder->value('name', 'default_value'));
+    }
+
     public function testChunkWithLastChunkComplete()
     {
         $builder = m::mock(Builder::class.'[forPage,get]', [$this->getMockQueryBuilder()]);
