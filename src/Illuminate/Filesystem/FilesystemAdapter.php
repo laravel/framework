@@ -652,6 +652,29 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Get the current path prefix.
+     *
+     * @return string
+     */
+    public function getPathPrefix()
+    {
+        return $this->getDriver()->getAdapter()->getPathPrefix();
+    }
+    
+    /**
+     *  Set a new path prefix.
+     * 
+     * @param  string  $path
+     * @return void
+    */
+    public function setPathPrefix($path)
+    {
+        return $this->driver->getAdapter()->setPathPrefix(
+            $this->getPathPrefix().$path
+        );
+    }
+
+    /**
      * Flush the Flysystem cache.
      *
      * @return void
