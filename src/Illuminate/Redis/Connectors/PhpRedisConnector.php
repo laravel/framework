@@ -162,15 +162,15 @@ class PhpRedisConnector
         ]));
 
         if (! empty($options['password'])) {
-            $client->auth((string) $options['password']);
+            $client->auth($options['password']);
         }
 
         if (! empty($options['database'])) {
-            $client->select((int) $options['database']);
+            $client->select($options['database']);
         }
 
         if (! empty($options['prefix'])) {
-            $client->setOption(Redis::OPT_PREFIX, (string) $options['prefix']);
+            $client->setOption(Redis::OPT_PREFIX, $options['prefix']);
         }
 
         return $client;
