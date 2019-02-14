@@ -27,13 +27,6 @@ class RouteListCommand extends Command
     protected $description = 'List all registered routes';
 
     /**
-     * The router instance.
-     *
-     * @var \Illuminate\Routing\Router
-     */
-    protected $router;
-
-    /**
      * An array of all the registered routes.
      *
      * @var \Illuminate\Routing\RouteCollection
@@ -64,7 +57,6 @@ class RouteListCommand extends Command
     {
         parent::__construct();
 
-        $this->router = $router;
         $this->routes = $router->getRoutes();
     }
 
