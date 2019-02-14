@@ -158,7 +158,7 @@ class PhpRedisConnector
     {
         $client = new RedisArray($servers, Arr::only($options, [
             'function', 'previous', 'retry_interval', 'lazy_connect',
-            'connect_timeout', 'read_timeout', 'distributor',
+            'connect_timeout', 'read_timeout', 'algorithm', 'consistent', 'distributor',
         ]));
 
         if (! empty($options['password'])) {
