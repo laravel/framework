@@ -2,9 +2,7 @@
 
 namespace Illuminate\Contracts\Config;
 
-use ArrayAccess;
-
-interface Repository extends ArrayAccess
+interface Repository
 {
     /**
      * Determine if the given configuration value exists.
