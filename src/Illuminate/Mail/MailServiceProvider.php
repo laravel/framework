@@ -25,9 +25,7 @@ class MailServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerSwiftMailer();
-
         $this->registerIlluminateMailer();
-
         $this->registerMarkdownRenderer();
     }
 
