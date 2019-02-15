@@ -43,6 +43,9 @@ trait AsPivot
     {
         $instance = new static;
 
+        // if this factory was presented valid timestamp columns, set th e
+        $instance->timestamps = $instance->hasTimestampAttributes($attributes);
+
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
@@ -57,12 +60,6 @@ trait AsPivot
         $instance->pivotParent = $parent;
 
         $instance->exists = $exists;
-
-        // If this is a subclassed Pivot class, treat it as a model and respect
-        // the $timestamps property
-        if (get_class($instance) === Pivot::class) {
-            $instance->timestamps = $instance->hasTimestampAttributes();
-        }
 
         return $instance;
     }
@@ -214,13 +211,15 @@ trait AsPivot
     }
 
     /**
-     * Determine if the pivot model has timestamp attributes.
+     * Determine if the pivot model has timestamp attributes in either a provided
+     * array of attributes or the currently tracked attributes inside the model.
      *
+     * @param $attributes array|null Optional,
      * @return bool
      */
-    public function hasTimestampAttributes()
+    public function hasTimestampAttributes($attributes = null)
     {
-        return array_key_exists($this->getCreatedAtColumn(), $this->attributes);
+        return array_key_exists($this->getCreatedAtColumn(), $attributes ?? $this->attributes);
     }
 
     /**

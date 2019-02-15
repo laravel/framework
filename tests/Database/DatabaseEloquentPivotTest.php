@@ -21,8 +21,6 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesAreSetCorrectly()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
-        $this->addMockConnection($parent);
-
         $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
         $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
@@ -125,7 +123,8 @@ class DatabaseEloquentPivotTest extends TestCase
         $query->shouldReceive('delete')->once()->andReturn(true);
         $pivot->expects($this->once())->method('newQueryWithoutRelationships')->will($this->returnValue($query));
 
-        $this->assertTrue($pivot->delete());
+        $rowsAffected = $pivot->delete();
+        $this->assertEquals(1, $rowsAffected);
     }
 
     public function testPivotModelTableNameIsSingular()
@@ -158,16 +157,10 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertEquals($model->getUpdatedAtColumn(), $pivotWithoutParent->getUpdatedAtColumn());
     }
 
-    protected function addMockConnection($model)
-    {
-        $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
-        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(Connection::class));
-        $connection->shouldReceive('getQueryGrammar')->andReturn(m::mock(Grammar::class));
-        // $connection->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
-        // $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
-        //     return new BaseBuilder($connection, $grammar, $processor);
-        // });
-    }
+    // public function testPivotModelWillFireEvents()
+    // {
+    //
+    // }
 }
 
 class DatabaseEloquentPivotTestDateStub extends Pivot
@@ -206,3 +199,58 @@ class DummyModel extends Model
 {
     //
 }
+//
+// class DummyModelWithExtendedPivot extends Model
+// {
+//     public function
+// }
+//
+// class DatabaseEloquentPivotWithEvents extends Pivot
+// {
+//     public $eventsCalled = [];
+//
+//     public static function boot()
+//     {
+//         parent::boot();
+//
+//         static::creating(function ($model) {
+//             // $model->eventsCalled[]
+//             return true;
+//         });
+//
+//         static::created(function ($model) {
+//             // $model->eventsCalled[]
+//             return true;
+//         });
+//
+//         static::updating(function ($model) {
+//             // $model->eventsCalled[]
+//             return true;
+//         });
+//
+//         static::updated(function ($model) {
+//             // $model->eventsCalled[]
+//             return true;
+//         });
+//
+//         static::saving(function ($model) {
+//             // $model->eventsCalled[]
+//             return true;
+//         });
+//
+//         static::saved(function ($model) {
+//             // $model->eventsCalled[]
+//             return true;
+//         });
+//
+//         static::deleting(function ($model) {
+//             // $model->eventsCalled[]
+//             return true;
+//         });
+//
+//         static::deleted(function ($model) {
+//             // $model->eventsCalled[]
+//             return true;
+//         });
+//     }
+// }
