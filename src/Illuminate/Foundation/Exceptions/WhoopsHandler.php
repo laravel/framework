@@ -60,9 +60,31 @@ class WhoopsHandler
      */
     protected function registerBlacklist($handler)
     {
-        foreach (config('app.debug_blacklist', []) as $key => $secrets) {
-            foreach ($secrets as $secret) {
-                $handler->blacklist($key, $secret);
+        $whitelist = config('app.debug_whitelist', []);
+        $all_superglob  = [
+            '_GET'      =>  $_GET ?? [],
+            '_POST'     =>  $_POST ?? [],
+            '_FILES'    =>  $_FILES ?? [],
+            '_COOKIE'   =>  $_COOKIE ?? [],
+            '_SESSION'  =>  $_SESSION ?? [],
+            '_SERVER'   =>  $_SERVER ?? [],
+            '_ENV'      =>  $_ENV ?? [],
+        ];
+
+        $missing_superglob = array_diff_key($all_superglob,$whitelist);
+        foreach ($missing_superglob as $missing_key => $values) {
+            // If you want to be absolutely sure not to overrite anything:
+            if (!array_key_exists($missing_key, $whitelist)) {
+                $whitelist[$missing_key] = [];
+            }
+        }
+
+        foreach ($whitelist as $superglob_key => $whitelisted_items) {
+            if(is_array($whitelisted_items) || ($whitelisted_items !== '*')) {
+                $blacklist = array_except($all_superglob[$superglob_key], $whitelisted_items);
+                foreach ($blacklist as $secret => $value) {
+                    $handler->blacklist($superglob_key, $secret);
+                }
             }
         }
 
