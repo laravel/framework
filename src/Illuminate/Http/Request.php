@@ -393,7 +393,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             $from->getContent()
         );
 
-        $request->setJson($from->json());
+        $request->setJson(clone $from->json());
 
         if ($session = $from->getSession()) {
             $request->setLaravelSession($session);
