@@ -10,7 +10,7 @@
 - Added `Illuminate\Cache\TaggedCache::getTags()` ([#27445](https://github.com/laravel/framework/pull/27445))
 - Added `Illuminate\Http\ResponseTrait::getCallback()` ([#27464](https://github.com/laravel/framework/pull/27464))
 - Added  license file to each component ([9e57e8b](https://github.com/laravel/framework/commit/9e57e8bea04638d5bafec62db1051fbc2ce39e3a))
-- Added `Model::withoutEventDispatcher()` method ([#27419](https://github.com/laravel/framework/pull/27419), [5c5d6b2](https://github.com/laravel/framework/commit/5c5d6b24f6156768575ae49aa84d7b1d004f23fe))
+- Added `Model::withoutEvents()` method ([#27419](https://github.com/laravel/framework/pull/27419), [5c5d6b2](https://github.com/laravel/framework/commit/5c5d6b24f6156768575ae49aa84d7b1d004f23fe))
 
 ### Reverted
 - Revert of "Fixed wrong class being used when eager loading nullable `MorphTo` with `withDefault()` ([#27411](https://github.com/laravel/framework/pull/27411))"([9bbf644](https://github.com/laravel/framework/commit/9bbf6443e2709d846367f04ebed9a41823ebcc34))
