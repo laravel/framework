@@ -2,7 +2,9 @@
 
 namespace Illuminate\Support;
 
-class AggregateServiceProvider extends ServiceProvider
+use Illuminate\Contracts\Support\RegistrableProvider;
+
+class AggregateServiceProvider extends ServiceProvider implements RegistrableProvider
 {
     /**
      * The provider class names.

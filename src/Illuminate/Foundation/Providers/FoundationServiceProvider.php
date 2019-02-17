@@ -5,8 +5,9 @@ namespace Illuminate\Foundation\Providers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\AggregateServiceProvider;
+use Illuminate\Contracts\Support\RegistrableProvider;
 
-class FoundationServiceProvider extends AggregateServiceProvider
+class FoundationServiceProvider extends AggregateServiceProvider implements RegistrableProvider
 {
     /**
      * The provider class names.

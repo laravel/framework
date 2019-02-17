@@ -14,9 +14,10 @@ use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
+use Illuminate\Contracts\Support\RegistrableProvider;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 
-class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
+class QueueServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
 {
     /**
      * Register the service provider.

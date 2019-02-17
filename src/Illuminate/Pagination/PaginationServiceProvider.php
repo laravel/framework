@@ -3,8 +3,9 @@
 namespace Illuminate\Pagination;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Support\RegistrableProvider;
 
-class PaginationServiceProvider extends ServiceProvider
+class PaginationServiceProvider extends ServiceProvider implements RegistrableProvider
 {
     /**
      * Bootstrap any application services.

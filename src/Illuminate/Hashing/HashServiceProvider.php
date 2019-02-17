@@ -4,8 +4,9 @@ namespace Illuminate\Hashing;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Support\RegistrableProvider;
 
-class HashServiceProvider extends ServiceProvider implements DeferrableProvider
+class HashServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
 {
     /**
      * Register the service provider.
