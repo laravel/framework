@@ -1,10 +1,13 @@
 <?php
 
+use PhpOption\Option;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Collection;
+use Dotenv\Environment\DotenvFactory;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HigherOrderTapProxy;
+use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
 
 if (! function_exists('append_config')) {
@@ -262,8 +265,13 @@ if (! function_exists('env')) {
      */
     function env($key, $default = null)
     {
-        return (new ServerConstAdapter)
-            ->get($key)
+        static $variables;
+
+        if ($variables === null) {
+            $variables = (new DotenvFactory([new EnvConstAdapter, new ServerConstAdapter]))->createImmutable();
+        }
+
+        return Option::fromValue($variables->get($key))
             ->map(function ($value) {
                 switch (strtolower($value)) {
                     case 'true':
