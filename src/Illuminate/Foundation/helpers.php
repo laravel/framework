@@ -1,9 +1,11 @@
 <?php
 
+use PhpOption\Option;
 use Illuminate\Foundation\Mix;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Date;
+use Dotenv\Environment\DotenvFactory;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\SerializableClosure;
@@ -12,8 +14,10 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Symfony\Component\HttpFoundation\Response;
+use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -465,6 +469,47 @@ if (! function_exists('encrypt')) {
     function encrypt($value, $serialize = true)
     {
         return app('encrypter')->encrypt($value, $serialize);
+    }
+}
+
+if (! function_exists('env')) {
+    /**
+     * Gets the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
+     */
+    function env($key, $default = null)
+    {
+        static $variables;
+
+        if ($variables === null) {
+            $variables = (new DotenvFactory([new EnvConstAdapter, new ServerConstAdapter]))->createImmutable();
+        }
+
+        return Option::fromValue($variables->get($key))
+            ->map(function ($value) {
+                switch (strtolower($value)) {
+                    case 'true':
+                    case '(true)':
+                        return true;
+                    case 'false':
+                    case '(false)':
+                        return false;
+                    case 'empty':
+                    case '(empty)':
+                        return '';
+                    case 'null':
+                    case '(null)':
+                        return;
+                }
+
+                return $value;
+            })
+            ->getOrCall(function () use ($default) {
+                return value($default);
+            });
     }
 }
 
