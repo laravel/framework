@@ -6,17 +6,13 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Notifications\Customizable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class VerifyEmail extends Notification
 {
-    /**
-     * The callback that should be used to build the mail message.
-     *
-     * @var \Closure|null
-     */
-    public static $toMailCallback;
+    use Customizable;
 
     /**
      * Get the notification's channels.
@@ -64,16 +60,5 @@ class VerifyEmail extends Notification
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             ['id' => $notifiable->getKey()]
         );
-    }
-
-    /**
-     * Set a callback that should be used when building the notification mail message.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function toMailUsing($callback)
-    {
-        static::$toMailCallback = $callback;
     }
 }
