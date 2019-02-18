@@ -32,6 +32,8 @@ class AuthenticateMiddlewareTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        Container::setInstance(null);
     }
 
     public function testDefaultUnauthenticatedThrows()

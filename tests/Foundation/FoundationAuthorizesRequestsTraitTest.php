@@ -12,6 +12,11 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        Container::setInstance(null);
+    }
+
     public function test_basic_gate_check()
     {
         unset($_SERVER['_test.authorizes.trait']);
