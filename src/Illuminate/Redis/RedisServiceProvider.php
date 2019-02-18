@@ -5,9 +5,8 @@ namespace Illuminate\Redis;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 
-class RedisServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
+class RedisServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register the service provider.

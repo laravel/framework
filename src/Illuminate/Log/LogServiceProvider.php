@@ -3,9 +3,8 @@
 namespace Illuminate\Log;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 
-class LogServiceProvider extends ServiceProvider implements RegistrableProvider
+class LogServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.

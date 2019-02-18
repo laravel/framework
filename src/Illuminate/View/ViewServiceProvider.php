@@ -8,9 +8,8 @@ use Illuminate\View\Engines\FileEngine;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Compilers\BladeCompiler;
-use Illuminate\Contracts\Support\RegistrableProvider;
 
-class ViewServiceProvider extends ServiceProvider implements RegistrableProvider
+class ViewServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.

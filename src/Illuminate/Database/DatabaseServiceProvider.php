@@ -7,12 +7,11 @@ use Faker\Generator as FakerGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Queue\EntityResolver;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
-class DatabaseServiceProvider extends ServiceProvider implements RegistrableProvider
+class DatabaseServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application events.

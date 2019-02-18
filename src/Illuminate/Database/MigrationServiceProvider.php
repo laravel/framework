@@ -6,10 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Migrations\MigrationCreator;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
-class MigrationServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
+class MigrationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register the service provider.

@@ -4,9 +4,8 @@ namespace Illuminate\Session;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Contracts\Support\RegistrableProvider;
 
-class SessionServiceProvider extends ServiceProvider implements RegistrableProvider
+class SessionServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.

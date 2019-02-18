@@ -4,9 +4,8 @@ namespace Illuminate\Validation;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 
-class ValidationServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
+class ValidationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register the service provider.

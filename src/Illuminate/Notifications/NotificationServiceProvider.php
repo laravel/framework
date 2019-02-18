@@ -3,11 +3,10 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 
-class NotificationServiceProvider extends ServiceProvider implements RegistrableProvider
+class NotificationServiceProvider extends ServiceProvider
 {
     /**
      * Boot the application services.

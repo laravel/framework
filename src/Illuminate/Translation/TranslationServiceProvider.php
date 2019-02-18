@@ -4,9 +4,8 @@ namespace Illuminate\Translation;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 
-class TranslationServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
+class TranslationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register the service provider.

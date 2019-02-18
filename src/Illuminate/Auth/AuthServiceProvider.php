@@ -4,11 +4,10 @@ namespace Illuminate\Auth;
 
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
-class AuthServiceProvider extends ServiceProvider implements RegistrableProvider
+class AuthServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.

@@ -14,7 +14,6 @@ use Illuminate\Log\LogServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
@@ -595,13 +594,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $provider = $this->resolveProvider($provider);
         }
 
-        /**
-         * @deprecated 'register' method will not be trigger for the run `register` method. Please use
-         * RegistrableProvider contract. In 5.9 will be removed register triggering by `register` method
-         */
-        $shouldRegister = method_exists($provider, 'register');
-
-        if ($provider instanceof RegistrableProvider || $shouldRegister) {
+        if (method_exists($provider, 'register')) {
             $provider->register();
         }
 

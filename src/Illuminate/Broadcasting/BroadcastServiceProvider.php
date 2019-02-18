@@ -4,11 +4,10 @@ namespace Illuminate\Broadcasting;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 
-class BroadcastServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
+class BroadcastServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register the service provider.

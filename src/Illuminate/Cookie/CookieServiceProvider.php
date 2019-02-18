@@ -3,9 +3,8 @@
 namespace Illuminate\Cookie;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 
-class CookieServiceProvider extends ServiceProvider implements RegistrableProvider
+class CookieServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.

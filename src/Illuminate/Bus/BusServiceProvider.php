@@ -4,12 +4,11 @@ namespace Illuminate\Bus;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
 
-class BusServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
+class BusServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register the service provider.

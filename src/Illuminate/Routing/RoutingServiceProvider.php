@@ -6,13 +6,12 @@ use Illuminate\Support\ServiceProvider;
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response as PsrResponse;
 use Psr\Http\Message\ServerRequestInterface;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
-class RoutingServiceProvider extends ServiceProvider implements RegistrableProvider
+class RoutingServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.

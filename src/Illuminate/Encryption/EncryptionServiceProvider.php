@@ -5,9 +5,8 @@ namespace Illuminate\Encryption;
 use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\RegistrableProvider;
 
-class EncryptionServiceProvider extends ServiceProvider implements RegistrableProvider
+class EncryptionServiceProvider extends ServiceProvider
 {
     /**
      * Register the service provider.

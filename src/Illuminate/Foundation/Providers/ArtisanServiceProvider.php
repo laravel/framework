@@ -30,7 +30,6 @@ use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
-use Illuminate\Contracts\Support\RegistrableProvider;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
@@ -74,7 +73,7 @@ use Illuminate\Database\Console\Migrations\InstallCommand as MigrateInstallComma
 use Illuminate\Database\Console\Migrations\RefreshCommand as MigrateRefreshCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand as MigrateRollbackCommand;
 
-class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvider, RegistrableProvider
+class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * The commands to be registered.
