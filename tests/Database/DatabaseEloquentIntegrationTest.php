@@ -1524,9 +1524,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testWhenBaseModelIsIgnoredAllChildModelsAreIgnored()
     {
-        // force loading of User model since it exists in a non-autoloadable place
-        class_exists(EloquentCollectionFreshTest::class);
-
         $this->assertFalse(Model::isIgnoringTouch());
         $this->assertFalse(User::isIgnoringTouch());
 
@@ -1541,10 +1538,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChildModelsAreIgnored()
     {
-        // force loading of User, Post model since it exists in a non-autoloadable place
-        class_exists(EloquentCollectionFreshTest::class);
-        class_exists(EloquentDeleteTest::class);
-
         $this->assertFalse(Model::isIgnoringTouch());
         $this->assertFalse(User::isIgnoringTouch());
         $this->assertFalse(Post::isIgnoringTouch());

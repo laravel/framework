@@ -77,14 +77,11 @@ trait AsPivot
     {
         $instance = static::fromAttributes($parent, [], $table, $exists);
 
-        $instance->setRawAttributes($attributes, true);
-
         // If this is a subclassed Pivot class, treat it as a model and respect
         // the $timestamps property
-        if (get_class($instance) === Pivot::class) {
-            $instance->timestamps = $instance->hasTimestampAttributes();
-        }
+        $instance->timestamps = $instance->hasTimestampAttributes($attributes);
 
+        $instance->setRawAttributes($attributes, true);
 
         return $instance;
     }

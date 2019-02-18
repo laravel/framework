@@ -2,10 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Connection;
-use Illuminate\Database\ConnectionResolverInterface;
-use Illuminate\Database\Grammar;
-use Illuminate\Database\Query\Processors\Processor;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
@@ -156,11 +152,6 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertEquals($model->getCreatedAtColumn(), $pivotWithoutParent->getCreatedAtColumn());
         $this->assertEquals($model->getUpdatedAtColumn(), $pivotWithoutParent->getUpdatedAtColumn());
     }
-
-    // public function testPivotModelWillFireEvents()
-    // {
-    //
-    // }
 }
 
 class DatabaseEloquentPivotTestDateStub extends Pivot
@@ -199,58 +190,3 @@ class DummyModel extends Model
 {
     //
 }
-//
-// class DummyModelWithExtendedPivot extends Model
-// {
-//     public function
-// }
-//
-// class DatabaseEloquentPivotWithEvents extends Pivot
-// {
-//     public $eventsCalled = [];
-//
-//     public static function boot()
-//     {
-//         parent::boot();
-//
-//         static::creating(function ($model) {
-//             // $model->eventsCalled[]
-//             return true;
-//         });
-//
-//         static::created(function ($model) {
-//             // $model->eventsCalled[]
-//             return true;
-//         });
-//
-//         static::updating(function ($model) {
-//             // $model->eventsCalled[]
-//             return true;
-//         });
-//
-//         static::updated(function ($model) {
-//             // $model->eventsCalled[]
-//             return true;
-//         });
-//
-//         static::saving(function ($model) {
-//             // $model->eventsCalled[]
-//             return true;
-//         });
-//
-//         static::saved(function ($model) {
-//             // $model->eventsCalled[]
-//             return true;
-//         });
-//
-//         static::deleting(function ($model) {
-//             // $model->eventsCalled[]
-//             return true;
-//         });
-//
-//         static::deleted(function ($model) {
-//             // $model->eventsCalled[]
-//             return true;
-//         });
-//     }
-// }
