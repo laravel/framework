@@ -531,11 +531,26 @@ class Gate implements GateContract
             return $this->resolvePolicy($this->policies[$class]);
         }
 
+        if (class_exists($guessedPolicy = $this->guessPolicyName($class))) {
+            return $this->resolvePolicy($guessedPolicy);
+        }
+
         foreach ($this->policies as $expected => $policy) {
             if (is_subclass_of($class, $expected)) {
                 return $this->resolvePolicy($policy);
             }
         }
+    }
+
+    /**
+     * Guess the policy name for the given class.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function guessPolicyName($class)
+    {
+        return dirname(str_replace('\\', '/', $class)).'\\Policies\\'.class_basename($class).'Policy';
     }
 
     /**
