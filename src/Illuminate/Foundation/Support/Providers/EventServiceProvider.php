@@ -40,14 +40,6 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function register()
-    {
-        //
-    }
-
-    /**
      * Get the events and handlers.
      *
      * @return array
