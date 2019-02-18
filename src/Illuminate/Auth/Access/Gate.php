@@ -550,7 +550,7 @@ class Gate implements GateContract
      */
     protected function guessPolicyName($class)
     {
-        return dirname(str_replace('\\', '/', $class)).'\\Policies\\'.class_basename($class).'Policy';
+        return str_replace('/', '\\', dirname(str_replace('\\', '/', $class)).'\\Policies\\'.class_basename($class).'Policy');
     }
 
     /**
