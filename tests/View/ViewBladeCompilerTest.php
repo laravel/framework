@@ -49,7 +49,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php/* foo */?>\nHello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php /* foo */ ?>\nHello World");
         $compiler->compile('foo');
     }
 
@@ -57,7 +57,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php/* foo */?>\nHello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php /* foo */ ?>\nHello World");
         $compiler->compile('foo');
         $this->assertEquals('foo', $compiler->getPath());
     }
@@ -73,7 +73,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php/* foo */?>\nHello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php /* foo */ ?>\nHello World");
         // set path before compilation
         $compiler->setPath('foo');
         // trigger compilation with null $path
@@ -97,7 +97,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php/* foo */?>\nHello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php /* foo */ ?>\nHello World");
         $compiler->compile('foo');
     }
 
