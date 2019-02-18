@@ -65,6 +65,13 @@ class Gate implements GateContract
     protected $stringCallbacks = [];
 
     /**
+     * The callback to be used to guess policy names.
+     *
+     * @var callable|null
+     */
+    protected $guessPolicyNamesUsingCallback;
+
+    /**
      * Create a new gate instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -531,11 +538,45 @@ class Gate implements GateContract
             return $this->resolvePolicy($this->policies[$class]);
         }
 
+        if (class_exists($guessedPolicy = $this->guessPolicyName($class))) {
+            return $this->resolvePolicy($guessedPolicy);
+        }
+
         foreach ($this->policies as $expected => $policy) {
             if (is_subclass_of($class, $expected)) {
                 return $this->resolvePolicy($policy);
             }
         }
+    }
+
+    /**
+     * Guess the policy name for the given class.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function guessPolicyName($class)
+    {
+        if ($this->guessPolicyNamesUsingCallback) {
+            return call_user_func($this->guessPolicyNamesUsingCallback, $class);
+        }
+
+        $classDirname = str_replace('/', '\\', dirname(str_replace('\\', '/', $class)));
+
+        return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
+    }
+
+    /**
+     * Specify a callback to be used to guess policy names.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function guessPolicyNamesUsing(callable $callback)
+    {
+        $this->guessPolicyNamesUsingCallback = $callback;
+
+        return $this;
     }
 
     /**

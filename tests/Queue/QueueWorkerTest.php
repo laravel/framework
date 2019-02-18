@@ -36,7 +36,7 @@ class QueueWorkerTest extends TestCase
 
     protected function tearDown(): void
     {
-        Container::setInstance();
+        Container::setInstance(null);
     }
 
     public function test_job_can_be_fired()
