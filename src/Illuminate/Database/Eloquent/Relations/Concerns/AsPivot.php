@@ -5,7 +5,6 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
 trait AsPivot
 {
@@ -43,7 +42,8 @@ trait AsPivot
     {
         $instance = new static;
 
-        // if this factory was presented valid timestamp columns, set th e
+        // if this factory was presented valid timestamp columns, set the $timestamps
+        // property accordingly
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
 
         // The pivot model is a "dynamic" model since we will set the tables dynamically
@@ -77,8 +77,8 @@ trait AsPivot
     {
         $instance = static::fromAttributes($parent, [], $table, $exists);
 
-        // If this is a subclassed Pivot class, treat it as a model and respect
-        // the $timestamps property
+        // if this factory was presented valid timestamp columns, set the $timestamps
+        // property accordingly
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
 
         $instance->setRawAttributes($attributes, true);
@@ -211,7 +211,7 @@ trait AsPivot
      * Determine if the pivot model has timestamp attributes in either a provided
      * array of attributes or the currently tracked attributes inside the model.
      *
-     * @param $attributes array|null Optional,
+     * @param $attributes array|null Options attributes to check instead of properties
      * @return bool
      */
     public function hasTimestampAttributes($attributes = null)

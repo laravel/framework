@@ -2,12 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Eloquent\Relations\MorphPivot;
-use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
 
 /**
  * @group integration
@@ -85,42 +82,34 @@ class PivotEventsTestCollaborator extends Pivot
 
         static::creating(function ($model) {
             static::$eventsCalled[] = 'creating';
-            return true;
         });
 
         static::created(function ($model) {
             static::$eventsCalled[] = 'created';
-            return true;
         });
 
         static::updating(function ($model) {
             static::$eventsCalled[] = 'updating';
-            return true;
         });
 
         static::updated(function ($model) {
             static::$eventsCalled[] = 'updated';
-            return true;
         });
 
         static::saving(function ($model) {
             static::$eventsCalled[] = 'saving';
-            return true;
         });
 
         static::saved(function ($model) {
             static::$eventsCalled[] = 'saved';
-            return true;
         });
 
         static::deleting(function ($model) {
             static::$eventsCalled[] = 'deleting';
-            return true;
         });
 
         static::deleted(function ($model) {
             static::$eventsCalled[] = 'deleted';
-            return true;
         });
     }
 }

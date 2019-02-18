@@ -6,8 +6,6 @@ use Exception;
 use RuntimeException;
 use InvalidArgumentException;
 use Illuminate\Support\Carbon;
-use Illuminate\Tests\Integration\Database\EloquentCollectionFreshTest;
-use Illuminate\Tests\Integration\Database\EloquentDeleteTest;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
