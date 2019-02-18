@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation;
+namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
