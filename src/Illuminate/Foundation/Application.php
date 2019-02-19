@@ -595,7 +595,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         }
 
         if (method_exists($provider, 'register')) {
-            $provider->register();
+            $this->call([$provider, 'register']);
         }
 
         // If there are bindings / singletons set as properties on the provider we
