@@ -48,7 +48,7 @@ trait ValidatesRequests
     }
 
     /**
-     * Validate the HTTP request with the given rules
+     * Validate the HTTP request with the given rules.
      *
      * @param  array  $rules
      * @param  array  $messages
