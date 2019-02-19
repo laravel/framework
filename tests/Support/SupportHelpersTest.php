@@ -962,6 +962,13 @@ class SupportHelpersTest extends TestCase
         $_SERVER['foo'] = '(null)';
         $this->assertNull(env('foo'));
     }
+
+    public function testGetFromENVFirst()
+    {
+        $_ENV['foo'] = 'From $_ENV';
+        $_SERVER['foo'] = 'From $_SERVER';
+        $this->assertSame('From $_ENV', env('foo'));
+    }
 }
 
 trait SupportTestTraitOne
