@@ -208,6 +208,34 @@ if (! function_exists('bcrypt')) {
     }
 }
 
+if (! function_exists('argon')) {
+    /**
+     * Hash the given value against the argon algorithm.
+     *
+     * @param  string  $value
+     * @param  array  $options
+     * @return string
+     */
+    function argon($value, $options = [])
+    {
+        return app('hash')->driver('argon')->make($value, $options);
+    }
+}
+
+if (! function_exists('argon2id')) {
+    /**
+     * Hash the given value against the argon2id algorithm.
+     *
+     * @param  string  $value
+     * @param  array  $options
+     * @return string
+     */
+    function argon2id($value, $options = [])
+    {
+        return app('hash')->driver('argon2id')->make($value, $options);
+    }
+}
+
 if (! function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
