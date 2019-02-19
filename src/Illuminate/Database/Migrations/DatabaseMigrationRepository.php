@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Migrations;
 
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Support\Carbon;
 
 class DatabaseMigrationRepository implements MigrationRepositoryInterface
 {
@@ -96,15 +97,25 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Log that a migration was run.
      *
-     * @param  string  $file
-     * @param  int  $batch
+     * @param  string $file
+     * @param  int $batch
+     *
      * @return void
+     * @throws \Throwable
      */
     public function log($file, $batch)
     {
-        $record = ['migration' => $file, 'batch' => $batch];
+        $record = ['migration' => $file, 'batch' => $batch, 'migrated_at' => Carbon::now()];
 
-        $this->table()->insert($record);
+        try {
+            $this->table()->insert($record);
+        } catch ( \Throwable $throwable) {
+            if (!$this->repositoryIsCompleted()) {
+                $this->addMissingColumns();
+                return $this->log($file, $batch);
+            }
+            throw $throwable;
+        }
     }
 
     /**
@@ -154,6 +165,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             $table->increments('id');
             $table->string('migration');
             $table->integer('batch');
+            $table->timestamp('migrated_at')->nullable();
         });
     }
 
@@ -208,5 +220,35 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     public function setSource($name)
     {
         $this->connection = $name;
+    }
+
+    /**
+     * Validate if the migrations table is complete
+     *
+     * @return bool
+     */
+    public function repositoryIsCompleted()
+    {
+        $schema = $this->getConnection()->getSchemaBuilder();
+        return $schema->hasColumns($this->table, [
+            'id',
+            'migration',
+            'batch',
+            'migrated_at',
+        ]);
+    }
+
+    /**
+     * Add the missing columns to the table
+     *
+     * @return void
+     */
+    protected function addMissingColumns()
+    {
+        $schema = $this->getConnection()->getSchemaBuilder();
+
+        $schema->table($this->table, function ($table) {
+            $table->timestamp('migrated_at')->nullable();
+        });
     }
 }

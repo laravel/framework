@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Closure;
+use Illuminate\Support\Carbon;
 use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -15,6 +16,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
 {
     protected function tearDown(): void
     {
+        Carbon::setTestNow();
         m::close();
     }
 
@@ -55,10 +57,68 @@ class DatabaseMigrationRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
+
+        $now = Carbon::now();
+        Carbon::setTestNow($now);
         $connectionMock = m::mock(Connection::class);
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
-        $query->shouldReceive('insert')->once()->with(['migration' => 'bar', 'batch' => 1]);
+        $query->shouldReceive('insert')->once()->with(['migration' => 'bar', 'batch' => 1, 'migrated_at' => $now]);
+        $query->shouldReceive('useWritePdo')->once()->andReturn($query);
+
+        $repo->log('bar', 1);
+    }
+
+    public function testLogMethodDetectsIncompleteMigrationTable()
+    {
+        $repo = $this->getRepository();
+        $query = m::mock(stdClass::class);
+
+        $now = Carbon::now();
+        Carbon::setTestNow($now);
+        $connectionMock = m::mock(Connection::class);
+        $schema = m::mock(stdClass::class);
+        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnection()->shouldReceive('table')->twice()->with('migrations')->andReturn($query);
+
+        $repo->getConnection()->shouldReceive('getSchemaBuilder')->twice()->andReturn($schema);
+        $schema->shouldReceive('hasColumns')->once()->andReturn(false);
+        $schema->shouldReceive('table')->once()->with('migrations', 'closure');
+
+        $query->shouldReceive('insert')->twice()->with(['migration' => 'bar', 'batch' => 1, 'migrated_at' => $now])
+        ->andReturnUsing(function () {
+            // we first get an exception because the table isn't complete
+            throw new \Exception('test');
+        }, function() {
+            // the second call will be successful
+            return;
+        });
+        $query->shouldReceive('useWritePdo')->twice()->andReturn($query);
+
+        $repo->log('bar', 1);
+    }
+
+    public function testLogMethodWillForwardAnyErrorIfTableIsComplete()
+    {
+        $this->expectExceptionMessage('test');
+        $repo = $this->getRepository();
+        $query = m::mock(stdClass::class);
+
+        $now = Carbon::now();
+        Carbon::setTestNow($now);
+        $connectionMock = m::mock(Connection::class);
+        $schema = m::mock(stdClass::class);
+        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
+
+        $repo->getConnection()->shouldReceive('getSchemaBuilder')->once()->andReturn($schema);
+        $schema->shouldReceive('hasColumns')->once()->andReturn(true);
+
+        $query->shouldReceive('insert')->once()->with(['migration' => 'bar', 'batch' => 1, 'migrated_at' => $now])
+            ->andReturnUsing(function () {
+                // we first get an exception because the table isn't complete
+                throw new \Exception('test');
+            });
         $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
         $repo->log('bar', 1);
