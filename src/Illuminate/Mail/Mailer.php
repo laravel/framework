@@ -529,6 +529,16 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Get the array of failed recipients.
+     *
+     * @return array
+     */
+    public function failures()
+    {
+        return $this->failedRecipients;
+    }
+
+    /**
      * Get the view factory instance.
      *
      * @return \Illuminate\Contracts\View\Factory
@@ -546,16 +556,6 @@ class Mailer implements MailerContract, MailQueueContract
     public function getSwiftMailer()
     {
         return $this->swift;
-    }
-
-    /**
-     * Get the array of failed recipients.
-     *
-     * @return array
-     */
-    public function failures()
-    {
-        return $this->failedRecipients;
     }
 
     /**
