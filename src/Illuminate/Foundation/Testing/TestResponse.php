@@ -790,6 +790,19 @@ class TestResponse
     }
 
     /**
+     * Assert that the response view has a collection or paginator.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function assertViewCollection($key)
+    {
+        $this->assertViewHas($key);
+
+        return new TestCollection($this->viewData($key));
+    }
+
+    /**
      * Get a piece of data from the original view.
      *
      * @param  string  $key

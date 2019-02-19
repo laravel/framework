@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Support\Collection;
 use Mockery as m;
 use JsonSerializable;
 use Illuminate\Http\Response;
@@ -35,6 +36,19 @@ class FoundationTestResponseTest extends TestCase
         ]);
 
         $response->assertViewHas('foo');
+    }
+
+    public function testAssertViewCollection()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'getData' => ['myCollection' => new Collection([1, 2, 3, 4])],
+        ]);
+
+        $response->assertViewCollection('myCollection')
+            ->contains(1)
+            ->notContains(5)
+            ->counts(4);
     }
 
     public function testAssertViewHasModel()
