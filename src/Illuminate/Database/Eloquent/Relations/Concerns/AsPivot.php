@@ -125,11 +125,11 @@ trait AsPivot
 
         $this->touchOwners();
 
-        $this->getDeleteQuery()->delete();
+        $affectedRows = $this->getDeleteQuery()->delete();
 
         $this->fireModelEvent('deleted', false);
 
-        return 1;
+        return $affectedRows;
     }
 
     /**
