@@ -97,7 +97,7 @@ class TestCollection
     }
 
     /**
-     * Exports a value into a single-line string
+     * Exports a value into a single-line string.
      *
      * @param  mixed  $value
      * @return string

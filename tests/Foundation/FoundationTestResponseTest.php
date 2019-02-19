@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Support\Collection;
 use Mockery as m;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Model;
