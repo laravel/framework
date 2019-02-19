@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Closure;
-use Illuminate\Support\Carbon;
 use stdClass;
 use Mockery as m;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Connection;
@@ -89,9 +89,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
         ->andReturnUsing(function () {
             // we first get an exception because the table isn't complete
             throw new \Exception('test');
-        }, function() {
+        }, function () {
             // the second call will be successful
-            return;
         });
         $query->shouldReceive('useWritePdo')->twice()->andReturn($query);
 

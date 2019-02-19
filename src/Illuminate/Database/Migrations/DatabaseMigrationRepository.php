@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class DatabaseMigrationRepository implements MigrationRepositoryInterface
 {
@@ -109,8 +109,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
 
         try {
             $this->table()->insert($record);
-        } catch ( \Throwable $throwable) {
-            if (!$this->repositoryIsCompleted()) {
+        } catch (\Throwable $throwable) {
+            if (! $this->repositoryIsCompleted()) {
                 $this->addMissingColumns();
                 return $this->log($file, $batch);
             }
@@ -223,7 +223,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Validate if the migrations table is complete
+     * Validate if the migrations table is complete.
      *
      * @return bool
      */
@@ -239,7 +239,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Add the missing columns to the table
+     * Add the missing columns to the table.
      *
      * @return void
      */
