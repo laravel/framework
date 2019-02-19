@@ -48,6 +48,22 @@ trait ValidatesRequests
     }
 
     /**
+     * Validate the HTTP request with the given rules
+     *
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validateRequest(array $rules, array $messages = [],
+                                    array $customAttributes = [])
+    {
+        return $this->validate(request(), $rules, $messages, $customAttributes);
+    }
+
+    /**
      * Validate the given request with the given rules.
      *
      * @param  string  $errorBag
