@@ -539,16 +539,6 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Get the view factory instance.
-     *
-     * @return \Illuminate\Contracts\View\Factory
-     */
-    public function getViewFactory()
-    {
-        return $this->views;
-    }
-
-    /**
      * Get the Swift Mailer instance.
      *
      * @return \Swift_Mailer
@@ -556,6 +546,16 @@ class Mailer implements MailerContract, MailQueueContract
     public function getSwiftMailer()
     {
         return $this->swift;
+    }
+
+    /**
+     * Get the view factory instance.
+     *
+     * @return \Illuminate\Contracts\View\Factory
+     */
+    public function getViewFactory()
+    {
+        return $this->views;
     }
 
     /**
