@@ -42,13 +42,17 @@ class FoundationTestResponseTest extends TestCase
     {
         $response = $this->makeMockResponse([
             'render' => 'hello world',
-            'getData' => ['myCollection' => new Collection([1, 2, 3, 4])],
+            'getData' => [
+                'myCollection' => new Collection([1, 2, 3, 4]),
+                'foo' => 'bar',
+            ],
         ]);
 
         $response->assertViewCollection('myCollection')
-            ->contains(1)
-            ->notContains(5)
-            ->counts(4);
+                ->contains(1)
+                ->notContains(5)
+                ->counts(4)
+            ->assertViewHas('foo', 'bar');
     }
 
     public function testAssertViewHasModel()

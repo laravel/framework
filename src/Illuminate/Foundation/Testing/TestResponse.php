@@ -799,7 +799,7 @@ class TestResponse
     {
         $this->assertViewHas($key);
 
-        return new TestCollection($this->viewData($key));
+        return new TestCollection($this->viewData($key), $this);
     }
 
     /**
