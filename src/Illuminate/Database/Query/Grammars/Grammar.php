@@ -698,6 +698,10 @@ class Grammar extends BaseGrammar
      */
     protected function compileOrders(Builder $query, $orders)
     {
+        // Key the array by columns to remove any duplicate columns and keep
+        // only the newest one / one with the highest index.
+        $orders = array_values(array_column($orders, null, 'column'));
+        
         if (! empty($orders)) {
             return 'order by '.implode(', ', $this->compileOrdersToArray($query, $orders));
         }
