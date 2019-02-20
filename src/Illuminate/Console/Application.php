@@ -5,7 +5,6 @@ namespace Illuminate\Console;
 use Closure;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,14 +17,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
-use Illuminate\Contracts\Console\Application as ApplicationContract;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Contracts\Console\Application as ConsoleApplicationContract;
 
-class Application extends SymfonyApplication implements ApplicationContract
+class Application extends SymfonyApplication implements ConsoleApplicationContract
 {
     /**
      * The Laravel application instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $laravel;
 
@@ -53,12 +53,12 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Create a new Artisan console application.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $laravel
+     * @param  \Illuminate\Contracts\Foundation\Application  $laravel
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  string  $version
      * @return void
      */
-    public function __construct(Container $laravel, Dispatcher $events, $version)
+    public function __construct(ApplicationContract $laravel, Dispatcher $events, $version)
     {
         parent::__construct('Laravel Framework', $version);
 
