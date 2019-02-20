@@ -33,7 +33,6 @@ class AuthTokenGuardTest extends TestCase
         $this->assertEquals(1, $guard->id());
     }
 
-
     public function testTokenCanBeHashed()
     {
         $provider = m::mock(UserProvider::class);
