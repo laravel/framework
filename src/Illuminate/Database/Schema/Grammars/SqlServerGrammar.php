@@ -62,7 +62,7 @@ class SqlServerGrammar extends Grammar
     {
         $columns = implode(', ', $this->getColumns($blueprint));
 
-        return 'create table '.$this->wrapTable($blueprint)." ($columns)";
+        return "if not exists (select * from sys.tables where name='{$blueprint->getTable()}') create table ".$this->wrapTable($blueprint)." ($columns) go";
     }
 
     /**
