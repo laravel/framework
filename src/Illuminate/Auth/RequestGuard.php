@@ -80,7 +80,7 @@ class RequestGuard implements Guard
      */
     public function setRequest(Request $request)
     {
-        if($this->request !== $request){
+        if ($this->request !== $request) {
             $this->user = null;
         }
         $this->request = $request;
