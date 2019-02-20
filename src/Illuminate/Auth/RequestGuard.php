@@ -83,6 +83,7 @@ class RequestGuard implements Guard
         if ($this->request !== $request) {
             $this->user = null;
         }
+
         $this->request = $request;
 
         return $this;
