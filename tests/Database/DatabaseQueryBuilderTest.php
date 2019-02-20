@@ -826,6 +826,20 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->union($this->getBuilder()->select('*')->from('dogs'));
         $builder->skip(5)->take(10);
         $this->assertEquals('select * from "users" union select * from "dogs" limit 10 offset 5', $builder->toSql());
+
+        $expectedSql = '(select * from "users") union (select * from "dogs") limit 10 offset 5';
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users');
+        $builder->union($this->getBuilder()->select('*')->from('dogs'));
+        $builder->skip(5)->take(10);
+        $this->assertEquals($expectedSql, $builder->toSql());
+
+        $expectedSql = '(select * from "users" limit 11) union (select * from "dogs" limit 22) limit 10 offset 5';
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->limit(11);
+        $builder->union($this->getBuilder()->select('*')->from('dogs')->limit(22));
+        $builder->skip(5)->take(10);
+        $this->assertEquals($expectedSql, $builder->toSql());
     }
 
     public function testUnionWithJoin()
