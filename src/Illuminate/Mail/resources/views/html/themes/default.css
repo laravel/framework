@@ -1,12 +1,12 @@
 /* Base */
 
 body, body *:not(html):not(style):not(br):not(tr):not(code) {
-    font-family: Avenir, Helvetica, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     box-sizing: border-box;
 }
 
 body {
-    background-color: #f5f8fa;
+    background-color: #F8FAFC;
     color: #74787E;
     height: 100%;
     hyphens: auto;
@@ -40,7 +40,7 @@ a img {
 /* Typography */
 
 h1 {
-    color: #2F3133;
+    color: #3D4852;
     font-size: 19px;
     font-weight: bold;
     margin-top: 0;
@@ -48,7 +48,7 @@ h1 {
 }
 
 h2 {
-    color: #2F3133;
+    color: #3D4852;
     font-size: 16px;
     font-weight: bold;
     margin-top: 0;
@@ -56,7 +56,7 @@ h2 {
 }
 
 h3 {
-    color: #2F3133;
+    color: #3D4852;
     font-size: 14px;
     font-weight: bold;
     margin-top: 0;
@@ -64,7 +64,7 @@ h3 {
 }
 
 p {
-    color: #74787E;
+    color: #3D4852;
     font-size: 16px;
     line-height: 1.5em;
     margin-top: 0;
@@ -82,7 +82,7 @@ img {
 /* Layout */
 
 .wrapper {
-    background-color: #f5f8fa;
+    background-color: #F8FAFC;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -220,29 +220,29 @@ img {
 
 .button-blue,
 .button-primary {
-    background-color: #3097D1;
-    border-top: 10px solid #3097D1;
-    border-right: 18px solid #3097D1;
-    border-bottom: 10px solid #3097D1;
-    border-left: 18px solid #3097D1;
+    background-color: #3490DC;
+    border-top: 10px solid #3490DC;
+    border-right: 18px solid #3490DC;
+    border-bottom: 10px solid #3490DC;
+    border-left: 18px solid #3490DC;
 }
 
 .button-green,
 .button-success {
-    background-color: #2ab27b;
-    border-top: 10px solid #2ab27b;
-    border-right: 18px solid #2ab27b;
-    border-bottom: 10px solid #2ab27b;
-    border-left: 18px solid #2ab27b;
+    background-color: #38C172;
+    border-top: 10px solid #38C172;
+    border-right: 18px solid #38C172;
+    border-bottom: 10px solid #38C172;
+    border-left: 18px solid #38C172;
 }
 
 .button-red,
 .button-error {
-    background-color: #bf5329;
-    border-top: 10px solid #bf5329;
-    border-right: 18px solid #bf5329;
-    border-bottom: 10px solid #bf5329;
-    border-left: 18px solid #bf5329;
+    background-color: #E3342F;
+    border-top: 10px solid #E3342F;
+    border-right: 18px solid #E3342F;
+    border-bottom: 10px solid #E3342F;
+    border-left: 18px solid #E3342F;
 }
 
 /* Panels */
@@ -252,7 +252,7 @@ img {
 }
 
 .panel-content {
-    background-color: #EDEFF2;
+    background-color: #F1F5F8;
     padding: 16px;
 }
 
