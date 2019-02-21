@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
+use RuntimeException;
 
 trait HasEvents
 {
@@ -30,6 +31,8 @@ trait HasEvents
      *
      * @param  object|array|string  $classes
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public static function observe($classes)
     {
@@ -45,13 +48,15 @@ trait HasEvents
      *
      * @param  object|string $class
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function registerObserver($class)
     {
         $className = is_string($class) ? $class : get_class($class);
 
         if (!class_exists($class)) {
-            throw new \RuntimeException('Given observer class not exists.');
+            throw new RuntimeException('Given observer class not exists.');
         }
 
         // When registering a model observer, we will spin through the possible events
