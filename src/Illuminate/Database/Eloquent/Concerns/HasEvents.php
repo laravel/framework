@@ -50,6 +50,10 @@ trait HasEvents
     {
         $className = is_string($class) ? $class : get_class($class);
 
+        if (!class_exists($class)) {
+            throw new \RuntimeException('Given observer class not exists.');
+        }
+
         // When registering a model observer, we will spin through the possible events
         // and determine if this observer has that method. If it does, we will hook
         // it into the model's event system, making it convenient to watch these.

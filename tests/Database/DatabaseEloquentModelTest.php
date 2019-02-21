@@ -1306,6 +1306,20 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::flushEventListeners();
     }
 
+    public function testThrowExceptionOnAttachingNotExistsModelObserverWithString()
+    {
+        $this->expectException(\RuntimeException::class);
+        EloquentModelStub::observe(NotExistClass::class);
+        EloquentModelStub::flushEventListeners();
+    }
+
+    public function testThrowExceptionOnAttachingNotExistsModelObserversThroughAnArray()
+    {
+        $this->expectException(\RuntimeException::class);
+        EloquentModelStub::observe([NotExistClass::class]);
+        EloquentModelStub::flushEventListeners();
+    }
+
     public function testModelObserversCanBeAttachedToModelsThroughCallingObserveMethodOnlyOnce()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock(Dispatcher::class));
