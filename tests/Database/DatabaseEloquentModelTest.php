@@ -7,6 +7,7 @@ use stdClass;
 use Exception;
 use Mockery as m;
 use ReflectionClass;
+use RuntimeException;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
@@ -1308,14 +1309,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testThrowExceptionOnAttachingNotExistsModelObserverWithString()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         EloquentModelStub::observe(NotExistClass::class);
         EloquentModelStub::flushEventListeners();
     }
 
     public function testThrowExceptionOnAttachingNotExistsModelObserversThroughAnArray()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         EloquentModelStub::observe([NotExistClass::class]);
         EloquentModelStub::flushEventListeners();
     }

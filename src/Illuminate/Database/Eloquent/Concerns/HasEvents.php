@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
-use RuntimeException;
 
 trait HasEvents
 {
