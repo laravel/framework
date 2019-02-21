@@ -55,7 +55,7 @@ trait HasEvents
     {
         $className = is_string($class) ? $class : get_class($class);
 
-        if (!class_exists($class)) {
+        if (! class_exists($class)) {
             throw new RuntimeException('Given observer class not exists.');
         }
 
