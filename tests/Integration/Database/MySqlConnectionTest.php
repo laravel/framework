@@ -34,7 +34,8 @@ class MySqlConnectionTest extends DatabaseTestCase
         parent::setUp();
 
         Schema::create('posts', function ($table) {
-            $table->decimal('rating', 5, 1);
+            $table->decimal('rating', 5, 1)->nullable();
+            $table->json('json')->nullable();
         });
     }
 
@@ -52,5 +53,22 @@ class MySqlConnectionTest extends DatabaseTestCase
         ]);
 
         $this->assertEquals(5.2, DB::table('posts')->value('rating'));
+        $this->assertEquals(1, DB::table('posts')->whereBetween('rating', [5.1, 5.3])->count());
+    }
+
+    public function testItUsesFloatWhenComparingJsonProperty()
+    {
+        DB::table('posts')->insert([
+            'rating' => 5.2,
+            'json' => json_encode([
+                'score' => 1.3,
+            ]),
+        ]);
+
+        $this->assertEquals(1, DB::table('posts')->where('json->>score', '>=', 1.3)->count());
+        $this->assertEquals(1, DB::table('posts')->where('json->>score', '>', 1.2)->count());
+        $this->assertEquals(1, DB::table('posts')->where('json->>score', '=', 1.3)->count());
+        $this->assertEquals(1, DB::table('posts')->where('json->>score', '>', 1.0)->count());
+        $this->assertEquals(0, DB::table('posts')->where('json->>score', '>', 1.3)->count());
     }
 }
