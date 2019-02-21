@@ -1311,14 +1311,12 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         EloquentModelStub::observe(NotExistClass::class);
-        EloquentModelStub::flushEventListeners();
     }
 
     public function testThrowExceptionOnAttachingNotExistsModelObserversThroughAnArray()
     {
         $this->expectException(RuntimeException::class);
         EloquentModelStub::observe([NotExistClass::class]);
-        EloquentModelStub::flushEventListeners();
     }
 
     public function testModelObserversCanBeAttachedToModelsThroughCallingObserveMethodOnlyOnce()
