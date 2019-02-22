@@ -8,8 +8,8 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\UploadedFile;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class HttpRequestTest extends TestCase
