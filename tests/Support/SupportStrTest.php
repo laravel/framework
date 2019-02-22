@@ -145,6 +145,13 @@ class SupportStrTest extends TestCase
         $this->assertEquals('سلام-دنیا', Str::slug('سلام دنیا', '-', null));
     }
 
+    public function testStrStart()
+    {
+        $this->assertEquals('/test/string', Str::start('test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('/test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('//test/string', '/'));
+    }
+
     public function testFinish()
     {
         $this->assertEquals('abbc', Str::finish('ab', 'bc'));
@@ -207,6 +214,15 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 10));
         $this->assertEquals('这是一...', Str::limit('这是一段中文', 6));
+
+        $string = 'The PHP framework for web artisans.';
+        $this->assertEquals('The PHP...', Str::limit($string, 7));
+        $this->assertEquals('The PHP', Str::limit($string, 7, ''));
+        $this->assertEquals('The PHP framework for web artisans.', Str::limit($string, 100));
+
+        $nonAsciiString = '这是一段中文';
+        $this->assertEquals('这是一...', Str::limit($nonAsciiString, 6));
+        $this->assertEquals('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 
     public function testLength()
@@ -274,6 +290,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals('LaravelPhpFramework', Str::studly('laravel_php_framework'));
         $this->assertEquals('LaravelPhPFramework', Str::studly('laravel-phP-framework'));
         $this->assertEquals('LaravelPhpFramework', Str::studly('laravel  -_-  php   -_-   framework   '));
+
+        $this->assertEquals('FooBar', Str::studly('fooBar'));
+        $this->assertEquals('FooBar', Str::studly('foo_bar'));
+        $this->assertEquals('FooBar', Str::studly('foo_bar')); // test cache
+        $this->assertEquals('FooBarBaz', Str::studly('foo-barBaz'));
+        $this->assertEquals('FooBarBaz', Str::studly('foo-bar_baz'));
     }
 
     public function testCamel()
@@ -282,6 +304,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals('laravelPhpFramework', Str::camel('Laravel_php_framework'));
         $this->assertEquals('laravelPhPFramework', Str::camel('Laravel-phP-framework'));
         $this->assertEquals('laravelPhpFramework', Str::camel('Laravel  -_-  php   -_-   framework   '));
+
+        $this->assertEquals('fooBar', Str::camel('FooBar'));
+        $this->assertEquals('fooBar', Str::camel('foo_bar'));
+        $this->assertEquals('fooBar', Str::camel('foo_bar')); // test cache
+        $this->assertEquals('fooBarBaz', Str::camel('Foo-barBaz'));
+        $this->assertEquals('fooBarBaz', Str::camel('foo-bar_baz'));
     }
 
     public function testSubstr()
