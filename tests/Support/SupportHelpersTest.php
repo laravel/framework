@@ -7,7 +7,6 @@ use ArrayAccess;
 use Mockery as m;
 use RuntimeException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Optional;
 use Illuminate\Contracts\Support\Htmlable;
@@ -209,48 +208,6 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten([['#foo', '#bar'], ['#baz']]));
     }
 
-    public function testStrIs()
-    {
-        $this->assertTrue(Str::is('*.dev', 'localhost.dev'));
-        $this->assertTrue(Str::is('a', 'a'));
-        $this->assertTrue(Str::is('/', '/'));
-        $this->assertTrue(Str::is('*dev*', 'localhost.dev'));
-        $this->assertTrue(Str::is('foo?bar', 'foo?bar'));
-        $this->assertFalse(Str::is('*something', 'foobar'));
-        $this->assertFalse(Str::is('foo', 'bar'));
-        $this->assertFalse(Str::is('foo.*', 'foobar'));
-        $this->assertFalse(Str::is('foo.ar', 'foobar'));
-        $this->assertFalse(Str::is('foo?bar', 'foobar'));
-        $this->assertFalse(Str::is('foo?bar', 'fobar'));
-
-        $this->assertTrue(Str::is([
-            '*.dev',
-            '*oc*',
-        ], 'localhost.dev'));
-
-        $this->assertFalse(Str::is([
-            '/',
-            'a*',
-        ], 'localhost.dev'));
-
-        $this->assertFalse(Str::is([], 'localhost.dev'));
-    }
-
-    public function testStrRandom()
-    {
-        $result = Str::random(20);
-        $this->assertIsString($result);
-        $this->assertEquals(20, strlen($result));
-    }
-
-    public function testStartsWith()
-    {
-        $this->assertTrue(Str::startsWith('jason', 'jas'));
-        $this->assertTrue(Str::startsWith('jason', ['jas']));
-        $this->assertFalse(Str::startsWith('jason', 'day'));
-        $this->assertFalse(Str::startsWith('jason', ['day']));
-    }
-
     public function testE()
     {
         $str = 'A \'quote\' is <b>bold</b>';
@@ -258,80 +215,6 @@ class SupportHelpersTest extends TestCase
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
-    }
-
-    public function testEndsWith()
-    {
-        $this->assertTrue(Str::endsWith('jason', 'on'));
-        $this->assertTrue(Str::endsWith('jason', ['on']));
-        $this->assertFalse(Str::endsWith('jason', 'no'));
-        $this->assertFalse(Str::endsWith('jason', ['no']));
-    }
-
-    public function testStrAfter()
-    {
-        $this->assertEquals('nah', Str::after('hannah', 'han'));
-        $this->assertEquals('nah', Str::after('hannah', 'n'));
-        $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
-    }
-
-    public function testStrContains()
-    {
-        $this->assertTrue(Str::contains('taylor', 'ylo'));
-        $this->assertTrue(Str::contains('taylor', ['ylo']));
-        $this->assertFalse(Str::contains('taylor', 'xxx'));
-        $this->assertFalse(Str::contains('taylor', ['xxx']));
-        $this->assertTrue(Str::contains('taylor', ['xxx', 'taylor']));
-    }
-
-    public function testStrFinish()
-    {
-        $this->assertEquals('test/string/', Str::finish('test/string', '/'));
-        $this->assertEquals('test/string/', Str::finish('test/string/', '/'));
-        $this->assertEquals('test/string/', Str::finish('test/string//', '/'));
-    }
-
-    public function testStrStart()
-    {
-        $this->assertEquals('/test/string', Str::start('test/string', '/'));
-        $this->assertEquals('/test/string', Str::start('/test/string', '/'));
-        $this->assertEquals('/test/string', Str::start('//test/string', '/'));
-    }
-
-    public function testSnakeCase()
-    {
-        $this->assertEquals('foo_bar', Str::snake('fooBar'));
-        $this->assertEquals('foo_bar', Str::snake('fooBar')); // test cache
-    }
-
-    public function testStrLimit()
-    {
-        $string = 'The PHP framework for web artisans.';
-        $this->assertEquals('The PHP...', Str::limit($string, 7));
-        $this->assertEquals('The PHP', Str::limit($string, 7, ''));
-        $this->assertEquals('The PHP framework for web artisans.', Str::limit($string, 100));
-
-        $nonAsciiString = '这是一段中文';
-        $this->assertEquals('这是一...', Str::limit($nonAsciiString, 6));
-        $this->assertEquals('这是一', Str::limit($nonAsciiString, 6, ''));
-    }
-
-    public function testCamelCase()
-    {
-        $this->assertEquals('fooBar', Str::camel('FooBar'));
-        $this->assertEquals('fooBar', Str::camel('foo_bar'));
-        $this->assertEquals('fooBar', Str::camel('foo_bar')); // test cache
-        $this->assertEquals('fooBarBaz', Str::camel('Foo-barBaz'));
-        $this->assertEquals('fooBarBaz', Str::camel('foo-bar_baz'));
-    }
-
-    public function testStudlyCase()
-    {
-        $this->assertEquals('FooBar', Str::studly('fooBar'));
-        $this->assertEquals('FooBar', Str::studly('foo_bar'));
-        $this->assertEquals('FooBar', Str::studly('foo_bar')); // test cache
-        $this->assertEquals('FooBarBaz', Str::studly('foo-barBaz'));
-        $this->assertEquals('FooBarBaz', Str::studly('foo-bar_baz'));
     }
 
     public function testClassBasename()
