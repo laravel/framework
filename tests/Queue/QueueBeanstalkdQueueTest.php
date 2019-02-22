@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
-use Pheanstalk\Contract\PheanstalkInterface;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
