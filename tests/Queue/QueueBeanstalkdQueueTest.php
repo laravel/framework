@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
+use Pheanstalk\Contract\PheanstalkInterface;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
@@ -48,7 +49,12 @@ class QueueBeanstalkdQueueTest extends TestCase
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('watchOnly')->once()->with('default')->andReturn($pheanstalk);
         $job = m::mock(Job::class);
-        $pheanstalk->shouldReceive('reserve')->once()->andReturn($job);
+
+        if (interface_exists(PheanstalkInterface::class)) {
+            $pheanstalk->shouldReceive('reserveWithTimeout')->once()->andReturn($job);
+        } else {
+            $pheanstalk->shouldReceive('reserve')->once()->andReturn($job);
+        }
 
         $result = $queue->pop();
 
