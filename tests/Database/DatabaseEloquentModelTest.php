@@ -11,6 +11,7 @@ use ReflectionClass;
 use RuntimeException;
 use DateTimeImmutable;
 use DateTimeInterface;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
@@ -1313,13 +1314,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testThrowExceptionOnAttachingNotExistsModelObserverWithString()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(InvalidArgumentException::class);
         EloquentModelStub::observe(NotExistClass::class);
     }
 
     public function testThrowExceptionOnAttachingNotExistsModelObserversThroughAnArray()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(InvalidArgumentException::class);
         EloquentModelStub::observe([NotExistClass::class]);
     }
 

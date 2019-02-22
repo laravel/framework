@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use RuntimeException;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Illuminate\Contracts\Events\Dispatcher;
 
 trait HasEvents
@@ -63,6 +63,27 @@ trait HasEvents
                 static::registerModelEvent($event, $className.'@'.$event);
             }
         }
+    }
+
+    /**
+     * Resolve the observer's class name from an object or string.
+     *
+     * @param  object|string $class
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function resolveObserverClassName($class)
+    {
+        if (is_object($class)) {
+            return get_class($class);
+        }
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
+        throw new InvalidArgumentException('Unable to find observer: '.$class);
     }
 
     /**
@@ -376,26 +397,5 @@ trait HasEvents
                 static::setEventDispatcher($dispatcher);
             }
         }
-    }
-
-    /**
-     * Resolve observer class name from object or string.
-     *
-     * @param  object|string $class
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    private function resolveObserverClassName($class)
-    {
-        if (is_object($class)) {
-            return get_class($class);
-        }
-
-        if (class_exists($class)) {
-            return $class;
-        }
-
-        throw new RuntimeException('Given observer class not exists.');
     }
 }
