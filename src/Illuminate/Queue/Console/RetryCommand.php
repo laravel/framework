@@ -87,6 +87,7 @@ class RetryCommand extends Command
         if (isset($payload['attempts'])) {
             $payload['attempts'] = 0;
         }
+        $payload['timeoutAt'] = null;
 
         return json_encode($payload);
     }
