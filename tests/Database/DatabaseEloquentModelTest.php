@@ -8,7 +8,6 @@ use Exception;
 use Mockery as m;
 use LogicException;
 use ReflectionClass;
-use RuntimeException;
 use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
