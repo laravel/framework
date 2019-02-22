@@ -53,11 +53,7 @@ trait HasEvents
      */
     protected function registerObserver($class)
     {
-        $className = is_string($class) ? $class : get_class($class);
-
-        if (! class_exists($className)) {
-            throw new RuntimeException('Given observer class not exists.');
-        }
+        $className = $this->resolveObserverClassName($class);
 
         // When registering a model observer, we will spin through the possible events
         // and determine if this observer has that method. If it does, we will hook
@@ -380,5 +376,26 @@ trait HasEvents
                 static::setEventDispatcher($dispatcher);
             }
         }
+    }
+
+    /**
+     * Resolve observer class name from object or string.
+     *
+     * @param  object|string $class
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    private function resolveObserverClassName($class)
+    {
+        if (is_object($class)) {
+            return get_class($class);
+        }
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
+        throw new RuntimeException('Given observer class not exists.');
     }
 }
