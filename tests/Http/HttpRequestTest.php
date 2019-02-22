@@ -8,6 +8,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
@@ -510,6 +511,18 @@ class HttpRequestTest extends TestCase
         ];
         $request = Request::create('/', 'GET', [], [], $files);
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request->file('foo'));
+    }
+
+    public function testValidateFileMethod()
+    {
+        $file = $this->getMockBuilder(SymfonyUploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg', ''])->getMock();
+        $file->method('isValid')->willReturn(false);
+        $file->method('getPathname')->willReturn('photo.jpg');
+        $file->method('getClientOriginalName')->willReturn('photo.jpg');
+        $request = Request::create('/', 'GET', [], [], ['photo' => $file]);
+        $request->except([], false);
+        $this->expectException(FileNotFoundException::class);
+        $request->except([]);
     }
 
     public function testHasFileMethod()

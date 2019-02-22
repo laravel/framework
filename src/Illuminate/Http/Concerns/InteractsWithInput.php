@@ -239,13 +239,14 @@ trait InteractsWithInput
      * Get all of the input except for a specified array of items.
      *
      * @param  array|mixed  $keys
+     * @param  bool  $includeFiles
      * @return array
      */
-    public function except($keys)
+    public function except($keys, $includeFiles = true)
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        $results = $this->all();
+        $results = $includeFiles ? $this->all() : $this->input();
 
         Arr::forget($results, $keys);
 
