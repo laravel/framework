@@ -24,6 +24,16 @@ abstract class ServiceProvider
     protected $defer = false;
 
     /**
+     * @var array
+     */
+    public $bindings = [];
+
+    /**
+     * @var array
+     */
+    public $singletons = [];
+
+    /**
      * The paths that should be published.
      *
      * @var array
