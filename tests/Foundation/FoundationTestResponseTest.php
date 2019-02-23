@@ -392,19 +392,21 @@ class FoundationTestResponseTest extends TestCase
             'errors' => ['key' => 'foo'],
         ];
 
-         $testResponse = TestResponse::fromBaseResponse(
+        $testResponse = TestResponse::fromBaseResponse(
             (new Response)->setContent(json_encode($data))
         );
 
         $testResponse->assertJsonValidationErrors(['key' => 'bar']);
     }
-     public function testAssertJsonValidationErrorMessagesMultipleMessages()
+
+    public function testAssertJsonValidationErrorMessagesMultipleMessages()
     {
         $data = [
             'status' => 'ok',
             'errors' => ['one' => 'foo', 'two' => 'bar'],
         ];
-         $testResponse = TestResponse::fromBaseResponse(
+
+        $testResponse = TestResponse::fromBaseResponse(
             (new Response)->setContent(json_encode($data))
         );
 
