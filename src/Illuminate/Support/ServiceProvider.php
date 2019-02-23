@@ -49,6 +49,16 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+
+    /**
      * Merge the given configuration with the existing configuration.
      *
      * @param  string  $path
@@ -271,16 +281,6 @@ abstract class ServiceProvider
         Artisan::starting(function ($artisan) use ($commands) {
             $artisan->resolveCommands($commands);
         });
-    }
-
-    /**
-     * Register services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
     }
 
     /**
