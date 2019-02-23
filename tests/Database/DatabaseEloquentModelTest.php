@@ -10,6 +10,7 @@ use LogicException;
 use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
@@ -1308,6 +1309,18 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('forget');
         EloquentModelStub::observe([EloquentTestObserverStub::class]);
         EloquentModelStub::flushEventListeners();
+    }
+
+    public function testThrowExceptionOnAttachingNotExistsModelObserverWithString()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        EloquentModelStub::observe(NotExistClass::class);
+    }
+
+    public function testThrowExceptionOnAttachingNotExistsModelObserversThroughAnArray()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        EloquentModelStub::observe([NotExistClass::class]);
     }
 
     public function testModelObserversCanBeAttachedToModelsThroughCallingObserveMethodOnlyOnce()
