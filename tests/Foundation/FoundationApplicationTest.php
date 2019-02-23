@@ -75,11 +75,11 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame($instance, $app->make(AbstractClass::class));
     }
 
-    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent()
+    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
         $provider = m::mock(ServiceProvider::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->never();
+        $provider->shouldReceive('register')->once();
         $app = new Application;
         $app->register($provider);
 

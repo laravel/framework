@@ -89,16 +89,6 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
-
-    /**
      * Pass dynamic methods onto the router instance.
      *
      * @param  string  $method
