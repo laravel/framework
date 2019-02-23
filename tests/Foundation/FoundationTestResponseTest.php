@@ -362,7 +362,7 @@ class FoundationTestResponseTest extends TestCase
             'errors' => ['foo' => 'one', 'bar' => 'two'],
         ];
 
-         $testResponse = TestResponse::fromBaseResponse(
+        $testResponse = TestResponse::fromBaseResponse(
             (new Response)->setContent(json_encode($data))
         );
 
@@ -376,11 +376,39 @@ class FoundationTestResponseTest extends TestCase
             'errors' => ['key' => 'foo'],
         ];
 
-         $testResponse = TestResponse::fromBaseResponse(
+        $testResponse = TestResponse::fromBaseResponse(
             (new Response)->setContent(json_encode($data))
         );
 
         $testResponse->assertJsonValidationErrors(['key' => 'foo']);
+    }
+
+    public function testAssertJsonValidationErrorMessagesCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = [
+            'status' => 'ok',
+            'errors' => ['key' => 'foo'],
+        ];
+
+         $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['key' => 'bar']);
+    }
+     public function testAssertJsonValidationErrorMessagesMultipleMessages()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['one' => 'foo', 'two' => 'bar'],
+        ];
+         $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => 'foo', 'two' => 'bar']);
     }
 
     public function testAssertJsonMissingValidationErrors()
