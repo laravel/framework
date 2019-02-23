@@ -631,30 +631,36 @@ class TestResponse
     }
 
     /**
-     * Assert that the response has the given JSON validation errors for the given keys.
+     * Assert that the response has the given JSON validation errors.
      *
-     * @param  string|array  $keys
+     * @param  string|array  $errors
      * @return $this
      */
-    public function assertJsonValidationErrors($keys)
+    public function assertJsonValidationErrors($errors)
     {
-        $keys = Arr::wrap($keys);
+        $errors = Arr::wrap($errors);
 
-        PHPUnit::assertNotEmpty($keys, 'No keys were provided.');
+        $checkMessages = array_keys($errors) !== range(0, count($errors) - 1);
 
-        $errors = $this->json()['errors'] ?? [];
+        PHPUnit::assertNotEmpty($errors, 'No validation errors were provided.');
 
-        $errorMessage = $errors
+        $jsonErrors = $this->json()['errors'] ?? [];
+
+        $errorMessage = $jsonErrors
                 ? 'Response has the following JSON validation errors:'.
-                        PHP_EOL.PHP_EOL.json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
+                        PHP_EOL.PHP_EOL.json_encode($jsonErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
                 : 'Response does not have JSON validation errors.';
 
-        foreach ($keys as $key) {
+        foreach ($errors as $key => $error) {
             PHPUnit::assertArrayHasKey(
-                $key,
-                $errors,
-                "Failed to find a validation error in the response for key: '{$key}'".PHP_EOL.PHP_EOL.$errorMessage
+                $checkMessages ? $key : $error,
+                $jsonErrors,
+                "Failed to find a validation error in the response for key: '{$error}'".PHP_EOL.PHP_EOL.$errorMessage
             );
+        }
+
+        if ($checkMessages) {
+            PHPUnit::assertArraySubset($errors, $jsonErrors, false, 'Failed to find validation messages:');
         }
 
         return $this;
