@@ -8,8 +8,8 @@ use Mockery as m;
 use RuntimeException;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\MessageBag;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\MessageBag;
 use Illuminate\Container\Container;
 use Illuminate\Validation\Validator;
 use Illuminate\Http\RedirectResponse;
@@ -141,7 +141,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $argumentExpected = ['input' => 'My input value'];
         $argumentActual = null;
 
-        $this->container->singleton('redirect', function ()  use ($argumentExpected, &$argumentActual) {
+        $this->container->singleton('redirect', function () use ($argumentExpected, &$argumentActual) {
             $redirector = m::mock(Redirector::class);
 
             $redirector->shouldReceive('to')->once()
@@ -149,6 +149,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
             $responser->shouldReceive('withInput')->once()->with(m::on(function ($argument) use ($argumentExpected, &$argumentActual) {
                 $argumentActual = $argument;
+
                 return true;
             }))->andReturn($responser);
 
