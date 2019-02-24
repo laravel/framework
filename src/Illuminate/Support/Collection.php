@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Traits\WhenTrait;
 use stdClass;
 use Countable;
 use Exception;
@@ -41,7 +42,7 @@ use Illuminate\Contracts\Support\Arrayable;
  */
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
-    use Macroable;
+    use Macroable, WhenTrait;
 
     /**
      * The items contained in the collection.
@@ -494,25 +495,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return new static(array_filter($this->items));
-    }
-
-    /**
-     * Apply the callback if the value is truthy.
-     *
-     * @param  bool  $value
-     * @param  callable  $callback
-     * @param  callable  $default
-     * @return static|mixed
-     */
-    public function when($value, callable $callback, callable $default = null)
-    {
-        if ($value) {
-            return $callback($this, $value);
-        } elseif ($default) {
-            return $default($this, $value);
-        }
-
-        return $this;
     }
 
     /**

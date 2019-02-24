@@ -2,11 +2,14 @@
 
 namespace Illuminate\Notifications\Messages;
 
+use Illuminate\Support\Traits\WhenTrait;
 use Traversable;
 use Illuminate\Contracts\Support\Arrayable;
 
 class MailMessage extends SimpleMessage
 {
+    use WhenTrait;
+
     /**
      * The view to be rendered.
      *
@@ -285,24 +288,5 @@ class MailMessage extends SimpleMessage
         return is_array($address) ||
                $address instanceof Arrayable ||
                $address instanceof Traversable;
-    }
-
-    /**
-     * Apply the callback if the value is truthy.
-     *
-     * @param  bool $condition
-     * @param  callable $callback
-     * @param  callable|null $default
-     * @return $this
-     */
-    public function when($condition, callable $callback, callable $default = null)
-    {
-        if ($condition) {
-            return $callback($this, $condition);
-        } elseif ($default) {
-            return $default($this, $condition);
-        }
-
-        return $this;
     }
 }
