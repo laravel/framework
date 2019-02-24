@@ -22,5 +22,4 @@ trait WhenTrait
 
         return $this;
     }
-    
 }
