@@ -216,7 +216,9 @@ class MailMessage extends SimpleMessage
      */
     public function attachWhen($condition, $file, array $options = [])
     {
-        return $condition ? $this->attach($file, $options) : $this;
+        return $this->when($condition, function (self $mailMessage) use ($file, $options) {
+            return $mailMessage->attach($file, $options);
+        });
     }
 
     /**
@@ -283,5 +285,24 @@ class MailMessage extends SimpleMessage
         return is_array($address) ||
                $address instanceof Arrayable ||
                $address instanceof Traversable;
+    }
+
+    /**
+     * Apply the callback if the value is truthy.
+     *
+     * @param  bool $condition
+     * @param  callable $callback
+     * @param  callable|null $default
+     * @return $this
+     */
+    public function when($condition, callable $callback, callable $default = null)
+    {
+        if ($condition) {
+            return $callback($this, $condition);
+        } elseif ($default) {
+            return $default($this, $condition);
+        }
+
+        return $this;
     }
 }
