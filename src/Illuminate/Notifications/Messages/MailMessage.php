@@ -207,6 +207,19 @@ class MailMessage extends SimpleMessage
     }
 
     /**
+     * Attach a file to the message based on a given condition.
+     *
+     * @param bool $condition
+     * @param  string $file
+     * @param  array $options
+     * @return $this
+     */
+    public function attachWhen(bool $condition, $file, array $options = [])
+    {
+        return $condition ? $this->attach($file, $options) : $this;
+    }
+
+    /**
      * Attach in-memory data as an attachment.
      *
      * @param  string  $data
