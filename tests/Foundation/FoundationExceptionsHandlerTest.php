@@ -6,6 +6,7 @@ use stdClass;
 use Exception;
 use Mockery as m;
 use RuntimeException;
+use Illuminate\Http\Request;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\Redirector;
@@ -141,17 +142,18 @@ class FoundationExceptionsHandlerTest extends TestCase
         $argumentExpected = ['input' => 'My input value'];
         $argumentActual = null;
 
-        $this->container->singleton('redirect', function () use ($argumentExpected, &$argumentActual) {
+        $this->container->singleton('redirect', function () use (&$argumentActual) {
             $redirector = m::mock(Redirector::class);
 
             $redirector->shouldReceive('to')->once()
                 ->andReturn($responser = m::mock(RedirectResponse::class));
 
-            $responser->shouldReceive('withInput')->once()->with(m::on(function ($argument) use ($argumentExpected, &$argumentActual) {
-                $argumentActual = $argument;
+            $responser->shouldReceive('withInput')->once()->with(m::on(
+                function ($argument) use (&$argumentActual) {
+                    $argumentActual = $argument;
 
-                return true;
-            }))->andReturn($responser);
+                    return true;
+                }))->andReturn($responser);
 
             $responser->shouldReceive('withErrors')->once()
                 ->andReturn($responser);
@@ -159,13 +161,13 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $redirector;
         });
 
-        $this->request->shouldReceive('expectsJson')->once()->andReturn(false);
-        $this->request->shouldReceive('input')->once()->andReturn($argumentExpected);
-
         $file = m::mock(UploadedFile::class);
-        $file->shouldReceive('isValid')->zeroOrMoreTimes()->andReturn(false);
-        $file->shouldReceive('getPathname')->zeroOrMoreTimes()->andReturn('photo.jpg');
-        $file->shouldReceive('getClientOriginalName')->zeroOrMoreTimes()->andReturn('photo.jpg');
+        $file->shouldReceive('getPathname')->andReturn('photo.jpg');
+        $file->shouldReceive('getClientOriginalName')->andReturn('photo.jpg');
+        $file->shouldReceive('getClientMimeType')->andReturn(null);
+        $file->shouldReceive('getError')->andReturn(null);
+
+        $request = Request::create('/', 'POST', $argumentExpected, [], ['photo' => $file]);
 
         $validator = m::mock(Validator::class);
         $validator->shouldReceive('errors')->andReturn(new MessageBag(['error' => 'My custom validation exception']));
@@ -173,7 +175,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $validationException = new ValidationException($validator);
         $validationException->redirectTo = '/';
 
-        $this->handler->render($this->request, $validationException);
+        $this->handler->render($request, $validationException);
 
         $this->assertEquals($argumentExpected, $argumentActual);
     }
