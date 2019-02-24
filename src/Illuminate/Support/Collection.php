@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Traits\WhenTrait;
 use stdClass;
 use Countable;
 use Exception;
@@ -13,6 +12,7 @@ use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\WhenTrait;
 use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Arrayable;

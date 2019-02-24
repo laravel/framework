@@ -2,10 +2,8 @@
 
 namespace Illuminate\Support\Traits;
 
-
 trait WhenTrait
 {
-
     /**
      * Apply the callback if the value is truthy.
      *
@@ -24,4 +22,5 @@ trait WhenTrait
 
         return $this;
     }
+    
 }

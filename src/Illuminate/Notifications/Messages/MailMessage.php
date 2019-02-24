@@ -2,8 +2,8 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Illuminate\Support\Traits\WhenTrait;
 use Traversable;
+use Illuminate\Support\Traits\WhenTrait;
 use Illuminate\Contracts\Support\Arrayable;
 
 class MailMessage extends SimpleMessage
