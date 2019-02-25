@@ -297,7 +297,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Join all items from the collection using a string. The final items can use a seperate glue string.
+     * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue
      * @param  string  $finalGlue
