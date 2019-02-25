@@ -369,6 +369,50 @@ class FoundationTestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors(['foo', 'bar']);
     }
 
+    public function testAssertJsonValidationErrorMessages()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['key' => 'foo'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['key' => 'foo']);
+    }
+
+    public function testAssertJsonValidationErrorMessagesCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = [
+            'status' => 'ok',
+            'errors' => ['key' => 'foo'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['key' => 'bar']);
+    }
+
+    public function testAssertJsonValidationErrorMessagesMultipleMessages()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['one' => 'foo', 'two' => 'bar'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => 'foo', 'two' => 'bar']);
+    }
+
     public function testAssertJsonMissingValidationErrors()
     {
         $baseResponse = tap(new Response, function ($response) {
