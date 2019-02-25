@@ -398,6 +398,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return $adapter->getUrl($path);
         } elseif (method_exists($this->driver, 'getUrl')) {
             return $this->driver->getUrl($path);
+        } elseif (! empty($this->driver->getConfig()->get('url'))) {
+            return $this->driver->getConfig()->get('url');
         } elseif ($adapter instanceof AwsS3Adapter) {
             return $this->getAwsUrl($adapter, $path);
         } elseif ($adapter instanceof RackspaceAdapter) {
