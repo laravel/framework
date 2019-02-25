@@ -4281,7 +4281,7 @@ class ValidationValidatorTest extends TestCase
             ['name' => 'adam', 'value' => 'adam'],
             ['name' => $ruleObject, 'value' => $ruleObject],
             [
-                'name.' . get_class($ruleObject) => '[custom] :attribute must be taylor',
+                'name.'.get_class($ruleObject) => '[custom] :attribute must be taylor',
             ]
         );
 
