@@ -1,6 +1,16 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.26...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.27...5.7)
+
+### Added
+- Add support for `Pheanstalk 4.x` ([#27622](https://github.com/laravel/framework/pull/27622))
+
+### Fixed
+- Fixed Postgres grammar when using union queries ([#27589](https://github.com/laravel/framework/pull/27589))
+
+### TODO:
+- https://github.com/laravel/framework/pull/27585
+- https://github.com/laravel/framework/pull/27618
 
 
 ## [v5.7.26 (2019-02-12)](https://github.com/laravel/framework/compare/v5.7.25...v5.7.26)
