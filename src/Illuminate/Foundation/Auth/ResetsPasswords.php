@@ -103,13 +103,9 @@ trait ResetsPasswords
     protected function resetPassword($user, $password)
     {
         $user->password = Hash::make($password);
-
         $user->setRememberToken(Str::random(60));
-
         $user->save();
-
         event(new PasswordReset($user));
-
         $this->guard()->login($user);
     }
 
