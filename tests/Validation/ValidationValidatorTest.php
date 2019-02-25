@@ -4247,6 +4247,49 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($rule->called);
     }
 
+    public function testCustomMessageForCustomRuleObject()
+    {
+        $ruleObject = new class implements Rule {
+            public function passes($attribute, $value)
+            {
+                return $value === 'taylor';
+            }
+
+            public function message()
+            {
+                return ':attribute must be taylor';
+            }
+        };
+
+        // Test custom message for rule class
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam', 'value' => 'adam'],
+            ['name' => $ruleObject, 'value' => $ruleObject],
+            [
+                get_class($ruleObject) => '[custom] :attribute must be taylor',
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('[custom] name must be taylor', $v->errors()->all()[0]);
+        $this->assertEquals('[custom] value must be taylor', $v->errors()->all()[1]);
+
+        // Test custom message for rule class for specific attribute
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam', 'value' => 'adam'],
+            ['name' => $ruleObject, 'value' => $ruleObject],
+            [
+                'name.' . get_class($ruleObject) => '[custom] :attribute must be taylor',
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('[custom] name must be taylor', $v->errors()->all()[0]);
+        $this->assertEquals('value must be taylor', $v->errors()->all()[1]);
+    }
+
     public function testValidateReturnsValidatedData()
     {
         $post = ['first' => 'john',  'preferred'=>'john', 'last' => 'doe', 'type' => 'admin'];
