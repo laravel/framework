@@ -119,6 +119,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select distinct "foo", "bar" from "users"', $builder->toSql());
     }
 
+    public function testBasicSelectDistinctWithColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->distinct('foo')->select('foo', 'bar')->from('users');
+        $this->assertEquals('select distinct ("foo"), "foo", "bar" from "users"', $builder->toSql());
+    }
+
     public function testBasicAlias()
     {
         $builder = $this->getBuilder();
