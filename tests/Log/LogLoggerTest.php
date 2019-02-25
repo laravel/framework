@@ -4,11 +4,11 @@ namespace Illuminate\Tests\Log;
 
 use Mockery as m;
 use Illuminate\Log\Logger;
+use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-use Psr\Log\LoggerInterface;
 
 class LogLoggerTest extends TestCase
 {
