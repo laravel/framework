@@ -307,7 +307,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($finalGlue === '') {
             return $this->implode($glue);
-        };
+        }
 
         if ($this->count() === 0) {
             return '';
@@ -321,7 +321,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $finalItem = $collection->pop();
 
-        return $collection->implode($glue) . $finalGlue . $finalItem;
+        return $collection->implode($glue).$finalGlue.$finalItem;
     }
 
     /**
