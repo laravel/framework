@@ -77,19 +77,19 @@ class ConcurrencyLimiter
             usleep(250 * 1000);
         }
 
-        if (is_callable($callback)) {
-            try {
-                return tap($callback(), function () use ($slot, $id) {
-                    $this->release($slot, $id);
-                });
-            } catch (Exception $exception) {
-                $this->release($slot, $id);
-
-                throw $exception;
-            }
+        if (! is_callable($callback)) {
+            return true;
         }
 
-        return true;
+        try {
+            return tap($callback(), function () use ($slot, $id) {
+                $this->release($slot, $id);
+            });
+        } catch (Exception $exception) {
+            $this->release($slot, $id);
+
+            throw $exception;
+        }
     }
 
     /**
