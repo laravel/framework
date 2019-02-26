@@ -484,6 +484,22 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->fromDateTime(null));
     }
 
+    public function testFromDateTimeMilliseconds()
+    {
+        if (version_compare(PHP_VERSION, '7.3.0-dev', '<')) {
+            $this->markTestSkipped('Due to https://bugs.php.net/bug.php?id=75577, proper "v" format support can only works since PHP 7.3.');
+        }
+
+        $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->setMethods(['getDateFormat'])->getMock();
+        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:s.vi'));
+        $model->setRawAttributes([
+            'created_at' => '2012-12-04 22:59.32130',
+        ]);
+
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
+        $this->assertEquals('22:30:59.321000', $model->created_at->format('H:i:s.u'));
+    }
+
     public function testInsertProcess()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
