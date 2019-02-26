@@ -270,11 +270,13 @@ class FileViewFinder implements ViewFinderInterface
      * Set the active view paths.
      *
      * @param  array  $paths
-     * @return array
+     * @return $this
      */
     public function setPaths($paths)
     {
         $this->paths = $paths;
+
+        return $this;
     }
 
     /**
