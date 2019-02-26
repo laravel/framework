@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.7.28...5.7)
 
 
-## [v5.7.28 (2019-02-28)](https://github.com/laravel/framework/compare/v5.7.27...v5.7.28)
+## [v5.7.28 (2019-02-26)](https://github.com/laravel/framework/compare/v5.7.27...v5.7.28)
 
 ### Added
 - Add support for `Pheanstalk 4.x` ([#27622](https://github.com/laravel/framework/pull/27622))
