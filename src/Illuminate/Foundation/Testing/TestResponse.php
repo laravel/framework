@@ -651,16 +651,16 @@ class TestResponse
                         PHP_EOL.PHP_EOL.json_encode($jsonErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
                 : 'Response does not have JSON validation errors.';
 
-        foreach ($errors as $key => $error) {
-            PHPUnit::assertArrayHasKey(
-                $checkMessages ? $key : $error,
-                $jsonErrors,
-                "Failed to find a validation error in the response for key: '{$error}'".PHP_EOL.PHP_EOL.$errorMessage
-            );
-        }
-
         if ($checkMessages) {
             PHPUnit::assertArraySubset($errors, $jsonErrors, false, 'Failed to find validation messages:');
+        } else {
+            foreach ($errors as $key) {
+                PHPUnit::assertArrayHasKey(
+                    $key,
+                    $jsonErrors,
+                    "Failed to find a validation error in the response for key: '{$key}'".PHP_EOL.PHP_EOL.$errorMessage
+                );
+            }
         }
 
         return $this;
