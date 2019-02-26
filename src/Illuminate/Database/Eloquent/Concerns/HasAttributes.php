@@ -794,7 +794,7 @@ trait HasAttributes
 
         $format = $this->getDateFormat();
 
-        // Work-around for https://bugs.php.net/bug.php?id=75577
+        // https://bugs.php.net/bug.php?id=75577
         if (version_compare(PHP_VERSION, '7.3.0-dev', '<')) {
             $format = str_replace('.v', '.u', $format);
         }
