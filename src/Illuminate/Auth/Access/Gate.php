@@ -560,12 +560,15 @@ class Gate implements GateContract
     protected function guessPolicyName($class)
     {
         if ($this->guessPolicyNamesUsingCallback) {
-            return Arr::wrap(call_user_func($this->guessPolicyNamesUsingCallback, $class));
+            $guesses = Arr::wrap(call_user_func($this->guessPolicyNamesUsingCallback, $class));
         }
 
         $classDirname = str_replace('/', '\\', dirname(str_replace('\\', '/', $class)));
 
-        return [$classDirname.'\\Policies\\'.class_basename($class).'Policy'];
+        return array_merge(
+            $guesses,
+            [$classDirname.'\\Policies\\'.class_basename($class).'Policy']
+        );
     }
 
     /**
