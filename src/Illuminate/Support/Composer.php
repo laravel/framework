@@ -91,7 +91,7 @@ class Composer
      */
     protected function getProcess(array $command)
     {
-        eturn (new Process($command, $this->workingPath))->setTimeout(null);
+        return (new Process($command, $this->workingPath))->setTimeout(null);
     }
 
     /**
