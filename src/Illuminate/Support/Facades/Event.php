@@ -24,7 +24,7 @@ class Event extends Facade
      * Replace the bound instance with a fake.
      *
      * @param  array|string  $eventsToFake
-     * @return EventFake
+     * @return \Illuminate\Support\Testing\Fakes\EventFake
      */
     public static function fake($eventsToFake = [])
     {

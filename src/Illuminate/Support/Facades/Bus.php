@@ -20,7 +20,7 @@ class Bus extends Facade
     /**
      * Replace the bound instance with a fake.
      *
-     * @return BusFake
+     * @return \Illuminate\Support\Testing\Fakes\BusFake
      */
     public static function fake()
     {

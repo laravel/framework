@@ -16,7 +16,7 @@ class Storage extends Facade
      *
      * @param  string|null  $disk
      *
-     * @return Filesystem
+     * @return \Illuminate\Filesystem\Filesystem
      */
     public static function fake($disk = null)
     {
@@ -35,7 +35,7 @@ class Storage extends Facade
      * Replace the given disk with a persistent local testing disk.
      *
      * @param  string|null  $disk
-     * @return Filesystem
+     * @return \Illuminate\Filesystem\Filesystem
      */
     public static function persistentFake($disk = null)
     {

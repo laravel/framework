@@ -24,7 +24,7 @@ class Queue extends Facade
     /**
      * Replace the bound instance with a fake.
      *
-     * @return QueueFake
+     * @return \Illuminate\Support\Testing\Fakes\QueueFake
      */
     public static function fake()
     {
