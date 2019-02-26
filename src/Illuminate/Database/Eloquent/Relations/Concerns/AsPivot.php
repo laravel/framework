@@ -42,6 +42,10 @@ trait AsPivot
     {
         $instance = new static;
 
+        // if this factory was presented valid timestamp columns, set the $timestamps
+        // property accordingly
+        $instance->timestamps = $instance->hasTimestampAttributes($attributes);
+
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
@@ -56,8 +60,6 @@ trait AsPivot
         $instance->pivotParent = $parent;
 
         $instance->exists = $exists;
-
-        $instance->timestamps = $instance->hasTimestampAttributes();
 
         return $instance;
     }
@@ -75,9 +77,11 @@ trait AsPivot
     {
         $instance = static::fromAttributes($parent, [], $table, $exists);
 
-        $instance->setRawAttributes($attributes, true);
+        // if this factory was presented valid timestamp columns, set the $timestamps
+        // property accordingly
+        $instance->timestamps = $instance->hasTimestampAttributes($attributes);
 
-        $instance->timestamps = $instance->hasTimestampAttributes();
+        $instance->setRawAttributes($attributes, true);
 
         return $instance;
     }
@@ -110,11 +114,22 @@ trait AsPivot
      */
     public function delete()
     {
+        // support for pivot classes that container a non-composite primary key
         if (isset($this->attributes[$this->getKeyName()])) {
-            return parent::delete();
+            return (int) parent::delete();
         }
 
-        return $this->getDeleteQuery()->delete();
+        if ($this->fireModelEvent('deleting') === false) {
+            return 0;
+        }
+
+        $this->touchOwners();
+
+        $affectedRows = $this->getDeleteQuery()->delete();
+
+        $this->fireModelEvent('deleted', false);
+
+        return $affectedRows;
     }
 
     /**
@@ -193,13 +208,15 @@ trait AsPivot
     }
 
     /**
-     * Determine if the pivot model has timestamp attributes.
+     * Determine if the pivot model has timestamp attributes in either a provided
+     * array of attributes or the currently tracked attributes inside the model.
      *
+     * @param $attributes array|null Options attributes to check instead of properties
      * @return bool
      */
-    public function hasTimestampAttributes()
+    public function hasTimestampAttributes($attributes = null)
     {
-        return array_key_exists($this->getCreatedAtColumn(), $this->attributes);
+        return array_key_exists($this->getCreatedAtColumn(), $attributes ?? $this->attributes);
     }
 
     /**
