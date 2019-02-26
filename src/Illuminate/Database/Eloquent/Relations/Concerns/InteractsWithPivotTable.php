@@ -185,16 +185,7 @@ trait InteractsWithPivotTable
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {
         if ($this->using) {
-            $updated = $this->newPivot([
-                $this->foreignPivotKey => $this->parent->getKey(),
-                $this->relatedPivotKey => $this->parseId($id),
-            ], true)->fill($attributes)->save();
-
-            if ($touch) {
-                $this->touchIfTouching();
-            }
-
-            return (int) $updated;
+            return $this->updateExistingPivotUsingCustomClass($id, $attributes, $touch);
         }
 
         if (in_array($this->updatedAt(), $this->pivotColumns)) {
@@ -213,6 +204,28 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Update an existing pivot record on the table via a custom class.
+     *
+     * @param  mixed  $id
+     * @param  array  $attributes
+     * @param  bool   $touch
+     * @return int
+     */
+    protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch)
+    {
+        $updated = $this->newPivot([
+            $this->foreignPivotKey => $this->parent->getKey(),
+            $this->relatedPivotKey => $this->parseId($id),
+        ], true)->fill($attributes)->save();
+
+        if ($touch) {
+            $this->touchIfTouching();
+        }
+
+        return (int) $updated;
+    }
+
+    /**
      * Attach a model to the parent.
      *
      * @param  mixed  $id
@@ -223,12 +236,7 @@ trait InteractsWithPivotTable
     public function attach($id, array $attributes = [], $touch = true)
     {
         if ($this->using) {
-            $records = $this->formatAttachRecords(
-                $this->parseIds($id), $attributes
-            );
-            foreach ($records as $record) {
-                $this->newPivot($record, false)->save();
-            }
+            $this->attachUsingCustomClass($id, $attributes);
         } else {
             // Here we will insert the attachment records into the pivot table. Once we have
             // inserted the records, we will touch the relationships if necessary and the
@@ -240,6 +248,24 @@ trait InteractsWithPivotTable
 
         if ($touch) {
             $this->touchIfTouching();
+        }
+    }
+
+    /**
+     * Attach a model to the parent using a custom class.
+     *
+     * @param  mixed  $id
+     * @param  array  $attributes
+     * @return void
+     */
+    protected function attachUsingCustomClass($id, array $attributes)
+    {
+        $records = $this->formatAttachRecords(
+            $this->parseIds($id), $attributes
+        );
+
+        foreach ($records as $record) {
+            $this->newPivot($record, false)->save();
         }
     }
 
@@ -378,13 +404,7 @@ trait InteractsWithPivotTable
     public function detach($ids = null, $touch = true)
     {
         if ($this->using) {
-            $results = 0;
-            foreach ($this->parseIds($ids) as $id) {
-                $results += $this->newPivot([
-                    $this->foreignPivotKey => $this->parent->getKey(),
-                    $this->relatedPivotKey => $id,
-                ], true)->delete();
-            }
+            $results = $this->detachUsingCustomClass($ids);
         } else {
             $query = $this->newPivotQuery();
 
@@ -409,6 +429,26 @@ trait InteractsWithPivotTable
 
         if ($touch) {
             $this->touchIfTouching();
+        }
+
+        return $results;
+    }
+
+    /**
+     * Detach models from the relationship using a custom class.
+     *
+     * @param  mixed  $ids
+     * @return int
+     */
+    protected function detachUsingCustomClass($ids)
+    {
+        $results = 0;
+
+        foreach ($this->parseIds($ids) as $id) {
+            $results += $this->newPivot([
+                $this->foreignPivotKey => $this->parent->getKey(),
+                $this->relatedPivotKey => $id,
+            ], true)->delete();
         }
 
         return $results;
