@@ -58,14 +58,5 @@ class GatePolicyResolutionTest extends TestCase
             AuthenticationTestUserPolicy::class,
             Gate::getPolicyFor(AuthenticationTestUser::class)
         );
-
-        Gate::guessPolicyNamesUsing(function () {
-            return AuthenticationCustomTestUserPolicy::class;
-        });
-
-        $this->assertInstanceOf(
-            AuthenticationCustomTestUserPolicy::class,
-            Gate::getPolicyFor(AuthenticationTestUser::class)
-        );
     }
 }
