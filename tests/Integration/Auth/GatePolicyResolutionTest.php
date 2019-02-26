@@ -37,7 +37,7 @@ class GatePolicyResolutionTest extends TestCase
         Gate::guessPolicyNamesUsing(function () {
             return [
                 'App\\Policies\\TestUserPolicy',
-                AuthenticationTestUserPolicy::class
+                AuthenticationTestUserPolicy::class,
             ];
         });
 
