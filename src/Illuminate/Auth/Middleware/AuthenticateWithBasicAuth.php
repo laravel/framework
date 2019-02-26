@@ -33,9 +33,13 @@ class AuthenticateWithBasicAuth
      * @param  string|null  $guard
      * @param  string|null  $field
      * @return mixed
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
     public function handle($request, Closure $next, $guard = null, $field = null)
     {
-        return $this->auth->guard($guard)->basic($field ?: 'email') ?: $next($request);
+        $this->auth->guard($guard)->basic($field ?: 'email');
+
+        return $next($request);
     }
 }
