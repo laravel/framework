@@ -652,7 +652,7 @@ class TestResponse
                 : 'Response does not have JSON validation errors.';
 
         if ($checkMessages) {
-            PHPUnit::assertArraySubset($errors, $jsonErrors, false, 'Failed to find validation messages:');
+            PHPUnit::assertArraySubset($errors, $jsonErrors, false, 'Failed to find validation errors:');
         } else {
             foreach ($errors as $key) {
                 PHPUnit::assertArrayHasKey(
