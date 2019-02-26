@@ -538,8 +538,10 @@ class Gate implements GateContract
             return $this->resolvePolicy($this->policies[$class]);
         }
 
-        if (class_exists($guessedPolicy = $this->guessPolicyName($class))) {
-            return $this->resolvePolicy($guessedPolicy);
+        foreach ($this->guessPolicyName($class) as $guessedPolicy) {
+            if (class_exists($guessedPolicy)) {
+                return $this->resolvePolicy($guessedPolicy);
+            }
         }
 
         foreach ($this->policies as $expected => $policy) {
@@ -553,17 +555,17 @@ class Gate implements GateContract
      * Guess the policy name for the given class.
      *
      * @param  string  $class
-     * @return string
+     * @return array
      */
     protected function guessPolicyName($class)
     {
         if ($this->guessPolicyNamesUsingCallback) {
-            return call_user_func($this->guessPolicyNamesUsingCallback, $class);
+            return Arr::wrap(call_user_func($this->guessPolicyNamesUsingCallback, $class));
         }
 
         $classDirname = str_replace('/', '\\', dirname(str_replace('\\', '/', $class)));
 
-        return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
+        return [$classDirname.'\\Policies\\'.class_basename($class).'Policy'];
     }
 
     /**

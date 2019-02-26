@@ -19,4 +19,31 @@ class GatePolicyResolutionTest extends TestCase
             Gate::getPolicyFor(AuthenticationTestUser::class)
         );
     }
+
+    public function testPolicyCanBeGuessedUsingCallback()
+    {
+        Gate::guessPolicyNamesUsing(function () {
+            return AuthenticationTestUserPolicy::class;
+        });
+
+        $this->assertInstanceOf(
+            AuthenticationTestUserPolicy::class,
+            Gate::getPolicyFor(AuthenticationTestUser::class)
+        );
+    }
+
+    public function testPolicyCanBeGuessedMultipleTimes()
+    {
+        Gate::guessPolicyNamesUsing(function () {
+            return [
+                'App\\Policies\\TestUserPolicy',
+                AuthenticationTestUserPolicy::class
+            ];
+        });
+
+        $this->assertInstanceOf(
+            AuthenticationTestUserPolicy::class,
+            Gate::getPolicyFor(AuthenticationTestUser::class)
+        );
+    }
 }
