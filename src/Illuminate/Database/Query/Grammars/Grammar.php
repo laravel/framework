@@ -109,7 +109,9 @@ class Grammar extends BaseGrammar
         // If the query has a "distinct" constraint and we're not asking for all columns
         // we need to prepend "distinct" onto the column name so that the query takes
         // it into account when it performs the aggregating operations on the data.
-        if ($query->distinct && $column !== '*') {
+        if (is_array($query->distinct)) {
+            $column = 'distinct ('.$this->columnize($query->distinct).')';
+        } elseif ($query->distinct && $column !== '*') {
             $column = 'distinct '.$column;
         }
 
@@ -132,7 +134,13 @@ class Grammar extends BaseGrammar
             return;
         }
 
-        $select = $query->distinct ? 'select distinct ' : 'select ';
+        if (is_array($query->distinct)) {
+            $select = 'select distinct ('.$this->columnize($query->distinct).'), ';
+        } elseif ($query->distinct) {
+            $select = 'select distinct ';
+        } else {
+            $select = 'select ';
+        }
 
         return $select.$this->columnize($columns);
     }

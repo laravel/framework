@@ -78,7 +78,7 @@ class Builder
     /**
      * Indicates if the query returns distinct results.
      *
-     * @var bool
+     * @var array|bool
      */
     public $distinct = false;
 
@@ -347,11 +347,14 @@ class Builder
     /**
      * Force the query to only return distinct results.
      *
+     * @param array|mixed $column
      * @return $this
      */
-    public function distinct()
+    public function distinct($column = true)
     {
-        $this->distinct = true;
+        $column = is_array($column) || is_bool($column) ? $column : func_get_args();
+
+        $this->distinct = $column;
 
         return $this;
     }
