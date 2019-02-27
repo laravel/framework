@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 
 /**
  * @group integration
@@ -16,12 +17,12 @@ class EloquentModelTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('test_model1', function ($table) {
+        Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamp('nullable_date')->nullable();
         });
 
-        Schema::create('test_model2', function ($table) {
+        Schema::create('test_model2', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('title');

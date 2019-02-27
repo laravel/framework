@@ -12,6 +12,7 @@ use Illuminate\Auth\Events\Attempting;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Authenticated;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 
 /**
@@ -38,7 +39,7 @@ class AuthenticationTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('username');

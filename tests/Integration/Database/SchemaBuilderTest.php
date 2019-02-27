@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\SchemaTest;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -13,13 +14,13 @@ class SchemaBuilderTest extends DatabaseTestCase
 {
     public function test_drop_all_tables()
     {
-        Schema::create('table', function ($table) {
+        Schema::create('table', function (Blueprint $table) {
             $table->increments('id');
         });
 
         Schema::dropAllTables();
 
-        Schema::create('table', function ($table) {
+        Schema::create('table', function (Blueprint $table) {
             $table->increments('id');
         });
 
