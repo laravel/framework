@@ -607,7 +607,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         if (property_exists($provider, 'singletons')) {
             foreach ($provider->singletons as $key => $value) {
-                $this->singleton($key, $value);
+                $this->singleton(is_numeric($key) ? $value : $key, $value);
             }
         }
 
