@@ -25,6 +25,8 @@ class Mix
             $path = "/{$path}";
         }
 
+        $manifestDirectory = $manifestDirectory ?: app('config')->get('app.manifest_directory');
+
         if ($manifestDirectory && ! Str::startsWith($manifestDirectory, '/')) {
             $manifestDirectory = "/{$manifestDirectory}";
         }
