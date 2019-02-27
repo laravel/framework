@@ -8,10 +8,19 @@ use Mockery as m;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Mix;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
 use Illuminate\Foundation\Application;
+use Illuminate\Config\Repository as Config;
 
 class FoundationHelpersTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        app()->singleton('config', function () {
+            return new Config([]);
+        });
+    }
+
     protected function tearDown(): void
     {
         m::close();
@@ -117,6 +126,23 @@ class FoundationHelpersTest extends TestCase
 
         unlink($manifest);
         rmdir($directory);
+    }
+
+    public function testMixWithConfiguredManifestDirectory()
+    {
+        app('config')->set(['app.manifest_directory' => 'mix']);
+
+        mkdir($directory = __DIR__.'/mix');
+        $manifest = $this->makeManifest('mix');
+
+        $result = mix('unversioned.css');
+
+        $this->assertSame('/mix/versioned.css', $result->toHtml());
+
+        unlink($manifest);
+        rmdir($directory);
+
+        app('config')->set(['app.manifest_directory' => '']);
     }
 
     public function testMixManifestDirectoryMissingStartingSlashHasItAdded()
