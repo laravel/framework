@@ -163,11 +163,33 @@ class BoundMethod
             $dependencies[] = $parameters[$parameter->getClass()->name];
 
             unset($parameters[$parameter->getClass()->name]);
+        } elseif ($parameter->getClass() && $parameterKey = static::findParameterKeyByClass($parameter->getClass()->name, $parameters)) {
+            $dependencies[] = $parameters[$parameterKey];
+
+            unset($parameters[$parameterKey]);
         } elseif ($parameter->getClass()) {
             $dependencies[] = $container->make($parameter->getClass()->name);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }
+    }
+    
+    /**
+     * Get the dependecy for the call parameter by type hinted class
+     * 
+     * @param  string $class
+     * @param  array $parameters
+     * @return int|string|null
+     */
+    protected static function findParameterKeyByClass(string $class, array $parameters)
+    {
+        foreach ($parameters as $key => $value) {
+            if ($value instanceof $class) {
+                return $key;
+            }
+        }
+
+        return null;
     }
 
     /**
