@@ -640,8 +640,6 @@ class TestResponse
     {
         $errors = Arr::wrap($errors);
 
-        $checkMessages = array_keys($errors) !== range(0, count($errors) - 1);
-
         PHPUnit::assertNotEmpty($errors, 'No validation errors were provided.');
 
         $jsonErrors = $this->json()['errors'] ?? [];
@@ -651,15 +649,15 @@ class TestResponse
                         PHP_EOL.PHP_EOL.json_encode($jsonErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
                 : 'Response does not have JSON validation errors.';
 
-        if ($checkMessages) {
-            PHPUnit::assertArraySubset($errors, $jsonErrors, false, 'Failed to find validation errors:');
-        } else {
-            foreach ($errors as $key) {
+        foreach ($errors as $key => $value) {
+            if (is_int($key)) {
                 PHPUnit::assertArrayHasKey(
-                    $key,
+                    $value,
                     $jsonErrors,
-                    "Failed to find a validation error in the response for key: '{$key}'".PHP_EOL.PHP_EOL.$errorMessage
+                    "Failed to find a validation error in the response for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
                 );
+            } else {
+                PHPUnit::assertArraySubset([$key => $value], $jsonErrors, false, 'Failed to find validation errors:');
             }
         }
 
