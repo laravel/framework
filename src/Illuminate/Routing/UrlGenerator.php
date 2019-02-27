@@ -355,7 +355,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function hasValidSignature(Request $request, $absolute = true)
     {
-        $url = $absolute ? $request->url() : '/'.$request->path();
+        $url = $absolute ? url()->current() : '/'.$request->path();
 
         $original = rtrim($url.'?'.Arr::query(
             Arr::except($request->query(), 'signature')
