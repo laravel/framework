@@ -382,11 +382,12 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Get the URL for the file at the given path.
      *
      * @param  string  $path
+     * @param  array  $options
      * @return string
      *
      * @throws \RuntimeException
      */
-    public function url($path)
+    public function url($path, array $options = [])
     {
         $adapter = $this->driver->getAdapter();
 
@@ -395,7 +396,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         }
 
         if (method_exists($adapter, 'getUrl')) {
-            return $adapter->getUrl($path);
+            return $adapter->getUrl($path, $options);
         } elseif (method_exists($this->driver, 'getUrl')) {
             return $this->driver->getUrl($path);
         } elseif ($adapter instanceof AwsS3Adapter) {
