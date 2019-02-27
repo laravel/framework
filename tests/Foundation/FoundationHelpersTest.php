@@ -8,7 +8,6 @@ use Mockery as m;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Mix;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
 use Illuminate\Foundation\Application;
 use Illuminate\Config\Repository as Config;
 
