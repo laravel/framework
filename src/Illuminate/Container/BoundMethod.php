@@ -173,10 +173,10 @@ class BoundMethod
             $dependencies[] = $parameter->getDefaultValue();
         }
     }
-    
+
     /**
      * Get the dependecy for the call parameter by type hinted class.
-     * 
+     *
      * @param  string $class
      * @param  array $parameters
      * @return int|string|null
