@@ -175,7 +175,7 @@ class BoundMethod
     }
     
     /**
-     * Get the dependecy for the call parameter by type hinted class
+     * Get the dependecy for the call parameter by type hinted class.
      * 
      * @param  string $class
      * @param  array $parameters
