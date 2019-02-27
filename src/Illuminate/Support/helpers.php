@@ -662,7 +662,7 @@ if (! function_exists('env')) {
                         return;
                 }
 
-                if (($valueLength = strlen($value)) > 1 && $value[0] === '"' && $value[$valueLength - 1] === '"') {
+                if (($valueLength = strlen($value)) > 1 && ($value[0] === '"' && $value[$valueLength - 1] === '"' || $value[0] === "'" && $value[$valueLength - 1] === "'")) {
                     return substr($value, 1, -1);
                 }
 

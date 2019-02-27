@@ -576,6 +576,9 @@ class SupportHelpersTest extends TestCase
     {
         $_SERVER['foo'] = '"null"';
         $this->assertSame('null', env('foo'));
+
+        $_SERVER['foo'] = "'null'";
+        $this->assertSame('null', env('foo'));
     }
 
     public function testGetFromENVFirst()
