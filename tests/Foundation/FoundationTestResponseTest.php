@@ -413,6 +413,36 @@ class FoundationTestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors(['one' => 'foo', 'two' => 'bar']);
     }
 
+    public function testAssertJsonValidationErrorMessagesMixed()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['one' => 'foo', 'two' => 'bar'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => 'foo', 'two']);
+    }
+
+    public function testAssertJsonValidationErrorMessagesMixedCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = [
+            'status' => 'ok',
+            'errors' => ['one' => 'foo', 'two' => 'bar'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => 'taylor', 'otwell']);
+    }
+
     public function testAssertJsonMissingValidationErrors()
     {
         $baseResponse = tap(new Response, function ($response) {

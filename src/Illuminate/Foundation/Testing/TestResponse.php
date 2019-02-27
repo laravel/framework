@@ -657,7 +657,12 @@ class TestResponse
                     "Failed to find a validation error in the response for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
                 );
             } else {
-                PHPUnit::assertArraySubset([$key => $value], $jsonErrors, false, 'Failed to find validation errors:');
+                PHPUnit::assertArraySubset(
+                    [$key => $value],
+                    $jsonErrors,
+                    false,
+                    'Failed to find validation errors:'
+                );
             }
         }
 
