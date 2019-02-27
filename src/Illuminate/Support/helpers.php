@@ -662,6 +662,10 @@ if (! function_exists('env')) {
                         return;
                 }
 
+                if (preg_match('/([\'"])(.*)\1/', $value, $matches)) {
+                    return $matches[2];
+                }
+
                 return $value;
             })
             ->getOrCall(function () use ($default) {
