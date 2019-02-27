@@ -661,7 +661,7 @@ class TestResponse
                     [$key => $value],
                     $jsonErrors,
                     false,
-                    "Failed to find a validation error in the response for key and message:"
+                    'Failed to find a validation error in the response for key and message:'
                 );
             }
         }
