@@ -45,7 +45,6 @@ class DummyQueuedNotificationWithStringVia extends Notification implements Shoul
      *
      * @param  mixed  $notifiable
      * @return array|string
-     * @return array|string
      */
     public function via($notifiable)
     {
