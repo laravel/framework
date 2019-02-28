@@ -34,6 +34,7 @@ class Pluralizer
         'jedi',
         'kin',
         'knowledge',
+        'leave',
         'love',
         'metadata',
         'money',
