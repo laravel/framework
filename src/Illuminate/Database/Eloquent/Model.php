@@ -608,7 +608,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function setKeysForSaveQuery(Builder $query)
     {
-        $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
+        $keys = $this->getKeyName();
+        $values = $this->getKeyForSaveQuery();
+
+        if(is_array($keys)) {
+            $query->where(array_map(function($key, $value) {
+                return [$key, '=', $value];
+            }, $keys, $values));
+        }
+        else {
+            $query->where($keys, '=', $values);
+        }
 
         return $query;
     }
