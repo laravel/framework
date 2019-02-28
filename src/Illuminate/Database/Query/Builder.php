@@ -347,14 +347,17 @@ class Builder
     /**
      * Force the query to only return distinct results.
      *
-     * @param array|mixed $column
      * @return $this
      */
-    public function distinct($column = true)
+    public function distinct()
     {
-        $column = is_array($column) || is_bool($column) ? $column : func_get_args();
+        $columns = func_get_args();
 
-        $this->distinct = $column;
+        if (count($columns) > 0) {
+            $this->distinct = is_array($columns[0]) || is_bool($columns[0]) ? $columns[0] : $columns;
+        } else {
+            $this->distinct = true;
+        }
 
         return $this;
     }
