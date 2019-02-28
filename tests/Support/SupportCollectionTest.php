@@ -738,6 +738,24 @@ class SupportCollectionTest extends TestCase
             }
         });
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
+        
+        $result = [];
+        $c->each(function ($item, $key) use (&$result) {
+            $result[$key] = $item;
+            if (is_string($key)) {
+                return 'break';
+            }
+        });
+        $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
+        
+        $result = [];
+        $c->each(function ($item, $key) use (&$result) {
+            if ($key === 'foo') {
+                return 'continue';
+            }
+            $result[$key] = $item;
+        });
+        $this->assertEquals([1, 2, 'bam' => 'baz'], $result);
     }
 
     public function testEachSpread()
