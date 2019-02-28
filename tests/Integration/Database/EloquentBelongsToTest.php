@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentBelongsToTest;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -16,7 +17,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('slug')->nullable();
             $table->unsignedInteger('parent_id')->nullable();

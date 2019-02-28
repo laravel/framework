@@ -7,6 +7,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class InteractsWithAuthenticationTest extends TestCase
@@ -27,7 +28,7 @@ class InteractsWithAuthenticationTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('username');
