@@ -703,7 +703,8 @@ class Gate implements GateContract
 
         return new static(
             $this->container, $callback, $this->abilities,
-            $this->policies, $this->beforeCallbacks, $this->afterCallbacks, $this->guessPolicyNamesUsingCallback
+            $this->policies, $this->beforeCallbacks, $this->afterCallbacks,
+            $this->guessPolicyNamesUsingCallback
         );
     }
 
