@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Illuminate\Bus\Queueable;
 use Mockery as m;
+use Illuminate\Bus\Queueable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
