@@ -179,7 +179,7 @@ class NotificationSender
         foreach ($notifiables as $notifiable) {
             $notificationId = Str::uuid()->toString();
 
-            foreach ($original->via($notifiable) as $channel) {
+            foreach ((array) $original->via($notifiable) as $channel) {
                 $notification = clone $original;
 
                 $notification->id = $notificationId;
