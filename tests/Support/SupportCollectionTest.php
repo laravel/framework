@@ -738,7 +738,7 @@ class SupportCollectionTest extends TestCase
             }
         });
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
-        
+
         $result = [];
         $c->each(function ($item, $key) use (&$result) {
             $result[$key] = $item;
@@ -747,7 +747,7 @@ class SupportCollectionTest extends TestCase
             }
         });
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
-        
+
         $result = [];
         $c->each(function ($item, $key) use (&$result) {
             if ($key === 'foo') {
