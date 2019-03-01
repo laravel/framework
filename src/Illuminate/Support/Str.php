@@ -149,7 +149,7 @@ class Str
      *
      * @param  string|array  $pattern
      * @param  string  $value
-     * @param  string $wildcard
+     * @param  string  $wildcard
      * @return bool
      */
     public static function is($pattern, $value, $wildcard = '.*')
