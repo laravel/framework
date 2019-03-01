@@ -335,6 +335,8 @@ class LogManager implements LoggerInterface
             $config['handler_with'] ?? []
         );
 
+        $with['level'] = $this->level($config);
+
         return new Monolog($this->parseChannel($config), [$this->prepareHandler(
             $this->app->make($config['handler'], $with), $config
         )]);
