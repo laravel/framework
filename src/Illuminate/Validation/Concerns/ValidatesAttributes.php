@@ -626,7 +626,7 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value)
     {
-        return (new EmailValidator)->isValid($value, new RFCValidation);
+        return is_string($value) && (new EmailValidator)->isValid($value, new RFCValidation);
     }
 
     /**
