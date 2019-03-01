@@ -26,7 +26,7 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
-    public function testLevelIsValidated()
+    public function testLogLevelIsValidated()
     {
         $level = 'fooLevel';
 
