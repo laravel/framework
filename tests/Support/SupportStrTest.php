@@ -193,7 +193,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is($patternObject, $valueObject));
 
         // Tests the wildcard parameter
-        $this->assertFalse(Str::is('foo.*.baz', 'test.bar.bar.baz', '[^.]*'));
+        $this->assertFalse(Str::is('foo.*.baz', 'foo.bar.bar.baz', '[^.]*'));
         $this->assertTrue(Str::is('foo.*.baz', 'foo.bar.baz', '[^.]*'));
     }
 
