@@ -1079,6 +1079,16 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Get the current route prefix.
+     *
+     * @return string|null
+     */
+    public function currentRouteGroup()
+    {
+        return $this->current() ? ltrim($this->current()->action['prefix'], '/') : null;
+    }
+
+    /**
      * Alias for the "currentRouteNamed" method.
      *
      * @param  mixed  ...$patterns
