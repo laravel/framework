@@ -9,6 +9,7 @@ use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
+use UnexpectedValueException;
 
 class Logger implements LoggerInterface
 {
@@ -172,6 +173,10 @@ class Logger implements LoggerInterface
     protected function writeLog($level, $message, $context)
     {
         $this->fireLogEvent($level, $message = $this->formatMessage($message), $context);
+
+        if (! method_exists($this->logger, $level)) {
+            throw new UnexpectedValueException("Invalid log level: [{$level}].");
+        }
 
         $this->logger->{$level}($message, $context);
     }
