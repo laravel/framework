@@ -27,6 +27,51 @@ class LogManagerTest extends TestCase
         $this->assertSame($logger1, $logger2);
     }
 
+    public function testStackChannel()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.stack', [
+            'driver' => 'stack',
+            'channels' => ['stderr', 'stdout'],
+        ]);
+
+        $config->set('logging.channels.stderr', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'notice',
+            'with' => [
+                'stream' => 'php://stderr',
+                'bubble' => false,
+            ],
+        ]);
+
+        $config->set('logging.channels.stdout', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'info',
+            'with' => [
+                'stream' => 'php://stdout',
+                'bubble' => true,
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('stack');
+        $handlers = $logger->getLogger()->getHandlers();
+
+        $this->assertInstanceOf(Logger::class, $logger);
+        $this->assertCount(2, $handlers);
+        $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
+        $this->assertInstanceOf(StreamHandler::class, $handlers[1]);
+        $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
+        $this->assertEquals(Monolog::INFO, $handlers[1]->getLevel());
+        $this->assertFalse($handlers[0]->getBubble());
+        $this->assertTrue($handlers[1]->getBubble());
+    }
+
     public function testLogManagerCreatesConfiguredMonologHandler()
     {
         $config = $this->app['config'];
@@ -34,9 +79,9 @@ class LogManagerTest extends TestCase
             'driver' => 'monolog',
             'name' => 'foobar',
             'handler' => StreamHandler::class,
+            'level' => 'notice',
             'with' => [
                 'stream' => 'php://stderr',
-                'level' => Monolog::NOTICE,
                 'bubble' => false,
             ],
         ]);
