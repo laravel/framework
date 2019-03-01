@@ -2019,6 +2019,22 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => ['not a string']], ['x' => 'Email']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['x' => new class {
+            public function __toString()
+            {
+                return 'aslsdlks';
+            }
+        }], ['x' => 'Email']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => new class {
+            public function __toString()
+            {
+                return 'foo@gmail.com';
+            }
+        }], ['x' => 'Email']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['x' => 'foo@gmail.com'], ['x' => 'Email']);
         $this->assertTrue($v->passes());
     }
