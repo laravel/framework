@@ -149,9 +149,10 @@ class Str
      *
      * @param  string|array  $pattern
      * @param  string  $value
+     * @param  string $wildcard
      * @return bool
      */
-    public static function is($pattern, $value)
+    public static function is($pattern, $value, $wildcard = '.*')
     {
         $patterns = Arr::wrap($pattern);
 
@@ -172,7 +173,7 @@ class Str
             // Asterisks are translated into zero-or-more regular expression wildcards
             // to make it convenient to check if the strings starts with the given
             // pattern such as "library/*", making any string check convenient.
-            $pattern = str_replace('\*', '.*', $pattern);
+            $pattern = str_replace('\*', $wildcard, $pattern);
 
             if (preg_match('#^'.$pattern.'\z#u', $value) === 1) {
                 return true;
