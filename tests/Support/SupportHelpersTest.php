@@ -579,6 +579,9 @@ class SupportHelpersTest extends TestCase
 
         $_SERVER['foo'] = "'null'";
         $this->assertSame('null', env('foo'));
+
+        $_SERVER['foo'] = 'x"null"x'; // this should not be unquoted
+        $this->assertSame('x"null"x', env('foo'));
     }
 
     public function testGetFromENVFirst()

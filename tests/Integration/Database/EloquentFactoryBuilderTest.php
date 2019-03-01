@@ -7,6 +7,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -107,36 +108,36 @@ class EloquentFactoryBuilderTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('email');
         });
 
-        Schema::create('profiles', function ($table) {
+        Schema::create('profiles', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
         });
 
-        Schema::create('teams', function ($table) {
+        Schema::create('teams', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('owner_id');
         });
 
-        Schema::create('team_users', function ($table) {
+        Schema::create('team_users', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('team_id');
             $table->unsignedInteger('user_id');
         });
 
-        Schema::connection('alternative-connection')->create('users', function ($table) {
+        Schema::connection('alternative-connection')->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('email');
         });
 
-        Schema::create('servers', function ($table) {
+        Schema::create('servers', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('tags');

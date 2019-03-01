@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 
 /**
  * @group integration
@@ -35,23 +36,23 @@ class EloquentModelConnectionsTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('parent', function ($table) {
+        Schema::create('parent', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        Schema::create('child', function ($table) {
+        Schema::create('child', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->integer('parent_id');
         });
 
-        Schema::connection('conn2')->create('parent', function ($table) {
+        Schema::connection('conn2')->create('parent', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        Schema::connection('conn2')->create('child', function ($table) {
+        Schema::connection('conn2')->create('child', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->integer('parent_id');
