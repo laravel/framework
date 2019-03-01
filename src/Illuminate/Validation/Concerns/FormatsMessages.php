@@ -98,7 +98,7 @@ trait FormatsMessages
         // that is not attribute specific. If we find either we'll return it.
         foreach ($keys as $key) {
             foreach (array_keys($source) as $sourceKey) {
-                if (Str::is($sourceKey, $key)) {
+                if (Str::is($sourceKey, $key, '[^.]*')) {
                     return $source[$sourceKey];
                 }
             }
