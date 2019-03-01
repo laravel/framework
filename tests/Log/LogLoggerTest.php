@@ -26,6 +26,18 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
+    public function testLevelIsValidated()
+    {
+        $level = 'fooLevel';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Invalid log level: [{$level}].");
+
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+
+        $writer->write($level, '', []);
+    }
+
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
