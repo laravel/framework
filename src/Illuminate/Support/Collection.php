@@ -309,11 +309,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $this->implode($glue);
         }
 
-        if ($this->count() === 0) {
+        $count = $this->count();
+
+        if ($count === 0) {
             return '';
         }
 
-        if ($this->count() === 1) {
+        if ($count === 1) {
             return $this->last();
         }
 
