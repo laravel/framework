@@ -51,6 +51,68 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testFirstAfterWithoutDefaultAndWithoutWrap()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->firstAfter(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertEquals('baz', $result);
+    }
+
+    public function testFirstAfterWithDefaultAndWithoutWrap()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->firstAfter(function ($value) {
+            return $value === 'not_present';
+        }, 'default');
+        $this->assertEquals('default', $result);
+        $result = $data->firstAfter(function ($value) {
+            return $value === 'baz';
+        }, 'default');
+        $this->assertEquals('default', $result);
+    }
+
+    public function testFirstAfterWithDefaultAndWithWrap()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->firstAfter(function ($value) {
+            return $value === 'baz';
+        }, 'default', true);
+        $this->assertEquals('foo', $result);
+    }
+
+    public function testFirstBeforeWithoutDefaultAndWithoutWrap()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->firstBefore(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertEquals('foo', $result);
+    }
+
+    public function testFirstBeforeWithDefaultAndWithoutWrap()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->firstBefore(function ($value) {
+            return $value === 'not_present';
+        }, 'default');
+        $this->assertEquals('default', $result);
+        $result = $data->firstBefore(function ($value) {
+            return $value === 'foo';
+        }, 'default');
+        $this->assertEquals('default', $result);
+    }
+
+    public function testFirstBeforeWithDefaultAndWithWrap()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->firstBefore(function ($value) {
+            return $value === 'foo';
+        }, 'default', true);
+        $this->assertEquals('baz', $result);
+    }
+
     public function testFirstWhere()
     {
         $data = new Collection([

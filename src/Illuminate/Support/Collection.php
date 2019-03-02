@@ -760,6 +760,55 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the next item from the collection after a truth test is passed.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @param  boolean $wrap
+     * @return mixed
+     */
+    public function firstAfter(callable $callback, $default = null, $wrap = false)
+    {
+        $grabNext = false;
+        foreach ($this->items as $key => $value) {
+            if($callback($value, $key)) {
+                $grabNext = true;
+                continue;
+            }
+            if($grabNext) {
+                return $value;
+            }
+        }
+        if($grabNext && $wrap) {
+            return Arr::first($this->items, null, $default);
+        }
+        return $default;
+    }
+
+    /**
+     * Get the previous item from the collection after a truth test is passed.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @param  boolean $wrap
+     * @return mixed
+     */
+    public function firstBefore(callable $callback, $default = null, $wrap = false)
+    {
+        $lastKey = null;
+        foreach ($this->items as $key => $value) {
+            if($callback($value, $key)) {
+                if($lastKey === null) {
+                    return $wrap ? Arr::last($this->items, null, $default) : $default;
+                }
+                return $this->items[$lastKey];
+            }
+            $lastKey = $key;
+        }
+        return $default;
+    }
+
+    /**
      * Get the first item by the given key value pair.
      *
      * @param  string  $key
