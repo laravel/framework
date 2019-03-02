@@ -595,6 +595,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
+    public function testWhereWithoutAValue()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id');
+        $builder->assertEquals('select * from [users] where id', $builder->toSql());
+    }
+
     public function testWhereBetweens()
     {
         $builder = $this->getBuilder();
