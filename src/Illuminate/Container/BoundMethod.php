@@ -178,31 +178,31 @@ class BoundMethod
     /**
      * Get the dependency for the given call parameter.
      *
-     * @param  \Illuminate\Container\Container $container
-     * @param $callback
-     * @param  array $inputData
+     * @param  \Illuminate\Container\Container  $container
+     * @param  callable|string  $callback
+     * @param  array  $inputData
      * @return mixed
      *
      * @throws \ReflectionException
      */
     protected static function addDependencyForCallParameterSeq($container, $callback, array $inputData)
     {
-        $signature = static::getCallReflector($callback)->getParameters();
+        $signatureParams = static::getCallReflector($callback)->getParameters();
         // In case the method has no explicit input parameters we will
         // call that with whatever input data available to us since
         // they may have used func_get_args() to catch the input.
-        if (count($signature) === 0) {
+        if (count($signatureParams) === 0) {
             return $inputData;
         }
 
         // When we receive the input as an indexed array and the count of passed arguments
         // is not less than the declared parameters, it means that we are provided with
         // everything needed, So the IOC container should not bother about injection.
-        if (count($signature) <= count($inputData)) {
+        if (count($signatureParams) <= count($inputData)) {
             return $inputData;
         }
 
-        return self::resolveDependencies($container, $inputData, $signature);
+        return self::resolveDependencies($container, $inputData, $signatureParams);
     }
 
     /**
@@ -217,19 +217,19 @@ class BoundMethod
     }
 
     /**
-     * @param $container
-     * @param array $inputData
-     * @param array $signature
+     * @param  \Illuminate\Container\Container  $container
+     * @param array  $inputData
+     * @param array  $signatureParams
      * @return array
      */
-    protected static function resolveDependencies($container, array $inputData, array $signature)
+    protected static function resolveDependencies($container, array $inputData, array $signatureParams)
     {
         $i = 0;
         $parameters = [];
         // Here we iterate through the list of declared parameters (in the method signature) and decide
         // whether it should be invoked with the provided input data, or we should resolve an object
         // for it (according to it's type-hint) or just call it with it's defined "default" value.
-        foreach ($signature as $parameter) {
+        foreach ($signatureParams as $parameter) {
             if ($class = $parameter->getClass()) {
                 if (array_key_exists($i, $inputData) && is_a($inputData[$i], $class->name)) {
                     // gets from indexed array input data
