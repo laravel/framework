@@ -5,6 +5,7 @@ namespace Illuminate\Container;
 use Closure;
 use ReflectionMethod;
 use ReflectionFunction;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 class BoundMethod
@@ -115,6 +116,10 @@ class BoundMethod
      */
     protected static function getMethodDependencies($container, $callback, array $parameters = [])
     {
+        if (! Arr::isAssoc($parameters)) {
+            return static::addDependencyForCallSeqParameters($container, $callback, $parameters);
+        }
+
         $dependencies = [];
 
         foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
@@ -168,6 +173,50 @@ class BoundMethod
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }
+    }
+
+    /**
+     * Get the dependency for the given call parameter.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @param  callable|string  $callback
+     * @param  array  $inputData
+     * @return mixed
+     *
+     * @throws \ReflectionException
+     */
+    protected static function addDependencyForCallSeqParameters($container, $callback, array $inputData)
+    {
+        $signatureParams = static::getCallReflector($callback)->getParameters();
+
+        // When we receive the input as an indexed array and the count of passed arguments
+        // is not less than the declared parameters, it means that we are provided with
+        // everything needed, So the IOC container should not bother about injection.
+        if (count($signatureParams) <= count($inputData)) {
+            return $inputData;
+        }
+
+        $i = 0;
+        $parameters = [];
+        // Here we iterate through the list of declared parameters (in the method signature) and decide
+        // whether it should be invoked with the provided input data, or we should resolve an object
+        // for it (according to it's type-hint) or just call it with it's defined "default" value.
+        foreach ($signatureParams as $parameter) {
+            if ($class = $parameter->getClass()) {
+                if (array_key_exists($i, $inputData) && is_a($inputData[$i], $class->name)) {
+                    // gets from indexed array input data
+                    $parameters[] = $inputData[$i++];
+                } else {
+                    $parameters[] = $container->make($class->name);
+                }
+            } elseif (array_key_exists($i, $inputData)) {
+                $parameters[] = $inputData[$i++];
+            } elseif ($parameter->isDefaultValueAvailable()) {
+                $parameters[] = $parameter->getDefaultValue();
+            }
+        }
+
+        return $parameters;
     }
 
     /**

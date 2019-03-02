@@ -14,12 +14,18 @@ class BoundMethodTest extends TestCase
         };
         $args = BoundMethodAccessor::getMethodDependencies(new Container(), $defaulty, ['a', 'b', 'c']);
         $this->assertSame(['a', 'b', 'c'], $args);
+
         $args = BoundMethodAccessor::getMethodDependencies(new Container(), $defaulty, ['a', 'b']);
         $this->assertSame(['a', 'b', 'default c'], $args);
+
         $args = BoundMethodAccessor::getMethodDependencies(new Container(), $defaulty, ['a', 'b', null]);
         $this->assertSame(['a', 'b', null], $args);
+
         $args = BoundMethodAccessor::getMethodDependencies(new Container(), $defaulty, ['a', null]);
         $this->assertSame(['a', null, 'default c'], $args);
+
+        $args = BoundMethodAccessor::getMethodDependencies(new Container(), $defaulty, ['a']);
+        $this->assertSame(['a', 'default b', 'default c'], $args);
     }
 
     public function testEndInjection()
@@ -99,6 +105,7 @@ class BoundMethodTest extends TestCase
         $this->assertInstanceOf(ContainerBoundMethodStub::class, $b);
         $this->assertEquals('value c', $c);
         $this->assertArrayNotHasKey(4, $args);
+
         $obj = new ContainerBoundMethodStub;
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies(new Container(), $callee, ['passed a', $obj]);
         $this->assertEquals('passed a', $a);
@@ -110,6 +117,7 @@ class BoundMethodTest extends TestCase
         $this->assertSame($obj, $b);
         $this->assertEquals('passed c', $c);
         $this->assertArrayNotHasKey(4, $args);
+
         $stub2 = new ContainerBoundMethodStub2;
         [$a, $b, $c] = $args = BoundMethodAccessor::getMethodDependencies(new Container(), $callee, ['passed a', $stub2]);
         $this->assertEquals('passed a', $a);

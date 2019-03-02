@@ -215,7 +215,6 @@ class ContainerCallTest extends TestCase
         (new Container)->call($callable, ['foo']);
     }
 
-
     public function testWithDefaultParametersIndexedArraySyntax()
     {
         $container = new Container;
@@ -246,6 +245,7 @@ class ContainerCallTest extends TestCase
         $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['foo', 'bar', 'baz', 'foo2', 'bar2', 'baz2']);
         $this->assertEquals(['foo', 'bar', 'baz', 'foo2', 'bar2', 'baz2'], $result);
     }
+
     public function testWithDefaultParametersAssociativeSyntax()
     {
         $container = new Container;
@@ -284,7 +284,6 @@ class ContainerCallTest extends TestCase
         $result = $container->call(ContainerTestDefaultyParams::class.'@noDefault', ['a' => 'foo', 'c' => 'baz', 'b' => 'bar']);
         $this->assertEquals(['foo', 'bar', 'baz'], $result);
     }
-
 }
 
 class ContainerTestCallStub
@@ -329,14 +328,17 @@ class ContainerTestDefaultyParams
     {
         return func_get_args();
     }
+
     public function defaultyBandC($a, $b = 'default b', $c = 'default c')
     {
         return func_get_args();
     }
+
     public function defaultyOnlyC($a, $b, $c = 'default c')
     {
         return func_get_args();
     }
+
     public function noDefault($a, $b, $c)
     {
         return func_get_args();
