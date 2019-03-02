@@ -779,7 +779,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 return $value;
             }
         }
-        if($grabNext && $wrap) {
+        if ($grabNext && $wrap) {
             return Arr::first($this->items, null, $default);
         }
         return $default;
@@ -798,7 +798,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $lastKey = null;
         foreach ($this->items as $key => $value) {
             if ($callback($value, $key)) {
-                if($lastKey === null) {
+                if ($lastKey === null) {
                     return $wrap ? Arr::last($this->items, null, $default) : $default;
                 }
                 return $this->items[$lastKey];
