@@ -764,18 +764,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  callable|null  $callback
      * @param  mixed  $default
-     * @param  boolean $wrap
+     * @param  bool $wrap
      * @return mixed
      */
     public function firstAfter(callable $callback, $default = null, $wrap = false)
     {
         $grabNext = false;
         foreach ($this->items as $key => $value) {
-            if($callback($value, $key)) {
+            if ($callback($value, $key)) {
                 $grabNext = true;
                 continue;
             }
-            if($grabNext) {
+            if ($grabNext) {
                 return $value;
             }
         }
@@ -790,14 +790,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  callable|null  $callback
      * @param  mixed  $default
-     * @param  boolean $wrap
+     * @param  bool $wrap
      * @return mixed
      */
     public function firstBefore(callable $callback, $default = null, $wrap = false)
     {
         $lastKey = null;
         foreach ($this->items as $key => $value) {
-            if($callback($value, $key)) {
+            if ($callback($value, $key)) {
                 if($lastKey === null) {
                     return $wrap ? Arr::last($this->items, null, $default) : $default;
                 }
