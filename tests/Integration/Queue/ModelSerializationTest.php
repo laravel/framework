@@ -7,6 +7,7 @@ use LogicException;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
@@ -38,35 +39,35 @@ class ModelSerializationTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
 
-        Schema::connection('custom')->create('users', function ($table) {
+        Schema::connection('custom')->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
 
-        Schema::create('orders', function ($table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('lines', function ($table) {
+        Schema::create('lines', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('order_id');
             $table->unsignedInteger('product_id');
         });
 
-        Schema::create('products', function ($table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('roles', function ($table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('role_user', function ($table) {
+        Schema::create('role_user', function (Blueprint $table) {
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('role_id');
         });

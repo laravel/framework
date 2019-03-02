@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -30,13 +31,13 @@ class EloquentUpdateTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('test_model1', function ($table) {
+        Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
             $table->string('title')->nullable();
         });
 
-        Schema::create('test_model2', function ($table) {
+        Schema::create('test_model2', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('job')->nullable();
@@ -44,7 +45,7 @@ class EloquentUpdateTest extends TestCase
             $table->timestamps();
         });
 
-        Schema::create('test_model3', function ($table) {
+        Schema::create('test_model3', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('counter');
             $table->softDeletes();

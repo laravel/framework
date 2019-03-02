@@ -29,7 +29,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.8-dev';
+    const VERSION = '5.8.2';
 
     /**
      * The base path for the Laravel installation.
@@ -594,9 +594,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $provider = $this->resolveProvider($provider);
         }
 
-        if (method_exists($provider, 'register')) {
-            $provider->register();
-        }
+        $provider->register();
 
         // If there are bindings / singletons set as properties on the provider we
         // will spin through them and register them with the application, which

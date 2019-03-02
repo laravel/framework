@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentHasManyThroughTest;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
@@ -17,26 +18,26 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('slug')->nullable();
             $table->integer('team_id')->nullable();
             $table->string('name');
         });
 
-        Schema::create('teams', function ($table) {
+        Schema::create('teams', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('owner_id')->nullable();
             $table->string('owner_slug')->nullable();
         });
 
-        Schema::create('categories', function ($table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('parent_id')->nullable();
             $table->softDeletes();
         });
 
-        Schema::create('products', function ($table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('category_id');
         });

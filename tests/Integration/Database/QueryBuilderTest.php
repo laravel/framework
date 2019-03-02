@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -16,7 +17,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function (Blueprint $table) {
             $table->timestamp('created_at');
         });
 

@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Illuminate\Contracts\Events\Dispatcher;
 
 trait HasEvents
@@ -30,6 +31,8 @@ trait HasEvents
      *
      * @param  object|array|string  $classes
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public static function observe($classes)
     {
@@ -45,10 +48,12 @@ trait HasEvents
      *
      * @param  object|string $class
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function registerObserver($class)
     {
-        $className = is_string($class) ? $class : get_class($class);
+        $className = $this->resolveObserverClassName($class);
 
         // When registering a model observer, we will spin through the possible events
         // and determine if this observer has that method. If it does, we will hook
@@ -58,6 +63,27 @@ trait HasEvents
                 static::registerModelEvent($event, $className.'@'.$event);
             }
         }
+    }
+
+    /**
+     * Resolve the observer's class name from an object or string.
+     *
+     * @param  object|string $class
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function resolveObserverClassName($class)
+    {
+        if (is_object($class)) {
+            return get_class($class);
+        }
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
+        throw new InvalidArgumentException('Unable to find observer: '.$class);
     }
 
     /**

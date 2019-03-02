@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentModelDecimalCastingTest;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -15,7 +16,7 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('test_model1', function ($table) {
+        Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->decimal('decimal_field_2', 8, 2)->nullable();
             $table->decimal('decimal_field_4', 8, 4)->nullable();

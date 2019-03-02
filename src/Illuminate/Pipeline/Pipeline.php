@@ -164,7 +164,7 @@ class Pipeline implements PipelineContract
                                 : $pipe(...$parameters);
 
                 return $response instanceof Responsable
-                            ? $response->toResponse($this->container->make(Request::class))
+                            ? $response->toResponse($this->getContainer()->make(Request::class))
                             : $response;
             };
         };
