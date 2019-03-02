@@ -599,7 +599,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->where('id');
-        $builder->assertEquals('select * from [users] where id', $builder->toSql());
+        $builder->assertEquals('select * from [users] where id != ?', $builder->toSql());
+        $this->assertEquals([0 => false], $builder->getBindings());
     }
 
     public function testWhereBetweens()
