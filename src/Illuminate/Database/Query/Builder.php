@@ -602,9 +602,9 @@ class Builder
             return $this->addArrayOfWheres($column, $boolean);
         }
 
-        // If only the column is passed, we will assume that it has to be true.
+        // If only the column is passed, we will assume that it must not be false.
         if (func_num_args() === 1) {
-            [$value, $operator] = [true, '='];
+            [$value, $operator] = [false, '!='];
         }
 
         // Here we will make some assumptions about the operator. If only 2 values are
