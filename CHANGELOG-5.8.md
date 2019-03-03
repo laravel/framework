@@ -2,6 +2,17 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.2...5.8)
 
+### Fixed
+- Fixed environment variable parsing ([#27706](https://github.com/laravel/framework/pull/27706))
+- Fixed guessed policy names when using `Gate::forUser` ([#27708](https://github.com/laravel/framework/pull/27708))
+- Fixed `via` as `string` in the `Notification` ([#27710](https://github.com/laravel/framework/pull/27710))
+
+### Changed
+- Check if `MessageBag` is empty before checking keys exist in the `MessageBag` ([#27719](https://github.com/laravel/framework/pull/27719))
+
+### TODO
+- https://github.com/laravel/framework/pull/27726, https://github.com/laravel/framework/commit/bc884bb30e3dc12545ab63cea1f5a74b33dab59c
+
 
 ## [v5.8.2 (2019-02-27)](https://github.com/laravel/framework/compare/v5.8.1...v5.8.2)
 
