@@ -141,7 +141,7 @@ class BelongsToMany extends Relation
     public function __construct(Builder $query, Model $parent, $table, $foreignPivotKey,
                                 $relatedPivotKey, $parentKey, $relatedKey, $relationName = null)
     {
-        $this->table = $table;
+        $this->table = $this->resolveTableName($table);
         $this->parentKey = $parentKey;
         $this->relatedKey = $relatedKey;
         $this->relationName = $relationName;
@@ -163,6 +163,31 @@ class BelongsToMany extends Relation
         if (static::$constraints) {
             $this->addWhereConstraints();
         }
+    }
+
+    /**
+     * Resolves table name from a given string.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function resolveTableName($class)
+    {
+        if (! class_exists($class)) {
+            return $class;
+        }
+
+        $object = new $class;
+
+        if ($object instanceof Model) {
+            if ($object instanceof Pivot) {
+                $this->using($class);
+            }
+
+            return $object->getTable();
+        }
+
+        return $class;
     }
 
     /**
