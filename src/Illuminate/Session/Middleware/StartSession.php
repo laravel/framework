@@ -41,7 +41,7 @@ class StartSession
     public function handle($request, Closure $next)
     {
         if (! $this->sessionConfigured()) {
-            return next($request);
+            return $next($request);
         }
 
         // If a session driver has been configured, we will need to start the session here
