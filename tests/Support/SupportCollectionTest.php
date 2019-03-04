@@ -1840,6 +1840,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([2 => ['rating' => 1, 'name' => '1'], 4 => ['rating' => 2, 'name' => '2'], 6 => ['rating' => 3, 'name' => '3']], $result->all());
     }
 
+    public function testKeyByNestedAttribute()
+    {
+        $data = new Collection([
+            ['id' => 1, 'person' => ['first_name' => 'foo', 'last_name' => 'bar']],
+            ['id' => 2, 'person' => ['first_name' => 'foo', 'last_name' => 'baz']]
+        ]);
+
+        $result = $data->keyBy('person.last_name');
+
+        $this->assertEquals([
+            'bar' => ['id' => 1, 'person' => ['first_name' => 'foo', 'last_name' => 'bar']],
+            'baz' => ['id' => 2, 'person' => ['first_name' => 'foo', 'last_name' => 'baz']]
+        ], $result->all());
+
+        $result = $data->keyBy('person.last_name')->map->id;
+
+        $this->assertEquals(['bar' => 1, 'baz' => 2], $result->all());
+    }
+
     public function testKeyByClosure()
     {
         $data = new Collection([
