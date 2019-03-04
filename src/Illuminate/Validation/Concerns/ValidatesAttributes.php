@@ -626,7 +626,6 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value)
     {
-        // Validate the value is a string or an object implementing __toString().
         if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
             return false;
         }
