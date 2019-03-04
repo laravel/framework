@@ -403,13 +403,12 @@ class SupportCollectionTest extends TestCase
     public function testHigherOrderNestedFilter()
     {
         $c = new Collection([
-            ['name' => 'bob', 'dinner' => [ 'main_course' => 'salad', 'starter' => 'soup']],
-            ['name' => 'eve', 'dinner' => [ 'main_course' => 'burger', 'desert' => 'ice cream']]
+            ['name' => 'bob', 'dinner' => ['main_course' => 'salad', 'starter' => 'soup']],
+            ['name' => 'eve', 'dinner' => ['main_course' => 'burger', 'desert' => 'ice cream']],
         ]);
 
         $this->assertCount(1, $c->filter->{'dinner.starter'});
     }
-
 
     public function testWhere()
     {
@@ -1844,14 +1843,14 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection([
             ['id' => 1, 'person' => ['first_name' => 'foo', 'last_name' => 'bar']],
-            ['id' => 2, 'person' => ['first_name' => 'foo', 'last_name' => 'baz']]
+            ['id' => 2, 'person' => ['first_name' => 'foo', 'last_name' => 'baz']],
         ]);
 
         $result = $data->keyBy('person.last_name');
 
         $this->assertEquals([
             'bar' => ['id' => 1, 'person' => ['first_name' => 'foo', 'last_name' => 'bar']],
-            'baz' => ['id' => 2, 'person' => ['first_name' => 'foo', 'last_name' => 'baz']]
+            'baz' => ['id' => 2, 'person' => ['first_name' => 'foo', 'last_name' => 'baz']],
         ], $result->all());
 
         $result = $data->keyBy('person.last_name')->map->id;
