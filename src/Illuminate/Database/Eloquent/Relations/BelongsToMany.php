@@ -198,17 +198,17 @@ class BelongsToMany extends Relation
         if (! class_exists($class)) {
             return $class;
         }
-        
+
         $object = new $class;
-        
+
         if ($object instanceof Model) {
             if ($object instanceof Pivot) {
                 $this->using($class);
             }
-            
+
             return $object->getTable();
         }
-        
+
         return $class;
     }
 
