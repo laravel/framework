@@ -346,6 +346,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['id1' => 'first', 'id2' => 'second'], $c->keyBy->id->map->name->all());
     }
 
+    public function testHigherOrderNestedKeyBy()
+    {
+        $c = new Collection([
+            ['value'  => 'foo 1', 'bar' => ['baz' => 'first']],
+            ['value'  => 'foo 2', 'bar' => ['baz' => 'second']],
+        ]);
+
+        $this->assertEquals(['first' => 'foo 1', 'second' => 'foo 2'], $c->keyBy->{'bar.baz'}->map->value->all());
+    }
+
     public function testHigherOrderUnique()
     {
         $c = new Collection([
@@ -354,6 +364,16 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertCount(1, $c->unique->id);
+    }
+
+    public function testHigherOrderNestedUnique()
+    {
+        $c = new Collection([
+            ['id' => '1', 'person' => ['first_name' => 'foo', 'last_name' => 'bar']],
+            ['id' => '2', 'person' => ['first_name' => 'foo', 'last_name' => 'baz']],
+        ]);
+
+        $this->assertCount(1, $c->unique->{'person.first_name'});
     }
 
     public function testHigherOrderFilter()
@@ -379,6 +399,17 @@ class SupportCollectionTest extends TestCase
 
         $this->assertCount(1, $c->filter->active());
     }
+
+    public function testHigherOrderNestedFilter()
+    {
+        $c = new Collection([
+            ['name' => 'bob', 'dinner' => [ 'main_course' => 'salad', 'starter' => 'soup']],
+            ['name' => 'eve', 'dinner' => [ 'main_course' => 'burger', 'desert' => 'ice cream']]
+        ]);
+
+        $this->assertCount(1, $c->filter->{'dinner.starter'});
+    }
+
 
     public function testWhere()
     {
