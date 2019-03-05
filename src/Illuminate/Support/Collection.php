@@ -1891,25 +1891,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Count the number of items in the collection by some predicate.
+     * Count the number of items in the collection using a given truth test.
      *
-     * @param callable|null
+     * @param  callable|null  $predicate
      * @return static
      */
-    public function countBy($predicate = null)
+    public function countBy($callback = null)
     {
-        if (is_null($predicate)) {
-            $predicate = function ($val) {
-                return $val;
+        if (is_null($callback)) {
+            $callback = function ($value) {
+                return $value;
             };
         }
 
-        return new static(
-            $this->groupBy($predicate)
-                ->map(function ($val) {
-                    return $val->count();
-                })
-        );
+        return new static($this->groupBy($callback)->map(function ($value) {
+            return $value->count();
+        }));
     }
 
     /**
