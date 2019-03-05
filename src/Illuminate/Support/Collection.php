@@ -1893,7 +1893,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Count the number of items in the collection using a given truth test.
      *
-     * @param  callable|null  $predicate
+     * @param  callable|null  $callback
      * @return static
      */
     public function countBy($callback = null)
