@@ -135,9 +135,17 @@ trait ResetsPasswords
      */
     protected function sendResetFailedResponse(Request $request, $response)
     {
+        $errorKey = 'email';
+
+        if ($response == Password::INVALID_PASSWORD) {
+            $errorKey = 'password';
+        } elseif ($response == Password::INVALID_TOKEN) {
+            $errorKey = 'token';
+        }
+
         return redirect()->back()
                     ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+                    ->withErrors([$errorKey => trans($response)]);
     }
 
     /**
