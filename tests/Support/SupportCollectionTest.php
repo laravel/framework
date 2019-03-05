@@ -307,6 +307,31 @@ class SupportCollectionTest extends TestCase
         $this->assertCount(2, $c);
     }
 
+    public function testCountableByWithoutPredicate()
+    {
+        $c = new Collection(['foo', 'foo', 'foo', 'bar', 'bar', 'foobar']);
+        $this->assertEquals(['foo' => 3, 'bar' => 2, 'foobar' => 1], $c->countBy()->all());
+
+        $c = new Collection([true, true, false, false, false]);
+        $this->assertEquals([true => 2, false => 3], $c->countBy()->all());
+
+        $c = new Collection([1, 5, 1, 5, 5, 1]);
+        $this->assertEquals([1 => 3, 5 => 3], $c->countBy()->all());
+    }
+
+    public function testCountableByWithPredicate()
+    {
+        $c = new Collection(['alice', 'aaron', 'bob', 'carla']);
+        $this->assertEquals(['a' => 2, 'b' => 1, 'c' => 1], $c->countBy(function ($name) {
+            return substr($name, 0, 1);
+        })->all());
+
+        $c = new Collection([1, 2, 3, 4, 5]);
+        $this->assertEquals([true => 2, false => 3], $c->countBy(function ($i) {
+            return $i % 2 === 0;
+        })->all());
+    }
+
     public function testIterable()
     {
         $c = new Collection(['foo']);
