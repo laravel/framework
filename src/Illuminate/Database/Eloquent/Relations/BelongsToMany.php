@@ -188,28 +188,28 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Resolves table name from a given string.
+     * Attempt to resolve the table name from a given string.
      *
-     * @param  string  $class
+     * @param  string  $table
      * @return string
      */
-    protected function resolveTableName($class)
+    protected function resolveTableName($table)
     {
-        if (! class_exists($class)) {
-            return $class;
+        if (! class_exists($table)) {
+            return $table;
         }
 
-        $object = new $class;
+        $model = new $table;
 
-        if ($object instanceof Model) {
-            if ($object instanceof Pivot) {
-                $this->using($class);
-            }
-
-            return $object->getTable();
+        if (! ($model instanceof Model)) {
+            return $table;
         }
 
-        return $class;
+        if ($model instanceof Pivot) {
+            $this->using($table);
+        }
+
+        return $model->getTable();
     }
 
     /**
