@@ -313,10 +313,10 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['foo' => 3, 'bar' => 2, 'foobar' => 1], $c->countBy()->all());
 
         $c = new Collection([true, true, false, false, false]);
-        $this->assertEquals([true => 2, false => 3,], $c->countBy()->all());
+        $this->assertEquals([true => 2, false => 3], $c->countBy()->all());
 
         $c = new Collection([1, 5, 1, 5, 5, 1]);
-        $this->assertEquals([1 => 3, 5 => 3,], $c->countBy()->all());
+        $this->assertEquals([1 => 3, 5 => 3], $c->countBy()->all());
     }
 
     public function testCountableByWithPredicate()
