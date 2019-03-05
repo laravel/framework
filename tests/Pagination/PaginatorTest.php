@@ -54,4 +54,29 @@ class PaginatorTest extends TestCase
 
         $this->assertSame($p->getOptions(), $options);
     }
+
+    public function testPaginatorGeneratesUrlsWithDottedPageNameWithoutQuery()
+    {
+        $paginator = new Paginator([1,2], 1, null, [
+            'path' => 'http://website.com/test/',
+            'pageName' => 'page.number',
+        ]);
+
+        $this->assertSame('http://website.com/test?page%5Bnumber%5D=2', $paginator->url(2));
+    }
+
+    public function testPaginatorGeneratesUrlsWithDottedPageNameWithQuery()
+    {
+        $paginator = new Paginator([1,2], 1, null, [
+            'path' => 'http://website.com/test/',
+            'pageName' => 'page.number',
+            'query' => [
+                'page' => [
+                    'size' => '1',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('http://website.com/test?page%5Bsize%5D=1&page%5Bnumber%5D=2', $paginator->url(2));
+    }
 }
