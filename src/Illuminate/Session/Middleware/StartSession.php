@@ -62,7 +62,7 @@ class StartSession
         // Again, if the session has been configured we will need to close out the session
         // so that the attributes may be persisted to some storage medium. We will also
         // add the session identifier cookie to the application response headers now.
-        $this->saveSession();
+        $this->saveSession($request);
 
         return $response;
     }
@@ -160,6 +160,17 @@ class StartSession
     }
 
     /**
+     * Save the session data to storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function saveSession($request)
+    {
+        $this->manager->driver()->save();
+    }
+
+    /**
      * Get the session lifetime in seconds.
      *
      * @return int
@@ -204,15 +215,5 @@ class StartSession
         $config = $config ?: $this->manager->getSessionConfig();
 
         return ! in_array($config['driver'], [null, 'array']);
-    }
-
-    /**
-     * Save the session data to storage.
-     *
-     * @return void
-     */
-    protected function saveSession()
-    {
-        $this->manager->driver()->save();
     }
 }
