@@ -1,17 +1,27 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.2...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.3...5.8)
+
+
+
+## [v5.8.3 (2019-03-05)](https://github.com/laravel/framework/compare/v5.8.2...v5.8.3)
+
+### Added
+- Added `Collection::countBy` ([#27770](https://github.com/laravel/framework/pull/27770))
+- Added protected `EloquentUserProvider::newModelQuery()` ([#27734](https://github.com/laravel/framework/pull/27734), [9bb7685](https://github.com/laravel/framework/commit/9bb76853403fcb071b9454f1dc0369a8b42c3257))
+- Added protected `StartSession::saveSession()` method ([#27771](https://github.com/laravel/framework/pull/27771), [76c7126](https://github.com/laravel/framework/commit/76c7126641e781fa30d819834f07149dda4e01e6))
+- Allow `belongsToMany` to take `Model/Pivot` class name as a second parameter ([#27774](https://github.com/laravel/framework/pull/27774))
 
 ### Fixed
 - Fixed environment variable parsing ([#27706](https://github.com/laravel/framework/pull/27706))
 - Fixed guessed policy names when using `Gate::forUser` ([#27708](https://github.com/laravel/framework/pull/27708))
 - Fixed `via` as `string` in the `Notification` ([#27710](https://github.com/laravel/framework/pull/27710))
+- Fixed `StartSession` middleware ([499e4fe](https://github.com/laravel/framework/commit/499e4fefefc4f8c0fe6377297b575054ec1d476f))
+- Fixed `stack` channel's bug related to the `level` ([#27726](https://github.com/laravel/framework/pull/27726), [bc884bb](https://github.com/laravel/framework/commit/bc884bb30e3dc12545ab63cea1f5a74b33dab59c))
+- Fixed `email` validation for not string values ([#27735](https://github.com/laravel/framework/pull/27735))
 
 ### Changed
 - Check if `MessageBag` is empty before checking keys exist in the `MessageBag` ([#27719](https://github.com/laravel/framework/pull/27719))
-
-### TODO
-- https://github.com/laravel/framework/pull/27726, https://github.com/laravel/framework/commit/bc884bb30e3dc12545ab63cea1f5a74b33dab59c
 
 
 ## [v5.8.2 (2019-02-27)](https://github.com/laravel/framework/compare/v5.8.1...v5.8.2)
