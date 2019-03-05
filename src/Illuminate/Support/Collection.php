@@ -1899,14 +1899,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function countBy($predicate = null)
     {
         if (is_null($predicate)) {
-            $predicate = function ($val, $key) {
+            $predicate = function ($val) {
                 return $val;
             };
         }
 
         return new static(
             $this->groupBy($predicate)
-                ->map(function ($val, $key) {
+                ->map(function ($val) {
                     return $val->count();
                 })
         );
