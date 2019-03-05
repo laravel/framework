@@ -6,6 +6,7 @@ use DateTime;
 use DateInterval;
 use Mockery as m;
 use DateTimeImmutable;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
@@ -13,6 +14,8 @@ use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Support\DateFactory;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Contracts\Cache\Store;
 
 class CacheRepositoryTest extends TestCase
@@ -224,6 +227,23 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 300);
         $repo->put($key, $value, $duration);
+    }
+
+    public function testGetSecondsRespectsCarbonImmutablePastTestNow()
+    {
+        if (! class_exists(CarbonImmutable::class)) {
+            $this->markTestSkipped('Test for Carbon 2 only');
+        }
+
+        DateFactory::use(CarbonImmutable::class);
+
+        Date::setTestNow(Date::now()->subHour());
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 300);
+        $repo->put($key, $value, Date::now()->addMinutes(5));
+
+        DateFactory::use(DateFactory::DEFAULT_CLASS_NAME);
     }
 
     public function testRegisterMacroWithNonStaticCall()
