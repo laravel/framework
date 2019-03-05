@@ -136,7 +136,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Define a contextual binding.
      *
-     * @param  array|string  $concrete
+     * @param  string[]|string  $concrete
      * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
     public function when($concrete)
@@ -293,7 +293,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the method to be bound in class@method format.
      *
-     * @param  array|string $method
+     * @param  string[]|string $method
      * @return string
      */
     protected function parseBindMethod($method)
@@ -434,8 +434,8 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Assign a set of tags to a given binding.
      *
-     * @param  array|string  $abstracts
-     * @param  array|mixed   ...$tags
+     * @param  string[]|string  $abstracts
+     * @param  string[]|mixed   ...$tags
      * @return void
      */
     public function tag($abstracts, $tags)
@@ -830,7 +830,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve all of the dependencies from the ReflectionParameters.
      *
-     * @param  array  $dependencies
+     * @param  \ReflectionParameter[]  $dependencies
      * @return array
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -1056,7 +1056,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  object  $object
-     * @param  array   $callbacksPerType
+     * @param  array[]   $callbacksPerType
      *
      * @return array
      */
@@ -1077,7 +1077,7 @@ class Container implements ArrayAccess, ContainerContract
      * Fire an array of callbacks with an object.
      *
      * @param  mixed  $object
-     * @param  array  $callbacks
+     * @param  \Closure[]  $callbacks
      * @return void
      */
     protected function fireCallbackArray($object, array $callbacks)
@@ -1090,7 +1090,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the container's bindings.
      *
-     * @return array
+     * @return array[]
      */
     public function getBindings()
     {

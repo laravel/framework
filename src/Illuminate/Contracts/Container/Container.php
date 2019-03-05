@@ -29,8 +29,8 @@ interface Container extends ContainerInterface
     /**
      * Assign a set of tags to a given binding.
      *
-     * @param  array|string  $abstracts
-     * @param  array|mixed   ...$tags
+     * @param  string[]|string  $abstracts
+     * @param  string[]|mixed   ...$tags
      * @return void
      */
     public function tag($abstracts, $tags);
@@ -105,7 +105,7 @@ interface Container extends ContainerInterface
     /**
      * Define a contextual binding.
      *
-     * @param  string|array  $concrete
+     * @param  string[]|string  $concrete
      * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
     public function when($concrete);
