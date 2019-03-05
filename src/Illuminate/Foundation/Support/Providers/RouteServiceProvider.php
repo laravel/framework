@@ -71,9 +71,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function loadCachedRoutes()
     {
-        $this->app->booted(function () {
-            require $this->app->getCachedRoutesPath();
-        });
+        require $this->app->getCachedRoutesPath();
     }
 
     /**
