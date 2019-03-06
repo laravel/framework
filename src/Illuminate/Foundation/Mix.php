@@ -64,7 +64,7 @@ class Mix
         }
 
         $html = $manifestDirectory.$manifest[$path];
-        if($relativePath && Str::startsWith($html, ['/'])){
+        if ($relativePath && Str::startsWith($html, ['/'])) {
             $html = Str::substr($html, 1);
         }
 
