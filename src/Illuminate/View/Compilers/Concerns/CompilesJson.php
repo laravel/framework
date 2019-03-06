@@ -12,6 +12,6 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        return "<?php echo json_encode(" . $this->stripParentheses($expression) . ") ?>";
+        return '<?php echo json_encode('.$this->stripParentheses($expression).') ?>';
     }
 }
