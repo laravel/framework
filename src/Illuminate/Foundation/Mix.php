@@ -11,13 +11,13 @@ class Mix
     /**
      * Get the path to a versioned Mix file.
      *
-     * @param  string  $path
-     * @param  string  $manifestDirectory
-     * @return \Illuminate\Support\HtmlString|string
-     *
-     * @throws \Exception
+     * @param  string $path
+     * @param  bool $relativePath
+     * @param  string $manifestDirectory
+     * @return HtmlString|string
+     * @throws Exception
      */
-    public function __invoke($path, $manifestDirectory = '')
+    public function __invoke($path, $relativePath = false, $manifestDirectory = '')
     {
         static $manifests = [];
 
@@ -63,6 +63,11 @@ class Mix
             }
         }
 
-        return new HtmlString($manifestDirectory.$manifest[$path]);
+        $html = $manifestDirectory.$manifest[$path];
+        if($relativePath && Str::startsWith($html, array("/"))){
+            $html = Str::substr($html, 1);
+        }
+
+        return new HtmlString($html);
     }
 }
