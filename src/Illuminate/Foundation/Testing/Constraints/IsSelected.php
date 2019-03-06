@@ -60,7 +60,7 @@ class IsSelected extends FormFieldConstraint
         foreach ($select->children() as $option) {
             if ($option->nodeName === 'optgroup') {
                 foreach ($option->childNodes as $child) {
-                    if ($child->hasAttribute('selected')) {
+                    if (method_exists($child,'getAttribute') && $child->hasAttribute('selected')) {
                         $selected[] = $this->getOptionValue($child);
                     }
                 }
