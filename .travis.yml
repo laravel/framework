@@ -18,8 +18,8 @@ matrix:
       env: setup=lowest
     - php: 5.6
       env: setup=stable
-    - php: 7.3
-      env: setup=lowest
+    - php: 7.0
+      env: setup=stable
     - php: 7.3
       env: setup=stable
 
