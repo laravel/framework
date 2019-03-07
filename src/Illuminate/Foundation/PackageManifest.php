@@ -43,6 +43,27 @@ class PackageManifest
     public $manifest;
 
     /**
+     * The installed packages.
+     *
+     * @var array
+     */
+    public $installedPackages;
+
+    /**
+     * The auto discovered packages.
+     *
+     * @var array
+     */
+    public $packages;
+
+    /**
+     * The recorded packages.
+     *
+     * @var array
+     */
+    public $recordedPackages = [];
+
+    /**
      * Create a new package manifest instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -110,21 +131,25 @@ class PackageManifest
      */
     public function build()
     {
-        $packages = [];
-
         if ($this->files->exists($path = $this->vendorPath.'/composer/installed.json')) {
-            $packages = json_decode($this->files->get($path), true);
+            $this->installedPackages = json_decode($this->files->get($path), true);
         }
 
         $ignoreAll = in_array('*', $ignore = $this->packagesToIgnore());
 
-        $this->write(collect($packages)->mapWithKeys(function ($package) {
+        $this->packages = collect($this->installedPackages)->mapWithKeys(function ($package) {
             return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
         })->each(function ($configuration) use (&$ignore) {
             $ignore = array_merge($ignore, $configuration['dont-discover'] ?? []);
         })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
             return $ignoreAll || in_array($package, $ignore);
-        })->filter()->all());
+        })->filter()->all();
+
+        if ($this->shouldSortPackages()) {
+            $this->sortPackages();
+        }
+
+        $this->write($this->packages);
     }
 
     /**
@@ -136,6 +161,92 @@ class PackageManifest
     protected function format($package)
     {
         return str_replace($this->vendorPath.'/', '', $package);
+    }
+
+    /**
+     * Determine if packages should be sorted.
+     *
+     * @return bool
+     */
+    protected function shouldSortPackages()
+    {
+        if (! file_exists($this->basePath.'/composer.json') || ! count($this->packages)) {
+            return false;
+        }
+
+        return json_decode(file_get_contents(
+            $this->basePath.'/composer.json'
+        ), true)['extra']['laravel']['sort-dependencies'] ?? false;
+    }
+
+    /**
+     * Sort the auto discovered packages in order of declaration.
+     *
+     * @return void
+     */
+    protected function sortPackages()
+    {
+        $this->recordPackagesByDeclaration($this->basePath.'/composer.json');
+
+        $sortingMask = array_flip(array_intersect(
+            $this->recordedPackages,
+            array_keys($this->packages)
+        ));
+
+        $this->packages = array_replace($sortingMask, $this->packages);
+    }
+
+    /**
+     * Record a deep list of all auto discovered package names sorted in order of declaration.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function recordPackagesByDeclaration($path)
+    {
+        $configuration = json_decode(file_get_contents($path), true);
+
+        $composerRequires = array_merge(
+            array_keys($configuration['require'] ?? []),
+            array_keys($configuration['require-dev'] ?? [])
+        );
+
+        foreach ($composerRequires as $packageName) {
+            if (in_array($packageName, $this->recordedPackages)) {
+                continue;
+            }
+
+            $this->recordedPackages[] = $packageName;
+
+            if (file_exists($composerPath = $this->packageComposerPath($packageName))) {
+                $this->recordPackagesByDeclaration($composerPath);
+            }
+        }
+    }
+
+    /**
+     * Get the package path to it´s composer.json.
+     *
+     * @param  string  $packageName
+     * @return string
+     */
+    protected function packageComposerPath($packageName)
+    {
+        $package = collect($this->installedPackages)->first(function ($value) use ($packageName) {
+            return $value['name'] == $packageName;
+        });
+
+        if (is_null($package)) {
+            return '';
+        }
+
+        $path = $this->vendorPath.'/'.$package['name'];
+
+        if ($package['dist']['type'] == 'path') {
+            $path = $package['dist']['url'] ?? '';
+        }
+
+        return $path ? $path.'/composer.json' : '';
     }
 
     /**
