@@ -903,6 +903,19 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1, 2, 3, 4, 5, 6], $data->collapse()->all());
     }
 
+    public function testJoin()
+    {
+        $this->assertEquals('a, b, c', (new Collection(['a', 'b', 'c']))->join(', '));
+
+        $this->assertEquals('a, b and c', (new Collection(['a', 'b', 'c']))->join(', ', ' and '));
+
+        $this->assertEquals('a and b', (new Collection(['a', 'b']))->join(', ', ' and '));
+
+        $this->assertEquals('a', (new Collection(['a']))->join(', ', ' and '));
+
+        $this->assertEquals('', (new Collection([]))->join(', ', ' and '));
+    }
+
     public function testCrossJoin()
     {
         // Cross join with an array
