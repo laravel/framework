@@ -533,6 +533,55 @@ if (! function_exists('data_get')) {
     }
 }
 
+if (! function_exists('try_data_get')) {
+    /**
+     * Try get an item from an array or object using "dot" notation.
+     *
+     * @param  mixed   $target
+     * @param  string|array|int  $key
+     * @param  mixed   $value contains found value.
+     * @return boolean true if array key exists false if not (value was not found).
+     */
+    function try_data_get($target, $key, &$value)
+    {
+        if (is_null($key)) {
+            return $target;
+        }
+
+        $key = is_array($key) ? $key : explode('.', $key);
+
+        while (! is_null($segment = array_shift($key))) {
+            if ($segment === '*') {
+                if ($target instanceof Collection) {
+                    $target = $target->all();
+                } elseif (! is_array($target)) {
+                    return false;
+                }
+
+                $result = [];
+
+                foreach ($target as $item) {
+                    $result[] = data_get($item, $key);
+                }
+
+                $value = in_array('*', $key) ? Arr::collapse($result) : $result;
+                return true;
+            }
+
+            if (Arr::accessible($target) && Arr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && isset($target->{$segment})) {
+                $target = $target->{$segment};
+            } else {
+                return false;
+            }
+        }
+
+        $value = $target;
+        return true;
+    }
+}
+
 if (! function_exists('data_set')) {
     /**
      * Set an item on an array or object using dot notation.
