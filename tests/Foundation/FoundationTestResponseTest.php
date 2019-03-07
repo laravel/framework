@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Foundation;
 
 use Mockery as m;
 use JsonSerializable;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Model;
@@ -198,21 +198,21 @@ class FoundationTestResponseTest extends TestCase
 
         $response->assertJsonp('callbackMethodName', $resource->jsonSerialize());
         $this->assertEquals(
-            '/**/callbackMethodName(' . json_encode($resource->jsonSerialize()) . ');',
+            '/**/callbackMethodName('.json_encode($resource->jsonSerialize()).');',
             $response->getContent()
         );
     }
 
     public function testAssertJsonpWithMixed()
     {
-        $resource = new JsonSerializableMixedResourcesStub; 
+        $resource = new JsonSerializableMixedResourcesStub;
         $response = TestResponse::fromBaseResponse(
             (new JsonResponse($resource->jsonSerialize()))->withCallback('callbackMethodName')
         );
 
         $response->assertJsonp('callbackMethodName', $resource->jsonSerialize());
         $this->assertEquals(
-            '/**/callbackMethodName(' . json_encode($resource->jsonSerialize()) . ');',
+            '/**/callbackMethodName('.json_encode($resource->jsonSerialize()).');',
             $response->getContent()
         );
     }

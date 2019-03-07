@@ -429,7 +429,7 @@ class TestResponse
     }
 
     /**
-     * Assert that the response is a superset of given JSONP
+     * Assert that the response is a superset of given JSONP.
      *
      * @param  string  $callback
      * @param  array  $data
@@ -440,7 +440,7 @@ class TestResponse
     {
         PHPUnit::assertEquals($callback, $this->getCallback());
         $this->assertJson($data, $strict);
-        
+
         return $this;
     }
 
