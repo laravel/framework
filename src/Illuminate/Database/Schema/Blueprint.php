@@ -376,6 +376,19 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given foreign key should be dropped.
+     *
+     * Alias for self::dropForeign().
+     *
+     * @param  string|array  $index
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropFk($index)
+    {
+        return $this->dropForeign($index);
+    }
+
+    /**
      * Indicate that the given indexes should be renamed.
      *
      * @param  string  $from
@@ -525,6 +538,20 @@ class Blueprint
     public function foreign($columns, $name = null)
     {
         return $this->indexCommand('foreign', $columns, $name);
+    }
+
+    /**
+     * Specify a foreign key for the table.
+     *
+     * Alias for self::foreign().
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function fk($columns, $name = null)
+    {
+        return $this->foreign($columns, $name);
     }
 
     /**
