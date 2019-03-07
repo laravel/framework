@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Contracts\Foundation\Application;
 use InvalidArgumentException;
 
 abstract class Manager
@@ -34,7 +35,7 @@ abstract class Manager
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct($app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
     }
