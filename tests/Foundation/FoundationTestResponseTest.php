@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Mockery as m;
 use JsonSerializable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\View\View;
@@ -186,6 +187,34 @@ class FoundationTestResponseTest extends TestCase
         $resource = new JsonSerializableMixedResourcesStub;
 
         $response->assertExactJson($resource->jsonSerialize());
+    }
+
+    public function testAssertJsonpWithArray()
+    {
+        $resource = new JsonSerializableSingleResourceStub;
+        $response = TestResponse::fromBaseResponse(
+            (new JsonResponse($resource->jsonSerialize()))->withCallback('callbackMethodName')
+        );
+
+        $response->assertJsonp('callbackMethodName', $resource->jsonSerialize());
+        $this->assertEquals(
+            '/**/callbackMethodName(' . json_encode($resource->jsonSerialize()) . ');',
+            $response->getContent()
+        );
+    }
+
+    public function testAssertJsonpWithMixed()
+    {
+        $resource = new JsonSerializableMixedResourcesStub; 
+        $response = TestResponse::fromBaseResponse(
+            (new JsonResponse($resource->jsonSerialize()))->withCallback('callbackMethodName')
+        );
+
+        $response->assertJsonp('callbackMethodName', $resource->jsonSerialize());
+        $this->assertEquals(
+            '/**/callbackMethodName(' . json_encode($resource->jsonSerialize()) . ');',
+            $response->getContent()
+        );
     }
 
     public function testAssertJsonFragment()
