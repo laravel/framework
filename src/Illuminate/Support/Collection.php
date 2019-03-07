@@ -1947,9 +1947,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function add($item)
     {
-        $this->items[] = $item;
-
-        return $this;
+        return $this->push($item);
     }
 
     /**
