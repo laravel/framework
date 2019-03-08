@@ -45,6 +45,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->input->setOption('migration', true);
             $this->input->setOption('controller', true);
             $this->input->setOption('resource', true);
+            $this->input->setOption('test', true);
         }
 
         if ($this->option('factory')) {
@@ -57,6 +58,10 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('controller') || $this->option('resource')) {
             $this->createController();
+        }
+
+        if ($this->option('test')) {
+            $this->createTest();
         }
     }
 
@@ -112,6 +117,23 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create a Feature Test and Unit Test for the model
+     *
+     * @return void
+     */
+    protected function createTest()
+    {
+        $test = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:test', [
+            'name' => "{$test}Test"
+        ]);
+        $this->call('make:test --unit', [
+            'name' => "{$test}Test"
+        ]);
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -146,6 +168,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+
+            ['test', 't', InputOption::VALUE_NONE, 'Create a new feature test and a new unit test for the model'],
         ];
     }
 }
