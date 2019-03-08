@@ -19,12 +19,55 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        $parts = explode(',', $this->stripParentheses($expression));
+        $expression = '<?php ' . $this->stripParentheses($expression);
 
-        $options = isset($parts[1]) ? trim($parts[1]) : $this->encodingOptions;
+        $tokens = token_get_all($expression);
 
-        $depth = isset($parts[2]) ? trim($parts[2]) : 512;
+        $openExpressions = 0;
 
-        return "<?php echo json_encode($parts[0], $options, $depth) ?>";
+        $arguments = [
+            null,
+            null,
+            null,
+        ];
+
+        $currentArgument = 0;
+
+        //remove the first
+        unset($tokens[0]);
+
+        foreach ($tokens as $token) {
+
+            //increment if we have an opening character
+            if (is_string($token) && in_array($token, ['(', '['])) {
+                $openExpressions++;
+            }
+
+            //decrement if we have a closing character
+            elseif (is_string($token) && in_array($token, [')', ']'])) {
+                $openExpressions--;
+            }
+
+            //we have no open expressions, and the token is a comma, move to the next argument
+            if ($openExpressions === 0 && is_string($token) && $token === ',') {
+                $currentArgument++;
+            }
+
+            elseif (is_array($token)) {
+                $arguments[$currentArgument] .= $token[1];
+            }
+
+            else {
+                $arguments[$currentArgument] .= $token;
+            }
+        }
+
+        $output = [
+            trim($arguments[0]),
+            trim($arguments[1] ?? $this->encodingOptions),
+            trim($arguments[2] ?? 512),
+        ];
+
+        return "<?php echo json_encode($output[0], $output[1], $output[2]) ?>";
     }
 }
