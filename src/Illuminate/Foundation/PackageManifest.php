@@ -57,11 +57,18 @@ class PackageManifest
     public $packages;
 
     /**
-     * The recorded packages.
+     * The recorded package names.
      *
      * @var array
      */
     public $recordedPackages = [];
+
+    /**
+     * All auto discovered package names ordered by their dependencies.
+     *
+     * @var array
+     */
+    public $sortingMask = [];
 
     /**
      * Create a new package manifest instance.
@@ -176,77 +183,57 @@ class PackageManifest
 
         return json_decode(file_get_contents(
             $this->basePath.'/composer.json'
-        ), true)['extra']['laravel']['sort-dependencies'] ?? false;
+        ), true)['extra']['laravel']['sort-providers'] ?? false;
     }
 
     /**
-     * Sort the auto discovered packages in order of declaration.
+     * Sort the auto discovered packages in order of their dependencies.
      *
      * @return void
      */
     protected function sortPackages()
     {
-        $this->recordPackagesByDeclaration($this->basePath.'/composer.json');
+        foreach (array_keys($this->packages) as $packageName) {
+            $this->recordPackagesByDependency($packageName);
+        }
 
-        $sortingMask = array_flip(array_intersect(
-            $this->recordedPackages,
-            array_keys($this->packages)
-        ));
-
-        $this->packages = array_replace($sortingMask, $this->packages);
+        $this->packages = array_replace(array_flip($this->sortingMask), $this->packages);
     }
 
     /**
-     * Record a deep list of all auto discovered package names sorted in order of declaration.
+     * Record a deep list of all auto discovered package names in order of their dependencies.
      *
      * @param  string  $path
      * @return void
      */
-    protected function recordPackagesByDeclaration($path)
+    protected function recordPackagesByDependency($packageName)
     {
-        $configuration = json_decode(file_get_contents($path), true);
-
-        $composerRequires = array_merge(
-            array_keys($configuration['require'] ?? []),
-            array_keys($configuration['require-dev'] ?? [])
-        );
-
-        foreach ($composerRequires as $packageName) {
-            if (in_array($packageName, $this->recordedPackages)) {
-                continue;
-            }
-
-            $this->recordedPackages[] = $packageName;
-
-            if (file_exists($composerPath = $this->packageComposerPath($packageName))) {
-                $this->recordPackagesByDeclaration($composerPath);
-            }
+        if (in_array($packageName, $this->recordedPackages)) {
+            return;
         }
-    }
 
-    /**
-     * Get the package path to it´s composer.json.
-     *
-     * @param  string  $packageName
-     * @return string
-     */
-    protected function packageComposerPath($packageName)
-    {
+        $this->recordedPackages[] = $packageName;
+
         $package = collect($this->installedPackages)->first(function ($value) use ($packageName) {
             return $value['name'] == $packageName;
         });
 
         if (is_null($package)) {
-            return '';
+            return;
         }
 
-        $path = $this->vendorPath.'/'.$package['name'];
+        $packageRequires = array_merge(
+            array_keys($package['require'] ?? []),
+            array_keys($package['require-dev'] ?? [])
+        );
 
-        if ($package['dist']['type'] == 'path') {
-            $path = $package['dist']['url'] ?? '';
+        foreach ($packageRequires as $required) {
+            $this->recordPackagesByDependency($required);
         }
 
-        return $path ? $path.'/composer.json' : '';
+        if (array_key_exists($packageName, $this->packages)) {
+            $this->sortingMask[] = $packageName;
+        }
     }
 
     /**
