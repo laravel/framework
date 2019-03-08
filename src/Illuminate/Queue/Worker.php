@@ -621,7 +621,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @return void
      */
-    public function setManager(QueueManager $manager)
+    public function setManager(QueueFactoryContract $manager)
     {
         $this->manager = $manager;
     }
