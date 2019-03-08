@@ -117,7 +117,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Create a Feature Test and Unit Test for the model
+     * Create a Feature Test and Unit Test for the model.
      *
      * @return void
      */
@@ -126,10 +126,10 @@ class ModelMakeCommand extends GeneratorCommand
         $test = Str::studly(class_basename($this->argument('name')));
 
         $this->call('make:test', [
-            'name' => "{$test}Test"
+            'name' => "{$test}Test",
         ]);
         $this->call('make:test --unit', [
-            'name' => "{$test}Test"
+            'name' => "{$test}Test",
         ]);
     }
 
