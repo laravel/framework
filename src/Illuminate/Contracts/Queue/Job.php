@@ -100,6 +100,13 @@ interface Job
     public function maxTries();
 
     /**
+     * Get the time delay before retrying a job.
+     *
+     * @return int|null
+     */
+    public function retriesIn();
+
+    /**
      * Get the number of seconds the job can run.
      *
      * @return int|null

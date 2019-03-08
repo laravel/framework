@@ -125,6 +125,7 @@ abstract class Queue
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
             'timeout' => $job->timeout ?? null,
+            'retriesIn' => $job->retriesIn ?? null,
             'timeoutAt' => $this->getJobExpiration($job),
             'data' => [
                 'commandName' => $job,
@@ -185,6 +186,7 @@ abstract class Queue
             'job' => $job,
             'maxTries' => null,
             'timeout' => null,
+            'retriesIn' => null,
             'data' => $data,
         ]);
     }

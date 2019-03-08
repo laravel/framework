@@ -243,6 +243,25 @@ class QueueWorkerTest extends TestCase
         $this->assertNull($job->failedWith);
     }
 
+    public function test_job_based_retries_in()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function ($job) use ($e) {
+            $job->attempts++;
+
+            throw $e;
+        });
+
+        $job->retriesIn = 60;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
+
+        $this->assertEquals($job->retriesIn, $worker->sleptFor);
+    }
+
     /**
      * Helpers...
      */
@@ -387,6 +406,11 @@ class WorkerFakeJob implements QueueJobContract
     public function maxTries()
     {
         return $this->maxTries;
+    }
+
+    public function retriesIn()
+    {
+        return $this->retriesIn;
     }
 
     public function timeoutAt()

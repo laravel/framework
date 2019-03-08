@@ -321,6 +321,11 @@ class Worker
                 $connectionName, $job, (int) $options->maxTries
             );
 
+            // Here we will check if there's a delay before retrying a job.
+            $this->delayJobAttemptExecution(
+              $job
+            );
+
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
@@ -480,6 +485,25 @@ class Worker
         $this->events->dispatch(new Events\JobExceptionOccurred(
             $connectionName, $job, $e
         ));
+    }
+
+    /**
+     * Delay a job retry if defined.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return  void
+     */
+    protected function delayJobAttemptExecution($job)
+    {
+        if (! $job->retriesIn()) {
+            return;
+        }
+
+        if ($job->attempts() === 1) {
+            return;
+        }
+
+        $this->sleep($job->retriesIn());
     }
 
     /**

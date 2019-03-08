@@ -234,6 +234,16 @@ abstract class Job
     }
 
     /**
+     * Get the time delay before retrying a job.
+     *
+     * @return int|null
+     */
+    public function retriesIn()
+    {
+        return $this->payload()['retriesIn'] ?? null;
+    }
+
+    /**
      * Get the number of seconds the job can run.
      *
      * @return int|null
