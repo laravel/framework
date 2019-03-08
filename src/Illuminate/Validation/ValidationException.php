@@ -46,14 +46,16 @@ class ValidationException extends Exception
     /**
      * Create a new exception instance.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @param  string  $errorBag
-     * @return void
+     * @param  \Illuminate\Contracts\Validation\Validator $validator
+     * @param  \Symfony\Component\HttpFoundation\Response $response
+     * @param  string $errorBag
+     * @param string $message The Exception message to throw.
+     * @param int $code
+     * @param \Throwable $previous
      */
-    public function __construct($validator, $response = null, $errorBag = 'default')
+    public function __construct($validator, $response = null, $errorBag = 'default', $message = 'The given data was invalid.', $code = 0, $previous = null)
     {
-        parent::__construct('The given data was invalid.');
+        parent::__construct($message, $code, $previous);
 
         $this->response = $response;
         $this->errorBag = $errorBag;

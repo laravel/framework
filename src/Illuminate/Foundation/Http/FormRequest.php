@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Http;
 
+use Illuminate\Contracts\Validation\ExceptionFactory;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Contracts\Container\Container;
@@ -120,14 +121,15 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param  \Illuminate\Contracts\Validation\Validator $validator
      * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function failedValidation(Validator $validator)
     {
-        throw (new ValidationException($validator))
+        throw $this->container->make(ExceptionFactory::class)
+                    ->make( new ValidationException($validator))
                     ->errorBag($this->errorBag)
                     ->redirectTo($this->getRedirectUrl());
     }
