@@ -2288,6 +2288,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
         $this->assertEquals('select * from [users] where json_value([items], \'$."price"."in_usd"\') = ? and json_value([items], \'$."age"\') = ?', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('items->available', '=', true);
+        $this->assertEquals('select * from [users] where json_value([items], \'$."available"\') = \'true\'', $builder->toSql());
     }
 
     public function testSqliteWrappingJson()
