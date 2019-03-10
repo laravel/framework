@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.3...5.8)
 
+### Added
+- Added `Illuminate\Support\Collection::join()` method ([#27723](https://github.com/laravel/framework/pull/27723))
 
 
 ## [v5.8.3 (2019-03-05)](https://github.com/laravel/framework/compare/v5.8.2...v5.8.3)
