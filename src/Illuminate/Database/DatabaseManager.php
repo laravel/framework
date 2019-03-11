@@ -327,8 +327,9 @@ class DatabaseManager implements ConnectionResolverInterface
      * Set the reconnect instance on connections created by this manager.
      *
      * @param  callable  $reconnector
+     * @return void
      */
-    public function setReconnector(callable $reconnector): void
+    public function setReconnector(callable $reconnector)
     {
         $this->reconnector = $reconnector;
     }
