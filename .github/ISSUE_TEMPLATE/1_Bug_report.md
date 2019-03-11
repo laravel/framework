@@ -1,6 +1,6 @@
 ---
 name: "🐛 Bug Report"
-about: 'Report a general framework issue. Please first check if you Laravel version is still supported: https://laravel.com/docs/5.8/releases#support-policy'
+about: 'Report a general framework issue. Please first check if your Laravel version is still supported: https://laravel.com/docs/5.8/releases#support-policy'
 
 ---
 
