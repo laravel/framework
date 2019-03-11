@@ -19,24 +19,15 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        $expression = '<?php ' . $this->stripParentheses($expression);
-
-        $tokens = token_get_all($expression);
+        $tokens = token_get_all('<?php ' . $this->stripParentheses($expression));
 
         $openExpressions = 0;
 
-        $arguments = [
-            null,
-            null,
-            null,
-        ];
+        $arguments = [null, null, null];
 
         $currentArgument = 0;
 
-        //remove the first
-        unset($tokens[0]);
-
-        foreach ($tokens as $token) {
+        foreach (array_slice($tokens, 1) as $token) {
 
             //increment if we have an opening character
             if (is_string($token) && in_array($token, ['(', '['])) {
@@ -62,12 +53,10 @@ trait CompilesJson
             }
         }
 
-        $output = [
-            trim($arguments[0]),
-            trim($arguments[1] ?? $this->encodingOptions),
-            trim($arguments[2] ?? 512),
-        ];
+        $value = trim($arguments[0]);
+        $options = trim($arguments[1] ?? $this->encodingOptions);
+        $depth = trim($arguments[2] ?? 512);
 
-        return "<?php echo json_encode($output[0], $output[1], $output[2]) ?>";
+        return "<?php echo json_encode($value, $options, $depth) ?>";
     }
 }
