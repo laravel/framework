@@ -1,6 +1,6 @@
 ---
 name: "📚 Documentation Issue"
-about: 'For documentation issues, see: https://github.com/laravel/docs/issues'
+about: 'For documentation issues, open a pull request at https://github.com/laravel/docs'
 
 ---
 
