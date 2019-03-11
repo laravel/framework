@@ -19,7 +19,7 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        $tokens = token_get_all('<?php ' . $this->stripParentheses($expression));
+        $tokens = token_get_all('<?php '.$this->stripParentheses($expression));
 
         $openExpressions = 0;
 
@@ -42,13 +42,9 @@ trait CompilesJson
             //we have no open expressions, and the token is a comma, move to the next argument
             if ($openExpressions === 0 && is_string($token) && $token === ',') {
                 $currentArgument++;
-            }
-
-            elseif (is_array($token)) {
+            } elseif (is_array($token)) {
                 $arguments[$currentArgument] .= $token[1];
-            }
-
-            else {
+            } else {
                 $arguments[$currentArgument] .= $token;
             }
         }
