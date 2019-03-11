@@ -1,7 +1,7 @@
 <!--
-Please only send in a PR to branches which are currently supported: https://laravel.com/docs/5.8/releases#support-policy 
+Please only send in a PR to branches which are currently supported: https://laravel.com/docs/releases#support-policy 
 
-If you are unsure to which branch you want to send a PR please read: https://laravel.com/docs/5.8/contributions#which-branch
+If you are unsure to which branch you want to send a PR please read: https://laravel.com/docs/contributions#which-branch
 
 Pull Requests without a descriptive title, thorough description, or tests will be closed.
 
