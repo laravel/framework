@@ -305,7 +305,7 @@ class Gate implements GateContract
     public function none($abilities, $arguments = [])
     {
         return ! $this->any($abilities, $arguments);
-    }     
+    }
 
     /**
      * Determine if the given ability should be granted for the current user.
