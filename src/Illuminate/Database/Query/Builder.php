@@ -2073,7 +2073,7 @@ class Builder
     {
         $result = (array) $this->first([$column]);
 
-        return count($result) > 0 ? reset($result) : null;
+        return $result[$column] ?? null;
     }
 
     /**
