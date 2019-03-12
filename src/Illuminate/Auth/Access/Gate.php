@@ -295,7 +295,7 @@ class Gate implements GateContract
         });
     }
 
-     /**
+    /**
      * Determine if any one of the given abilities should be denied for the current user.
      *
      * @param  iterable|string  $abilities
@@ -305,7 +305,7 @@ class Gate implements GateContract
     public function none($abilities, $arguments = [])
     {
         return ! $this->any($abilities, $arguments);
-    }   
+    }     
 
     /**
      * Determine if the given ability should be granted for the current user.
