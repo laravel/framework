@@ -1,9 +1,18 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.3...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.4...5.8)
+
+
+
+## [v5.8.4 (2019-03-12)](https://github.com/laravel/framework/compare/v5.8.3...v5.8.4)
 
 ### Added
 - Added `Illuminate\Support\Collection::join()` method ([#27723](https://github.com/laravel/framework/pull/27723))
+- Added `Illuminate\Foundation\Http\Kernel::getRouteMiddleware()` method ([#27852](https://github.com/laravel/framework/pull/27852))
+- Added danish specific transliteration to `Str` class ([#27857](https://github.com/laravel/framework/pull/27857))
+
+### Fixed
+- Fixed JSON boolean queries ([#27847](https://github.com/laravel/framework/pull/27847))
 
 
 ## [v5.8.3 (2019-03-05)](https://github.com/laravel/framework/compare/v5.8.2...v5.8.3)
