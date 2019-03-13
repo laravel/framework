@@ -166,6 +166,18 @@ class Builder
     }
 
     /**
+     * Create a new table from the schema if it not exists.
+     *
+     * @param string $table
+     * @param \Closure $callback
+     * @return void
+     */
+    public function createIfNotExists($table, Closure $callback)
+    {
+        $this->hasTable($table) === false && $this->create($table, $callback);
+    }
+
+    /**
      * Drop a table from the schema.
      *
      * @param  string  $table
