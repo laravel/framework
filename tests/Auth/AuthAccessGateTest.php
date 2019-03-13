@@ -630,6 +630,15 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->any(['edit', 'update'], new AccessGateTestDummy));
     }
 
+    public function test_none_ability_check_passes_if_all_fail()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
+
+        $this->assertTrue($gate->none(['edit', 'update'], new AccessGateTestDummy));
+    }
+
     public function test_every_ability_check_passes_if_all_pass()
     {
         $gate = $this->getBasicGate();
