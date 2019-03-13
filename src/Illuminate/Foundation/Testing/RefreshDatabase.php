@@ -39,6 +39,10 @@ trait RefreshDatabase
     {
         $this->artisan('migrate');
 
+        if (method_exists($this, 'afterMigrate')) {
+            $this->afterMigrate();
+        }
+
         $this->app[Kernel::class]->setArtisan(null);
     }
 
@@ -57,6 +61,10 @@ trait RefreshDatabase
             $this->app[Kernel::class]->setArtisan(null);
 
             RefreshDatabaseState::$migrated = true;
+
+            if (method_exists($this, 'afterMigrate')) {
+                $this->afterMigrate();
+            }
         }
 
         $this->beginDatabaseTransaction();
