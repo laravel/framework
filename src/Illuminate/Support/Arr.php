@@ -541,9 +541,6 @@ class Arr
         if (is_null($seed)) {
             shuffle($array);
         } else {
-            // Seed the random number generator to guarantee the order in which the
-            // array is shuffled.  Then, after the shuffling is done, reset the
-            // seed randomly to prevent biases in future random methods.
             mt_srand($seed);
             shuffle($array);
             mt_srand();
