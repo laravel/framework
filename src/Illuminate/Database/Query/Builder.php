@@ -1823,6 +1823,13 @@ class Builder {
 		$this->aggregate = null;
 
 		$this->columns = $previousColumns;
+		
+		// Fix for returning the proper count with a groupBy clause
+                if ($function == 'count' && !empty($this->groups)) {
+
+                        return $results->count();
+
+                }
 
 		if (isset($results[0]))
 		{
