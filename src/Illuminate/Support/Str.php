@@ -340,15 +340,20 @@ class Str
      * @param  string  $search
      * @param  string  $replace
      * @param  string  $subject
+     * @param  boolean $sensitive
      * @return string
      */
-    public static function replaceFirst($search, $replace, $subject)
+    public static function replaceFirst($search, $replace, $subject, $sensitive = true)
     {
         if ($search == '') {
             return $subject;
         }
-
-        $position = strpos($subject, $search);
+        
+        if ($sensitive) {
+            $position = strpos($subject, $search);
+        } else {
+            $position = stripos($subject, $search);
+        }
 
         if ($position !== false) {
             return substr_replace($subject, $replace, $position, strlen($search));
