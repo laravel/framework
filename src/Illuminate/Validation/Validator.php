@@ -333,12 +333,12 @@ class Validator implements ValidatorContract
 
         $results = [];
 
-        $missingValue = Str::random(10);
+        $nullPreserver = new \stdClass();
 
         foreach (array_keys($this->getRules()) as $key) {
-            $value = data_get($this->getData(), $key, $missingValue);
+            $value = data_get($this->getData(), $key, $nullPreserver);
 
-            if ($value !== $missingValue) {
+            if ($value !== $nullPreserver) {
                 Arr::set($results, $key, $value);
             }
         }
