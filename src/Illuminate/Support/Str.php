@@ -340,7 +340,7 @@ class Str
      * @param  string  $search
      * @param  string  $replace
      * @param  string  $subject
-     * @param  boolean $sensitive
+     * @param  bool $sensitive
      * @return string
      */
     public static function replaceFirst($search, $replace, $subject, $sensitive = true)
@@ -348,7 +348,7 @@ class Str
         if ($search == '') {
             return $subject;
         }
-        
+
         if ($sensitive) {
             $position = strpos($subject, $search);
         } else {
