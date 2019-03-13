@@ -42,7 +42,7 @@ class DatabaseManager implements ConnectionResolverInterface
     protected $extensions = [];
 
     /**
-     * When creating connections, the default reconnector to call when a connection need to be recreated.
+     * The callback to be executed to reconnect to a database.
      *
      * @var callable
      */
@@ -59,7 +59,8 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $this->app = $app;
         $this->factory = $factory;
-        $this->reconnector = function (Connection $connection) {
+
+        $this->reconnector = function ($connection) {
             $this->reconnect($connection->getName());
         };
     }
@@ -324,7 +325,7 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * Set the reconnect instance on connections created by this manager.
+     * Set the database reconnector callback.
      *
      * @param  callable  $reconnector
      * @return void
