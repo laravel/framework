@@ -552,7 +552,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
         $this->queueRecallerCookie($this->user());
 
-        $this->fireLogoutOtherDevicesEvent($this->user());
+        $this->fireOtherDeviceLogoutEvent($this->user());
 
         return $result;
     }
@@ -618,15 +618,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Fire the logout other devices event if the dispatcher is set.
+     * Fire the other device logout event if the dispatcher is set.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    protected function fireLogoutOtherDevicesEvent($user)
+    protected function fireOtherDeviceLogoutEvent($user)
     {
         if (isset($this->events)) {
-            $this->events->dispatch(new Events\LogoutOtherDevices(
+            $this->events->dispatch(new Events\OtherDeviceLogout(
                 $this->name, $user
             ));
         }
