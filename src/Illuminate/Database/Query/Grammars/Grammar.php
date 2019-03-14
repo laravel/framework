@@ -110,7 +110,7 @@ class Grammar extends BaseGrammar
         // we need to prepend "distinct" onto the column name so that the query takes
         // it into account when it performs the aggregating operations on the data.
         if (is_array($query->distinct)) {
-            $column = 'distinct ('.$this->columnize($query->distinct).')';
+            $column = 'distinct '.$this->columnize($query->distinct).'';
         } elseif ($query->distinct && $column !== '*') {
             $column = 'distinct '.$column;
         }
@@ -134,9 +134,7 @@ class Grammar extends BaseGrammar
             return;
         }
 
-        if (is_array($query->distinct)) {
-            $select = 'select distinct ('.$this->columnize($query->distinct).'), ';
-        } elseif ($query->distinct) {
+        if ($query->distinct) {
             $select = 'select distinct ';
         } else {
             $select = 'select ';
