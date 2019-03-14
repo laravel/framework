@@ -57,6 +57,7 @@ use Illuminate\Foundation\Console\NotificationMakeCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Foundation\Console\ContainerBindingListCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
@@ -131,6 +132,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'CacheTable' => 'command.cache.table',
         'ChannelMake' => 'command.channel.make',
         'ConsoleMake' => 'command.console.make',
+        'ContainerBindingList' => 'command.app.list',
         'ControllerMake' => 'command.controller.make',
         'EventGenerate' => 'command.event.generate',
         'EventMake' => 'command.event.make',
@@ -303,6 +305,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.config.clear', function ($app) {
             return new ConfigClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerContainerBindingListCommand()
+    {
+        $this->app->singleton('command.app.list', function ($app) {
+            return new ContainerBindingListCommand;
         });
     }
 
