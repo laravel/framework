@@ -63,6 +63,7 @@ class ContainerBindingListCommand extends Command
     {
         return array_map(function ($id) use ($bindings) {
             $binding = array_merge($bindings[$id], ['id' => $id]);
+
             return Arr::only($binding, $this->getColumns());
         }, array_keys($bindings));
     }
