@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Http\RedirectResponse;
@@ -217,7 +218,7 @@ class Handler implements ExceptionHandlerContract
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $request->expectsJson()
-                    ? response()->json(['message' => $exception->getMessage()], 401)
+                    ? response()->json(['message' => Lang::getFromJson($exception->getMessage())], 401)
                     : redirect()->guest($exception->redirectTo() ?? route('login'));
     }
 
@@ -263,7 +264,7 @@ class Handler implements ExceptionHandlerContract
     protected function invalidJson($request, ValidationException $exception)
     {
         return response()->json([
-            'message' => $exception->getMessage(),
+            'message' => Lang::getFromJson($exception->getMessage()),
             'errors' => $exception->errors(),
         ], $exception->status);
     }
