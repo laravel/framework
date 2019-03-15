@@ -5,6 +5,7 @@ namespace Illuminate\Session\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\InputOption;
 
 class SessionTableCommand extends Command
 {
@@ -62,6 +63,8 @@ class SessionTableCommand extends Command
 
         $this->info('Migration created successfully!');
 
+        $this->migrateSessionTable($fullPath);
+
         $this->composer->dumpAutoloads();
     }
 
@@ -77,5 +80,32 @@ class SessionTableCommand extends Command
         $path = $this->laravel->databasePath().'/migrations';
 
         return $this->laravel['migration.creator']->create($name, $path);
+    }
+
+    /**
+     * Migrate the session table.
+     *
+     * @param string $fullPath
+     * @return void
+     */
+    protected function migrateSessionTable($fullPath)
+    {
+        if ($this->option('migrate')) {
+            $path = str_replace(getcwd(), '', $fullPath);
+
+            $this->call('migrate', ['--path' => $path]);
+        }
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['migrate', 'm', InputOption::VALUE_NONE, 'Migrate the session table.'],
+        ];
     }
 }
