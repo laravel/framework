@@ -101,6 +101,14 @@ class ViewBladeCompilerTest extends TestCase
         $compiler->compile('foo');
     }
 
+    public function testShouldStartFromStrictTypesDeclaration()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $strictTypeDecl = "<?php\ndeclare(strict_types = 1);";
+        $this->assertTrue(substr($compiler->compileString("<?php\ndeclare(strict_types = 1);\nHello World"),
+            0, strlen($strictTypeDecl)) === $strictTypeDecl);
+    }
+
     protected function getFiles()
     {
         return m::mock(Filesystem::class);
