@@ -37,7 +37,7 @@ trait ResetsPasswords
      */
     public function reset(Request $request)
     {
-        $request->validate($this->rules(), $this->validationErrorMessages());
+        $request->validate($this->rules(), $this->validationErrorMessages(), $this->validationCustomAttributes());
 
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
@@ -76,6 +76,16 @@ trait ResetsPasswords
      * @return array
      */
     protected function validationErrorMessages()
+    {
+        return [];
+    }
+    
+    /**
+     * Get the password reset custom attributes.
+     *
+     * @return array
+     */
+    protected function validationCustomAttributes()
     {
         return [];
     }
