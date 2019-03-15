@@ -564,6 +564,104 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Add the constraints for a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string|null  $alias
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationJoinQuery(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
+    {
+        if ($parentQuery->getQuery()->from === $query->getQuery()->from) {
+            return $this->getRelationJoinQueryForSelfRelation($query, $parentQuery, $type, $alias);
+        }
+
+        if ($parentQuery->getQuery()->from === $this->throughParent->getTable()) {
+            return $this->getRelationJoinQueryForThroughSelfRelation($query, $parentQuery, $type, $alias);
+        }
+
+        $this->performRelationJoin($query, $type);
+
+        return $query->whereColumn(
+            $this->getQualifiedFarKeyName(), '=', $this->getQualifiedSecondLocalKeyName()
+        );
+    }
+
+    /**
+     * Add the constraints for a relationship query on the same table.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string|null  $alias
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationJoinQueryForSelfRelation(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
+    {
+        $query->from($query->getModel()->getTable().' as '.$hash = ($alias ?: $this->getRelationCountHash()));
+
+        $query->join($this->throughParent->getTable(), function($join) use ($parentQuery) {
+            $join->on($this->getQualifiedFirstKeyName(), '=', $parentQuery->getQuery()->from.'.'.$this->localKey);
+
+            if ($this->throughParentSoftDeletes()) {
+                $join->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+            }
+        }, null, null, $type);
+
+        $query->getModel()->setTable($hash);
+
+        return $query->whereColumn(
+            $hash.'.'.$this->secondKey, '=', $this->getQualifiedParentKeyName()
+        );
+    }
+
+    /**
+     * Add the constraints for a relationship query on the same table as the through parent.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string|null  $alias
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationJoinQueryForThroughSelfRelation(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
+    {
+        $table = $this->throughParent->getTable().' as '.$hash = ($alias ?: $this->getRelationCountHash());
+
+        $query->join($table, function($join) use ($parentQuery, $hash) {
+            $join->on($hash.'.'.$this->firstKey, '=', $parentQuery->getQuery()->from.'.'.$this->localKey);
+
+            if ($this->throughParentSoftDeletes()) {
+                $join->whereNull($hash.'.'.$this->throughParent->getDeletedAtColumn());
+            }
+        }, null, null, $type);
+
+        return $query->whereColumn(
+            $this->getQualifiedFarKeyName(), '=', $hash.'.'.$this->secondLocalKey
+        );
+    }
+
+    /**
+     * Set the join clause for the relation query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param  string  $type
+     * @return $this
+     */
+    protected function performRelationJoin($query = null, $type = 'inner')
+    {
+        $query = $query ?: $this->query;
+
+        $query->join($this->throughParent->getTable(), function($join) {
+            $join->on($this->getQualifiedFirstKeyName(), '=', $this->getQualifiedLocalKeyName());
+        }, null, null, $type);
+
+        return $this;
+    }
+
+    /**
      * Get a relationship join table hash.
      *
      * @return string
@@ -651,5 +749,15 @@ class HasManyThrough extends Relation
     public function getSecondLocalKeyName()
     {
         return $this->secondLocalKey;
+    }
+
+    /**
+     * Get the qualified second local key on the through parent model.
+     *
+     * @return string
+     */
+    public function getQualifiedSecondLocalKeyName()
+    {
+        return $this->throughParent->qualifyColumn($this->secondLocalKey);
     }
 }

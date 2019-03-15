@@ -978,6 +978,66 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Adds the constraints for a relationship join.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string|null  $alias
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationJoinQuery(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
+    {
+        if ($query->getQuery()->from == $parentQuery->getQuery()->from) {
+            return $this->getRelationJoinQueryForSelfRelation($query, $parentQuery, $type, $alias);
+        }
+
+        $this->performRelationJoin($query, $type);
+
+        return $query->whereColumn(
+            $this->getQualifiedRelatedKeyName(), '=', $this->getQualifiedRelatedPivotKeyName()
+        );
+    }
+
+    /**
+     * Add the constraints for a relationship query on the same table.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string|null  $alias
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationJoinQueryForSelfRelation(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
+    {
+        $query->from($this->related->getTable().' as '.$hash = ($alias ?: $this->getRelationCountHash()));
+
+        $this->related->setTable($hash);
+
+        $this->performRelationJoin($query, $type);
+
+        return $query->whereColumn(
+            $this->getQualifiedRelatedKeyName(), '=', $this->getQualifiedRelatedPivotKeyName()
+        );
+    }
+
+    /**
+     * Set the join clause for the relation query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param  string  $type
+     * @return $this
+     */
+    protected function performRelationJoin($query = null, $type = 'inner')
+    {
+        $query = $query ?: $this->query;
+
+        $query->join($this->table, $this->getQualifiedForeignPivotKeyName(), '=', $this->getQualifiedParentKeyName(), $type);
+
+        return $this;
+    }
+
+    /**
      * Get the key for comparing against the parent key in "has" query.
      *
      * @return string
@@ -1062,6 +1122,16 @@ class BelongsToMany extends Relation
     public function getRelatedPivotKeyName()
     {
         return $this->relatedPivotKey;
+    }
+
+    /**
+     * Get the fully qualified related key name for the relation.
+     *
+     * @return string
+     */
+    public function getQualifiedRelatedKeyName()
+    {
+        return $this->related->qualifyColumn($this->relatedKey);
     }
 
     /**

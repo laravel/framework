@@ -278,6 +278,46 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Adds the constraints for a relationship join.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string|null  $alias
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationJoinQuery(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
+    {
+        if ($query->getQuery()->from == $parentQuery->getQuery()->from) {
+            return $this->getRelationJoinQueryForSelfRelation($query, $parentQuery, $type, $alias);
+        }
+
+        return $query->whereColumn(
+            $query->qualifyColumn($this->ownerKey), '=', $this->getQualifiedForeignKeyName()
+        );
+    }
+
+    /**
+     * Add the constraints for a relationship query on the same table.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string|null  $alias
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationJoinQueryForSelfRelation(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
+    {
+        $query->from($query->getModel()->getTable().' as '.$hash = ($alias ?: $this->getRelationCountHash()));
+
+        $query->getModel()->setTable($hash);
+
+        return $query->whereColumn(
+            $hash.'.'.$this->ownerKey, '=', $this->getQualifiedForeignKeyName()
+        );
+    }
+
+    /**
      * Get a relationship join table hash.
      *
      * @return string

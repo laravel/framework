@@ -116,6 +116,26 @@ class MorphToMany extends BelongsToMany
     }
 
     /**
+     * Set the join clause for the relation query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param  string  $type
+     * @return $this
+     */
+    protected function performRelationJoin($query = null, $type = 'inner')
+    {
+        $query = $query ?: $this->query;
+
+        $query->join($this->table, function($join) {
+            $join->on($this->getQualifiedForeignPivotKeyName(), '=', $this->getQualifiedParentKeyName());
+
+            $join->where($this->table.'.'.$this->morphType, '=', $this->morphClass);
+        }, null, null, $type);
+
+        return $this;
+    }
+
+    /**
      * Create a new query builder for the pivot table.
      *
      * @return \Illuminate\Database\Query\Builder
