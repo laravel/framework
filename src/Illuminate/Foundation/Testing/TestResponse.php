@@ -637,7 +637,7 @@ class TestResponse
      * @param string  $responseKey
      * @return $this
      */
-    public function assertJsonValidationErrors($keys, string $responseKey = 'errors')
+    public function assertJsonValidationErrors($keys, $responseKey = 'errors')
     {
         $keys = Arr::wrap($keys);
 
