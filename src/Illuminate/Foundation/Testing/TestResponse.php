@@ -634,7 +634,7 @@ class TestResponse
      * Assert that the response has the given JSON validation errors for the given keys.
      *
      * @param  string|array  $keys
-     * @param string  $responseKey
+     * @param  string  $responseKey
      * @return $this
      */
     public function assertJsonValidationErrors($keys, $responseKey = 'errors')
@@ -665,10 +665,10 @@ class TestResponse
      * Assert that the response has no JSON validation errors for the given keys.
      *
      * @param  string|array  $keys
-     * @param string  $responseKey
+     * @param  string  $responseKey
      * @return $this
      */
-    public function assertJsonMissingValidationErrors($keys = null, string $responseKey = 'errors')
+    public function assertJsonMissingValidationErrors($keys = null, $responseKey = 'errors')
     {
         $json = $this->json();
 
