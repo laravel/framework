@@ -326,7 +326,7 @@ class FoundationTestResponseTest extends TestCase
             (new Response)->setContent(json_encode($data))
         );
 
-        $testResponse->assertJsonValidationErrors('foo','data');
+        $testResponse->assertJsonValidationErrors('foo', 'data');
     }
 
     public function testAssertJsonValidationErrorsCanFail()
@@ -471,7 +471,7 @@ class FoundationTestResponseTest extends TestCase
             (new Response)->setContent(json_encode($data))
         );
 
-        $testResponse->assertJsonMissingValidationErrors('bar','data');
+        $testResponse->assertJsonMissingValidationErrors('bar', 'data');
     }
 
     public function testMacroable()

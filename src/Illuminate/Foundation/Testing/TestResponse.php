@@ -637,7 +637,7 @@ class TestResponse
      * @param string       $responseKey
      * @return $this
      */
-    public function assertJsonValidationErrors($keys, $responseKey = 'errors')
+    public function assertJsonValidationErrors($keys, string $responseKey = 'errors')
     {
         $keys = Arr::wrap($keys);
 
@@ -646,15 +646,15 @@ class TestResponse
         $errors = $this->json()[$responseKey] ?? [];
 
         $errorMessage = $errors
-            ? 'Response has the following JSON validation errors:' .
-            PHP_EOL . PHP_EOL . json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL
+            ? 'Response has the following JSON validation errors:'.
+            PHP_EOL.PHP_EOL.json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
             : 'Response does not have JSON validation errors.';
 
         foreach ($keys as $key) {
             PHPUnit::assertArrayHasKey(
                 $key,
                 $errors,
-                "Failed to find a validation error in the response for key: '{$key}'" . PHP_EOL . PHP_EOL . $errorMessage
+                "Failed to find a validation error in the response for key: '{$key}'".PHP_EOL.PHP_EOL.$errorMessage
             );
         }
 
@@ -672,7 +672,7 @@ class TestResponse
     {
         $json = $this->json();
 
-        if (!array_key_exists($responseKey, $json)) {
+        if (! array_key_exists($responseKey, $json)) {
             PHPUnit::assertArrayNotHasKey($responseKey, $json);
 
             return $this;
@@ -682,7 +682,7 @@ class TestResponse
 
         if (is_null($keys) && count($errors) > 0) {
             PHPUnit::fail(
-                'Response has unexpected validation errors: ' . PHP_EOL . PHP_EOL .
+                'Response has unexpected validation errors: '.PHP_EOL.PHP_EOL.
                 json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
             );
         }
