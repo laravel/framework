@@ -2005,19 +2005,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUpdateOrInsertMethodWorksWithEmptyUpdateValues()
     {
-        $builder = m::mock(Builder::class.'[where,exists,insert]', [
-            m::mock(ConnectionInterface::class),
-            new Grammar,
-            m::mock(Processor::class),
-        ]);
-
-        $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
-        $builder->shouldReceive('exists')->once()->andReturn(false);
-        $builder->shouldReceive('insert')->once()->with(['email' => 'foo', 'name' => 'bar'])->andReturn(true);
-
-        $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
-
-        $builder = m::mock(Builder::class.'[where,exists,update]', [
+        $builder = m::spy(Builder::class.'[where,exists,update]', [
             m::mock(ConnectionInterface::class),
             new Grammar,
             m::mock(Processor::class),
@@ -2025,10 +2013,9 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
         $builder->shouldReceive('exists')->once()->andReturn(true);
-        $builder->shouldReceive('take')->andReturnSelf();
-        $builder->shouldNotReceive('update')->with([]);
 
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo']));
+        $builder->shouldNotHaveReceived('update');
     }
 
     public function testDeleteMethod()
