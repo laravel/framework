@@ -574,72 +574,44 @@ class HasManyThrough extends Relation
      */
     public function getRelationJoinQuery(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
     {
-        if ($parentQuery->getQuery()->from === $query->getQuery()->from) {
-            return $this->getRelationJoinQueryForSelfRelation($query, $parentQuery, $type, $alias);
+        if(strpos($alias, ',') !== false) {
+            [$throughAlias, $farAlias] = explode(',', $alias);
+        } else {
+            [$throughAlias, $farAlias] = [null, $alias];
         }
 
-        if ($parentQuery->getQuery()->from === $this->throughParent->getTable()) {
-            return $this->getRelationJoinQueryForThroughSelfRelation($query, $parentQuery, $type, $alias);
+        if (is_null($farAlias) && $parentQuery->getQuery()->from === $query->getQuery()->from) {
+            $farAlias = $this->getRelationCountHash();
         }
 
-        $this->performRelationJoin($query, $type);
+        if (is_null($throughAlias) && $parentQuery->getQuery()->from === $this->throughParent->getTable()) {
+            $throughAlias = $this->getRelationCountHash();
+        }
 
-        return $query->whereColumn(
-            $this->getQualifiedFarKeyName(), '=', $this->getQualifiedSecondLocalKeyName()
-        );
-    }
+        if(!is_null($farAlias) && $farAlias != $query->getModel()->getTable()) {
+            $query->from($query->getModel()->getTable().' as '.$farAlias);
 
-    /**
-     * Add the constraints for a relationship query on the same table.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  string  $type
-     * @param  string|null  $alias
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function getRelationJoinQueryForSelfRelation(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
-    {
-        $query->from($query->getModel()->getTable().' as '.$hash = ($alias ?: $this->getRelationCountHash()));
+            $query->getModel()->setTable($farAlias);
+        }
 
-        $query->join($this->throughParent->getTable(), function($join) use ($parentQuery) {
-            $join->on($this->getQualifiedFirstKeyName(), '=', $parentQuery->getQuery()->from.'.'.$this->localKey);
+        if(!is_null($throughAlias) && $throughAlias != $this->throughParent->getTable()) {
+            $table = $this->throughParent->getTable().' as '.$throughAlias;
+
+            $on = $throughAlias;
+        } else {
+            $table = $on = $this->throughParent->getTable();
+        }
+
+        $query->join($table, function($join) use ($parentQuery, $on) {
+            $join->on($on.'.'.$this->firstKey, '=', $parentQuery->qualifyColumn($this->localKey));
 
             if ($this->throughParentSoftDeletes()) {
-                $join->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
-            }
-        }, null, null, $type);
-
-        $query->getModel()->setTable($hash);
-
-        return $query->whereColumn(
-            $hash.'.'.$this->secondKey, '=', $this->getQualifiedParentKeyName()
-        );
-    }
-
-    /**
-     * Add the constraints for a relationship query on the same table as the through parent.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  string  $type
-     * @param  string|null  $alias
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function getRelationJoinQueryForThroughSelfRelation(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
-    {
-        $table = $this->throughParent->getTable().' as '.$hash = ($alias ?: $this->getRelationCountHash());
-
-        $query->join($table, function($join) use ($parentQuery, $hash) {
-            $join->on($hash.'.'.$this->firstKey, '=', $parentQuery->getQuery()->from.'.'.$this->localKey);
-
-            if ($this->throughParentSoftDeletes()) {
-                $join->whereNull($hash.'.'.$this->throughParent->getDeletedAtColumn());
+                $join->whereNull($on.'.'.$this->throughParent->getDeletedAtColumn());
             }
         }, null, null, $type);
 
         return $query->whereColumn(
-            $this->getQualifiedFarKeyName(), '=', $hash.'.'.$this->secondLocalKey
+            $query->qualifyColumn($this->secondKey), '=', $on.'.'.$this->secondLocalKey
         );
     }
 

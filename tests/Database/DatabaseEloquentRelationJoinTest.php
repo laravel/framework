@@ -181,6 +181,150 @@ class DatabaseEloquentRelationJoinTest extends TestCase
         $this->assertEquals([0 => EloquentVideoModelStub::class], $builder->getBindings());
     }
 
+    public function testHasOneUsingAliasRelationJoin()
+    {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('phone as telephones');
+
+        $this->assertEquals('select * from "users" inner join "phones" as "telephones" on "telephones"."user_id" = "users"."id"', $builder->toSql());
+    }
+
+    public function testHasOneInverseUsingAliasRelationJoin()
+    {
+        $builder = (new EloquentPhoneModelStub)->newQuery()->joinRelation('user as contacts');
+
+        $this->assertEquals('select * from "phones" inner join "users" as "contacts" on "contacts"."id" = "phones"."user_id"', $builder->toSql());
+    }
+
+    public function testHasManyUsingAliasRelationJoin()
+    {
+        $builder = (new EloquentPostModelStub)->newQuery()->joinRelation('comments as feedback');
+
+        $this->assertEquals('select * from "posts" inner join "comments" as "feedback" on "feedback"."post_id" = "posts"."id"', $builder->toSql());
+    }
+
+    public function testHasManyInverseUsingAliasRelationJoin()
+    {
+        $builder = (new EloquentCommentModelStub)->newQuery()->joinRelation('post as article');
+
+        $this->assertEquals('select * from "comments" inner join "posts" as "article" on "article"."id" = "comments"."post_id"', $builder->toSql());
+    }
+
+    public function testBelongsToManyUsingFarAliasRelationJoin()
+    {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('roles as positions');
+
+        $this->assertEquals('select * from "users" inner join "role_user" on "role_user"."user_id" = "users"."id" inner join "roles" as "positions" on "positions"."id" = "role_user"."role_id"', $builder->toSql());
+    }
+
+    public function testBelongsToManyUsingPivotAliasRelationJoin()
+    {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('roles as users_roles,roles');
+
+        $this->assertEquals('select * from "users" inner join "role_user" as "users_roles" on "users_roles"."user_id" = "users"."id" inner join "roles" on "roles"."id" = "users_roles"."role_id"', $builder->toSql());
+    }
+
+    public function testBelongsToManyUsingPivotAndFarAliasRelationJoin()
+    {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('roles as position_user,positions');
+
+        $this->assertEquals('select * from "users" inner join "role_user" as "position_user" on "position_user"."user_id" = "users"."id" inner join "roles" as "positions" on "positions"."id" = "position_user"."role_id"', $builder->toSql());
+    }
+
+    public function testHasOneThroughUsingFarAliasRelationJoin()
+    {
+        $builder = (new EloquentSupplierModelStub)->newQuery()->joinRelation('userHistory as revisions');
+
+        $this->assertEquals('select * from "suppliers" inner join "users" on "users"."supplier_id" = "suppliers"."id" inner join "history" as "revisions" on "revisions"."user_id" = "users"."id"', $builder->toSql());
+    }
+
+    public function testHasOneThroughUsingThroughAliasRelationJoin()
+    {
+        $builder = (new EloquentSupplierModelStub)->newQuery()->joinRelation('userHistory as workers,history');
+
+        $this->assertEquals('select * from "suppliers" inner join "users" as "workers" on "workers"."supplier_id" = "suppliers"."id" inner join "history" on "history"."user_id" = "workers"."id"', $builder->toSql());
+    }
+
+    public function testHasOneThroughUsingThroughAndFarAliasRelationJoin()
+    {
+        $builder = (new EloquentSupplierModelStub)->newQuery()->joinRelation('userHistory as workers,revisions');
+
+        $this->assertEquals('select * from "suppliers" inner join "users" as "workers" on "workers"."supplier_id" = "suppliers"."id" inner join "history" as "revisions" on "revisions"."user_id" = "workers"."id"', $builder->toSql());
+    }
+
+    public function testHasOneThroughInverseUsingFarAliasRelationJoin()
+    {
+        $builder = (new EloquentUserHistoryModelStub)->newQuery()->joinRelation('user.supplier as providers');
+
+        $this->assertEquals('select * from "history" inner join "users" on "users"."id" = "history"."user_id" inner join "suppliers" as "providers" on "providers"."id" = "users"."supplier_id"', $builder->toSql());
+    }
+
+    public function testHasOneThroughInverseUsingThroughAliasRelationJoin()
+    {
+        $builder = (new EloquentUserHistoryModelStub)->newQuery()->joinRelation('user as workers.supplier');
+
+        $this->assertEquals('select * from "history" inner join "users" as "workers" on "workers"."id" = "history"."user_id" inner join "suppliers" on "suppliers"."id" = "workers"."supplier_id"', $builder->toSql());
+    }
+
+    public function testHasOneThroughInverseUsingThroughAndFarAliasRelationJoin()
+    {
+        $builder = (new EloquentUserHistoryModelStub)->newQuery()->joinRelation('user as workers.supplier as providers');
+
+        $this->assertEquals('select * from "history" inner join "users" as "workers" on "workers"."id" = "history"."user_id" inner join "suppliers" as "providers" on "providers"."id" = "workers"."supplier_id"', $builder->toSql());
+    }
+
+    public function testHasManyThroughUsingFarAliasRelationJoin()
+    {
+        $builder = (new EloquentCountryModelStub)->newQuery()->joinRelation('posts as articles');
+
+        $this->assertEquals('select * from "countries" inner join "users" on "users"."country_id" = "countries"."id" inner join "posts" as "articles" on "articles"."user_id" = "users"."id"', $builder->toSql());
+    }
+
+    public function testHasManyThroughUsingThroughAliasRelationJoin()
+    {
+        $builder = (new EloquentCountryModelStub)->newQuery()->joinRelation('posts as citizens,posts');
+
+        $this->assertEquals('select * from "countries" inner join "users" as "citizens" on "citizens"."country_id" = "countries"."id" inner join "posts" on "posts"."user_id" = "citizens"."id"', $builder->toSql());
+    }
+
+    public function testHasManyThroughUsingThroughAndFarAliasRelationJoin()
+    {
+        $builder = (new EloquentCountryModelStub)->newQuery()->joinRelation('posts as citizens,articles');
+
+        $this->assertEquals('select * from "countries" inner join "users" as "citizens" on "citizens"."country_id" = "countries"."id" inner join "posts" as "articles" on "articles"."user_id" = "citizens"."id"', $builder->toSql());
+    }
+
+    public function testMorphOneUsingAliasRelationJoin()
+    {
+        $builder = (new EloquentPostModelStub)->newQuery()->joinRelation('image');
+
+        $this->assertEquals('select * from "posts" inner join "images" on "images"."imageable_id" = "posts"."id" and "images"."imageable_type" = ?', $builder->toSql());
+        $this->assertEquals([0 => EloquentPostModelStub::class], $builder->getBindings());
+    }
+
+    public function testMorphManyUsingAliasRelationJoin()
+    {
+        $builder = (new EloquentPostModelStub)->newQuery()->joinRelation('polymorphicComments');
+
+        $this->assertEquals('select * from "posts" inner join "comments" on "comments"."commentable_id" = "posts"."id" and "comments"."commentable_type" = ?', $builder->toSql());
+        $this->assertEquals([0 => EloquentPostModelStub::class], $builder->getBindings());
+    }
+
+    public function testMorphToManyUsingAliasRelationJoin()
+    {
+        $builder = (new EloquentPostModelStub)->newQuery()->joinRelation('tags');
+
+        $this->assertEquals('select * from "posts" inner join "taggables" on "taggables"."taggable_id" = "posts"."id" and "taggables"."taggable_type" = ? inner join "tags" on "tags"."id" = "taggables"."tag_id"', $builder->toSql());
+        $this->assertEquals([0 => EloquentPostModelStub::class], $builder->getBindings());
+    }
+
+    public function testMorphedByManyUsingAliasRelationJoin()
+    {
+        $builder = (new EloquentTagModelStub)->newQuery()->joinRelation('posts');
+
+        $this->assertEquals('select * from "tags" inner join "taggables" on "taggables"."tag_id" = "tags"."id" and "taggables"."taggable_type" = ? inner join "posts" on "posts"."id" = "taggables"."taggable_id"', $builder->toSql());
+        $this->assertEquals([0 => EloquentPostModelStub::class], $builder->getBindings());
+    }
+
     public function testParentSoftDeletesHasOneRelationJoin()
     {
         $builder = (new EloquentSoftDeletingUserModelStub)->newQuery()->joinRelation('phone');
@@ -268,7 +412,7 @@ class DatabaseEloquentRelationJoinTest extends TestCase
     {
         $builder = (new EloquentCountryModelStub)->newQuery()->joinRelation('postsThroughSoftDeletingUser');
 
-        $this->assertEquals('select * from "countries" inner join "users" on "users"."country_id" = "countries"."id" inner join "posts" on "posts"."user_id" = "users"."id" and "users"."deleted_at" is null', $builder->toSql());
+        $this->assertEquals('select * from "countries" inner join "users" on "users"."country_id" = "countries"."id" and "users"."deleted_at" is null inner join "posts" on "posts"."user_id" = "users"."id" and "users"."deleted_at" is null', $builder->toSql());
     }
 
     public function testChildSoftDeletesHasManyThroughRelationJoin()
@@ -329,14 +473,14 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testHasManyThroughSelfUsingAliasRelationJoin()
     {
-        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('employeePosts as employees');
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('employeePosts as employees,posts');
 
         $this->assertEquals('select * from "users" inner join "users" as "employees" on "employees"."manager_id" = "users"."id" inner join "posts" on "posts"."user_id" = "employees"."id"', $builder->toSql());
     }
 
     public function testHasManyThroughSoftDeletingSelfUsingAliasRelationJoin()
     {
-        $builder = (new EloquentSoftDeletingUserModelStub)->newQuery()->joinRelation('employeePosts as employees');
+        $builder = (new EloquentSoftDeletingUserModelStub)->newQuery()->joinRelation('employeePosts as employees,posts');
 
         $this->assertEquals('select * from "users" inner join "users" as "employees" on "employees"."manager_id" = "users"."id" and "employees"."deleted_at" is null inner join "posts" on "posts"."user_id" = "employees"."id" and "users"."deleted_at" is null where "users"."deleted_at" is null', $builder->toSql());
     }
@@ -532,6 +676,37 @@ class DatabaseEloquentRelationJoinTest extends TestCase
         $this->assertEquals('select * from "users" inner join "posts" on "posts"."user_id" = "users"."id" and "posts"."is_active" = ? cross join "comments" on "comments"."post_id" = "posts"."id" and "comments"."created_by_id" = "users"."id"', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
+
+    public function testMultipleAliasesForBelongsToRelationJoin()
+    {
+        $builder = (new EloquentPostModelStub)->newQuery()->joinRelation('user as authors.country as nations');
+
+        $this->assertEquals('select * from "posts" inner join "users" as "authors" on "authors"."id" = "posts"."user_id" inner join "countries" as "nations" on "nations"."id" = "authors"."country_id"', $builder->toSql());
+    }
+
+    public function testMultipleAliasesForHasManyRelationJoin()
+    {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts as articles.comments as reviews');
+
+        $this->assertEquals('select * from "users" inner join "posts" as "articles" on "articles"."user_id" = "users"."id" inner join "comments" as "reviews" on "reviews"."post_id" = "articles"."id"', $builder->toSql());
+    }
+
+    public function testMultipleAliasesForHasManyThroughRelationJoin()
+    {
+        $builder = (new EloquentCountryModelStub)->newQuery()->joinRelation('posts as citizens,articles.likes as feedback,favorites');
+
+        $this->assertEquals('select * from "countries" inner join "users" as "citizens" on "citizens"."country_id" = "countries"."id" inner join "posts" as "articles" on "articles"."user_id" = "citizens"."id" inner join "comments" as "feedback" on "feedback"."post_id" = "articles"."id" inner join "likes" as "favorites" on "favorites"."comment_id" = "feedback"."id"', $builder->toSql());
+    }
+
+    public function testHasManyUsingLocalScopeRelationJoin()
+    {
+        $builder = (new EloquentCountryModelStub)->newQuery()->joinRelation('users', function($join) {
+            $join->active();
+        });
+
+        $this->assertEquals('select * from "countries" inner join "users" on "users"."country_id" = "countries"."id" and "active" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
 }
 
 class EloquentRelationJoinModelStub extends Model
@@ -547,6 +722,11 @@ class EloquentRelationJoinPivotStub extends Pivot
 class EloquentUserModelStub extends EloquentRelationJoinModelStub
 {
     protected $table = 'users';
+
+    public function scopeActive($query)
+    {
+        return $query->where('active', 1);
+    }
 
     public function phone()
     {
@@ -667,6 +847,11 @@ class EloquentPostModelStub extends EloquentRelationJoinModelStub
     {
         return $this->morphToMany(EloquentTagModelStub::class, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id');
     }
+
+    public function likes()
+    {
+        return $this->hasManyThrough(EloquentLikeModelStub::class, EloquentCommentModelStub::class, 'post_id', 'comment_id', 'id', 'id');
+    }
 }
 
 class EloquentCommentModelStub extends EloquentRelationJoinModelStub
@@ -676,6 +861,11 @@ class EloquentCommentModelStub extends EloquentRelationJoinModelStub
     public function post()
     {
         return $this->belongsTo(EloquentPostModelStub::class, 'post_id', 'id');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(EloquentLikeModelStub::class, 'comment_id', 'id');
     }
 }
 
@@ -812,6 +1002,11 @@ class EloquentDepartmentModelStub extends EloquentRelationJoinModelStub
     {
         return $this->hasMany(EloquentUserModelStub::class, 'department_id');
     }
+}
+
+class EloquentLikeModelStub extends EloquentRelationJoinModelStub
+{
+    protected $table = 'likes';
 }
 
 class EloquentSoftDeletingUserModelStub extends EloquentUserModelStub
