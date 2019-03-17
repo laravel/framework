@@ -14,7 +14,6 @@
 - Fixed seeding logic in `Arr::shuffle()` ([#27861](https://github.com/laravel/framework/pull/27861)) 
 
 ### TODO:
-- https://github.com/laravel/framework/pull/27878
 - https://github.com/laravel/framework/pull/27883
 - https://github.com/laravel/framework/pull/27893, https://github.com/laravel/framework/pull/27902
 
