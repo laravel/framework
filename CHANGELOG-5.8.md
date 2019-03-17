@@ -2,6 +2,21 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.4...5.8)
 
+### Added
+- Added `Illuminate\Database\DatabaseManager::setReconnector()` ([#27845](https://github.com/laravel/framework/pull/27845))
+- Added `Illuminate\Auth\Access\Gate::none()` ([#27859](https://github.com/laravel/framework/pull/27859))
+- Added `OtherDeviceLogout` event ([#27865](https://github.com/laravel/framework/pull/27865), [5e87f2d](https://github.com/laravel/framework/commit/5e87f2df072ec4a243b6a3a983a753e8ffa5e6bf))
+
+### Changed 
+- Add replacement for lower danish `æ` ([#27886](https://github.com/laravel/framework/pull/27886))
+
+### Fixed
+- Fixed seeding logic in `Arr::shuffle()` ([#27861](https://github.com/laravel/framework/pull/27861)) 
+
+### TODO:
+- https://github.com/laravel/framework/pull/27878
+- https://github.com/laravel/framework/pull/27883
+- https://github.com/laravel/framework/pull/27893, https://github.com/laravel/framework/pull/27902
 
 
 ## [v5.8.4 (2019-03-12)](https://github.com/laravel/framework/compare/v5.8.3...v5.8.4)
