@@ -316,6 +316,20 @@ class SupportStrTest extends TestCase
         $this->assertEquals('fooBarBaz', Str::camel('foo-bar_baz'));
     }
 
+    public function testPascal()
+    {
+        $this->assertSame('LaravelPHPFramework', Str::pascal('Laravel_p_h_p_framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('Laravel_php_framework'));
+        $this->assertSame('LaravelPhPFramework', Str::pascal('Laravel-phP-framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('Laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('FooBar', Str::pascal('FooBar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar')); // test cache
+        $this->assertSame('FooBarBaz', Str::pascal('Foo-barBaz'));
+        $this->assertSame('FooBarBaz', Str::pascal('foo-bar_baz'));
+    }
+
     public function testSubstr()
     {
         $this->assertEquals('Ё', Str::substr('БГДЖИЛЁ', -1));

@@ -27,6 +27,13 @@ class Str
     protected static $camelCache = [];
 
     /**
+     * The cache of pascal-cased words.
+     *
+     * @var array
+     */
+    protected static $pascalCache = [];
+
+    /**
      * The cache of studly-cased words.
      *
      * @var array
@@ -92,6 +99,21 @@ class Str
         }
 
         return static::$camelCache[$value] = lcfirst(static::studly($value));
+    }
+
+    /**
+     * Convert a value to pascal case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function pascal($value)
+    {
+        if (isset(static::$pascalCache[$value])) {
+            return static::$pascalCache[$value];
+        }
+
+        return static::$pascalCache[$value] = ucfirst(static::studly($value));
     }
 
     /**
