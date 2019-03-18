@@ -19,9 +19,9 @@ class PaginatorTest extends TestCase
         $pageInfo = [
             'per_page' => 2,
             'current_page' => 2,
-            'first_page_url' => '/?page=1',
+            'first_page_url' => '/',
             'next_page_url' => '/?page=3',
-            'prev_page_url' => '/?page=1',
+            'prev_page_url' => '/',
             'from' => 3,
             'to' => 4,
             'data' => ['item3', 'item4'],
@@ -36,7 +36,7 @@ class PaginatorTest extends TestCase
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test/']);
 
-        $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
+        $this->assertEquals('http://website.com/test?page=3', $p->nextPageUrl());
     }
 
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
@@ -44,7 +44,7 @@ class PaginatorTest extends TestCase
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test']);
 
-        $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
+        $this->assertEquals('http://website.com/test?page=3', $p->nextPageUrl());
     }
 
     public function testItRetrievesThePaginatorOptions()
