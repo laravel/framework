@@ -21,7 +21,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
  */
 class Builder
 {
-    use BuildsQueries, Concerns\QueriesRelationships, ForwardsCalls;
+    use BuildsQueries, Concerns\QueriesRelationships, Concerns\JoinsRelationships, ForwardsCalls;
 
     /**
      * The base query builder instance.
