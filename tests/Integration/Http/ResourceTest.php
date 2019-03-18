@@ -468,8 +468,8 @@ class ResourceTest extends TestCase
                 ],
             ],
             'links' => [
-                'first' => '/?page=1',
-                'last' => '/?page=1',
+                'first' => '/',
+                'last' => '/',
                 'prev' => null,
                 'next' => null,
             ],
@@ -509,8 +509,8 @@ class ResourceTest extends TestCase
                 ],
             ],
             'links' => [
-                'first' => '/?page=1',
-                'last' => '/?page=1',
+                'first' => '/',
+                'last' => '/',
                 'prev' => null,
                 'next' => null,
             ],
