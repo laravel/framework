@@ -379,9 +379,11 @@ class SupportArrTest extends TestCase
 
     public function testOnly()
     {
-        $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
-        $array = Arr::only($array, ['name', 'price']);
-        $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
+        $array = ['size' => 10, 'name' => 'Desk', 'price' => 100, 'orders' => 10];
+        $array = Arr::only($array, ['name', 'price', 'size'], true);
+
+        $this->assertEquals(['name' => 'Desk', 'price' => 100, 'size' => 10], $array);
+        $this->assertEquals('{"name":"Desk","price":100,"size":10}', json_encode($array));
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
     }
 

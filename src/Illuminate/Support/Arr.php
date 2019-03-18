@@ -358,10 +358,18 @@ class Arr
      *
      * @param  array  $array
      * @param  array|string  $keys
+     * @param  bool $sortByKeysParameter
      * @return array
      */
-    public static function only($array, $keys)
+    public static function only($array, $keys, $sortByKeysParameter = false)
     {
+        if ($sortByKeysParameter) {
+            $keysFlip = array_flip((array) $keys);
+            $result = array_intersect_key($array, $keysFlip);
+
+            return array_merge($keysFlip, $result);
+        }
+
         return array_intersect_key($array, array_flip((array) $keys));
     }
 
