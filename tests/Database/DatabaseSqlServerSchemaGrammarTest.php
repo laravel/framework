@@ -497,7 +497,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->dateTime('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "created_at" datetime not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "created_at" datetime2 not null', $statements[0]);
     }
 
     public function testAddingDateTimeWithPrecision()

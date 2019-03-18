@@ -503,7 +503,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return $column->precision ? "datetime2($column->precision)" : 'datetime';
+        return $column->precision ? "datetime2($column->precision)" : 'datetime2';
     }
 
     /**
