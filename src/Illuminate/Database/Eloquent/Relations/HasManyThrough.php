@@ -574,7 +574,7 @@ class HasManyThrough extends Relation
      */
     public function getRelationJoinQuery(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
     {
-        if(strpos($alias, ',') !== false) {
+        if (strpos($alias, ',') !== false) {
             [$throughAlias, $farAlias] = explode(',', $alias);
         } else {
             [$throughAlias, $farAlias] = [null, $alias];
@@ -588,13 +588,13 @@ class HasManyThrough extends Relation
             $throughAlias = $this->getRelationCountHash();
         }
 
-        if(!is_null($farAlias) && $farAlias != $query->getModel()->getTable()) {
+        if (! is_null($farAlias) && $farAlias != $query->getModel()->getTable()) {
             $query->from($query->getModel()->getTable().' as '.$farAlias);
 
             $query->getModel()->setTable($farAlias);
         }
 
-        if(!is_null($throughAlias) && $throughAlias != $this->throughParent->getTable()) {
+        if (! is_null($throughAlias) && $throughAlias != $this->throughParent->getTable()) {
             $table = $this->throughParent->getTable().' as '.$throughAlias;
 
             $on = $throughAlias;
@@ -602,7 +602,7 @@ class HasManyThrough extends Relation
             $table = $on = $this->throughParent->getTable();
         }
 
-        $query->join($table, function($join) use ($parentQuery, $on) {
+        $query->join($table, function ($join) use ($parentQuery, $on) {
             $join->on($on.'.'.$this->firstKey, '=', $parentQuery->qualifyColumn($this->localKey));
 
             if ($this->throughParentSoftDeletes()) {
@@ -626,7 +626,7 @@ class HasManyThrough extends Relation
     {
         $query = $query ?: $this->query;
 
-        $query->join($this->throughParent->getTable(), function($join) {
+        $query->join($this->throughParent->getTable(), function ($join) {
             $join->on($this->getQualifiedFirstKeyName(), '=', $this->getQualifiedLocalKeyName());
         }, null, null, $type);
 

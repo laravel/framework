@@ -128,7 +128,7 @@ class MorphToMany extends BelongsToMany
     {
         $query = $query ?: $this->query;
 
-        $query->join($table, function($join) use ($on) {
+        $query->join($table, function ($join) use ($on) {
             $join->on($on.'.'.$this->foreignPivotKey, '=', $this->getQualifiedParentKeyName());
 
             $join->where($on.'.'.$this->morphType, '=', $this->morphClass);

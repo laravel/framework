@@ -348,7 +348,7 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testChildSoftDeletesHasOneWithTrashedRelationJoin()
     {
-        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('softDeletingPhone', function($join) {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('softDeletingPhone', function ($join) {
             $join->withTrashed();
         });
 
@@ -371,7 +371,7 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testParentAndChildSoftDeletesHasOneWithTrashedChildRelationJoin()
     {
-        $builder = (new EloquentSoftDeletingUserModelStub)->newQuery()->joinRelation('softDeletingPhone', function($join) {
+        $builder = (new EloquentSoftDeletingUserModelStub)->newQuery()->joinRelation('softDeletingPhone', function ($join) {
             $join->withTrashed();
         });
 
@@ -380,7 +380,7 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testParentAndChildSoftDeletesHasOneWithTrashedRelationJoin()
     {
-        $builder = (new EloquentSoftDeletingUserModelStub)->newQuery()->withTrashed()->joinRelation('softDeletingPhone', function($join) {
+        $builder = (new EloquentSoftDeletingUserModelStub)->newQuery()->withTrashed()->joinRelation('softDeletingPhone', function ($join) {
             $join->withTrashed();
         });
 
@@ -515,9 +515,9 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testThroughJoinForHasManyRelationJoin()
     {
-        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts', function($join) {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts', function ($join) {
             $join->where('posts.is_active', '=', 1);
-        })->joinThroughRelation('posts.comments', function($join) {
+        })->joinThroughRelation('posts.comments', function ($join) {
             $join->whereColumn('comments.created_by_id', '=', 'users.id');
         });
 
@@ -643,9 +643,9 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testLeftThroughJoinForHasManyRelationJoin()
     {
-        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts', function($join) {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts', function ($join) {
             $join->where('posts.is_active', '=', 1);
-        })->leftJoinThroughRelation('posts.comments', function($join) {
+        })->leftJoinThroughRelation('posts.comments', function ($join) {
             $join->whereColumn('comments.created_by_id', '=', 'users.id');
         });
 
@@ -655,9 +655,9 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testRightThroughJoinForHasManyRelationJoin()
     {
-        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts', function($join) {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts', function ($join) {
             $join->where('posts.is_active', '=', 1);
-        })->rightJoinThroughRelation('posts.comments', function($join) {
+        })->rightJoinThroughRelation('posts.comments', function ($join) {
             $join->whereColumn('comments.created_by_id', '=', 'users.id');
         });
 
@@ -667,9 +667,9 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testCrossThroughJoinForHasManyRelationJoin()
     {
-        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts', function($join) {
+        $builder = (new EloquentUserModelStub)->newQuery()->joinRelation('posts', function ($join) {
             $join->where('posts.is_active', '=', 1);
-        })->crossJoinThroughRelation('posts.comments', function($join) {
+        })->crossJoinThroughRelation('posts.comments', function ($join) {
             $join->whereColumn('comments.created_by_id', '=', 'users.id');
         });
 
@@ -700,7 +700,7 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
     public function testHasManyUsingLocalScopeRelationJoin()
     {
-        $builder = (new EloquentCountryModelStub)->newQuery()->joinRelation('users', function($join) {
+        $builder = (new EloquentCountryModelStub)->newQuery()->joinRelation('users', function ($join) {
             $join->active();
         });
 

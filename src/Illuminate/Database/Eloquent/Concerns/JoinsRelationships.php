@@ -4,14 +4,9 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 
 trait JoinsRelationships
 {
@@ -21,7 +16,7 @@ trait JoinsRelationships
      * @param  string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $type
-     * @param  boolean  $through
+     * @param  bool  $through
      * @param  \Illuminate\Database\Eloquent\Builder  $relatedQuery
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
@@ -48,7 +43,7 @@ trait JoinsRelationships
         // If we're simply passing through a relation, then we want to advance the relation
         // without actually applying any joins. Presumably the developer has already used
         // a modified version of this join, and they don't want to do it all over again.
-        if($through) {
+        if ($through) {
             return $joinQuery;
         }
 
@@ -63,7 +58,7 @@ trait JoinsRelationships
             $joinQuery, $relation, $type
         );
 
-        return !is_null($relatedQuery) ? $joinQuery : $this;
+        return ! is_null($relatedQuery) ? $joinQuery : $this;
     }
 
     /**
@@ -72,7 +67,7 @@ trait JoinsRelationships
      * @param  string  $relations
      * @param  \Closure|null  $callback
      * @param  string  $type
-     * @param  boolean  $through
+     * @param  bool  $through
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     protected function joinNestedRelation($relations, Closure $callback = null, $type = 'inner', $through = false)
@@ -81,7 +76,7 @@ trait JoinsRelationships
 
         $relatedQuery = $this;
 
-        while(count($relations) > 0) {
+        while (count($relations) > 0) {
             $closure = count($relations) > 1 ? null : $callback;
             $useThrough = count($relations) > 1 && $through;
 
@@ -105,12 +100,12 @@ trait JoinsRelationships
 
         $baseJoinQuery = $joinQuery->toBase();
 
-        if(!empty($baseJoinQuery->joins)) {
+        if (! empty($baseJoinQuery->joins)) {
             $this->mergeJoins($baseJoinQuery->joins, $baseJoinQuery->bindings['join']);
         }
 
         return $this->join($baseJoinQuery->from, function($join) use ($baseJoinQuery) {
-            if(!empty($baseJoinQuery->wheres)) {
+            if (! empty($baseJoinQuery->wheres)) {
                 $join->mergeWheres($baseJoinQuery->wheres, $baseJoinQuery->bindings['where']);
             }
         }, null, null, $type);
@@ -121,7 +116,7 @@ trait JoinsRelationships
      *
      * @param  string  $relation
      * @param  \Closure|null  $callback
-     * @param  boolean  $through
+     * @param  bool  $through
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function leftJoinRelation($relation, Closure $callback = null, $through = false)
@@ -134,7 +129,7 @@ trait JoinsRelationships
      *
      * @param  string  $relation
      * @param  \Closure|null  $callback
-     * @param  boolean  $through
+     * @param  bool  $through
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function rightJoinRelation($relation, Closure $callback = null, $through = false)
@@ -147,7 +142,7 @@ trait JoinsRelationships
      *
      * @param  string  $relation
      * @param  \Closure|null  $callback
-     * @param  boolean  $through
+     * @param  bool  $through
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function crossJoinRelation($relation, Closure $callback = null, $through = false)

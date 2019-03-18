@@ -963,7 +963,7 @@ class BelongsToMany extends Relation
      */
     public function getRelationJoinQuery(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
     {
-        if(strpos($alias, ',') !== false) {
+        if( strpos($alias, ',') !== false) {
             [$pivotAlias, $farAlias] = explode(',', $alias);
         } else {
             [$pivotAlias, $farAlias] = [null, $alias];
@@ -977,13 +977,13 @@ class BelongsToMany extends Relation
             $pivotAlias = $this->getRelationCountHash();
         }
 
-        if(!is_null($farAlias) && $farAlias != $this->related->getTable()) {
+        if (! is_null($farAlias) && $farAlias != $this->related->getTable()) {
             $query->from($this->related->getTable().' as '.$farAlias);
 
             $this->related->setTable($farAlias);
         }
 
-        if(!is_null($pivotAlias) && $pivotAlias != $this->table) {
+        if (! is_null($pivotAlias) && $pivotAlias != $this->table) {
             $table = $this->table.' as '.$pivotAlias;
 
             $on = $pivotAlias;

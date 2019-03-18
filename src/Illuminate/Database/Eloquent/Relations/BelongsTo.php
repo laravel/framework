@@ -292,7 +292,7 @@ class BelongsTo extends Relation
             $alias = $this->getRelationCountHash();
         }
 
-        if(!is_null($alias) && $alias != $query->getModel()->getTable()) {
+        if (! is_null($alias) && $alias != $query->getModel()->getTable()) {
             $query->from($query->getModel()->getTable().' as '.$alias);
 
             $query->getModel()->setTable($alias);
