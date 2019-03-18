@@ -104,7 +104,7 @@ trait JoinsRelationships
             $this->mergeJoins($baseJoinQuery->joins, $baseJoinQuery->bindings['join']);
         }
 
-        return $this->join($baseJoinQuery->from, function($join) use ($baseJoinQuery) {
+        return $this->join($baseJoinQuery->from, function ($join) use ($baseJoinQuery) {
             if (! empty($baseJoinQuery->wheres)) {
                 $join->mergeWheres($baseJoinQuery->wheres, $baseJoinQuery->bindings['where']);
             }

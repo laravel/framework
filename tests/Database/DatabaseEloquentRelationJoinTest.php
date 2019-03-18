@@ -711,12 +711,10 @@ class DatabaseEloquentRelationJoinTest extends TestCase
 
 class EloquentRelationJoinModelStub extends Model
 {
-
 }
 
 class EloquentRelationJoinPivotStub extends Pivot
 {
-
 }
 
 class EloquentUserModelStub extends EloquentRelationJoinModelStub

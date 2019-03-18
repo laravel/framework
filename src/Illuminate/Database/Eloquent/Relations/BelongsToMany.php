@@ -963,7 +963,7 @@ class BelongsToMany extends Relation
      */
     public function getRelationJoinQuery(Builder $query, Builder $parentQuery, $type = 'inner', $alias = null)
     {
-        if( strpos($alias, ',') !== false) {
+        if (strpos($alias, ',') !== false) {
             [$pivotAlias, $farAlias] = explode(',', $alias);
         } else {
             [$pivotAlias, $farAlias] = [null, $alias];
