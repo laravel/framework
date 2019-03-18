@@ -2003,6 +2003,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
     }
 
+    public function testUpdateOrInsertMethodWorksWithEmptyUpdateValues()
+    {
+        $builder = m::spy(Builder::class.'[where,exists,update]', [
+            m::mock(ConnectionInterface::class),
+            new Grammar,
+            m::mock(Processor::class),
+        ]);
+
+        $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
+        $builder->shouldReceive('exists')->once()->andReturn(true);
+
+        $this->assertTrue($builder->updateOrInsert(['email' => 'foo']));
+        $builder->shouldNotHaveReceived('update');
+    }
+
     public function testDeleteMethod()
     {
         $builder = $this->getBuilder();
