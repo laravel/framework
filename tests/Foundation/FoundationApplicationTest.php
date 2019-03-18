@@ -309,6 +309,15 @@ class FoundationApplicationTest extends TestCase
 
         $this->assertEquals(4, $counter);
     }
+
+    public function testGetNamespace()
+    {
+        $app1 = new Application(realpath(__DIR__.'/fixtures/laravel1'));
+        $app2 = new Application(realpath(__DIR__.'/fixtures/laravel2'));
+
+        $this->assertSame('Laravel\\One\\', $app1->getNamespace());
+        $this->assertSame('Laravel\\Two\\', $app2->getNamespace());
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
