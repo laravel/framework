@@ -1111,6 +1111,38 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse($c->push(['active' => false])->every->active);
     }
 
+    public function testAny()
+    {
+        $c = new Collection([]);
+        $this->assertFalse($c->any('key', 'value'));
+        $this->assertFalse($c->any(function () {
+            return false;
+        }));
+
+        $c = new Collection([['age' => 18], ['age' => 20], ['age' => 20]]);
+        $this->assertTrue($c->any('age', 18));
+        $this->assertTrue($c->any('age', '>=', 18));
+        $this->assertTrue($c->any(function ($item) {
+            return $item['age'] >= 18;
+        }));
+        $this->assertFalse($c->any(function ($item) {
+            return $item['age'] > 20;
+        }));
+
+        $c = new Collection([null, null]);
+        $this->assertTrue($c->any(function ($item) {
+            return $item === null;
+        }));
+        $this->assertTrue($c->push('not null')->any(function ($item) {
+            return $item === null;
+        }));
+
+        $c = new Collection([]);
+        $this->assertFalse($c->any('active'));
+        $this->assertFalse($c->any->active);
+        $this->assertTrue($c->push(['active' => true])->any->active);
+    }
+
     public function testExcept()
     {
         $data = new Collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
