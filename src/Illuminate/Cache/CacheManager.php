@@ -353,7 +353,7 @@ class CacheManager implements FactoryContract
      * @return void
      */
     public function saveCustomCreatorConfig($driver) {
-        $this->app["config"]["cache.stores.$driver"] = [
+        $this->app['config']["cache.stores.{$driver}"] = [
             "driver" => $driver
         ];
     }
