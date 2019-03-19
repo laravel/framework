@@ -383,31 +383,36 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the path to the language files.
      *
+     * @param  string  $path Optionally, a path to append to the language files path
      * @return string
      */
-    public function langPath()
+    public function langPath($path = '')
     {
-        return $this->resourcePath().DIRECTORY_SEPARATOR.'lang';
+        return $this->resourcePath().DIRECTORY_SEPARATOR.'lang'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
      * Get the path to the public / web directory.
      *
+     * @param  string  $path Optionally, a path to append to the public path
      * @return string
      */
-    public function publicPath()
+    public function publicPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'public';
+        return $this->basePath.DIRECTORY_SEPARATOR.'public'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
      * Get the path to the storage directory.
      *
+     * @param  string  $path Optionally, a path to append to the storage path
      * @return string
      */
-    public function storagePath()
+    public function storagePath($path = '')
     {
-        return $this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage';
+        $storagePath = $this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage';
+
+        return $storagePath.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -439,11 +444,14 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the path to the environment file directory.
      *
+     * @param  string  $path Optionally, a path to append to the environment path
      * @return string
      */
-    public function environmentPath()
+    public function environmentPath($path = '')
     {
-        return $this->environmentPath ?: $this->basePath;
+        $environmentPath = $this->environmentPath ?: $this->basePath;
+
+        return $environmentPath.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
