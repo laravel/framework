@@ -80,10 +80,12 @@ class Gate implements GateContract
      * @param  array  $policies
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
+     * @param  callable  $guessPolicyNamesUsingCallback
      * @return void
      */
     public function __construct(Container $container, callable $userResolver, array $abilities = [],
-                                array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [])
+                                array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [],
+                                callable $guessPolicyNamesUsingCallback = null)
     {
         $this->policies = $policies;
         $this->container = $container;
@@ -91,6 +93,7 @@ class Gate implements GateContract
         $this->userResolver = $userResolver;
         $this->afterCallbacks = $afterCallbacks;
         $this->beforeCallbacks = $beforeCallbacks;
+        $this->guessPolicyNamesUsingCallback = $guessPolicyNamesUsingCallback;
     }
 
     /**
@@ -290,6 +293,18 @@ class Gate implements GateContract
         return collect($abilities)->contains(function ($ability) use ($arguments) {
             return $this->check($ability, $arguments);
         });
+    }
+
+    /**
+     * Determine if all of the given abilities should be denied for the current user.
+     *
+     * @param  iterable|string  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function none($abilities, $arguments = [])
+    {
+        return ! $this->any($abilities, $arguments);
     }
 
     /**
@@ -538,8 +553,10 @@ class Gate implements GateContract
             return $this->resolvePolicy($this->policies[$class]);
         }
 
-        if (class_exists($guessedPolicy = $this->guessPolicyName($class))) {
-            return $this->resolvePolicy($guessedPolicy);
+        foreach ($this->guessPolicyName($class) as $guessedPolicy) {
+            if (class_exists($guessedPolicy)) {
+                return $this->resolvePolicy($guessedPolicy);
+            }
         }
 
         foreach ($this->policies as $expected => $policy) {
@@ -553,17 +570,17 @@ class Gate implements GateContract
      * Guess the policy name for the given class.
      *
      * @param  string  $class
-     * @return string
+     * @return array
      */
     protected function guessPolicyName($class)
     {
         if ($this->guessPolicyNamesUsingCallback) {
-            return call_user_func($this->guessPolicyNamesUsingCallback, $class);
+            return Arr::wrap(call_user_func($this->guessPolicyNamesUsingCallback, $class));
         }
 
         $classDirname = str_replace('/', '\\', dirname(str_replace('\\', '/', $class)));
 
-        return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
+        return [$classDirname.'\\Policies\\'.class_basename($class).'Policy'];
     }
 
     /**
@@ -698,7 +715,8 @@ class Gate implements GateContract
 
         return new static(
             $this->container, $callback, $this->abilities,
-            $this->policies, $this->beforeCallbacks, $this->afterCallbacks
+            $this->policies, $this->beforeCallbacks, $this->afterCallbacks,
+            $this->guessPolicyNamesUsingCallback
         );
     }
 

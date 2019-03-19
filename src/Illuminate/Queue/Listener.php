@@ -126,7 +126,7 @@ class Listener
     /**
      * Add the environment option to the given command.
      *
-     * @param  string  $command
+     * @param  array  $command
      * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return array
      */

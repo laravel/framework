@@ -331,6 +331,7 @@ class LogManager implements LoggerInterface
         }
 
         $with = array_merge(
+            ['level' => $this->level($config)],
             $config['with'] ?? [],
             $config['handler_with'] ?? []
         );

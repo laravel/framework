@@ -11,7 +11,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 
 class ContainerTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Container::setInstance(null);
     }

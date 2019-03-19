@@ -443,6 +443,33 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     *Wrap the given JSON selector for boolean values.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanSelector($value)
+    {
+        $selector = str_replace(
+            '->>', '->',
+            $this->wrapJsonSelector($value)
+        );
+
+        return '('.$selector.')::jsonb';
+    }
+
+    /**
+     * Wrap the given JSON boolean value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanValue($value)
+    {
+        return "'".$value."'::jsonb";
+    }
+
+    /**
      * Wrap the attributes of the give JSON path.
      *
      * @param  array  $path

@@ -208,9 +208,7 @@ class Event
     {
         $this->callBeforeCallbacks($container);
 
-        (new Process(
-            $this->buildCommand(), base_path(), null, null, null
-        ))->run();
+        Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
 
         $this->callAfterCallbacks($container);
     }
@@ -225,9 +223,7 @@ class Event
     {
         $this->callBeforeCallbacks($container);
 
-        (new Process(
-            $this->buildCommand(), base_path(), null, null, null
-        ))->run();
+        Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
     }
 
     /**

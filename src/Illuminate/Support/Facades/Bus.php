@@ -20,11 +20,13 @@ class Bus extends Facade
     /**
      * Replace the bound instance with a fake.
      *
-     * @return void
+     * @return \Illuminate\Support\Testing\Fakes\BusFake
      */
     public static function fake()
     {
-        static::swap(new BusFake);
+        static::swap($fake = new BusFake);
+
+        return $fake;
     }
 
     /**

@@ -1,6 +1,24 @@
 # Release Notes for 5.7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.7.26...5.7)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.7.28...5.7)
+
+
+## [v5.7.28 (2019-02-26)](https://github.com/laravel/framework/compare/v5.7.27...v5.7.28)
+
+### Added
+- Add support for `Pheanstalk 4.x` ([#27622](https://github.com/laravel/framework/pull/27622))
+- Allow configuration of token guard keys ([#27585](https://github.com/laravel/framework/pull/27585))
+
+### Changed
+- Update vue preset to exclude `@babel/preset-react` ([#27645](https://github.com/laravel/framework/pull/27645))
+- Reflash the session for the broadcasting auth call ([#27647](https://github.com/laravel/framework/pull/27647))
+- Improving readability in `AuthenticateWithBasicAuth` Middleware ([#27661](https://github.com/laravel/framework/pull/27661))
+- Use safe container getter on `Pipeline` ([#27648](https://github.com/laravel/framework/pull/27648))
+
+### Fixed
+- Fixed Postgres grammar when using union queries ([#27589](https://github.com/laravel/framework/pull/27589))
+- Fixed an issue when using Mail::queue to queue Mailables ([#27618](https://github.com/laravel/framework/pull/27618))
+- Fixed error in `Foundation\Exceptions\Handler` ([#27632](https://github.com/laravel/framework/pull/27632))
 
 
 ## [v5.7.26 (2019-02-12)](https://github.com/laravel/framework/compare/v5.7.25...v5.7.26)

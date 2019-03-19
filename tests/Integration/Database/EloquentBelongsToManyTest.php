@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -21,19 +22,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
             $table->timestamps();
         });
 
-        Schema::create('tags', function ($table) {
+        Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('posts_tags', function ($table) {
+        Schema::create('posts_tags', function (Blueprint $table) {
             $table->integer('post_id');
             $table->integer('tag_id');
             $table->string('flag')->default('');
@@ -120,6 +121,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertInstanceOf(CustomPivot::class, $post->tagsWithCustomPivot[0]->pivot);
         $this->assertEquals('1507630210', $post->tagsWithCustomPivot[0]->pivot->getAttributes()['created_at']);
+
+        $this->assertInstanceOf(CustomPivot::class, $post->tagsWithCustomPivotClass[0]->pivot);
+        $this->assertEquals('posts_tags', $post->tagsWithCustomPivotClass()->getTable());
 
         $this->assertEquals([
             'post_id' => '1',
@@ -634,6 +638,11 @@ class Post extends Model
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
             ->using(CustomPivot::class)
             ->withTimestamps();
+    }
+
+    public function tagsWithCustomPivotClass()
+    {
+        return $this->belongsToMany(TagWithCustomPivot::class, CustomPivot::class, 'post_id', 'tag_id');
     }
 
     public function tagsWithCustomAccessor()

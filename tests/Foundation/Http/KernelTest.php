@@ -17,6 +17,13 @@ class KernelTest extends TestCase
         $this->assertEquals([], $kernel->getMiddlewareGroups());
     }
 
+    public function testGetRouteMiddleware()
+    {
+        $kernel = new Kernel($this->getApplication(), $this->getRouter());
+
+        $this->assertEquals([], $kernel->getRouteMiddleware());
+    }
+
     /**
      * @return \Illuminate\Contracts\Foundation\Application
      */

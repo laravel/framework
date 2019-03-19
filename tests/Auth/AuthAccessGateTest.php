@@ -507,6 +507,32 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
     }
 
+    public function test_for_user_method_attaches_a_new_user_to_a_new_gate_instance_with_guess_callback()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function () {
+            return true;
+        });
+
+        $counter = 0;
+        $guesserCallback = function () use (&$counter) {
+            $counter++;
+        };
+        $gate->guessPolicyNamesUsing($guesserCallback);
+        $gate->getPolicyFor('fooClass');
+        $this->assertEquals(1, $counter);
+
+        // now the guesser callback should be present on the new gate as well
+        $newGate = $gate->forUser((object) ['id' => 1]);
+
+        $newGate->getPolicyFor('fooClass');
+        $this->assertEquals(2, $counter);
+
+        $newGate->getPolicyFor('fooClass');
+        $this->assertEquals(3, $counter);
+    }
+
     /**
      * @dataProvider notCallableDataProvider
      */
@@ -602,6 +628,15 @@ class AuthAccessGateTest extends TestCase
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
 
         $this->assertFalse($gate->any(['edit', 'update'], new AccessGateTestDummy));
+    }
+
+    public function test_none_ability_check_passes_if_all_fail()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
+
+        $this->assertTrue($gate->none(['edit', 'update'], new AccessGateTestDummy));
     }
 
     public function test_every_ability_check_passes_if_all_pass()

@@ -12,7 +12,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Container::setInstance(null);
     }

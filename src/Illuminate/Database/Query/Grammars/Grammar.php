@@ -540,6 +540,24 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where JSON boolean" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonBoolean(Builder $query, $where)
+    {
+        $column = $this->wrapJsonBooleanSelector($where['column']);
+
+        $value = $this->wrapJsonBooleanValue(
+            $this->parameter($where['value'])
+        );
+
+        return $column.' '.$where['operator'].' '.$value;
+    }
+
+    /**
      * Compile a "where JSON contains" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1051,6 +1069,28 @@ class Grammar extends BaseGrammar
     protected function wrapJsonSelector($value)
     {
         throw new RuntimeException('This database engine does not support JSON operations.');
+    }
+
+    /**
+     * Wrap the given JSON selector for boolean values.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanSelector($value)
+    {
+        return $this->wrapJsonSelector($value);
+    }
+
+    /**
+     * Wrap the given JSON boolean value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanValue($value)
+    {
+        return $value;
     }
 
     /**

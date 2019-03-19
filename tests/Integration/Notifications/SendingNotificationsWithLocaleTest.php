@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Notifications\Notification;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Notifications\Channels\MailChannel;
@@ -57,7 +58,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('name')->nullable();

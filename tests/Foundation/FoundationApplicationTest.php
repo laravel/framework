@@ -75,11 +75,11 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame($instance, $app->make(AbstractClass::class));
     }
 
-    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent()
+    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
         $provider = m::mock(ServiceProvider::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->never();
+        $provider->shouldReceive('register')->once();
         $app = new Application;
         $app->register($provider);
 
@@ -308,6 +308,15 @@ class FoundationApplicationTest extends TestCase
         $application->booted($closure3);
 
         $this->assertEquals(4, $counter);
+    }
+
+    public function testGetNamespace()
+    {
+        $app1 = new Application(realpath(__DIR__.'/fixtures/laravel1'));
+        $app2 = new Application(realpath(__DIR__.'/fixtures/laravel2'));
+
+        $this->assertSame('Laravel\\One\\', $app1->getNamespace());
+        $this->assertSame('Laravel\\Two\\', $app2->getNamespace());
     }
 }
 
