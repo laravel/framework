@@ -44,11 +44,19 @@ class MorphPivot extends Pivot
      */
     public function delete()
     {
+        if ($this->fireModelEvent('deleting') === false) {
+            return false;
+        }
+        
         $query = $this->getDeleteQuery();
 
         $query->where($this->morphType, $this->morphClass);
 
-        return $query->delete();
+        $result = $query->delete();
+        
+        $this->fireModelEvent('deleted', false);
+        
+        return $result;
     }
 
     /**
