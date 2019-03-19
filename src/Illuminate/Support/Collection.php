@@ -56,7 +56,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @var array
      */
     protected static $proxies = [
-        'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
+        'average', 'avg', 'contains', 'each', 'every', 'any', 'filter', 'first',
         'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
         'reject', 'some', 'sortBy', 'sortByDesc', 'sum', 'unique',
     ];
@@ -462,6 +462,31 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return $this->every($this->operatorForWhere(...func_get_args()));
+    }
+
+    /**
+     * Determine if an item in the collection pass the given test.
+     *
+     * @param  string|callable  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function any($key, $operator = null, $value = null)
+    {
+        if (func_num_args() === 1) {
+            $callback = $this->valueRetriever($key);
+
+            foreach ($this->items as $k => $v) {
+                if ($callback($v, $k)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return $this->any($this->operatorForWhere(...func_get_args()));
     }
 
     /**
