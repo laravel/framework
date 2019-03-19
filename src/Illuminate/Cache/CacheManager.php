@@ -341,7 +341,21 @@ class CacheManager implements FactoryContract
     {
         $this->customCreators[$driver] = $callback->bindTo($this, $this);
 
+        $this->saveCustomCreatorConfig($driver);
+
         return $this;
+    }
+
+    /**
+     * Allows you to save the settings of the newly added drive.
+     *
+     * @param $driver
+     * @return void
+     */
+    public function saveCustomCreatorConfig($driver) {
+        $this->app["config"]["cache.stores.$driver"] = [
+            "driver" => $driver
+        ];
     }
 
     /**
