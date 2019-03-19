@@ -891,6 +891,52 @@ class SupportCollectionTest extends TestCase
         ], $c->uniqueStrict('id')->all());
     }
 
+    public function testUniqueWithRejected()
+    {
+        $c = new Collection(['Osama', 'Rana', 'Rana']);
+
+        $rejected = [];
+        $unique = $c->unique(null, $rejected)->all();
+
+        $this->assertEquals(['Osama', 'Rana'], $unique);
+        $this->assertEquals(['Rana'], $rejected);
+
+        $c = new Collection([
+            1 => ['id' => 1, 'first' => 'Osama', 'last' => 'Aldemeery'],
+            2 => ['id' => 2, 'first' => 'Osama', 'last' => 'Aldemeery'],
+            3 => ['id' => 3, 'first' => 'Rana', 'last' => 'Aldemeery'],
+            4 => ['id' => 4, 'first' => 'Rana', 'last' => 'Aldemeery'],
+        ]);
+
+        $rejected = [];
+        $unique = $c->unique('first', $rejected)->all();
+
+        $this->assertEquals([
+            1 => ['id' => 1, 'first' => 'Osama', 'last' => 'Aldemeery'],
+            3 => ['id' => 3, 'first' => 'Rana', 'last' => 'Aldemeery'],
+        ], $unique);
+
+        $this->assertEquals([
+            ['id' => 2, 'first' => 'Osama', 'last' => 'Aldemeery'],
+            ['id' => 4, 'first' => 'Rana', 'last' => 'Aldemeery'],
+        ], $rejected);
+
+        $rejected = [];
+        $unique = $c->unique(function ($item, $key) {
+            return $key % 2;
+        }, $rejected)->all();
+
+        $this->assertEquals([
+            1 => ['id' => 1, 'first' => 'Osama', 'last' => 'Aldemeery'],
+            2 => ['id' => 2, 'first' => 'Osama', 'last' => 'Aldemeery'],
+        ], $unique);
+
+        $this->assertEquals([
+            ['id' => 3, 'first' => 'Rana', 'last' => 'Aldemeery'],
+            ['id' => 4, 'first' => 'Rana', 'last' => 'Aldemeery'],
+        ], $rejected);
+    }
+
     public function testCollapse()
     {
         $data = new Collection([[$object1 = new stdClass], [$object2 = new stdClass]]);
