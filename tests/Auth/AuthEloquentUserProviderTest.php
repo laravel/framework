@@ -37,6 +37,7 @@ class AuthEloquentUserProviderTest extends TestCase
 
         $provider = $this->getProviderMock();
         $mock = m::mock(stdClass::class);
+        $mock->shouldReceive('newQuery')->once()->andReturn($mock);
         $mock->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
         $mock->shouldReceive('where')->once()->with('id', 1)->andReturn($mock);
         $mock->shouldReceive('first')->once()->andReturn($mockUser);
@@ -50,6 +51,7 @@ class AuthEloquentUserProviderTest extends TestCase
     {
         $provider = $this->getProviderMock();
         $mock = m::mock(stdClass::class);
+        $mock->shouldReceive('newQuery')->once()->andReturn($mock);
         $mock->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
         $mock->shouldReceive('where')->once()->with('id', 1)->andReturn($mock);
         $mock->shouldReceive('first')->once()->andReturn(null);
@@ -66,6 +68,7 @@ class AuthEloquentUserProviderTest extends TestCase
 
         $provider = $this->getProviderMock();
         $mock = m::mock(stdClass::class);
+        $mock->shouldReceive('newQuery')->once()->andReturn($mock);
         $mock->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
         $mock->shouldReceive('where')->once()->with('id', 1)->andReturn($mock);
         $mock->shouldReceive('first')->once()->andReturn($mockUser);

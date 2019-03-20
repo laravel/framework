@@ -626,6 +626,10 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value)
     {
+        if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+            return false;
+        }
+
         return (new EmailValidator)->isValid($value, new RFCValidation);
     }
 
@@ -707,6 +711,8 @@ trait ValidatesAttributes
 
         if (isset($parameters[2])) {
             [$idColumn, $id] = $this->getUniqueIds($parameters);
+
+            $id = stripslashes($id);
         }
 
         // The presence verifier is responsible for counting rows within this store

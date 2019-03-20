@@ -541,11 +541,9 @@ class Arr
         if (is_null($seed)) {
             shuffle($array);
         } else {
-            srand($seed);
-
-            usort($array, function () {
-                return rand(-1, 1);
-            });
+            mt_srand($seed);
+            shuffle($array);
+            mt_srand();
         }
 
         return $array;

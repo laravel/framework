@@ -141,14 +141,39 @@ class BelongsToMany extends Relation
     public function __construct(Builder $query, Model $parent, $table, $foreignPivotKey,
                                 $relatedPivotKey, $parentKey, $relatedKey, $relationName = null)
     {
-        $this->table = $table;
         $this->parentKey = $parentKey;
         $this->relatedKey = $relatedKey;
         $this->relationName = $relationName;
         $this->relatedPivotKey = $relatedPivotKey;
         $this->foreignPivotKey = $foreignPivotKey;
+        $this->table = $this->resolveTableName($table);
 
         parent::__construct($query, $parent);
+    }
+
+    /**
+     * Attempt to resolve the intermediate table name from the given string.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    protected function resolveTableName($table)
+    {
+        if (! Str::contains($table, '\\') || ! class_exists($table)) {
+            return $table;
+        }
+
+        $model = new $table;
+
+        if (! $model instanceof Model) {
+            return $table;
+        }
+
+        if ($model instanceof Pivot) {
+            $this->using($table);
+        }
+
+        return $model->getTable();
     }
 
     /**

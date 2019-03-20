@@ -159,11 +159,15 @@ abstract class Facade
     /**
      * Resolve the facade root instance from the container.
      *
-     * @param  string  $name
+     * @param  object|string  $name
      * @return mixed
      */
     protected static function resolveFacadeInstance($name)
     {
+        if (is_object($name)) {
+            return $name;
+        }
+
         if (isset(static::$resolvedInstance[$name])) {
             return static::$resolvedInstance[$name];
         }

@@ -37,10 +37,6 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $container = new Container;
         $container->instance('db', $db->getDatabaseManager());
 
-        $container->bind('db.schema', function ($c) {
-            return $c['db']->connection()->getSchemaBuilder();
-        });
-
         Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
