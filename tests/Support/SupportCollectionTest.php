@@ -983,14 +983,20 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['b' => 'dayle', 'a' => 'taylor']);
 
-        $this->assertEquals(['a' => 'taylor', 'b' => 'dayle'], $data->sortKeys()->all());
+        $sortData = $data->sortKeys()->all();
+
+        $this->assertEquals(['a' => 'taylor', 'b' => 'dayle'], $sortData);
+        $this->assertEquals(['a', 'b'], array_keys($sortData));
     }
 
     public function testSortKeysDesc()
     {
         $data = new Collection(['a' => 'taylor', 'b' => 'dayle']);
 
-        $this->assertEquals(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeys()->all());
+        $sortData = $data->sortKeysDesc()->all();
+
+        $this->assertEquals(['b' => 'dayle', 'a' => 'taylor'], $sortData);
+        $this->assertEquals(['b', 'a'], array_keys($sortData));
     }
 
     public function testReverse()
