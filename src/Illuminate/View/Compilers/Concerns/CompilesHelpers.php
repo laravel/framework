@@ -46,4 +46,15 @@ trait CompilesHelpers
     {
         return "<?php echo method_field{$method}; ?>";
     }
+
+    /**
+     * Compile the route statements into valid PHP.
+     *
+     * @param  string  $arguments
+     * @return string
+     */
+    protected function compileRoute($arguments)
+    {
+        return "<?php echo route{$arguments}; ?>";
+    }
 }
