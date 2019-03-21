@@ -520,7 +520,7 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string  $name
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ForeignDefinition
      */
     public function foreign($columns, $name = null)
     {
@@ -1229,7 +1229,7 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string  $index
      * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignDefinition
      */
     protected function indexCommand($type, $columns, $index, $algorithm = null)
     {
