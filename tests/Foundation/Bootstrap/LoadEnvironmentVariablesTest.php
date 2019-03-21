@@ -37,9 +37,6 @@ class LoadEnvironmentVariablesTest extends TestCase
         (new LoadEnvironmentVariables)->bootstrap($this->getAppMock('.env'));
 
         $this->assertSame('BAR', env('FOO'));
-        $this->assertSame('BAR', getenv('FOO'));
-        $this->assertSame('BAR', $_ENV['FOO']);
-        $this->assertSame('BAR', $_SERVER['FOO']);
     }
 
     public function testCanFailSilent()
