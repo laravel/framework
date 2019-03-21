@@ -79,7 +79,7 @@ class RedisCacheLockTest extends TestCase
         $firstLock = Cache::store('redis')->lock('foo', 10);
         try {
             $firstLock->block(1, function () {
-                throw new \Exception("failed");
+                throw new \Exception('failed');
             });
         } catch (\Exception $e) {
             // Not testing the exception, just testing the lock
