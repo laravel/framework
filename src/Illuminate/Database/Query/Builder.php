@@ -2084,7 +2084,13 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        return collect($this->onceWithColumns(Arr::wrap($columns), function () {
+        if (empty($columns)) {
+            $columns = ['*'];
+        } else {
+            $columns = Arr::wrap($columns);
+        }
+        
+        return collect($this->onceWithColumns($columns, function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
     }
