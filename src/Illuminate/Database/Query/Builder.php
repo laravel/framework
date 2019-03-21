@@ -2084,12 +2084,12 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        if (empty($columns)) {
+        if (is_null($columns)) {
             $columns = ['*'];
         } else {
             $columns = Arr::wrap($columns);
         }
-        
+
         return collect($this->onceWithColumns($columns, function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
