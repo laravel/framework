@@ -1041,7 +1041,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['b' => 'dayle', 'z' => 'zorro', 'a' => 'taylor']);
 
-        $sortData = $data->sortKeys(SORT_REGULAR, false, ['z','t'])->all();
+        $sortData = $data->sortKeys(SORT_REGULAR, false, ['z', 't'])->all();
 
         $this->assertEquals(['z' => 'zorro', 'a' => 'taylor', 'b' => 'dayle'], $sortData);
         $this->assertEquals(['z', 'a', 'b'], array_keys($sortData));
