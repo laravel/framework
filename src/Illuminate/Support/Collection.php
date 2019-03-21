@@ -1653,26 +1653,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  int  $options
      * @param  bool  $descending
+     * @param  array $priorityKeys
      * @return static
      */
-    public function sortKeys($options = SORT_REGULAR, $descending = false)
+    public function sortKeys($options = SORT_REGULAR, $descending = false, $priorityKeys = [])
     {
         $items = $this->items;
 
         $descending ? krsort($items, $options) : ksort($items, $options);
 
-        return new static($items);
+        return new static(array_merge(Arr::only($items, $priorityKeys), $items));
     }
 
     /**
      * Sort the collection keys in descending order.
      *
      * @param  int $options
+     * @param  array $priorityKeys
      * @return static
      */
-    public function sortKeysDesc($options = SORT_REGULAR)
+    public function sortKeysDesc($options = SORT_REGULAR, $priorityKeys = [])
     {
-        return $this->sortKeys($options, true);
+        return $this->sortKeys($options, true, $priorityKeys);
     }
 
     /**
