@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Exception;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
@@ -80,9 +81,9 @@ class RedisCacheLockTest extends TestCase
 
         try {
             $firstLock->block(1, function () {
-                throw new \Exception('failed');
+                throw new Exception('failed');
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Not testing the exception, just testing the lock
             // is released regardless of the how the exception
             // thrown by the callback was handled.
