@@ -77,6 +77,7 @@ class RedisCacheLockTest extends TestCase
         Cache::store('redis')->lock('foo')->forceRelease();
 
         $firstLock = Cache::store('redis')->lock('foo', 10);
+
         try {
             $firstLock->block(1, function () {
                 throw new \Exception('failed');
@@ -86,7 +87,9 @@ class RedisCacheLockTest extends TestCase
             // is released regardless of the how the exception
             // thrown by the callback was handled.
         }
+
         $secondLock = Cache::store('redis')->lock('foo', 1);
+
         $this->assertTrue($secondLock->get());
     }
 
