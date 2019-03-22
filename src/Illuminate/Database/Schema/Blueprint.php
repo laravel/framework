@@ -1213,6 +1213,40 @@ class Blueprint
     }
 
     /**
+     * Add nullable morph columns after a specified column.
+     *
+     * @param  string  $name
+     * @param  string  $afterColumn
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableMorphsAfter($name, $afterColumn, $indexName = null)
+    {
+        $this->string("{$name}_type")->after("$afterColumn")->nullable();
+
+        $this->unsignedBigInteger("{$name}_id")->after("$afterColumn")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add morphs after column for a polymorphic table.
+     *
+     * @param  string  $name
+     * @param  string  $afterColumn
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function morphsAfter($name, $afterColumn, $indexName = null)
+    {
+        $this->string("{$name}_type")->after("$afterColumn");
+
+        $this->unsignedBigInteger("{$name}_id")->after("$afterColumn");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
      * Adds the `remember_token` column to the table.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition
