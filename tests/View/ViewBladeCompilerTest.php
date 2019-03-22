@@ -101,6 +101,24 @@ class ViewBladeCompilerTest extends TestCase
         $compiler->compile('foo');
     }
 
+    public function testDontIncludeEmptyPath()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $files->shouldReceive('get')->once()->with('')->andReturn('Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('').'.php', "Hello World");
+        $compiler->setPath("");
+        $compiler->compile();
+    }
+
+    public function testDontIncludeNullPath()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $files->shouldReceive('get')->once()->with(null)->andReturn('Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1(null).'.php', "Hello World");
+        $compiler->setPath(null);
+        $compiler->compile();
+    }
+
     public function testShouldStartFromStrictTypesDeclaration()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
