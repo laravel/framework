@@ -1229,7 +1229,7 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string  $index
      * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignDefinition
+     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
     protected function indexCommand($type, $columns, $index, $algorithm = null)
     {
@@ -1318,7 +1318,7 @@ class Blueprint
      *
      * @param  string  $name
      * @param  array  $parameters
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
     protected function addCommand($name, array $parameters = [])
     {
@@ -1332,10 +1332,13 @@ class Blueprint
      *
      * @param  string  $name
      * @param  array  $parameters
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
     protected function createCommand($name, array $parameters = [])
     {
+        if ($name === 'foreign') {
+            return new ForeignKeyDefinition(array_merge(compact('name'), $parameters));
+        }
         return new Fluent(array_merge(compact('name'), $parameters));
     }
 
