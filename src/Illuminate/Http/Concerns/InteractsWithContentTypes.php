@@ -31,7 +31,9 @@ trait InteractsWithContentTypes
      */
     public function isJson()
     {
-        return Str::contains($this->header('CONTENT_TYPE'), ['/json', '+json']);
+        return $this->containsJson(
+            $this->header('CONTENT_TYPE')
+        );
     }
 
     /**
@@ -53,7 +55,7 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && Str::contains($acceptable[0], ['/json', '+json']);
+        return isset($acceptable[0]) && $this->containsJson($acceptable[0]);
     }
 
     /**
@@ -167,5 +169,16 @@ trait InteractsWithContentTypes
         }
 
         return $default;
+    }
+
+    /**
+     * Determine if a given parameter is a json content type.
+     *
+     * @param  string  $contentType
+     * @return bool
+     */
+    protected function containsJson($contentType)
+    {
+        return Str::contains($contentType, ['/json', '+json']);
     }
 }
