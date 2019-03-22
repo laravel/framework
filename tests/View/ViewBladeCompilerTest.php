@@ -105,8 +105,8 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('').'.php', "Hello World");
-        $compiler->setPath("");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('').'.php', 'Hello World');
+        $compiler->setPath('');
         $compiler->compile();
     }
 
@@ -114,7 +114,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with(null)->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1(null).'.php', "Hello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1(null).'.php', 'Hello World');
         $compiler->setPath(null);
         $compiler->compile();
     }
