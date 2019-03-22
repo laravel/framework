@@ -131,7 +131,7 @@ if (! function_exists('app_path')) {
      */
     function app_path($path = '')
     {
-        return app('path').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->path($path);
     }
 }
 
@@ -190,7 +190,7 @@ if (! function_exists('base_path')) {
      */
     function base_path($path = '')
     {
-        return app()->basePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->basePath($path);
     }
 }
 
@@ -293,7 +293,7 @@ if (! function_exists('config_path')) {
      */
     function config_path($path = '')
     {
-        return app()->make('path.config').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->configPath($path);
     }
 }
 

@@ -315,6 +315,20 @@ class FoundationTestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors('foo');
     }
 
+    public function testAssertJsonValidationErrorsCustomErrorsName()
+    {
+        $data = [
+            'status' => 'ok',
+            'data' => ['foo' => 'oops'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors('foo', 'data');
+    }
+
     public function testAssertJsonValidationErrorsCanFail()
     {
         $this->expectException(AssertionFailedError::class);
@@ -444,6 +458,20 @@ class FoundationTestResponseTest extends TestCase
         );
 
         $testResponse->assertJsonMissingValidationErrors();
+    }
+
+    public function testAssertJsonMissingValidationErrorsCustomErrorsName()
+    {
+        $data = [
+            'status' => 'ok',
+            'data' => ['foo' => 'oops'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonMissingValidationErrors('bar', 'data');
     }
 
     public function testMacroable()

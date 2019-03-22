@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 
 class FoundationApplicationTest extends TestCase
@@ -333,10 +334,8 @@ class ApplicationBasicServiceProviderStub extends ServiceProvider
     }
 }
 
-class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider
+class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider implements DeferrableProvider
 {
-    protected $defer = true;
-
     public function register()
     {
         $this->app->singleton('foo', function () {
@@ -345,10 +344,9 @@ class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider
     }
 }
 
-class ApplicationDeferredServiceProviderCountStub extends ServiceProvider
+class ApplicationDeferredServiceProviderCountStub extends ServiceProvider implements DeferrableProvider
 {
     public static $count = 0;
-    protected $defer = true;
 
     public function register()
     {
@@ -357,10 +355,9 @@ class ApplicationDeferredServiceProviderCountStub extends ServiceProvider
     }
 }
 
-class ApplicationDeferredServiceProviderStub extends ServiceProvider
+class ApplicationDeferredServiceProviderStub extends ServiceProvider implements DeferrableProvider
 {
     public static $initialized = false;
-    protected $defer = true;
 
     public function register()
     {
@@ -369,10 +366,8 @@ class ApplicationDeferredServiceProviderStub extends ServiceProvider
     }
 }
 
-class ApplicationFactoryProviderStub extends ServiceProvider
+class ApplicationFactoryProviderStub extends ServiceProvider implements DeferrableProvider
 {
-    protected $defer = true;
-
     public function register()
     {
         $this->app->bind('foo', function () {
@@ -383,10 +378,8 @@ class ApplicationFactoryProviderStub extends ServiceProvider
     }
 }
 
-class ApplicationMultiProviderStub extends ServiceProvider
+class ApplicationMultiProviderStub extends ServiceProvider implements DeferrableProvider
 {
-    protected $defer = true;
-
     public function register()
     {
         $this->app->singleton('foo', function () {
