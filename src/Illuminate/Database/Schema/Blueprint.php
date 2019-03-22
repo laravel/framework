@@ -1339,6 +1339,7 @@ class Blueprint
         if ($name === 'foreign') {
             return new ForeignKeyDefinition(array_merge(compact('name'), $parameters));
         }
+
         return new Fluent(array_merge(compact('name'), $parameters));
     }
 
