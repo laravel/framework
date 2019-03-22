@@ -1211,6 +1211,22 @@ class Blueprint
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
+    
+    /**
+     * Add nullable polymorphic columns after a column.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableMorphsAfter($name, $afterColumn, $indexName = null)
+    {
+        $this->string("{$name}_type")->after("$afterColumn")->nullable();
+
+        $this->unsignedBigInteger("{$name}_id")->after("$afterColumn")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
 
     /**
      * Adds the `remember_token` column to the table.
