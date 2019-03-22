@@ -38,7 +38,7 @@ class Blueprint
     /**
      * The commands that should be run for the table.
      *
-     * @var \Illuminate\Support\Fluent[]
+     * @var \Illuminate\Support\Fluent[]|\Illuminate\Database\Schema\ForeignKeyDefinition[]
      */
     protected $commands = [];
 
@@ -520,7 +520,7 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string  $name
-     * @return \Illuminate\Database\Schema\ForeignDefinition
+     * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function foreign($columns, $name = null)
     {
