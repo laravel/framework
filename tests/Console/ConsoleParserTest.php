@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Parser;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ConsoleParserTest extends TestCase
@@ -143,5 +144,12 @@ class ConsoleParserTest extends TestCase
 
         $results = Parser::parse('command:name {--option=default : The option description.}');
         $this->assertSame('default', $results[2][0]->getDefault());
+    }
+
+    public function testNameException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to determine command name from signature.');
+        Parser::parse(" \t\n\r\x0B\f");
     }
 }
