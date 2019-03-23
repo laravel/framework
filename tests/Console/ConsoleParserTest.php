@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Console;
 
-use Illuminate\Console\Parser;
 use InvalidArgumentException;
+use Illuminate\Console\Parser;
 use PHPUnit\Framework\TestCase;
 
 class ConsoleParserTest extends TestCase
