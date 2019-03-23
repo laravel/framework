@@ -150,6 +150,7 @@ class ConsoleParserTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to determine command name from signature.');
+        
         Parser::parse(" \t\n\r\x0B\f");
     }
 }
