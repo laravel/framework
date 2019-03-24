@@ -235,17 +235,17 @@ class Builder
 
     public function whereLike($column, $value)
     {
-        return $this->query->where($column, 'like', '%' . $value . '%');
+        return $this->query->where($column, 'like', '%'.$value.'%');
     }
 
     public function whereLLike($column, $value)
     {
-        return $this->query->where($column, 'like', '%' . $value);
+        return $this->query->where($column, 'like', '%'. $value);
     }
 
     public function whereRLike($column, $value)
     {
-        return $this->query->where($column, 'like', $value . '%');
+        return $this->query->where($column, 'like', $value.'%');
     }
 
     /**
