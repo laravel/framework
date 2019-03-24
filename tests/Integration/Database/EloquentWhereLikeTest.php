@@ -22,10 +22,10 @@ class EloquentWhereLikeTest extends DatabaseTestCase
         });
 
         User::create([
-            'email' => 'test_email@laravel.com'
+            'email' => 'test_email@laravel.com',
         ]);
         User::create([
-            'email' => 'taylor.otwell@laravel.com'
+            'email' => 'taylor.otwell@laravel.com',
         ]);
     }
 
