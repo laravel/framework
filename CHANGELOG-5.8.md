@@ -2,6 +2,13 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.7...5.8)
 
+### Refactoring
+- Refactoring of `env()` helper ([#27965](https://github.com/laravel/framework/pull/27965))
+
+### TODO
+- https://github.com/laravel/framework/pull/27976
+- https://github.com/laravel/framework/pull/27987
+
 
 ## [v5.8.6-v5.8.7 (2019-03-21)](https://github.com/laravel/framework/compare/v5.8.5...v5.8.7)
 
