@@ -233,6 +233,21 @@ class Builder
         return $this;
     }
 
+    public function whereLike($column, $value)
+    {
+        return $this->query->where($column, 'like', '%' . $value . '%');
+    }
+
+    public function whereLLike($column, $value)
+    {
+        return $this->query->where($column, 'like', '%' . $value);
+    }
+
+    public function whereRLike($column, $value)
+    {
+        return $this->query->where($column, 'like', $value . '%');
+    }
+
     /**
      * Add an "or where" clause to the query.
      *
