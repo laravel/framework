@@ -265,10 +265,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Prepend to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
-     * @param  string  $separator
+     * @param  string $path
+     * @param  string $data
+     * @param  string $separator
      * @return bool
+     * @throws ContractFileNotFoundException
      */
     public function prepend($path, $data, $separator = PHP_EOL)
     {
@@ -282,10 +283,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Append to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
-     * @param  string  $separator
+     * @param  string $path
+     * @param  string $data
+     * @param  string $separator
      * @return bool
+     * @throws ContractFileNotFoundException
      */
     public function append($path, $data, $separator = PHP_EOL)
     {

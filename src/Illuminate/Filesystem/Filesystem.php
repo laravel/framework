@@ -149,9 +149,10 @@ class Filesystem
     /**
      * Prepend to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
+     * @param  string $path
+     * @param  string $data
      * @return int
+     * @throws FileNotFoundException
      */
     public function prepend($path, $data)
     {

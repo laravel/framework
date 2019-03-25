@@ -112,8 +112,9 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Retrieve the handler for a command.
      *
-     * @param  mixed  $command
+     * @param  mixed $command
      * @return bool|mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function getCommandHandler($command)
     {
