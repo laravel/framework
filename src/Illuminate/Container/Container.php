@@ -795,7 +795,7 @@ class Container implements ArrayAccess, ContainerContract
         try {
             $reflector = new ReflectionClass($concrete);
         } catch (ReflectionException $e) {
-            throw new BindingResolutionException("Target class [$concrete] does not exist.");
+            throw new BindingResolutionException("Target class [$concrete] does not exist.", 0, $e);
         }
 
         // If the type is not instantiable, the developer is attempting to resolve
