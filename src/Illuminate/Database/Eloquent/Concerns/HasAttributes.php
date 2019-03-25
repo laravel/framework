@@ -115,6 +115,16 @@ trait HasAttributes
     }
 
     /**
+     * Get an array of initial attributes.
+     *
+     * @return array
+     */
+    protected function initialAttributes()
+    {
+        return [];
+    }
+
+    /**
      * Add the date attributes to the attributes array.
      *
      * @param  array  $attributes
