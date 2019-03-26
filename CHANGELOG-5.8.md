@@ -1,13 +1,24 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.7...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.8...5.8)
+
+
+## [v5.8.8 (2019-03-26)](https://github.com/laravel/framework/compare/v5.8.7...v5.8.8)
+
+### Added
+- Added `Illuminate\Database\Query\Builder::forPageBeforeId()` method ([#28011](https://github.com/laravel/framework/pull/28011))
+
+### Fixed
+- Fixed `BelongsToMany::detach()` with custom pivot class ([#27997](https://github.com/laravel/framework/pull/27997))
+- Fixed incorrect event namespace in generated listener by `event:generate` command ([#28007](https://github.com/laravel/framework/pull/28007))
+- Fixed unique validation without ignored column ([#27987](https://github.com/laravel/framework/pull/27987))
+
+### Changed
+- Added `parameters` argument to `resolve` helper ([#28020](https://github.com/laravel/framework/pull/28020))
+- Don't add the path only if path is `empty` in compiled view ([#27976](https://github.com/laravel/framework/pull/27976))
 
 ### Refactoring
 - Refactoring of `env()` helper ([#27965](https://github.com/laravel/framework/pull/27965))
-
-### TODO
-- https://github.com/laravel/framework/pull/27976
-- https://github.com/laravel/framework/pull/27987
 
 
 ## [v5.8.6-v5.8.7 (2019-03-21)](https://github.com/laravel/framework/compare/v5.8.5...v5.8.7)
