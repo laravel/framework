@@ -238,7 +238,7 @@ class RouteRegistrarTest extends TestCase
             'resource-three'    => RouteRegistrarControllerStubThree::class,
         ], ['except' => ['create', 'show']]);
 
-        $this->assertCount(15, $this->router->getRoutes());
+        $this->assertCount(18, $this->router->getRoutes());
 
         foreach (['one', 'two', 'three'] as $resource) {
             $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
@@ -282,7 +282,7 @@ class RouteRegistrarTest extends TestCase
             'resource-three'    => RouteRegistrarControllerStubThree::class,
         ]);
 
-        $this->assertCount(21, $this->router->getRoutes());
+        $this->assertCount(24, $this->router->getRoutes());
 
         foreach (['one', 'two', 'three'] as $resource) {
             $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
@@ -301,7 +301,7 @@ class RouteRegistrarTest extends TestCase
                      ->resource('users', RouteRegistrarControllerStub::class)
                      ->register();
 
-        $this->assertCount(7, $resource->getRoutes());
+        $this->assertCount(8, $resource->getRoutes());
 
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.create'));
@@ -329,7 +329,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->except(['index', 'create', 'store', 'show', 'edit']);
 
-        $this->assertCount(2, $this->router->getRoutes());
+        $this->assertCount(3, $this->router->getRoutes());
 
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
@@ -443,6 +443,22 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertCount(2, $this->router->getRoutes());
 
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+    }
+
+    /**
+     * @depends testUserCanRegisterApiResourceWithOnlyOption
+     */
+    public function testCanRegisterApiResourceWithOptionsMethod()
+    {
+        $this->router->apiResource('users', RouteRegistrarControllerStub::class, [
+            'only' => ['index', 'show', 'store', 'update', 'destroy', 'options'],
+        ]);
+
+        $this->assertCount(6, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.options'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
     }

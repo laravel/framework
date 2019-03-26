@@ -18,7 +18,7 @@ class ResourceRegistrar
      *
      * @var array
      */
-    protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
+    protected $resourceDefaults = ['options', 'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
      * The parameters set for this resource instance.
@@ -289,6 +289,24 @@ class ResourceRegistrar
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
         return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Add the 'options' method for a resourceful route.
+     *
+     * @param  string  $name
+     * @param  string  $base
+     * @param  string  $controller
+     * @param  array   $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addResourceOptions($name, $base, $controller, $options)
+    {
+        $uri = $this->getResourceUri($name);
+
+        $action = $this->getResourceAction($name, $controller, 'options', $options);
+
+        return $this->router->options($uri, $action);
     }
 
     /**
