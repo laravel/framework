@@ -298,30 +298,6 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a where in sub-select clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereInSub(Builder $query, $where)
-    {
-        return $this->wrap($where['column']).' in ('.$this->compileSelect($where['query']).')';
-    }
-
-    /**
-     * Compile a where not in sub-select clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereNotInSub(Builder $query, $where)
-    {
-        return $this->wrap($where['column']).' not in ('.$this->compileSelect($where['query']).')';
-    }
-
-    /**
      * Compile a "where in raw" clause.
      *
      * For safety, whereIntegerInRaw ensures this method is only used with integer values.

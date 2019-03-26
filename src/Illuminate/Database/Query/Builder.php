@@ -910,51 +910,6 @@ class Builder
     }
 
     /**
-     * Add a where in with a sub-select to the query.
-     *
-     * @param  string   $column
-     * @param  \Closure $callback
-     * @param  string   $boolean
-     * @param  bool     $not
-     * @return $this
-     */
-    protected function whereInSub($column, Closure $callback, $boolean, $not)
-    {
-        $type = $not ? 'NotInSub' : 'InSub';
-
-        // To create the exists sub-select, we will actually create a query and call the
-        // provided callback with the query so the developer may set any of the query
-        // conditions they want for the in clause, then we'll put it in this array.
-        call_user_func($callback, $query = $this->forSubQuery());
-
-        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
-
-        $this->addBinding($query->getBindings(), 'where');
-
-        return $this;
-    }
-
-    /**
-     * Add an external sub-select to the query.
-     *
-     * @param  string   $column
-     * @param  \Illuminate\Database\Query\Builder|static  $query
-     * @param  string   $boolean
-     * @param  bool     $not
-     * @return $this
-     */
-    protected function whereInExistingQuery($column, $query, $boolean, $not)
-    {
-        $type = $not ? 'NotInSub' : 'InSub';
-
-        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
-
-        $this->addBinding($query->getBindings(), 'where');
-
-        return $this;
-    }
-
-    /**
      * Add a "where in raw" clause for integer values to the query.
      *
      * @param  string  $column
