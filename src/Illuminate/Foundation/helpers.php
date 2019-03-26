@@ -722,11 +722,12 @@ if (! function_exists('resolve')) {
      * Resolve a service from the container.
      *
      * @param  string  $name
+     * @param  array  $params
      * @return mixed
      */
-    function resolve($name)
+    function resolve($name, array $params = [])
     {
-        return app($name);
+        return app($name, $params);
     }
 }
 
