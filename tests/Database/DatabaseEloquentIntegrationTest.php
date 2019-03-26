@@ -1090,6 +1090,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNotNull(EloquentTestUserWithGlobalScopeRemovingOtherScope::find($user->id));
     }
 
+    public function testForPageBeforeIdCorrectlyPaginates()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::forPageBeforeId(15, 2);
+        $this->assertInstanceOf(Builder::class, $results);
+        $this->assertEquals(1, $results->first()->id);
+
+        $results = EloquentTestUser::orderBy('id', 'desc')->forPageBeforeId(15, 2);
+        $this->assertInstanceOf(Builder::class, $results);
+        $this->assertEquals(1, $results->first()->id);
+    }
+
     public function testForPageAfterIdCorrectlyPaginates()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
