@@ -14,13 +14,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Tests\Integration\Database\Post;
-use Illuminate\Tests\Integration\Database\User;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Tests\Integration\Database\Fixtures\Post;
+use Illuminate\Tests\Integration\Database\Fixtures\User;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends TestCase

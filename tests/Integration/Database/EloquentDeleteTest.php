@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Tests\Integration\Database\Fixtures\Post;
 
 /**
  * @group integration
@@ -78,11 +79,6 @@ class EloquentDeleteTest extends TestCase
 
         $this->assertEquals($role->id, RoleObserver::$model->id);
     }
-}
-
-class Post extends Model
-{
-    public $table = 'posts';
 }
 
 class Comment extends Model
