@@ -333,13 +333,13 @@ class Arr
                             $subKeyArray = $subKeyArray[$index];
                         }
                     }
-                } else if ($segment == '**') {
+                } elseif ($segment == '**') {
                     foreach ($subKeyArray as $index => $subkey) {
                         if (static::accessible($subKeyArray) && static::exists($subKeyArray, $index)) {
                             $subKeyArray = $subKeyArray[$index];
                         }
                     }
-                } else if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
+                } elseif (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
                     $subKeyArray = $subKeyArray[$segment];
                 } else {
                     return false;
