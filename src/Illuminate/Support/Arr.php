@@ -327,7 +327,13 @@ class Arr
             }
 
             foreach (explode('.', $key) as $segment) {
-                if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
+                if ($segment == '*') {
+                    foreach($subKeyArray as $index => $subkey) {
+                        if (static::accessible($subKeyArray) && static::exists($subKeyArray, $index)) {
+                            $subKeyArray = $subKeyArray[$index];
+                        }
+                    }
+                } else if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
                     $subKeyArray = $subKeyArray[$segment];
                 } else {
                     return false;
