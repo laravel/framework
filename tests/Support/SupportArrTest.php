@@ -358,7 +358,7 @@ class SupportArrTest extends TestCase
         ];
         $this->assertTrue(Arr::has($array, 'products.0.name'));
         $this->assertFalse(Arr::has($array, 'products.0.price'));
-                
+
         $this->assertTrue(Arr::has($array, 'products.**.id'));
         $this->assertFalse(Arr::has($array, 'products.*.id'));
 
