@@ -24,6 +24,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         Concerns\HasGlobalScopes,
         Concerns\HasRelationships,
         Concerns\HasTimestamps,
+        Concerns\HasOptimisticLocking,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
         ForwardsCalls;
@@ -153,6 +154,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var string
      */
     const UPDATED_AT = 'updated_at';
+
+    /**
+     * The name of the "lock_version" column.
+     *
+     * @var string
+     */
+    const LOCK_VERSION = 'lock_version';
 
     /**
      * Create a new Eloquent model instance.
@@ -738,7 +746,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $dirty = $this->getDirty();
 
         if (count($dirty) > 0) {
-            $this->setKeysForSaveQuery($query)->update($dirty);
+            if ($this->usesOptimisticLocking()) {
+                $this->setKeysForOptimisticLocking($query);
+                $this->incrementLockVersion();
+                $dirty[static::LOCK_VERSION] = $this->{static::LOCK_VERSION};
+            }
+
+            $count = $this->setKeysForSaveQuery($query)->update($dirty);
+
+            if ($this->usesOptimisticLocking() && $count === 0) {
+                $this->throwOptimisticLockingException();
+            }
 
             $this->syncChanges();
 
@@ -789,6 +807,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // convenience. After, we will just continue saving these model instances.
         if ($this->usesTimestamps()) {
             $this->updateTimestamps();
+        }
+
+        if ($this->usesOptimisticLocking() && ! $this->isDirty(static::LOCK_VERSION)) {
+            $this->incrementLockVersion();
         }
 
         // If the model has an incrementing key, we can use the "insertGetId" method on
