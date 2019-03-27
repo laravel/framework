@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cache\ArrayStore;
 
 class CacheArrayStoreTest extends TestCase
 {
     public function testItemsCanBeSetAndRetrieved()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $result = $store->put('foo', 'bar', 10);
         $this->assertTrue($result);
         $this->assertEquals('bar', $store->get('foo'));
@@ -18,7 +18,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testMultipleItemsCanBeSetAndRetrieved()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $result = $store->put('foo', 'bar', 10);
         $resultMany = $store->putMany([
             'fizz'  => 'buz',
@@ -37,7 +37,7 @@ class CacheArrayStoreTest extends TestCase
     public function testItemsCanExpire(): void
     {
         Carbon::setTestNow(Carbon::now());
-        $store = new ArrayStore;
+        $store = new ArrayStore();
 
         $store->put('foo', 'bar', 10);
         Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
@@ -59,7 +59,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testValuesCanBeIncremented()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 1, 10);
         $result = $store->increment('foo');
         $this->assertEquals(2, $result);
@@ -68,7 +68,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testNonExistingKeysCanBeIncremented()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $result = $store->increment('foo');
         $this->assertEquals(1, $result);
         $this->assertEquals(1, $store->get('foo'));
@@ -76,7 +76,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testValuesCanBeDecremented()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 1, 10);
         $result = $store->decrement('foo');
         $this->assertEquals(0, $result);
@@ -85,7 +85,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testItemsCanBeRemoved()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 'bar', 10);
         $store->forget('foo');
         $this->assertNull($store->get('foo'));
@@ -93,7 +93,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testItemsCanBeFlushed()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->put('foo', 'bar', 10);
         $store->put('baz', 'boom', 10);
         $result = $store->flush();
@@ -104,7 +104,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testCacheKey()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $this->assertEmpty($store->getPrefix());
     }
 }

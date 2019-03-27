@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Console;
 
-use Mockery as m;
-use Illuminate\Console\Command;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Application;
+use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
-use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 class ConsoleApplicationTest extends TestCase
 {
@@ -59,10 +59,10 @@ class ConsoleApplicationTest extends TestCase
         );
 
         $codeOfCallingArrayInput = $app->call('help', [
-            '--raw' => true,
-            '--format' => 'txt',
+            '--raw'            => true,
+            '--format'         => 'txt',
             '--no-interaction' => true,
-            '--env' => 'testing',
+            '--env'            => 'testing',
         ]);
 
         $outputOfCallingArrayInput = $app->output();

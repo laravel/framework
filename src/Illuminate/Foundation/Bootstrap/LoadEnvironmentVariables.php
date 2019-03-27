@@ -3,12 +3,12 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Dotenv\Dotenv;
+use Dotenv\Environment\Adapter\EnvConstAdapter;
+use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Dotenv\Environment\DotenvFactory;
 use Dotenv\Exception\InvalidFileException;
-use Symfony\Component\Console\Input\ArgvInput;
-use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Illuminate\Contracts\Foundation\Application;
-use Dotenv\Environment\Adapter\ServerConstAdapter;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 class LoadEnvironmentVariables
@@ -16,7 +16,8 @@ class LoadEnvironmentVariables
     /**
      * Bootstrap the given application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
      * @return void
      */
     public function bootstrap(Application $app)
@@ -37,12 +38,13 @@ class LoadEnvironmentVariables
     /**
      * Detect if a custom environment file matching the APP_ENV exists.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
      * @return void
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if ($app->runningInConsole() && ($input = new ArgvInput)->hasParameterOption('--env')) {
+        if ($app->runningInConsole() && ($input = new ArgvInput())->hasParameterOption('--env')) {
             if ($this->setEnvironmentFilePath(
                 $app, $app->environmentFile().'.'.$input->getParameterOption('--env')
             )) {
@@ -50,7 +52,7 @@ class LoadEnvironmentVariables
             }
         }
 
-        if (! env('APP_ENV')) {
+        if (!env('APP_ENV')) {
             return;
         }
 
@@ -62,8 +64,9 @@ class LoadEnvironmentVariables
     /**
      * Load a custom environment file.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  string  $file
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param string                                       $file
+     *
      * @return bool
      */
     protected function setEnvironmentFilePath($app, $file)
@@ -80,7 +83,8 @@ class LoadEnvironmentVariables
     /**
      * Create a Dotenv instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
      * @return \Dotenv\Dotenv
      */
     protected function createDotenv($app)
@@ -88,19 +92,20 @@ class LoadEnvironmentVariables
         return Dotenv::create(
             $app->environmentPath(),
             $app->environmentFile(),
-            new DotenvFactory([new EnvConstAdapter, new ServerConstAdapter])
+            new DotenvFactory([new EnvConstAdapter(), new ServerConstAdapter()])
         );
     }
 
     /**
      * Write the error information to the screen and exit.
      *
-     * @param  \Dotenv\Exception\InvalidFileException  $e
+     * @param \Dotenv\Exception\InvalidFileException $e
+     *
      * @return void
      */
     protected function writeErrorAndDie(InvalidFileException $e)
     {
-        $output = (new ConsoleOutput)->getErrorOutput();
+        $output = (new ConsoleOutput())->getErrorOutput();
 
         $output->writeln('The environment file is invalid!');
         $output->writeln($e->getMessage());

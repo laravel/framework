@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use RuntimeException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\Schema\Blueprint;
 use Doctrine\DBAL\Schema\SqliteSchemaManager;
+use Illuminate\Database\Capsule\Manager;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {
@@ -97,16 +97,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testDropColumn()
     {
-        if (! class_exists(SqliteSchemaManager::class)) {
+        if (!class_exists(SqliteSchemaManager::class)) {
             $this->markTestSkipped('Doctrine should be installed to run dropColumn tests');
         }
 
-        $db = new Manager;
+        $db = new Manager();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => 'prefix_',
+            'prefix'   => 'prefix_',
         ]);
 
         $schema = $db->getConnection()->getSchemaBuilder();
@@ -148,16 +148,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testRenameIndex()
     {
-        if (! class_exists(SqliteSchemaManager::class)) {
+        if (!class_exists(SqliteSchemaManager::class)) {
             $this->markTestSkipped('Doctrine should be installed to run renameIndex tests');
         }
 
-        $db = new Manager;
+        $db = new Manager();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => 'prefix_',
+            'prefix'   => 'prefix_',
         ]);
 
         $schema = $db->getConnection()->getSchemaBuilder();
@@ -780,6 +780,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function getGrammar()
     {
-        return new SQLiteGrammar;
+        return new SQLiteGrammar();
     }
 }

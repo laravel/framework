@@ -17,6 +17,7 @@ class OptimisticLockingException extends RuntimeException
      * Set related model.
      *
      * @param \Illuminate\Database\Eloquent\Model $model
+     *
      * @return $this
      */
     public function setModel($model)

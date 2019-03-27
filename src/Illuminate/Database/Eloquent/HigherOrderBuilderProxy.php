@@ -25,7 +25,7 @@ class HigherOrderBuilderProxy
      * Create a new proxy instance.
      *
      * @param Builder $builder
-     * @param string $method
+     * @param string  $method
      */
     public function __construct(Builder $builder, $method)
     {
@@ -36,8 +36,9 @@ class HigherOrderBuilderProxy
     /**
      * Proxy a scope call onto the query builder.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)

@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use PDO;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connectors\Connector;
 use Illuminate\Database\Connectors\MySqlConnector;
-use Illuminate\Database\Connectors\SQLiteConnector;
 use Illuminate\Database\Connectors\PostgresConnector;
+use Illuminate\Database\Connectors\SQLiteConnector;
 use Illuminate\Database\Connectors\SqlServerConnector;
+use Mockery as m;
+use PDO;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseConnectorTest extends TestCase
 {
@@ -20,7 +20,7 @@ class DatabaseConnectorTest extends TestCase
 
     public function testOptionResolution()
     {
-        $connector = new Connector;
+        $connector = new Connector();
         $connector->setDefaultOptions([0 => 'foo', 1 => 'bar']);
         $this->assertEquals([0 => 'baz', 1 => 'bar', 2 => 'boom'], $connector->getOptions(['options' => [0 => 'baz', 2 => 'boom']]));
     }
@@ -168,7 +168,7 @@ class DatabaseConnectorTest extends TestCase
 
     public function testSqlServerConnectCallsCreateConnectionWithPreferredODBC()
     {
-        if (! in_array('odbc', PDO::getAvailableDrivers())) {
+        if (!in_array('odbc', PDO::getAvailableDrivers())) {
             $this->markTestSkipped('PHP was compiled without PDO ODBC support.');
         }
 

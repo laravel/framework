@@ -25,7 +25,8 @@ class Hub implements HubContract
     /**
      * Create a new Hub instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
+     * @param \Illuminate\Contracts\Container\Container|null $container
+     *
      * @return void
      */
     public function __construct(Container $container = null)
@@ -36,7 +37,8 @@ class Hub implements HubContract
     /**
      * Define the default named pipeline.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function defaults(Closure $callback)
@@ -47,8 +49,9 @@ class Hub implements HubContract
     /**
      * Define a new named pipeline.
      *
-     * @param  string  $name
-     * @param  \Closure  $callback
+     * @param string   $name
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function pipeline($name, Closure $callback)
@@ -59,8 +62,9 @@ class Hub implements HubContract
     /**
      * Send an object through one of the available pipelines.
      *
-     * @param  mixed  $object
-     * @param  string|null  $pipeline
+     * @param mixed       $object
+     * @param string|null $pipeline
+     *
      * @return mixed
      */
     public function pipe($object, $pipeline = null)

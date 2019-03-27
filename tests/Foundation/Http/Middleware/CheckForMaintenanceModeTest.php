@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Mockery as m;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Http\Exceptions\MaintenanceModeException;
+use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Http\Request;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CheckForMaintenanceModeTest extends TestCase
 {
@@ -30,7 +30,7 @@ class CheckForMaintenanceModeTest extends TestCase
     protected function setUp(): void
     {
         if (is_null($this->files)) {
-            $this->files = new Filesystem;
+            $this->files = new Filesystem();
         }
 
         $this->storagePath = __DIR__.'/tmp';
@@ -134,7 +134,8 @@ class CheckForMaintenanceModeTest extends TestCase
     /**
      * Create a mock of maintenance application.
      *
-     * @param  string|array  $ips
+     * @param string|array $ips
+     *
      * @return \Mockery\MockInterface
      */
     protected function createMaintenanceApplication($ips = null)
@@ -151,14 +152,15 @@ class CheckForMaintenanceModeTest extends TestCase
     /**
      * Make a down file with the given allowed ips.
      *
-     * @param  string|array  $ips
+     * @param string|array $ips
+     *
      * @return array
      */
     protected function makeDownFile($ips = null)
     {
         $data = [
-            'time' => time(),
-            'retry' => 86400,
+            'time'    => time(),
+            'retry'   => 86400,
             'message' => 'This application is down for maintenance.',
         ];
 

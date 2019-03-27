@@ -2,8 +2,8 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcaster extends Broadcaster
@@ -27,8 +27,9 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
-     * @param  string|null  $connection
+     * @param \Illuminate\Contracts\Redis\Factory $redis
+     * @param string|null                         $connection
+     *
      * @return void
      */
     public function __construct(Redis $redis, $connection = null)
@@ -40,18 +41,19 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Authenticate the incoming request for a given channel.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @param \Illuminate\Http\Request $request
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     *
+     * @return mixed
      */
     public function auth($request)
     {
         $channelName = $this->normalizeChannelName($request->channel_name);
 
         if ($this->isGuardedChannel($request->channel_name) &&
-            ! $this->retrieveUser($request, $channelName)) {
-            throw new AccessDeniedHttpException;
+            !$this->retrieveUser($request, $channelName)) {
+            throw new AccessDeniedHttpException();
         }
 
         return parent::verifyUserCanAccessChannel(
@@ -62,8 +64,9 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Return the valid authentication response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
+     * @param \Illuminate\Http\Request $request
+     * @param mixed                    $result
+     *
      * @return mixed
      */
     public function validAuthenticationResponse($request, $result)
@@ -75,7 +78,7 @@ class RedisBroadcaster extends Broadcaster
         $channelName = $this->normalizeChannelName($request->channel_name);
 
         return json_encode(['channel_data' => [
-            'user_id' => $this->retrieveUser($request, $channelName)->getAuthIdentifier(),
+            'user_id'   => $this->retrieveUser($request, $channelName)->getAuthIdentifier(),
             'user_info' => $result,
         ]]);
     }
@@ -83,9 +86,10 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Broadcast the given event.
      *
-     * @param  array  $channels
-     * @param  string  $event
-     * @param  array  $payload
+     * @param array  $channels
+     * @param string $event
+     * @param array  $payload
+     *
      * @return void
      */
     public function broadcast(array $channels, $event, array $payload = [])
@@ -93,8 +97,8 @@ class RedisBroadcaster extends Broadcaster
         $connection = $this->redis->connection($this->connection);
 
         $payload = json_encode([
-            'event' => $event,
-            'data' => $payload,
+            'event'  => $event,
+            'data'   => $payload,
             'socket' => Arr::pull($payload, 'socket'),
         ]);
 

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Auth;
 
-use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Http\Request;
 
 trait VerifiesEmails
 {
@@ -13,7 +13,8 @@ trait VerifiesEmails
     /**
      * Show the email verification notice.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request)
@@ -26,14 +27,16 @@ trait VerifiesEmails
     /**
      * Mark the authenticated user's email address as verified.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @return \Illuminate\Http\Response
      */
     public function verify(Request $request)
     {
         if ($request->route('id') != $request->user()->getKey()) {
-            throw new AuthorizationException;
+            throw new AuthorizationException();
         }
 
         if ($request->user()->hasVerifiedEmail()) {
@@ -50,7 +53,8 @@ trait VerifiesEmails
     /**
      * Resend the email verification notification.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function resend(Request $request)

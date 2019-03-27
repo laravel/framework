@@ -17,7 +17,8 @@ class HttpResponseException extends RuntimeException
     /**
      * Create a new HTTP response exception instance.
      *
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     *
      * @return void
      */
     public function __construct(Response $response)

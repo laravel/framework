@@ -28,9 +28,10 @@ class Failed
     /**
      * Create a new event instance.
      *
-     * @param  string  $guard
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  array  $credentials
+     * @param string                                          $guard
+     * @param \Illuminate\Contracts\Auth\Authenticatable|null $user
+     * @param array                                           $credentials
+     *
      * @return void
      */
     public function __construct($guard, $user, $credentials)

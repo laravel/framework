@@ -20,7 +20,7 @@ class RefreshCommandTest extends DatabaseTestCase
     public function test_refresh_with_realpath()
     {
         $options = [
-            '--path' => realpath(__DIR__.'/stubs/'),
+            '--path'     => realpath(__DIR__.'/stubs/'),
             '--realpath' => true,
         ];
 

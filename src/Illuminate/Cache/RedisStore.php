@@ -31,9 +31,10 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Create a new Redis store.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
-     * @param  string  $prefix
-     * @param  string  $connection
+     * @param \Illuminate\Contracts\Redis\Factory $redis
+     * @param string                              $prefix
+     * @param string                              $connection
+     *
      * @return void
      */
     public function __construct(Redis $redis, $prefix = '', $connection = 'default')
@@ -46,14 +47,15 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return mixed
      */
     public function get($key)
     {
         $value = $this->connection()->get($this->prefix.$key);
 
-        return ! is_null($value) ? $this->unserialize($value) : null;
+        return !is_null($value) ? $this->unserialize($value) : null;
     }
 
     /**
@@ -61,7 +63,8 @@ class RedisStore extends TaggableStore implements LockProvider
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return array
      */
     public function many(array $keys)
@@ -73,7 +76,7 @@ class RedisStore extends TaggableStore implements LockProvider
         }, $keys));
 
         foreach ($values as $index => $value) {
-            $results[$keys[$index]] = ! is_null($value) ? $this->unserialize($value) : null;
+            $results[$keys[$index]] = !is_null($value) ? $this->unserialize($value) : null;
         }
 
         return $results;
@@ -82,9 +85,10 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function put($key, $value, $seconds)
@@ -97,8 +101,9 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
-     * @param  int  $seconds
+     * @param array $values
+     * @param int   $seconds
+     *
      * @return bool
      */
     public function putMany(array $values, $seconds)
@@ -121,9 +126,10 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function add($key, $value, $seconds)
@@ -138,8 +144,9 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function increment($key, $value = 1)
@@ -150,8 +157,9 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function decrement($key, $value = 1)
@@ -162,8 +170,9 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value)
@@ -174,9 +183,10 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Get a lock instance.
      *
-     * @param  string $name
-     * @param  int $seconds
-     * @param  string|null $owner
+     * @param string      $name
+     * @param int         $seconds
+     * @param string|null $owner
+     *
      * @return \Illuminate\Contracts\Cache\Lock
      */
     public function lock($name, $seconds = 0, $owner = null)
@@ -187,8 +197,9 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Restore a lock instance using the owner identifier.
      *
-     * @param  string  $name
-     * @param  string  $owner
+     * @param string $name
+     * @param string $owner
+     *
      * @return \Illuminate\Contracts\Cache\Lock
      */
     public function restoreLock($name, $owner)
@@ -199,7 +210,8 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key)
@@ -222,7 +234,8 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Begin executing a new tags operation.
      *
-     * @param  array|mixed  $names
+     * @param array|mixed $names
+     *
      * @return \Illuminate\Cache\RedisTaggedCache
      */
     public function tags($names)
@@ -245,7 +258,8 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Set the connection name to be used.
      *
-     * @param  string  $connection
+     * @param string $connection
+     *
      * @return void
      */
     public function setConnection($connection)
@@ -276,18 +290,20 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Set the cache key prefix.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return void
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
+        $this->prefix = !empty($prefix) ? $prefix.':' : '';
     }
 
     /**
      * Serialize the value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     protected function serialize($value)
@@ -298,7 +314,8 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Unserialize the value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     protected function unserialize($value)

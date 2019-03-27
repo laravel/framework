@@ -3,9 +3,9 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Countable;
-use IteratorAggregate;
-use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Http\Resources\CollectsResources;
+use Illuminate\Pagination\AbstractPaginator;
+use IteratorAggregate;
 
 class ResourceCollection extends JsonResource implements Countable, IteratorAggregate
 {
@@ -28,7 +28,8 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     /**
      * Create a new resource instance.
      *
-     * @param  mixed  $resource
+     * @param mixed $resource
+     *
      * @return void
      */
     public function __construct($resource)
@@ -51,7 +52,8 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     /**
      * Transform the resource into a JSON array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return array
      */
     public function toArray($request)
@@ -62,7 +64,8 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     /**
      * Create an HTTP response that represents the object.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function toResponse($request)

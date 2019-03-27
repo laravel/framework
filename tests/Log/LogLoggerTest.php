@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Log;
 
-use Mockery as m;
-use RuntimeException;
-use Illuminate\Log\Logger;
-use Monolog\Logger as Monolog;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Events\MessageLogged;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Log\Logger;
+use Mockery as m;
+use Monolog\Logger as Monolog;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class LogLoggerTest extends TestCase
 {
@@ -28,7 +28,7 @@ class LogLoggerTest extends TestCase
 
     public function testLoggerFiresEventsDispatcher()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
+        $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher());
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
         $events->listen(MessageLogged::class, function ($event) {

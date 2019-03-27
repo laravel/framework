@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @group integration
@@ -64,7 +64,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         ]);
 
         $project->collaborators()->attach([
-            $user->id => ['permissions' => ['foo' => 'bar']],
+            $user->id  => ['permissions' => ['foo' => 'bar']],
             $user2->id => ['permissions' => ['baz' => 'bar']],
         ]);
         $project = $project->fresh();
@@ -104,7 +104,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         ]);
 
         $project->collaborators()->sync([
-            $user->id => ['permissions' => ['foo' => 'bar']],
+            $user->id  => ['permissions' => ['foo' => 'bar']],
             $user2->id => ['permissions' => ['baz' => 'bar']],
         ]);
         $project = $project->fresh();
@@ -128,12 +128,12 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         ]);
 
         $project->collaborators()->attach([
-            $user->id => ['permissions' => ['foo' => 'bar']],
+            $user->id  => ['permissions' => ['foo' => 'bar']],
             $user2->id => ['permissions' => ['baz' => 'bar']],
         ]);
 
         $project->collaborators()->sync([
-            $user->id => ['permissions' => ['foo1' => 'bar1']],
+            $user->id  => ['permissions' => ['foo1' => 'bar1']],
             $user2->id => ['permissions' => ['baz2' => 'bar2']],
         ]);
 

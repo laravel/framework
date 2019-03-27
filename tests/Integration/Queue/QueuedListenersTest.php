@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Event;
-use Queue;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Events\CallQueuedListener;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\CallQueuedListener;
+use Orchestra\Testbench\TestCase;
+use Queue;
 
 /**
  * @group integration
@@ -21,7 +21,7 @@ class QueuedListenersTest extends TestCase
         Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldNotQueue::class);
 
         Event::dispatch(
-            new QueuedListenersTestEvent
+            new QueuedListenersTestEvent()
         );
 
         Queue::assertPushed(CallQueuedListener::class, function ($job) {

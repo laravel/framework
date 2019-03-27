@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Encryption;
 
-use RuntimeException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Encryption\Encrypter;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Encryption\Encrypter;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class EncrypterTest extends TestCase
 {

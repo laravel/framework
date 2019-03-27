@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
-use Illuminate\Support\Str;
-use Illuminate\Auth\Events\Login;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Auth\Events\Failed;
-use Illuminate\Auth\Events\Logout;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Auth\Events\Attempting;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -28,9 +28,9 @@ class AuthenticationTest extends TestCase
 
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
@@ -50,9 +50,9 @@ class AuthenticationTest extends TestCase
         });
 
         AuthenticationTestUser::create([
-            'username' => 'username',
-            'email' => 'email',
-            'password' => bcrypt('password'),
+            'username'  => 'username',
+            'email'     => 'email',
+            'password'  => bcrypt('password'),
             'is_active' => true,
         ]);
 
@@ -85,9 +85,9 @@ class AuthenticationTest extends TestCase
     public function test_basic_auth_respects_additional_conditions()
     {
         AuthenticationTestUser::create([
-            'username' => 'username2',
-            'email' => 'email2',
-            'password' => bcrypt('password'),
+            'username'  => 'username2',
+            'email'     => 'email2',
+            'password'  => bcrypt('password'),
             'is_active' => false,
         ]);
 
@@ -230,11 +230,11 @@ class AuthenticationTest extends TestCase
         $provider = new EloquentUserProvider(app('hash'), AuthenticationTestUser::class);
 
         $user = AuthenticationTestUser::create([
-            'username' => 'username2',
-            'email' => 'email2',
-            'password' => bcrypt('password'),
+            'username'       => 'username2',
+            'email'          => 'email2',
+            'password'       => bcrypt('password'),
             'remember_token' => $token = Str::random(),
-            'is_active' => false,
+            'is_active'      => false,
         ]);
 
         $this->assertEquals($user->id, $provider->retrieveByToken($user->id, $token)->id);

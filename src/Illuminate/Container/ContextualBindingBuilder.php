@@ -2,9 +2,9 @@
 
 namespace Illuminate\Container;
 
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
+use Illuminate\Support\Arr;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
 {
@@ -32,8 +32,9 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * Create a new contextual binding builder.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  string|array  $concrete
+     * @param \Illuminate\Contracts\Container\Container $container
+     * @param string|array                              $concrete
+     *
      * @return void
      */
     public function __construct(Container $container, $concrete)
@@ -45,7 +46,8 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * Define the abstract target that depends on the context.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return $this
      */
     public function needs($abstract)
@@ -58,7 +60,8 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * Define the implementation for the contextual binding.
      *
-     * @param  \Closure|string  $implementation
+     * @param \Closure|string $implementation
+     *
      * @return void
      */
     public function give($implementation)

@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 
 /**
  * @group integration
@@ -16,11 +16,11 @@ class FoundationHelpersTest extends TestCase
     public function test_rescue()
     {
         $this->assertEquals(rescue(function () {
-            throw new Exception;
+            throw new Exception();
         }, 'rescued!'), 'rescued!');
 
         $this->assertEquals(rescue(function () {
-            throw new Exception;
+            throw new Exception();
         }, function () {
             return 'rescued!';
         }), 'rescued!');
@@ -29,7 +29,7 @@ class FoundationHelpersTest extends TestCase
             return 'no need to rescue';
         }, 'rescued!'), 'no need to rescue');
 
-        $testClass = new class {
+        $testClass = new class() {
             public function test(int $a)
             {
                 return $a;
@@ -43,7 +43,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixReportsExceptionWhenAssetIsMissingFromManifest()
     {
-        $handler = new FakeHandler;
+        $handler = new FakeHandler();
         $this->app->instance(ExceptionHandler::class, $handler);
         $manifest = $this->makeManifest();
 
@@ -86,7 +86,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixOnlyThrowsAndReportsOneExceptionWhenAssetIsMissingFromManifestWhenInDebugMode()
     {
-        $handler = new FakeHandler;
+        $handler = new FakeHandler();
         $this->app->instance(ExceptionHandler::class, $handler);
         $this->app['config']->set('app.debug', true);
         $manifest = $this->makeManifest();

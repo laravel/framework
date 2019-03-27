@@ -2,23 +2,23 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSoftDeletingTest extends TestCase
 {
     public function testDeletedAtIsAddedToDateCasts()
     {
-        $model = new SoftDeletingModel;
+        $model = new SoftDeletingModel();
 
         $this->assertContains('deleted_at', $model->getDates());
     }
 
     public function testDeletedAtIsUniqueWhenAlreadyExists()
     {
-        $model = new class extends SoftDeletingModel {
+        $model = new class() extends SoftDeletingModel {
             protected $dates = ['deleted_at'];
         };
         $entries = array_filter($model->getDates(), function ($attribute) {

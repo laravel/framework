@@ -28,8 +28,9 @@ class FileStore implements Store
     /**
      * Create a new file cache store instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string  $directory
+     * @param \Illuminate\Filesystem\Filesystem $files
+     * @param string                            $directory
+     *
      * @return void
      */
     public function __construct(Filesystem $files, $directory)
@@ -41,7 +42,8 @@ class FileStore implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return mixed
      */
     public function get($key)
@@ -52,9 +54,10 @@ class FileStore implements Store
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function put($key, $value, $seconds)
@@ -71,12 +74,13 @@ class FileStore implements Store
     /**
      * Create the file cache directory if necessary.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     protected function ensureCacheDirectoryExists($path)
     {
-        if (! $this->files->exists(dirname($path))) {
+        if (!$this->files->exists(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
     }
@@ -84,8 +88,9 @@ class FileStore implements Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function increment($key, $value = 1)
@@ -100,8 +105,9 @@ class FileStore implements Store
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function decrement($key, $value = 1)
@@ -112,8 +118,9 @@ class FileStore implements Store
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value)
@@ -124,7 +131,8 @@ class FileStore implements Store
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key)
@@ -143,12 +151,12 @@ class FileStore implements Store
      */
     public function flush()
     {
-        if (! $this->files->isDirectory($this->directory)) {
+        if (!$this->files->isDirectory($this->directory)) {
             return false;
         }
 
         foreach ($this->files->directories($this->directory) as $directory) {
-            if (! $this->files->deleteDirectory($directory)) {
+            if (!$this->files->deleteDirectory($directory)) {
                 return false;
             }
         }
@@ -159,7 +167,8 @@ class FileStore implements Store
     /**
      * Retrieve an item and expiry time from the cache by key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return array
      */
     protected function getPayload($key)
@@ -209,7 +218,8 @@ class FileStore implements Store
     /**
      * Get the full path for the given cache key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return string
      */
     protected function path($key)
@@ -222,7 +232,8 @@ class FileStore implements Store
     /**
      * Get the expiration time based on the given seconds.
      *
-     * @param  int  $seconds
+     * @param int $seconds
+     *
      * @return int
      */
     protected function expiration($seconds)

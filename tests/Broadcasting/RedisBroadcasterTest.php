@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcasterTest extends TestCase
@@ -123,7 +123,7 @@ class RedisBroadcasterTest extends TestCase
         $this->assertEquals(
             json_encode([
                 'channel_data' => [
-                    'user_id' => 42,
+                    'user_id'   => 42,
                     'user_info' => [
                         'a' => 'b',
                         'c' => 'd',
@@ -138,7 +138,8 @@ class RedisBroadcasterTest extends TestCase
     }
 
     /**
-     * @param  string  $channel
+     * @param string $channel
+     *
      * @return \Illuminate\Http\Request
      */
     protected function getMockRequestWithUserForChannel($channel)
@@ -157,7 +158,8 @@ class RedisBroadcasterTest extends TestCase
     }
 
     /**
-     * @param  string  $channel
+     * @param string $channel
+     *
      * @return \Illuminate\Http\Request
      */
     protected function getMockRequestWithoutUserForChannel($channel)

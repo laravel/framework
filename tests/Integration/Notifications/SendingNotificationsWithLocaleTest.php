@@ -2,21 +2,21 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Illuminate\Mail\Mailable;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Notifications\Notification;
 use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -36,9 +36,9 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         View::addLocation(__DIR__.'/Fixtures');
@@ -69,10 +69,10 @@ class SendingNotificationsWithLocaleTest extends TestCase
     {
         $user = NotifiableLocalizedUser::forceCreate([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
-        NotificationFacade::send($user, new GreetingMailNotification);
+        NotificationFacade::send($user, new GreetingMailNotification());
 
         $this->assertStringContainsString('hello',
             app('swift.transport')->messages()[0]->getBody()
@@ -83,10 +83,10 @@ class SendingNotificationsWithLocaleTest extends TestCase
     {
         $user = NotifiableLocalizedUser::forceCreate([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
-        NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
+        NotificationFacade::locale('fr')->send($user, new GreetingMailNotification());
 
         $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
@@ -98,15 +98,15 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $users = [
             NotifiableLocalizedUser::forceCreate([
                 'email' => 'taylor@laravel.com',
-                'name' => 'Taylor Otwell',
+                'name'  => 'Taylor Otwell',
             ]),
             NotifiableLocalizedUser::forceCreate([
                 'email' => 'mohamed@laravel.com',
-                'name' => 'Mohamed Said',
+                'name'  => 'Mohamed Said',
             ]),
         ];
 
-        NotificationFacade::send($users, (new GreetingMailNotification)->locale('fr'));
+        NotificationFacade::send($users, (new GreetingMailNotification())->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
@@ -121,10 +121,10 @@ class SendingNotificationsWithLocaleTest extends TestCase
     {
         $user = NotifiableLocalizedUser::forceCreate([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
-        NotificationFacade::locale('fr')->send($user, new GreetingMailNotificationWithMailable);
+        NotificationFacade::locale('fr')->send($user, new GreetingMailNotificationWithMailable());
 
         $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
@@ -141,10 +141,10 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         $user = NotifiableLocalizedUser::forceCreate([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
-        $user->notify((new GreetingMailNotification)->locale('fr'));
+        $user->notify((new GreetingMailNotification())->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
@@ -162,11 +162,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
     public function test_locale_is_sent_with_notifiable_preferred_locale()
     {
         $recipient = new NotifiableEmailLocalePreferredUser([
-            'email' => 'test@mail.com',
+            'email'        => 'test@mail.com',
             'email_locale' => 'fr',
         ]);
 
-        $recipient->notify(new GreetingMailNotification);
+        $recipient->notify(new GreetingMailNotification());
 
         $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
@@ -177,11 +177,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
     {
         $recipients = [
             new NotifiableEmailLocalePreferredUser([
-                'email' => 'test@mail.com',
+                'email'        => 'test@mail.com',
                 'email_locale' => 'fr',
             ]),
             new NotifiableEmailLocalePreferredUser([
-                'email' => 'test.2@mail.com',
+                'email'        => 'test.2@mail.com',
                 'email_locale' => 'es',
             ]),
             NotifiableLocalizedUser::forceCreate([
@@ -190,7 +190,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         ];
 
         NotificationFacade::send(
-            $recipients, new GreetingMailNotification
+            $recipients, new GreetingMailNotification()
         );
 
         $this->assertStringContainsString('bonjour',
@@ -207,12 +207,12 @@ class SendingNotificationsWithLocaleTest extends TestCase
     public function test_locale_is_sent_with_notification_selected_locale_overriding_notifiable_preferred_locale()
     {
         $recipient = new NotifiableEmailLocalePreferredUser([
-            'email' => 'test@mail.com',
+            'email'        => 'test@mail.com',
             'email_locale' => 'es',
         ]);
 
         $recipient->notify(
-            (new GreetingMailNotification)->locale('fr')
+            (new GreetingMailNotification())->locale('fr')
         );
 
         $this->assertStringContainsString('bonjour',
@@ -223,12 +223,12 @@ class SendingNotificationsWithLocaleTest extends TestCase
     public function test_locale_is_sent_with_facade_selected_locale_overriding_notifiable_preferred_locale()
     {
         $recipient = new NotifiableEmailLocalePreferredUser([
-            'email' => 'test@mail.com',
+            'email'        => 'test@mail.com',
             'email_locale' => 'es',
         ]);
 
         NotificationFacade::locale('fr')->send(
-            $recipient, new GreetingMailNotification
+            $recipient, new GreetingMailNotification()
         );
 
         $this->assertStringContainsString('bonjour',
@@ -269,7 +269,7 @@ class GreetingMailNotification extends Notification
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->greeting(__('hi'))
             ->line(Carbon::tomorrow()->diffForHumans());
     }
@@ -284,7 +284,7 @@ class GreetingMailNotificationWithMailable extends Notification
 
     public function toMail($notifiable)
     {
-        return new GreetingMailable;
+        return new GreetingMailable();
     }
 }
 

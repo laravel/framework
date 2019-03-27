@@ -35,7 +35,7 @@ class Mail extends Facade
      */
     public static function fake()
     {
-        static::swap($fake = new MailFake);
+        static::swap($fake = new MailFake());
 
         return $fake;
     }

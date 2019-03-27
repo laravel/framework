@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
-use Mockery as m;
-use ReflectionClass;
-use Illuminate\Queue\Queue;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\Queue;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
@@ -57,7 +57,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
 
-        $job = new stdClass;
+        $job = new stdClass();
         $job->invalid = "\xc3\x28";
 
         $queue = $this->getMockForAbstractClass(Queue::class);
@@ -95,19 +95,19 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[
-                'queue' => 'queue',
-                'payload' => json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
-                'attempts' => 0,
-                'reserved_at' => null,
+                'queue'        => 'queue',
+                'payload'      => json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
+                'attempts'     => 0,
+                'reserved_at'  => null,
                 'available_at' => 'available',
-                'created_at' => 'created',
+                'created_at'   => 'created',
             ], [
-                'queue' => 'queue',
-                'payload' => json_encode(['displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
-                'attempts' => 0,
-                'reserved_at' => null,
+                'queue'        => 'queue',
+                'payload'      => json_encode(['displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
+                'attempts'     => 0,
+                'reserved_at'  => null,
                 'available_at' => 'available',
-                'created_at' => 'created',
+                'created_at'   => 'created',
             ]], $records);
         });
 

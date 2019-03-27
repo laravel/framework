@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest;
 
-use stdClass;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use stdClass;
 
 /**
  * @group integration
@@ -33,7 +33,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         /** @var JsonCast $object */
         $object = JsonCast::create([
             'basic_string_as_json_field' => 'this is a string',
-            'json_string_as_json_field' => '{"key1":"value1"}',
+            'json_string_as_json_field'  => '{"key1":"value1"}',
         ]);
 
         $this->assertEquals('this is a string', $object->basic_string_as_json_field);
@@ -91,9 +91,9 @@ class JsonCast extends Model
 
     public $casts = [
         'basic_string_as_json_field' => 'json',
-        'json_string_as_json_field' => 'json',
-        'array_as_json_field' => 'array',
-        'object_as_json_field' => 'object',
-        'collection_as_json_field' => 'collection',
+        'json_string_as_json_field'  => 'json',
+        'array_as_json_field'        => 'array',
+        'object_as_json_field'       => 'object',
+        'collection_as_json_field'   => 'collection',
     ];
 }

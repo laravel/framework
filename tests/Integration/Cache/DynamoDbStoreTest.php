@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * @group integration
@@ -15,7 +15,7 @@ class DynamoDbStoreTest extends TestCase
     {
         parent::setUp();
 
-        if (! isset($_ENV['DYNAMODB_CACHE_TABLE'])) {
+        if (!isset($_ENV['DYNAMODB_CACHE_TABLE'])) {
             $this->markTestSkipped('DynamoDB not configured.');
         }
     }
@@ -30,8 +30,8 @@ class DynamoDbStoreTest extends TestCase
         $this->assertEquals(28, Cache::driver('dynamodb')->get('age'));
 
         $this->assertEquals([
-            'name' => 'Abigail',
-            'age' => 28,
+            'name'   => 'Abigail',
+            'age'    => 28,
             'height' => null,
         ], Cache::driver('dynamodb')->many(['name', 'age', 'height']));
 
@@ -69,7 +69,8 @@ class DynamoDbStoreTest extends TestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
+     *
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -78,10 +79,10 @@ class DynamoDbStoreTest extends TestCase
 
         $app['config']->set('cache.stores.dynamodb', [
             'driver' => 'dynamodb',
-            'key' => env('AWS_ACCESS_KEY_ID'),
+            'key'    => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => 'us-east-1',
-            'table' => env('DYNAMODB_CACHE_TABLE', 'laravel_test'),
+            'table'  => env('DYNAMODB_CACHE_TABLE', 'laravel_test'),
         ]);
     }
 }

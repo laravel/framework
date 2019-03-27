@@ -9,8 +9,9 @@ class FileFactory
     /**
      * Create a new fake file.
      *
-     * @param  string  $name
-     * @param  int  $kilobytes
+     * @param string $name
+     * @param int    $kilobytes
+     *
      * @return \Illuminate\Http\Testing\File
      */
     public function create($name, $kilobytes = 0)
@@ -23,9 +24,10 @@ class FileFactory
     /**
      * Create a new fake image.
      *
-     * @param  string  $name
-     * @param  int  $width
-     * @param  int  $height
+     * @param string $name
+     * @param int    $width
+     * @param int    $height
+     *
      * @return \Illuminate\Http\Testing\File
      */
     public function image($name, $width = 10, $height = 10)
@@ -38,9 +40,10 @@ class FileFactory
     /**
      * Generate a dummy image of the given width and height.
      *
-     * @param  int  $width
-     * @param  int  $height
-     * @param  string  $type
+     * @param int    $width
+     * @param int    $height
+     * @param string $type
+     *
      * @return resource
      */
     protected function generateImage($width, $height, $type)

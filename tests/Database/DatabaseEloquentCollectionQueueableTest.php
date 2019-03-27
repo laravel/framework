@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DatabaseEloquentCollectionQueueableTest extends TestCase
 {
@@ -50,7 +50,7 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
         // serialization + JSON encoding breaks because of UTF-8 issues. Encoding
         // of a QueueableCollection must favor QueueableEntity::queueableId().
         $mock = Mockery::mock(Model::class, [
-            'getKey' => random_bytes(10),
+            'getKey'         => random_bytes(10),
             'getQueueableId' => 'mocked',
         ]);
 

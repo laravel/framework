@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Monolog\Logger;
-use Psr\Log\NullLogger;
-use Psr\Log\LoggerInterface;
-use Orchestra\Testbench\TestCase;
-use Monolog\Handler\StreamHandler;
 use Illuminate\Mail\Transport\LogTransport;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Orchestra\Testbench\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class MailLogTransportTest extends TestCase
 {
@@ -16,7 +16,7 @@ class MailLogTransportTest extends TestCase
         $this->app['config']->set('mail.log_channel', 'mail');
         $this->app['config']->set('logging.channels.mail', [
             'driver' => 'single',
-            'path' => 'mail.log',
+            'path'   => 'mail.log',
         ]);
 
         $manager = $this->app['swift.transport'];

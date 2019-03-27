@@ -2,8 +2,8 @@
 
 namespace Illuminate\Hashing;
 
-use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use RuntimeException;
 
 class ArgonHasher extends AbstractHasher implements HasherContract
 {
@@ -38,7 +38,8 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Create a new hasher instance.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return void
      */
     public function __construct(array $options = [])
@@ -52,18 +53,19 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Hash the given value.
      *
-     * @param  string  $value
-     * @param  array  $options
-     * @return string
+     * @param string $value
+     * @param array  $options
      *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function make($value, array $options = [])
     {
         $hash = password_hash($value, $this->algorithm(), [
             'memory_cost' => $this->memory($options),
-            'time_cost' => $this->time($options),
-            'threads' => $this->threads($options),
+            'time_cost'   => $this->time($options),
+            'threads'     => $this->threads($options),
         ]);
 
         if ($hash === false) {
@@ -86,9 +88,10 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string  $value
-     * @param  string  $hashedValue
-     * @param  array  $options
+     * @param string $value
+     * @param string $hashedValue
+     * @param array  $options
+     *
      * @return bool
      */
     public function check($value, $hashedValue, array $options = [])
@@ -103,23 +106,25 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Check if the given hash has been hashed using the given options.
      *
-     * @param  string  $hashedValue
-     * @param  array  $options
+     * @param string $hashedValue
+     * @param array  $options
+     *
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = [])
     {
         return password_needs_rehash($hashedValue, $this->algorithm(), [
             'memory_cost' => $this->memory($options),
-            'time_cost' => $this->time($options),
-            'threads' => $this->threads($options),
+            'time_cost'   => $this->time($options),
+            'threads'     => $this->threads($options),
         ]);
     }
 
     /**
      * Set the default password memory factor.
      *
-     * @param  int  $memory
+     * @param int $memory
+     *
      * @return $this
      */
     public function setMemory(int $memory)
@@ -132,7 +137,8 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Set the default password timing factor.
      *
-     * @param  int  $time
+     * @param int $time
+     *
      * @return $this
      */
     public function setTime(int $time)
@@ -145,7 +151,8 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Set the default password threads factor.
      *
-     * @param  int  $threads
+     * @param int $threads
+     *
      * @return $this
      */
     public function setThreads(int $threads)
@@ -158,7 +165,8 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Extract the memory cost value from the options array.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return int
      */
     protected function memory(array $options)
@@ -169,7 +177,8 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Extract the time cost value from the options array.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return int
      */
     protected function time(array $options)
@@ -180,7 +189,8 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Extract the threads value from the options array.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return int
      */
     protected function threads(array $options)

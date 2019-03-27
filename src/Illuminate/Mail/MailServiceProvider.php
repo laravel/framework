@@ -2,12 +2,12 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Mailer;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Swift_DependencyContainer;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\DeferrableProvider;
+use Swift_Mailer;
 
 class MailServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -60,9 +60,10 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
     /**
      * Set a global address on the mailer by type.
      *
-     * @param  \Illuminate\Mail\Mailer  $mailer
-     * @param  array  $config
-     * @param  string  $type
+     * @param \Illuminate\Mail\Mailer $mailer
+     * @param array                   $config
+     * @param string                  $type
+     *
      * @return void
      */
     protected function setGlobalAddress($mailer, array $config, $type)

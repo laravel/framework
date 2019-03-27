@@ -2,17 +2,17 @@
 
 namespace Illuminate\Tests\Hashing;
 
-use RuntimeException;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Hashing\Argon2IdHasher;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
-use Illuminate\Hashing\Argon2IdHasher;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class HasherTest extends TestCase
 {
     public function testBasicBcryptHashing()
     {
-        $hasher = new BcryptHasher;
+        $hasher = new BcryptHasher();
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
@@ -23,11 +23,11 @@ class HasherTest extends TestCase
 
     public function testBasicArgon2iHashing()
     {
-        if (! defined('PASSWORD_ARGON2I')) {
+        if (!defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
 
-        $hasher = new ArgonHasher;
+        $hasher = new ArgonHasher();
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
@@ -38,11 +38,11 @@ class HasherTest extends TestCase
 
     public function testBasicArgon2idHashing()
     {
-        if (! defined('PASSWORD_ARGON2ID')) {
+        if (!defined('PASSWORD_ARGON2ID')) {
             $this->markTestSkipped('PHP not compiled with Argon2id hashing support.');
         }
 
-        $hasher = new Argon2IdHasher;
+        $hasher = new Argon2IdHasher();
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
@@ -55,7 +55,7 @@ class HasherTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        if (! defined('PASSWORD_ARGON2I')) {
+        if (!defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
 

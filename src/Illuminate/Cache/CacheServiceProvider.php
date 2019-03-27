@@ -2,8 +2,8 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\ServiceProvider;
 
 class CacheServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -23,7 +23,7 @@ class CacheServiceProvider extends ServiceProvider implements DeferrableProvider
         });
 
         $this->app->singleton('memcached.connector', function () {
-            return new MemcachedConnector;
+            return new MemcachedConnector();
         });
     }
 

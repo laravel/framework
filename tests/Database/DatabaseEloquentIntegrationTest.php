@@ -3,25 +3,25 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use RuntimeException;
-use InvalidArgumentException;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\QueryException;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\QueryException;
+use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Tests\Integration\Database\Post;
 use Illuminate\Tests\Integration\Database\User;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Pagination\AbstractPaginator as Paginator;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabaseEloquentIntegrationTest extends TestCase
 {
@@ -32,7 +32,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     protected function setUp(): void
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -398,7 +398,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $i = 0;
         EloquentTestNonIncrementingSecond::query()->chunkById(2, function (Collection $users) use (&$i) {
-            if (! $i) {
+            if (!$i) {
                 $this->assertEquals(' First', $users[0]->name);
                 $this->assertEquals(' Second', $users[1]->name);
             } else {
@@ -900,7 +900,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testEmptyMorphToRelationship()
     {
-        $photo = new EloquentTestPhoto;
+        $photo = new EloquentTestPhoto();
 
         $this->assertNull($photo->imageable);
     }
@@ -995,7 +995,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $this->connection()->transaction(function () use ($user) {
                     $user->email = 'otwell@laravel.com';
                     $user->save();
-                    throw new Exception;
+
+                    throw new Exception();
                 });
             } catch (Exception $e) {
                 // ignore the exception
@@ -1042,7 +1043,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testToArrayIncludesDefaultFormattedTimestamps()
     {
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
 
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
@@ -1057,7 +1058,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testToArrayIncludesCustomFormattedTimestamps()
     {
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
         $model->setDateFormat('d-m-y');
 
         $model->setRawAttributes([
@@ -1132,6 +1133,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestItem::create(['id' => 1]);
         EloquentTestOrder::create(['id' => 1, 'item_type' => EloquentTestItem::class, 'item_id' => 1]);
+
         try {
             $item = EloquentTestOrder::first()->item;
         } catch (Exception $e) {
@@ -1212,13 +1214,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals($users->map->fresh(), $users->fresh());
 
-        $users = new Collection;
+        $users = new Collection();
         $this->assertEquals($users->map->fresh(), $users->fresh());
     }
 
     public function testTimestampsUsingDefaultDateFormat()
     {
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
         $model->setDateFormat('Y-m-d H:i:s'); // Default MySQL/PostgreSQL/SQLite date format
         $model->setRawAttributes([
             'created_at' => '2017-11-14 08:23:19',
@@ -1229,7 +1231,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testTimestampsUsingDefaultSqlServerDateFormat()
     {
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
         $model->setDateFormat('Y-m-d H:i:s.v'); // Default SQL Server date format
         $model->setRawAttributes([
             'created_at' => '2017-11-14 08:23:19.000',
@@ -1243,7 +1245,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testTimestampsUsingCustomDateFormat()
     {
         // Simulating using custom precisions with timestamps(4)
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
         $model->setDateFormat('Y-m-d H:i:s.u'); // Custom date format
         $model->setRawAttributes([
             'created_at' => '2017-11-14 08:23:19.0000',
@@ -1257,7 +1259,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testTimestampsUsingOldSqlServerDateFormat()
     {
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
         $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
         $model->setRawAttributes([
             'created_at' => '2017-11-14 08:23:19.000',
@@ -1270,7 +1272,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
         $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
         $model->setRawAttributes([
             'updated_at' => '2017-11-14 08:23:19.734',
@@ -1608,17 +1610,17 @@ class EloquentTestUser extends Eloquent
 
     public function friends()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id');
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id');
     }
 
     public function friendsOne()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
     }
 
     public function friendsTwo()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
     }
 
     public function posts()
@@ -1733,12 +1735,12 @@ class EloquentTestPost extends Eloquent
 
     public function childPosts()
     {
-        return $this->hasMany(EloquentTestPost::class, 'parent_id');
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function parentPost()
     {
-        return $this->belongsTo(EloquentTestPost::class, 'parent_id');
+        return $this->belongsTo(self::class, 'parent_id');
     }
 }
 

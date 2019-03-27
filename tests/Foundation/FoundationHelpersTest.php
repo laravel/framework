@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use stdClass;
 use Exception;
-use Mockery as m;
-use Illuminate\Support\Str;
-use Illuminate\Foundation\Mix;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Mix;
+use Illuminate\Support\Str;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class FoundationHelpersTest extends TestCase
 {
@@ -19,7 +19,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testCache()
     {
-        $app = new Application;
+        $app = new Application();
         $app['cache'] = $cache = m::mock(stdClass::class);
 
         // 1. cache()
@@ -240,7 +240,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixIsSwappableForTests()
     {
-        (new Application)->instance(Mix::class, function () {
+        (new Application())->instance(Mix::class, function () {
             return 'expected';
         });
 

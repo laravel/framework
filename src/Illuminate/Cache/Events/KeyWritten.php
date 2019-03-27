@@ -21,10 +21,11 @@ class KeyWritten extends CacheEvent
     /**
      * Create a new event instance.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  int|null  $seconds
-     * @param  array  $tags
+     * @param string   $key
+     * @param mixed    $value
+     * @param int|null $seconds
+     * @param array    $tags
+     *
      * @return void
      */
     public function __construct($key, $value, $seconds = null, $tags = [])

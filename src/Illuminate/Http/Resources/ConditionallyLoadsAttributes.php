@@ -9,7 +9,8 @@ trait ConditionallyLoadsAttributes
     /**
      * Filter the given data, removing any optional values.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return array
      */
     protected function filter($data)
@@ -43,10 +44,11 @@ trait ConditionallyLoadsAttributes
     /**
      * Merge the given data in at the given index.
      *
-     * @param  array  $data
-     * @param  int  $index
-     * @param  array  $merge
-     * @param  bool  $numericKeys
+     * @param array $data
+     * @param int   $index
+     * @param array $merge
+     * @param bool  $numericKeys
+     *
      * @return array
      */
     protected function mergeData($data, $index, $merge, $numericKeys)
@@ -66,7 +68,8 @@ trait ConditionallyLoadsAttributes
     /**
      * Remove the missing values from the filtered data.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return array
      */
     protected function removeMissingValues($data)
@@ -94,9 +97,10 @@ trait ConditionallyLoadsAttributes
     /**
      * Retrieve a value based on a given condition.
      *
-     * @param  bool  $condition
-     * @param  mixed  $value
-     * @param  mixed  $default
+     * @param bool  $condition
+     * @param mixed $value
+     * @param mixed $default
+     *
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function when($condition, $value, $default = null)
@@ -105,13 +109,14 @@ trait ConditionallyLoadsAttributes
             return value($value);
         }
 
-        return func_num_args() === 3 ? value($default) : new MissingValue;
+        return func_num_args() === 3 ? value($default) : new MissingValue();
     }
 
     /**
      * Merge a value into the array.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return \Illuminate\Http\Resources\MergeValue|mixed
      */
     protected function merge($value)
@@ -122,19 +127,21 @@ trait ConditionallyLoadsAttributes
     /**
      * Merge a value based on a given condition.
      *
-     * @param  bool  $condition
-     * @param  mixed  $value
+     * @param bool  $condition
+     * @param mixed $value
+     *
      * @return \Illuminate\Http\Resources\MergeValue|mixed
      */
     protected function mergeWhen($condition, $value)
     {
-        return $condition ? new MergeValue(value($value)) : new MissingValue;
+        return $condition ? new MergeValue(value($value)) : new MissingValue();
     }
 
     /**
      * Merge the given attributes.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Illuminate\Http\Resources\MergeValue
      */
     protected function attributes($attributes)
@@ -147,18 +154,19 @@ trait ConditionallyLoadsAttributes
     /**
      * Retrieve a relationship if it has been loaded.
      *
-     * @param  string  $relationship
-     * @param  mixed  $value
-     * @param  mixed  $default
+     * @param string $relationship
+     * @param mixed  $value
+     * @param mixed  $default
+     *
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenLoaded($relationship, $value = null, $default = null)
     {
         if (func_num_args() < 3) {
-            $default = new MissingValue;
+            $default = new MissingValue();
         }
 
-        if (! $this->resource->relationLoaded($relationship)) {
+        if (!$this->resource->relationLoaded($relationship)) {
             return value($default);
         }
 
@@ -167,7 +175,7 @@ trait ConditionallyLoadsAttributes
         }
 
         if ($this->resource->{$relationship} === null) {
-            return null;
+            return;
         }
 
         return value($value);
@@ -176,9 +184,10 @@ trait ConditionallyLoadsAttributes
     /**
      * Execute a callback if the given pivot table has been loaded.
      *
-     * @param  string  $table
-     * @param  mixed  $value
-     * @param  mixed  $default
+     * @param string $table
+     * @param mixed  $value
+     * @param mixed  $default
+     *
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenPivotLoaded($table, $value, $default = null)
@@ -189,16 +198,17 @@ trait ConditionallyLoadsAttributes
     /**
      * Execute a callback if the given pivot table with a custom accessor has been loaded.
      *
-     * @param  string  $accessor
-     * @param  string  $table
-     * @param  mixed  $value
-     * @param  mixed  $default
+     * @param string $accessor
+     * @param string $table
+     * @param mixed  $value
+     * @param mixed  $default
+     *
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenPivotLoadedAs($accessor, $table, $value, $default = null)
     {
         if (func_num_args() === 3) {
-            $default = new MissingValue;
+            $default = new MissingValue();
         }
 
         return $this->when(
@@ -212,15 +222,16 @@ trait ConditionallyLoadsAttributes
     /**
      * Transform the given value if it is present.
      *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  mixed  $default
+     * @param mixed    $value
+     * @param callable $callback
+     * @param mixed    $default
+     *
      * @return mixed
      */
     protected function transform($value, callable $callback, $default = null)
     {
         return transform(
-            $value, $callback, func_num_args() === 3 ? $default : new MissingValue
+            $value, $callback, func_num_args() === 3 ? $default : new MissingValue()
         );
     }
 }

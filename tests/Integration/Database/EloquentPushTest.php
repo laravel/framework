@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @group integration
@@ -35,7 +35,7 @@ class EloquentPushTest extends DatabaseTestCase
 
     public function testPushMethodSavesTheRelationshipsRecursively()
     {
-        $user = new UserX;
+        $user = new UserX();
         $user->name = 'Test';
         $user->save();
         $user->posts()->create(['title' => 'Test title']);

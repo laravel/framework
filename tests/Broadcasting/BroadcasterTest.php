@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Exception;
+use Illuminate\Broadcasting\Broadcasters\Broadcaster;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\BindingRegistrar;
+use Illuminate\Database\Eloquent\Model;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Routing\BindingRegistrar;
-use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BroadcasterTest extends TestCase
@@ -22,7 +22,7 @@ class BroadcasterTest extends TestCase
     {
         parent::setUp();
 
-        $this->broadcaster = new FakeBroadcaster;
+        $this->broadcaster = new FakeBroadcaster();
     }
 
     protected function tearDown(): void
@@ -61,7 +61,7 @@ class BroadcasterTest extends TestCase
         /*
          * Test Explicit Binding...
          */
-        $container = new Container;
+        $container = new Container();
         Container::setInstance($container);
         $binder = m::mock(BindingRegistrar::class);
         $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn(function () {
@@ -73,7 +73,7 @@ class BroadcasterTest extends TestCase
         };
         $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
         $this->assertEquals(['bound'], $parameters);
-        Container::setInstance(new Container);
+        Container::setInstance(new Container());
     }
 
     public function testCanUseChannelClasses()
@@ -180,7 +180,7 @@ class BroadcasterTest extends TestCase
         $request->shouldReceive('user')
                 ->once()
                 ->withNoArgs()
-                ->andReturn(new DummyUser);
+                ->andReturn(new DummyUser());
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -197,7 +197,7 @@ class BroadcasterTest extends TestCase
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard')
-                ->andReturn(new DummyUser);
+                ->andReturn(new DummyUser());
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -220,7 +220,7 @@ class BroadcasterTest extends TestCase
         $request->shouldReceive('user')
                 ->twice()
                 ->with('myguard2')
-                ->andReturn(new DummyUser)
+                ->andReturn(new DummyUser())
                 ->ordered('user');
 
         $this->assertInstanceOf(

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Console;
 
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class OutputStyle extends SymfonyStyle
 {
@@ -18,8 +18,9 @@ class OutputStyle extends SymfonyStyle
     /**
      * Create a new Console OutputStyle instance.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
      * @return void
      */
     public function __construct(InputInterface $input, OutputInterface $output)

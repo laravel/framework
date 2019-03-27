@@ -39,7 +39,8 @@ class MigrateCommand extends BaseCommand
     /**
      * Create a new migration command instance.
      *
-     * @param  \Illuminate\Database\Migrations\Migrator  $migrator
+     * @param \Illuminate\Database\Migrations\Migrator $migrator
+     *
      * @return void
      */
     public function __construct(Migrator $migrator)
@@ -56,7 +57,7 @@ class MigrateCommand extends BaseCommand
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
+        if (!$this->confirmToProceed()) {
             return;
         }
 
@@ -68,13 +69,13 @@ class MigrateCommand extends BaseCommand
         $this->migrator->setOutput($this->output)
                 ->run($this->getMigrationPaths(), [
                     'pretend' => $this->option('pretend'),
-                    'step' => $this->option('step'),
+                    'step'    => $this->option('step'),
                 ]);
 
         // Finally, if the "seed" option has been given, we will re-run the database
         // seed task to re-populate the database, which is convenient when adding
         // a migration and a seed at the same time, as it is only this command.
-        if ($this->option('seed') && ! $this->option('pretend')) {
+        if ($this->option('seed') && !$this->option('pretend')) {
             $this->call('db:seed', ['--force' => true]);
         }
     }
@@ -88,7 +89,7 @@ class MigrateCommand extends BaseCommand
     {
         $this->migrator->setConnection($this->option('database'));
 
-        if (! $this->migrator->repositoryExists()) {
+        if (!$this->migrator->repositoryExists()) {
             $this->call('migrate:install', array_filter([
                 '--database' => $this->option('database'),
             ]));

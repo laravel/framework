@@ -9,8 +9,9 @@ class EntityNotFoundException extends InvalidArgumentException
     /**
      * Create a new exception instance.
      *
-     * @param  string  $type
-     * @param  mixed  $id
+     * @param string $type
+     * @param mixed  $id
+     *
      * @return void
      */
     public function __construct($type, $id)

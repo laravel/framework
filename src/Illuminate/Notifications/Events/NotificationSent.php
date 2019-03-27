@@ -40,10 +40,11 @@ class NotificationSent
     /**
      * Create a new event instance.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  string  $channel
-     * @param  mixed  $response
+     * @param mixed                                  $notifiable
+     * @param \Illuminate\Notifications\Notification $notification
+     * @param string                                 $channel
+     * @param mixed                                  $response
+     *
      * @return void
      */
     public function __construct($notifiable, $notification, $channel, $response = null)

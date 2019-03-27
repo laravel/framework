@@ -2,18 +2,18 @@
 
 namespace Illuminate\Tests\Log;
 
-use ReflectionProperty;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
-use Monolog\Logger as Monolog;
-use Orchestra\Testbench\TestCase;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\NewRelicHandler;
-use Monolog\Handler\LogEntriesHandler;
 use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Handler\LogEntriesHandler;
+use Monolog\Handler\NewRelicHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Logger as Monolog;
+use Orchestra\Testbench\TestCase;
+use ReflectionProperty;
 
 class LogManagerTest extends TestCase
 {
@@ -32,25 +32,25 @@ class LogManagerTest extends TestCase
         $config = $this->app['config'];
 
         $config->set('logging.channels.stack', [
-            'driver' => 'stack',
+            'driver'   => 'stack',
             'channels' => ['stderr', 'stdout'],
         ]);
 
         $config->set('logging.channels.stderr', [
-            'driver' => 'monolog',
+            'driver'  => 'monolog',
             'handler' => StreamHandler::class,
-            'level' => 'notice',
-            'with' => [
+            'level'   => 'notice',
+            'with'    => [
                 'stream' => 'php://stderr',
                 'bubble' => false,
             ],
         ]);
 
         $config->set('logging.channels.stdout', [
-            'driver' => 'monolog',
+            'driver'  => 'monolog',
             'handler' => StreamHandler::class,
-            'level' => 'info',
-            'with' => [
+            'level'   => 'info',
+            'with'    => [
                 'stream' => 'php://stdout',
                 'bubble' => true,
             ],
@@ -76,11 +76,11 @@ class LogManagerTest extends TestCase
     {
         $config = $this->app['config'];
         $config->set('logging.channels.nonbubblingstream', [
-            'driver' => 'monolog',
-            'name' => 'foobar',
+            'driver'  => 'monolog',
+            'name'    => 'foobar',
             'handler' => StreamHandler::class,
-            'level' => 'notice',
-            'with' => [
+            'level'   => 'notice',
+            'with'    => [
                 'stream' => 'php://stderr',
                 'bubble' => false,
             ],
@@ -104,10 +104,10 @@ class LogManagerTest extends TestCase
         $this->assertEquals('php://stderr', $url->getValue($handlers[0]));
 
         $config->set('logging.channels.logentries', [
-            'driver' => 'monolog',
-            'name' => 'le',
+            'driver'  => 'monolog',
+            'name'    => 'le',
             'handler' => LogEntriesHandler::class,
-            'with' => [
+            'with'    => [
                 'token' => '123456789',
             ],
         ]);
@@ -126,9 +126,9 @@ class LogManagerTest extends TestCase
     {
         $config = $this->app['config'];
         $config->set('logging.channels.newrelic', [
-            'driver' => 'monolog',
-            'name' => 'nr',
-            'handler' => NewRelicHandler::class,
+            'driver'    => 'monolog',
+            'name'      => 'nr',
+            'handler'   => NewRelicHandler::class,
             'formatter' => 'default',
         ]);
 
@@ -142,10 +142,10 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(NormalizerFormatter::class, $handler->getFormatter());
 
         $config->set('logging.channels.newrelic2', [
-            'driver' => 'monolog',
-            'name' => 'nr',
-            'handler' => NewRelicHandler::class,
-            'formatter' => HtmlFormatter::class,
+            'driver'         => 'monolog',
+            'name'           => 'nr',
+            'handler'        => NewRelicHandler::class,
+            'formatter'      => HtmlFormatter::class,
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
@@ -169,8 +169,8 @@ class LogManagerTest extends TestCase
         $config = $this->app['config'];
         $config->set('logging.channels.defaultsingle', [
             'driver' => 'single',
-            'name' => 'ds',
-            'path' => storage_path('logs/laravel.log'),
+            'name'   => 'ds',
+            'path'   => storage_path('logs/laravel.log'),
         ]);
 
         $manager = new LogManager($this->app);
@@ -184,10 +184,10 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(LineFormatter::class, $formatter);
 
         $config->set('logging.channels.formattedsingle', [
-            'driver' => 'single',
-            'name' => 'fs',
-            'path' => storage_path('logs/laravel.log'),
-            'formatter' => HtmlFormatter::class,
+            'driver'         => 'single',
+            'name'           => 'fs',
+            'path'           => storage_path('logs/laravel.log'),
+            'formatter'      => HtmlFormatter::class,
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
@@ -211,8 +211,8 @@ class LogManagerTest extends TestCase
         $config = $this->app['config'];
         $config->set('logging.channels.defaultdaily', [
             'driver' => 'daily',
-            'name' => 'dd',
-            'path' => storage_path('logs/laravel.log'),
+            'name'   => 'dd',
+            'path'   => storage_path('logs/laravel.log'),
         ]);
 
         $manager = new LogManager($this->app);
@@ -226,10 +226,10 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(LineFormatter::class, $formatter);
 
         $config->set('logging.channels.formatteddaily', [
-            'driver' => 'daily',
-            'name' => 'fd',
-            'path' => storage_path('logs/laravel.log'),
-            'formatter' => HtmlFormatter::class,
+            'driver'         => 'daily',
+            'name'           => 'fd',
+            'path'           => storage_path('logs/laravel.log'),
+            'formatter'      => HtmlFormatter::class,
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
@@ -253,7 +253,7 @@ class LogManagerTest extends TestCase
         $config = $this->app['config'];
         $config->set('logging.channels.defaultsyslog', [
             'driver' => 'syslog',
-            'name' => 'ds',
+            'name'   => 'ds',
         ]);
 
         $manager = new LogManager($this->app);
@@ -267,9 +267,9 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(LineFormatter::class, $formatter);
 
         $config->set('logging.channels.formattedsyslog', [
-            'driver' => 'syslog',
-            'name' => 'fs',
-            'formatter' => HtmlFormatter::class,
+            'driver'         => 'syslog',
+            'name'           => 'fs',
+            'formatter'      => HtmlFormatter::class,
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],

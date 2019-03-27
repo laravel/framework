@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToGlobalScopesTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -30,10 +30,10 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         });
 
         $post = Post::create();
-        (new Comment)->commentable()->associate($post)->save();
+        (new Comment())->commentable()->associate($post)->save();
 
         $post = tap(Post::create())->delete();
-        (new Comment)->commentable()->associate($post)->save();
+        (new Comment())->commentable()->associate($post)->save();
     }
 
     public function test_with_global_scopes()

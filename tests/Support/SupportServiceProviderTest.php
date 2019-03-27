@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class SupportServiceProviderTest extends TestCase
 {
@@ -62,8 +62,8 @@ class SupportServiceProviderTest extends TestCase
             'source/unmarked/two/a' => 'destination/unmarked/two/a',
             'source/unmarked/two/b' => 'destination/unmarked/two/b',
             'source/unmarked/two/c' => 'destination/tagged/two/a',
-            'source/tagged/two/a' => 'destination/tagged/two/a',
-            'source/tagged/two/b' => 'destination/tagged/two/b',
+            'source/tagged/two/a'   => 'destination/tagged/two/a',
+            'source/tagged/two/b'   => 'destination/tagged/two/b',
         ];
         $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published paths.');
     }
@@ -99,7 +99,7 @@ class SupportServiceProviderTest extends TestCase
         $this->assertArrayHasKey('source/tagged/one', $toPublish, 'Service provider does not return expected tagged path key.');
         $this->assertArrayNotHasKey('source/unmarked/two/c', $toPublish, 'Service provider does return unexpected tagged path key.');
         $expected = [
-            'source/tagged/one' => 'destination/tagged/one',
+            'source/tagged/one'   => 'destination/tagged/one',
             'source/tagged/two/a' => 'destination/tagged/two/a',
             'source/tagged/two/b' => 'destination/tagged/two/b',
         ];

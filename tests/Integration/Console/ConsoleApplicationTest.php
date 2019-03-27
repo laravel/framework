@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Command;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Console\Kernel;
+use Orchestra\Testbench\TestCase;
 
 class ConsoleApplicationTest extends TestCase
 {
@@ -12,7 +12,7 @@ class ConsoleApplicationTest extends TestCase
     {
         parent::setUp();
 
-        $this->app[Kernel::class]->registerCommand(new FooCommandStub);
+        $this->app[Kernel::class]->registerCommand(new FooCommandStub());
     }
 
     public function test_artisan_call_using_command_name()

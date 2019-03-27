@@ -3,8 +3,8 @@
 namespace Illuminate\Redis\Limiters;
 
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Support\Str;
 
 class ConcurrencyLimiter
 {
@@ -39,10 +39,11 @@ class ConcurrencyLimiter
     /**
      * Create a new concurrency limiter instance.
      *
-     * @param  \Illuminate\Redis\Connections\Connection  $redis
-     * @param  string  $name
-     * @param  int  $maxLocks
-     * @param  int  $releaseAfter
+     * @param \Illuminate\Redis\Connections\Connection $redis
+     * @param string                                   $name
+     * @param int                                      $maxLocks
+     * @param int                                      $releaseAfter
+     *
      * @return void
      */
     public function __construct($redis, $name, $maxLocks, $releaseAfter)
@@ -56,12 +57,13 @@ class ConcurrencyLimiter
     /**
      * Attempt to acquire the lock for the given number of seconds.
      *
-     * @param  int  $timeout
-     * @param  callable|null  $callback
-     * @return bool
+     * @param int           $timeout
+     * @param callable|null $callback
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
      * @throws \Exception
+     *
+     * @return bool
      */
     public function block($timeout, $callback = null)
     {
@@ -69,9 +71,9 @@ class ConcurrencyLimiter
 
         $id = Str::random(20);
 
-        while (! $slot = $this->acquire($id)) {
+        while (!$slot = $this->acquire($id)) {
             if (time() - $timeout >= $starting) {
-                throw new LimiterTimeoutException;
+                throw new LimiterTimeoutException();
             }
 
             usleep(250 * 1000);
@@ -136,8 +138,9 @@ LUA;
     /**
      * Release the lock.
      *
-     * @param  string $key
-     * @param  string $id
+     * @param string $key
+     * @param string $id
+     *
      * @return void
      */
     protected function release($key, $id)

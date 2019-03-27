@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @group integration
@@ -27,15 +27,15 @@ class EloquentWhereTest extends DatabaseTestCase
     {
         /** @var UserWhereTest $firstUser */
         $firstUser = UserWhereTest::create([
-            'name' => 'test-name',
-            'email' => 'test-email',
+            'name'    => 'test-name',
+            'email'   => 'test-email',
             'address' => 'test-address',
         ]);
 
         /** @var UserWhereTest $secondUser */
         $secondUser = UserWhereTest::create([
-            'name' => 'test-name1',
-            'email' => 'test-email1',
+            'name'    => 'test-name1',
+            'email'   => 'test-email1',
             'address' => 'test-address1',
         ]);
 

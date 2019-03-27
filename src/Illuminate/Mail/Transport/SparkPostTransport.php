@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Mime_SimpleMessage;
 use GuzzleHttp\ClientInterface;
+use Swift_Mime_SimpleMessage;
 
 class SparkPostTransport extends Transport
 {
@@ -31,9 +31,10 @@ class SparkPostTransport extends Transport
     /**
      * Create a new SparkPost transport instance.
      *
-     * @param  \GuzzleHttp\ClientInterface  $client
-     * @param  string  $key
-     * @param  array  $options
+     * @param \GuzzleHttp\ClientInterface $client
+     * @param string                      $key
+     * @param array                       $options
+     *
      * @return void
      */
     public function __construct(ClientInterface $client, $key, $options = [])
@@ -60,7 +61,7 @@ class SparkPostTransport extends Transport
             ],
             'json' => array_merge([
                 'recipients' => $recipients,
-                'content' => [
+                'content'    => [
                     'email_rfc822' => $message->toString(),
                 ],
             ], $this->options),
@@ -80,7 +81,8 @@ class SparkPostTransport extends Transport
      *
      * Note that SparkPost still respects CC, BCC headers in raw message itself.
      *
-     * @param  \Swift_Mime_SimpleMessage $message
+     * @param \Swift_Mime_SimpleMessage $message
+     *
      * @return array
      */
     protected function getRecipients(Swift_Mime_SimpleMessage $message)
@@ -105,7 +107,8 @@ class SparkPostTransport extends Transport
     /**
      * Get the transmission ID from the response.
      *
-     * @param  \GuzzleHttp\Psr7\Response  $response
+     * @param \GuzzleHttp\Psr7\Response $response
+     *
      * @return string
      */
     protected function getTransmissionId($response)
@@ -128,7 +131,8 @@ class SparkPostTransport extends Transport
     /**
      * Set the API key being used by the transport.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return string
      */
     public function setKey($key)
@@ -159,7 +163,8 @@ class SparkPostTransport extends Transport
     /**
      * Set the transmission options being used by the transport.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return array
      */
     public function setOptions(array $options)

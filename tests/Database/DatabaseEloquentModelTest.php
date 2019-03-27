@@ -3,32 +3,32 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
-use stdClass;
-use Exception;
-use Mockery as m;
-use LogicException;
-use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;
-use InvalidArgumentException;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Model;
+use Exception;
 use Foo\Bar\EloquentModelNamespacedStub;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\InteractsWithTime;
+use InvalidArgumentException;
+use LogicException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 
 class DatabaseEloquentModelTest extends TestCase
 {
@@ -54,7 +54,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testAttributeManipulation()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->name = 'foo';
         $this->assertEquals('foo', $model->name);
         $this->assertTrue(isset($model->name));
@@ -85,7 +85,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDirtyOnCastOrDateAttributes()
     {
-        $model = new EloquentModelCastingStub;
+        $model = new EloquentModelCastingStub();
         $model->setDateFormat('Y-m-d H:i:s');
         $model->boolAttribute = 1;
         $model->foo = 1;
@@ -125,7 +125,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testCalculatedAttributes()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->password = 'secret';
         $attributes = $model->getAttributes();
 
@@ -155,7 +155,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testOnly()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->first_name = 'taylor';
         $model->last_name = 'otwell';
         $model->project = 'laravel';
@@ -167,7 +167,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testNewInstanceReturnsNewInstanceWithAttributesSet()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $instance = $model->newInstance(['name' => 'taylor']);
         $this->assertInstanceOf(EloquentModelStub::class, $instance);
         $this->assertEquals('taylor', $instance->name);
@@ -175,7 +175,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testNewInstanceReturnsNewInstanceWithTableSet()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setTable('test');
         $newInstance = $model->newInstance();
 
@@ -229,7 +229,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testWithoutMethodRemovesEagerLoadedRelationshipCorrectly()
     {
-        $model = new EloquentModelWithoutRelationStub;
+        $model = new EloquentModelWithoutRelationStub();
         $this->addMockConnection($model);
         $instance = $model->newInstance()->newQuery()->without('foo');
         $this->assertEmpty($instance->getEagerLoads());
@@ -237,7 +237,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testEagerLoadingWithColumns()
     {
-        $model = new EloquentModelWithoutRelationStub;
+        $model = new EloquentModelWithoutRelationStub();
         $instance = $model->newInstance()->newQuery()->with('foo:bar,baz', 'hadi');
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('select')->once()->with(['bar', 'baz']);
@@ -403,10 +403,10 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjectsOnCreate()
     {
         $timestamps = [
-            'created_at' =>Carbon::now(),
+            'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
-        $model = new EloquentDateModelStub;
+        $model = new EloquentDateModelStub();
         Model::setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
         $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock(stdClass::class));
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
@@ -422,7 +422,7 @@ class DatabaseEloquentModelTest extends TestCase
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
-        $model = new EloquentDateModelStub;
+        $model = new EloquentDateModelStub();
         Model::setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
         $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock(stdClass::class));
         $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
@@ -435,26 +435,26 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testTimestampsAreCreatedFromStringsAndIntegers()
     {
-        $model = new EloquentDateModelStub;
+        $model = new EloquentDateModelStub();
         $model->created_at = '2013-05-22 00:00:00';
         $this->assertInstanceOf(Carbon::class, $model->created_at);
 
-        $model = new EloquentDateModelStub;
+        $model = new EloquentDateModelStub();
         $model->created_at = $this->currentTime();
         $this->assertInstanceOf(Carbon::class, $model->created_at);
 
-        $model = new EloquentDateModelStub;
+        $model = new EloquentDateModelStub();
         $model->created_at = 0;
         $this->assertInstanceOf(Carbon::class, $model->created_at);
 
-        $model = new EloquentDateModelStub;
+        $model = new EloquentDateModelStub();
         $model->created_at = '2012-01-01';
         $this->assertInstanceOf(Carbon::class, $model->created_at);
     }
 
     public function testFromDateTime()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
 
         $value = Carbon::parse('2015-04-17 22:59:01');
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
@@ -703,14 +703,14 @@ class DatabaseEloquentModelTest extends TestCase
             return new BaseBuilder($conn, $grammar, $processor);
         });
         $resolver->shouldReceive('connection')->andReturn($conn);
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $builder = $model->newQuery();
         $this->assertInstanceOf(Builder::class, $builder);
     }
 
     public function testGetAndSetTableOperations()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->assertEquals('stub', $model->getTable());
         $model->setTable('foo');
         $this->assertEquals('foo', $model->getTable());
@@ -718,7 +718,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testGetKeyReturnsValueOfPrimaryKey()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->id = 1;
         $this->assertEquals(1, $model->getKey());
         $this->assertEquals('id', $model->getKeyName());
@@ -741,7 +741,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testToArray()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->name = 'foo';
         $model->age = null;
         $model->password = 'password1';
@@ -751,7 +751,7 @@ class DatabaseEloquentModelTest extends TestCase
         ]));
         $model->setRelation('partner', new EloquentModelStub(['name' => 'abby']));
         $model->setRelation('group', null);
-        $model->setRelation('multi', new BaseCollection);
+        $model->setRelation('multi', new BaseCollection());
         $array = $model->toArray();
 
         $this->assertIsArray($array);
@@ -770,7 +770,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testVisibleCreatesArrayWhitelist()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setVisible(['name']);
         $model->name = 'Taylor';
         $model->age = 26;
@@ -781,7 +781,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testHiddenCanAlsoExcludeRelationships()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->name = 'Taylor';
         $model->setRelation('foo', ['bar']);
         $model->setHidden(['foo', 'list_items', 'password']);
@@ -792,7 +792,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testGetArrayableRelationsFunctionExcludeHiddenRelationships()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
 
         $class = new ReflectionClass($model);
         $method = $class->getMethod('getArrayableRelations');
@@ -809,7 +809,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testToArraySnakeAttributes()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setRelation('namesList', new BaseCollection([
             new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
         ]));
@@ -818,7 +818,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('baz', $array['names_list'][0]['bar']);
         $this->assertEquals('boom', $array['names_list'][1]['bam']);
 
-        $model = new EloquentModelCamelStub;
+        $model = new EloquentModelCamelStub();
         $model->setRelation('namesList', new BaseCollection([
             new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
         ]));
@@ -830,7 +830,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testToArrayUsesMutators()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->list_items = [1, 2, 3];
         $array = $model->toArray();
 
@@ -906,7 +906,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testFillable()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->fillable(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar']);
         $this->assertEquals('foo', $model->name);
@@ -915,20 +915,20 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testQualifyColumn()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
 
         $this->assertEquals('stub.column', $model->qualifyColumn('column'));
     }
 
     public function testForceFillMethodFillsGuardedAttributes()
     {
-        $model = (new EloquentModelSaveStub)->forceFill(['id' => 21]);
+        $model = (new EloquentModelSaveStub())->forceFill(['id' => 21]);
         $this->assertEquals(21, $model->id);
     }
 
     public function testFillingJSONAttributes()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->fillable(['meta->name', 'meta->price', 'meta->size->width']);
         $model->fill(['meta->name' => 'foo', 'meta->price' => 'bar', 'meta->size->width' => 'baz']);
         $this->assertEquals(
@@ -947,7 +947,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testUnguardAllowsAnythingToBeSet()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         EloquentModelStub::unguard();
         $model->guard(['*']);
         $model->fill(['name' => 'foo', 'age' => 'bar']);
@@ -958,14 +958,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testUnderscorePropertiesAreNotFilled()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->fill(['_method' => 'PUT']);
         $this->assertEquals([], $model->getAttributes());
     }
 
     public function testGuarded()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->guard(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
         $this->assertFalse(isset($model->name));
@@ -975,7 +975,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testFillableOverridesGuarded()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->guard(['name', 'age']);
         $model->fillable(['age', 'foo']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
@@ -989,7 +989,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->expectException(MassAssignmentException::class);
         $this->expectExceptionMessage('name');
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->guard(['*']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'votes' => 'baz']);
     }
@@ -997,7 +997,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUnguardedRunsCallbackWhileBeingUnguarded()
     {
         $model = Model::unguarded(function () {
-            return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
+            return (new EloquentModelStub())->guard(['*'])->fill(['name' => 'Taylor']);
         });
         $this->assertEquals('Taylor', $model->name);
         $this->assertFalse(Model::isUnguarded());
@@ -1007,7 +1007,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         Model::unguard();
         $model = Model::unguarded(function () {
-            return (new EloquentModelStub)->guard(['*'])->fill(['name' => 'Taylor']);
+            return (new EloquentModelStub())->guard(['*'])->fill(['name' => 'Taylor']);
         });
         $this->assertEquals('Taylor', $model->name);
         $this->assertTrue(Model::isUnguarded());
@@ -1018,7 +1018,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         try {
             Model::unguarded(function () {
-                throw new Exception;
+                throw new Exception();
             });
         } catch (Exception $e) {
             // ignore the exception
@@ -1028,12 +1028,12 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testHasOneCreatesProperRelation()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->hasOne(EloquentModelSaveStub::class);
         $this->assertEquals('save_stub.eloquent_model_stub_id', $relation->getQualifiedForeignKeyName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->hasOne(EloquentModelSaveStub::class, 'foo');
         $this->assertEquals('save_stub.foo', $relation->getQualifiedForeignKeyName());
@@ -1043,7 +1043,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testMorphOneCreatesProperRelation()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->morphOne(EloquentModelSaveStub::class, 'morph');
         $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
@@ -1054,7 +1054,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testCorrectMorphClassIsReturned()
     {
         Relation::morphMap(['alias' => 'AnotherModel']);
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
 
         try {
             $this->assertEquals(EloquentModelStub::class, $model->getMorphClass());
@@ -1065,12 +1065,12 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testHasManyCreatesProperRelation()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->hasMany(EloquentModelSaveStub::class);
         $this->assertEquals('save_stub.eloquent_model_stub_id', $relation->getQualifiedForeignKeyName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->hasMany(EloquentModelSaveStub::class, 'foo');
 
@@ -1081,7 +1081,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testMorphManyCreatesProperRelation()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->morphMany(EloquentModelSaveStub::class, 'morph');
         $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
@@ -1091,14 +1091,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testBelongsToCreatesProperRelation()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->belongsToStub();
         $this->assertEquals('belongs_to_stub_id', $relation->getForeignKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->belongsToExplicitKeyStub();
         $this->assertEquals('foo', $relation->getForeignKeyName());
@@ -1106,7 +1106,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testMorphToCreatesProperRelation()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
 
         // $this->morphTo();
@@ -1138,7 +1138,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testBelongsToManyCreatesProperRelation()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
 
         $relation = $model->belongsToMany(EloquentModelSaveStub::class);
@@ -1148,7 +1148,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
         $this->assertEquals(__FUNCTION__, $relation->getRelationName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
         $relation = $model->belongsToMany(EloquentModelSaveStub::class, 'table', 'foreign', 'other');
         $this->assertEquals('table.foreign', $relation->getQualifiedForeignPivotKeyName());
@@ -1160,78 +1160,78 @@ class DatabaseEloquentModelTest extends TestCase
     public function testRelationsWithVariedConnections()
     {
         // Has one
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->hasOne(EloquentNoConnectionModelStub::class);
         $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->hasOne(EloquentDifferentConnectionModelStub::class);
         $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
 
         // Morph One
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->morphOne(EloquentNoConnectionModelStub::class, 'type');
         $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->morphOne(EloquentDifferentConnectionModelStub::class, 'type');
         $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
 
         // Belongs to
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->belongsTo(EloquentNoConnectionModelStub::class);
         $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->belongsTo(EloquentDifferentConnectionModelStub::class);
         $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
 
         // has many
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->hasMany(EloquentNoConnectionModelStub::class);
         $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->hasMany(EloquentDifferentConnectionModelStub::class);
         $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
 
         // has many through
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->hasManyThrough(EloquentNoConnectionModelStub::class, EloquentModelSaveStub::class);
         $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->hasManyThrough(EloquentDifferentConnectionModelStub::class, EloquentModelSaveStub::class);
         $this->assertEquals('different_connection', $relation->getRelated()->getConnectionName());
 
         // belongs to many
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->belongsToMany(EloquentNoConnectionModelStub::class);
         $this->assertEquals('non_default', $relation->getRelated()->getConnectionName());
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->setConnection('non_default');
         $this->addMockConnection($model);
         $relation = $model->belongsToMany(EloquentDifferentConnectionModelStub::class);
@@ -1242,16 +1242,16 @@ class DatabaseEloquentModelTest extends TestCase
     {
         require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
 
-        $model = new EloquentModelWithoutTableStub;
+        $model = new EloquentModelWithoutTableStub();
         $this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
 
-        $namespacedModel = new EloquentModelNamespacedStub;
+        $namespacedModel = new EloquentModelNamespacedStub();
         $this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
     }
 
     public function testTheMutatorCacheIsPopulated()
     {
-        $class = new EloquentModelStub;
+        $class = new EloquentModelStub();
 
         $expectedAttributes = [
             'list_items',
@@ -1264,20 +1264,20 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testRouteKeyIsPrimaryKey()
     {
-        $model = new EloquentModelNonIncrementingStub;
+        $model = new EloquentModelNonIncrementingStub();
         $model->id = 'foo';
         $this->assertEquals('foo', $model->getRouteKey());
     }
 
     public function testRouteNameIsPrimaryKeyName()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->assertEquals('id', $model->getRouteKeyName());
     }
 
     public function testCloneModelMakesAFreshCopyOfTheModel()
     {
-        $class = new EloquentModelStub;
+        $class = new EloquentModelStub();
         $class->id = 1;
         $class->exists = true;
         $class->first = 'taylor';
@@ -1303,7 +1303,7 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@saved');
         $events->shouldReceive('forget');
-        EloquentModelStub::observe(new EloquentTestObserverStub);
+        EloquentModelStub::observe(new EloquentTestObserverStub());
         EloquentModelStub::flushEventListeners();
     }
 
@@ -1369,7 +1369,7 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelSaveStub::observe(EloquentTestObserverStub::class);
 
         $model = EloquentModelSaveStub::withoutEvents(function () {
-            $model = new EloquentModelSaveStub;
+            $model = new EloquentModelSaveStub();
             $model->save();
 
             return $model;
@@ -1391,7 +1391,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testSetObservableEvents()
     {
-        $class = new EloquentModelStub;
+        $class = new EloquentModelStub();
         $class->setObservableEvents(['foo']);
 
         $this->assertContains('foo', $class->getObservableEvents());
@@ -1399,7 +1399,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testAddObservableEvent()
     {
-        $class = new EloquentModelStub;
+        $class = new EloquentModelStub();
         $class->addObservableEvents('foo');
 
         $this->assertContains('foo', $class->getObservableEvents());
@@ -1407,7 +1407,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testAddMultipleObserveableEvents()
     {
-        $class = new EloquentModelStub;
+        $class = new EloquentModelStub();
         $class->addObservableEvents('foo', 'bar');
 
         $this->assertContains('foo', $class->getObservableEvents());
@@ -1416,7 +1416,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testRemoveObservableEvent()
     {
-        $class = new EloquentModelStub;
+        $class = new EloquentModelStub();
         $class->setObservableEvents(['foo', 'bar']);
         $class->removeObservableEvents('bar');
 
@@ -1425,7 +1425,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testRemoveMultipleObservableEvents()
     {
-        $class = new EloquentModelStub;
+        $class = new EloquentModelStub();
         $class->setObservableEvents(['foo', 'bar']);
         $class->removeObservableEvents('foo', 'bar');
 
@@ -1438,13 +1438,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Illuminate\Tests\Database\EloquentModelStub::incorrectRelationStub must return a relationship instance.');
 
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->incorrectRelationStub;
     }
 
     public function testModelIsBootedOnUnserialize()
     {
-        $model = new EloquentModelBootingTestStub;
+        $model = new EloquentModelBootingTestStub();
         $this->assertTrue(EloquentModelBootingTestStub::isBooted());
         $model->foo = 'bar';
         $string = serialize($model);
@@ -1457,13 +1457,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelsTraitIsInitialized()
     {
-        $model = new EloquentModelStubWithTrait;
+        $model = new EloquentModelStubWithTrait();
         $this->assertTrue($model->fooBarIsInitialized);
     }
 
     public function testAppendingOfAttributes()
     {
-        $model = new EloquentModelAppendsStub;
+        $model = new EloquentModelAppendsStub();
 
         $this->assertTrue(isset($model->is_admin));
         $this->assertTrue(isset($model->camelCased));
@@ -1482,7 +1482,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testGetMutatedAttributes()
     {
-        $model = new EloquentModelGetMutatorsStub;
+        $model = new EloquentModelGetMutatorsStub();
 
         $this->assertEquals(['first_name', 'middle_name', 'last_name'], $model->getMutatedAttributes());
 
@@ -1494,11 +1494,11 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $model->id = 'id';
         $model->foo = 'bar';
-        $model->created_at = new DateTime;
-        $model->updated_at = new DateTime;
+        $model->created_at = new DateTime();
+        $model->updated_at = new DateTime();
         $replicated = $model->replicate();
 
         $this->assertNull($replicated->id);
@@ -1562,7 +1562,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelAttributesAreCastedWhenPresentInCastsArray()
     {
-        $model = new EloquentModelCastingStub;
+        $model = new EloquentModelCastingStub();
         $model->setDateFormat('Y-m-d H:i:s');
         $model->intAttribute = '3';
         $model->floatAttribute = '4.0';
@@ -1570,7 +1570,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->boolAttribute = 1;
         $model->booleanAttribute = 0;
         $model->objectAttribute = ['foo' => 'bar'];
-        $obj = new stdClass;
+        $obj = new stdClass();
         $obj->foo = 'bar';
         $model->arrayAttribute = $obj;
         $model->jsonAttribute = ['foo' => 'bar'];
@@ -1620,7 +1620,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelDateAttributeCastingResetsTime()
     {
-        $model = new EloquentModelCastingStub;
+        $model = new EloquentModelCastingStub();
         $model->setDateFormat('Y-m-d H:i:s');
         $model->dateAttribute = '1969-07-20 22:56:00';
 
@@ -1632,7 +1632,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelAttributeCastingPreservesNull()
     {
-        $model = new EloquentModelCastingStub;
+        $model = new EloquentModelCastingStub();
         $model->intAttribute = null;
         $model->floatAttribute = null;
         $model->stringAttribute = null;
@@ -1691,9 +1691,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->expectException(JsonEncodingException::class);
         $this->expectExceptionMessage('Unable to encode attribute [objectAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.');
 
-        $model = new EloquentModelCastingStub;
+        $model = new EloquentModelCastingStub();
         $model->objectAttribute = ['foo' => "b\xF8r"];
-        $obj = new stdClass;
+        $obj = new stdClass();
         $obj->foo = "b\xF8r";
         $model->arrayAttribute = $obj;
         $model->jsonAttribute = ['foo' => "b\xF8r"];
@@ -1703,7 +1703,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelAttributeCastingWithSpecialFloatValues()
     {
-        $model = new EloquentModelCastingStub;
+        $model = new EloquentModelCastingStub();
 
         $model->floatAttribute = 0;
         $this->assertSame(0.0, $model->floatAttribute);
@@ -1729,13 +1729,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testUpdatingNonExistentModelFails()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->assertFalse($model->update());
     }
 
     public function testIssetBehavesCorrectlyWithAttributesAndRelationships()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->assertFalse(isset($model->nonexistent));
 
         $model->some_attribute = 'some_value';
@@ -1792,12 +1792,12 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testScopesMethod()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelStub();
         $this->addMockConnection($model);
 
         $scopes = [
             'published',
-            'category' => 'Laravel',
+            'category'  => 'Laravel',
             'framework' => ['Laravel', '5.3'],
         ];
 
@@ -2222,16 +2222,16 @@ class EloquentModelGetMutatorsStub extends Model
 class EloquentModelCastingStub extends Model
 {
     protected $casts = [
-        'intAttribute' => 'int',
-        'floatAttribute' => 'float',
-        'stringAttribute' => 'string',
-        'boolAttribute' => 'bool',
-        'booleanAttribute' => 'boolean',
-        'objectAttribute' => 'object',
-        'arrayAttribute' => 'array',
-        'jsonAttribute' => 'json',
-        'dateAttribute' => 'date',
-        'datetimeAttribute' => 'datetime',
+        'intAttribute'       => 'int',
+        'floatAttribute'     => 'float',
+        'stringAttribute'    => 'string',
+        'boolAttribute'      => 'bool',
+        'booleanAttribute'   => 'boolean',
+        'objectAttribute'    => 'object',
+        'arrayAttribute'     => 'array',
+        'jsonAttribute'      => 'json',
+        'dateAttribute'      => 'date',
+        'datetimeAttribute'  => 'datetime',
         'timestampAttribute' => 'timestamp',
     ];
 

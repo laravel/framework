@@ -2,12 +2,12 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 trait MakesHttpRequests
 {
@@ -35,7 +35,8 @@ trait MakesHttpRequests
     /**
      * Define additional headers to be sent with the request.
      *
-     * @param  array $headers
+     * @param array $headers
+     *
      * @return $this
      */
     public function withHeaders(array $headers)
@@ -48,8 +49,9 @@ trait MakesHttpRequests
     /**
      * Add a header to be sent with the request.
      *
-     * @param  string $name
-     * @param  string $value
+     * @param string $name
+     * @param string $value
+     *
      * @return $this
      */
     public function withHeader(string $name, string $value)
@@ -74,7 +76,8 @@ trait MakesHttpRequests
     /**
      * Define a set of server variables to be sent with the requests.
      *
-     * @param  array  $server
+     * @param array $server
+     *
      * @return $this
      */
     public function withServerVariables(array $server)
@@ -87,7 +90,8 @@ trait MakesHttpRequests
     /**
      * Disable middleware for the test.
      *
-     * @param  string|array  $middleware
+     * @param string|array $middleware
+     *
      * @return $this
      */
     public function withoutMiddleware($middleware = null)
@@ -99,7 +103,7 @@ trait MakesHttpRequests
         }
 
         foreach ((array) $middleware as $abstract) {
-            $this->app->instance($abstract, new class {
+            $this->app->instance($abstract, new class() {
                 public function handle($request, $next)
                 {
                     return $next($request);
@@ -113,7 +117,8 @@ trait MakesHttpRequests
     /**
      * Enable the given middleware for the test.
      *
-     * @param  string|array  $middleware
+     * @param string|array $middleware
+     *
      * @return $this
      */
     public function withMiddleware($middleware = null)
@@ -146,7 +151,8 @@ trait MakesHttpRequests
     /**
      * Set the referer header and previous URL session value in order to simulate a previous request.
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return $this
      */
     public function from(string $url)
@@ -159,8 +165,9 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a GET request.
      *
-     * @param  string  $uri
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function get($uri, array $headers = [])
@@ -173,8 +180,9 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a GET request, expecting a JSON response.
      *
-     * @param  string  $uri
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function getJson($uri, array $headers = [])
@@ -185,9 +193,10 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a POST request.
      *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function post($uri, array $data = [], array $headers = [])
@@ -200,9 +209,10 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a POST request, expecting a JSON response.
      *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function postJson($uri, array $data = [], array $headers = [])
@@ -213,9 +223,10 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PUT request.
      *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function put($uri, array $data = [], array $headers = [])
@@ -228,9 +239,10 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PUT request, expecting a JSON response.
      *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function putJson($uri, array $data = [], array $headers = [])
@@ -241,9 +253,10 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PATCH request.
      *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function patch($uri, array $data = [], array $headers = [])
@@ -256,9 +269,10 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PATCH request, expecting a JSON response.
      *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function patchJson($uri, array $data = [], array $headers = [])
@@ -269,9 +283,10 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a DELETE request.
      *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function delete($uri, array $data = [], array $headers = [])
@@ -284,9 +299,10 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a DELETE request, expecting a JSON response.
      *
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function deleteJson($uri, array $data = [], array $headers = [])
@@ -297,10 +313,11 @@ trait MakesHttpRequests
     /**
      * Call the given URI with a JSON request.
      *
-     * @param  string  $method
-     * @param  string  $uri
-     * @param  array  $data
-     * @param  array  $headers
+     * @param string $method
+     * @param string $uri
+     * @param array  $data
+     * @param array  $headers
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function json($method, $uri, array $data = [], array $headers = [])
@@ -311,8 +328,8 @@ trait MakesHttpRequests
 
         $headers = array_merge([
             'CONTENT_LENGTH' => mb_strlen($content, '8bit'),
-            'CONTENT_TYPE' => 'application/json',
-            'Accept' => 'application/json',
+            'CONTENT_TYPE'   => 'application/json',
+            'Accept'         => 'application/json',
         ], $headers);
 
         return $this->call(
@@ -323,13 +340,14 @@ trait MakesHttpRequests
     /**
      * Call the given URI and return the Response.
      *
-     * @param  string  $method
-     * @param  string  $uri
-     * @param  array  $parameters
-     * @param  array  $cookies
-     * @param  array  $files
-     * @param  array  $server
-     * @param  string  $content
+     * @param string $method
+     * @param string $uri
+     * @param array  $parameters
+     * @param array  $cookies
+     * @param array  $files
+     * @param array  $server
+     * @param string $content
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
@@ -359,7 +377,8 @@ trait MakesHttpRequests
     /**
      * Turn the given URI into a fully qualified URL.
      *
-     * @param  string  $uri
+     * @param string $uri
+     *
      * @return string
      */
     protected function prepareUrlForRequest($uri)
@@ -368,7 +387,7 @@ trait MakesHttpRequests
             $uri = substr($uri, 1);
         }
 
-        if (! Str::startsWith($uri, 'http')) {
+        if (!Str::startsWith($uri, 'http')) {
             $uri = config('app.url').'/'.$uri;
         }
 
@@ -378,7 +397,8 @@ trait MakesHttpRequests
     /**
      * Transform headers array to array of $_SERVER vars with HTTP_* format.
      *
-     * @param  array  $headers
+     * @param array $headers
+     *
      * @return array
      */
     protected function transformHeadersToServerVars(array $headers)
@@ -393,12 +413,13 @@ trait MakesHttpRequests
     /**
      * Format the header name for the server array.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function formatServerHeaderKey($name)
     {
-        if (! Str::startsWith($name, 'HTTP_') && $name !== 'CONTENT_TYPE' && $name !== 'REMOTE_ADDR') {
+        if (!Str::startsWith($name, 'HTTP_') && $name !== 'CONTENT_TYPE' && $name !== 'REMOTE_ADDR') {
             return 'HTTP_'.$name;
         }
 
@@ -408,7 +429,8 @@ trait MakesHttpRequests
     /**
      * Extract the file uploads from the given data array.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return array
      */
     protected function extractFilesFromDataArray(&$data)
@@ -435,7 +457,8 @@ trait MakesHttpRequests
     /**
      * Follow a redirect chain until a non-redirect is received.
      *
-     * @param  \Illuminate\Http\Response  $response
+     * @param \Illuminate\Http\Response $response
+     *
      * @return \Illuminate\Http\Response|\Illuminate\Foundation\Testing\TestResponse
      */
     protected function followRedirects($response)
@@ -452,7 +475,8 @@ trait MakesHttpRequests
     /**
      * Create the test response instance from the given response.
      *
-     * @param  \Illuminate\Http\Response  $response
+     * @param \Illuminate\Http\Response $response
+     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     protected function createTestResponse($response)

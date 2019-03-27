@@ -21,8 +21,9 @@ class RouteMatched
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Routing\Route $route
+     * @param \Illuminate\Http\Request  $request
+     *
      * @return void
      */
     public function __construct($route, $request)

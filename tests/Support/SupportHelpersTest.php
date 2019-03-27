@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
 use ArrayAccess;
-use Mockery as m;
-use RuntimeException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Optional;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Optional;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use stdClass;
 
 class SupportHelpersTest extends TestCase
 {
@@ -42,8 +42,8 @@ class SupportHelpersTest extends TestCase
 
     public function testObjectGet()
     {
-        $class = new stdClass;
-        $class->name = new stdClass;
+        $class = new stdClass();
+        $class->name = new stdClass();
         $class->name->first = 'Taylor';
 
         $this->assertEquals('Taylor', object_get($class, 'name.first'));
@@ -335,14 +335,14 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitTwo::class => SupportTestTraitTwo::class,
             SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
-        class_uses_recursive(new SupportTestClassTwo));
+        class_uses_recursive(new SupportTestClassTwo()));
     }
 
     public function testClassUsesRecursiveReturnParentTraitsFirst()
     {
         $this->assertSame([
-            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
-            SupportTestTraitOne::class => SupportTestTraitOne::class,
+            SupportTestTraitTwo::class   => SupportTestTraitTwo::class,
+            SupportTestTraitOne::class   => SupportTestTraitOne::class,
             SupportTestTraitThree::class => SupportTestTraitThree::class,
         ],
         class_uses_recursive(SupportTestClassThree::class));
@@ -364,12 +364,12 @@ class SupportHelpersTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        throw_if(true, new RuntimeException);
+        throw_if(true, new RuntimeException());
     }
 
     public function testThrowReturnIfNotThrown()
     {
-        $this->assertSame('foo', throw_unless('foo', new RuntimeException));
+        $this->assertSame('foo', throw_unless('foo', new RuntimeException()));
     }
 
     public function testThrowWithString()
@@ -384,7 +384,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertNull(optional(null)->something());
 
-        $this->assertEquals(10, optional(new class {
+        $this->assertEquals(10, optional(new class() {
             public function something()
             {
                 return 10;
@@ -462,10 +462,10 @@ class SupportHelpersTest extends TestCase
 
         $this->assertNull(optional(null)->present()->something());
 
-        $this->assertEquals('$10.00', optional(new class {
+        $this->assertEquals('$10.00', optional(new class() {
             public function present()
             {
-                return new class {
+                return new class() {
                     public function something()
                     {
                         return '$10.00';
@@ -484,7 +484,7 @@ class SupportHelpersTest extends TestCase
                 return $attempts;
             }
 
-            throw new RuntimeException;
+            throw new RuntimeException();
         }, 100);
 
         // Make sure we made two attempts

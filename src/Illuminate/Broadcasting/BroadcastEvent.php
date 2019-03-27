@@ -2,13 +2,13 @@
 
 namespace Illuminate\Broadcasting;
 
-use ReflectionClass;
-use ReflectionProperty;
-use Illuminate\Support\Arr;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Illuminate\Support\Arr;
+use ReflectionClass;
+use ReflectionProperty;
 
 class BroadcastEvent implements ShouldQueue
 {
@@ -24,7 +24,8 @@ class BroadcastEvent implements ShouldQueue
     /**
      * Create a new job handler instance.
      *
-     * @param  mixed  $event
+     * @param mixed $event
+     *
      * @return void
      */
     public function __construct($event)
@@ -35,7 +36,8 @@ class BroadcastEvent implements ShouldQueue
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
+     * @param \Illuminate\Contracts\Broadcasting\Broadcaster $broadcaster
+     *
      * @return void
      */
     public function handle(Broadcaster $broadcaster)
@@ -52,7 +54,8 @@ class BroadcastEvent implements ShouldQueue
     /**
      * Get the payload for the given event.
      *
-     * @param  mixed  $event
+     * @param mixed $event
+     *
      * @return array
      */
     protected function getPayloadFromEvent($event)
@@ -77,7 +80,8 @@ class BroadcastEvent implements ShouldQueue
     /**
      * Format the given value for a property.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     protected function formatProperty($value)

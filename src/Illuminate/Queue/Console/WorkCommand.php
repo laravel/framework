@@ -2,14 +2,14 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Queue\Worker;
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Worker;
+use Illuminate\Queue\WorkerOptions;
+use Illuminate\Support\Carbon;
 
 class WorkCommand extends Command
 {
@@ -48,7 +48,8 @@ class WorkCommand extends Command
     /**
      * Create a new queue work command.
      *
-     * @param  \Illuminate\Queue\Worker  $worker
+     * @param \Illuminate\Queue\Worker $worker
+     *
      * @return void
      */
     public function __construct(Worker $worker)
@@ -90,8 +91,9 @@ class WorkCommand extends Command
     /**
      * Run the worker instance.
      *
-     * @param  string  $connection
-     * @param  string  $queue
+     * @param string $connection
+     * @param string $queue
+     *
      * @return array
      */
     protected function runWorker($connection, $queue)
@@ -143,8 +145,9 @@ class WorkCommand extends Command
     /**
      * Write the status output for the queue worker.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  string $status
+     * @param \Illuminate\Contracts\Queue\Job $job
+     * @param string                          $status
+     *
      * @return void
      */
     protected function writeOutput(Job $job, $status)
@@ -162,9 +165,10 @@ class WorkCommand extends Command
     /**
      * Format the status output for the queue worker.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  string  $status
-     * @param  string  $type
+     * @param \Illuminate\Contracts\Queue\Job $job
+     * @param string                          $status
+     * @param string                          $type
+     *
      * @return void
      */
     protected function writeStatus(Job $job, $status, $type)
@@ -180,7 +184,8 @@ class WorkCommand extends Command
     /**
      * Store a failed job event.
      *
-     * @param  \Illuminate\Queue\Events\JobFailed  $event
+     * @param \Illuminate\Queue\Events\JobFailed $event
+     *
      * @return void
      */
     protected function logFailedJob(JobFailed $event)
@@ -194,7 +199,8 @@ class WorkCommand extends Command
     /**
      * Get the queue name for the worker.
      *
-     * @param  string  $connection
+     * @param string $connection
+     *
      * @return string
      */
     protected function getQueue($connection)

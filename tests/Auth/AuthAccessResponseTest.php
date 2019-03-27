@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Auth;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Response;
+use PHPUnit\Framework\TestCase;
 
 class AuthAccessResponseTest extends TestCase
 {
@@ -15,7 +15,7 @@ class AuthAccessResponseTest extends TestCase
         $response = new Response('some data');
         $this->assertSame('some data', (string) $response);
 
-        $response = new Response;
+        $response = new Response();
         $this->assertSame('', (string) $response);
     }
 }

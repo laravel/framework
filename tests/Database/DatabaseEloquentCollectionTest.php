@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use LogicException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
+use LogicException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
@@ -133,11 +133,11 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testFindMethodFindsManyModelsById()
     {
-        $model1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
-        $model2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
-        $model3 = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
+        $model1 = (new TestEloquentCollectionModel())->forceFill(['id' => 1]);
+        $model2 = (new TestEloquentCollectionModel())->forceFill(['id' => 2]);
+        $model3 = (new TestEloquentCollectionModel())->forceFill(['id' => 3]);
 
-        $c = new Collection;
+        $c = new Collection();
         $this->assertInstanceOf(Collection::class, $c->find([]));
         $this->assertCount(0, $c->find([1]));
 
@@ -312,7 +312,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testMakeHiddenAddsHiddenOnEntireCollection()
     {
-        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = new Collection([new TestEloquentCollectionModel()]);
         $c = $c->makeHidden(['visible']);
 
         $this->assertEquals(['hidden', 'visible'], $c[0]->getHidden());
@@ -320,7 +320,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testMakeVisibleRemovesHiddenFromEntireCollection()
     {
-        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = new Collection([new TestEloquentCollectionModel()]);
         $c = $c->makeVisible(['hidden']);
 
         $this->assertEquals([], $c[0]->getHidden());
@@ -340,7 +340,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()
     {
-        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = new Collection([new TestEloquentCollectionModel()]);
         $c = $c->makeVisible('hidden');
 
         $this->assertEquals([], $c[0]->getHidden());
@@ -349,7 +349,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testQueueableCollectionImplementation()
     {
-        $c = new Collection([new TestEloquentCollectionModel, new TestEloquentCollectionModel]);
+        $c = new Collection([new TestEloquentCollectionModel(), new TestEloquentCollectionModel()]);
         $this->assertEquals(TestEloquentCollectionModel::class, $c->getQueueableClass());
     }
 
@@ -358,13 +358,13 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Queueing collections with multiple model types is not supported.');
 
-        $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
+        $c = new Collection([new TestEloquentCollectionModel(), (object) ['id' => 'something']]);
         $c->getQueueableClass();
     }
 
     public function testEmptyCollectionStayEmptyOnFresh()
     {
-        $c = new Collection;
+        $c = new Collection();
         $this->assertEquals($c, $c->fresh());
     }
 }

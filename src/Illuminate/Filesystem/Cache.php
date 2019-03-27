@@ -31,9 +31,9 @@ class Cache extends AbstractCache
     /**
      * Create a new cache instance.
      *
-     * @param \Illuminate\Contracts\Cache\Repository  $repository
-     * @param string  $key
-     * @param int|null  $expire
+     * @param \Illuminate\Contracts\Cache\Repository $repository
+     * @param string                                 $key
+     * @param int|null                               $expire
      */
     public function __construct(Repository $repository, $key = 'flysystem', $expire = null)
     {
@@ -51,7 +51,7 @@ class Cache extends AbstractCache
     {
         $contents = $this->repository->get($this->key);
 
-        if (! is_null($contents)) {
+        if (!is_null($contents)) {
             $this->setFromStorage($contents);
         }
     }

@@ -5,8 +5,8 @@ namespace Illuminate\Console\Scheduling;
 use DateTimeInterface;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
-use Illuminate\Support\ProcessUtils;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\ProcessUtils;
 
 class Schedule
 {
@@ -41,7 +41,8 @@ class Schedule
     /**
      * Create a new schedule instance.
      *
-     * @param  \DateTimeZone|string|null  $timezone
+     * @param \DateTimeZone|string|null $timezone
+     *
      * @return void
      */
     public function __construct($timezone = null)
@@ -62,8 +63,9 @@ class Schedule
     /**
      * Add a new callback event to the schedule.
      *
-     * @param  string|callable  $callback
-     * @param  array  $parameters
+     * @param string|callable $callback
+     * @param array           $parameters
+     *
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function call($callback, array $parameters = [])
@@ -78,8 +80,9 @@ class Schedule
     /**
      * Add a new Artisan command event to the schedule.
      *
-     * @param  string  $command
-     * @param  array  $parameters
+     * @param string $command
+     * @param array  $parameters
+     *
      * @return \Illuminate\Console\Scheduling\Event
      */
     public function command($command, array $parameters = [])
@@ -96,9 +99,10 @@ class Schedule
     /**
      * Add a new job callback event to the schedule.
      *
-     * @param  object|string  $job
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param object|string $job
+     * @param string|null   $queue
+     * @param string|null   $connection
+     *
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function job($job, $queue = null, $connection = null)
@@ -119,8 +123,9 @@ class Schedule
     /**
      * Add a new command event to the schedule.
      *
-     * @param  string  $command
-     * @param  array  $parameters
+     * @param string $command
+     * @param array  $parameters
+     *
      * @return \Illuminate\Console\Scheduling\Event
      */
     public function exec($command, array $parameters = [])
@@ -137,7 +142,8 @@ class Schedule
     /**
      * Compile parameters for a command.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return string
      */
     protected function compileParameters(array $parameters)
@@ -147,7 +153,7 @@ class Schedule
                 $value = collect($value)->map(function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');
-            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
+            } elseif (!is_numeric($value) && !preg_match('/^(-.$|--.*)/i', $value)) {
                 $value = ProcessUtils::escapeArgument($value);
             }
 
@@ -158,8 +164,9 @@ class Schedule
     /**
      * Determine if the server is allowed to run this event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeInterface  $time
+     * @param \Illuminate\Console\Scheduling\Event $event
+     * @param \DateTimeInterface                   $time
+     *
      * @return bool
      */
     public function serverShouldRun(Event $event, DateTimeInterface $time)
@@ -170,7 +177,8 @@ class Schedule
     /**
      * Get all of the events on the schedule that are due.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
      * @return \Illuminate\Support\Collection
      */
     public function dueEvents($app)
@@ -191,7 +199,8 @@ class Schedule
     /**
      * Specify the cache store that should be used to store mutexes.
      *
-     * @param  string  $store
+     * @param string $store
+     *
      * @return $this
      */
     public function useCache($store)

@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -55,7 +55,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $tag3 = Tag::create(['name' => Str::random()]);
 
         $post->tags()->sync([
-            $tag->id => ['flag' => 'taylor'],
+            $tag->id  => ['flag' => 'taylor'],
             $tag2->id => ['flag' => ''],
             $tag3->id => ['flag' => 'exclude'],
         ]);
@@ -74,7 +74,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals('posts_tags', $post->tags[0]->pivot->getTable());
         $this->assertEquals(
             [
-                'post_id' => '1', 'tag_id' => '1', 'flag' => 'taylor',
+                'post_id'    => '1', 'tag_id' => '1', 'flag' => 'taylor',
                 'created_at' => '2017-10-10 10:10:10', 'updated_at' => '2017-10-10 10:10:10',
             ],
             $post->tags[0]->pivot->toArray()
@@ -127,7 +127,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals([
             'post_id' => '1',
-            'tag_id' => '1',
+            'tag_id'  => '1',
         ], $post->tagsWithCustomAccessor[0]->tag->toArray());
 
         $pivot = $post->tagsWithCustomPivot[0]->pivot;
@@ -352,14 +352,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals([
             'attached' => [$tag3->id, $tag4->id],
             'detached' => [1 => $tag2->id],
-            'updated' => [],
+            'updated'  => [],
         ], $output);
 
         $post->tags()->sync([]);
         $this->assertEmpty($post->load('tags')->tags);
 
         $post->tags()->sync([
-            $tag->id => ['flag' => 'taylor'],
+            $tag->id  => ['flag' => 'taylor'],
             $tag2->id => ['flag' => 'mohamed'],
         ]);
         $post->load('tags');

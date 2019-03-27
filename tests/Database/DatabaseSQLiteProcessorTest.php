@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSQLiteProcessorTest extends TestCase
 {
     public function testProcessColumnListing()
     {
-        $processor = new SQLiteProcessor;
+        $processor = new SQLiteProcessor();
 
         $listing = [['name' => 'id'], ['name' => 'name'], ['name' => 'email']];
         $expected = ['id', 'name', 'email'];

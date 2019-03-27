@@ -1,20 +1,21 @@
 <?php
 
-use PhpOption\Option;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Optional;
-use Illuminate\Support\Collection;
-use Dotenv\Environment\DotenvFactory;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\HigherOrderTapProxy;
 use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
+use Dotenv\Environment\DotenvFactory;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Optional;
+use PhpOption\Option;
 
-if (! function_exists('append_config')) {
+if (!function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
      *
-     * @param  array  $array
+     * @param array $array
+     *
      * @return array
      */
     function append_config(array $array)
@@ -33,11 +34,12 @@ if (! function_exists('append_config')) {
     }
 }
 
-if (! function_exists('blank')) {
+if (!function_exists('blank')) {
     /**
      * Determine if the given value is "blank".
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return bool
      */
     function blank($value)
@@ -62,11 +64,12 @@ if (! function_exists('blank')) {
     }
 }
 
-if (! function_exists('class_basename')) {
+if (!function_exists('class_basename')) {
     /**
      * Get the class "basename" of the given object / class.
      *
-     * @param  string|object  $class
+     * @param string|object $class
+     *
      * @return string
      */
     function class_basename($class)
@@ -77,11 +80,12 @@ if (! function_exists('class_basename')) {
     }
 }
 
-if (! function_exists('class_uses_recursive')) {
+if (!function_exists('class_uses_recursive')) {
     /**
      * Returns all traits used by a class, its parent classes and trait of their traits.
      *
-     * @param  object|string  $class
+     * @param object|string $class
+     *
      * @return array
      */
     function class_uses_recursive($class)
@@ -100,11 +104,12 @@ if (! function_exists('class_uses_recursive')) {
     }
 }
 
-if (! function_exists('collect')) {
+if (!function_exists('collect')) {
     /**
      * Create a collection from the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return \Illuminate\Support\Collection
      */
     function collect($value = null)
@@ -113,13 +118,14 @@ if (! function_exists('collect')) {
     }
 }
 
-if (! function_exists('data_fill')) {
+if (!function_exists('data_fill')) {
     /**
      * Fill in data where it's missing.
      *
-     * @param  mixed   $target
-     * @param  string|array  $key
-     * @param  mixed  $value
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     *
      * @return mixed
      */
     function data_fill(&$target, $key, $value)
@@ -128,13 +134,14 @@ if (! function_exists('data_fill')) {
     }
 }
 
-if (! function_exists('data_get')) {
+if (!function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.
      *
-     * @param  mixed   $target
-     * @param  string|array|int  $key
-     * @param  mixed   $default
+     * @param mixed            $target
+     * @param string|array|int $key
+     * @param mixed            $default
+     *
      * @return mixed
      */
     function data_get($target, $key, $default = null)
@@ -145,11 +152,11 @@ if (! function_exists('data_get')) {
 
         $key = is_array($key) ? $key : explode('.', $key);
 
-        while (! is_null($segment = array_shift($key))) {
+        while (!is_null($segment = array_shift($key))) {
             if ($segment === '*') {
                 if ($target instanceof Collection) {
                     $target = $target->all();
-                } elseif (! is_array($target)) {
+                } elseif (!is_array($target)) {
                     return value($default);
                 }
 
@@ -175,14 +182,15 @@ if (! function_exists('data_get')) {
     }
 }
 
-if (! function_exists('data_set')) {
+if (!function_exists('data_set')) {
     /**
      * Set an item on an array or object using dot notation.
      *
-     * @param  mixed  $target
-     * @param  string|array  $key
-     * @param  mixed  $value
-     * @param  bool  $overwrite
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     * @param bool         $overwrite
+     *
      * @return mixed
      */
     function data_set(&$target, $key, $value, $overwrite = true)
@@ -190,7 +198,7 @@ if (! function_exists('data_set')) {
         $segments = is_array($key) ? $key : explode('.', $key);
 
         if (($segment = array_shift($segments)) === '*') {
-            if (! Arr::accessible($target)) {
+            if (!Arr::accessible($target)) {
                 $target = [];
             }
 
@@ -205,22 +213,22 @@ if (! function_exists('data_set')) {
             }
         } elseif (Arr::accessible($target)) {
             if ($segments) {
-                if (! Arr::exists($target, $segment)) {
+                if (!Arr::exists($target, $segment)) {
                     $target[$segment] = [];
                 }
 
                 data_set($target[$segment], $segments, $value, $overwrite);
-            } elseif ($overwrite || ! Arr::exists($target, $segment)) {
+            } elseif ($overwrite || !Arr::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
         } elseif (is_object($target)) {
             if ($segments) {
-                if (! isset($target->{$segment})) {
+                if (!isset($target->{$segment})) {
                     $target->{$segment} = [];
                 }
 
                 data_set($target->{$segment}, $segments, $value, $overwrite);
-            } elseif ($overwrite || ! isset($target->{$segment})) {
+            } elseif ($overwrite || !isset($target->{$segment})) {
                 $target->{$segment} = $value;
             }
         } else {
@@ -237,12 +245,13 @@ if (! function_exists('data_set')) {
     }
 }
 
-if (! function_exists('e')) {
+if (!function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param  \Illuminate\Contracts\Support\Htmlable|string  $value
-     * @param  bool  $doubleEncode
+     * @param \Illuminate\Contracts\Support\Htmlable|string $value
+     * @param bool                                          $doubleEncode
+     *
      * @return string
      */
     function e($value, $doubleEncode = true)
@@ -255,12 +264,13 @@ if (! function_exists('e')) {
     }
 }
 
-if (! function_exists('env')) {
+if (!function_exists('env')) {
     /**
      * Gets the value of an environment variable.
      *
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     function env($key, $default = null)
@@ -268,7 +278,7 @@ if (! function_exists('env')) {
         static $variables;
 
         if ($variables === null) {
-            $variables = (new DotenvFactory([new EnvConstAdapter, new ServerConstAdapter]))->createImmutable();
+            $variables = (new DotenvFactory([new EnvConstAdapter(), new ServerConstAdapter()]))->createImmutable();
         }
 
         return Option::fromValue($variables->get($key))
@@ -300,24 +310,26 @@ if (! function_exists('env')) {
     }
 }
 
-if (! function_exists('filled')) {
+if (!function_exists('filled')) {
     /**
      * Determine if a value is "filled".
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return bool
      */
     function filled($value)
     {
-        return ! blank($value);
+        return !blank($value);
     }
 }
 
-if (! function_exists('head')) {
+if (!function_exists('head')) {
     /**
      * Get the first element of an array. Useful for method chaining.
      *
-     * @param  array  $array
+     * @param array $array
+     *
      * @return mixed
      */
     function head($array)
@@ -326,11 +338,12 @@ if (! function_exists('head')) {
     }
 }
 
-if (! function_exists('last')) {
+if (!function_exists('last')) {
     /**
      * Get the last element from an array.
      *
-     * @param  array  $array
+     * @param array $array
+     *
      * @return mixed
      */
     function last($array)
@@ -339,13 +352,14 @@ if (! function_exists('last')) {
     }
 }
 
-if (! function_exists('object_get')) {
+if (!function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.
      *
-     * @param  object  $object
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param object $object
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     function object_get($object, $key, $default = null)
@@ -355,7 +369,7 @@ if (! function_exists('object_get')) {
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (! is_object($object) || ! isset($object->{$segment})) {
+            if (!is_object($object) || !isset($object->{$segment})) {
                 return value($default);
             }
 
@@ -366,31 +380,33 @@ if (! function_exists('object_get')) {
     }
 }
 
-if (! function_exists('optional')) {
+if (!function_exists('optional')) {
     /**
      * Provide access to optional objects.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
+     * @param mixed         $value
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     function optional($value = null, callable $callback = null)
     {
         if (is_null($callback)) {
             return new Optional($value);
-        } elseif (! is_null($value)) {
+        } elseif (!is_null($value)) {
             return $callback($value);
         }
     }
 }
 
-if (! function_exists('preg_replace_array')) {
+if (!function_exists('preg_replace_array')) {
     /**
      * Replace a given pattern with each value in the array in sequentially.
      *
-     * @param  string  $pattern
-     * @param  array   $replacements
-     * @param  string  $subject
+     * @param string $pattern
+     * @param array  $replacements
+     * @param string $subject
+     *
      * @return string
      */
     function preg_replace_array($pattern, array $replacements, $subject)
@@ -403,16 +419,17 @@ if (! function_exists('preg_replace_array')) {
     }
 }
 
-if (! function_exists('retry')) {
+if (!function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
      *
-     * @param  int  $times
-     * @param  callable  $callback
-     * @param  int  $sleep
-     * @return mixed
+     * @param int      $times
+     * @param callable $callback
+     * @param int      $sleep
      *
      * @throws \Exception
+     *
+     * @return mixed
      */
     function retry($times, callable $callback, $sleep = 0)
     {
@@ -425,7 +442,7 @@ if (! function_exists('retry')) {
         try {
             return $callback($attempts);
         } catch (Exception $e) {
-            if (! $times) {
+            if (!$times) {
                 throw $e;
             }
 
@@ -440,12 +457,13 @@ if (! function_exists('retry')) {
     }
 }
 
-if (! function_exists('tap')) {
+if (!function_exists('tap')) {
     /**
      * Call the given Closure with the given value then return the value.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
+     * @param mixed         $value
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     function tap($value, $callback = null)
@@ -460,16 +478,17 @@ if (! function_exists('tap')) {
     }
 }
 
-if (! function_exists('throw_if')) {
+if (!function_exists('throw_if')) {
     /**
      * Throw the given exception if the given condition is true.
      *
-     * @param  mixed  $condition
-     * @param  \Throwable|string  $exception
-     * @param  array  ...$parameters
-     * @return mixed
+     * @param mixed             $condition
+     * @param \Throwable|string $exception
+     * @param array             ...$parameters
      *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     function throw_if($condition, $exception, ...$parameters)
     {
@@ -481,19 +500,21 @@ if (! function_exists('throw_if')) {
     }
 }
 
-if (! function_exists('throw_unless')) {
+if (!function_exists('throw_unless')) {
     /**
      * Throw the given exception unless the given condition is true.
      *
-     * @param  mixed  $condition
-     * @param  \Throwable|string  $exception
-     * @param  array  ...$parameters
-     * @return mixed
+     * @param mixed             $condition
+     * @param \Throwable|string $exception
+     * @param array             ...$parameters
+     *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     function throw_unless($condition, $exception, ...$parameters)
     {
-        if (! $condition) {
+        if (!$condition) {
             throw (is_string($exception) ? new $exception(...$parameters) : $exception);
         }
 
@@ -501,11 +522,12 @@ if (! function_exists('throw_unless')) {
     }
 }
 
-if (! function_exists('trait_uses_recursive')) {
+if (!function_exists('trait_uses_recursive')) {
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  string  $trait
+     * @param string $trait
+     *
      * @return array
      */
     function trait_uses_recursive($trait)
@@ -520,13 +542,14 @@ if (! function_exists('trait_uses_recursive')) {
     }
 }
 
-if (! function_exists('transform')) {
+if (!function_exists('transform')) {
     /**
      * Transform the given value if it is present.
      *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  mixed  $default
+     * @param mixed    $value
+     * @param callable $callback
+     * @param mixed    $default
+     *
      * @return mixed|null
      */
     function transform($value, callable $callback, $default = null)
@@ -543,11 +566,12 @@ if (! function_exists('transform')) {
     }
 }
 
-if (! function_exists('value')) {
+if (!function_exists('value')) {
     /**
      * Return the default value of the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     function value($value)
@@ -556,7 +580,7 @@ if (! function_exists('value')) {
     }
 }
 
-if (! function_exists('windows_os')) {
+if (!function_exists('windows_os')) {
     /**
      * Determine whether the current environment is Windows based.
      *
@@ -568,12 +592,13 @@ if (! function_exists('windows_os')) {
     }
 }
 
-if (! function_exists('with')) {
+if (!function_exists('with')) {
     /**
      * Return the given value, optionally passed through the given callback.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
+     * @param mixed         $value
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     function with($value, callable $callback = null)

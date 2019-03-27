@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use PHPUnit\Framework\ExpectationFailedException;
+use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingEventFakeTest extends TestCase
 {

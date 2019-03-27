@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use PDO;
-use Mockery as m;
-use ReflectionProperty;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use InvalidArgumentException;
+use Mockery as m;
+use PDO;
+use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 class DatabaseConnectionFactoryTest extends TestCase
 {
@@ -17,16 +17,16 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->db = new DB;
+        $this->db = new DB();
 
         $this->db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
         $this->db->addConnection([
             'driver' => 'sqlite',
-            'read' => [
+            'read'   => [
                 'database'  => ':memory:',
             ],
             'write' => [
@@ -105,8 +105,8 @@ class DatabaseConnectionFactoryTest extends TestCase
     public function testSqliteForeignKeyConstraints()
     {
         $this->db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
+            'driver'                  => 'sqlite',
+            'database'                => ':memory:',
             'foreign_key_constraints' => true,
         ], 'constraints_set');
 

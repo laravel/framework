@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing;
 
-use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LogicException;
 use UnexpectedValueException;
 
 class RouteAction
@@ -12,8 +12,9 @@ class RouteAction
     /**
      * Parse the given action into an array.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param string $uri
+     * @param mixed  $action
+     *
      * @return array
      */
     public static function parse($uri, $action)
@@ -29,8 +30,8 @@ class RouteAction
         // as the "uses" property, because there is nothing else we need to do when
         // it is available. Otherwise we will need to find it in the action list.
         if (is_callable($action)) {
-            return ! is_array($action) ? ['uses' => $action] : [
-                'uses' => $action[0].'@'.$action[1],
+            return !is_array($action) ? ['uses' => $action] : [
+                'uses'       => $action[0].'@'.$action[1],
                 'controller' => $action[0].'@'.$action[1],
             ];
         }
@@ -38,11 +39,11 @@ class RouteAction
         // If no "uses" property has been set, we will dig through the array to find a
         // Closure instance within this list. We will set the first Closure we come
         // across into the "uses" property that will get fired off by this route.
-        elseif (! isset($action['uses'])) {
+        elseif (!isset($action['uses'])) {
             $action['uses'] = static::findCallable($action);
         }
 
-        if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
+        if (is_string($action['uses']) && !Str::contains($action['uses'], '@')) {
             $action['uses'] = static::makeInvokable($action['uses']);
         }
 
@@ -52,7 +53,8 @@ class RouteAction
     /**
      * Get an action for a route that has no action.
      *
-     * @param  string  $uri
+     * @param string $uri
+     *
      * @return array
      */
     protected static function missingAction($uri)
@@ -65,7 +67,8 @@ class RouteAction
     /**
      * Find the callable in an action array.
      *
-     * @param  array  $action
+     * @param array $action
+     *
      * @return callable
      */
     protected static function findCallable(array $action)
@@ -78,14 +81,15 @@ class RouteAction
     /**
      * Make an action for an invokable controller.
      *
-     * @param  string $action
-     * @return string
+     * @param string $action
      *
      * @throws \UnexpectedValueException
+     *
+     * @return string
      */
     protected static function makeInvokable($action)
     {
-        if (! method_exists($action, '__invoke')) {
+        if (!method_exists($action, '__invoke')) {
             throw new UnexpectedValueException("Invalid route action: [{$action}].");
         }
 

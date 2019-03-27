@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Session;
 
-use Mockery;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Response;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\TokenMismatchException;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Mockery;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -19,7 +19,7 @@ class SessionPersistenceTest extends TestCase
 {
     public function test_session_is_persisted_even_if_exception_is_thrown_from_route()
     {
-        $handler = new FakeNullSessionHandler;
+        $handler = new FakeNullSessionHandler();
         $this->assertFalse($handler->written);
 
         Session::extend('fake-null', function () use ($handler) {
@@ -27,7 +27,7 @@ class SessionPersistenceTest extends TestCase
         });
 
         Route::get('/', function () {
-            throw new TokenMismatchException;
+            throw new TokenMismatchException();
         })->middleware('web');
 
         $response = $this->get('/');
@@ -41,7 +41,7 @@ class SessionPersistenceTest extends TestCase
             $handler = Mockery::mock(ExceptionHandler::class)->shouldIgnoreMissing()
         );
 
-        $handler->shouldReceive('render')->andReturn(new Response);
+        $handler->shouldReceive('render')->andReturn(new Response());
 
         $app['config']->set('app.key', Str::random(32));
         $app['config']->set('session.driver', 'fake-null');

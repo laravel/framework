@@ -40,10 +40,11 @@ class NotificationFailed
     /**
      * Create a new event instance.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  string  $channel
-     * @param  array  $data
+     * @param mixed                                  $notifiable
+     * @param \Illuminate\Notifications\Notification $notification
+     * @param string                                 $channel
+     * @param array                                  $data
+     *
      * @return void
      */
     public function __construct($notifiable, $notification, $channel, $data = [])

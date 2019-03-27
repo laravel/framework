@@ -23,7 +23,8 @@ class CacheEventMutex implements EventMutex
     /**
      * Create a new overlapping strategy.
      *
-     * @param  \Illuminate\Contracts\Cache\Factory  $cache
+     * @param \Illuminate\Contracts\Cache\Factory $cache
+     *
      * @return void
      */
     public function __construct(Cache $cache)
@@ -34,7 +35,8 @@ class CacheEventMutex implements EventMutex
     /**
      * Attempt to obtain an event mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param \Illuminate\Console\Scheduling\Event $event
+     *
      * @return bool
      */
     public function create(Event $event)
@@ -47,7 +49,8 @@ class CacheEventMutex implements EventMutex
     /**
      * Determine if an event mutex exists for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param \Illuminate\Console\Scheduling\Event $event
+     *
      * @return bool
      */
     public function exists(Event $event)
@@ -58,7 +61,8 @@ class CacheEventMutex implements EventMutex
     /**
      * Clear the event mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param \Illuminate\Console\Scheduling\Event $event
+     *
      * @return void
      */
     public function forget(Event $event)
@@ -69,7 +73,8 @@ class CacheEventMutex implements EventMutex
     /**
      * Specify the cache store that should be used.
      *
-     * @param  string  $store
+     * @param string $store
+     *
      * @return $this
      */
     public function useStore($store)

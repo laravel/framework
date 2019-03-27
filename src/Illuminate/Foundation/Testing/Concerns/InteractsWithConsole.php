@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Support\Arr;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\PendingCommand;
+use Illuminate\Support\Arr;
 
 trait InteractsWithConsole
 {
@@ -33,13 +33,14 @@ trait InteractsWithConsole
     /**
      * Call artisan command and return code.
      *
-     * @param  string  $command
-     * @param  array  $parameters
+     * @param string $command
+     * @param array  $parameters
+     *
      * @return \Illuminate\Foundation\Testing\PendingCommand|int
      */
     public function artisan($command, $parameters = [])
     {
-        if (! $this->mockConsoleOutput) {
+        if (!$this->mockConsoleOutput) {
             return $this->app[Kernel::class]->call($command, $parameters);
         }
 

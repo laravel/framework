@@ -18,13 +18,14 @@ class ArrayStore extends TaggableStore
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return mixed
      */
     public function get($key)
     {
-        if (! isset($this->storage[$key])) {
-            return null;
+        if (!isset($this->storage[$key])) {
+            return;
         }
 
         $item = $this->storage[$key];
@@ -34,7 +35,7 @@ class ArrayStore extends TaggableStore
         if ($expiresAt !== 0 && $this->currentTime() > $expiresAt) {
             $this->forget($key);
 
-            return null;
+            return;
         }
 
         return $item['value'];
@@ -43,15 +44,16 @@ class ArrayStore extends TaggableStore
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function put($key, $value, $seconds)
     {
         $this->storage[$key] = [
-            'value' => $value,
+            'value'     => $value,
             'expiresAt' => $this->calculateExpiration($seconds),
         ];
 
@@ -61,13 +63,14 @@ class ArrayStore extends TaggableStore
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function increment($key, $value = 1)
     {
-        if (! isset($this->storage[$key])) {
+        if (!isset($this->storage[$key])) {
             $this->forever($key, $value);
 
             return $this->storage[$key]['value'];
@@ -81,8 +84,9 @@ class ArrayStore extends TaggableStore
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function decrement($key, $value = 1)
@@ -93,8 +97,9 @@ class ArrayStore extends TaggableStore
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value)
@@ -105,7 +110,8 @@ class ArrayStore extends TaggableStore
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key)
@@ -140,7 +146,8 @@ class ArrayStore extends TaggableStore
     /**
      * Get the expiration time of the key.
      *
-     * @param  int  $seconds
+     * @param int $seconds
+     *
      * @return int
      */
     protected function calculateExpiration($seconds)
@@ -151,7 +158,8 @@ class ArrayStore extends TaggableStore
     /**
      * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $seconds
+     * @param int $seconds
+     *
      * @return int
      */
     protected function toTimestamp($seconds)

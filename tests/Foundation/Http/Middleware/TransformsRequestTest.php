@@ -2,17 +2,17 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TransformsRequestTest extends TestCase
 {
     public function testTransformOncePerKeyWhenMethodIsGet()
     {
-        $middleware = new TruncateInput;
+        $middleware = new TruncateInput();
         $symfonyRequest = new SymfonyRequest([
             'bar' => '123',
             'baz' => 'abc',
@@ -28,10 +28,10 @@ class TransformsRequestTest extends TestCase
 
     public function testTransformOncePerKeyWhenMethodIsPost()
     {
-        $middleware = new ManipulateInput;
+        $middleware = new ManipulateInput();
         $symfonyRequest = new SymfonyRequest(
             [
-                'name' => 'Damian',
+                'name'  => 'Damian',
                 'beers' => 4,
             ],
             ['age' => 28]
@@ -48,10 +48,10 @@ class TransformsRequestTest extends TestCase
 
     public function testTransformOncePerArrayKeysWhenMethodIsPost()
     {
-        $middleware = new ManipulateArrayInput;
+        $middleware = new ManipulateArrayInput();
         $symfonyRequest = new SymfonyRequest(
             [
-                'name' => 'Damian',
+                'name'  => 'Damian',
                 'beers' => [4, 8, 12],
             ],
             [
@@ -70,10 +70,10 @@ class TransformsRequestTest extends TestCase
 
     public function testTransformOncePerKeyWhenContentTypeIsJson()
     {
-        $middleware = new ManipulateInput;
+        $middleware = new ManipulateInput();
         $symfonyRequest = new SymfonyRequest(
             [
-                'name' => 'Damian',
+                'name'  => 'Damian',
                 'beers' => 4,
             ],
             [],

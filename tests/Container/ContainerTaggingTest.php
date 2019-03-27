@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Container;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
 
 class ContainerTaggingTest extends TestCase
 {
     public function testContainerTags()
     {
-        $container = new Container;
+        $container = new Container();
         $container->tag(ContainerImplementationTaggedStub::class, 'foo', 'bar');
         $container->tag(ContainerImplementationTaggedStubTwo::class, ['foo']);
 
@@ -30,7 +30,7 @@ class ContainerTaggingTest extends TestCase
         $this->assertInstanceOf(ContainerImplementationTaggedStub::class, $barResults[0]);
         $this->assertInstanceOf(ContainerImplementationTaggedStubTwo::class, $fooResults[1]);
 
-        $container = new Container;
+        $container = new Container();
         $container->tag([ContainerImplementationTaggedStub::class, ContainerImplementationTaggedStubTwo::class], ['foo']);
         $this->assertCount(2, $container->tagged('foo'));
 
@@ -65,7 +65,7 @@ class ContainerTaggingTest extends TestCase
 
     public function testLazyLoadedTaggedServicesCanBeLoopedOverMultipleTimes()
     {
-        $container = new Container;
+        $container = new Container();
         $container->tag(ContainerImplementationTaggedStub::class, 'foo');
         $container->tag(ContainerImplementationTaggedStubTwo::class, ['foo']);
 

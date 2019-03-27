@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Http;
 
-use Mockery as m;
-use RuntimeException;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Http\UploadedFile;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends TestCase
 {
@@ -432,11 +432,11 @@ class HttpRequestTest extends TestCase
 
         $files = [
             'foo' => [
-                'size' => 500,
-                'name' => 'foo.jpg',
+                'size'     => 500,
+                'name'     => 'foo.jpg',
                 'tmp_name' => __FILE__,
-                'type' => 'blah',
-                'error' => null,
+                'type'     => 'blah',
+                'error'    => null,
             ],
         ];
         $request = Request::create('/', 'GET', [], [], $files);
@@ -502,11 +502,11 @@ class HttpRequestTest extends TestCase
     {
         $files = [
             'foo' => [
-                'size' => 500,
-                'name' => 'foo.jpg',
+                'size'     => 500,
+                'name'     => 'foo.jpg',
                 'tmp_name' => __FILE__,
-                'type' => 'blah',
-                'error' => null,
+                'type'     => 'blah',
+                'error'    => null,
             ],
         ];
         $request = Request::create('/', 'GET', [], [], $files);
@@ -520,11 +520,11 @@ class HttpRequestTest extends TestCase
 
         $files = [
             'foo' => [
-                'size' => 500,
-                'name' => 'foo.jpg',
+                'size'     => 500,
+                'name'     => 'foo.jpg',
                 'tmp_name' => __FILE__,
-                'type' => 'blah',
-                'error' => null,
+                'type'     => 'blah',
+                'error'    => null,
             ],
         ];
         $request = Request::create('/', 'GET', [], [], $files);
@@ -657,11 +657,11 @@ class HttpRequestTest extends TestCase
     {
         $invalidFiles = [
             'file' => [
-                'name' => null,
-                'type' => null,
+                'name'     => null,
+                'type'     => null,
                 'tmp_name' => null,
-                'error' => 4,
-                'size' => 0,
+                'error'    => 4,
+                'size'     => 0,
             ],
         ];
 
@@ -674,11 +674,11 @@ class HttpRequestTest extends TestCase
     {
         $invalidFiles = [
             'file' => [
-                'name' => [''],
-                'type' => [''],
+                'name'     => [''],
+                'type'     => [''],
                 'tmp_name' => [''],
-                'error' => [4],
-                'size' => [0],
+                'error'    => [4],
+                'size'     => [0],
             ],
         ];
 

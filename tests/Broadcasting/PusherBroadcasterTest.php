@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PusherBroadcasterTest extends TestCase
@@ -127,9 +127,9 @@ class PusherBroadcasterTest extends TestCase
         $request = $this->getMockRequestWithUserForChannel('presence-test');
 
         $data = [
-            'auth' => 'abcd:efgh',
+            'auth'         => 'abcd:efgh',
             'channel_data' => [
-                'user_id' => 42,
+                'user_id'   => 42,
                 'user_info' => [1, 2, 3, 4],
             ],
         ];
@@ -145,7 +145,8 @@ class PusherBroadcasterTest extends TestCase
     }
 
     /**
-     * @param  string  $channel
+     * @param string $channel
+     *
      * @return \Illuminate\Http\Request
      */
     protected function getMockRequestWithUserForChannel($channel)
@@ -169,7 +170,8 @@ class PusherBroadcasterTest extends TestCase
     }
 
     /**
-     * @param  string  $channel
+     * @param string $channel
+     *
      * @return \Illuminate\Http\Request
      */
     protected function getMockRequestWithoutUserForChannel($channel)

@@ -31,7 +31,7 @@ class RefreshCommand extends Command
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
+        if (!$this->confirmToProceed()) {
             return;
         }
 
@@ -58,9 +58,9 @@ class RefreshCommand extends Command
         // them in succession. We'll also see if we need to re-seed the database.
         $this->call('migrate', array_filter([
             '--database' => $database,
-            '--path' => $path,
+            '--path'     => $path,
             '--realpath' => $this->input->getOption('realpath'),
-            '--force' => true,
+            '--force'    => true,
         ]));
 
         if ($this->needsSeeding()) {
@@ -71,36 +71,38 @@ class RefreshCommand extends Command
     /**
      * Run the rollback command.
      *
-     * @param  string  $database
-     * @param  string  $path
-     * @param  int  $step
+     * @param string $database
+     * @param string $path
+     * @param int    $step
+     *
      * @return void
      */
     protected function runRollback($database, $path, $step)
     {
         $this->call('migrate:rollback', array_filter([
             '--database' => $database,
-            '--path' => $path,
+            '--path'     => $path,
             '--realpath' => $this->input->getOption('realpath'),
-            '--step' => $step,
-            '--force' => true,
+            '--step'     => $step,
+            '--force'    => true,
         ]));
     }
 
     /**
      * Run the reset command.
      *
-     * @param  string  $database
-     * @param  string  $path
+     * @param string $database
+     * @param string $path
+     *
      * @return void
      */
     protected function runReset($database, $path)
     {
         $this->call('migrate:reset', array_filter([
             '--database' => $database,
-            '--path' => $path,
+            '--path'     => $path,
             '--realpath' => $this->input->getOption('realpath'),
-            '--force' => true,
+            '--force'    => true,
         ]));
     }
 
@@ -117,15 +119,16 @@ class RefreshCommand extends Command
     /**
      * Run the database seeder command.
      *
-     * @param  string  $database
+     * @param string $database
+     *
      * @return void
      */
     protected function runSeeder($database)
     {
         $this->call('db:seed', array_filter([
             '--database' => $database,
-            '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
-            '--force' => true,
+            '--class'    => $this->option('seeder') ?: 'DatabaseSeeder',
+            '--force'    => true,
         ]));
     }
 

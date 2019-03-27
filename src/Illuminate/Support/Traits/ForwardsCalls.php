@@ -2,20 +2,21 @@
 
 namespace Illuminate\Support\Traits;
 
-use Error;
 use BadMethodCallException;
+use Error;
 
 trait ForwardsCalls
 {
     /**
      * Forward a method call to the given object.
      *
-     * @param  mixed  $object
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
+     * @param mixed  $object
+     * @param string $method
+     * @param array  $parameters
      *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     protected function forwardCallTo($object, $method, $parameters)
     {
@@ -24,7 +25,7 @@ trait ForwardsCalls
         } catch (Error | BadMethodCallException $e) {
             $pattern = '~^Call to undefined method (?P<class>[^:]+)::(?P<method>[^\(]+)\(\)$~';
 
-            if (! preg_match($pattern, $e->getMessage(), $matches)) {
+            if (!preg_match($pattern, $e->getMessage(), $matches)) {
                 throw $e;
             }
 
@@ -40,10 +41,11 @@ trait ForwardsCalls
     /**
      * Throw a bad method call exception for the given method.
      *
-     * @param  string  $method
-     * @return void
+     * @param string $method
      *
      * @throws \BadMethodCallException
+     *
+     * @return void
      */
     protected static function throwBadMethodCallException($method)
     {

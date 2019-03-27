@@ -13,13 +13,13 @@ trait ParsesLogConfiguration
      * @var array
      */
     protected $levels = [
-        'debug' => Monolog::DEBUG,
-        'info' => Monolog::INFO,
-        'notice' => Monolog::NOTICE,
-        'warning' => Monolog::WARNING,
-        'error' => Monolog::ERROR,
-        'critical' => Monolog::CRITICAL,
-        'alert' => Monolog::ALERT,
+        'debug'     => Monolog::DEBUG,
+        'info'      => Monolog::INFO,
+        'notice'    => Monolog::NOTICE,
+        'warning'   => Monolog::WARNING,
+        'error'     => Monolog::ERROR,
+        'critical'  => Monolog::CRITICAL,
+        'alert'     => Monolog::ALERT,
         'emergency' => Monolog::EMERGENCY,
     ];
 
@@ -33,10 +33,11 @@ trait ParsesLogConfiguration
     /**
      * Parse the string level into a Monolog constant.
      *
-     * @param  array  $config
-     * @return int
+     * @param array $config
      *
      * @throws \InvalidArgumentException
+     *
+     * @return int
      */
     protected function level(array $config)
     {
@@ -52,12 +53,13 @@ trait ParsesLogConfiguration
     /**
      * Extract the log channel from the given configuration.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return string
      */
     protected function parseChannel(array $config)
     {
-        if (! isset($config['name'])) {
+        if (!isset($config['name'])) {
             return $this->getFallbackChannelName();
         }
 

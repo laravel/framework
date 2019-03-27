@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Messages\DatabaseMessage;
+use Illuminate\Notifications\Notification;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class NotificationDatabaseChannelTest extends TestCase
 {
@@ -17,36 +17,36 @@ class NotificationDatabaseChannelTest extends TestCase
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
-        $notification = new NotificationDatabaseChannelTestNotification;
+        $notification = new NotificationDatabaseChannelTestNotification();
         $notification->id = 1;
         $notifiable = m::mock();
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
-            'id' => 1,
-            'type' => get_class($notification),
-            'data' => ['invoice_id' => 1],
+            'id'      => 1,
+            'type'    => get_class($notification),
+            'data'    => ['invoice_id' => 1],
             'read_at' => null,
         ]);
 
-        $channel = new DatabaseChannel;
+        $channel = new DatabaseChannel();
         $channel->send($notifiable, $notification);
     }
 
     public function testCorrectPayloadIsSentToDatabase()
     {
-        $notification = new NotificationDatabaseChannelTestNotification;
+        $notification = new NotificationDatabaseChannelTestNotification();
         $notification->id = 1;
         $notifiable = m::mock();
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
-            'id' => 1,
-            'type' => get_class($notification),
-            'data' => ['invoice_id' => 1],
-            'read_at' => null,
+            'id'        => 1,
+            'type'      => get_class($notification),
+            'data'      => ['invoice_id' => 1],
+            'read_at'   => null,
             'something' => 'else',
         ]);
 
-        $channel = new ExtendedDatabaseChannel;
+        $channel = new ExtendedDatabaseChannel();
         $channel->send($notifiable, $notification);
     }
 }

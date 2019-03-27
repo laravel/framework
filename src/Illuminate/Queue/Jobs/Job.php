@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
+use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
 {
@@ -109,7 +109,8 @@ abstract class Job
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0)
@@ -160,7 +161,8 @@ abstract class Job
     /**
      * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param  \Throwable|null $e
+     * @param \Throwable|null $e
+     *
      * @return void
      */
     public function fail($e = null)
@@ -180,7 +182,7 @@ abstract class Job
             $this->failed($e);
         } finally {
             $this->resolve(Dispatcher::class)->dispatch(new JobFailed(
-                $this->connectionName, $this, $e ?: new ManuallyFailedException
+                $this->connectionName, $this, $e ?: new ManuallyFailedException()
             ));
         }
     }
@@ -188,7 +190,8 @@ abstract class Job
     /**
      * Process an exception that caused the job to fail.
      *
-     * @param  \Throwable|null $e
+     * @param \Throwable|null $e
+     *
      * @return void
      */
     protected function failed($e)
@@ -205,7 +208,8 @@ abstract class Job
     /**
      * Resolve the given class.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return mixed
      */
     protected function resolve($class)

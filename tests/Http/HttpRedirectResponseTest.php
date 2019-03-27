@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Http;
 
-use Mockery as m;
 use BadMethodCallException;
+use Illuminate\Contracts\Support\MessageProvider;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Session\Store;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Illuminate\Http\RedirectResponse;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Contracts\Support\MessageProvider;
 
 class HttpRedirectResponseTest extends TestCase
 {
@@ -84,10 +84,10 @@ class HttpRedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
+        $session->shouldReceive('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag());
         $session->shouldReceive('flash')->once()->with('errors', m::type(ViewErrorBag::class));
         $provider = m::mock(MessageProvider::class);
-        $provider->shouldReceive('getMessageBag')->once()->andReturn(new MessageBag);
+        $provider->shouldReceive('getMessageBag')->once()->andReturn(new MessageBag());
         $response->withErrors($provider);
     }
 
@@ -110,7 +110,7 @@ class HttpRedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
+        $session->shouldReceive('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag());
         $session->shouldReceive('flash')->once()->with('errors', m::type(ViewErrorBag::class));
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);

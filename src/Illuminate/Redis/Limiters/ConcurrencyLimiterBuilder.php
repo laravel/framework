@@ -2,8 +2,8 @@
 
 namespace Illuminate\Redis\Limiters;
 
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Support\InteractsWithTime;
 
 class ConcurrencyLimiterBuilder
 {
@@ -47,8 +47,9 @@ class ConcurrencyLimiterBuilder
     /**
      * Create a new builder instance.
      *
-     * @param  \Illuminate\Redis\Connections\Connection  $connection
-     * @param  string  $name
+     * @param \Illuminate\Redis\Connections\Connection $connection
+     * @param string                                   $name
+     *
      * @return void
      */
     public function __construct($connection, $name)
@@ -60,7 +61,8 @@ class ConcurrencyLimiterBuilder
     /**
      * Set the maximum number of locks that can obtained per time window.
      *
-     * @param  int  $maxLocks
+     * @param int $maxLocks
+     *
      * @return $this
      */
     public function limit($maxLocks)
@@ -73,7 +75,8 @@ class ConcurrencyLimiterBuilder
     /**
      * Set the number of seconds until the lock will be released.
      *
-     * @param  int  $releaseAfter
+     * @param int $releaseAfter
+     *
      * @return $this
      */
     public function releaseAfter($releaseAfter)
@@ -86,7 +89,8 @@ class ConcurrencyLimiterBuilder
     /**
      * Set the amount of time to block until a lock is available.
      *
-     * @param  int  $timeout
+     * @param int $timeout
+     *
      * @return $this
      */
     public function block($timeout)
@@ -99,11 +103,12 @@ class ConcurrencyLimiterBuilder
     /**
      * Execute the given callback if a lock is obtained, otherwise call the failure callback.
      *
-     * @param  callable  $callback
-     * @param  callable|null  $failure
-     * @return mixed
+     * @param callable      $callback
+     * @param callable|null $failure
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
+     *
+     * @return mixed
      */
     public function then(callable $callback, callable $failure = null)
     {

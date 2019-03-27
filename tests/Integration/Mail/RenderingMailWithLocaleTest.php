@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Mailable;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\View;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -29,14 +29,14 @@ class RenderingMailWithLocaleTest extends TestCase
 
     public function testMailableRendersInDefaultLocale()
     {
-        $mail = new RenderedTestMail;
+        $mail = new RenderedTestMail();
 
         $this->assertStringContainsString('name'.PHP_EOL, $mail->render());
     }
 
     public function testMailableRendersInSelectedLocale()
     {
-        $mail = (new RenderedTestMail)->locale('es');
+        $mail = (new RenderedTestMail())->locale('es');
 
         $this->assertStringContainsString('nombre'.PHP_EOL, $mail->render());
     }
@@ -45,7 +45,7 @@ class RenderingMailWithLocaleTest extends TestCase
     {
         $this->app->setLocale('es');
 
-        $mail = new RenderedTestMail;
+        $mail = new RenderedTestMail();
 
         $this->assertStringContainsString('nombre'.PHP_EOL, $mail->render());
     }

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
 
 class SendQueuedMailable
 {
@@ -31,7 +31,8 @@ class SendQueuedMailable
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @param \Illuminate\Contracts\Mail\Mailable $mailable
+     *
      * @return void
      */
     public function __construct(MailableContract $mailable)
@@ -44,7 +45,8 @@ class SendQueuedMailable
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param \Illuminate\Contracts\Mail\Mailer $mailer
+     *
      * @return void
      */
     public function handle(MailerContract $mailer)
@@ -65,7 +67,8 @@ class SendQueuedMailable
     /**
      * Call the failed method on the mailable instance.
      *
-     * @param  \Exception  $e
+     * @param \Exception $e
+     *
      * @return void
      */
     public function failed($e)

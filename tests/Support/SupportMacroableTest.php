@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Traits\Macroable;
+use PHPUnit\Framework\TestCase;
 
 class SupportMacroableTest extends TestCase
 {
@@ -16,7 +16,7 @@ class SupportMacroableTest extends TestCase
 
     private function createObjectForTrait()
     {
-        return new EmptyMacroable;
+        return new EmptyMacroable();
     }
 
     public function testRegisterMacro()
@@ -45,7 +45,7 @@ class SupportMacroableTest extends TestCase
         TestMacroable::macro('tryStatic', function () {
             return static::getProtectedStatic();
         });
-        $instance = new TestMacroable;
+        $instance = new TestMacroable();
 
         $result = $instance->tryInstance();
         $this->assertEquals('instance', $result);
@@ -56,8 +56,8 @@ class SupportMacroableTest extends TestCase
 
     public function testClassBasedMacros()
     {
-        TestMacroable::mixin(new TestMixin);
-        $instance = new TestMacroable;
+        TestMacroable::mixin(new TestMixin());
+        $instance = new TestMacroable();
         $this->assertEquals('instance-Adam', $instance->methodOne('Adam'));
     }
 
@@ -66,11 +66,11 @@ class SupportMacroableTest extends TestCase
         TestMacroable::macro('methodThree', function () {
             return 'bar';
         });
-        TestMacroable::mixin(new TestMixin, false);
-        $instance = new TestMacroable;
+        TestMacroable::mixin(new TestMixin(), false);
+        $instance = new TestMacroable();
         $this->assertEquals('bar', $instance->methodThree());
 
-        TestMacroable::mixin(new TestMixin);
+        TestMacroable::mixin(new TestMixin());
         $this->assertEquals('foo', $instance->methodThree());
     }
 }

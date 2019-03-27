@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Container;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\RewindableGenerator;
+use PHPUnit\Framework\TestCase;
 
 class RewindableGeneratorTest extends TestCase
 {

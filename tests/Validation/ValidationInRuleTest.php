@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Validation\Rule;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Validation\Rules\In;
 use Illuminate\Tests\Validation\fixtures\Values;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\In;
+use PHPUnit\Framework\TestCase;
 
 class ValidationInRuleTest extends TestCase
 {
@@ -31,7 +31,7 @@ class ValidationInRuleTest extends TestCase
 
         $this->assertEquals('in:"1","2","3","4"', (string) $rule);
 
-        $rule = Rule::in(new Values);
+        $rule = Rule::in(new Values());
 
         $this->assertEquals('in:"1","2","3","4"', (string) $rule);
 

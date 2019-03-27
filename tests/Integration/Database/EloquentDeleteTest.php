@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -20,9 +20,9 @@ class EloquentDeleteTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 
@@ -69,7 +69,7 @@ class EloquentDeleteTest extends TestCase
     {
         $role = Role::create([]);
         $this->assertInstanceOf(Role::class, $role);
-        Role::observe(new RoleObserver);
+        Role::observe(new RoleObserver());
 
         $role->delete();
         $this->assertNull(RoleObserver::$model);

@@ -9,7 +9,8 @@ class JsonExpression extends Expression
     /**
      * Create a new raw query expression.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return void
      */
     public function __construct($value)
@@ -22,10 +23,11 @@ class JsonExpression extends Expression
     /**
      * Translate the given value into the appropriate JSON binding parameter.
      *
-     * @param  mixed  $value
-     * @return string
+     * @param mixed $value
      *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     protected function getJsonBindingParameter($value)
     {

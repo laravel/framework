@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Console\Migrations\TableGuesser;
+use PHPUnit\Framework\TestCase;
 
 class TableGuesserTest extends TestCase
 {

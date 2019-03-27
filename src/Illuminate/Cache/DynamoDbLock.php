@@ -14,10 +14,11 @@ class DynamoDbLock extends Lock
     /**
      * Create a new lock instance.
      *
-     * @param  \Illuminate\Cache\DynamoDbStore  $dynamo
-     * @param  string  $name
-     * @param  int  $seconds
-     * @param  string|null  $owner
+     * @param \Illuminate\Cache\DynamoDbStore $dynamo
+     * @param string                          $name
+     * @param int                             $seconds
+     * @param string|null                     $owner
+     *
      * @return void
      */
     public function __construct(DynamoDbStore $dynamo, $name, $seconds, $owner = null)

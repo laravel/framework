@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
+use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresProcessorTest extends TestCase
 {
     public function testProcessColumnListing()
     {
-        $processor = new PostgresProcessor;
+        $processor = new PostgresProcessor();
 
         $listing = [['column_name' => 'id'], ['column_name' => 'name'], ['column_name' => 'email']];
         $expected = ['id', 'name', 'email'];

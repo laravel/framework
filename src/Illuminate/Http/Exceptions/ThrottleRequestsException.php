@@ -10,10 +10,11 @@ class ThrottleRequestsException extends HttpException
     /**
      * Create a new exception instance.
      *
-     * @param  string|null  $message
-     * @param  \Exception|null  $previous
-     * @param  array  $headers
-     * @param  int  $code
+     * @param string|null     $message
+     * @param \Exception|null $previous
+     * @param array           $headers
+     * @param int             $code
+     *
      * @return void
      */
     public function __construct($message = null, Exception $previous = null, array $headers = [], $code = 0)

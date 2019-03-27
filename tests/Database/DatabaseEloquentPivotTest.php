@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPivotTest extends TestCase
 {
@@ -125,7 +125,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPivotModelTableNameIsSingular()
     {
-        $pivot = new Pivot;
+        $pivot = new Pivot();
 
         $this->assertEquals('pivot', $pivot->getTable());
     }
@@ -136,7 +136,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('parent_created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('parent_updated_at');
 
-        $pivotWithParent = new Pivot;
+        $pivotWithParent = new Pivot();
         $pivotWithParent->pivotParent = $parent;
 
         $this->assertEquals('parent_created_at', $pivotWithParent->getCreatedAtColumn());
@@ -145,9 +145,9 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPivotModelWithoutParentReturnsModelTimestampColumns()
     {
-        $model = new DummyModel;
+        $model = new DummyModel();
 
-        $pivotWithoutParent = new Pivot;
+        $pivotWithoutParent = new Pivot();
 
         $this->assertEquals($model->getCreatedAtColumn(), $pivotWithoutParent->getCreatedAtColumn());
         $this->assertEquals($model->getUpdatedAtColumn(), $pivotWithoutParent->getUpdatedAtColumn());

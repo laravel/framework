@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
 use Exception;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Mockery as m;
 use Pheanstalk\Job;
 use Pheanstalk\Pheanstalk;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Jobs\BeanstalkdJob;
-use Illuminate\Contracts\Events\Dispatcher;
+use stdClass;
 
 class QueueBeanstalkdJobTest extends TestCase
 {
@@ -40,7 +40,7 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->getContainer()->shouldReceive('make')->once()->with(Dispatcher::class)->andReturn($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(JobFailed::class))->andReturnNull();
 
-        $job->fail(new Exception);
+        $job->fail(new Exception());
     }
 
     public function testDeleteRemovesTheJobFromBeanstalkd()

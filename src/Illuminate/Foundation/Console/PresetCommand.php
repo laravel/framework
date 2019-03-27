@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use InvalidArgumentException;
 use Illuminate\Console\Command;
+use InvalidArgumentException;
 
 class PresetCommand extends Command
 {
@@ -26,9 +26,9 @@ class PresetCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function handle()
     {
@@ -36,7 +36,7 @@ class PresetCommand extends Command
             return call_user_func(static::$macros[$this->argument('type')], $this);
         }
 
-        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react'])) {
+        if (!in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react'])) {
             throw new InvalidArgumentException('Invalid preset.');
         }
 

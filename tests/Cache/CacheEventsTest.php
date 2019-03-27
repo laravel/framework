@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Cache\Repository;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Cache\Events\CacheHit;
-use Illuminate\Contracts\Cache\Store;
-use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\KeyForgotten;
+use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\Store;
+use Illuminate\Events\Dispatcher;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CacheEventsTest extends TestCase
 {
@@ -177,7 +177,7 @@ class CacheEventsTest extends TestCase
     protected function assertEventMatches($eventClass, $properties = [])
     {
         return m::on(function ($event) use ($eventClass, $properties) {
-            if (! $event instanceof $eventClass) {
+            if (!$event instanceof $eventClass) {
                 return false;
             }
 
@@ -198,7 +198,7 @@ class CacheEventsTest extends TestCase
 
     protected function getRepository($dispatcher)
     {
-        $repository = new Repository(new ArrayStore);
+        $repository = new Repository(new ArrayStore());
         $repository->put('baz', 'qux', 99);
         $repository->tags('taylor')->put('baz', 'qux', 99);
         $repository->setEventDispatcher($dispatcher);

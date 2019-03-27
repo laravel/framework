@@ -30,8 +30,9 @@ trait ManagesStacks
     /**
      * Start injecting content into a push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     public function startPush($section, $content = '')
@@ -48,9 +49,9 @@ trait ManagesStacks
     /**
      * Stop injecting content into a push section.
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function stopPush()
     {
@@ -66,17 +67,18 @@ trait ManagesStacks
     /**
      * Append content to a given push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     protected function extendPush($section, $content)
     {
-        if (! isset($this->pushes[$section])) {
+        if (!isset($this->pushes[$section])) {
             $this->pushes[$section] = [];
         }
 
-        if (! isset($this->pushes[$section][$this->renderCount])) {
+        if (!isset($this->pushes[$section][$this->renderCount])) {
             $this->pushes[$section][$this->renderCount] = $content;
         } else {
             $this->pushes[$section][$this->renderCount] .= $content;
@@ -86,8 +88,9 @@ trait ManagesStacks
     /**
      * Start prepending content into a push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     public function startPrepend($section, $content = '')
@@ -104,9 +107,9 @@ trait ManagesStacks
     /**
      * Stop prepending content into a push section.
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function stopPrepend()
     {
@@ -122,17 +125,18 @@ trait ManagesStacks
     /**
      * Prepend content to a given stack.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     protected function extendPrepend($section, $content)
     {
-        if (! isset($this->prepends[$section])) {
+        if (!isset($this->prepends[$section])) {
             $this->prepends[$section] = [];
         }
 
-        if (! isset($this->prepends[$section][$this->renderCount])) {
+        if (!isset($this->prepends[$section][$this->renderCount])) {
             $this->prepends[$section][$this->renderCount] = $content;
         } else {
             $this->prepends[$section][$this->renderCount] = $content.$this->prepends[$section][$this->renderCount];
@@ -142,13 +146,14 @@ trait ManagesStacks
     /**
      * Get the string contents of a push section.
      *
-     * @param  string  $section
-     * @param  string  $default
+     * @param string $section
+     * @param string $default
+     *
      * @return string
      */
     public function yieldPushContent($section, $default = '')
     {
-        if (! isset($this->pushes[$section]) && ! isset($this->prepends[$section])) {
+        if (!isset($this->pushes[$section]) && !isset($this->prepends[$section])) {
             return $default;
         }
 

@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Session;
 
-use Mockery as m;
-use ReflectionClass;
-use SessionHandlerInterface;
-use Illuminate\Session\Store;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Session\Store;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
@@ -105,8 +105,8 @@ class SessionStoreTest extends TestCase
             $this->getSessionId(),
             serialize([
                 '_token' => $session->token(),
-                'foo' => 'bar',
-                'baz' => 'boom',
+                'foo'    => 'bar',
+                'baz'    => 'boom',
                 '_flash' => [
                     'new' => [],
                     'old' => ['baz'],
@@ -294,10 +294,10 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->never();
 
-        $session = new Store('test', m::mock(new CookieSessionHandler(new CookieJar, 60)));
+        $session = new Store('test', m::mock(new CookieSessionHandler(new CookieJar(), 60)));
         $this->assertTrue($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->once();
-        $request = new Request;
+        $request = new Request();
         $session->setRequestOnHandler($request);
     }
 

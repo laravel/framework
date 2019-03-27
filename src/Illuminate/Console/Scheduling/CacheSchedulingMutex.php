@@ -24,7 +24,8 @@ class CacheSchedulingMutex implements SchedulingMutex
     /**
      * Create a new scheduling strategy.
      *
-     * @param  \Illuminate\Contracts\Cache\Factory  $cache
+     * @param \Illuminate\Contracts\Cache\Factory $cache
+     *
      * @return void
      */
     public function __construct(Cache $cache)
@@ -35,8 +36,9 @@ class CacheSchedulingMutex implements SchedulingMutex
     /**
      * Attempt to obtain a scheduling mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeInterface  $time
+     * @param \Illuminate\Console\Scheduling\Event $event
+     * @param \DateTimeInterface                   $time
+     *
      * @return bool
      */
     public function create(Event $event, DateTimeInterface $time)
@@ -49,8 +51,9 @@ class CacheSchedulingMutex implements SchedulingMutex
     /**
      * Determine if a scheduling mutex exists for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeInterface  $time
+     * @param \Illuminate\Console\Scheduling\Event $event
+     * @param \DateTimeInterface                   $time
+     *
      * @return bool
      */
     public function exists(Event $event, DateTimeInterface $time)
@@ -63,7 +66,8 @@ class CacheSchedulingMutex implements SchedulingMutex
     /**
      * Specify the cache store that should be used.
      *
-     * @param  string  $store
+     * @param string $store
+     *
      * @return $this
      */
     public function useStore($store)

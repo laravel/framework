@@ -18,7 +18,7 @@ class BaseCommand extends Command
         // migrations may be run for any customized path from within the application.
         if ($this->input->hasOption('path') && $this->option('path')) {
             return collect($this->option('path'))->map(function ($path) {
-                return ! $this->usingRealPath()
+                return !$this->usingRealPath()
                                 ? $this->laravel->basePath().'/'.$path
                                 : $path;
             })->all();

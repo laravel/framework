@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Mockery as m;
 use Illuminate\Queue\Listener;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\ListenerOptions;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 class QueueListenerTest extends TestCase
@@ -39,7 +39,7 @@ class QueueListenerTest extends TestCase
     public function testMakeProcessCorrectlyFormatsCommandLine()
     {
         $listener = new Listener(__DIR__);
-        $options = new ListenerOptions;
+        $options = new ListenerOptions();
         $options->delay = 1;
         $options->memory = 2;
         $options->timeout = 3;
