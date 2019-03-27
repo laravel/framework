@@ -108,6 +108,29 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('datetimeAttribute'));
     }
 
+    public function testDirtyOnJsonAttributes()
+    {
+        $array = ['a' => 'foo', 'b' => ['c' => 'bar', 'd' => 'baz']];
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes(['objectAttribute' => '{"a": "foo"}']);
+        $model->arrayAttribute = $array;
+        $model->jsonAttribute = $array;
+        $model->collectionAttribute = $array;
+        $model->syncOriginal();
+
+        $array = ['b' => ['d' => 'baz', 'c' => 'bar'], 'a' => 'foo'];
+        $model->objectAttribute = ['a' => 'foo'];
+        $model->arrayAttribute = $array;
+        $model->jsonAttribute = $array;
+        $model->collectionAttribute = $array;
+
+        $this->assertFalse($model->isDirty());
+
+        $model->objectAttribute = ['a' => 'bar'];
+
+        $this->assertTrue($model->isDirty());
+    }
+
     public function testCleanAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
@@ -2230,6 +2253,7 @@ class EloquentModelCastingStub extends Model
         'objectAttribute' => 'object',
         'arrayAttribute' => 'array',
         'jsonAttribute' => 'json',
+        'collectionAttribute' => 'collection',
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',

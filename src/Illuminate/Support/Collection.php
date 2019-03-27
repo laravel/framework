@@ -1667,12 +1667,43 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Sort the collection keys in descending order.
      *
-     * @param  int $options
+     * @param  int  $options
      * @return static
      */
     public function sortKeysDesc($options = SORT_REGULAR)
     {
         return $this->sortKeys($options, true);
+    }
+
+    /**
+     * Sort the collection keys recursively.
+     *
+     * @param  int  $options
+     * @param  bool  $descending
+     * @return static
+     */
+    public function sortKeysRecursively($options = SORT_REGULAR, $descending = false)
+    {
+        $items = $this->sortKeys($options, $descending)->all();
+
+        foreach ($items as $key => $value) {
+            if (is_array($value)) {
+                $items[$key] = (new static($value))->sortKeysRecursively($options, $descending)->all();
+            }
+        }
+
+        return new static($items);
+    }
+
+    /**
+     * Sort the collection keys recursively in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortKeysRecursivelyDesc($options = SORT_REGULAR)
+    {
+        return $this->sortKeysRecursively($options, true);
     }
 
     /**

@@ -1031,6 +1031,20 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeys()->all());
     }
 
+    public function testSortKeysRecursively()
+    {
+        $data = new Collection(['b' => ['d' => 'baz', 'c' => 'bar'], 'a' => 'foo']);
+
+        $this->assertEquals(['a' => 'foo', 'b' => ['c' => 'bar', 'd' => 'baz']], $data->sortKeysRecursively()->all());
+    }
+
+    public function testSortKeysRecursivelyDesc()
+    {
+        $data = new Collection(['a' => 'foo', 'b' => ['c' => 'bar', 'd' => 'baz']]);
+
+        $this->assertEquals(['b' => ['d' => 'baz', 'c' => 'bar'], 'a' => 'foo'], $data->sortKeysRecursivelyDesc()->all());
+    }
+
     public function testReverse()
     {
         $data = new Collection(['zaeed', 'alan']);

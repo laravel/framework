@@ -1145,7 +1145,7 @@ trait HasAttributes
     /**
      * Determine if the new and old values for a given key are equivalent.
      *
-     * @param  string $key
+     * @param  string  $key
      * @param  mixed  $current
      * @return bool
      */
@@ -1165,12 +1165,36 @@ trait HasAttributes
             return $this->fromDateTime($current) ===
                    $this->fromDateTime($original);
         } elseif ($this->hasCast($key)) {
-            return $this->castAttribute($key, $current) ===
-                   $this->castAttribute($key, $original);
+            return $this->originalWithCastIsEquivalent($key, $current, $original);
         }
 
         return is_numeric($current) && is_numeric($original)
                 && strcmp((string) $current, (string) $original) === 0;
+    }
+
+    /**
+     * Determine if the new and old values for a given key with cast are equivalent.
+     *
+     * @param  string  $key
+     * @param  mixed  $current
+     * @param  mixed  $original
+     * @return bool
+     */
+    protected function originalWithCastIsEquivalent($key, $current, $original)
+    {
+        $current = $this->castAttribute($key, $current);
+        $original = $this->castAttribute($key, $original);
+
+        if ($current === $original) {
+            return true;
+        } elseif (! $this->isJsonCastable($key)) {
+            return false;
+        }
+
+        $current = collect($current)->sortKeysRecursively()->all();
+        $original = collect($original)->sortKeysRecursively()->all();
+
+        return $current === $original;
     }
 
     /**
