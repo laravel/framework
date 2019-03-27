@@ -759,6 +759,16 @@ class Blueprint
     }
 
     /**
+     * Adds the `lock_version` column for optimistic locking to the table.
+     *
+     * @return \Illuminate\Support\Fluent
+     */
+    public function lockVersion()
+    {
+        return $this->integer('lock_version')->default(1);
+    }
+
+    /**
      * Create a new drop index command on the blueprint.
      *
      * @param  string  $command

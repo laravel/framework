@@ -41,6 +41,7 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
+            $table->lockVersion();
             $table->timestamps();
         });
 
@@ -347,6 +348,25 @@ class DatabaseEloquentIntegrationTest extends PHPUnit_Framework_TestCase
         $this->assertNull($photo->imageable);
     }
 
+    public function testOptimisticLockingProcess()
+    {
+        $user = EloquentOptimisticallyLockedTestUser::create(['id' => 1, 'email' => '1@gmail.com']);
+
+        $this->assertEquals($user->{EloquentOptimisticallyLockedTestUser::LOCK_VERSION}, 1);
+
+        $firstUser = EloquentOptimisticallyLockedTestUser::find($user->id);
+        $secondUser = EloquentOptimisticallyLockedTestUser::find($user->id);
+
+        $firstUser->email = '2@gmail.com';
+        $this->assertEquals($firstUser->save(), true);
+
+        $this->assertEquals($firstUser->{EloquentOptimisticallyLockedTestUser::LOCK_VERSION}, 2);
+
+        $this->setExpectedException(\Illuminate\Database\Eloquent\OptimisticLockingException::class);
+        $secondUser->email = '3@gmail.com';
+        $secondUser->save();
+    }
+
     public function testMultiInsertsWithDifferentValues()
     {
         $date = '1970-01-01';
@@ -434,6 +454,7 @@ class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';
     protected $guarded = [];
+
     public function friends()
     {
         return $this->belongsToMany('EloquentTestUser', 'friends', 'user_id', 'friend_id');
@@ -450,6 +471,11 @@ class EloquentTestUser extends Eloquent
     {
         return $this->morphMany('EloquentTestPhoto', 'imageable');
     }
+}
+
+class EloquentOptimisticallyLockedTestUser extends EloquentTestUser
+{
+    public $optimisticLocking = true;
 }
 
 class EloquentTestPost extends Eloquent

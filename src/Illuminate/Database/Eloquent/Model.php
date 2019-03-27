@@ -73,6 +73,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $timestamps = true;
 
     /**
+     * Indicates if the optimistic locking should be checked.
+     *
+     * @var bool
+     */
+    public $optimisticLocking = false;
+
+    /**
      * The model's attributes.
      *
      * @var array
@@ -253,6 +260,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var string
      */
     const UPDATED_AT = 'updated_at';
+
+
+    /**
+     * The name of the "lock_version" column.
+     *
+     * @var string
+     */
+    const LOCK_VERSION = 'lock_version';
 
     /**
      * Create a new Eloquent model instance.
@@ -1513,7 +1528,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $dirty = $this->getDirty();
 
             if (count($dirty) > 0) {
-                $this->setKeysForSaveQuery($query)->update($dirty);
+
+                $this->setKeysForSaveQuery($query);
+
+                $checkLocking = false;
+                if ($this->optimisticLocking && array_get($options, 'optimisticLocking', true)) {
+
+                    $this->setKeysForOptimisticLocking($query);
+
+                    $this->{static::LOCK_VERSION} = $dirty[static::LOCK_VERSION] = $this->{static::LOCK_VERSION} + 1;
+
+                    $checkLocking = true;
+                }
+
+                $count = $query->update($dirty);
+
+                if ($checkLocking && $count === 0) {
+                    $this->{static::LOCK_VERSION} = $this->{static::LOCK_VERSION} - 1;
+                    throw (new OptimisticLockingException("Model has been changed during update."))->setModel($this);
+                }
 
                 $this->fireModelEvent('updated', false);
             }
@@ -1556,6 +1589,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // there by the developer as the manually determined key for these models.
         else {
             $query->insert($attributes);
+        }
+
+        if ($this->optimisticLocking && !$this->isDirty(static::LOCK_VERSION)) {
+            $this->{static::LOCK_VERSION} = 1;
         }
 
         // We will go ahead and set the exists property to true, so that it is set when
@@ -1648,6 +1685,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         return $query;
     }
+
+    /**
+     * Set the keys for a save update query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function setKeysForOptimisticLocking(Builder $query)
+    {
+        $query->where(static::LOCK_VERSION, '=', $this->{static::LOCK_VERSION});
+
+        return $query;
+    }
+
 
     /**
      * Get the primary key value for a save query.
