@@ -1223,6 +1223,16 @@ class Blueprint
     }
 
     /**
+     * Adds the `lock_version` column to the table.
+     *
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function lockVersion()
+    {
+        return $this->integer('lock_version')->unsigned()->default(1);
+    }
+
+    /**
      * Add a new index command to the blueprint.
      *
      * @param  string  $type

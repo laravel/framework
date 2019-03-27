@@ -77,6 +77,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->timestamps();
             });
 
+            $this->schema($connection)->create('optimistically_lockable_users', function ($table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                $table->string('email');
+                $table->lockVersion();
+                $table->timestamps();
+            });
+
             $this->schema($connection)->create('friends', function ($table) {
                 $table->integer('user_id');
                 $table->integer('friend_id');
@@ -897,6 +905,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNull($photo->imageable);
     }
 
+    public function testOptimisticLockingProcess()
+    {
+        $user = EloquentOptimisticallyLockedTestUser::create(['id' => 1, 'email' => '1@gmail.com']);
+        $this->assertEquals($user->{EloquentOptimisticallyLockedTestUser::LOCK_VERSION}, 1);
+        $firstUser = EloquentOptimisticallyLockedTestUser::find($user->id);
+        $secondUser = EloquentOptimisticallyLockedTestUser::find($user->id);
+        $firstUser->email = '2@gmail.com';
+        $this->assertEquals($firstUser->save(), true);
+        $this->assertEquals($firstUser->{EloquentOptimisticallyLockedTestUser::LOCK_VERSION}, 2);
+        $secondUser->email = '3@gmail.com';
+        $this->expectException(\Illuminate\Database\Eloquent\OptimisticLockingException::class);
+        $secondUser->save();
+    }
+
     public function testSaveOrFail()
     {
         $date = '1970-01-01';
@@ -1621,6 +1643,13 @@ class EloquentTestUser extends Eloquent
             $join->where('photo.imageable_type', 'EloquentTestPost');
         });
     }
+}
+
+class EloquentOptimisticallyLockedTestUser extends EloquentTestUser
+{
+    protected $table = 'optimistically_lockable_users';
+
+    public $optimisticLocking = true;
 }
 
 class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
