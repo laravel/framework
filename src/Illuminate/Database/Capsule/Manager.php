@@ -9,6 +9,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class Manager
 {
@@ -24,10 +25,10 @@ class Manager
     /**
      * Create a new database capsule manager.
      *
-     * @param  \Illuminate\Container\Container|null  $container
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(Container $container = null)
+    public function __construct(ContainerContract $container = null)
     {
         $this->setupContainer($container ?: new Container);
 

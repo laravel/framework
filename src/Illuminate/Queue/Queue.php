@@ -3,7 +3,7 @@
 namespace Illuminate\Queue;
 
 use DateTimeInterface;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\InteractsWithTime;
 
 abstract class Queue
@@ -250,7 +250,7 @@ abstract class Queue
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
     public function setContainer(Container $container)
