@@ -3,8 +3,8 @@
 namespace Illuminate\Queue;
 
 use DateTimeInterface;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Container\Container;
 
 abstract class Queue
 {
