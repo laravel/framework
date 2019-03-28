@@ -1862,6 +1862,21 @@ class SupportCollectionTest extends TestCase
         ], $result->all());
     }
 
+    public function testKeyByObject()
+    {
+        $data = new Collection([
+            ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+            ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
+        ]);
+        $result = $data->keyBy(function ($item, $key) {
+            return new Collection([$key, $item['firstname'], $item['lastname']]);
+        });
+        $this->assertEquals([
+            '[0,"Taylor","Otwell"]' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+            '[1,"Lucas","Michot"]' => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
+        ], $result->all());
+    }
+
     public function testContains()
     {
         $c = new Collection([1, 3, 5]);
