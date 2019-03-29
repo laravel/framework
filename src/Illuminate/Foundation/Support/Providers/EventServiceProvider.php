@@ -102,7 +102,7 @@ class EventServiceProvider extends ServiceProvider
     protected function discoverEventsWithin()
     {
         return [
-            app_path('Listeners'),
+            $this->app->path('Listeners'),
         ];
     }
 }
