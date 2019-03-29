@@ -29,7 +29,9 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        foreach ($this->listens() as $event => $listeners) {
+        $events = array_merge($this->discoveredEvents(), $this->listens());
+
+        foreach ($events as $event => $listeners) {
             foreach ($listeners as $listener) {
                 Event::listen($event, $listener);
             }
@@ -47,10 +49,33 @@ class EventServiceProvider extends ServiceProvider
      */
     public function listens()
     {
-        return array_merge(
-            $this->discoverEvents(),
-            $this->listen
-        );
+        return $this->listen;
+    }
+
+    /**
+     * Get the discovered events and listeners for the application.
+     *
+     * @return array
+     */
+    protected function discoveredEvents()
+    {
+        if ($this->app->eventsAreCached()) {
+            return require $this->app->getCachedEventsPath();
+        }
+
+        return $this->shouldDiscoverEvents()
+                    ? $this->discoverEvents()
+                    : [];
+    }
+
+    /**
+     * Determine if events and listeners should be automatically discovered.
+     *
+     * @return bool
+     */
+    public function shouldDiscoverEvents()
+    {
+        return false;
     }
 
     /**
@@ -58,7 +83,7 @@ class EventServiceProvider extends ServiceProvider
      *
      * @return array
      */
-    protected function discoverEvents()
+    public function discoverEvents()
     {
         return collect($this->discoverEventsWithin())
                     ->reduce(function ($discovered, $directory) {
