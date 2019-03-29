@@ -2,7 +2,7 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
-trait CompilesError
+trait CompilesErrors
 {
     /**
      * Compile the error statements into valid PHP.
