@@ -1,16 +1,12 @@
 <?php
 
-use PhpOption\Option;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Collection;
-use Dotenv\Environment\DotenvFactory;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HigherOrderTapProxy;
-use Dotenv\Environment\Adapter\PutenvAdapter;
-use Dotenv\Environment\Adapter\EnvConstAdapter;
-use Dotenv\Environment\Adapter\ServerConstAdapter;
 
 if (! function_exists('append_config')) {
     /**
@@ -640,38 +636,7 @@ if (! function_exists('env')) {
      */
     function env($key, $default = null)
     {
-        static $variables;
-
-        if ($variables === null) {
-            $variables = (new DotenvFactory([new EnvConstAdapter, new PutenvAdapter, new ServerConstAdapter]))->createImmutable();
-        }
-
-        return Option::fromValue($variables->get($key))
-            ->map(function ($value) {
-                switch (strtolower($value)) {
-                    case 'true':
-                    case '(true)':
-                        return true;
-                    case 'false':
-                    case '(false)':
-                        return false;
-                    case 'empty':
-                    case '(empty)':
-                        return '';
-                    case 'null':
-                    case '(null)':
-                        return;
-                }
-
-                if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
-                    return $matches[2];
-                }
-
-                return $value;
-            })
-            ->getOrCall(function () use ($default) {
-                return value($default);
-            });
+        return Env::get($key, $default);
     }
 }
 
