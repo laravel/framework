@@ -953,7 +953,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedEventsPath()
     {
-        return $_ENV['APP_EVENTS_CACHE'] ?? $this->storagePath().'/framework/cache/events.php';
+        return $_ENV['APP_EVENTS_CACHE'] ?? $this->bootstrapPath().'/cache/events.php';
     }
 
     /**
