@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\OptimisticLockingException;
 
 trait HasOptimisticLocking
 {
@@ -55,17 +54,5 @@ trait HasOptimisticLocking
         $query->where(static::LOCK_VERSION, '=', $this->{static::LOCK_VERSION});
 
         return $query;
-    }
-
-    /**
-     * Throws optimistic locking exception of update failure.
-     *
-     * @throws \Illuminate\Database\Eloquent\OptimisticLockingException
-     */
-    public function throwOptimisticLockingException()
-    {
-        $this->rollbackLockVersion();
-
-        throw (new OptimisticLockingException('Model has been changed during update.'))->setModel($this);
     }
 }

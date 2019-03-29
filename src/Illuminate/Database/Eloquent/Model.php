@@ -755,7 +755,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $count = $this->setKeysForSaveQuery($query)->update($dirty);
 
             if ($this->usesOptimisticLocking() && $count === 0) {
-                $this->throwOptimisticLockingException();
+                $this->rollbackLockVersion();
+                throw (new OptimisticLockingException('Model has been changed during update.'))->setModel($this);
             }
 
             $this->syncChanges();
