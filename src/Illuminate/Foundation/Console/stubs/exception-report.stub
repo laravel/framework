@@ -7,12 +7,12 @@ use Exception;
 class DummyClass extends Exception
 {
     /**
-     * Report the exception.
-     *
-     * @return void
-     */
-     public function report()
-     {
+    * Report the exception.
+    *
+    * @return void
+    */
+    public function report()
+    {
         //
     }
 }
