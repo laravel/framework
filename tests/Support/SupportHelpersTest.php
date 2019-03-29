@@ -6,8 +6,8 @@ use stdClass;
 use ArrayAccess;
 use Mockery as m;
 use RuntimeException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Env;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Optional;
 use Illuminate\Contracts\Support\Htmlable;
 
