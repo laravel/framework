@@ -47,7 +47,10 @@ class EventServiceProvider extends ServiceProvider
      */
     public function listens()
     {
-        return array_merge($this->discoverEvents(), $this->listen);
+        return array_merge(
+            $this->discoverEvents(),
+            $this->listen
+        );
     }
 
     /**
