@@ -274,6 +274,15 @@ class ContainerTest extends TestCase
         $container->make(ContainerDependentStub::class, []);
     }
 
+    public function testBindingResolutionExceptionMessageWhenClassDoesNotExist()
+    {
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Target class [Foo\Bar\Baz\DummyClass] does not exist.');
+
+        $container = new Container;
+        $container->build('Foo\Bar\Baz\DummyClass');
+    }
+
     public function testForgetInstanceForgetsInstance()
     {
         $container = new Container;
