@@ -269,7 +269,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the client IP address.
      *
-     * @return string
+     * @return string|null
      */
     public function ip()
     {
