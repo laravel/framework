@@ -3,9 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 
 class EventCacheCommand extends Command

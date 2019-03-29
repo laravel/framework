@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use RuntimeException;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
