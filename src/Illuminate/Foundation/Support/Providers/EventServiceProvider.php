@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Support\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Events\DiscoverEvents;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -46,6 +47,34 @@ class EventServiceProvider extends ServiceProvider
      */
     public function listens()
     {
-        return $this->listen;
+        return array_merge($this->discoverEvents(), $this->listen);
+    }
+
+    /**
+     * Discover the events and listeners for the application.
+     *
+     * @return array
+     */
+    protected function discoverEvents()
+    {
+        return collect($this->discoverEventsWithin())
+                    ->reduce(function ($discovered, $directory) {
+                        return array_merge(
+                            $discovered,
+                            DiscoverEvents::within($directory, base_path())
+                        );
+                    }, []);
+    }
+
+    /**
+     * Get the listener directories that should be used to discover events.
+     *
+     * @return array
+     */
+    protected function discoverEventsWithin()
+    {
+        return [
+            app_path('Listeners'),
+        ];
     }
 }
