@@ -516,9 +516,9 @@ if (! function_exists('generic_asset')) {
      */
     function generic_asset($path, $env_value = 'local')
     {
-        if(env('APP_ENV', '') === $env_value){
+        if (env('APP_ENV', '') === $env_value) {
             return app('url')->asset($path);
-        }else{
+        } else {
             return app('url')->secure_asset($path);
         }
     }
