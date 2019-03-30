@@ -233,6 +233,19 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Determine whether a key exists in the cache.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function exists($key)
+    {
+        $value = $this->connection()->exists($this->prefix.$key);
+
+        return $value === 1;
+    }
+
+    /**
      * Get the Redis connection instance.
      *
      * @return \Predis\ClientInterface

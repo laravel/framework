@@ -15,6 +15,8 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Cache\Events\KeyForgotten;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Cache\Events\CacheKeyExists;
+use Illuminate\Cache\Events\CacheKeyDoesntExist;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 /**
@@ -63,22 +65,44 @@ class Repository implements CacheContract, ArrayAccess
      * Determine if an item exists in the cache.
      *
      * @param  string  $key
+     * @param  bool|null  $allowNull
      * @return bool
      */
-    public function has($key)
+    public function has($key, $allowNull = null)
     {
-        return ! is_null($this->get($key));
+        if ($allowNull === null) {
+            $allowNull = config('cache.allow-null', false);
+        }
+
+        if ($allowNull) {
+            if (! method_exists($this->store, 'exists')) {
+                throw new BadMethodCallException('This cache store does not support the exists command.');
+            }
+
+            $exists = $this->store->exists($key);
+        } else {
+            $exists = ! is_null($this->get($key));
+        }
+
+        if ($exists) {
+            $this->event(new CacheKeyExists($key));
+        } else {
+            $this->event(new CacheKeyDoesntExist($key));
+        }
+
+        return $exists;
     }
 
     /**
      * Determine if an item doesn't exist in the cache.
      *
      * @param  string  $key
+     * @param  bool|null  $allowNull
      * @return bool
      */
-    public function missing($key)
+    public function missing($key, $allowNull = null)
     {
-        return ! $this->has($key);
+        return ! $this->has($key, $allowNull);
     }
 
     /**
@@ -371,17 +395,29 @@ class Repository implements CacheContract, ArrayAccess
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure  $callback
+     * @param  bool|null  $allowNull
      * @return mixed
      */
-    public function remember($key, $ttl, Closure $callback)
+    public function remember($key, $ttl, Closure $callback, $allowNull = null)
     {
-        $value = $this->get($key);
+        if ($allowNull === null) {
+            $allowNull = config('cache.allow-null', false);
+        }
 
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of seconds so it's available for all subsequent requests.
-        if (! is_null($value)) {
-            return $value;
+
+        if ($allowNull) {
+            if ($this->has($key, true)) {
+                return $this->get($key);
+            }
+        } else {
+            $value = $this->get($key);
+
+            if (! is_null($value)) {
+                return $value;
+            }
         }
 
         $this->put($key, $value = $callback(), $ttl);
@@ -406,22 +442,12 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  \Closure  $callback
+     * @param  bool|null  $allowNull
      * @return mixed
      */
-    public function rememberForever($key, Closure $callback)
+    public function rememberForever($key, Closure $callback, $allowNull = null)
     {
-        $value = $this->get($key);
-
-        // If the item exists in the cache we will just return this immediately
-        // and if not we will execute the given Closure and cache the result
-        // of that forever so it is available for all subsequent requests.
-        if (! is_null($value)) {
-            return $value;
-        }
-
-        $this->forever($key, $value = $callback());
-
-        return $value;
+        return $this->remember($key, null, $callback, $allowNull);
     }
 
     /**

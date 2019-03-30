@@ -69,27 +69,30 @@ interface Repository extends CacheInterface
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure  $callback
+     * @param  bool|null  $allowNull
      * @return mixed
      */
-    public function remember($key, $ttl, Closure $callback);
+    public function remember($key, $ttl, Closure $callback, $allowNull = null);
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @param  string  $key
      * @param  \Closure  $callback
+     * @param  bool|null  $allowNull
      * @return mixed
      */
-    public function sear($key, Closure $callback);
+    public function sear($key, Closure $callback, $allowNull = null);
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @param  string  $key
      * @param  \Closure  $callback
+     * @param  bool|null  $allowNull
      * @return mixed
      */
-    public function rememberForever($key, Closure $callback);
+    public function rememberForever($key, Closure $callback, $allowNull = null);
 
     /**
      * Remove an item from the cache.
