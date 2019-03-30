@@ -2,6 +2,12 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.8...5.8)
 
+### Fixed
+- Fixed serializing a collection from a `Resource` with `preserveKeys` property ([#27985](https://github.com/laravel/framework/pull/27985))
+
+### Changed
+- Update forever cache duration for database driver from minutes to seconds ([#28048](https://github.com/laravel/framework/pull/28048))
+
 
 ## [v5.8.8 (2019-03-26)](https://github.com/laravel/framework/compare/v5.8.7...v5.8.8)
 
