@@ -14,8 +14,8 @@ use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Cache\Events\KeyForgotten;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Cache\Events\CacheKeyExists;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Cache\Events\CacheKeyDoesntExist;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
