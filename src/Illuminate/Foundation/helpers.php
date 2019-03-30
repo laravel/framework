@@ -506,6 +506,24 @@ if (! function_exists('factory')) {
     }
 }
 
+if (! function_exists('generic_asset')) {
+    /**
+     * Generate an asset path for the application acording to the APP_ENV value used.
+     *
+     * @param  string  $path
+     * @param  string  $env_value
+     * @return string
+     */
+    function generic_asset($path, $env_value = 'local')
+    {
+        if(env('APP_ENV', '') === $env_value){
+            return app('url')->asset($path);
+        }else{
+            return app('url')->secure_asset($path);
+        }
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
