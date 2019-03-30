@@ -528,7 +528,7 @@ if (! function_exists('is_localhost')) {
      */
     function is_localhost()
     {
-        return isset($_SERVER["SERVER_ADDR"]) && ($_SERVER["SERVER_ADDR"] == '127.0.0.1' || $_SERVER["SERVER_ADDR"] == '::1');
+        return isset($_SERVER['SERVER_ADDR']) && ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || $_SERVER['SERVER_ADDR'] == '::1');
     }
 }
 
