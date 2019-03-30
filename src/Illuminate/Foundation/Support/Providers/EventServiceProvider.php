@@ -29,7 +29,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $events = array_merge($this->discoveredEvents(), $this->listens());
+        $events = array_merge_recursive($this->discoveredEvents(), $this->listens());
 
         foreach ($events as $event => $listeners) {
             foreach (array_unique($listeners) as $listener) {
