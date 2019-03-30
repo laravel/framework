@@ -520,6 +520,17 @@ if (! function_exists('info')) {
     }
 }
 
+if (! function_exists('is_localhost')) {
+    /**
+     * Check if project is running on localhost or not.
+     *
+     * @return boolean
+     */
+    function is_localhost(){
+        return isset($_SERVER["SERVER_ADDR"]) && ($_SERVER["SERVER_ADDR"] == '127.0.0.1' || $_SERVER["SERVER_ADDR"] == '::1');
+    }
+}
+
 if (! function_exists('logger')) {
     /**
      * Log a debug message to the logs.
