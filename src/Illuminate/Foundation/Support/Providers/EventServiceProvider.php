@@ -32,7 +32,7 @@ class EventServiceProvider extends ServiceProvider
         $events = array_merge($this->discoveredEvents(), $this->listens());
 
         foreach ($events as $event => $listeners) {
-            foreach ($listeners as $listener) {
+            foreach (array_unique($listeners) as $listener) {
                 Event::listen($event, $listener);
             }
         }
