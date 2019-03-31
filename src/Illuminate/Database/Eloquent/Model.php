@@ -1175,6 +1175,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $instance->setRawAttributes($attributes);
 
             $instance->setRelations($this->relations);
+
+            $instance->fireModelEvent('replicating', false);
         });
     }
 

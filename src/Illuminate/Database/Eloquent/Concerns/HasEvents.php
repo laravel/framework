@@ -96,7 +96,7 @@ trait HasEvents
         return array_merge(
             [
                 'retrieved', 'creating', 'created', 'updating', 'updated',
-                'saving', 'saved', 'restoring', 'restored',
+                'saving', 'saved', 'restoring', 'restored', 'replicating',
                 'deleting', 'deleted', 'forceDeleted',
             ],
             $this->observables
@@ -301,6 +301,17 @@ trait HasEvents
     public static function created($callback)
     {
         static::registerModelEvent('created', $callback);
+    }
+
+    /**
+     * Register a replicating model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function replicating($callback)
+    {
+        static::registerModelEvent('replicating', $callback);
     }
 
     /**
