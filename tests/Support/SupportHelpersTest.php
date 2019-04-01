@@ -6,6 +6,7 @@ use stdClass;
 use ArrayAccess;
 use Mockery as m;
 use RuntimeException;
+use Illuminate\Support\Env;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Optional;
 use Illuminate\Contracts\Support\Htmlable;
@@ -531,6 +532,7 @@ class SupportHelpersTest extends TestCase
     {
         $_SERVER['foo'] = 'bar';
         $this->assertSame('bar', env('foo'));
+        $this->assertSame('bar', Env::get('foo'));
     }
 
     public function testEnvTrue()
