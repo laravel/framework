@@ -104,4 +104,16 @@ class DatabaseSoftDeletingTraitStub
     {
         return defined('static::UPDATED_AT') ? static::UPDATED_AT : 'updated_at';
     }
+
+    public function setKeysForSaveQuery($query)
+    {
+        $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
+
+        return $query;
+    }
+
+    protected function getKeyForSaveQuery()
+    {
+        return 1;
+    }
 }
