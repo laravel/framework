@@ -696,7 +696,7 @@ class Event
     /**
      * Determine the next due date for an event.
      *
-     * @param  \DateTime|string  $currentTime
+     * @param  \DateTimeInterface|string  $currentTime
      * @param  int  $nth
      * @param  bool  $allowCurrentDate
      * @return \Illuminate\Support\Carbon
