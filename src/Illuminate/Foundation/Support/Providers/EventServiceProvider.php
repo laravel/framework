@@ -29,7 +29,10 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $events = array_merge_recursive($this->discoveredEvents(), $this->listens());
+        $events = array_merge_recursive(
+            $this->discoveredEvents(),
+            $this->listens()
+        );
 
         foreach ($events as $event => $listeners) {
             foreach (array_unique($listeners) as $listener) {
@@ -87,7 +90,7 @@ class EventServiceProvider extends ServiceProvider
     {
         return collect($this->discoverEventsWithin())
                     ->reduce(function ($discovered, $directory) {
-                        return array_merge(
+                        return array_merge_recursive(
                             $discovered,
                             DiscoverEvents::within($directory, base_path())
                         );
