@@ -342,6 +342,11 @@ class AuthAccessGateTest extends TestCase
 
         $dummy = new AccessGateTestDummy;
 
+        $gate->before(function ($user, $ability, array $arguments) use ($dummy) {
+            $this->assertCount(1, $arguments);
+            $this->assertSame($dummy, $arguments[0]);
+        });
+
         $gate->define('foo', function ($user, $x) use ($dummy) {
             $this->assertEquals($dummy, $x);
 
@@ -357,6 +362,11 @@ class AuthAccessGateTest extends TestCase
 
         $dummy1 = new AccessGateTestDummy;
         $dummy2 = new AccessGateTestDummy;
+
+        $gate->before(function ($user, $ability, array $arguments) use ($dummy1, $dummy2) {
+            $this->assertCount(2, $arguments);
+            $this->assertSame([$dummy1, $dummy2], $arguments);
+        });
 
         $gate->define('foo', function ($user, $x, $y) use ($dummy1, $dummy2) {
             $this->assertEquals($dummy1, $x);
