@@ -2173,16 +2173,6 @@ class Builder
     }
 
     /**
-     * Get the default key name of the table.
-     *
-     * @return string
-     */
-    protected function defaultKeyName()
-    {
-        return 'id';
-    }
-
-    /**
      * Throw an exception if the query doesn't have an orderBy clause.
      *
      * @return void
@@ -2801,6 +2791,16 @@ class Builder
         return array_values(array_filter($bindings, function ($binding) {
             return ! $binding instanceof Expression;
         }));
+    }
+
+    /**
+     * Get the default key name of the table.
+     *
+     * @return string
+     */
+    protected function defaultKeyName()
+    {
+        return 'id';
     }
 
     /**

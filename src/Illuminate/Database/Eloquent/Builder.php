@@ -646,16 +646,6 @@ class Builder
     }
 
     /**
-     * Get the default key name of the table.
-     *
-     * @return string
-     */
-    protected function defaultKeyName()
-    {
-        return $this->getModel()->getKeyName();
-    }
-
-    /**
      * Add a generic "order by" clause if the query doesn't already have one.
      *
      * @return void
@@ -1208,6 +1198,16 @@ class Builder
         $this->eagerLoad = $eagerLoad;
 
         return $this;
+    }
+
+    /**
+     * Get the default key name of the table.
+     *
+     * @return string
+     */
+    protected function defaultKeyName()
+    {
+        return $this->getModel()->getKeyName();
     }
 
     /**
