@@ -646,49 +646,13 @@ class Builder
     }
 
     /**
-     * Chunk the results of a query by comparing numeric IDs.
+     * Get the default key name of the table.
      *
-     * @param  int  $count
-     * @param  callable  $callback
-     * @param  string|null  $column
-     * @param  string|null  $alias
-     * @return bool
+     * @return string
      */
-    public function chunkById($count, callable $callback, $column = null, $alias = null)
+    protected function defaultKeyName()
     {
-        $column = is_null($column) ? $this->getModel()->getKeyName() : $column;
-
-        $alias = is_null($alias) ? $column : $alias;
-
-        $lastId = null;
-
-        do {
-            $clone = clone $this;
-
-            // We'll execute the query for the given page and get the results. If there are
-            // no results we can just break and return from here. When there are results
-            // we will call the callback with the current chunk of these results here.
-            $results = $clone->forPageAfterId($count, $lastId, $column)->get();
-
-            $countResults = $results->count();
-
-            if ($countResults == 0) {
-                break;
-            }
-
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
-            if ($callback($results) === false) {
-                return false;
-            }
-
-            $lastId = $results->last()->{$alias};
-
-            unset($results);
-        } while ($countResults == $count);
-
-        return true;
+        return $this->getModel()->getKeyName();
     }
 
     /**
