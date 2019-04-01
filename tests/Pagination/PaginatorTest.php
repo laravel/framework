@@ -54,4 +54,17 @@ class PaginatorTest extends TestCase
 
         $this->assertSame($p->getOptions(), $options);
     }
+
+    public function testModifyCollection()
+    {
+        $p = new Paginator(['item1', 'item2', 'item3'], 4);
+
+        $p->modifyCollection(function ($collection) {
+            $collection->push('item4');
+
+            return $collection;
+        });
+
+        $this->assertEquals(['item1', 'item2', 'item3', 'item4'], $p->getCollection()->all());
+    }
 }

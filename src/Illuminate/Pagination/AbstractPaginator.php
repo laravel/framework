@@ -571,6 +571,19 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Modify the paginator's underlying collection.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function modifyCollection(callable $callback)
+    {
+        return $this->setCollection(
+            $callback($this->getCollection())
+        );
+    }
+
+    /**
      * Get the paginator options.
      *
      * @return array

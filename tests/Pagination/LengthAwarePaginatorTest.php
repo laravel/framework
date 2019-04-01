@@ -108,4 +108,17 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $this->assertSame($this->options, $this->p->getOptions());
     }
+
+    public function testModifyCollection()
+    {
+        $p = new LengthAwarePaginator(['item1', 'item2', 'item3'], 3, 4);
+
+        $p->modifyCollection(function ($collection) {
+            $collection->push('item4');
+
+            return $collection;
+        });
+
+        $this->assertEquals(['item1', 'item2', 'item3', 'item4'], $p->getCollection()->all());
+    }
 }
