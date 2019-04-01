@@ -78,7 +78,7 @@ class Manager
      * Get a fluent query builder instance.
      *
      * @param  string  $table
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return \Illuminate\Database\Query\Builder
      */
     public static function table($table, $connection = null)

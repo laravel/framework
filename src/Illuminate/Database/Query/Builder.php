@@ -198,8 +198,8 @@ class Builder
      * Create a new query builder instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
-     * @param  \Illuminate\Database\Query\Processors\Processor  $processor
+     * @param  \Illuminate\Database\Query\Grammars\Grammar|null  $grammar
+     * @param  \Illuminate\Database\Query\Processors\Processor|null  $processor
      * @return void
      */
     public function __construct(ConnectionInterface $connection,
@@ -637,18 +637,22 @@ class Builder
             return $this->whereNull($column, $boolean, $operator !== '=');
         }
 
+        $type = 'Basic';
+
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
         if (Str::contains($column, '->') && is_bool($value)) {
             $value = new Expression($value ? 'true' : 'false');
+
+            if (is_string($column)) {
+                $type = 'JsonBoolean';
+            }
         }
 
         // Now that we are working with just a simple query we can put the elements
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
-        $type = 'Basic';
-
         $this->wheres[] = compact(
             'type', 'column', 'operator', 'value', 'boolean'
         );
@@ -1935,6 +1939,26 @@ class Builder
     }
 
     /**
+     * Constrain the query to the previous "page" of results before a given ID.
+     *
+     * @param  int  $perPage
+     * @param  int|null  $lastId
+     * @param  string  $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function forPageBeforeId($perPage = 15, $lastId = 0, $column = 'id')
+    {
+        $this->orders = $this->removeExistingOrdersFor($column);
+
+        if (! is_null($lastId)) {
+            $this->where($column, '<', $lastId);
+        }
+
+        return $this->orderBy($column, 'desc')
+                    ->take($perPage);
+    }
+
+    /**
      * Constrain the query to the next "page" of results after a given ID.
      *
      * @param  int  $perPage
@@ -2672,6 +2696,10 @@ class Builder
     {
         if (! $this->where($attributes)->exists()) {
             return $this->insert(array_merge($attributes, $values));
+        }
+
+        if (empty($values)) {
+            return true;
         }
 
         return (bool) $this->take(1)->update($values);

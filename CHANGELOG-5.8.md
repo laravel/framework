@@ -1,7 +1,76 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.3...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.8...5.8)
 
+### Fixed
+- Fixed serializing a collection from a `Resource` with `preserveKeys` property ([#27985](https://github.com/laravel/framework/pull/27985))
+
+### Changed
+- Update forever cache duration for database driver from minutes to seconds ([#28048](https://github.com/laravel/framework/pull/28048))
+
+
+## [v5.8.8 (2019-03-26)](https://github.com/laravel/framework/compare/v5.8.7...v5.8.8)
+
+### Added
+- Added `Illuminate\Database\Query\Builder::forPageBeforeId()` method ([#28011](https://github.com/laravel/framework/pull/28011))
+
+### Fixed
+- Fixed `BelongsToMany::detach()` with custom pivot class ([#27997](https://github.com/laravel/framework/pull/27997))
+- Fixed incorrect event namespace in generated listener by `event:generate` command ([#28007](https://github.com/laravel/framework/pull/28007))
+- Fixed unique validation without ignored column ([#27987](https://github.com/laravel/framework/pull/27987))
+
+### Changed
+- Added `parameters` argument to `resolve` helper ([#28020](https://github.com/laravel/framework/pull/28020))
+- Don't add the path only if path is `empty` in compiled view ([#27976](https://github.com/laravel/framework/pull/27976))
+
+### Refactoring
+- Refactoring of `env()` helper ([#27965](https://github.com/laravel/framework/pull/27965))
+
+
+## [v5.8.6-v5.8.7 (2019-03-21)](https://github.com/laravel/framework/compare/v5.8.5...v5.8.7)
+
+### Fixed
+- Fix: Locks acquired with block() are not immediately released if the callback fails ([#27957](https://github.com/laravel/framework/pull/27957))
+
+### Changed
+- Allowed retrieving `env` variables with `getenv()` ([#27958](https://github.com/laravel/framework/pull/27958), [c37702c](https://github.com/laravel/framework/commit/c37702cbdedd4e06eba2162d7a1be7d74362e0cf))
+- Used `stripslashes` for `Validation\Rules\Unique.php` ([#27940](https://github.com/laravel/framework/pull/27940), [34759cc](https://github.com/laravel/framework/commit/34759cc0e0e63c952d7f8b7580f48144a063c684))
+
+### Refactoring
+- Refactoring of `Illuminate\Http\Concerns::allFiles()` ([#27955](https://github.com/laravel/framework/pull/27955))
+
+
+## [v5.8.5 (2019-03-19)](https://github.com/laravel/framework/compare/v5.8.4...v5.8.5)
+
+### Added
+- Added `Illuminate\Database\DatabaseManager::setReconnector()` ([#27845](https://github.com/laravel/framework/pull/27845))
+- Added `Illuminate\Auth\Access\Gate::none()` ([#27859](https://github.com/laravel/framework/pull/27859))
+- Added `OtherDeviceLogout` event ([#27865](https://github.com/laravel/framework/pull/27865), [5e87f2d](https://github.com/laravel/framework/commit/5e87f2df072ec4a243b6a3a983a753e8ffa5e6bf))
+- Added `even` and `odd` flags to the `Loop` variable in the `blade` ([#27883](https://github.com/laravel/framework/pull/27883))
+
+### Changed 
+- Add replacement for lower danish `æ` ([#27886](https://github.com/laravel/framework/pull/27886))
+- Show error message from exception, if message exist for `403.blade.php` and `503.blade.php` error ([#27893](https://github.com/laravel/framework/pull/27893), [#27902](https://github.com/laravel/framework/pull/27902))
+
+### Fixed
+- Fixed seeding logic in `Arr::shuffle()` ([#27861](https://github.com/laravel/framework/pull/27861)) 
+- Fixed `Illuminate\Database\Query\Builder::updateOrInsert()` with empty `$values` ([#27906](https://github.com/laravel/framework/pull/27906))
+- Fixed `Application::getNamespace()` method ([#27915](https://github.com/laravel/framework/pull/27915))
+- Fixed of store previous url ([#27935](https://github.com/laravel/framework/pull/27935), [791992e](https://github.com/laravel/framework/commit/791992e20efdf043ac3c2d989025d48d648821de))
+
+### Security
+- Changed `Validation\Rules\Unique.php` ([da4d4a4](https://github.com/laravel/framework/commit/da4d4a468eee174bd619b4a04aab57e419d10ff4)). You can read more [here](https://blog.laravel.com/unique-rule-sql-injection-warning)
+
+
+## [v5.8.4 (2019-03-12)](https://github.com/laravel/framework/compare/v5.8.3...v5.8.4)
+
+### Added
+- Added `Illuminate\Support\Collection::join()` method ([#27723](https://github.com/laravel/framework/pull/27723))
+- Added `Illuminate\Foundation\Http\Kernel::getRouteMiddleware()` method ([#27852](https://github.com/laravel/framework/pull/27852))
+- Added danish specific transliteration to `Str` class ([#27857](https://github.com/laravel/framework/pull/27857))
+
+### Fixed
+- Fixed JSON boolean queries ([#27847](https://github.com/laravel/framework/pull/27847))
 
 
 ## [v5.8.3 (2019-03-05)](https://github.com/laravel/framework/compare/v5.8.2...v5.8.3)

@@ -59,7 +59,7 @@ trait SoftDeletes
         if ($this->forceDeleting) {
             $this->exists = false;
 
-            return $this->newModelQuery()->where($this->getKeyName(), $this->getKey())->forceDelete();
+            return $this->setKeysForSaveQuery($this->newModelQuery())->forceDelete();
         }
 
         return $this->runSoftDelete();
@@ -72,7 +72,7 @@ trait SoftDeletes
      */
     protected function runSoftDelete()
     {
-        $query = $this->newModelQuery()->where($this->getKeyName(), $this->getKey());
+        $query = $this->setKeysForSaveQuery($this->newModelQuery());
 
         $time = $this->freshTimestamp();
 

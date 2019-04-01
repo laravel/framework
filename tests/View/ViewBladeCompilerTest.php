@@ -49,7 +49,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php /* foo */ ?>\nHello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "Hello World\n<?php /* foo */ ?>");
         $compiler->compile('foo');
     }
 
@@ -57,7 +57,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php /* foo */ ?>\nHello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "Hello World\n<?php /* foo */ ?>");
         $compiler->compile('foo');
         $this->assertEquals('foo', $compiler->getPath());
     }
@@ -73,7 +73,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php /* foo */ ?>\nHello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "Hello World\n<?php /* foo */ ?>");
         // set path before compilation
         $compiler->setPath('foo');
         // trigger compilation with null $path
@@ -97,8 +97,34 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "<?php /* foo */ ?>\nHello World");
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', "Hello World\n<?php /* foo */ ?>");
         $compiler->compile('foo');
+    }
+
+    public function testDontIncludeEmptyPath()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $files->shouldReceive('get')->once()->with('')->andReturn('Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('').'.php', 'Hello World');
+        $compiler->setPath('');
+        $compiler->compile();
+    }
+
+    public function testDontIncludeNullPath()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $files->shouldReceive('get')->once()->with(null)->andReturn('Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1(null).'.php', 'Hello World');
+        $compiler->setPath(null);
+        $compiler->compile();
+    }
+
+    public function testShouldStartFromStrictTypesDeclaration()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $strictTypeDecl = "<?php\ndeclare(strict_types = 1);";
+        $this->assertTrue(substr($compiler->compileString("<?php\ndeclare(strict_types = 1);\nHello World"),
+            0, strlen($strictTypeDecl)) === $strictTypeDecl);
     }
 
     protected function getFiles()

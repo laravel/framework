@@ -659,7 +659,7 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return void
      */
     function report($exception)
@@ -722,11 +722,12 @@ if (! function_exists('resolve')) {
      * Resolve a service from the container.
      *
      * @param  string  $name
+     * @param  array  $parameters
      * @return mixed
      */
-    function resolve($name)
+    function resolve($name, array $parameters = [])
     {
-        return app($name);
+        return app($name, $parameters);
     }
 }
 
@@ -952,7 +953,7 @@ if (! function_exists('view')) {
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $view
-     * @param  array   $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
      * @param  array   $mergeData
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */

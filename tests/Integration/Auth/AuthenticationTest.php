@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 
 /**
@@ -178,6 +179,27 @@ class AuthenticationTest extends TestCase
         $this->app['auth']->logout();
         $this->assertNull($this->app['auth']->user());
         Event::assertDispatched(Logout::class, function ($event) {
+            $this->assertEquals('web', $event->guard);
+            $this->assertEquals(1, $event->user->id);
+
+            return true;
+        });
+    }
+
+    public function test_logging_out_other_devices()
+    {
+        Event::fake();
+
+        $this->app['auth']->loginUsingId(1);
+
+        $user = $this->app['auth']->user();
+
+        $this->assertEquals(1, $user->id);
+
+        $this->app['auth']->logoutOtherDevices('adifferentpassword');
+        $this->assertEquals(1, $user->id);
+
+        Event::assertDispatched(OtherDeviceLogout::class, function ($event) {
             $this->assertEquals('web', $event->guard);
             $this->assertEquals(1, $event->user->id);
 

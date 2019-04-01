@@ -30,6 +30,7 @@ class SupportPluralizerTest extends TestCase
         $this->assertEquals('Children', Str::plural('Child'));
         $this->assertEquals('CHILDREN', Str::plural('CHILD'));
         $this->assertEquals('Tests', Str::plural('Test'));
+        $this->assertEquals('children', Str::plural('cHiLd'));
     }
 
     public function testIfEndOfWordPlural()

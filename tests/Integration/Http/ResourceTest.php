@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
@@ -627,6 +628,39 @@ class ResourceTest extends TestCase
         $response->assertStatus(200);
 
         $response->assertJson(['data' => $data]);
+    }
+
+    public function test_keys_are_preserved_in_an_anonymous_colletion_if_the_resource_is_flagged_to_preserve_keys()
+    {
+        $data = Collection::make([
+            [
+                'id' => 1,
+                'authorId' => 5,
+                'bookId' => 22,
+            ],
+            [
+                'id' => 2,
+                'authorId' => 5,
+                'bookId' => 15,
+            ],
+            [
+                'id' => 3,
+                'authorId' => 42,
+                'bookId' => 12,
+            ],
+        ])->keyBy->id;
+
+        Route::get('/', function () use ($data) {
+            return ResourceWithPreservedKeys::collection($data);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson(['data' => $data->toArray()]);
     }
 
     public function test_leading_merge_keyed_value_is_merged_correctly()

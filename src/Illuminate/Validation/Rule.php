@@ -65,7 +65,7 @@ class Rule
     /**
      * Get a required_if constraint builder instance.
      *
-     * @param  callable  $callback
+     * @param  callable|bool  $callback
      * @return \Illuminate\Validation\Rules\RequiredIf
      */
     public static function requiredIf($callback)

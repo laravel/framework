@@ -184,7 +184,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $count = $values->count();
 
-        if ($count == 0) {
+        if ($count === 0) {
             return;
         }
 
@@ -985,6 +985,36 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     protected function useAsCallable($value)
     {
         return ! is_string($value) && is_callable($value);
+    }
+
+    /**
+     * Join all items from the collection using a string. The final items can use a separate glue string.
+     *
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    public function join($glue, $finalGlue = '')
+    {
+        if ($finalGlue === '') {
+            return $this->implode($glue);
+        }
+
+        $count = $this->count();
+
+        if ($count === 0) {
+            return '';
+        }
+
+        if ($count === 1) {
+            return $this->last();
+        }
+
+        $collection = new static($this->items);
+
+        $finalItem = $collection->pop();
+
+        return $collection->implode($glue).$finalGlue.$finalItem;
     }
 
     /**
