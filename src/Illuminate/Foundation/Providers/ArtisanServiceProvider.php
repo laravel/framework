@@ -19,6 +19,7 @@ use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
+use Illuminate\Foundation\Console\EventListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
@@ -93,6 +94,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Environment' => 'command.environment',
         'EventCache' => 'command.event.cache',
         'EventClear' => 'command.event.clear',
+        'EventList' => 'command.event.list',
         'KeyGenerate' => 'command.key.generate',
         'Migrate' => 'command.migrate',
         'MigrateFresh' => 'command.migrate.fresh',
@@ -427,6 +429,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.event.clear', function ($app) {
             return new EventClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerEventListCommand()
+    {
+        $this->app->singleton('command.event.list', function () {
+            return new EventListCommand();
         });
     }
 
