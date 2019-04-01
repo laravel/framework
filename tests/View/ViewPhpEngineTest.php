@@ -19,4 +19,19 @@ class ViewPhpEngineTest extends TestCase
         $this->assertEquals('Hello World
 ', $engine->get(__DIR__.'/fixtures/basic.php'));
     }
+
+    public function testTrimWhitespace()
+    {
+        $engine = new PhpEngine;
+        $this->assertEquals('Hello World', $engine->get(__DIR__.'/fixtures/basicWithPath.php'));
+    }
+
+    public function testTrimOnlyPathRelatedWhitespace()
+    {
+        $engine = new PhpEngine;
+        $this->assertEquals('Hello World
+
+
+', $engine->get(__DIR__.'/fixtures/basicWithManyWhiteSpacesBeforePath.php'));
+    }
 }

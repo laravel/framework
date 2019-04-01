@@ -3,6 +3,7 @@
 namespace Illuminate\View\Engines;
 
 use Exception;
+use Illuminate\Support\Str;
 use Throwable;
 use Illuminate\Contracts\View\Engine;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -47,7 +48,14 @@ class PhpEngine implements Engine
             $this->handleViewException(new FatalThrowableError($e), $obLevel);
         }
 
-        return ltrim(ob_get_clean());
+        $lines = file($__path);
+        $last_line = $lines[count($lines)-1];
+        $ob_get_clean = ob_get_clean();
+
+        if (Str::startsWith($last_line, "<?php /*") && Str::endsWith($last_line, "*/ ?>")) {
+            $ob_get_clean =  substr_replace($ob_get_clean ,"", -1);
+        }
+        return ltrim($ob_get_clean);
     }
 
     /**
