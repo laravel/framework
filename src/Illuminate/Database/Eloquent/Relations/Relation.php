@@ -131,6 +131,7 @@ abstract class Relation
     public function addConstraint(Closure $constraint)
     {
         $this->queryConstraints[] = $constraint;
+
         return $this;
     }
 
@@ -143,6 +144,7 @@ abstract class Relation
     public function addEagerConstraint(Closure $constraint)
     {
         $this->eagerConstraints[] = $constraint;
+
         return $this;
     }
 
