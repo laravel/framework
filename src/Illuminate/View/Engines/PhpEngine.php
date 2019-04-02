@@ -53,7 +53,7 @@ class PhpEngine implements Engine
         $ob_get_clean = ob_get_clean();
 
         if (Str::startsWith($last_line, "<?php /*") && Str::endsWith($last_line, "*/ ?>")) {
-            $ob_get_clean =  substr_replace($ob_get_clean ,"", -1);
+            $ob_get_clean =  Str::replaceLast("\n", "", $ob_get_clean);
         }
         return ltrim($ob_get_clean);
     }
