@@ -1,12 +1,22 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.8...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.9...5.8)
+
+
+## [v5.8.9 (2019-04-02)](https://github.com/laravel/framework/compare/v5.8.8...v5.8.9)
+
+### Added
+- Added Event Discovery ([#28064](https://github.com/laravel/framework/pull/28064), [#28085](https://github.com/laravel/framework/pull/28085))
 
 ### Fixed
 - Fixed serializing a collection from a `Resource` with `preserveKeys` property ([#27985](https://github.com/laravel/framework/pull/27985))
+- Fixed: `SoftDelete::runSoftDelete` and `SoftDelete::performDeleteOnModel` with overwritten `Model::setKeysForSaveQuery` ([#28081](https://github.com/laravel/framework/pull/28081))
 
 ### Changed
 - Update forever cache duration for database driver from minutes to seconds ([#28048](https://github.com/laravel/framework/pull/28048))
+
+### Refactoring:
+- Refactoring of `Illuminate\Auth\Access\Gate::callBeforeCallbacks()` ([#28079](https://github.com/laravel/framework/pull/28079))
 
 
 ## [v5.8.8 (2019-03-26)](https://github.com/laravel/framework/compare/v5.8.7...v5.8.8)
