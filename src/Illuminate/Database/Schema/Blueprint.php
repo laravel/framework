@@ -1213,7 +1213,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable morph columns after a specified column.
+     * Add nullable columns after a column for a polymorphic table.
      *
      * @param  string  $name
      * @param  string  $afterColumn
@@ -1230,7 +1230,7 @@ class Blueprint
     }
 
     /**
-     * Add morphs after column for a polymorphic table.
+     * Add columns after a column for a polymorphic table.
      *
      * @param  string  $name
      * @param  string  $afterColumn
