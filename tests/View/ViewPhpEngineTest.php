@@ -34,4 +34,10 @@ class ViewPhpEngineTest extends TestCase
 
 ', $engine->get(__DIR__.'/fixtures/basicWithManyWhiteSpacesBeforePath.php'));
     }
+
+    public function testEmpty()
+    {
+        $engine = new PhpEngine;
+        $this->assertEquals('', $engine->get(__DIR__.'/fixtures/empty.php'));
+    }
 }

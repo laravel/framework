@@ -49,11 +49,13 @@ class PhpEngine implements Engine
         }
 
         $lines = file($__path);
-        $last_line = $lines[count($lines)-1];
+        $count = count($lines);
         $ob_get_clean = ob_get_clean();
-
-        if (Str::startsWith($last_line, "<?php /*") && Str::endsWith($last_line, "*/ ?>")) {
-            $ob_get_clean =  Str::replaceLast("\n", "", $ob_get_clean);
+        if ($count > 0) {
+            $last_line = $lines[$count - 1];
+            if (Str::startsWith($last_line, "<?php /*") && Str::endsWith($last_line, "*/ ?>")) {
+                $ob_get_clean = Str::replaceLast("\n", "", $ob_get_clean);
+            }
         }
         return ltrim($ob_get_clean);
     }
