@@ -49,6 +49,20 @@ abstract class Relation
     protected static $constraints = true;
 
     /**
+     * All callables to apply on query relations.
+     *
+     * @var array
+     */
+    protected $queryConstraints = [];
+
+    /**
+     * All constraints to apply on eager loading.
+     *
+     * @var array
+     */
+    protected $eagerConstraints = [];
+
+    /**
      * An array to map class names to their morph names in database.
      *
      * @var array
@@ -107,6 +121,61 @@ abstract class Relation
      * @return void
      */
     abstract public function addEagerConstraints(array $models);
+
+    /**
+     * Add a constraint on the relation query.
+     *
+     * @param Closure $constraint
+     * @return static
+     */
+    public function addConstraint(Closure $constraint)
+    {
+        $this->queryConstraints[] = $constraint;
+        return $this;
+    }
+
+    /**
+     * Add a constraint on the eager load of the relation.
+     *
+     * @param Closure $constraint
+     * @return static
+     */
+    public function addEagerConstraint(Closure $constraint)
+    {
+        $this->eagerConstraints[] = $constraint;
+        return $this;
+    }
+
+    /**
+     * Add a constraint on the relation query.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function applyQueryConstraints(Builder $query)
+    {
+        foreach ($this->queryConstraints as $constraint) {
+            call_user_func($constraint, $query);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Add a constraint on the relation query.
+     *
+     * @param Builder $query
+     * @param array $models
+     * @return Builder
+     */
+    public function applyEagerConstraints(Builder $query, array $models)
+    {
+        foreach ($this->eagerConstraints as $constraint) {
+            call_user_func($constraint, $query, $models);
+        }
+
+        return $query;
+    }
 
     /**
      * Initialize the relation on a set of models.
