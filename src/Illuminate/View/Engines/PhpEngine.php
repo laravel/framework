@@ -54,7 +54,7 @@ class PhpEngine implements Engine
         if ($count > 0) {
             $last_line = $lines[$count - 1];
             if (Str::startsWith($last_line, '<?php /*') && Str::endsWith($last_line, '*/ ?>')) {
-                $ob_get_clean = Str::replaceLast('\n', '', $ob_get_clean);
+                $ob_get_clean = Str::replaceLast("\n", '', $ob_get_clean);
             }
         }
 
