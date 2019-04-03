@@ -82,7 +82,7 @@ class UrlWindowTest extends TestCase
         for ($i = 1; $i <= 8; $i++) {
             $first[$i] = '/?page='.$i;
         }
-        $this->assertEquals(['first' => $first, 'slider' => null, 'last' => [12 => '/?page=12',13 => '/?page=13']], $window->get());
+        $this->assertEquals(['first' => $first, 'slider' => null, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
     }
 
     public function testMakeUrlWindow()
