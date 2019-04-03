@@ -956,11 +956,11 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::unguard(false);
     }
 
-    public function testUnderscorePropertiesAreNotFilled()
+    public function testUnderscorePropertiesAreFilled()
     {
         $model = new EloquentModelStub;
         $model->fill(['_method' => 'PUT']);
-        $this->assertEquals([], $model->getAttributes());
+        $this->assertEquals(['_method' => 'PUT'], $model->getAttributes());
     }
 
     public function testGuarded()
