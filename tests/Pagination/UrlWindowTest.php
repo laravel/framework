@@ -68,4 +68,28 @@ class UrlWindowTest extends TestCase
 
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
     }
+
+    public function testGetUrlSliderTooCloseToBeginning()
+    {
+        $array = [];
+        for ($i = 1; $i <= 13; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+
+        $p = new LengthAwarePaginator($array, count($array), 1, 1);
+        $window = new UrlWindow($p);
+
+        $first = [];
+        for ($i = 1; $i <= 8; $i++) {
+            $first[$i] = '/?page='.$i;
+        }
+
+        $this->assertEquals(['first' => $first, 'slider' => null, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
+    }
+
+    public function testMakeUrlWindow()
+    {
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => null], UrlWindow::make($p));
+    }
 }
