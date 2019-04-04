@@ -122,6 +122,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 $this->files->get($this->getPath())
             );
 
+            if (! empty($this->getPath())) {
+                $contents .= "<?php /**PATH {$this->getPath()} ENDPATH**/ ?>";
+            }
+
             $this->files->put(
                 $this->getCompiledPath($this->getPath()), $contents
             );
