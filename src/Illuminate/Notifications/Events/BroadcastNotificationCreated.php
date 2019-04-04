@@ -60,13 +60,27 @@ class BroadcastNotificationCreated implements ShouldBroadcast
             return $channels;
         }
 
-        return [new PrivateChannel($this->channelName())];
+        $channels = [];
+
+        if (is_array($this->channelName())) {
+        	foreach ($this->channelName() as $channel) {
+        		if (is_string($channel)) {
+        			$channels[] = new PrivateChannel($channel);
+		        } else {
+        			$channels[] = $channel;
+		        }
+	        }
+        } else {
+	        $channels[] = new PrivateChannel($this->channelName());
+        }
+
+        return $channels;
     }
 
     /**
      * Get the broadcast channel name for the event.
      *
-     * @return string
+     * @return string|array
      */
     protected function channelName()
     {
