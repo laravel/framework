@@ -29,6 +29,8 @@ abstract class HasOneOrMany extends Relation
      */
     protected static $selfJoinCount = 0;
 
+    protected $keyBy = null;
+
     /**
      * Create a new has one or many relationship instance.
      *
@@ -157,6 +159,19 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Set the key by with results of the relationship are returned.
+     *
+     * @param string|callable $keyBy
+     * @return $this
+     */
+    public function keyBy($keyBy)
+    {
+        $this->keyBy = $keyBy;
+
+        return $this;
+    }
+
+    /**
      * Build model dictionary keyed by the relation's foreign key.
      *
      * @param  \Illuminate\Database\Eloquent\Collection  $results
@@ -168,7 +183,7 @@ abstract class HasOneOrMany extends Relation
 
         return $results->mapToDictionary(function ($result) use ($foreign) {
             return [$result->{$foreign} => $result];
-        })->all();
+        }, $this->keyBy)->all();
     }
 
     /**
