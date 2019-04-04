@@ -20,6 +20,7 @@ class RouteGroup
         }
 
         $new = array_merge(static::formatAs($new, $old), [
+            'class' => static::formatClass($new, $old),
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old),
             'where' => static::formatWhere($new, $old),
@@ -28,6 +29,18 @@ class RouteGroup
         return array_merge_recursive(Arr::except(
             $old, ['namespace', 'prefix', 'where', 'as']
         ), $new);
+    }
+
+    /**
+     * Format the class for the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @return string|null
+     */
+    protected static function formatClass($new, $old)
+    {
+        return $new['class'] ?? $old['class'] ?? null;
     }
 
     /**

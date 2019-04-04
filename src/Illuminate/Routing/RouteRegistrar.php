@@ -19,6 +19,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar domain(string $value)
  * @method \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
  * @method \Illuminate\Routing\RouteRegistrar name(string $value)
+ * @method \Illuminate\Routing\RouteRegistrar class(string  $class)
  * @method \Illuminate\Routing\RouteRegistrar namespace(string $value)
  * @method \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
  * @method \Illuminate\Routing\RouteRegistrar where(array  $where)
@@ -54,7 +55,7 @@ class RouteRegistrar
      * @var array
      */
     protected $allowedAttributes = [
-        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix', 'where',
+        'as', 'domain', 'middleware', 'name', 'class', 'namespace', 'prefix', 'where',
     ];
 
     /**

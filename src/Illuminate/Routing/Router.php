@@ -509,6 +509,7 @@ class Router implements RegistrarContract, BindingRegistrar
         // has the proper clause for this property. Then we can simply set the name
         // of the controller on the action and return the action array for usage.
         if (! empty($this->groupStack)) {
+            $action['uses'] = $this->prependGroupClass($action['uses']);
             $action['uses'] = $this->prependGroupNamespace($action['uses']);
         }
 
@@ -518,6 +519,19 @@ class Router implements RegistrarContract, BindingRegistrar
         $action['controller'] = $action['uses'];
 
         return $action;
+    }
+
+    /**
+     * Prepend the last group class onto the use clause.
+     *
+     * @param  string  $method_name
+     * @return string
+     */
+    protected function prependGroupClass($method_name)
+    {
+        $group = end($this->groupStack);
+
+        return isset($group['class']) ? $group['class'].'@'.$method_name : $method_name;
     }
 
     /**

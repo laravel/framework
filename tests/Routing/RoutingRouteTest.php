@@ -905,21 +905,21 @@ class RoutingRouteTest extends TestCase
     public function testGroupMerging()
     {
         $old = ['prefix' => 'foo/bar/'];
-        $this->assertEquals(['prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => []], RouteGroup::merge(['prefix' => 'baz'], $old));
+        $this->assertEquals(['prefix' => 'foo/bar/baz', 'class' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['prefix' => 'baz'], $old));
 
         $old = ['domain' => 'foo'];
-        $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['domain' => 'baz'], $old));
+        $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'class' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['domain' => 'baz'], $old));
 
         $old = ['as' => 'foo.'];
-        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['as' => 'bar'], $old));
+        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'class' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['as' => 'bar'], $old));
 
         $old = ['where' => ['var1' => 'foo', 'var2' => 'bar']];
-        $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
+        $this->assertEquals(['prefix' => null, 'class' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'baz', 'var3' => 'qux',
         ]], RouteGroup::merge(['where' => ['var2' => 'baz', 'var3' => 'qux']], $old));
 
         $old = [];
-        $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
+        $this->assertEquals(['prefix' => null, 'class' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'bar',
         ]], RouteGroup::merge(['where' => ['var1' => 'foo', 'var2' => 'bar']], $old));
     }
