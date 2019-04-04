@@ -30,7 +30,7 @@ class RouteGroup
             $old, ['namespace', 'prefix', 'where', 'as']
         ), $new);
     }
-    
+
     /**
      * Format the class for the new group attributes.
      *
