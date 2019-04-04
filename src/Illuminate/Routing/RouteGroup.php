@@ -40,7 +40,7 @@ class RouteGroup
      */
     protected static function formatClass($new, $old)
     {
-        return empty($new['class']) ? $old['class'] : $new['class'];
+        return $new['class'] ?? $old['class'] ?? null;
     }
 
     /**
