@@ -1086,10 +1086,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * The callback should return an associative array with a single key/value pair.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     * @param string|callable $keyBy
      * @return static
      */
-    public function mapToDictionary(callable $callback)
+    public function mapToDictionary(callable $callback, $keyBy = null)
     {
         $dictionary = [];
 
@@ -1104,7 +1105,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 $dictionary[$key] = [];
             }
 
-            $dictionary[$key][] = $value;
+            if ($keyBy) {
+                $innerKey = $this->useAsCallable($keyBy) ? $keyBy($item) : data_get($item, $keyBy);
+                $dictionary[$key][$innerKey] = $value;
+            } else {
+                $dictionary[$key][] = $value;
+            }
         }
 
         return new static($dictionary);

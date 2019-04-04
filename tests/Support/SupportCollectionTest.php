@@ -1525,6 +1525,50 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => [0, 4], 2 => [1, 3], 3 => [2]], $groups->toArray());
     }
 
+    public function testMapToDictionaryWithKeyByAsString()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A', 'key' => 4],
+            ['id' => 2, 'name' => 'B', 'key' => 3],
+            ['id' => 3, 'name' => 'C', 'key' => 2],
+            ['id' => 4, 'name' => 'B', 'key' => 1],
+        ]);
+
+        $groups = $data->mapToDictionary(
+            function ($item, $key) {
+                return [$item['name'] => $item['id']];
+            },
+            'key'
+        );
+
+        $this->assertInstanceOf(Collection::class, $groups);
+        $this->assertEquals(['A' => [4 => 1], 'B' => [3 => 2, 1 => 4], 'C' => [2 => 3]], $groups->toArray());
+        $this->assertIsArray($groups['A']);
+    }
+
+    public function testMapToDictionaryWithKeyByAsCallable()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 3, 'name' => 'C'],
+            ['id' => 4, 'name' => 'B'],
+        ]);
+
+        $groups = $data->mapToDictionary(
+            function ($item, $key) {
+                return [$item['name'] => $item['id']];
+            },
+            function ($item) {
+                return 2 * $item['id'];
+            }
+        );
+
+        $this->assertInstanceOf(Collection::class, $groups);
+        $this->assertEquals(['A' => [2 => 1], 'B' => [4 => 2, 8 => 4], 'C' => [6 => 3]], $groups->toArray());
+        $this->assertIsArray($groups['A']);
+    }
+
     public function testMapToGroups()
     {
         $data = new Collection([
