@@ -77,7 +77,7 @@ class Factory implements FactoryContract
      * Create a new Validator factory instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
     public function __construct(Translator $translator, Container $container = null)

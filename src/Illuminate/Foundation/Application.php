@@ -937,6 +937,26 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Determine if the application events are cached.
+     *
+     * @return bool
+     */
+    public function eventsAreCached()
+    {
+        return $this['files']->exists($this->getCachedEventsPath());
+    }
+
+    /**
+     * Get the path to the events cache file.
+     *
+     * @return string
+     */
+    public function getCachedEventsPath()
+    {
+        return $_ENV['APP_EVENTS_CACHE'] ?? $this->bootstrapPath().'/cache/events.php';
+    }
+
+    /**
      * Determine if the application is currently down for maintenance.
      *
      * @return bool

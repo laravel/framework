@@ -14,13 +14,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Tests\Integration\Database\Post;
-use Illuminate\Tests\Integration\Database\User;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Tests\Integration\Database\Fixtures\Post;
+use Illuminate\Tests\Integration\Database\Fixtures\User;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends TestCase
@@ -1102,6 +1102,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user->delete();
 
         $this->assertNotNull(EloquentTestUserWithGlobalScopeRemovingOtherScope::find($user->id));
+    }
+
+    public function testForPageBeforeIdCorrectlyPaginates()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::forPageBeforeId(15, 2);
+        $this->assertInstanceOf(Builder::class, $results);
+        $this->assertEquals(1, $results->first()->id);
+
+        $results = EloquentTestUser::orderBy('id', 'desc')->forPageBeforeId(15, 2);
+        $this->assertInstanceOf(Builder::class, $results);
+        $this->assertEquals(1, $results->first()->id);
     }
 
     public function testForPageAfterIdCorrectlyPaginates()

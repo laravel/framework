@@ -1889,7 +1889,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users,email_addr,NULL,id_col,foo,bar']);
         $mock = m::mock(PresenceVerifierInterface::class);
         $mock->shouldReceive('setConnection')->once()->with(null);
-        $mock->shouldReceive('getCount')->once()->with('users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar'])->andReturn(2);
+        $mock->shouldReceive('getCount')->once()->withArgs(function () {
+            return func_get_args() === ['users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar']];
+        })->andReturn(2);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
     }

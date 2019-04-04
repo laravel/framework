@@ -184,7 +184,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $count = $values->count();
 
-        if ($count == 0) {
+        if ($count === 0) {
             return;
         }
 

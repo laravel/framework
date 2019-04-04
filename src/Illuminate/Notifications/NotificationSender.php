@@ -82,7 +82,7 @@ class NotificationSender
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
-     * @param  array  $channels
+     * @param  array|null  $channels
      * @return void
      */
     public function sendNow($notifiables, $notification, array $channels = null)

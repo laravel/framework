@@ -659,7 +659,7 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return void
      */
     function report($exception)
@@ -722,11 +722,12 @@ if (! function_exists('resolve')) {
      * Resolve a service from the container.
      *
      * @param  string  $name
+     * @param  array  $parameters
      * @return mixed
      */
-    function resolve($name)
+    function resolve($name, array $parameters = [])
     {
-        return app($name);
+        return app($name, $parameters);
     }
 }
 

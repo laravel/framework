@@ -574,6 +574,21 @@ class SupportHelpersTest extends TestCase
         $this->assertNull(env('foo'));
     }
 
+    public function testEnvDefault()
+    {
+        $_SERVER['foo'] = 'bar';
+        $this->assertEquals('bar', env('foo', 'default'));
+
+        $_SERVER['foo'] = '';
+        $this->assertEquals('', env('foo', 'default'));
+
+        unset($_SERVER['foo']);
+        $this->assertEquals('default', env('foo', 'default'));
+
+        $_SERVER['foo'] = null;
+        $this->assertEquals('default', env('foo', 'default'));
+    }
+
     public function testEnvEscapedString()
     {
         $_SERVER['foo'] = '"null"';
