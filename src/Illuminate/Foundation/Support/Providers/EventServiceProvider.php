@@ -23,7 +23,7 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [];
     
     /**
-     * Should automatically discover events and listeners
+     * Should automatically discover events and listeners.
      *
      * @var bool
      */
