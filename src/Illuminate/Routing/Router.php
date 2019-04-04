@@ -531,7 +531,7 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         $group = end($this->groupStack);
 
-        return isset($group['class']) ? $group['class'] . '@' . $method_name : $method_name;
+        return isset($group['class']) ? $group['class'].'@'.$method_name : $method_name;
     }
 
     /**
