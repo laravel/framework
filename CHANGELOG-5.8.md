@@ -1,6 +1,20 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.9...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.10...5.8)
+
+
+## [v5.8.10 (2019-04-04)](https://github.com/laravel/framework/compare/v5.8.9...v5.8.10)
+
+### Added
+- Added `replicating` model event ([#28077](https://github.com/laravel/framework/pull/28077))
+- Make `NotificationFake` macroable ([#28091](https://github.com/laravel/framework/pull/28091))
+
+### Fixed
+- Exclude non-existing directories from event discovery ([#28098](https://github.com/laravel/framework/pull/28098))
+
+### Changed
+- Sorting of events in `event:list` command ([3437751](https://github.com/laravel/framework/commit/343775115722ed0e6c3455b72ee7204aefdf37d3))
+- Removed path hint in compiled view ([33ce7bb](https://github.com/laravel/framework/commit/33ce7bbb6a7f536036b58b66cc760fbb9eda80de))
 
 
 ## [v5.8.9 (2019-04-02)](https://github.com/laravel/framework/compare/v5.8.8...v5.8.9)
