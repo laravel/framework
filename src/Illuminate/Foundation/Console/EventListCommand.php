@@ -48,6 +48,6 @@ class EventListCommand extends Command
 
         return collect($events)->map(function ($value, $key) {
             return ['Event' => $key, 'Listeners' => implode("\n", $value)];
-        })->values()->toArray();
+        })->sortBy('Event')->values()->toArray();
     }
 }
