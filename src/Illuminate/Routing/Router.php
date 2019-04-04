@@ -520,7 +520,7 @@ class Router implements RegistrarContract, BindingRegistrar
 
         return $action;
     }
-    
+
     /**
      * Prepend the last group class onto the use clause.
      *
