@@ -401,6 +401,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(2, $i);
     }
 
+    public function testEachByIdWithNonIncrementingKey()
+    {
+        EloquentTestNonIncrementingSecond::create(['name' => ' First']);
+        EloquentTestNonIncrementingSecond::create(['name' => ' Second']);
+        EloquentTestNonIncrementingSecond::create(['name' => ' Third']);
+
+        $users = [];
+        EloquentTestNonIncrementingSecond::query()->eachById(
+            function (EloquentTestNonIncrementingSecond $user, $i) use (&$users) {
+                $users[] = [$user->name, $i];
+            }, 2, 'name');
+        $this->assertSame([[' First', 0], [' Second', 1], [' Third', 0]], $users);
+    }
+
     public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);

@@ -368,15 +368,4 @@ class BelongsTo extends Relation
     {
         return $this->relationName;
     }
-
-    /**
-     * Get the name of the relationship.
-     *
-     * @return string
-     * @deprecated The getRelationName() method should be used instead. Will be removed in Laravel 5.9.
-     */
-    public function getRelation()
-    {
-        return $this->relationName;
-    }
 }
