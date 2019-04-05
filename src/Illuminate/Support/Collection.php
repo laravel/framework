@@ -1568,7 +1568,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Chunk the underlying collection array.
      *
      * @param  int  $size
-     * @param  boolean $preserveKeys
+     * @param  bool $preserveKeys
      * @return static
      */
     public function chunk($size, $preserveKeys = true)
