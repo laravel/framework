@@ -92,4 +92,13 @@ class DateFacadeTest extends TestCase
     {
         DateFactory::use(42);
     }
+
+    public function testMacro()
+    {
+        Date::macro('returnNonDate', function () {
+            return 'string';
+        });
+
+        $this->assertSame('string', Date::returnNonDate());
+    }
 }
