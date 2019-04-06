@@ -53,7 +53,7 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresConnectCallsCreateConnectionWithProperArguments()
     {
-        $dsn = 'pgsql:host=foo;dbname=bar;port=111';
+        $dsn = "pgsql:dbname=bar;host=foo;port=111;options='--client_encoding=utf8'";
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
@@ -68,7 +68,7 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresSearchPathIsSet()
     {
-        $dsn = 'pgsql:host=foo;dbname=bar';
+        $dsn = "pgsql:dbname=bar;host=foo;options='--client_encoding=utf8'";
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => 'public', 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
@@ -84,7 +84,7 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresSearchPathArraySupported()
     {
-        $dsn = 'pgsql:host=foo;dbname=bar';
+        $dsn = "pgsql:dbname=bar;host=foo;options='--client_encoding=utf8'";
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => ['public', 'user'], 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
@@ -100,7 +100,7 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresApplicationNameIsSet()
     {
-        $dsn = 'pgsql:host=foo;dbname=bar';
+        $dsn = "pgsql:dbname=bar;host=foo;options='--client_encoding=utf8'";
         $config = ['host' => 'foo', 'database' => 'bar', 'charset' => 'utf8', 'application_name' => 'Laravel App'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
