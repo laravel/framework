@@ -116,7 +116,15 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function getSocketDsn(array $config)
     {
-        return "mysql:unix_socket={$config['unix_socket']};dbname={$config['database']}";
+        $dsn = "mysql:unix_socket={$config['unix_socket']};dbname={$config['database']}";
+
+        // "set names" has only effect on server charset.
+        // We should specify client charset on DSN for security reason.
+        if (isset($config['charset'])) {
+            $dsn .= ";charset={$config['charset']}";
+        }
+
+        return $dsn;
     }
 
     /**
@@ -127,11 +135,19 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function getHostDsn(array $config)
     {
-        extract($config, EXTR_SKIP);
+        $dsn = "mysql:host={$config['host']};dbname={$config['database']}";
 
-        return isset($port)
-                    ? "mysql:host={$host};port={$port};dbname={$database}"
-                    : "mysql:host={$host};dbname={$database}";
+        if (isset($config['port'])) {
+            $dsn .= ";port={$config['port']}";
+        }
+
+        // "set names" has only effect on server charset.
+        // We should specify client charset on DSN for security reason.
+        if (isset($config['charset'])) {
+            $dsn .= ";charset={$config['charset']}";
+        }
+
+        return $dsn;
     }
 
     /**
