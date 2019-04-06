@@ -140,17 +140,24 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // First we will create the basic DSN setup as well as the port if it is in
         // in the configuration options. This will give us the basic DSN we will
         // need to establish the PDO connections and return them back for use.
-        extract($config, EXTR_SKIP);
 
-        $host = isset($host) ? "host={$host};" : '';
+        $dsn = "pgsql:dbname={$config['database']}";
 
-        $dsn = "pgsql:{$host}dbname={$database}";
+        if (isset($config['host'])) {
+            $dsn .= ";host={$config['host']}";
+        }
 
         // If a port was specified, we will add it to this Postgres DSN connections
         // format. Once we have done that we are ready to return this connection
         // string back out for usage, as this has been fully constructed here.
         if (isset($config['port'])) {
-            $dsn .= ";port={$port}";
+            $dsn .= ";port={$config['port']}";
+        }
+
+        // "set names" has only effect on server charset.
+        // We should specify client charset on DSN for security reason.
+        if (isset($config['charset'])) {
+            $dsn .= ";options='--client_encoding={$config['charset']}'";
         }
 
         return $this->addSslOptions($dsn, $config);
