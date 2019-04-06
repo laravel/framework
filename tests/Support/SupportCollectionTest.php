@@ -1088,6 +1088,18 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testChunkWhenNotPreserveKeys()
+    {
+        $data = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = $data->chunk(3, false);
+
+        $this->assertInstanceOf(Collection::class, $data);
+        $this->assertInstanceOf(Collection::class, $data[0]);
+        $this->assertCount(4, $data);
+        $this->assertEquals([1, 2, 3], $data[0]->toArray());
+        $this->assertEquals([0 => 10], $data[3]->toArray());
+    }
+
     public function testEvery()
     {
         $c = new Collection([]);
