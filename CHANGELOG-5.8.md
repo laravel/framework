@@ -2,6 +2,12 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.10...5.8)
 
+### Changed
+- Added view path to end of compiled blade view (in case if path is not empty) ([#28117](https://github.com/laravel/framework/pull/28117))
+
+### TODO
+- https://github.com/laravel/framework/commit/82ded9a28621b552589aba66e4e05f9a46f46db6
+
 
 ## [v5.8.10 (2019-04-04)](https://github.com/laravel/framework/compare/v5.8.9...v5.8.10)
 
