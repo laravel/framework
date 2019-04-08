@@ -159,10 +159,8 @@ class FilesystemManager implements FactoryContract
             ? LocalAdapter::SKIP_LINKS
             : LocalAdapter::DISALLOW_LINKS;
 
-        $lock = $config['lock'] ?? LOCK_EX;
-
         return $this->adapt($this->createFlysystem(new LocalAdapter(
-            $config['root'], $lock, $links, $permissions
+            $config['root'], $config['lock'] ?? LOCK_EX, $links, $permissions
         ), $config));
     }
 
