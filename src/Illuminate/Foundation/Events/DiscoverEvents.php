@@ -19,12 +19,11 @@ class DiscoverEvents
      */
     public static function within($listenerPath, $basePath)
     {
-        return collect(static::getListenerEvents((new Finder)
-            ->files()
-            ->in($listenerPath), $basePath))
-            ->mapToDictionary(function ($event, $listener) {
-                return [$event => $listener];
-            })->all();
+        return collect(static::getListenerEvents(
+            (new Finder)->files()->in($listenerPath), $basePath
+        ))->mapToDictionary(function ($event, $listener) {
+            return [$event => $listener];
+        })->all();
     }
 
     /**
