@@ -144,6 +144,13 @@ class Event
     public $mutex;
 
     /**
+     * The exit status code of the command.
+     *
+     * @var int|null
+     */
+    public $exitCode;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -208,7 +215,7 @@ class Event
     {
         $this->callBeforeCallbacks($container);
 
-        Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
+        $this->exitCode = Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
 
         $this->callAfterCallbacks($container);
     }
