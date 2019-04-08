@@ -502,7 +502,7 @@ trait ValidatesAttributes
             return (int) $value === 0;
         }
 
-        return $parameters[0] !== 0 &&  $value % $parameters[0] === 0;
+        return $value % $parameters[0] === 0;
     }
 
     /**
