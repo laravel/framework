@@ -498,8 +498,8 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'multiple_of');
         $this->shouldBeNumeric($attribute, 'multiple_of');
 
-        if ((float) $parameters[0] === 0) {
-            return (float) $value === 0;
+        if ((float) $parameters[0] === 0.0) {
+            return (float) $value === 0.0;
         }
 
         return fmod($value, $parameters[0]) === 0.0;
