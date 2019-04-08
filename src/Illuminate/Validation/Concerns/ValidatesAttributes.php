@@ -486,6 +486,26 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a multiple of given number.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateMultipleOf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'multiple_of');
+        $this->shouldBeNumeric($attribute, 'multiple_of');
+
+        if ((int) $parameters[0] === 0) {
+            return (int) $value === 0;
+        }
+
+        return $parameters[0] !== 0 &&  $value % $parameters[0] === 0;
+    }
+
+    /**
      * Validate the dimensions of an image matches the given values.
      *
      * @param  string $attribute

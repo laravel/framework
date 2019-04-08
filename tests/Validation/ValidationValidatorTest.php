@@ -1413,6 +1413,29 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:5']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:0']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:-4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-24'], ['foo' => 'multiple_of:-4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'multiple_of:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'multiple_of:5']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateSize()
