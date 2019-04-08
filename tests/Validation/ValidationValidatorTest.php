@@ -1422,8 +1422,11 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:0']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:-4']);
+        $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:4.1']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:-4']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '24'], ['foo' => 'multiple_of:4']);
         $this->assertTrue($v->passes());
