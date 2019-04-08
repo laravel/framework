@@ -144,9 +144,9 @@ class Event
     public $mutex;
 
     /**
-     * The command exit status code.
+     * The exit status code of the command.
      *
-     * @var int
+     * @var int|null
      */
     public $exitCode;
 
