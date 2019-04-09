@@ -215,7 +215,8 @@ class FilesystemManager implements FactoryContract
      * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Cloud
      */
-    public function createGoogleDriver(array $config){
+    public function createGoogleDriver(array $config)
+    {
         $config = array_merge(['endpoint' => 'https://storage.googleapis.com'], $config);
         $s3Config = $this->formatS3Config($config);
 

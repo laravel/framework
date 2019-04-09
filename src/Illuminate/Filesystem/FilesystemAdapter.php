@@ -465,7 +465,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param $path
      * @return string
      */
-    protected function getGoogleUrl($adapter, $path){
+    protected function getGoogleUrl($adapter, $path)
+    {
         return $this->concatPathToUrl(
             "{$adapter->getClient()->getEndpoint()->getScheme()}://{$adapter->getClient()->getEndpoint()->getHost()}/{$adapter->getBucket()}",
             $adapter->getPathPrefix().$path
