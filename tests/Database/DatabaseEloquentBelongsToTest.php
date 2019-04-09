@@ -169,7 +169,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testDefaultEagerConstraintsWhenIncrementingAndNonIntKeyType()
     {
-        $relation = $this->getRelation(null, false, 'string');
+        $relation = $this->getRelation(null, 'string');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([]));
         $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
@@ -177,21 +177,20 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testDefaultEagerConstraintsWhenNotIncrementing()
     {
-        $relation = $this->getRelation(null, false);
+        $relation = $this->getRelation();
         $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([]));
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', m::mustBe([]));
         $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }
 
-    protected function getRelation($parent = null, $incrementing = true, $keyType = 'int')
+    protected function getRelation($parent = null, $keyType = 'int')
     {
         $this->builder = m::mock(Builder::class);
         $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $this->related = m::mock(Model::class);
-        $this->related->incrementing = $incrementing;
         $this->related->shouldReceive('getKeyType')->andReturn($keyType);
-        $this->related->shouldReceive('getIncrementing')->andReturn($incrementing);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
