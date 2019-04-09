@@ -398,6 +398,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return $adapter->getUrl($path);
         } elseif (method_exists($this->driver, 'getUrl')) {
             return $this->driver->getUrl($path);
+        } elseif ($adapter instanceof GoogleAdapter) {
+            return $this->getGoogleUrl($adapter, $path);
         } elseif ($adapter instanceof AwsS3Adapter) {
             return $this->getAwsUrl($adapter, $path);
         } elseif ($adapter instanceof RackspaceAdapter) {
@@ -453,6 +455,20 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         return $adapter->getClient()->getObjectUrl(
             $adapter->getBucket(), $adapter->getPathPrefix().$path
+        );
+    }
+
+    /**
+     * Get the URL for the file at the given path.
+     *
+     * @param GoogleAdapter $adapter
+     * @param $path
+     * @return string
+     */
+    protected function getGoogleUrl($adapter, $path){
+        return $this->concatPathToUrl(
+            "{$adapter->getClient()->getEndpoint()->getScheme()}://{$adapter->getClient()->getEndpoint()->getHost()}/{$adapter->getBucket()}",
+            $adapter->getPathPrefix().$path
         );
     }
 

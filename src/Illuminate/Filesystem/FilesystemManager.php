@@ -210,6 +210,25 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Create an instance of the Google Storage Driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Filesystem\Cloud
+     */
+    public function createGoogleDriver(array $config){
+        $config = array_merge(['endpoint' => 'https://storage.googleapis.com'], $config);
+        $s3Config = $this->formatS3Config($config);
+
+        $root = $s3Config['root'] ?? null;
+
+        $options = $config['options'] ?? [];
+
+        return $this->adapt($this->createFlysystem(
+            new GoogleAdapter(new S3Client($s3Config), $s3Config['bucket'], $root, $options), $config
+        ));
+    }
+
+    /**
      * Format the given S3 configuration with the default options.
      *
      * @param  array  $config
