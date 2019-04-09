@@ -67,6 +67,10 @@ class DiscoverEvents
     {
         $class = trim(str_replace($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 
-        return str_replace(DIRECTORY_SEPARATOR, '\\', ucfirst(Str::replaceLast('.php', '', $class)));
+        return str_replace(
+            [DIRECTORY_SEPARATOR, 'App\\'],
+            ['\\', app()->getNamespace()],
+            ucfirst(Str::replaceLast('.php', '', $class))
+        );
     }
 }
