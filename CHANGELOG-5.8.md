@@ -2,11 +2,20 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.10...5.8)
 
+### Added
+- Allowed to call `macros` directly on `Illuminate\Support\Facades\Date` ([#28129](https://github.com/laravel/framework/pull/28129))
+- Allowed `lock` to be configured in `local filesystems` ([#28124](https://github.com/laravel/framework/pull/28124))
+
 ### Changed
 - Added view path to end of compiled blade view (in case if path is not empty) ([#28117](https://github.com/laravel/framework/pull/28117))
 
+### Refactoring
+- Refactoring of `Illuminate\Foundation\Events\DiscoverEvents::within()` ([#28122](https://github.com/laravel/framework/pull/28122), [006f999](https://github.com/laravel/framework/commit/006f999d8c629bf87ea0252447866a879d7d4a6e))
+
 ### TODO
 - https://github.com/laravel/framework/commit/82ded9a28621b552589aba66e4e05f9a46f46db6
+- https://github.com/laravel/framework/pull/28140
+- https://github.com/laravel/framework/pull/28145
 
 
 ## [v5.8.10 (2019-04-04)](https://github.com/laravel/framework/compare/v5.8.9...v5.8.10)
