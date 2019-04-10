@@ -59,8 +59,10 @@ class Str
         if (! is_null($languageSpecific)) {
             $value = str_replace($languageSpecific[0], $languageSpecific[1], $value);
         }
-
-        foreach (static::charsArray() as $key => $val) {
+        
+        $charsArray = static::charsArray();
+            
+        foreach ($charsArray as $key => $val) {
             $value = str_replace($val, $key, $value);
         }
 
