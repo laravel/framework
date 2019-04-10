@@ -2267,6 +2267,10 @@ SQL;
         $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
+        $builder->select("json->\\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
         $builder->select("json->\\\'))#");
         $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
     }
