@@ -663,6 +663,82 @@ class Event
     }
 
     /**
+     * Register a callback to be called after the operation if it was successful.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function onSuccess(Closure $callback)
+    {
+        return $this->then(function (Container $container) use ($callback) {
+            if (0 === $this->exitCode) {
+                $container->call($callback);
+            }
+        });
+    }
+
+    /**
+     * Register a callback to be called after the operation if it failed.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function onFailure(Closure $callback)
+    {
+        return $this->then(function (Container $container) use ($callback) {
+            if (0 !== $this->exitCode) {
+                $container->call($callback);
+            }
+        });
+    }
+
+    /**
+     * Register a callback to ping a given URL after the job runs if it was successful.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingOnSuccess($url)
+    {
+        return $this->onSuccess(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
+    }
+
+    /**
+     * Register a callback to ping a given URL after the job runs if it failed.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingOnFailure($url)
+    {
+        return $this->onFailure(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
+    }
+
+    /**
+     * E-mail the results of the scheduled operation if it failed.
+     *
+     * @param  array|mixed  $addresses
+     * @return $this
+     */
+    public function emailOnFailure($addresses)
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        $addresses = Arr::wrap($addresses);
+
+        return $this->onFailure(function (Mailer $mailer) use ($addresses) {
+            $oldDescription = $this->description;
+            $this->description = '[FAILURE] '.$this->getEmailSubject();
+            $this->emailOutput($mailer, $addresses, false);
+            $this->description = $oldDescription;
+        });
+    }
+
+    /**
      * Set the human-friendly description of the event.
      *
      * @param  string  $description
