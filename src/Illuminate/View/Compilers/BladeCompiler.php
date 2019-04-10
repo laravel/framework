@@ -123,7 +123,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             );
 
             if (! empty($this->getPath())) {
-                $tokens = $this->getOpenAndClosingPHPTokens($contents);
+                $tokens = $this->getOpenAndClosingPhpTokens($contents);
 
                 // If the tokens we retrieved from the compiled contents have at least
                 // one opening tag and if that last token isn't the closing tag, we
@@ -142,12 +142,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Returns the open and closing PHP tag tokens which are present in the compiled contents.
+     * Get the open and closing PHP tag tokens from the given string.
      *
      * @param  string  $contents
      * @return \Illuminate\Support\Collection
      */
-    protected function getOpenAndClosingPHPTokens($contents)
+    protected function getOpenAndClosingPhpTokens($contents)
     {
         return collect(token_get_all($contents))
             ->pluck($tokenNumber = 0)
