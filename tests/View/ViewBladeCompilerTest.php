@@ -76,7 +76,7 @@ class ViewBladeCompilerTest extends TestCase
         $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         // set path before compilation
         $compiler->setPath('foo');
-        // trigger compilation with null $path
+        // trigger compilation with $path
         $compiler->compile();
         $this->assertEquals('foo', $compiler->getPath());
     }
@@ -93,12 +93,64 @@ class ViewBladeCompilerTest extends TestCase
         }}'));
     }
 
-    public function testIncludePathToTemplate()
+    /**
+     * @param  string  $content
+     * @param  string  $compiled
+     *
+     * @dataProvider appendViewPathDataProvider
+     */
+    public function testIncludePathToTemplate($content, $compiled)
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->shouldReceive('get')->once()->with('foo')->andReturn($content);
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', $compiled);
+
         $compiler->compile('foo');
+    }
+
+    /**
+     * @return array
+     */
+    public function appendViewPathDataProvider()
+    {
+        return [
+            'No PHP blocks' => [
+                'Hello World',
+                'Hello World<?php /**PATH foo ENDPATH**/ ?>',
+            ],
+            'Single PHP block without closing ?>' => [
+                '<?php echo $path',
+                '<?php echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+            ],
+            'Ending PHP block.' => [
+                'Hello world<?php echo $path ?>',
+                'Hello world<?php echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+            ],
+            'Ending PHP block without closing ?>' => [
+                'Hello world<?php echo $path',
+                'Hello world<?php echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+            ],
+            'PHP block between content.' => [
+                'Hello world<?php echo $path ?>Hi There',
+                'Hello world<?php echo $path ?>Hi There<?php /**PATH foo ENDPATH**/ ?>',
+            ],
+            'Multiple PHP blocks.' => [
+                'Hello world<?php echo $path ?>Hi There<?php echo $path ?>Hello Again',
+                'Hello world<?php echo $path ?>Hi There<?php echo $path ?>Hello Again<?php /**PATH foo ENDPATH**/ ?>',
+            ],
+            'Multiple PHP blocks without closing ?>' => [
+                'Hello world<?php echo $path ?>Hi There<?php echo $path',
+                'Hello world<?php echo $path ?>Hi There<?php echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+            ],
+            'Short open echo tag' => [
+                'Hello world<?= echo $path',
+                'Hello world<?= echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+            ],
+            'Echo XML declaration' => [
+                '<?php echo \'<?xml version="1.0" encoding="UTF-8"?>\';',
+                '<?php echo \'<?xml version="1.0" encoding="UTF-8"?>\'; ?><?php /**PATH foo ENDPATH**/ ?>',
+            ],
+        ];
     }
 
     public function testDontIncludeEmptyPath()
