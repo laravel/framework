@@ -360,7 +360,7 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
-     * Override the parent to prevent circular dependency.
+     * Override the QueueManager to prevent circular dependency.
      *
      * @param  string  $method
      * @param  array   $parameters
