@@ -34,7 +34,12 @@ class PaginationServiceProvider extends ServiceProvider
         });
 
         Paginator::currentPathResolver(function () {
-            return $this->app['request']->url();
+            $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
+            $url = $this->app['request']->url();
+            if($http_type=='https://'){
+                $url = str_replace('http', 'https', $url);
+            }
+            return $url;
         });
 
         Paginator::currentPageResolver(function ($pageName = 'page') {
