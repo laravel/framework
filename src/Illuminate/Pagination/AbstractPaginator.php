@@ -560,7 +560,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @param  \Illuminate\Support\Collection|\Illuminate\Support\HigherOrderCollectionProxy  $collection
      * @return $this
      */
     public function setCollection(Collection $collection)
