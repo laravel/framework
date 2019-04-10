@@ -2254,21 +2254,21 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testJsonPathEscaping()
     {
-        $expectedJsonEscape = <<<SQL
+        $expectedWithJsonEscaped = <<<SQL
 select json_unquote(json_extract(`json`, '$."\'))#"'))
 SQL;
 
         $builder = $this->getMySqlBuilder();
         $builder->select("json->'))#");
-        $this->assertEquals($expectedJsonEscape, $builder->toSql());
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select("json->\'))#");
-        $this->assertEquals($expectedJsonEscape, $builder->toSql());
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select("json->\\\'))#");
-        $this->assertEquals($expectedJsonEscape, $builder->toSql());
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
     }
 
     public function testMySqlWrappingJson()
