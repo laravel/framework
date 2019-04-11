@@ -306,6 +306,19 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get the comparison function to detect duplicates.
+     *
+     * @param  bool  $strict
+     * @return \Closure
+     */
+    protected function duplicateComparator($strict)
+    {
+        return function ($a, $b) {
+            return $a->is($b);
+        };
+    }
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param  \ArrayAccess|array  $items
