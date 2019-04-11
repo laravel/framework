@@ -22,13 +22,6 @@ class ScheduleRunCommand extends Command
     protected $description = 'Run the scheduled commands';
 
     /**
-     * The schedule instance.
-     *
-     * @var \Illuminate\Console\Scheduling\Schedule
-     */
-    protected $schedule;
-
-    /**
      * The 24 hour timestamp this scheduler command started running.
      *
      * @var \Illuminate\Support\Carbon;
@@ -45,13 +38,10 @@ class ScheduleRunCommand extends Command
     /**
      * Create a new command instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    public function __construct(Schedule $schedule)
+    public function __construct()
     {
-        $this->schedule = $schedule;
-
         $this->startedAt = Date::now();
 
         parent::__construct();
@@ -60,17 +50,18 @@ class ScheduleRunCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
      */
-    public function handle()
+    public function handle(Schedule $schedule)
     {
-        foreach ($this->schedule->dueEvents($this->laravel) as $event) {
+        foreach ($schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 continue;
             }
 
             if ($event->onOneServer) {
-                $this->runSingleServerEvent($event);
+                $this->runSingleServerEvent($schedule, $event);
             } else {
                 $this->runEvent($event);
             }
@@ -86,12 +77,13 @@ class ScheduleRunCommand extends Command
     /**
      * Run the given single server event.
      *
+     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
      */
-    protected function runSingleServerEvent($event)
+    protected function runSingleServerEvent($schedule, $event)
     {
-        if ($this->schedule->serverShouldRun($event, $this->startedAt)) {
+        if ($schedule->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
             $this->line('<info>Skipping command (has already run on another server):</info> '.$event->getSummaryForDisplay());
