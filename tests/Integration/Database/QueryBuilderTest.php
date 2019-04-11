@@ -36,12 +36,14 @@ class QueryBuilderTest extends DatabaseTestCase
     public function testWhereDay()
     {
         $this->assertSame(1, DB::table('posts')->whereDay('created_at', '02')->count());
+        $this->assertSame(1, DB::table('posts')->whereDay('created_at', 2)->count());
         $this->assertSame(1, DB::table('posts')->whereDay('created_at', new Carbon('2018-01-02'))->count());
     }
 
     public function testWhereMonth()
     {
         $this->assertSame(1, DB::table('posts')->whereMonth('created_at', '01')->count());
+        $this->assertSame(1, DB::table('posts')->whereMonth('created_at', 1)->count());
         $this->assertSame(1, DB::table('posts')->whereMonth('created_at', new Carbon('2018-01-02'))->count());
     }
 
