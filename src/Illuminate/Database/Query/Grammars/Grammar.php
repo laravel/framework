@@ -1095,6 +1095,8 @@ class Grammar extends BaseGrammar
      */
     protected function wrapJsonPath($value, $delimiter = '->')
     {
+        $value = preg_replace("/([\\\\]+)?\\'/", "\\'", $value);
+
         return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
     }
 

@@ -1,18 +1,18 @@
 <?php
 
-namespace Illuminate\Tests\Foundation;
+namespace Illuminate\Tests\Integration\Foundation;
 
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 use Illuminate\Foundation\Events\DiscoverEvents;
-use Illuminate\Tests\Foundation\Fixtures\EventDiscovery\Events\EventOne;
-use Illuminate\Tests\Foundation\Fixtures\EventDiscovery\Events\EventTwo;
-use Illuminate\Tests\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventOne;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventTwo;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
 
 class DiscoverEventsTest extends TestCase
 {
     public function test_events_can_be_discovered()
     {
-        class_alias(Listener::class, 'Tests\Foundation\Fixtures\EventDiscovery\Listeners\Listener');
+        class_alias(Listener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener');
 
         $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/Listeners', getcwd());
 

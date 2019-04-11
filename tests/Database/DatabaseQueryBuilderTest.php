@@ -2252,6 +2252,29 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where json_extract(`items`, \'$."available"\') = true and json_extract(`items`, \'$."active"\') = false and json_unquote(json_extract(`items`, \'$."number_available"\')) = ?', $builder->toSql());
     }
 
+    public function testJsonPathEscaping()
+    {
+        $expectedWithJsonEscaped = <<<SQL
+select json_unquote(json_extract(`json`, '$."\'))#"'))
+SQL;
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\\\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+    }
+
     public function testMySqlWrappingJson()
     {
         $builder = $this->getMySqlBuilder();

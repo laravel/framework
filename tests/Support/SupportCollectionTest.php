@@ -745,6 +745,60 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssocUsing($c2, 'strcasecmp')->all());
     }
 
+    public function testDuplicates()
+    {
+        $duplicates = Collection::make([1, 2, 1, 'laravel', null, 'laravel', 'php', null])->duplicates()->all();
+        $this->assertSame([2 => 1, 5 => 'laravel', 7 => null], $duplicates);
+
+        // does loose comparison
+        $duplicates = Collection::make([2, '2', [], null])->duplicates()->all();
+        $this->assertSame([1 => '2', 3 => null], $duplicates);
+
+        // works with mix of primitives
+        $duplicates = Collection::make([1, '2', ['laravel'], ['laravel'], null, '2'])->duplicates()->all();
+        $this->assertSame([3 => ['laravel'], 5 => '2'], $duplicates);
+
+        // works with mix of objects and primitives **excepts numbers**.
+        $expected = new Collection(['laravel']);
+        $duplicates = Collection::make([new Collection(['laravel']), $expected, $expected, [], '2', '2'])->duplicates()->all();
+        $this->assertSame([1 => $expected, 2 => $expected, 5 => '2'], $duplicates);
+    }
+
+    public function testDuplicatesWithKey()
+    {
+        $items = [['framework' => 'vue'], ['framework' => 'laravel'], ['framework' => 'laravel']];
+        $duplicates = Collection::make($items)->duplicates('framework')->all();
+        $this->assertSame([2 => 'laravel'], $duplicates);
+    }
+
+    public function testDuplicatesWithCallback()
+    {
+        $items = [['framework' => 'vue'], ['framework' => 'laravel'], ['framework' => 'laravel']];
+        $duplicates = Collection::make($items)->duplicates(function ($item) {
+            return $item['framework'];
+        })->all();
+        $this->assertSame([2 => 'laravel'], $duplicates);
+    }
+
+    public function testDuplicatesWithStrict()
+    {
+        $duplicates = Collection::make([1, 2, 1, 'laravel', null, 'laravel', 'php', null])->duplicatesStrict()->all();
+        $this->assertSame([2 => 1, 5 => 'laravel', 7 => null], $duplicates);
+
+        // does strict comparison
+        $duplicates = Collection::make([2, '2', [], null])->duplicatesStrict()->all();
+        $this->assertSame([], $duplicates);
+
+        // works with mix of primitives
+        $duplicates = Collection::make([1, '2', ['laravel'], ['laravel'], null, '2'])->duplicatesStrict()->all();
+        $this->assertSame([3 => ['laravel'], 5 => '2'], $duplicates);
+
+        // works with mix of primitives, objects, and numbers
+        $expected = new Collection(['laravel']);
+        $duplicates = Collection::make([new Collection(['laravel']), $expected, $expected, [], '2', '2'])->duplicatesStrict()->all();
+        $this->assertSame([2 => $expected, 5 => '2'], $duplicates);
+    }
+
     public function testEach()
     {
         $c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
