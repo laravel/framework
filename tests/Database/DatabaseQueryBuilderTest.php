@@ -2044,6 +2044,25 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertCount(1, $builder->getRawBindings()['where']);
         $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
     }
+    
+    public function testJsonPathEscaping()
+    {
+        $expectedWithJsonEscaped = <<<SQL
+select json_unquote(json_extract(`json`, '$."\'))#"'))
+SQL;
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\\\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+    }
 
     public function testMySqlWrappingJson()
     {
