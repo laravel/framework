@@ -616,6 +616,17 @@ class Builder
             return $this->whereNested($column, $boolean);
         }
 
+        // If the operator is a literal string 'in' or 'not in', we will assume
+        // the developer wants to use the corresponding 'in' or 'not in' SQL
+        // operators. We will simply proxy to the query builder methods.
+        if ($operator == 'in') {
+            return $this->whereIn($column, $value, $boolean);
+        }
+
+        if ($operator == 'not in') {
+            return $this->whereNotIn($column, $value, $boolean);
+        }
+
         // If the given operator is not found in the list of valid operators we will
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
