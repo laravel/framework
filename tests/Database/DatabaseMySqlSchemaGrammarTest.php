@@ -9,9 +9,6 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 
-/**
- * @group setTest
- */
 class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
     protected function tearDown(): void
