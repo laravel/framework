@@ -13,7 +13,7 @@ class EventListCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'event:list {--event= : The event name}';
+    protected $signature = 'event:list {--event= : Filter the events by name}';
 
     /**
      * The console command description.
@@ -21,13 +21,6 @@ class EventListCommand extends Command
      * @var string
      */
     protected $description = "List the application's events and listeners";
-
-    /**
-     * The table headers for the command.
-     *
-     * @var array
-     */
-    protected $headers = ['Event', 'Listeners'];
 
     /**
      * Execute the console command.
@@ -39,14 +32,10 @@ class EventListCommand extends Command
         $events = $this->getEvents();
 
         if (empty($events)) {
-            if ($this->isSearching()) {
-                return $this->error('Your application doesn\'t have any events matching the given criteria.');
-            }
-
-            return $this->error('Your application doesn\'t has any events, listeners.');
+            return $this->error("Your application doesn't have any events matching the given criteria.");
         }
 
-        $this->displayEvents($events);
+        $this->table(['Event', 'Listeners'], $events);
     }
 
     /**
@@ -64,7 +53,7 @@ class EventListCommand extends Command
             $events = array_merge_recursive($events, $providerEvents);
         }
 
-        if ($this->isSearching()) {
+        if ($this->filteringByEvent()) {
             $events = $this->filterEvents($events);
         }
 
@@ -74,40 +63,29 @@ class EventListCommand extends Command
     }
 
     /**
-     * Determine whether the user is searching event.
-     *
-     * @return bool
-     */
-    protected function isSearching()
-    {
-        return $this->input->hasParameterOption('--event');
-    }
-
-    /**
-     * Filter the given events.
+     * Filter the given events using the provided event name filter.
      *
      * @param  array  $events
      * @return array
      */
     protected function filterEvents(array $events)
     {
-        return collect($events)->filter(function ($listeners, $event) {
-            if ($this->option('event')) {
-                return Str::contains($event, $this->option('event'));
-            }
+        if (! $eventName = $this->option('event')) {
+            return $events;
+        }
 
-            return true;
+        return collect($events)->filter(function ($listeners, $event) use ($eventName) {
+            return Str::contains($event, $eventName);
         })->toArray();
     }
 
     /**
-     * Display the event listeners information on the console.
+     * Determine whether the user is filtering by an event name.
      *
-     * @param  array  $events
-     * @return void
+     * @return bool
      */
-    protected function displayEvents(array $events)
+    protected function filteringByEvent()
     {
-        $this->table($this->headers, $events);
+        return ! empty($this->option('event'));
     }
 }
