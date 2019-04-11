@@ -408,6 +408,49 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Retrieve duplicate items from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  bool  $strict
+     * @return static
+     */
+    public function duplicates($callback = null, $strict = false)
+    {
+        $items = $this->map($this->valueRetriever($callback));
+
+        $uniqueItems = $items->unique(null, $strict);
+
+        $compare = $strict ? function ($a, $b) {
+            return $a === $b;
+        } : function ($a, $b) {
+            return $a == $b;
+        };
+
+        $duplicates = new static;
+
+        foreach ($items as $key => $value) {
+            if ($uniqueItems->isNotEmpty() && $compare($value, $uniqueItems->first())) {
+                $uniqueItems->shift();
+            } else {
+                $duplicates[$key] = $value;
+            }
+        }
+
+        return $duplicates;
+    }
+
+    /**
+     * Retrieve duplicate items from the collection using strict comparison.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function duplicatesStrict($callback = null)
+    {
+        return $this->duplicates($callback, true);
+    }
+
+    /**
      * Execute a callback over each item.
      *
      * @param  callable  $callback
