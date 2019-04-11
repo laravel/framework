@@ -392,7 +392,7 @@ class Handler implements ExceptionHandlerContract
     {
         $paths = collect(config('view.paths'));
 
-        View::replaceNamespace('errors', $paths->map(function ($path) {
+        View::addNamespace('errors', $paths->map(function ($path) {
             return "{$path}/errors";
         })->push(__DIR__.'/views')->all());
     }
