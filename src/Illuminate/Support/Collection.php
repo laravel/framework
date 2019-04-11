@@ -422,7 +422,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $compare = $strict ? function ($a, $b) {
             return $a === $b;
-        } : function ($a, $b) {
+        }
+        : function ($a, $b) {
             return $a == $b;
         };
 
