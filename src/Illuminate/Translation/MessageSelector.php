@@ -111,299 +111,299 @@ class MessageSelector
     {
         switch ($locale) {
             case 'az':
-            case 'az_AZ':
+            case 'az-AZ':
             case 'bo':
-            case 'bo_CN':
-            case 'bo_IN':
+            case 'bo-CN':
+            case 'bo-IN':
             case 'dz':
-            case 'dz_BT':
+            case 'dz-BT':
             case 'id':
-            case 'id_ID':
+            case 'id-ID':
             case 'ja':
-            case 'ja_JP':
+            case 'ja-JP':
             case 'jv':
             case 'ka':
-            case 'ka_GE':
+            case 'ka-GE':
             case 'km':
-            case 'km_KH':
+            case 'km-KH':
             case 'kn':
-            case 'kn_IN':
+            case 'kn-IN':
             case 'ko':
-            case 'ko_KR':
+            case 'ko-KR':
             case 'ms':
-            case 'ms_MY':
+            case 'ms-MY':
             case 'th':
-            case 'th_TH':
+            case 'th-TH':
             case 'tr':
-            case 'tr_CY':
-            case 'tr_TR':
+            case 'tr-CY':
+            case 'tr-TR':
             case 'vi':
-            case 'vi_VN':
+            case 'vi-VN':
             case 'zh':
-            case 'zh_CN':
-            case 'zh_HK':
-            case 'zh_SG':
-            case 'zh_TW':
+            case 'zh-CN':
+            case 'zh-HK':
+            case 'zh-SG':
+            case 'zh-TW':
                 return 0;
             case 'af':
-            case 'af_ZA':
+            case 'af-ZA':
             case 'bn':
-            case 'bn_BD':
-            case 'bn_IN':
+            case 'bn-BD':
+            case 'bn-IN':
             case 'bg':
-            case 'bg_BG':
+            case 'bg-BG':
             case 'ca':
-            case 'ca_AD':
-            case 'ca_ES':
-            case 'ca_FR':
-            case 'ca_IT':
+            case 'ca-AD':
+            case 'ca-ES':
+            case 'ca-FR':
+            case 'ca-IT':
             case 'da':
-            case 'da_DK':
+            case 'da-DK':
             case 'de':
-            case 'de_AT':
-            case 'de_BE':
-            case 'de_CH':
-            case 'de_DE':
-            case 'de_LI':
-            case 'de_LU':
+            case 'de-AT':
+            case 'de-BE':
+            case 'de-CH':
+            case 'de-DE':
+            case 'de-LI':
+            case 'de-LU':
             case 'el':
-            case 'el_CY':
-            case 'el_GR':
+            case 'el-CY':
+            case 'el-GR':
             case 'en':
-            case 'en_AG':
-            case 'en_AU':
-            case 'en_BW':
-            case 'en_CA':
-            case 'en_DK':
-            case 'en_GB':
-            case 'en_HK':
-            case 'en_IE':
-            case 'en_IN':
-            case 'en_NG':
-            case 'en_NZ':
-            case 'en_PH':
-            case 'en_SG':
-            case 'en_US':
-            case 'en_ZA':
-            case 'en_ZM':
-            case 'en_ZW':
+            case 'en-AG':
+            case 'en-AU':
+            case 'en-BW':
+            case 'en-CA':
+            case 'en-DK':
+            case 'en-GB':
+            case 'en-HK':
+            case 'en-IE':
+            case 'en-IN':
+            case 'en-NG':
+            case 'en-NZ':
+            case 'en-PH':
+            case 'en-SG':
+            case 'en-US':
+            case 'en-ZA':
+            case 'en-ZM':
+            case 'en-ZW':
             case 'eo':
-            case 'eo_US':
+            case 'eo-US':
             case 'es':
-            case 'es_AR':
-            case 'es_BO':
-            case 'es_CL':
-            case 'es_CO':
-            case 'es_CR':
-            case 'es_CU':
-            case 'es_DO':
-            case 'es_EC':
-            case 'es_ES':
-            case 'es_GT':
-            case 'es_HN':
-            case 'es_MX':
-            case 'es_NI':
-            case 'es_PA':
-            case 'es_PE':
-            case 'es_PR':
-            case 'es_PY':
-            case 'es_SV':
-            case 'es_US':
-            case 'es_UY':
-            case 'es_VE':
+            case 'es-AR':
+            case 'es-BO':
+            case 'es-CL':
+            case 'es-CO':
+            case 'es-CR':
+            case 'es-CU':
+            case 'es-DO':
+            case 'es-EC':
+            case 'es-ES':
+            case 'es-GT':
+            case 'es-HN':
+            case 'es-MX':
+            case 'es-NI':
+            case 'es-PA':
+            case 'es-PE':
+            case 'es-PR':
+            case 'es-PY':
+            case 'es-SV':
+            case 'es-US':
+            case 'es-UY':
+            case 'es-VE':
             case 'et':
-            case 'et_EE':
+            case 'et-EE':
             case 'eu':
-            case 'eu_ES':
-            case 'eu_FR':
+            case 'eu-ES':
+            case 'eu-FR':
             case 'fa':
-            case 'fa_IR':
+            case 'fa-IR':
             case 'fi':
-            case 'fi_FI':
+            case 'fi-FI':
             case 'fo':
-            case 'fo_FO':
+            case 'fo-FO':
             case 'fur':
-            case 'fur_IT':
+            case 'fur-IT':
             case 'fy':
-            case 'fy_DE':
-            case 'fy_NL':
+            case 'fy-DE':
+            case 'fy-NL':
             case 'gl':
-            case 'gl_ES':
+            case 'gl-ES':
             case 'gu':
-            case 'gu_IN':
+            case 'gu-IN':
             case 'ha':
-            case 'ha_NG':
+            case 'ha-NG':
             case 'he':
-            case 'he_IL':
+            case 'he-IL':
             case 'hu':
-            case 'hu_HU':
+            case 'hu-HU':
             case 'is':
-            case 'is_IS':
+            case 'is-IS':
             case 'it':
-            case 'it_CH':
-            case 'it_IT':
+            case 'it-CH':
+            case 'it-IT':
             case 'ku':
-            case 'ku_TR':
+            case 'ku-TR':
             case 'lb':
-            case 'lb_LU':
+            case 'lb-LU':
             case 'ml':
-            case 'ml_IN':
+            case 'ml-IN':
             case 'mn':
-            case 'mn_MN':
+            case 'mn-MN':
             case 'mr':
-            case 'mr_IN':
+            case 'mr-IN':
             case 'nah':
             case 'nb':
-            case 'nb_NO':
+            case 'nb-NO':
             case 'ne':
-            case 'ne_NP':
+            case 'ne-NP':
             case 'nl':
-            case 'nl_AW':
-            case 'nl_BE':
-            case 'nl_NL':
+            case 'nl-AW':
+            case 'nl-BE':
+            case 'nl-NL':
             case 'nn':
-            case 'nn_NO':
+            case 'nn-NO':
             case 'no':
             case 'om':
-            case 'om_ET':
-            case 'om_KE':
+            case 'om-ET':
+            case 'om-KE':
             case 'or':
-            case 'or_IN':
+            case 'or-IN':
             case 'pa':
-            case 'pa_IN':
-            case 'pa_PK':
+            case 'pa-IN':
+            case 'pa-PK':
             case 'pap':
-            case 'pap_AN':
-            case 'pap_AW':
-            case 'pap_CW':
+            case 'pap-AN':
+            case 'pap-AW':
+            case 'pap-CW':
             case 'ps':
-            case 'ps_AF':
+            case 'ps-AF':
             case 'pt':
-            case 'pt_BR':
-            case 'pt_PT':
+            case 'pt-BR':
+            case 'pt-PT':
             case 'so':
-            case 'so_DJ':
-            case 'so_ET':
-            case 'so_KE':
-            case 'so_SO':
+            case 'so-DJ':
+            case 'so-ET':
+            case 'so-KE':
+            case 'so-SO':
             case 'sq':
-            case 'sq_AL':
-            case 'sq_MK':
+            case 'sq-AL':
+            case 'sq-MK':
             case 'sv':
-            case 'sv_FI':
-            case 'sv_SE':
+            case 'sv-FI':
+            case 'sv-SE':
             case 'sw':
-            case 'sw_KE':
-            case 'sw_TZ':
+            case 'sw-KE':
+            case 'sw-TZ':
             case 'ta':
-            case 'ta_IN':
-            case 'ta_LK':
+            case 'ta-IN':
+            case 'ta-LK':
             case 'te':
-            case 'te_IN':
+            case 'te-IN':
             case 'tk':
-            case 'tk_TM':
+            case 'tk-TM':
             case 'ur':
-            case 'ur_IN':
-            case 'ur_PK':
+            case 'ur-IN':
+            case 'ur-PK':
             case 'zu':
-            case 'zu_ZA':
+            case 'zu-ZA':
                 return ($number == 1) ? 0 : 1;
             case 'am':
-            case 'am_ET':
+            case 'am-ET':
             case 'bh':
             case 'fil':
-            case 'fil_PH':
+            case 'fil-PH':
             case 'fr':
-            case 'fr_BE':
-            case 'fr_CA':
-            case 'fr_CH':
-            case 'fr_FR':
-            case 'fr_LU':
+            case 'fr-BE':
+            case 'fr-CA':
+            case 'fr-CH':
+            case 'fr-FR':
+            case 'fr-LU':
             case 'gun':
             case 'hi':
-            case 'hi_IN':
+            case 'hi-IN':
             case 'hy':
-            case 'hy_AM':
+            case 'hy-AM':
             case 'ln':
-            case 'ln_CD':
+            case 'ln-CD':
             case 'mg':
-            case 'mg_MG':
+            case 'mg-MG':
             case 'nso':
-            case 'nso_ZA':
+            case 'nso-ZA':
             case 'ti':
-            case 'ti_ER':
-            case 'ti_ET':
+            case 'ti-ER':
+            case 'ti-ET':
             case 'wa':
-            case 'wa_BE':
+            case 'wa-BE':
             case 'xbr':
                 return (($number == 0) || ($number == 1)) ? 0 : 1;
             case 'be':
-            case 'be_BY':
+            case 'be-BY':
             case 'bs':
-            case 'bs_BA':
+            case 'bs-BA':
             case 'hr':
-            case 'hr_HR':
+            case 'hr-HR':
             case 'ru':
-            case 'ru_RU':
-            case 'ru_UA':
+            case 'ru-RU':
+            case 'ru-UA':
             case 'sr':
-            case 'sr_ME':
-            case 'sr_RS':
+            case 'sr-ME':
+            case 'sr-RS':
             case 'uk':
-            case 'uk_UA':
+            case 'uk-UA':
                 return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
             case 'cs':
-            case 'cs_CZ':
+            case 'cs-CZ':
             case 'sk':
-            case 'sk_SK':
+            case 'sk-SK':
                 return ($number == 1) ? 0 : ((($number >= 2) && ($number <= 4)) ? 1 : 2);
             case 'ga':
-            case 'ga_IE':
+            case 'ga-IE':
                 return ($number == 1) ? 0 : (($number == 2) ? 1 : 2);
             case 'lt':
-            case 'lt_LT':
+            case 'lt-LT':
                 return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
             case 'sl':
-            case 'sl_SI':
+            case 'sl-SI':
                 return ($number % 100 == 1) ? 0 : (($number % 100 == 2) ? 1 : ((($number % 100 == 3) || ($number % 100 == 4)) ? 2 : 3));
             case 'mk':
-            case 'mk_MK':
+            case 'mk-MK':
                 return ($number % 10 == 1) ? 0 : 1;
             case 'mt':
-            case 'mt_MT':
+            case 'mt-MT':
                 return ($number == 1) ? 0 : ((($number == 0) || (($number % 100 > 1) && ($number % 100 < 11))) ? 1 : ((($number % 100 > 10) && ($number % 100 < 20)) ? 2 : 3));
             case 'lv':
-            case 'lv_LV':
+            case 'lv-LV':
                 return ($number == 0) ? 0 : ((($number % 10 == 1) && ($number % 100 != 11)) ? 1 : 2);
             case 'pl':
-            case 'pl_PL':
+            case 'pl-PL':
                 return ($number == 1) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 12) || ($number % 100 > 14))) ? 1 : 2);
             case 'cy':
-            case 'cy_GB':
+            case 'cy-GB':
                 return ($number == 1) ? 0 : (($number == 2) ? 1 : ((($number == 8) || ($number == 11)) ? 2 : 3));
             case 'ro':
-            case 'ro_RO':
+            case 'ro-RO':
                 return ($number == 1) ? 0 : ((($number == 0) || (($number % 100 > 0) && ($number % 100 < 20))) ? 1 : 2);
             case 'ar':
-            case 'ar_AE':
-            case 'ar_BH':
-            case 'ar_DZ':
-            case 'ar_EG':
-            case 'ar_IN':
-            case 'ar_IQ':
-            case 'ar_JO':
-            case 'ar_KW':
-            case 'ar_LB':
-            case 'ar_LY':
-            case 'ar_MA':
-            case 'ar_OM':
-            case 'ar_QA':
-            case 'ar_SA':
-            case 'ar_SD':
-            case 'ar_SS':
-            case 'ar_SY':
-            case 'ar_TN':
-            case 'ar_YE':
+            case 'ar-AE':
+            case 'ar-BH':
+            case 'ar-DZ':
+            case 'ar-EG':
+            case 'ar-IN':
+            case 'ar-IQ':
+            case 'ar-JO':
+            case 'ar-KW':
+            case 'ar-LB':
+            case 'ar-LY':
+            case 'ar-MA':
+            case 'ar-OM':
+            case 'ar-QA':
+            case 'ar-SA':
+            case 'ar-SD':
+            case 'ar-SS':
+            case 'ar-SY':
+            case 'ar-TN':
+            case 'ar-YE':
                 return ($number == 0) ? 0 : (($number == 1) ? 1 : (($number == 2) ? 2 : ((($number % 100 >= 3) && ($number % 100 <= 10)) ? 3 : ((($number % 100 >= 11) && ($number % 100 <= 99)) ? 4 : 5))));
             default:
                 return 0;
