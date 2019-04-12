@@ -301,6 +301,16 @@ class FileViewFinder implements ViewFinderInterface
     }
 
     /**
+     * Get the views that have been located.
+     *
+     * @return array
+     */
+    public function getViews()
+    {
+        return $this->views;
+    }
+
+    /**
      * Get the namespace to file path hints.
      *
      * @return array
@@ -318,15 +328,5 @@ class FileViewFinder implements ViewFinderInterface
     public function getExtensions()
     {
         return $this->extensions;
-    }
-
-    /**
-     * Get registered views.
-     *
-     * @return array
-     */
-    public function getViews()
-    {
-        return $this->views;
     }
 }
