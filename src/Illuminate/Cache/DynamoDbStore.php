@@ -8,9 +8,10 @@ use Illuminate\Support\Carbon;
 use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Cache\LockProvider;
 use Aws\DynamoDb\Exception\DynamoDbException;
 
-class DynamoDbStore implements Store
+class DynamoDbStore implements Store, LockProvider
 {
     use InteractsWithTime;
 
