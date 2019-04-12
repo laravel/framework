@@ -111,7 +111,7 @@ class MessageSelector
     {
         // Transform pt_BR to pt-BR
         $locale = str_replace('_', '-', $locale);
-        
+
         switch ($locale) {
             case 'az':
             case 'az-AZ':
