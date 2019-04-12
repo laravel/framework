@@ -275,6 +275,28 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(new Collection([$one, $two]), $c->unique());
     }
 
+    public function testCollectionReturnsUniqueStrictBasedOnKeysOnly()
+    {
+        $one = new TestEloquentCollectionModel();
+        $two = new TestEloquentCollectionModel();
+        $three = new TestEloquentCollectionModel();
+        $four = new TestEloquentCollectionModel();
+        $one->id = 1;
+        $one->someAttribute = '1';
+        $two->id = 1;
+        $two->someAttribute = '2';
+        $three->id = 1;
+        $three->someAttribute = '3';
+        $four->id = 2;
+        $four->someAttribute = '4';
+
+        $uniques = Collection::make([$one, $two, $three, $four])->unique()->all();
+        $this->assertSame([$three, $four], $uniques);
+
+        $uniques = Collection::make([$one, $two, $three, $four])->unique(null, true)->all();
+        $this->assertSame([$three, $four], $uniques);
+    }
+
     public function testOnlyReturnsCollectionWithGivenModelKeys()
     {
         $one = m::mock(Model::class);
