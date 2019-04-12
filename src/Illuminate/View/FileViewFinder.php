@@ -319,4 +319,14 @@ class FileViewFinder implements ViewFinderInterface
     {
         return $this->extensions;
     }
+
+    /**
+     * Get registered views.
+     *
+     * @return array
+     */
+    public function getViews()
+    {
+        return $this->views;
+    }
 }
