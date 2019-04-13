@@ -112,7 +112,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, 'pivot');
-        $this->runCommand($command, ['name' => 'create_users_table' , '--pivot' => true]);
+        $this->runCommand($command, ['name' => 'create_users_table', '--pivot' => true]);
     }
 
     protected function runCommand($command, $input = [])

@@ -98,7 +98,7 @@ class MigrationCreator
         // We also have stubs for creating new tables and modifying existing tables
         // to save the developer some typing when they are creating a new tables
         // or modifying existing tables. We'll grab the appropriate stub here.
-        $stub = $create ? ($tableType ? 'pivot.stub' :  'create.stub') : 'update.stub';
+        $stub = $create ? ($tableType ? 'pivot.stub' : 'create.stub') : 'update.stub';
 
         return $this->files->get($this->stubPath()."/{$stub}");
     }
@@ -122,12 +122,12 @@ class MigrationCreator
             $stub = str_replace('DummyTable', $table, $stub);
         }
 
-        if($create && $tableType == 'pivot') {
-            [$parent,$related] = [Str::before($table,'_'),Str::after($table,'_')];
-            $stub = str_replace('DummyParentKey', "{$parent}_id",$stub);
-            $stub = str_replace('DummyParentTable', Str::plural($parent),$stub);
-            $stub = str_replace('DummyRelatedKey', "{$related}_id",$stub);
-            $stub = str_replace('DummyRelatedTable', Str::plural($related),$stub);
+        if ($create && $tableType == 'pivot') {
+            [$parent,$related] = [Str::before($table, '_'), Str::after($table, '_')];
+            $stub = str_replace('DummyParentKey', "{$parent}_id", $stub);
+            $stub = str_replace('DummyParentTable', Str::plural($parent), $stub);
+            $stub = str_replace('DummyRelatedKey', "{$related}_id", $stub);
+            $stub = str_replace('DummyRelatedTable', Str::plural($related), $stub);
         }
 
         return $stub;
