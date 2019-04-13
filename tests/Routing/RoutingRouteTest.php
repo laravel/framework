@@ -26,6 +26,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -1560,39 +1561,127 @@ class RoutingRouteTest extends TestCase
 
     public function testRouteRedirect()
     {
-        $router = $this->getRouter();
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');
         });
         $router->redirect('contact_us', 'contact');
 
-        $response = $router->dispatch(Request::create('contact_us', 'GET'));
+        $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact'));
         $this->assertEquals(302, $response->getStatusCode());
     }
 
+    public function testRouteRedirectRetainsExistingStartingForwardSlash()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('contact_us', '/contact');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('/contact'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectStripsMissingStartingForwardSlash()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('contact_us', 'contact');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('contact'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectExceptionWhenMissingExpectedParameters()
+    {
+        $this->expectException(UrlGenerationException::class);
+        $this->expectExceptionMessage('Missing required parameters for [Route: laravel_route_redirect_destination] [URI: users/{user}].');
+
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('users', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $router->get('users', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('users', 'users/{user}');
+
+        $router->dispatch($request);
+    }
+
     public function testRouteRedirectWithCustomStatus()
     {
-        $router = $this->getRouter();
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');
         });
         $router->redirect('contact_us', 'contact', 301);
 
-        $response = $router->dispatch(Request::create('contact_us', 'GET'));
+        $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact'));
         $this->assertEquals(301, $response->getStatusCode());
     }
 
     public function testRoutePermanentRedirect()
     {
-        $router = $this->getRouter();
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');
         });
         $router->permanentRedirect('contact_us', 'contact');
 
-        $response = $router->dispatch(Request::create('contact_us', 'GET'));
+        $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact'));
         $this->assertEquals(301, $response->getStatusCode());
     }
