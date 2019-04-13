@@ -45,18 +45,18 @@ class MigrationCreator
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $tableType = null)
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($table, $create);
+        $stub = $this->getStub($table, $create, $tableType);
 
         $this->files->put(
             $path = $this->getPath($name, $path),
-            $this->populateStub($name, $stub, $table)
+            $this->populateStub($name, $stub, $table, $create, $tableType)
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
@@ -89,7 +89,7 @@ class MigrationCreator
      * @param  bool    $create
      * @return string
      */
-    protected function getStub($table, $create)
+    protected function getStub($table, $create, $tableType)
     {
         if (is_null($table)) {
             return $this->files->get($this->stubPath().'/blank.stub');
@@ -98,7 +98,7 @@ class MigrationCreator
         // We also have stubs for creating new tables and modifying existing tables
         // to save the developer some typing when they are creating a new tables
         // or modifying existing tables. We'll grab the appropriate stub here.
-        $stub = $create ? 'create.stub' : 'update.stub';
+        $stub = $create ? ($tableType ? 'pivot.stub' :  'create.stub') : 'update.stub';
 
         return $this->files->get($this->stubPath()."/{$stub}");
     }
@@ -111,7 +111,7 @@ class MigrationCreator
      * @param  string  $table
      * @return string
      */
-    protected function populateStub($name, $stub, $table)
+    protected function populateStub($name, $stub, $table, $create, $tableType)
     {
         $stub = str_replace('DummyClass', $this->getClassName($name), $stub);
 
@@ -120,6 +120,14 @@ class MigrationCreator
         // or update migration from the console instead of typing it manually.
         if (! is_null($table)) {
             $stub = str_replace('DummyTable', $table, $stub);
+        }
+
+        if($create && $tableType == 'pivot') {
+            [$parent,$related] = [Str::before($table,'_'),Str::after($table,'_')];
+            $stub = str_replace('DummyParentKey', "{$parent}_id",$stub);
+            $stub = str_replace('DummyParentTable', Str::plural($parent),$stub);
+            $stub = str_replace('DummyRelatedKey', "{$related}_id",$stub);
+            $stub = str_replace('DummyRelatedTable', Str::plural($related),$stub);
         }
 
         return $stub;

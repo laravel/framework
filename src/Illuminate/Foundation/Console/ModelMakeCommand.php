@@ -91,6 +91,7 @@ class ModelMakeCommand extends GeneratorCommand
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
             '--create' => $table,
+            '--pivot' => $this->option('pivot'),
         ]);
     }
 

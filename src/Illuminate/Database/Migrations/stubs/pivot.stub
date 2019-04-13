@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class DummyClass extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('DummyTable', function (Blueprint $table) {
+            $table->unsignedBigInteger('DummyParentKey');
+            $table->foreign('DummyParentKey')->references('id')->on('DummyParentTable');
+
+            $table->unsignedBigInteger('DummyRelatedKey');
+            $table->foreign('DummyRelatedKey')->references('id')->on('DummyRelatedTable');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('DummyTable');
+    }
+}
