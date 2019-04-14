@@ -334,6 +334,7 @@ class Builder
         if (! $this->connection->isDoctrineAvailable()) {
             return;
         }
+        
         if (! Type::hasType($name)) {
             Type::addType($name, $class);
             $this->connection
