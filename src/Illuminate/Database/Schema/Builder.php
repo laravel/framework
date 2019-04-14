@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
-use Doctrine\DBAL\Types\Type;
 use LogicException;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 
 class Builder
@@ -337,7 +337,7 @@ class Builder
 
         if (! Type::hasType($name)) {
             Type::addType($name, $class);
-            
+
             $this->connection
                 ->getDoctrineSchemaManager()
                 ->getDatabasePlatform()

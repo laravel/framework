@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Schema\Types;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 class TinyInteger extends Type
 {
