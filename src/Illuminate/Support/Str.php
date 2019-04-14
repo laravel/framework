@@ -98,7 +98,8 @@ class Str
         if ($case_insensitive === false || $search === '') {
             return $search === '' ? $subject : explode($search, $subject, 2)[0];
         }
-        return stripos($subject, $search) === false ? $subject : substr($subject, 0, stripos($subject, $search));
+        $pos = stripos($subject, $search) === false;
+        return $pos ? $subject : substr($subject, 0, $pos);
     }
 
     /**
