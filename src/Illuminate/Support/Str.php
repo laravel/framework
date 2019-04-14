@@ -122,6 +122,51 @@ class Str
     }
 
     /**
+     * Get the portion of a string between delimiters
+     *
+     * @param  string  $subject
+     * @param  string  $after
+     * @param  string  $before
+     * @param  bool    $case_insensitive
+     * @return string
+     */
+    public static function between($subject, $after, $before = null, $case_insensitive = false) {
+        $before = $before === null ? $after : $before;
+
+        return self::before(self::after($subject, $after, $case_insensitive), $before, $case_insensitive);
+    }
+
+    /**
+     * Get the largest portion of a string between delimiters
+     *
+     * @param  string  $subject
+     * @param  string  $after
+     * @param  string  $before
+     * @param  bool    $case_insensitive
+     * @return string
+     */
+    public static function betweenGreedy($subject, $after, $before = null, $case_insensitive = false) {
+        $before = $before === null ? $after : $before;
+
+        return self::beforeLast(self::after($subject, $after, $case_insensitive), $before, $case_insensitive);
+    }
+
+    /**
+     * Get the last portion of a string between delimiters
+     *
+     * @param  string  $subject
+     * @param  string  $after
+     * @param  string  $before
+     * @param  bool    $case_insensitive
+     * @return string
+     */
+    public static function betweenLazy($subject, $after, $before = null, $case_insensitive = false) {
+        $before = $before === null ? $after : $before;
+
+        return self::afterLast(self::beforeLast($subject, $before, $case_insensitive), $after, $case_insensitive);
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @param  string  $value
