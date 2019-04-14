@@ -34,15 +34,33 @@ class Str
     protected static $studlyCache = [];
 
     /**
-     * Return the remainder of a string after a given value.
+     * Return the remainder of a string after the first occurence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
+     * @param  boolean $case_insensitive
      * @return string
      */
-    public static function after($subject, $search)
+    public static function after($subject, $search, $case_insensitive = false)
     {
-        return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+        if ($case_insensitive === false || $subject === '') {
+            return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+        }
+        $pos = stripos($subject, $search);
+        return $pos === false ? $subject : substr($subject, $pos + strlen($search));
+    }
+
+    /**
+     * Return the remainder of a string after the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @param  boolean $case_insensitive
+     * @return string
+     */
+    public static function afterLast($subject, $search, $case_insensitive = false) {
+        $pos = $case_insensitive ? strripos($subject, $search) : strrpos($subject, $search);
+        return $search === '' || $pos === false ? $subject : substr($subject, $pos + strlen($search));
     }
 
     /**
@@ -68,15 +86,32 @@ class Str
     }
 
     /**
-     * Get the portion of a string before a given value.
+     * Get the portion of a string before the first occurence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
+     * @param  boolean $case_insensitive
      * @return string
      */
-    public static function before($subject, $search)
+    public static function before($subject, $search, $case_insensitive = false)
     {
-        return $search === '' ? $subject : explode($search, $subject)[0];
+        if ($case_insensitive === false || $search === '') {
+            return $search === '' ? $subject : explode($search, $subject, 2)[0];
+        }
+        return stripos($subject, $search) === false ? $subject : substr($subject, 0, stripos($subject, $search));
+    }
+
+    /**
+     * Get the portion of a string before the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @param  boolean $case_insensitive
+     * @return string
+     */
+    public static function beforeLast($subject, $search, $case_insensitive = false) {
+        $pos = $case_insensitive ? strripos($subject, $search) : strrpos($subject, $search);
+        return $search === '' || $pos === false ? $subject : substr($subject, 0, $pos);
     }
 
     /**
