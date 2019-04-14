@@ -47,7 +47,7 @@ class Str
             return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
         }
         $pos = stripos($subject, $search);
-        
+
         return $pos === false ? $subject : substr($subject, $pos + strlen($search));
     }
 
