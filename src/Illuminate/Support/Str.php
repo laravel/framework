@@ -46,9 +46,9 @@ class Str
         if ($case_insensitive === false || $subject === '') {
             return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
         }
-        $pos = stripos($subject, $search);
+        $pos = mb_stripos($subject, $search);
 
-        return $pos === false ? $subject : substr($subject, $pos + strlen($search));
+        return $pos === false ? $subject : mb_substr($subject, $pos + mb_strlen($search));
     }
 
     /**
@@ -61,9 +61,9 @@ class Str
      */
     public static function afterLast($subject, $search, $case_insensitive = false)
     {
-        $pos = $case_insensitive ? strripos($subject, $search) : strrpos($subject, $search);
+        $pos = $case_insensitive ? mb_strripos($subject, $search) : mb_strrpos($subject, $search);
 
-        return $search === '' || $pos === false ? $subject : substr($subject, $pos + strlen($search));
+        return $search === '' || $pos === false ? $subject : mb_substr($subject, $pos + mb_strlen($search));
     }
 
     /**
@@ -101,9 +101,9 @@ class Str
         if ($case_insensitive === false || $search === '') {
             return $search === '' ? $subject : explode($search, $subject, 2)[0];
         }
-        $pos = stripos($subject, $search) === false;
+        $pos = mb_stripos($subject, $search) === false;
 
-        return $pos ? $subject : substr($subject, 0, $pos);
+        return $pos ? $subject : mb_substr($subject, 0, $pos);
     }
 
     /**
@@ -116,9 +116,9 @@ class Str
      */
     public static function beforeLast($subject, $search, $case_insensitive = false)
     {
-        $pos = $case_insensitive ? strripos($subject, $search) : strrpos($subject, $search);
+        $pos = $case_insensitive ? mb_strripos($subject, $search) : mb_strrpos($subject, $search);
 
-        return $search === '' || $pos === false ? $subject : substr($subject, 0, $pos);
+        return $search === '' || $pos === false ? $subject : mb_substr($subject, 0, $pos);
     }
 
     /**
