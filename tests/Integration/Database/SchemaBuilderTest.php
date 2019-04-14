@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\SchemaTest;
 
+use Doctrine\DBAL\Types\Type;
+use Illuminate\Database\Schema\Types\TinyInteger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
@@ -36,5 +38,12 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement('create view "view"("id") as select 1');
 
         $this->assertTrue(true);
+    }
+
+    public function test_register_custom_DBAL_type()
+    {
+        Schema::registerCustomDBALType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
+
+        $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
     }
 }

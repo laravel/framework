@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use Doctrine\DBAL\Types\Type;
 use LogicException;
 use Illuminate\Database\Connection;
 
@@ -316,5 +317,29 @@ class Builder
     public function blueprintResolver(Closure $resolver)
     {
         $this->resolver = $resolver;
+    }
+
+    /**
+     * Register your own Doctrine mapping type.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string $type
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function registerCustomDBALType($class, $name, $type)
+    {
+        if (! $this->connection->isDoctrineAvailable()) {
+            return;
+        }
+        if (! Type::hasType($name)) {
+            Type::addType($name, $class);
+            $this->connection
+                ->getDoctrineSchemaManager()
+                ->getDatabasePlatform()
+                ->registerDoctrineTypeMapping($type, $name);
+        }
     }
 }
