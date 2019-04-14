@@ -47,6 +47,7 @@ class Str
             return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
         }
         $pos = stripos($subject, $search);
+        
         return $pos === false ? $subject : substr($subject, $pos + strlen($search));
     }
 
@@ -61,6 +62,7 @@ class Str
     public static function afterLast($subject, $search, $case_insensitive = false)
     {
         $pos = $case_insensitive ? strripos($subject, $search) : strrpos($subject, $search);
+
         return $search === '' || $pos === false ? $subject : substr($subject, $pos + strlen($search));
     }
 
@@ -100,6 +102,7 @@ class Str
             return $search === '' ? $subject : explode($search, $subject, 2)[0];
         }
         $pos = stripos($subject, $search) === false;
+
         return $pos ? $subject : substr($subject, 0, $pos);
     }
 
@@ -114,6 +117,7 @@ class Str
     public static function beforeLast($subject, $search, $case_insensitive = false)
     {
         $pos = $case_insensitive ? strripos($subject, $search) : strrpos($subject, $search);
+
         return $search === '' || $pos === false ? $subject : substr($subject, 0, $pos);
     }
 
