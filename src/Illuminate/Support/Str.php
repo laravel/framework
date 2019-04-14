@@ -101,9 +101,9 @@ class Str
         if ($case_insensitive === false || $search === '') {
             return $search === '' ? $subject : explode($search, $subject, 2)[0];
         }
-        $pos = mb_stripos($subject, $search) === false;
+        $pos = mb_stripos($subject, $search);
 
-        return $pos ? $subject : mb_substr($subject, 0, $pos);
+        return $pos === false ? $subject : mb_substr($subject, 0, $pos);
     }
 
     /**
