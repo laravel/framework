@@ -34,15 +34,36 @@ class Str
     protected static $studlyCache = [];
 
     /**
-     * Return the remainder of a string after a given value.
+     * Return the remainder of a string after the first occurence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
+     * @param  bool $case_insensitive
      * @return string
      */
-    public static function after($subject, $search)
+    public static function after($subject, $search, $case_insensitive = false)
     {
-        return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+        if ($case_insensitive === false || $subject === '') {
+            return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+        }
+        $pos = mb_stripos($subject, $search);
+
+        return $pos === false ? $subject : mb_substr($subject, $pos + mb_strlen($search));
+    }
+
+    /**
+     * Return the remainder of a string after the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @param  bool $case_insensitive
+     * @return string
+     */
+    public static function afterLast($subject, $search, $case_insensitive = false)
+    {
+        $pos = $case_insensitive ? mb_strripos($subject, $search) : mb_strrpos($subject, $search);
+
+        return $search === '' || $pos === false ? $subject : mb_substr($subject, $pos + mb_strlen($search));
     }
 
     /**
@@ -68,15 +89,81 @@ class Str
     }
 
     /**
-     * Get the portion of a string before a given value.
+     * Get the portion of a string before the first occurence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
+     * @param  bool $case_insensitive
      * @return string
      */
-    public static function before($subject, $search)
+    public static function before($subject, $search, $case_insensitive = false)
     {
-        return $search === '' ? $subject : explode($search, $subject)[0];
+        if ($case_insensitive === false || $search === '') {
+            return $search === '' ? $subject : explode($search, $subject, 2)[0];
+        }
+        $pos = mb_stripos($subject, $search);
+
+        return $pos === false ? $subject : mb_substr($subject, 0, $pos);
+    }
+
+    /**
+     * Get the portion of a string before the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @param  bool $case_insensitive
+     * @return string
+     */
+    public static function beforeLast($subject, $search, $case_insensitive = false)
+    {
+        $pos = $case_insensitive ? mb_strripos($subject, $search) : mb_strrpos($subject, $search);
+
+        return $search === '' || $pos === false ? $subject : mb_substr($subject, 0, $pos);
+    }
+
+    /**
+     * Get the portion of a string between delimiters
+     *
+     * @param  string  $subject
+     * @param  string  $after
+     * @param  string  $before
+     * @param  bool    $case_insensitive
+     * @return string
+     */
+    public static function between($subject, $after, $before = null, $case_insensitive = false) {
+        $before = $before === null ? $after : $before;
+
+        return self::before(self::after($subject, $after, $case_insensitive), $before, $case_insensitive);
+    }
+
+    /**
+     * Get the portion of a string between delimiters, getting as much as possible
+     *
+     * @param  string  $subject
+     * @param  string  $after
+     * @param  string  $before
+     * @param  bool    $case_insensitive
+     * @return string
+     */
+    public static function betweenGreedy($subject, $after, $before = null, $case_insensitive = false) {
+        $before = $before === null ? $after : $before;
+
+        return self::beforeLast(self::after($subject, $after, $case_insensitive), $before, $case_insensitive);
+    }
+
+    /**
+     * Get the last portion of a string between delimiters
+     *
+     * @param  string  $subject
+     * @param  string  $after
+     * @param  string  $before
+     * @param  bool    $case_insensitive
+     * @return string
+     */
+    public static function betweenLazy($subject, $after, $before = null, $case_insensitive = false) {
+        $before = $before === null ? $after : $before;
+
+        return self::afterLast(self::beforeLast($subject, $before, $case_insensitive), $after, $case_insensitive);
     }
 
     /**
