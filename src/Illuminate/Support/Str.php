@@ -38,7 +38,7 @@ class Str
      *
      * @param  string  $subject
      * @param  string  $search
-     * @param  boolean $case_insensitive
+     * @param  bool $case_insensitive
      * @return string
      */
     public static function after($subject, $search, $case_insensitive = false)
@@ -55,10 +55,11 @@ class Str
      *
      * @param  string  $subject
      * @param  string  $search
-     * @param  boolean $case_insensitive
+     * @param  bool $case_insensitive
      * @return string
      */
-    public static function afterLast($subject, $search, $case_insensitive = false) {
+    public static function afterLast($subject, $search, $case_insensitive = false)
+    {
         $pos = $case_insensitive ? strripos($subject, $search) : strrpos($subject, $search);
         return $search === '' || $pos === false ? $subject : substr($subject, $pos + strlen($search));
     }
@@ -90,7 +91,7 @@ class Str
      *
      * @param  string  $subject
      * @param  string  $search
-     * @param  boolean $case_insensitive
+     * @param  bool $case_insensitive
      * @return string
      */
     public static function before($subject, $search, $case_insensitive = false)
@@ -107,10 +108,11 @@ class Str
      *
      * @param  string  $subject
      * @param  string  $search
-     * @param  boolean $case_insensitive
+     * @param  bool $case_insensitive
      * @return string
      */
-    public static function beforeLast($subject, $search, $case_insensitive = false) {
+    public static function beforeLast($subject, $search, $case_insensitive = false)
+    {
         $pos = $case_insensitive ? strripos($subject, $search) : strrpos($subject, $search);
         return $search === '' || $pos === false ? $subject : substr($subject, 0, $pos);
     }
