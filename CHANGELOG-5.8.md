@@ -2,6 +2,24 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.11...5.8)
 
+### Added
+- Added `Illuminate\Support\Collection::duplicates()` ([#28181](https://github.com/laravel/framework/pull/28181))
+- Added `Illuminate\Database\Eloquent\Collection::duplicates()` ([#28194](https://github.com/laravel/framework/pull/28194))
+- Added `Illuminate\View\FileViewFinder::getViews()` ([#28198](https://github.com/laravel/framework/pull/28198))
+
+### TODO:
+- Fixed circular dependency - fix #28165 ([#28164](https://github.com/laravel/framework/pull/28164))
+- Add schedule event helpers to deal with successful/failed commands ([#28167](https://github.com/laravel/framework/pull/28167))
+- Added SET datatype on MySQL Grammar ([#28171](https://github.com/laravel/framework/pull/28171))
+- Make inequality validation fail on different types rather than 500 ([#28174](https://github.com/laravel/framework/pull/28174))
+- Fix enum definition not producing N-quoted string on Sql Server ([#28176](https://github.com/laravel/framework/pull/28176))
+- Improve event list command ([#28177](https://github.com/laravel/framework/pull/28177), [cde1c5d](https://github.com/laravel/framework/commit/cde1c5d8b38a9b040e70c344bba82781239a0bbf))
+- `whereDay` and `whereMonth` inconsistent when passing `int` values ([#28185](https://github.com/laravel/framework/pull/28185))
+- Enh: `FactoryMakeCommand` updated to generate more IDE friendly code ([#28188](https://github.com/laravel/framework/pull/28188))
+- in/not in operators ([#28192](https://github.com/laravel/framework/pull/28192))
+- Add missing LockProvider interface on DynamoDbStore ([#28203](https://github.com/laravel/framework/pull/28203))
+- Change session's user_id to unsigned big integer ([#28206](https://github.com/laravel/framework/pull/28206))
+
 
 ## [v5.8.11 (2019-04-10)](https://github.com/laravel/framework/compare/v5.8.10...v5.8.11)
 
