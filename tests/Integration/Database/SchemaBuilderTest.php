@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Integration\Database\SchemaTest;
 
 use Doctrine\DBAL\Types\Type;
-use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Types\TinyInteger;
+use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -58,7 +58,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             'DROP TABLE test',
             'CREATE TABLE test (test_column TINYINT NOT NULL COLLATE BINARY)',
             'INSERT INTO test (test_column) SELECT test_column FROM __temp__test',
-            'DROP TABLE __temp__test'
+            'DROP TABLE __temp__test',
         ];
 
         $statements = $blueprint->toSql($this->getConnection(), new SQLiteGrammar());
