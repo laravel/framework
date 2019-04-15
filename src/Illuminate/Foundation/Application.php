@@ -568,7 +568,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
                             return Str::startsWith($provider, 'Illuminate\\');
                         });
 
-        $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
+        $appProviders = $providers->get(1)
+                            ->partition(function ($provider) {
+                                return Str::startsWith($provider, 'App\\');
+                            });
+
+        $providers->put(1, $appProviders[1]); // App\\
+        $providers->put(2, $appProviders[0]); // providers registered between Illuminate\\ and App\\
+
+        $providers->splice(2, 0, [$this->make(PackageManifest::class)->providers()]);
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
                     ->load($providers->collapse()->toArray());
