@@ -12,10 +12,10 @@ class RedirectController extends Controller
      * Invoke the controller method.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Routing\UrlGenerator  $urlGenerator
+     * @param  \Illuminate\Routing\UrlGenerator  $url
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function __invoke(Request $request, UrlGenerator $urlGenerator)
+    public function __invoke(Request $request, UrlGenerator $url)
     {
         $parameters = collect($request->route()->parameters());
 
@@ -23,11 +23,15 @@ class RedirectController extends Controller
 
         $destination = $parameters->pop();
 
-        $route = (new Route('GET', $destination, ['as' => 'laravel_route_redirect_destination']))->bind($request);
+        $route = (new Route('GET', $destination, [
+            'as' => 'laravel_route_redirect_destination'
+        ]))->bind($request);
 
-        $parameters = $parameters->only($route->getCompiled()->getPathVariables())->toArray();
+        $parameters = $parameters->only(
+            $route->getCompiled()->getPathVariables()
+        )->toArray();
 
-        $url = $urlGenerator->toRoute($route, $parameters, false);
+        $url = $url->toRoute($route, $parameters, false);
 
         if (! Str::startsWith($destination, '/') && Str::startsWith($url, '/')) {
             $url = Str::after($url, '/');
