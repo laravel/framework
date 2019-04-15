@@ -24,7 +24,7 @@ class RedirectController extends Controller
         $destination = $parameters->pop();
 
         $route = (new Route('GET', $destination, [
-            'as' => 'laravel_route_redirect_destination'
+            'as' => 'laravel_route_redirect_destination',
         ]))->bind($request);
 
         $parameters = $parameters->only(
