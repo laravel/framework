@@ -27,32 +27,6 @@ class TinyInteger extends Type
     }
 
     /**
-     * Converts a value from its database representation to its PHP representation
-     * of this type.
-     *
-     * @param  mixed  $value
-     * @param  AbstractPlatform  $platform
-     * @return mixed
-     */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
-    {
-        return $value;
-    }
-
-    /**
-     * Converts a value from its PHP representation to its database representation
-     * of this type.
-     *
-     * @param  mixed  $value
-     * @param  AbstractPlatform  $platform
-     * @return mixed
-     */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
-    {
-        return $value;
-    }
-
-    /**
      * The name of the custom type.
      *
      * @return string

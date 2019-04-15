@@ -331,17 +331,15 @@ class Builder
      */
     public function registerCustomDBALType($class, $name, $type)
     {
-        if (! $this->connection->isDoctrineAvailable()) {
+        if (Type::hasType($name)) {
             return;
         }
 
-        if (! Type::hasType($name)) {
-            Type::addType($name, $class);
+        Type::addType($name, $class);
 
-            $this->connection
-                ->getDoctrineSchemaManager()
-                ->getDatabasePlatform()
-                ->registerDoctrineTypeMapping($type, $name);
-        }
+        $this->connection
+            ->getDoctrineSchemaManager()
+            ->getDatabasePlatform()
+            ->registerDoctrineTypeMapping($type, $name);
     }
 }

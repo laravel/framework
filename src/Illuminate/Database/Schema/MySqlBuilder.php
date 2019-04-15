@@ -18,7 +18,7 @@ class MySqlBuilder extends Builder
     {
         parent::__construct($connection);
 
-        $this->registerCustomDBALType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
+        $this->registerCustomDBALTypes();
     }
 
     /**
@@ -127,5 +127,21 @@ class MySqlBuilder extends Builder
         return $this->connection->select(
             $this->grammar->compileGetAllViews()
         );
+    }
+
+    /**
+     * Register custom DBAL types for the MySQL builder.
+     *
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function registerCustomDBALTypes()
+    {
+        if (! $this->connection->isDoctrineAvailable()) {
+            return;
+        }
+
+        $this->registerCustomDBALType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
     }
 }
