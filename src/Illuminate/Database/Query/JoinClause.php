@@ -60,10 +60,10 @@ class JoinClause extends Builder
     {
         $this->type = $type;
         $this->table = $table;
-        $this->parentConnection = $parentQuery->getConnection();
+        $this->parentClass = get_class($parentQuery);
         $this->parentGrammar = $parentQuery->getGrammar();
         $this->parentProcessor = $parentQuery->getProcessor();
-        $this->parentClass = get_class($parentQuery);
+        $this->parentConnection = $parentQuery->getConnection();
 
         parent::__construct(
             $this->parentConnection, $this->parentGrammar, $this->parentProcessor
