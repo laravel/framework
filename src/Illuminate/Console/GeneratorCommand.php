@@ -52,7 +52,7 @@ abstract class GeneratorCommand extends Command
     {
         $name = $this->qualifyClass($this->getNameInput());
 
-        $path = $this->getPath($name);
+        $path = $this->getPath(($this->type == 'Model') ? config('model.default_path', '') . '/' . $this->getNameInput() : $name);
 
         // First we will check to see if the class already exists. If it does, we don't want
         // to create the class and overwrite the user's code. So, we will bail out so the
