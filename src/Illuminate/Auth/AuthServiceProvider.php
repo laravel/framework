@@ -23,6 +23,8 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerAccessGate();
 
         $this->registerRequestRebindHandler();
+
+        $this->registerEventRebindHandler();
     }
 
     /**
@@ -85,6 +87,21 @@ class AuthServiceProvider extends ServiceProvider
             $request->setUserResolver(function ($guard = null) use ($app) {
                 return call_user_func($app['auth']->userResolver(), $guard);
             });
+        });
+    }
+
+    /**
+     * Register a resolver for the 'events' rebinding.
+     *
+     * @return void
+     */
+    protected function registerEventRebindHandler()
+    {
+        $this->app->rebinding('events', function ($app, $dispatcher) {
+            $guard = $app['auth']->guard();
+            if (method_exists($guard, 'setDispatcher')) {
+                $guard->setDispatcher($dispatcher);
+            }
         });
     }
 }
