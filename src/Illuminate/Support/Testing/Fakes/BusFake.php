@@ -10,7 +10,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 class BusFake implements Dispatcher
 {
     /**
-     * The original bus dispatcher.
+     * The original Bus dispatcher implementation.
      *
      * @var \Illuminate\Contracts\Bus\Dispatcher
      */
@@ -174,8 +174,7 @@ class BusFake implements Dispatcher
                 return $job instanceof Closure
                             ? $job($command)
                             : $job === get_class($command);
-            })
-            ->isNotEmpty();
+            })->isNotEmpty();
     }
 
     /**
