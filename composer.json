@@ -1,5 +1,5 @@
 {
-    "name": "laravel/framework",
+    "name": "rene-roscher/framework",
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
@@ -12,6 +12,10 @@
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
+        },
+        {
+            "name": "Rene Roscher",
+            "email": "admin@developments.world"
         }
     ],
     "require": {
