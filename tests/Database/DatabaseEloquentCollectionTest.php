@@ -252,12 +252,16 @@ class DatabaseEloquentCollectionTest extends TestCase
         $three = new TestEloquentCollectionModel();
         $four = new TestEloquentCollectionModel();
         $one->id = 1;
+        $one->exists = 1;
         $one->someAttribute = '1';
         $two->id = 1;
+        $two->exists = 1;
         $two->someAttribute = '2';
         $three->id = 1;
+        $three->exists = 1;
         $three->someAttribute = '3';
         $four->id = 2;
+        $four->exists = 1;
         $four->someAttribute = '4';
 
         $duplicates = Collection::make([$one, $two, $three, $four])->duplicates()->all();

@@ -1513,7 +1513,9 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with('eloquent.replicating: '.get_class($model), m::on(function ($m) use ($model) {
-            return $model->is($m);
+            return $model->getKey() === $m->getKey()
+                && $model->getTable() === $m->getTable()
+                && $model->getConnectionName() === $m->getConnectionName();
         }));
 
         $model->replicate();

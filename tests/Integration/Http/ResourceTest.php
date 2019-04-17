@@ -553,6 +553,7 @@ class ResourceTest extends TestCase
     public function test_original_on_response_is_model_when_single_resource()
     {
         $createdPost = new Post(['id' => 5, 'title' => 'Test Title']);
+        $createdPost->exists = true;
         Route::get('/', function () use ($createdPost) {
             return new ReallyEmptyPostResource($createdPost);
         });
