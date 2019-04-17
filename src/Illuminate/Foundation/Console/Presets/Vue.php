@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
 
@@ -44,7 +45,7 @@ class Vue extends Preset
      */
     protected static function updateWebpackConfiguration()
     {
-        copy(__DIR__.'/vue-stubs/webpack.mix.js', base_path('webpack.mix.js'));
+        copy(__DIR__.'/vue-stubs/webpack.mix.js', Laravel::basePath('webpack.mix.js'));
     }
 
     /**
@@ -55,12 +56,12 @@ class Vue extends Preset
     protected static function updateComponent()
     {
         (new Filesystem)->delete(
-            resource_path('js/components/Example.js')
+            Laravel::resourcePath('js/components/Example.js')
         );
 
         copy(
             __DIR__.'/vue-stubs/ExampleComponent.vue',
-            resource_path('js/components/ExampleComponent.vue')
+            Laravel::resourcePath('js/components/ExampleComponent.vue')
         );
     }
 
@@ -71,6 +72,6 @@ class Vue extends Preset
      */
     protected static function updateBootstrapping()
     {
-        copy(__DIR__.'/vue-stubs/app.js', resource_path('js/app.js'));
+        copy(__DIR__.'/vue-stubs/app.js', Laravel::resourcePath('js/app.js'));
     }
 }

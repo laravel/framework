@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Events;
 
+use Laravel;
+
 trait Dispatchable
 {
     /**
@@ -11,7 +13,7 @@ trait Dispatchable
      */
     public static function dispatch()
     {
-        return event(new static(...func_get_args()));
+        return Laravel::event(new static(...func_get_args()));
     }
 
     /**
@@ -21,6 +23,6 @@ trait Dispatchable
      */
     public static function broadcast()
     {
-        return broadcast(new static(...func_get_args()));
+        return Laravel::broadcast(new static(...func_get_args()));
     }
 }

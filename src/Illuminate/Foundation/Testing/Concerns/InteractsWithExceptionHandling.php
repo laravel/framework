@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Laravel;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -61,7 +62,7 @@ trait InteractsWithExceptionHandling
     protected function withoutExceptionHandling(array $except = [])
     {
         if ($this->originalExceptionHandler == null) {
-            $this->originalExceptionHandler = app(ExceptionHandler::class);
+            $this->originalExceptionHandler = Laravel::app(ExceptionHandler::class);
         }
 
         $this->app->instance(ExceptionHandler::class, new class($this->originalExceptionHandler, $except) implements ExceptionHandler {

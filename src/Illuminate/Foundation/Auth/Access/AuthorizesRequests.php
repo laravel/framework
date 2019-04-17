@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth\Access;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\Access\Gate;
 
@@ -20,7 +21,7 @@ trait AuthorizesRequests
     {
         [$ability, $arguments] = $this->parseAbilityAndArguments($ability, $arguments);
 
-        return app(Gate::class)->authorize($ability, $arguments);
+        return Laravel::app(Gate::class)->authorize($ability, $arguments);
     }
 
     /**
@@ -37,7 +38,7 @@ trait AuthorizesRequests
     {
         [$ability, $arguments] = $this->parseAbilityAndArguments($ability, $arguments);
 
-        return app(Gate::class)->forUser($user)->authorize($ability, $arguments);
+        return Laravel::app(Gate::class)->forUser($user)->authorize($ability, $arguments);
     }
 
     /**

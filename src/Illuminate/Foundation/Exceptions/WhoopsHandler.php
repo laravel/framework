@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Exceptions;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
 use Whoops\Handler\PrettyPageHandler;
@@ -47,8 +48,8 @@ class WhoopsHandler
     protected function directoriesExceptVendor()
     {
         return Arr::except(
-            array_flip((new Filesystem)->directories(base_path())),
-            [base_path('vendor')]
+            array_flip((new Filesystem)->directories(Laravel::basePath())),
+            [Laravel::basePath('vendor')]
         );
     }
 
@@ -60,7 +61,7 @@ class WhoopsHandler
      */
     protected function registerBlacklist($handler)
     {
-        foreach (config('app.debug_blacklist', []) as $key => $secrets) {
+        foreach (Laravel::config('app.debug_blacklist', []) as $key => $secrets) {
             foreach ($secrets as $secret) {
                 $handler->blacklist($key, $secret);
             }
@@ -77,8 +78,8 @@ class WhoopsHandler
      */
     protected function registerEditor($handler)
     {
-        if (config('app.editor', false)) {
-            $handler->setEditor(config('app.editor'));
+        if (Laravel::config('app.editor', false)) {
+            $handler->setEditor(Laravel::config('app.editor'));
         }
 
         return $this;

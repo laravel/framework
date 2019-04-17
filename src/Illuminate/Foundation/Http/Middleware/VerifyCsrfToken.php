@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Laravel;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
@@ -175,7 +176,7 @@ class VerifyCsrfToken
      */
     protected function addCookieToResponse($request, $response)
     {
-        $config = config('session');
+        $config = Laravel::config('session');
 
         $response->headers->setCookie(
             new Cookie(

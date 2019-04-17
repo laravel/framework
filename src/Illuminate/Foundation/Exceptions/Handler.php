@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Exceptions;
 
+use Laravel;
 use Exception;
 use Throwable;
 use Whoops\Run as Whoops;
@@ -217,8 +218,8 @@ class Handler implements ExceptionHandlerContract
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $request->expectsJson()
-                    ? response()->json(['message' => $exception->getMessage()], 401)
-                    : redirect()->guest($exception->redirectTo() ?? route('login'));
+                    ? Laravel::response()->json(['message' => $exception->getMessage()], 401)
+                    : Laravel::redirect()->guest($exception->redirectTo() ?? Laravel::route('login'));
     }
 
     /**
@@ -248,7 +249,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalid($request, ValidationException $exception)
     {
-        return redirect($exception->redirectTo ?? url()->previous())
+        return Laravel::redirect($exception->redirectTo ?? Laravel::url()->previous())
                     ->withInput(Arr::except($request->input(), $this->dontFlash))
                     ->withErrors($exception->errors(), $exception->errorBag);
     }
@@ -262,7 +263,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalidJson($request, ValidationException $exception)
     {
-        return response()->json([
+        return Laravel::response()->json([
             'message' => $exception->getMessage(),
             'errors' => $exception->errors(),
         ], $exception->status);
@@ -277,7 +278,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareResponse($request, Exception $e)
     {
-        if (! $this->isHttpException($e) && config('app.debug')) {
+        if (! $this->isHttpException($e) && Laravel::config('app.debug')) {
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
 
@@ -314,11 +315,11 @@ class Handler implements ExceptionHandlerContract
     protected function renderExceptionContent(Exception $e)
     {
         try {
-            return config('app.debug') && class_exists(Whoops::class)
+            return Laravel::config('app.debug') && class_exists(Whoops::class)
                         ? $this->renderExceptionWithWhoops($e)
-                        : $this->renderExceptionWithSymfony($e, config('app.debug'));
+                        : $this->renderExceptionWithSymfony($e, Laravel::config('app.debug'));
         } catch (Exception $e) {
-            return $this->renderExceptionWithSymfony($e, config('app.debug'));
+            return $this->renderExceptionWithSymfony($e, Laravel::config('app.debug'));
         }
     }
 
@@ -373,8 +374,8 @@ class Handler implements ExceptionHandlerContract
     {
         $this->registerErrorViewPaths();
 
-        if (view()->exists($view = "errors::{$e->getStatusCode()}")) {
-            return response()->view($view, [
+        if (Laravel::view()->exists($view = "errors::{$e->getStatusCode()}")) {
+            return Laravel::response()->view($view, [
                 'errors' => new ViewErrorBag,
                 'exception' => $e,
             ], $e->getStatusCode(), $e->getHeaders());
@@ -390,7 +391,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function registerErrorViewPaths()
     {
-        $paths = collect(config('view.paths'));
+        $paths = collect(Laravel::config('view.paths'));
 
         View::replaceNamespace('errors', $paths->map(function ($path) {
             return "{$path}/errors";
@@ -444,7 +445,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function convertExceptionToArray(Exception $e)
     {
-        return config('app.debug') ? [
+        return Laravel::config('app.debug') ? [
             'message' => $e->getMessage(),
             'exception' => get_class($e),
             'file' => $e->getFile(),

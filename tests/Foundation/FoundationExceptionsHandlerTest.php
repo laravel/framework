@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Laravel;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -196,7 +197,7 @@ class CustomException extends Exception implements Responsable
 {
     public function toResponse($request)
     {
-        return response()->json(['response' => 'My custom exception response']);
+        return Laravel::response()->json(['response' => 'My custom exception response']);
     }
 }
 

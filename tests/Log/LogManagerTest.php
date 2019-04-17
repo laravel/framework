@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Log;
 
+use Laravel;
 use ReflectionProperty;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
@@ -170,7 +171,7 @@ class LogManagerTest extends TestCase
         $config->set('logging.channels.defaultsingle', [
             'driver' => 'single',
             'name' => 'ds',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => Laravel::storagePath('logs/laravel.log'),
         ]);
 
         $manager = new LogManager($this->app);
@@ -186,7 +187,7 @@ class LogManagerTest extends TestCase
         $config->set('logging.channels.formattedsingle', [
             'driver' => 'single',
             'name' => 'fs',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => Laravel::storagePath('logs/laravel.log'),
             'formatter' => HtmlFormatter::class,
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
@@ -212,7 +213,7 @@ class LogManagerTest extends TestCase
         $config->set('logging.channels.defaultdaily', [
             'driver' => 'daily',
             'name' => 'dd',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => Laravel::storagePath('logs/laravel.log'),
         ]);
 
         $manager = new LogManager($this->app);
@@ -228,7 +229,7 @@ class LogManagerTest extends TestCase
         $config->set('logging.channels.formatteddaily', [
             'driver' => 'daily',
             'name' => 'fd',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => Laravel::storagePath('logs/laravel.log'),
             'formatter' => HtmlFormatter::class,
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',

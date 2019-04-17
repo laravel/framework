@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\AggregateServiceProvider;
@@ -50,7 +51,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     public function registerRequestValidation()
     {
         Request::macro('validate', function (array $rules, ...$params) {
-            return validator()->validate($this->all(), $rules, ...$params);
+            return Laravel::validator()->validate($this->all(), $rules, ...$params);
         });
     }
 

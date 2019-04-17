@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources\Json;
 
+use Laravel;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Responsable;
@@ -34,7 +35,7 @@ class ResourceResponse implements Responsable
      */
     public function toResponse($request)
     {
-        return tap(response()->json(
+        return tap(Laravel::response()->json(
             $this->wrap(
                 $this->resource->resolve($request),
                 $this->resource->with($request),

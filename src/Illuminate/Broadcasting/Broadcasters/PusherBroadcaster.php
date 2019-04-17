@@ -2,6 +2,7 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
+use Laravel;
 use Pusher\Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -91,7 +92,7 @@ class PusherBroadcaster extends Broadcaster
             return json_decode($response, true);
         }
 
-        return response()->json(json_decode($response, true))
+        return Laravel::response()->json(json_decode($response, true))
                     ->withCallback($request->callback);
     }
 

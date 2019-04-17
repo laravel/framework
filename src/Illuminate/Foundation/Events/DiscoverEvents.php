@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Events;
 
+use Laravel;
 use SplFileInfo;
 use ReflectionClass;
 use ReflectionMethod;
@@ -69,7 +70,7 @@ class DiscoverEvents
 
         return str_replace(
             [DIRECTORY_SEPARATOR, 'App\\'],
-            ['\\', app()->getNamespace()],
+            ['\\', Laravel::app()->getNamespace()],
             ucfirst(Str::replaceLast('.php', '', $class))
         );
     }

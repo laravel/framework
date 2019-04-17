@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Console\Command;
 use Illuminate\Support\InteractsWithTime;
 
@@ -33,7 +34,7 @@ class DownCommand extends Command
     public function handle()
     {
         file_put_contents(
-            storage_path('framework/down'),
+            Laravel::storagePath('framework/down'),
             json_encode($this->getDownFilePayload(), JSON_PRETTY_PRINT)
         );
 

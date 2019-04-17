@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
@@ -232,11 +233,11 @@ abstract class GeneratorCommand extends Command
      */
     protected function userProviderModel()
     {
-        $guard = config('auth.defaults.guard');
+        $guard = Laravel::config('auth.defaults.guard');
 
-        $provider = config("auth.guards.{$guard}.provider");
+        $provider = Laravel::config("auth.guards.{$guard}.provider");
 
-        return config("auth.providers.{$provider}.model");
+        return Laravel::config("auth.providers.{$provider}.model");
     }
 
     /**

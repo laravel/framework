@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Validation;
 
+use Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Validation\ValidationException;
@@ -19,7 +20,7 @@ trait ValidatesRequests
      */
     public function validateWith($validator, Request $request = null)
     {
-        $request = $request ?: request();
+        $request = $request ?: Laravel::request();
 
         if (is_array($validator)) {
             $validator = $this->getValidationFactory()->make($request->all(), $validator);
@@ -78,6 +79,6 @@ trait ValidatesRequests
      */
     protected function getValidationFactory()
     {
-        return app(Factory::class);
+        return Laravel::app(Factory::class);
     }
 }

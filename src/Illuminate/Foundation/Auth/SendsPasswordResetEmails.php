@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
@@ -14,7 +15,7 @@ trait SendsPasswordResetEmails
      */
     public function showLinkRequestForm()
     {
-        return view('auth.passwords.email');
+        return Laravel::view('auth.passwords.email');
     }
 
     /**
@@ -59,7 +60,7 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkResponse(Request $request, $response)
     {
-        return back()->with('status', trans($response));
+        return Laravel::back()->with('status', Laravel::trans($response));
     }
 
     /**
@@ -71,9 +72,9 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
-        return back()
+        return Laravel::back()
                 ->withInput($request->only('email'))
-                ->withErrors(['email' => trans($response)]);
+                ->withErrors(['email' => Laravel::trans($response)]);
     }
 
     /**

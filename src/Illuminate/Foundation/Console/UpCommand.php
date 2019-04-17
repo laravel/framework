@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Console\Command;
 
 class UpCommand extends Command
@@ -27,7 +28,7 @@ class UpCommand extends Command
      */
     public function handle()
     {
-        @unlink(storage_path('framework/down'));
+        @unlink(Laravel::storagePath('framework/down'));
 
         $this->info('Application is now live.');
     }

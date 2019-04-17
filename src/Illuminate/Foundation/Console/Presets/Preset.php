@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
+use Laravel;
 use Illuminate\Filesystem\Filesystem;
 
 class Preset
@@ -15,7 +16,7 @@ class Preset
     {
         $filesystem = new Filesystem;
 
-        if (! $filesystem->isDirectory($directory = resource_path('js/components'))) {
+        if (! $filesystem->isDirectory($directory = Laravel::resourcePath('js/components'))) {
             $filesystem->makeDirectory($directory, 0755, true);
         }
     }
@@ -28,13 +29,13 @@ class Preset
      */
     protected static function updatePackages($dev = true)
     {
-        if (! file_exists(base_path('package.json'))) {
+        if (! file_exists(Laravel::basePath('package.json'))) {
             return;
         }
 
         $configurationKey = $dev ? 'devDependencies' : 'dependencies';
 
-        $packages = json_decode(file_get_contents(base_path('package.json')), true);
+        $packages = json_decode(file_get_contents(Laravel::basePath('package.json')), true);
 
         $packages[$configurationKey] = static::updatePackageArray(
             array_key_exists($configurationKey, $packages) ? $packages[$configurationKey] : [],
@@ -44,7 +45,7 @@ class Preset
         ksort($packages[$configurationKey]);
 
         file_put_contents(
-            base_path('package.json'),
+            Laravel::basePath('package.json'),
             json_encode($packages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL
         );
     }
@@ -57,9 +58,9 @@ class Preset
     protected static function removeNodeModules()
     {
         tap(new Filesystem, function ($files) {
-            $files->deleteDirectory(base_path('node_modules'));
+            $files->deleteDirectory(Laravel::basePath('node_modules'));
 
-            $files->delete(base_path('yarn.lock'));
+            $files->delete(Laravel::basePath('yarn.lock'));
         });
     }
 }

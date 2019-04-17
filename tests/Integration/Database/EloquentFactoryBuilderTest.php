@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Laravel;
 use Faker\Generator;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
@@ -43,18 +44,18 @@ class EloquentFactoryBuilderTest extends TestCase
         $factory->define(FactoryBuildableProfile::class, function (Generator $faker) {
             return [
                 'user_id' => function () {
-                    return factory(FactoryBuildableUser::class)->create()->id;
+                    return Laravel::factory(FactoryBuildableUser::class)->create()->id;
                 },
             ];
         });
 
         $factory->afterMaking(FactoryBuildableUser::class, function (FactoryBuildableUser $user, Generator $faker) {
-            $profile = factory(FactoryBuildableProfile::class)->make(['user_id' => $user->id]);
+            $profile = Laravel::factory(FactoryBuildableProfile::class)->make(['user_id' => $user->id]);
             $user->setRelation('profile', $profile);
         });
 
         $factory->afterMakingState(FactoryBuildableUser::class, 'with_callable_server', function (FactoryBuildableUser $user, Generator $faker) {
-            $server = factory(FactoryBuildableServer::class)
+            $server = Laravel::factory(FactoryBuildableServer::class)
                 ->state('callable')
                 ->make(['user_id' => $user->id]);
 
@@ -65,7 +66,7 @@ class EloquentFactoryBuilderTest extends TestCase
             return [
                 'name' => $faker->name,
                 'owner_id' => function () {
-                    return factory(FactoryBuildableUser::class)->create()->id;
+                    return Laravel::factory(FactoryBuildableUser::class)->create()->id;
                 },
             ];
         });
@@ -80,7 +81,7 @@ class EloquentFactoryBuilderTest extends TestCase
                 'status' => 'active',
                 'tags' => ['Storage', 'Data'],
                 'user_id' => function () {
-                    return factory(FactoryBuildableUser::class)->create()->id;
+                    return Laravel::factory(FactoryBuildableUser::class)->create()->id;
                 },
             ];
         });
@@ -92,7 +93,7 @@ class EloquentFactoryBuilderTest extends TestCase
         });
 
         $factory->afterCreatingState(FactoryBuildableUser::class, 'with_callable_server', function (FactoryBuildableUser $user, Generator $faker) {
-            factory(FactoryBuildableServer::class)
+            Laravel::factory(FactoryBuildableServer::class)
                 ->state('callable')
                 ->create(['user_id' => $user->id]);
         });
@@ -148,7 +149,7 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_creating_factory_models()
     {
-        $user = factory(FactoryBuildableUser::class)->create();
+        $user = Laravel::factory(FactoryBuildableUser::class)->create();
 
         $dbUser = FactoryBuildableUser::find(1);
 
@@ -157,16 +158,16 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_creating_factory_models_overriding_attributes()
     {
-        $user = factory(FactoryBuildableUser::class)->create(['name' => 'Zain']);
+        $user = Laravel::factory(FactoryBuildableUser::class)->create(['name' => 'Zain']);
 
         $this->assertEquals('Zain', $user->name);
     }
 
     public function test_creating_collection_of_models()
     {
-        $users = factory(FactoryBuildableUser::class, 3)->create();
+        $users = Laravel::factory(FactoryBuildableUser::class, 3)->create();
 
-        $instances = factory(FactoryBuildableUser::class, 3)->make();
+        $instances = Laravel::factory(FactoryBuildableUser::class, 3)->make();
 
         $this->assertInstanceOf(Collection::class, $users);
         $this->assertInstanceOf(Collection::class, $instances);
@@ -178,9 +179,9 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_creating_models_with_callable_state()
     {
-        $server = factory(FactoryBuildableServer::class)->create();
+        $server = Laravel::factory(FactoryBuildableServer::class)->create();
 
-        $callableServer = factory(FactoryBuildableServer::class)->state('callable')->create();
+        $callableServer = Laravel::factory(FactoryBuildableServer::class)->state('callable')->create();
 
         $this->assertEquals('active', $server->status);
         $this->assertEquals(['Storage', 'Data'], $server->tags);
@@ -189,9 +190,9 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_creating_models_with_inline_state()
     {
-        $server = factory(FactoryBuildableServer::class)->create();
+        $server = Laravel::factory(FactoryBuildableServer::class)->create();
 
-        $inlineServer = factory(FactoryBuildableServer::class)->state('inline')->create();
+        $inlineServer = Laravel::factory(FactoryBuildableServer::class)->state('inline')->create();
 
         $this->assertEquals('active', $server->status);
         $this->assertEquals('inline', $inlineServer->status);
@@ -199,10 +200,10 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_creating_models_with_relationships()
     {
-        factory(FactoryBuildableUser::class, 2)
+        Laravel::factory(FactoryBuildableUser::class, 2)
             ->create()
             ->each(function ($user) {
-                $user->servers()->saveMany(factory(FactoryBuildableServer::class, 2)->make());
+                $user->servers()->saveMany(Laravel::factory(FactoryBuildableServer::class, 2)->make());
             })
             ->each(function ($user) {
                 $this->assertCount(2, $user->servers);
@@ -211,7 +212,7 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_creating_models_on_custom_connection()
     {
-        $user = factory(FactoryBuildableUser::class)
+        $user = Laravel::factory(FactoryBuildableUser::class)
             ->connection('alternative-connection')
             ->create();
 
@@ -223,14 +224,14 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_creating_models_with_after_callback()
     {
-        $team = factory(FactoryBuildableTeam::class)->create();
+        $team = Laravel::factory(FactoryBuildableTeam::class)->create();
 
         $this->assertTrue($team->users->contains($team->owner));
     }
 
     public function test_creating_models_with_after_callback_state()
     {
-        $user = factory(FactoryBuildableUser::class)->state('with_callable_server')->create();
+        $user = Laravel::factory(FactoryBuildableUser::class)->state('with_callable_server')->create();
 
         $this->assertNotNull($user->profile);
         $this->assertNotNull($user->servers->where('status', 'callable')->first());
@@ -238,7 +239,7 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_making_models_with_a_custom_connection()
     {
-        $user = factory(FactoryBuildableUser::class)
+        $user = Laravel::factory(FactoryBuildableUser::class)
             ->connection('alternative-connection')
             ->make();
 
@@ -247,14 +248,14 @@ class EloquentFactoryBuilderTest extends TestCase
 
     public function test_making_models_with_after_callback()
     {
-        $user = factory(FactoryBuildableUser::class)->make();
+        $user = Laravel::factory(FactoryBuildableUser::class)->make();
 
         $this->assertNotNull($user->profile);
     }
 
     public function test_making_models_with_after_callback_state()
     {
-        $user = factory(FactoryBuildableUser::class)->state('with_callable_server')->make();
+        $user = Laravel::factory(FactoryBuildableUser::class)->state('with_callable_server')->make();
 
         $this->assertNotNull($user->profile);
         $this->assertNotNull($user->servers->where('status', 'callable')->first());

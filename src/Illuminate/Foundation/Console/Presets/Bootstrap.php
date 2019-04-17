@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
+use Laravel;
+
 class Bootstrap extends Preset
 {
     /**
@@ -38,7 +40,7 @@ class Bootstrap extends Preset
      */
     protected static function updateSass()
     {
-        copy(__DIR__.'/bootstrap-stubs/_variables.scss', resource_path('sass/_variables.scss'));
-        copy(__DIR__.'/bootstrap-stubs/app.scss', resource_path('sass/app.scss'));
+        copy(__DIR__.'/bootstrap-stubs/_variables.scss', Laravel::resourcePath('sass/_variables.scss'));
+        copy(__DIR__.'/bootstrap-stubs/app.scss', Laravel::resourcePath('sass/app.scss'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Laravel;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +14,7 @@ class FallbackRouteTest extends TestCase
     public function test_basic_fallback()
     {
         Route::fallback(function () {
-            return response('fallback', 404);
+            return Laravel::response('fallback', 404);
         });
 
         Route::get('one', function () {
@@ -29,7 +30,7 @@ class FallbackRouteTest extends TestCase
     {
         Route::group(['prefix' => 'prefix'], function () {
             Route::fallback(function () {
-                return response('fallback', 404);
+                return Laravel::response('fallback', 404);
             });
 
             Route::get('one', function () {
@@ -46,7 +47,7 @@ class FallbackRouteTest extends TestCase
     public function test_fallback_with_wildcards()
     {
         Route::fallback(function () {
-            return response('fallback', 404);
+            return Laravel::response('fallback', 404);
         });
 
         Route::get('one', function () {
@@ -65,7 +66,7 @@ class FallbackRouteTest extends TestCase
     public function test_no_routes()
     {
         Route::fallback(function () {
-            return response('fallback', 404);
+            return Laravel::response('fallback', 404);
         });
 
         $this->assertStringContainsString('fallback', $this->get('/non-existing')->getContent());
@@ -75,7 +76,7 @@ class FallbackRouteTest extends TestCase
     public function test_respond_with_named_fallback_route()
     {
         Route::fallback(function () {
-            return response('fallback', 404);
+            return Laravel::response('fallback', 404);
         })->name('testFallbackRoute');
 
         Route::get('one', function () {

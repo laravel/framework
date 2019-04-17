@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Laravel;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 trait DispatchesJobs
@@ -14,7 +15,7 @@ trait DispatchesJobs
      */
     protected function dispatch($job)
     {
-        return app(Dispatcher::class)->dispatch($job);
+        return Laravel::app(Dispatcher::class)->dispatch($job);
     }
 
     /**
@@ -25,6 +26,6 @@ trait DispatchesJobs
      */
     public function dispatchNow($job)
     {
-        return app(Dispatcher::class)->dispatchNow($job);
+        return Laravel::app(Dispatcher::class)->dispatchNow($job);
     }
 }

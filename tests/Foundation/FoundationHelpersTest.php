@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Laravel;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -22,24 +23,24 @@ class FoundationHelpersTest extends TestCase
         $app = new Application;
         $app['cache'] = $cache = m::mock(stdClass::class);
 
-        // 1. cache()
-        $this->assertInstanceOf(stdClass::class, cache());
+        // 1. Laravel::cache()
+        $this->assertInstanceOf(stdClass::class, Laravel::cache());
 
-        // 2. cache(['foo' => 'bar'], 1);
+        // 2. Laravel::cache(['foo' => 'bar'], 1);
         $cache->shouldReceive('put')->once()->with('foo', 'bar', 1);
-        cache(['foo' => 'bar'], 1);
+        Laravel::cache(['foo' => 'bar'], 1);
 
-        // 3. cache('foo');
+        // 3. Laravel::cache('foo');
         $cache->shouldReceive('get')->once()->with('foo')->andReturn('bar');
-        $this->assertEquals('bar', cache('foo'));
+        $this->assertEquals('bar', Laravel::cache('foo'));
 
-        // 4. cache('foo', null);
+        // 4. Laravel::cache('foo', null);
         $cache->shouldReceive('get')->once()->with('foo', null)->andReturn('bar');
-        $this->assertEquals('bar', cache('foo', null));
+        $this->assertEquals('bar', Laravel::cache('foo', null));
 
-        // 5. cache('baz', 'default');
+        // 5. Laravel::cache('baz', 'default');
         $cache->shouldReceive('get')->once()->with('baz', 'default')->andReturn('default');
-        $this->assertEquals('default', cache('baz', 'default'));
+        $this->assertEquals('default', Laravel::cache('baz', 'default'));
     }
 
     public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
@@ -47,29 +48,29 @@ class FoundationHelpersTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('You must specify an expiration time when setting a value in the cache.');
 
-        cache(['foo' => 'bar']);
+        Laravel::cache(['foo' => 'bar']);
     }
 
     public function testUnversionedElixir()
     {
         $file = 'unversioned.css';
 
-        app()->singleton('path.public', function () {
+        Laravel::app()->singleton('path.public', function () {
             return __DIR__;
         });
 
-        touch(public_path($file));
+        touch(Laravel::publicPath($file));
 
-        $this->assertEquals('/'.$file, elixir($file));
+        $this->assertEquals('/'.$file, Laravel::elixir($file));
 
-        unlink(public_path($file));
+        unlink(Laravel::publicPath($file));
     }
 
     public function testMixDoesNotIncludeHost()
     {
         $manifest = $this->makeManifest();
 
-        $result = mix('/unversioned.css');
+        $result = Laravel::mix('/unversioned.css');
 
         $this->assertSame('/versioned.css', $result->toHtml());
 
@@ -79,10 +80,10 @@ class FoundationHelpersTest extends TestCase
     public function testMixCachesManifestForSubsequentCalls()
     {
         $manifest = $this->makeManifest();
-        mix('unversioned.css');
+        Laravel::mix('unversioned.css');
         unlink($manifest);
 
-        $result = mix('/unversioned.css');
+        $result = Laravel::mix('/unversioned.css');
 
         $this->assertSame('/versioned.css', $result->toHtml());
     }
@@ -91,7 +92,7 @@ class FoundationHelpersTest extends TestCase
     {
         $manifest = $this->makeManifest();
 
-        $result = mix('unversioned.css');
+        $result = Laravel::mix('unversioned.css');
 
         $this->assertSame('/versioned.css', $result->toHtml());
 
@@ -103,7 +104,7 @@ class FoundationHelpersTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('The Mix manifest does not exist.');
 
-        mix('unversioned.css', 'missing');
+        Laravel::mix('unversioned.css', 'missing');
     }
 
     public function testMixWithManifestDirectory()
@@ -111,7 +112,7 @@ class FoundationHelpersTest extends TestCase
         mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('mix');
 
-        $result = mix('unversioned.css', 'mix');
+        $result = Laravel::mix('unversioned.css', 'mix');
 
         $this->assertSame('/mix/versioned.css', $result->toHtml());
 
@@ -124,7 +125,7 @@ class FoundationHelpersTest extends TestCase
         mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('/mix');
 
-        $result = mix('unversioned.css', 'mix');
+        $result = Laravel::mix('unversioned.css', 'mix');
 
         $this->assertSame('/mix/versioned.css', $result->toHtml());
 
@@ -136,7 +137,7 @@ class FoundationHelpersTest extends TestCase
     {
         $path = $this->makeHotModuleReloadFile('https://laravel.com/docs');
 
-        $result = mix('unversioned.css');
+        $result = Laravel::mix('unversioned.css');
 
         $this->assertSame('//laravel.com/docs/unversioned.css', $result->toHtml());
 
@@ -147,7 +148,7 @@ class FoundationHelpersTest extends TestCase
     {
         $path = $this->makeHotModuleReloadFile('http://laravel.com/docs');
 
-        $result = mix('unversioned.css');
+        $result = Laravel::mix('unversioned.css');
 
         $this->assertSame('//laravel.com/docs/unversioned.css', $result->toHtml());
 
@@ -159,7 +160,7 @@ class FoundationHelpersTest extends TestCase
         mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('https://laravel.com/docs', 'mix');
 
-        $result = mix('unversioned.css', 'mix');
+        $result = Laravel::mix('unversioned.css', 'mix');
 
         $this->assertSame('//laravel.com/docs/unversioned.css', $result->toHtml());
 
@@ -172,7 +173,7 @@ class FoundationHelpersTest extends TestCase
         mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('http://laravel.com/docs', 'mix');
 
-        $result = mix('unversioned.css', 'mix');
+        $result = Laravel::mix('unversioned.css', 'mix');
 
         $this->assertSame('//laravel.com/docs/unversioned.css', $result->toHtml());
 
@@ -184,7 +185,7 @@ class FoundationHelpersTest extends TestCase
     {
         $path = $this->makeHotModuleReloadFile('');
 
-        $result = mix('unversioned.css');
+        $result = Laravel::mix('unversioned.css');
 
         $this->assertSame('//localhost:8080/unversioned.css', $result->toHtml());
 
@@ -196,7 +197,7 @@ class FoundationHelpersTest extends TestCase
         mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('', 'mix');
 
-        $result = mix('unversioned.css', 'mix');
+        $result = Laravel::mix('unversioned.css', 'mix');
 
         $this->assertSame('//localhost:8080/unversioned.css', $result->toHtml());
 
@@ -206,11 +207,11 @@ class FoundationHelpersTest extends TestCase
 
     protected function makeHotModuleReloadFile($url, $directory = '')
     {
-        app()->singleton('path.public', function () {
+        Laravel::app()->singleton('path.public', function () {
             return __DIR__;
         });
 
-        $path = public_path(Str::finish($directory, '/').'hot');
+        $path = Laravel::publicPath(Str::finish($directory, '/').'hot');
 
         // Laravel mix when run 'hot' has a new line after the
         // url, so for consistency this "\n" is added.
@@ -221,11 +222,11 @@ class FoundationHelpersTest extends TestCase
 
     protected function makeManifest($directory = '')
     {
-        app()->singleton('path.public', function () {
+        Laravel::app()->singleton('path.public', function () {
             return __DIR__;
         });
 
-        $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
+        $path = Laravel::publicPath(Str::finish($directory, '/').'mix-manifest.json');
 
         touch($path);
 
@@ -244,6 +245,6 @@ class FoundationHelpersTest extends TestCase
             return 'expected';
         });
 
-        $this->assertSame('expected', mix('asset.png'));
+        $this->assertSame('expected', Laravel::mix('asset.png'));
     }
 }

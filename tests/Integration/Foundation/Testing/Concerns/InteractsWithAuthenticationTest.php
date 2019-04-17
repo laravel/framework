@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Testing\Concerns;
 
+use Laravel;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +41,7 @@ class InteractsWithAuthenticationTest extends TestCase
         AuthenticationTestUser::create([
             'username' => 'taylorotwell',
             'email' => 'taylorotwell@laravel.com',
-            'password' => bcrypt('password'),
+            'password' => Laravel::bcrypt('password'),
             'is_active' => true,
         ]);
     }

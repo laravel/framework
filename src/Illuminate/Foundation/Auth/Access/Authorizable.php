@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth\Access;
 
+use Laravel;
 use Illuminate\Contracts\Auth\Access\Gate;
 
 trait Authorizable
@@ -15,7 +16,7 @@ trait Authorizable
      */
     public function can($ability, $arguments = [])
     {
-        return app(Gate::class)->forUser($this)->check($ability, $arguments);
+        return Laravel::app(Gate::class)->forUser($this)->check($ability, $arguments);
     }
 
     /**

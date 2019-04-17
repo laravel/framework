@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 
@@ -52,7 +53,7 @@ class TestMakeCommand extends GeneratorCommand
     {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
-        return base_path('tests').str_replace('\\', '/', $name).'.php';
+        return Laravel::basePath('tests').str_replace('\\', '/', $name).'.php';
     }
 
     /**

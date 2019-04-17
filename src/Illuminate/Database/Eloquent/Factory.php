@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Laravel;
 use ArrayAccess;
 use Faker\Generator as Faker;
 use Symfony\Component\Finder\Finder;
@@ -63,7 +64,7 @@ class Factory implements ArrayAccess
      */
     public static function construct(Faker $faker, $pathToFactories = null)
     {
-        $pathToFactories = $pathToFactories ?: database_path('factories');
+        $pathToFactories = $pathToFactories ?: Laravel::databasePath('factories');
 
         return (new static($faker))->load($pathToFactories);
     }

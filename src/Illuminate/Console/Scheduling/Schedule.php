@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Laravel;
 use DateTimeInterface;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
@@ -104,14 +105,14 @@ class Schedule
     public function job($job, $queue = null, $connection = null)
     {
         return $this->call(function () use ($job, $queue, $connection) {
-            $job = is_string($job) ? resolve($job) : $job;
+            $job = is_string($job) ? Laravel::resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
-                dispatch($job)
+                Laravel::dispatch($job)
                     ->onConnection($connection ?? $job->connection)
                     ->onQueue($queue ?? $job->queue);
             } else {
-                dispatch_now($job);
+                Laravel::dispatchNow($job);
             }
         })->name(is_string($job) ? $job : get_class($job));
     }

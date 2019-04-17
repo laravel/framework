@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Laravel;
 use Mockery as m;
 use RuntimeException;
 use Illuminate\Queue\Worker;
@@ -164,7 +165,7 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
-        $job->timeoutAt = now()->addSeconds(1)->getTimestamp();
+        $job->timeoutAt = Laravel::now()->addSeconds(1)->getTimestamp();
 
         $job->attempts = 0;
 

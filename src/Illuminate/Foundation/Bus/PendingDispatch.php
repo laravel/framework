@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Laravel;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 class PendingDispatch
@@ -109,6 +110,6 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        app(Dispatcher::class)->dispatch($this->job);
+        Laravel::app(Dispatcher::class)->dispatch($this->job);
     }
 }

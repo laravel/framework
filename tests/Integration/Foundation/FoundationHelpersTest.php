@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
+use Laravel;
 use Exception;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -15,17 +16,17 @@ class FoundationHelpersTest extends TestCase
 {
     public function test_rescue()
     {
-        $this->assertEquals(rescue(function () {
+        $this->assertEquals(Laravel::rescue(function () {
             throw new Exception;
         }, 'rescued!'), 'rescued!');
 
-        $this->assertEquals(rescue(function () {
+        $this->assertEquals(Laravel::rescue(function () {
             throw new Exception;
         }, function () {
             return 'rescued!';
         }), 'rescued!');
 
-        $this->assertEquals(rescue(function () {
+        $this->assertEquals(Laravel::rescue(function () {
             return 'no need to rescue';
         }, 'rescued!'), 'no need to rescue');
 
@@ -36,7 +37,7 @@ class FoundationHelpersTest extends TestCase
             }
         };
 
-        $this->assertEquals(rescue(function () use ($testClass) {
+        $this->assertEquals(Laravel::rescue(function () use ($testClass) {
             $testClass->test([]);
         }, 'rescued!'), 'rescued!');
     }
@@ -47,7 +48,7 @@ class FoundationHelpersTest extends TestCase
         $this->app->instance(ExceptionHandler::class, $handler);
         $manifest = $this->makeManifest();
 
-        mix('missing.js');
+        Laravel::mix('missing.js');
 
         $this->assertInstanceOf(Exception::class, $handler->reported[0]);
         $this->assertSame('Unable to locate Mix file: /missing.js.', $handler->reported[0]->getMessage());
@@ -60,7 +61,7 @@ class FoundationHelpersTest extends TestCase
         $this->app['config']->set('app.debug', false);
         $manifest = $this->makeManifest();
 
-        $path = mix('missing.js');
+        $path = Laravel::mix('missing.js');
 
         $this->assertSame('/missing.js', $path);
 
@@ -76,7 +77,7 @@ class FoundationHelpersTest extends TestCase
         $manifest = $this->makeManifest();
 
         try {
-            mix('missing.js');
+            Laravel::mix('missing.js');
         } catch (\Exception $e) {
             throw $e;
         } finally { // make sure we can cleanup the file
@@ -91,7 +92,7 @@ class FoundationHelpersTest extends TestCase
         $this->app['config']->set('app.debug', true);
         $manifest = $this->makeManifest();
         Route::get('test-route', function () {
-            mix('missing.js');
+            Laravel::mix('missing.js');
         });
 
         $this->get('/test-route');
@@ -107,7 +108,7 @@ class FoundationHelpersTest extends TestCase
             return __DIR__;
         });
 
-        $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
+        $path = Laravel::publicPath(Str::finish($directory, '/').'mix-manifest.json');
 
         touch($path);
 

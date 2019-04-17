@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Laravel;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
@@ -279,7 +280,7 @@ class ResourceTest extends TestCase
             'title' => 'Test Title',
         ]));
 
-        $this->assertEquals('http://localhost/post/5', url('/post', $post));
+        $this->assertEquals('http://localhost/post/5', Laravel::url('/post', $post));
     }
 
     public function test_named_routes_are_url_routable()
@@ -290,7 +291,7 @@ class ResourceTest extends TestCase
         ]));
 
         Route::get('/post/{id}', function () use ($post) {
-            return route('post.show', $post);
+            return Laravel::route('post.show', $post);
         })->name('post.show');
 
         $response = $this->withoutExceptionHandling()->get('/post/1');

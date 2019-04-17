@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -17,7 +18,7 @@ trait AuthenticatesUsers
      */
     public function showLoginForm()
     {
-        return view('auth.login');
+        return Laravel::view('auth.login');
     }
 
     /**
@@ -106,7 +107,7 @@ trait AuthenticatesUsers
         $this->clearLoginAttempts($request);
 
         return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
+                ?: Laravel::redirect()->intended($this->redirectPath());
     }
 
     /**
@@ -132,7 +133,7 @@ trait AuthenticatesUsers
     protected function sendFailedLoginResponse(Request $request)
     {
         throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
+            $this->username() => [Laravel::trans('auth.failed')],
         ]);
     }
 
@@ -158,7 +159,7 @@ trait AuthenticatesUsers
 
         $request->session()->invalidate();
 
-        return $this->loggedOut($request) ?: redirect('/');
+        return $this->loggedOut($request) ?: Laravel::redirect('/');
     }
 
     /**

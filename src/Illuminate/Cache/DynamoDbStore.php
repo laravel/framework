@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Laravel;
 use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -391,7 +392,7 @@ class DynamoDbStore implements Store, LockProvider
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, now()->addYears(5));
+        return $this->put($key, $value, Laravel::now()->addYears(5));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Laravel;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 trait Dispatchable
@@ -23,7 +24,7 @@ trait Dispatchable
      */
     public static function dispatchNow()
     {
-        return app(Dispatcher::class)->dispatchNow(new static(...func_get_args()));
+        return Laravel::app(Dispatcher::class)->dispatchNow(new static(...func_get_args()));
     }
 
     /**

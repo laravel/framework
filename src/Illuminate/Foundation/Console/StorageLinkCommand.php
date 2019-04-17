@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Console\Command;
 
 class StorageLinkCommand extends Command
@@ -27,12 +28,12 @@ class StorageLinkCommand extends Command
      */
     public function handle()
     {
-        if (file_exists(public_path('storage'))) {
+        if (file_exists(Laravel::publicPath('storage'))) {
             return $this->error('The "public/storage" directory already exists.');
         }
 
         $this->laravel->make('files')->link(
-            storage_path('app/public'), public_path('storage')
+            Laravel::storagePath('app/public'), Laravel::publicPath('storage')
         );
 
         $this->info('The [public/storage] directory has been linked.');

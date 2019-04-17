@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\TestResponse;
@@ -369,7 +370,7 @@ trait MakesHttpRequests
         }
 
         if (! Str::startsWith($uri, 'http')) {
-            $uri = config('app.url').'/'.$uri;
+            $uri = Laravel::config('app.url').'/'.$uri;
         }
 
         return trim($uri, '/');

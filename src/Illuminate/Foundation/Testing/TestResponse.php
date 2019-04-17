@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Closure;
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -204,7 +205,7 @@ class TestResponse
     public function assertLocation($uri)
     {
         PHPUnit::assertEquals(
-            app('url')->to($uri), app('url')->to($this->headers->get('Location'))
+            Laravel::app('url')->to($uri), Laravel::app('url')->to($this->headers->get('Location'))
         );
 
         return $this;
@@ -247,7 +248,7 @@ class TestResponse
         $cookieValue = $cookie->getValue();
 
         $actual = $encrypted
-            ? app('encrypter')->decrypt($cookieValue, $unserialize) : $cookieValue;
+            ? Laravel::app('encrypter')->decrypt($cookieValue, $unserialize) : $cookieValue;
 
         PHPUnit::assertEquals(
             $value, $actual,
@@ -999,7 +1000,7 @@ class TestResponse
      */
     protected function session()
     {
-        return app('session.store');
+        return Laravel::app('session.store');
     }
 
     /**

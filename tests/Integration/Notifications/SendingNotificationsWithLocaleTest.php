@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
+use Laravel;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
@@ -43,7 +44,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         View::addLocation(__DIR__.'/Fixtures');
 
-        app('translator')->setLoaded([
+        Laravel::app('translator')->setLoaded([
             '*' => [
                 '*' => [
                     'en' => ['hi' => 'hello'],
@@ -75,7 +76,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::send($user, new GreetingMailNotification);
 
         $this->assertStringContainsString('hello',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
     }
 
@@ -89,7 +90,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
     }
 
@@ -109,11 +110,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::send($users, (new GreetingMailNotification)->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[1]->getBody()
+            Laravel::app('swift.transport')->messages()[1]->getBody()
         );
     }
 
@@ -127,7 +128,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotificationWithMailable);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
     }
 
@@ -147,11 +148,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $user->notify((new GreetingMailNotification)->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
 
         $this->assertRegExp('/dans (1|un) jour/',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
 
         $this->assertTrue($this->app->isLocale('en'));
@@ -169,7 +170,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $recipient->notify(new GreetingMailNotification);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
     }
 
@@ -194,13 +195,13 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
         $this->assertStringContainsString('hola',
-            app('swift.transport')->messages()[1]->getBody()
+            Laravel::app('swift.transport')->messages()[1]->getBody()
         );
         $this->assertStringContainsString('hi',
-            app('swift.transport')->messages()[2]->getBody()
+            Laravel::app('swift.transport')->messages()[2]->getBody()
         );
     }
 
@@ -216,7 +217,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
     }
 
@@ -232,7 +233,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            Laravel::app('swift.transport')->messages()[0]->getBody()
         );
     }
 }
@@ -270,7 +271,7 @@ class GreetingMailNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->greeting(__('hi'))
+            ->greeting(Laravel::__('hi'))
             ->line(Carbon::tomorrow()->diffForHumans());
     }
 }

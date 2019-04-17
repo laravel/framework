@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Laravel;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
@@ -29,8 +30,8 @@ class Mix
             $manifestDirectory = "/{$manifestDirectory}";
         }
 
-        if (file_exists(public_path($manifestDirectory.'/hot'))) {
-            $url = rtrim(file_get_contents(public_path($manifestDirectory.'/hot')));
+        if (file_exists(Laravel::publicPath($manifestDirectory.'/hot'))) {
+            $url = rtrim(file_get_contents(Laravel::publicPath($manifestDirectory.'/hot')));
 
             if (Str::startsWith($url, ['http://', 'https://'])) {
                 return new HtmlString(Str::after($url, ':').$path);
@@ -39,7 +40,7 @@ class Mix
             return new HtmlString("//localhost:8080{$path}");
         }
 
-        $manifestPath = public_path($manifestDirectory.'/mix-manifest.json');
+        $manifestPath = Laravel::publicPath($manifestDirectory.'/mix-manifest.json');
 
         if (! isset($manifests[$manifestPath])) {
             if (! file_exists($manifestPath)) {
@@ -54,8 +55,8 @@ class Mix
         if (! isset($manifest[$path])) {
             $exception = new Exception("Unable to locate Mix file: {$path}.");
 
-            if (! app('config')->get('app.debug')) {
-                report($exception);
+            if (! Laravel::app('config')->get('app.debug')) {
+                Laravel::report($exception);
 
                 return $path;
             } else {

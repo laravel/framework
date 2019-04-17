@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
+use Laravel;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Encryption\Encrypter;
@@ -15,7 +16,7 @@ class VerifyCsrfTokenExceptTest extends TestCase
     {
         parent::setUp();
 
-        $this->stub = new VerifyCsrfTokenExceptStub(app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
+        $this->stub = new VerifyCsrfTokenExceptStub(Laravel::app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
         $this->request = Request::create('http://example.com/foo/bar', 'POST');
     }
 

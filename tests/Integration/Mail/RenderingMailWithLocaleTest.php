@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
+use Laravel;
 use Illuminate\Mail\Mailable;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\View;
@@ -17,7 +18,7 @@ class RenderingMailWithLocaleTest extends TestCase
 
         View::addLocation(__DIR__.'/Fixtures');
 
-        app('translator')->setLoaded([
+        Laravel::app('translator')->setLoaded([
             '*' => [
                 '*' => [
                     'en' => ['nom' => 'name'],

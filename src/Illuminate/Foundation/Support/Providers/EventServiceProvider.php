@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
+use Laravel;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Events\DiscoverEvents;
@@ -95,7 +96,7 @@ class EventServiceProvider extends ServiceProvider
                     ->reduce(function ($discovered, $directory) {
                         return array_merge_recursive(
                             $discovered,
-                            DiscoverEvents::within($directory, base_path())
+                            DiscoverEvents::within($directory, Laravel::basePath())
                         );
                     }, []);
     }

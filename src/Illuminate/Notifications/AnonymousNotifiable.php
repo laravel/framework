@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use Laravel;
 use Illuminate\Contracts\Notifications\Dispatcher;
 
 class AnonymousNotifiable
@@ -35,7 +36,7 @@ class AnonymousNotifiable
      */
     public function notify($notification)
     {
-        app(Dispatcher::class)->send($this, $notification);
+        Laravel::app(Dispatcher::class)->send($this, $notification);
     }
 
     /**
@@ -46,7 +47,7 @@ class AnonymousNotifiable
      */
     public function notifyNow($notification)
     {
-        app(Dispatcher::class)->sendNow($this, $notification);
+        Laravel::app(Dispatcher::class)->sendNow($this, $notification);
     }
 
     /**

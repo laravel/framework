@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
+use Laravel;
 use Illuminate\Filesystem\Filesystem;
 
 class None extends Preset
@@ -17,11 +18,11 @@ class None extends Preset
         static::updateBootstrapping();
 
         tap(new Filesystem, function ($filesystem) {
-            $filesystem->deleteDirectory(resource_path('js/components'));
-            $filesystem->delete(resource_path('sass/_variables.scss'));
-            $filesystem->deleteDirectory(base_path('node_modules'));
-            $filesystem->deleteDirectory(public_path('css'));
-            $filesystem->deleteDirectory(public_path('js'));
+            $filesystem->deleteDirectory(Laravel::resourcePath('js/components'));
+            $filesystem->delete(Laravel::resourcePath('sass/_variables.scss'));
+            $filesystem->deleteDirectory(Laravel::basePath('node_modules'));
+            $filesystem->deleteDirectory(Laravel::publicPath('css'));
+            $filesystem->deleteDirectory(Laravel::publicPath('js'));
         });
     }
 
@@ -53,8 +54,8 @@ class None extends Preset
      */
     protected static function updateBootstrapping()
     {
-        file_put_contents(resource_path('sass/app.scss'), ''.PHP_EOL);
-        copy(__DIR__.'/none-stubs/app.js', resource_path('js/app.js'));
-        copy(__DIR__.'/none-stubs/bootstrap.js', resource_path('js/bootstrap.js'));
+        file_put_contents(Laravel::resourcePath('sass/app.scss'), ''.PHP_EOL);
+        copy(__DIR__.'/none-stubs/app.js', Laravel::resourcePath('js/app.js'));
+        copy(__DIR__.'/none-stubs/bootstrap.js', Laravel::resourcePath('js/bootstrap.js'));
     }
 }

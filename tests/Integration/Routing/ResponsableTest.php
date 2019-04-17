@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Laravel;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Support\Responsable;
@@ -29,6 +30,6 @@ class TestResponsableResponse implements Responsable
 {
     public function toResponse($request)
     {
-        return response('hello world', 201, ['X-Test-Header' => 'Taylor']);
+        return Laravel::response('hello world', 201, ['X-Test-Header' => 'Taylor']);
     }
 }

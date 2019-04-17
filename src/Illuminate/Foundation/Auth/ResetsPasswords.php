@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ trait ResetsPasswords
      */
     public function showResetForm(Request $request, $token = null)
     {
-        return view('auth.passwords.reset')->with(
+        return Laravel::view('auth.passwords.reset')->with(
             ['token' => $token, 'email' => $request->email]
         );
     }
@@ -108,7 +109,7 @@ trait ResetsPasswords
 
         $user->save();
 
-        event(new PasswordReset($user));
+        Laravel::event(new PasswordReset($user));
 
         $this->guard()->login($user);
     }
@@ -122,8 +123,8 @@ trait ResetsPasswords
      */
     protected function sendResetResponse(Request $request, $response)
     {
-        return redirect($this->redirectPath())
-                            ->with('status', trans($response));
+        return Laravel::redirect($this->redirectPath())
+                            ->with('status', Laravel::trans($response));
     }
 
     /**
@@ -135,9 +136,9 @@ trait ResetsPasswords
      */
     protected function sendResetFailedResponse(Request $request, $response)
     {
-        return redirect()->back()
+        return Laravel::redirect()->back()
                     ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+                    ->withErrors(['email' => Laravel::trans($response)]);
     }
 
     /**

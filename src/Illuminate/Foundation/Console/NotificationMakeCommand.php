@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -51,7 +52,7 @@ class NotificationMakeCommand extends GeneratorCommand
      */
     protected function writeMarkdownTemplate()
     {
-        $path = resource_path('views/'.str_replace('.', '/', $this->option('markdown'))).'.blade.php';
+        $path = Laravel::resourcePath('views/'.str_replace('.', '/', $this->option('markdown'))).'.blade.php';
 
         if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0755, true);

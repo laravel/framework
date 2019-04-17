@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Closure;
+use Laravel;
 use Cron\CronExpression;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -215,7 +216,7 @@ class Event
     {
         $this->callBeforeCallbacks($container);
 
-        $this->exitCode = Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
+        $this->exitCode = Process::fromShellCommandline($this->buildCommand(), Laravel::basePath(), null, null, null)->run();
 
         $this->callAfterCallbacks($container);
     }
@@ -230,7 +231,7 @@ class Event
     {
         $this->callBeforeCallbacks($container);
 
-        Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
+        Process::fromShellCommandline($this->buildCommand(), Laravel::basePath(), null, null, null)->run();
     }
 
     /**
@@ -442,7 +443,7 @@ class Event
     protected function ensureOutputIsBeingCaptured()
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
-            $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
+            $this->sendOutputTo(Laravel::storagePath('logs/schedule-'.sha1($this->mutexName()).'.log'));
         }
     }
 

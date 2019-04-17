@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Laravel;
 use Mockery as m;
 use Illuminate\Bus\Dispatcher;
 use Orchestra\Testbench\TestCase;
@@ -28,7 +29,7 @@ class CallQueuedHandlerTest extends TestCase
     {
         CallQueuedHandlerTestJob::$handled = false;
 
-        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher(Laravel::app()));
 
         $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
@@ -46,7 +47,7 @@ class CallQueuedHandlerTest extends TestCase
 
     public function test_job_is_marked_as_failed_if_model_not_found_exception_is_thrown()
     {
-        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher(Laravel::app()));
 
         $job = m::mock(Job::class);
         $job->shouldReceive('resolveName')->andReturn(__CLASS__);
@@ -61,7 +62,7 @@ class CallQueuedHandlerTest extends TestCase
     {
         Event::fake();
 
-        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher(Laravel::app()));
 
         $job = m::mock(Job::class);
         $job->shouldReceive('getConnectionName')->andReturn('connection');

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources\Json;
 
+use Laravel;
 use Illuminate\Support\Arr;
 
 class PaginatedResourceResponse extends ResourceResponse
@@ -14,7 +15,7 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
-        return tap(response()->json(
+        return tap(Laravel::response()->json(
             $this->wrap(
                 $this->resource->resolve($request),
                 array_merge_recursive(

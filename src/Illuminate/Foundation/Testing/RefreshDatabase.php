@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Laravel;
 use Illuminate\Contracts\Console\Kernel;
 
 trait RefreshDatabase
@@ -25,9 +26,9 @@ trait RefreshDatabase
      */
     protected function usingInMemoryDatabase()
     {
-        $default = config('database.default');
+        $default = Laravel::config('database.default');
 
-        return config("database.connections.$default.database") === ':memory:';
+        return Laravel::config("database.connections.$default.database") === ':memory:';
     }
 
     /**

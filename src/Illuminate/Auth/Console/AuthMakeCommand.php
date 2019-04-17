@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Console;
 
+use Laravel;
 use Illuminate\Console\Command;
 use Illuminate\Console\DetectsApplicationNamespace;
 
@@ -53,12 +54,12 @@ class AuthMakeCommand extends Command
 
         if (! $this->option('views')) {
             file_put_contents(
-                app_path('Http/Controllers/HomeController.php'),
+                Laravel::appPath('Http/Controllers/HomeController.php'),
                 $this->compileControllerStub()
             );
 
             file_put_contents(
-                base_path('routes/web.php'),
+                Laravel::basePath('routes/web.php'),
                 file_get_contents(__DIR__.'/stubs/make/routes.stub'),
                 FILE_APPEND
             );
@@ -74,11 +75,11 @@ class AuthMakeCommand extends Command
      */
     protected function createDirectories()
     {
-        if (! is_dir($directory = resource_path('views/layouts'))) {
+        if (! is_dir($directory = Laravel::resourcePath('views/layouts'))) {
             mkdir($directory, 0755, true);
         }
 
-        if (! is_dir($directory = resource_path('views/auth/passwords'))) {
+        if (! is_dir($directory = Laravel::resourcePath('views/auth/passwords'))) {
             mkdir($directory, 0755, true);
         }
     }
@@ -91,7 +92,7 @@ class AuthMakeCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            if (file_exists($view = resource_path('views/'.$value)) && ! $this->option('force')) {
+            if (file_exists($view = Laravel::resourcePath('views/'.$value)) && ! $this->option('force')) {
                 if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
                     continue;
                 }

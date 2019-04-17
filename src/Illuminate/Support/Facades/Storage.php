@@ -23,7 +23,7 @@ class Storage extends Facade
         $disk = $disk ?: self::$app['config']->get('filesystems.default');
 
         (new Filesystem)->cleanDirectory(
-            $root = storage_path('framework/testing/disks/'.$disk)
+            $root = Laravel::storagePath('framework/testing/disks/'.$disk)
         );
 
         static::set($disk, $fake = self::createLocalDriver(['root' => $root]));
@@ -42,7 +42,7 @@ class Storage extends Facade
         $disk = $disk ?: self::$app['config']->get('filesystems.default');
 
         static::set($disk, $fake = self::createLocalDriver([
-            'root' => storage_path('framework/testing/disks/'.$disk),
+            'root' => Laravel::storagePath('framework/testing/disks/'.$disk),
         ]));
 
         return $fake;

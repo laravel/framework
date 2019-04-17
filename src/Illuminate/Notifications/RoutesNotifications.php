@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Notifications\Dispatcher;
 
@@ -15,7 +16,7 @@ trait RoutesNotifications
      */
     public function notify($instance)
     {
-        app(Dispatcher::class)->send($this, $instance);
+        Laravel::app(Dispatcher::class)->send($this, $instance);
     }
 
     /**
@@ -27,7 +28,7 @@ trait RoutesNotifications
      */
     public function notifyNow($instance, array $channels = null)
     {
-        app(Dispatcher::class)->sendNow($this, $instance, $channels);
+        Laravel::app(Dispatcher::class)->sendNow($this, $instance, $channels);
     }
 
     /**

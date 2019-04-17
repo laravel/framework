@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
@@ -32,7 +33,7 @@ class UrlSigningTest extends TestCase
         })->name('foo');
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', Laravel::now()->addMinutes(5), ['id' => 1]));
         $this->assertEquals('valid', $this->get($url)->original);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
@@ -55,7 +56,7 @@ class UrlSigningTest extends TestCase
         })->name('foo')->middleware(ValidateSignature::class);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', Laravel::now()->addMinutes(5), ['id' => 1]));
         $this->assertEquals('valid', $this->get($url)->original);
     }
 
@@ -66,7 +67,7 @@ class UrlSigningTest extends TestCase
         })->name('foo')->middleware(ValidateSignature::class);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', Laravel::now()->addMinutes(5), ['id' => 1]));
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
 
         $response = $this->get($url);

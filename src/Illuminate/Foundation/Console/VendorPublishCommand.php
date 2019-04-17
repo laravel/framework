@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 use League\Flysystem\MountManager;
@@ -266,9 +267,9 @@ class VendorPublishCommand extends Command
      */
     protected function status($from, $to, $type)
     {
-        $from = str_replace(base_path(), '', realpath($from));
+        $from = str_replace(Laravel::basePath(), '', realpath($from));
 
-        $to = str_replace(base_path(), '', realpath($to));
+        $to = str_replace(Laravel::basePath(), '', realpath($to));
 
         $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
     }

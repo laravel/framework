@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiter;
@@ -75,7 +76,7 @@ trait ThrottlesLogins
      */
     protected function fireLockoutEvent(Request $request)
     {
-        event(new Lockout($request));
+        Laravel::event(new Lockout($request));
     }
 
     /**
@@ -96,7 +97,7 @@ trait ThrottlesLogins
      */
     protected function limiter()
     {
-        return app(RateLimiter::class);
+        return Laravel::app(RateLimiter::class);
     }
 
     /**

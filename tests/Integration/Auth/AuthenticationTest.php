@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Login;
 use Orchestra\Testbench\TestCase;
@@ -52,7 +53,7 @@ class AuthenticationTest extends TestCase
         AuthenticationTestUser::create([
             'username' => 'username',
             'email' => 'email',
-            'password' => bcrypt('password'),
+            'password' => Laravel::bcrypt('password'),
             'is_active' => true,
         ]);
 
@@ -87,7 +88,7 @@ class AuthenticationTest extends TestCase
         AuthenticationTestUser::create([
             'username' => 'username2',
             'email' => 'email2',
-            'password' => bcrypt('password'),
+            'password' => Laravel::bcrypt('password'),
             'is_active' => false,
         ]);
 
@@ -227,12 +228,12 @@ class AuthenticationTest extends TestCase
 
     public function test_auth_via_attempt_remembering()
     {
-        $provider = new EloquentUserProvider(app('hash'), AuthenticationTestUser::class);
+        $provider = new EloquentUserProvider(Laravel::app('hash'), AuthenticationTestUser::class);
 
         $user = AuthenticationTestUser::create([
             'username' => 'username2',
             'email' => 'email2',
-            'password' => bcrypt('password'),
+            'password' => Laravel::bcrypt('password'),
             'remember_token' => $token = Str::random(),
             'is_active' => false,
         ]);
