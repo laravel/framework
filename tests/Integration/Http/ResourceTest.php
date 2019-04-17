@@ -559,7 +559,7 @@ class ResourceTest extends TestCase
         $response = $this->withoutExceptionHandling()->get(
             '/', ['Accept' => 'application/json']
         );
-        $this->assertTrue($createdPost->is($response->getOriginalContent()));
+        $this->assertEquals($createdPost->getKey(), $response->getOriginalContent()->getKey());
     }
 
     public function test_original_on_response_is_collection_of_model_when_collection_resource()

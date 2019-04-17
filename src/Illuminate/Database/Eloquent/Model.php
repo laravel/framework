@@ -1189,6 +1189,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function is($model)
     {
         return ! is_null($model) &&
+               $this->exists &&
+               $model->exists &&
                $this->getKey() === $model->getKey() &&
                $this->getTable() === $model->getTable() &&
                $this->getConnectionName() === $model->getConnectionName();
