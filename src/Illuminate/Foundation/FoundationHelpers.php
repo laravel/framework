@@ -46,10 +46,10 @@ trait FoundationHelpers
         if ($code instanceof Response) {
             throw new HttpResponseException($code);
         } elseif ($code instanceof Responsable) {
-            throw new HttpResponseException($code->toResponse(static::request()));
+            throw new HttpResponseException($code->toResponse(Laravel::request()));
         }
 
-        static::app()->abort($code, $message, $headers);
+        Laravel::app()->abort($code, $message, $headers);
     }
 
     /**
@@ -67,7 +67,7 @@ trait FoundationHelpers
     public static function abortIf($boolean, $code, $message = '', array $headers = [])
     {
         if ($boolean) {
-            static::abort($code, $message, $headers);
+            Laravel::abort($code, $message, $headers);
         }
     }
 
@@ -86,7 +86,7 @@ trait FoundationHelpers
     public static function abortUnless($boolean, $code, $message = '', array $headers = [])
     {
         if (! $boolean) {
-            static::abort($code, $message, $headers);
+            Laravel::abort($code, $message, $headers);
         }
     }
 
@@ -100,7 +100,7 @@ trait FoundationHelpers
      */
     public static function action($name, $parameters = [], $absolute = true)
     {
-        return static::app('url')->action($name, $parameters, $absolute);
+        return Laravel::app('url')->action($name, $parameters, $absolute);
     }
 
     /**
@@ -126,7 +126,7 @@ trait FoundationHelpers
      */
     public static function appPath($path = '')
     {
-        return static::app('path').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return Laravel::app('path').($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -138,7 +138,7 @@ trait FoundationHelpers
      */
     public static function asset($path, $secure = null)
     {
-        return static::app('url')->asset($path, $secure);
+        return Laravel::app('url')->asset($path, $secure);
     }
 
     /**
@@ -150,9 +150,9 @@ trait FoundationHelpers
     public static function auth($guard = null)
     {
         if (is_null($guard)) {
-            return static::app(AuthFactory::class);
+            return Laravel::app(AuthFactory::class);
         }
-        return static::app(AuthFactory::class)->guard($guard);
+        return Laravel::app(AuthFactory::class)->guard($guard);
     }
 
     /**
@@ -165,7 +165,7 @@ trait FoundationHelpers
      */
     public static function back($status = 302, $headers = [], $fallback = false)
     {
-        return static::app('redirect')->back($status, $headers, $fallback);
+        return Laravel::app('redirect')->back($status, $headers, $fallback);
     }
 
     /**
@@ -176,7 +176,7 @@ trait FoundationHelpers
      */
     public static function basePath($path = '')
     {
-        return static::app()->basePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return Laravel::app()->basePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -188,7 +188,7 @@ trait FoundationHelpers
      */
     public static function bcrypt($value, $options = [])
     {
-        return static::app('hash')->driver('bcrypt')->make($value, $options);
+        return Laravel::app('hash')->driver('bcrypt')->make($value, $options);
     }
 
     /**
@@ -199,7 +199,7 @@ trait FoundationHelpers
      */
     public static function broadcast($event = null)
     {
-        return static::app(BroadcastFactory::class)->event($event);
+        return Laravel::app(BroadcastFactory::class)->event($event);
     }
 
     /**
@@ -217,11 +217,11 @@ trait FoundationHelpers
         $arguments = func_get_args();
 
         if (empty($arguments)) {
-            return static::app('cache');
+            return Laravel::app('cache');
         }
 
         if (is_string($arguments[0])) {
-            return static::app('cache')->get(...$arguments);
+            return Laravel::app('cache')->get(...$arguments);
         }
 
         if (! is_array($arguments[0])) {
@@ -236,7 +236,7 @@ trait FoundationHelpers
             );
         }
 
-        return static::app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1]);
+        return Laravel::app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1]);
     }
 
     /**
@@ -251,14 +251,14 @@ trait FoundationHelpers
     public static function config($key = null, $default = null)
     {
         if (is_null($key)) {
-            return static::app('config');
+            return Laravel::app('config');
         }
 
         if (is_array($key)) {
-            return static::app('config')->set($key);
+            return Laravel::app('config')->set($key);
         }
 
-        return static::app('config')->get($key, $default);
+        return Laravel::app('config')->get($key, $default);
     }
 
     /**
@@ -269,7 +269,7 @@ trait FoundationHelpers
      */
     public static function configPath($path = '')
     {
-        return static::app()->make('path.config').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return Laravel::app()->make('path.config').($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -288,7 +288,7 @@ trait FoundationHelpers
      */
     public static function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true, $raw = false, $sameSite = null)
     {
-        $cookie = static::app(CookieFactory::class);
+        $cookie = Laravel::app(CookieFactory::class);
 
         if (is_null($name)) {
             return $cookie;
@@ -304,7 +304,7 @@ trait FoundationHelpers
      */
     public static function csrfField()
     {
-        return new HtmlString('<input type="hidden" name="_token" value="'.static::csrfToken().'">');
+        return new HtmlString('<input type="hidden" name="_token" value="'.Laravel::csrfToken().'">');
     }
 
     /**
@@ -316,7 +316,7 @@ trait FoundationHelpers
      */
     public static function csrfToken()
     {
-        $session = static::app('session');
+        $session = Laravel::app('session');
 
         if (isset($session)) {
             return $session->token();
@@ -333,7 +333,7 @@ trait FoundationHelpers
      */
     public static function databasePath($path = '')
     {
-        return static::app()->databasePath($path);
+        return Laravel::app()->databasePath($path);
     }
 
     /**
@@ -345,7 +345,7 @@ trait FoundationHelpers
      */
     public static function decrypt($value, $unserialize = true)
     {
-        return static::app('encrypter')->decrypt($value, $unserialize);
+        return Laravel::app('encrypter')->decrypt($value, $unserialize);
     }
 
     /**
@@ -372,7 +372,7 @@ trait FoundationHelpers
      */
     public static function dispatchNow($job, $handler = null)
     {
-        return static::app(Dispatcher::class)->dispatchNow($job, $handler);
+        return Laravel::app(Dispatcher::class)->dispatchNow($job, $handler);
     }
 
     /**
@@ -390,7 +390,7 @@ trait FoundationHelpers
         static $manifestPath;
 
         if (empty($manifest) || $manifestPath !== $buildDirectory) {
-            $path = static::publicPath($buildDirectory.'/rev-manifest.json');
+            $path = Laravel::publicPath($buildDirectory.'/rev-manifest.json');
 
             if (file_exists($path)) {
                 $manifest = json_decode(file_get_contents($path), true);
@@ -404,7 +404,7 @@ trait FoundationHelpers
             return '/'.trim($buildDirectory.'/'.$manifest[$file], '/');
         }
 
-        $unversioned = static::publicPath($file);
+        $unversioned = Laravel::publicPath($file);
 
         if (file_exists($unversioned)) {
             return '/'.trim($file, '/');
@@ -422,7 +422,7 @@ trait FoundationHelpers
      */
     public static function encrypt($value, $serialize = true)
     {
-        return static::app('encrypter')->encrypt($value, $serialize);
+        return Laravel::app('encrypter')->encrypt($value, $serialize);
     }
 
     /**
@@ -435,7 +435,7 @@ trait FoundationHelpers
      */
     public static function event(...$args)
     {
-        return static::app('events')->dispatch(...$args);
+        return Laravel::app('events')->dispatch(...$args);
     }
 
     /**
@@ -446,7 +446,7 @@ trait FoundationHelpers
      */
     public static function factory()
     {
-        $factory = static::app(EloquentFactory::class);
+        $factory = Laravel::app(EloquentFactory::class);
 
         $arguments = func_get_args();
 
@@ -468,7 +468,7 @@ trait FoundationHelpers
      */
     public static function info($message, $context = [])
     {
-        static::app('log')->info($message, $context);
+        Laravel::app('log')->info($message, $context);
     }
 
     /**
@@ -481,10 +481,10 @@ trait FoundationHelpers
     public static function logger($message = null, array $context = [])
     {
         if (is_null($message)) {
-            return static::app('log');
+            return Laravel::app('log');
         }
 
-        return static::app('log')->debug($message, $context);
+        return Laravel::app('log')->debug($message, $context);
     }
 
     /**
@@ -495,7 +495,7 @@ trait FoundationHelpers
      */
     public static function logs($driver = null)
     {
-        return $driver ? static::app('log')->driver($driver) : static::app('log');
+        return $driver ? Laravel::app('log')->driver($driver) : Laravel::app('log');
     }
 
     /**
@@ -520,7 +520,7 @@ trait FoundationHelpers
      */
     public static function mix($path, $manifestDirectory = '')
     {
-        return static::app(Mix::class)(...func_get_args());
+        return Laravel::app(Mix::class)(...func_get_args());
     }
 
     /**
@@ -543,7 +543,7 @@ trait FoundationHelpers
      */
     public static function old($key = null, $default = null)
     {
-        return static::app('request')->old($key, $default);
+        return Laravel::app('request')->old($key, $default);
     }
 
     /**
@@ -556,7 +556,7 @@ trait FoundationHelpers
      */
     public static function policy($class)
     {
-        return static::app(Gate::class)->getPolicyFor($class);
+        return Laravel::app(Gate::class)->getPolicyFor($class);
     }
 
     /**
@@ -567,7 +567,7 @@ trait FoundationHelpers
      */
     public static function publicPath($path = '')
     {
-        return static::app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path);
+        return Laravel::app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path);
     }
 
     /**
@@ -582,10 +582,10 @@ trait FoundationHelpers
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null)
     {
         if (is_null($to)) {
-            return static::app('redirect');
+            return Laravel::app('redirect');
         }
 
-        return static::app('redirect')->to($to, $status, $headers, $secure);
+        return Laravel::app('redirect')->to($to, $status, $headers, $secure);
     }
 
     /**
@@ -601,7 +601,7 @@ trait FoundationHelpers
             $exception = new FatalThrowableError($exception);
         }
 
-        static::app(ExceptionHandler::class)->report($exception);
+        Laravel::app(ExceptionHandler::class)->report($exception);
     }
 
     /**
@@ -614,16 +614,16 @@ trait FoundationHelpers
     public static function request($key = null, $default = null)
     {
         if (is_null($key)) {
-            return static::app('request');
+            return Laravel::app('request');
         }
 
         if (is_array($key)) {
-            return static::app('request')->only($key);
+            return Laravel::app('request')->only($key);
         }
 
-        $value = static::app('request')->__get($key);
+        $value = Laravel::app('request')->__get($key);
 
-        return is_null($value) ? static::value($default) : $value;
+        return is_null($value) ? Laravel::value($default) : $value;
     }
 
     /**
@@ -638,9 +638,9 @@ trait FoundationHelpers
         try {
             return $callback();
         } catch (Throwable $e) {
-            static::report($e);
+            Laravel::report($e);
 
-            return static::value($rescue);
+            return Laravel::value($rescue);
         }
     }
 
@@ -653,7 +653,7 @@ trait FoundationHelpers
      */
     public static function resolve($name, array $parameters = [])
     {
-        return static::app($name, $parameters);
+        return Laravel::app($name, $parameters);
     }
 
     /**
@@ -664,7 +664,7 @@ trait FoundationHelpers
      */
     public static function resourcePath($path = '')
     {
-        return static::app()->resourcePath($path);
+        return Laravel::app()->resourcePath($path);
     }
 
     /**
@@ -677,7 +677,7 @@ trait FoundationHelpers
      */
     public static function response($content = '', $status = 200, array $headers = [])
     {
-        $factory = static::app(ResponseFactory::class);
+        $factory = Laravel::app(ResponseFactory::class);
 
         if (func_num_args() === 0) {
             return $factory;
@@ -696,7 +696,7 @@ trait FoundationHelpers
      */
     public static function route($name, $parameters = [], $absolute = true)
     {
-        return static::app('url')->route($name, $parameters, $absolute);
+        return Laravel::app('url')->route($name, $parameters, $absolute);
     }
 
     /**
@@ -707,7 +707,7 @@ trait FoundationHelpers
      */
     public static function secureAsset($path)
     {
-        return static::asset($path, true);
+        return Laravel::asset($path, true);
     }
 
     /**
@@ -719,7 +719,7 @@ trait FoundationHelpers
      */
     public static function secureUrl($path, $parameters = [])
     {
-        return static::url($path, $parameters, true);
+        return Laravel::url($path, $parameters, true);
     }
 
     /**
@@ -734,14 +734,14 @@ trait FoundationHelpers
     public static function session($key = null, $default = null)
     {
         if (is_null($key)) {
-            return static::app('session');
+            return Laravel::app('session');
         }
 
         if (is_array($key)) {
-            return static::app('session')->put($key);
+            return Laravel::app('session')->put($key);
         }
 
-        return static::app('session')->get($key, $default);
+        return Laravel::app('session')->get($key, $default);
     }
 
     /**
@@ -752,7 +752,7 @@ trait FoundationHelpers
      */
     public static function storagePath($path = '')
     {
-        return static::app('path.storage').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return Laravel::app('path.storage').($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -777,10 +777,10 @@ trait FoundationHelpers
     public static function trans($key = null, $replace = [], $locale = null)
     {
         if (is_null($key)) {
-            return static::app('translator');
+            return Laravel::app('translator');
         }
 
-        return static::app('translator')->trans($key, $replace, $locale);
+        return Laravel::app('translator')->trans($key, $replace, $locale);
     }
 
     /**
@@ -794,7 +794,7 @@ trait FoundationHelpers
      */
     public static function transChoice($key, $number, array $replace = [], $locale = null)
     {
-        return static::app('translator')->transChoice($key, $number, $replace, $locale);
+        return Laravel::app('translator')->transChoice($key, $number, $replace, $locale);
     }
 
     /**
@@ -807,7 +807,7 @@ trait FoundationHelpers
      */
     public static function __($key, $replace = [], $locale = null)
     {
-        return static::app('translator')->getFromJson($key, $replace, $locale);
+        return Laravel::app('translator')->getFromJson($key, $replace, $locale);
     }
 
     /**
@@ -821,10 +821,10 @@ trait FoundationHelpers
     public static function url($path = null, $parameters = [], $secure = null)
     {
         if (is_null($path)) {
-            return static::app(UrlGenerator::class);
+            return Laravel::app(UrlGenerator::class);
         }
 
-        return static::app(UrlGenerator::class)->to($path, $parameters, $secure);
+        return Laravel::app(UrlGenerator::class)->to($path, $parameters, $secure);
     }
 
     /**
@@ -838,7 +838,7 @@ trait FoundationHelpers
      */
     public static function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = [])
     {
-        $factory = static::app(ValidationFactory::class);
+        $factory = Laravel::app(ValidationFactory::class);
 
         if (func_num_args() === 0) {
             return $factory;
@@ -857,7 +857,7 @@ trait FoundationHelpers
      */
     public static function view($view = null, $data = [], $mergeData = [])
     {
-        $factory = static::app(ViewFactory::class);
+        $factory = Laravel::app(ViewFactory::class);
 
         if (func_num_args() === 0) {
             return $factory;
