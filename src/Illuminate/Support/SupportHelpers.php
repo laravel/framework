@@ -1,19 +1,43 @@
 <?php
 
-if (! function_exists('append_config')) {
+namespace Illuminate\Support;
+
+use Exception;
+use PhpOption\Option;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Support\Optional;
+use Illuminate\Support\Collection;
+use Dotenv\Environment\DotenvFactory;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HigherOrderTapProxy;
+use Dotenv\Environment\Adapter\PutenvAdapter;
+use Dotenv\Environment\Adapter\EnvConstAdapter;
+use Dotenv\Environment\Adapter\ServerConstAdapter;
+
+trait SupportHelpers
+{
     /**
      * Assign high numeric IDs to a config item to force appending.
      *
      * @param  array  $array
      * @return array
      */
-    function append_config(array $array)
+    public static function appendConfig(array $array)
     {
-        return Laravel::appendConfig($array);
-    }
-}
+        $start = 9999;
 
-if (! function_exists('array_add')) {
+        foreach ($array as $key => $value) {
+            if (is_numeric($key)) {
+                $start++;
+
+                $array[$start] = Arr::pull($array, $key);
+            }
+        }
+
+        return $array;
+    }
+
     /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
@@ -24,13 +48,11 @@ if (! function_exists('array_add')) {
      *
      * @deprecated Arr::add() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_add($array, $key, $value)
+    public static function arrayAdd($array, $key, $value)
     {
-        return Laravel::arrayAdd($array, $key, $value);
+        return Arr::add($array, $key, $value);
     }
-}
 
-if (! function_exists('array_collapse')) {
     /**
      * Collapse an array of arrays into a single array.
      *
@@ -39,13 +61,11 @@ if (! function_exists('array_collapse')) {
      *
      * @deprecated Arr::collapse() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_collapse($array)
+    public static function arrayCollapse($array)
     {
-        return Laravel::arrayCollapse($array);
+        return Arr::collapse($array);
     }
-}
 
-if (! function_exists('array_divide')) {
     /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
@@ -54,13 +74,11 @@ if (! function_exists('array_divide')) {
      *
      * @deprecated Arr::divide() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_divide($array)
+    public static function arrayDivide($array)
     {
-        return Laravel::arrayDivide($array);
+        return Arr::divide($array);
     }
-}
 
-if (! function_exists('array_dot')) {
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
@@ -70,13 +88,11 @@ if (! function_exists('array_dot')) {
      *
      * @deprecated Arr::dot() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_dot($array, $prepend = '')
+    public static function arrayDot($array, $prepend = '')
     {
-        return Laravel::arrayDot($array, $prepend);
+        return Arr::dot($array, $prepend);
     }
-}
 
-if (! function_exists('array_except')) {
     /**
      * Get all of the given array except for a specified array of keys.
      *
@@ -86,13 +102,11 @@ if (! function_exists('array_except')) {
      *
      * @deprecated Arr::except() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_except($array, $keys)
+    public static function arrayExcept($array, $keys)
     {
-        return Laravel::arrayExcept($array, $keys);
+        return Arr::except($array, $keys);
     }
-}
 
-if (! function_exists('array_first')) {
     /**
      * Return the first element in an array passing a given truth test.
      *
@@ -103,13 +117,11 @@ if (! function_exists('array_first')) {
      *
      * @deprecated Arr::first() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_first($array, callable $callback = null, $default = null)
+    public static function arrayFirst($array, callable $callback = null, $default = null)
     {
-        return Laravel::arrayFirst($array, $callback, $default);
+        return Arr::first($array, $callback, $default);
     }
-}
 
-if (! function_exists('array_flatten')) {
     /**
      * Flatten a multi-dimensional array into a single level.
      *
@@ -119,13 +131,11 @@ if (! function_exists('array_flatten')) {
      *
      * @deprecated Arr::flatten() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_flatten($array, $depth = INF)
+    public static function arrayFlatten($array, $depth = INF)
     {
-        return Laravel::arrayFlatten($array, $depth);
+        return Arr::flatten($array, $depth);
     }
-}
 
-if (! function_exists('array_forget')) {
     /**
      * Remove one or many array items from a given array using "dot" notation.
      *
@@ -135,13 +145,11 @@ if (! function_exists('array_forget')) {
      *
      * @deprecated Arr::forget() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_forget(&$array, $keys)
+    public static function arrayForget(&$array, $keys)
     {
-        return Laravel::arrayForget($array, $keys);
+        return Arr::forget($array, $keys);
     }
-}
 
-if (! function_exists('array_get')) {
     /**
      * Get an item from an array using "dot" notation.
      *
@@ -152,13 +160,11 @@ if (! function_exists('array_get')) {
      *
      * @deprecated Arr::get() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_get($array, $key, $default = null)
+    public static function arrayGet($array, $key, $default = null)
     {
-        return Laravel::arrayGet($array, $key, $default);
+        return Arr::get($array, $key, $default);
     }
-}
 
-if (! function_exists('array_has')) {
     /**
      * Check if an item or items exist in an array using "dot" notation.
      *
@@ -168,13 +174,11 @@ if (! function_exists('array_has')) {
      *
      * @deprecated Arr::has() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_has($array, $keys)
+    public static function arrayHas($array, $keys)
     {
-        return Laravel::arrayHas($array, $keys);
+        return Arr::has($array, $keys);
     }
-}
 
-if (! function_exists('array_last')) {
     /**
      * Return the last element in an array passing a given truth test.
      *
@@ -185,13 +189,11 @@ if (! function_exists('array_last')) {
      *
      * @deprecated Arr::last() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_last($array, callable $callback = null, $default = null)
+    public static function arrayLast($array, callable $callback = null, $default = null)
     {
-        return Laravel::arrayLast($array, $callback, $default);
+        return Arr::last($array, $callback, $default);
     }
-}
 
-if (! function_exists('array_only')) {
     /**
      * Get a subset of the items from the given array.
      *
@@ -201,13 +203,11 @@ if (! function_exists('array_only')) {
      *
      * @deprecated Arr::only() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_only($array, $keys)
+    public static function arrayOnly($array, $keys)
     {
-        return Laravel::arrayOnly($array, $keys);
+        return Arr::only($array, $keys);
     }
-}
 
-if (! function_exists('array_pluck')) {
     /**
      * Pluck an array of values from an array.
      *
@@ -218,13 +218,11 @@ if (! function_exists('array_pluck')) {
      *
      * @deprecated Arr::pluck() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_pluck($array, $value, $key = null)
+    public static function arrayPluck($array, $value, $key = null)
     {
-        return Laravel::arrayPluck($array, $value, $key);
+        return Arr::pluck($array, $value, $key);
     }
-}
 
-if (! function_exists('array_prepend')) {
     /**
      * Push an item onto the beginning of an array.
      *
@@ -235,13 +233,11 @@ if (! function_exists('array_prepend')) {
      *
      * @deprecated Arr::prepend() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_prepend($array, $value, $key = null)
+    public static function arrayPrepend($array, $value, $key = null)
     {
-        return Laravel::arrayPrepend($array, $value, $key);
+        return Arr::prepend($array, $value, $key);
     }
-}
 
-if (! function_exists('array_pull')) {
     /**
      * Get a value from the array, and remove it.
      *
@@ -252,13 +248,11 @@ if (! function_exists('array_pull')) {
      *
      * @deprecated Arr::pull() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_pull(&$array, $key, $default = null)
+    public static function arrayPull(&$array, $key, $default = null)
     {
-        return Laravel::arrayPull($array, $key, $default);
+        return Arr::pull($array, $key, $default);
     }
-}
 
-if (! function_exists('array_random')) {
     /**
      * Get a random value from an array.
      *
@@ -268,13 +262,11 @@ if (! function_exists('array_random')) {
      *
      * @deprecated Arr::random() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_random($array, $num = null)
+    public static function arrayRandom($array, $num = null)
     {
-        return Laravel::arrayRandom($array, $num);
+        return Arr::random($array, $num);
     }
-}
 
-if (! function_exists('array_set')) {
     /**
      * Set an array item to a given value using "dot" notation.
      *
@@ -287,13 +279,11 @@ if (! function_exists('array_set')) {
      *
      * @deprecated Arr::set() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_set(&$array, $key, $value)
+    public static function arraySet(&$array, $key, $value)
     {
-        return Laravel::arraySet($array, $key, $value);
+        return Arr::set($array, $key, $value);
     }
-}
 
-if (! function_exists('array_sort')) {
     /**
      * Sort the array by the given callback or attribute name.
      *
@@ -303,13 +293,11 @@ if (! function_exists('array_sort')) {
      *
      * @deprecated Arr::sort() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_sort($array, $callback = null)
+    public static function arraySort($array, $callback = null)
     {
-        return Laravel::arraySort($array, $callback);
+        return Arr::sort($array, $callback);
     }
-}
 
-if (! function_exists('array_sort_recursive')) {
     /**
      * Recursively sort an array by keys and values.
      *
@@ -318,13 +306,11 @@ if (! function_exists('array_sort_recursive')) {
      *
      * @deprecated Arr::sortRecursive() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_sort_recursive($array)
+    public static function arraySortRecursive($array)
     {
-        return Laravel::arraySortRecursive($array);
+        return Arr::sortRecursive($array);
     }
-}
 
-if (! function_exists('array_where')) {
     /**
      * Filter the array using the given callback.
      *
@@ -334,13 +320,11 @@ if (! function_exists('array_where')) {
      *
      * @deprecated Arr::where() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_where($array, callable $callback)
+    public static function arrayWhere($array, callable $callback)
     {
-        return Laravel::arrayWhere($array, $callback);
+        return Arr::where($array, $callback);
     }
-}
 
-if (! function_exists('array_wrap')) {
     /**
      * If the given value is not an array, wrap it in one.
      *
@@ -349,26 +333,38 @@ if (! function_exists('array_wrap')) {
      *
      * @deprecated Arr::wrap() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function array_wrap($value)
+    public static function arrayWrap($value)
     {
-        return Laravel::arrayWrap($value);
+        return Arr::wrap($value);
     }
-}
 
-if (! function_exists('blank')) {
     /**
      * Determine if the given value is "blank".
      *
      * @param  mixed  $value
      * @return bool
      */
-    function blank($value)
+    public static function blank($value)
     {
-        return Laravel::blank($value);
-    }
-}
+        if (is_null($value)) {
+            return true;
+        }
 
-if (! function_exists('camel_case')) {
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Countable) {
+            return count($value) === 0;
+        }
+
+        return empty($value);
+    }
+
     /**
      * Convert a value to camel case.
      *
@@ -377,52 +373,56 @@ if (! function_exists('camel_case')) {
      *
      * @deprecated Str::camel() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function camel_case($value)
+    public static function camelCase($value)
     {
-        return Laravel::camelCase($value);
+        return Str::camel($value);
     }
-}
 
-if (! function_exists('class_basename')) {
     /**
      * Get the class "basename" of the given object / class.
      *
      * @param  string|object  $class
      * @return string
      */
-    function class_basename($class)
+    public static function classBasename($class)
     {
-        return Laravel::classBasename($class);
-    }
-}
+        $class = is_object($class) ? get_class($class) : $class;
 
-if (! function_exists('class_uses_recursive')) {
+        return basename(str_replace('\\', '/', $class));
+    }
+
     /**
      * Returns all traits used by a class, its parent classes and trait of their traits.
      *
      * @param  object|string  $class
      * @return array
      */
-    function class_uses_recursive($class)
+    public static function classUsesRecursive($class)
     {
-        return Laravel::classUsesRecursive($class);
-    }
-}
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
 
-if (! function_exists('collect')) {
+        $results = [];
+
+        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
+            $results += trait_uses_recursive($class);
+        }
+
+        return array_unique($results);
+    }
+
     /**
      * Create a collection from the given value.
      *
      * @param  mixed  $value
      * @return \Illuminate\Support\Collection
      */
-    function collect($value = null)
+    public static function collect($value = null)
     {
-        return Laravel::collect($value);
+        return new Collection($value);
     }
-}
 
-if (! function_exists('data_fill')) {
     /**
      * Fill in data where it's missing.
      *
@@ -431,13 +431,11 @@ if (! function_exists('data_fill')) {
      * @param  mixed  $value
      * @return mixed
      */
-    function data_fill(&$target, $key, $value)
+    public static function dataFill(&$target, $key, $value)
     {
-        return Laravel::dataFill($target, $key, $value);
+        return data_set($target, $key, $value, false);
     }
-}
 
-if (! function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.
      *
@@ -446,13 +444,43 @@ if (! function_exists('data_get')) {
      * @param  mixed   $default
      * @return mixed
      */
-    function data_get($target, $key, $default = null)
+    public static function dataGet($target, $key, $default = null)
     {
-        return Laravel::dataGet($target, $key, $default);
-    }
-}
+        if (is_null($key)) {
+            return $target;
+        }
 
-if (! function_exists('data_set')) {
+        $key = is_array($key) ? $key : explode('.', $key);
+
+        while (! is_null($segment = array_shift($key))) {
+            if ($segment === '*') {
+                if ($target instanceof Collection) {
+                    $target = $target->all();
+                } elseif (! is_array($target)) {
+                    return value($default);
+                }
+
+                $result = [];
+
+                foreach ($target as $item) {
+                    $result[] = data_get($item, $key);
+                }
+
+                return in_array('*', $key) ? Arr::collapse($result) : $result;
+            }
+
+            if (Arr::accessible($target) && Arr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && isset($target->{$segment})) {
+                $target = $target->{$segment};
+            } else {
+                return value($default);
+            }
+        }
+
+        return $target;
+    }
+
     /**
      * Set an item on an array or object using dot notation.
      *
@@ -462,13 +490,57 @@ if (! function_exists('data_set')) {
      * @param  bool  $overwrite
      * @return mixed
      */
-    function data_set(&$target, $key, $value, $overwrite = true)
+    public static function dataSet(&$target, $key, $value, $overwrite = true)
     {
-        return Laravel::dataSet($target, $key, $value, $overwrite);
-    }
-}
+        $segments = is_array($key) ? $key : explode('.', $key);
 
-if (! function_exists('e')) {
+        if (($segment = array_shift($segments)) === '*') {
+            if (! Arr::accessible($target)) {
+                $target = [];
+            }
+
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    data_set($inner, $segments, $value, $overwrite);
+                }
+            } elseif ($overwrite) {
+                foreach ($target as &$inner) {
+                    $inner = $value;
+                }
+            }
+        } elseif (Arr::accessible($target)) {
+            if ($segments) {
+                if (! Arr::exists($target, $segment)) {
+                    $target[$segment] = [];
+                }
+
+                data_set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite || ! Arr::exists($target, $segment)) {
+                $target[$segment] = $value;
+            }
+        } elseif (is_object($target)) {
+            if ($segments) {
+                if (! isset($target->{$segment})) {
+                    $target->{$segment} = [];
+                }
+
+                data_set($target->{$segment}, $segments, $value, $overwrite);
+            } elseif ($overwrite || ! isset($target->{$segment})) {
+                $target->{$segment} = $value;
+            }
+        } else {
+            $target = [];
+
+            if ($segments) {
+                data_set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite) {
+                $target[$segment] = $value;
+            }
+        }
+
+        return $target;
+    }
+
     /**
      * Encode HTML special characters in a string.
      *
@@ -476,13 +548,15 @@ if (! function_exists('e')) {
      * @param  bool  $doubleEncode
      * @return string
      */
-    function e($value, $doubleEncode = true)
+    public static function e($value, $doubleEncode = true)
     {
-        return Laravel::e($value, $doubleEncode);
-    }
-}
+        if ($value instanceof Htmlable) {
+            return $value->toHtml();
+        }
 
-if (! function_exists('ends_with')) {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+    }
+
     /**
      * Determine if a given string ends with a given substring.
      *
@@ -492,13 +566,11 @@ if (! function_exists('ends_with')) {
      *
      * @deprecated Str::endsWith() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function ends_with($haystack, $needles)
+    public static function endsWith($haystack, $needles)
     {
-        return Laravel::endsWith($haystack, $needles);
+        return Str::endsWith($haystack, $needles);
     }
-}
 
-if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable.
      *
@@ -506,39 +578,64 @@ if (! function_exists('env')) {
      * @param  mixed   $default
      * @return mixed
      */
-    function env($key, $default = null)
+    public static function env($key, $default = null)
     {
-        return Laravel::env($key, $default);
-    }
-}
+        static $variables;
 
-if (! function_exists('filled')) {
+        if ($variables === null) {
+            $variables = (new DotenvFactory([new EnvConstAdapter, new PutenvAdapter, new ServerConstAdapter]))->createImmutable();
+        }
+
+        return Option::fromValue($variables->get($key))
+            ->map(function ($value) {
+                switch (strtolower($value)) {
+                    case 'true':
+                    case '(true)':
+                        return true;
+                    case 'false':
+                    case '(false)':
+                        return false;
+                    case 'empty':
+                    case '(empty)':
+                        return '';
+                    case 'null':
+                    case '(null)':
+                        return;
+                }
+
+                if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
+                    return $matches[2];
+                }
+
+                return $value;
+            })
+            ->getOrCall(function () use ($default) {
+                return value($default);
+            });
+    }
+
     /**
      * Determine if a value is "filled".
      *
      * @param  mixed  $value
      * @return bool
      */
-    function filled($value)
+    public static function filled($value)
     {
-        return Laravel::filled($value);
+        return ! blank($value);
     }
-}
 
-if (! function_exists('head')) {
     /**
      * Get the first element of an array. Useful for method chaining.
      *
      * @param  array  $array
      * @return mixed
      */
-    function head($array)
+    public static function head($array)
     {
-        return Laravel::head($array);
+        return reset($array);
     }
-}
 
-if (! function_exists('kebab_case')) {
     /**
      * Convert a string to kebab case.
      *
@@ -547,26 +644,22 @@ if (! function_exists('kebab_case')) {
      *
      * @deprecated Str::kebab() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function kebab_case($value)
+    public static function kebabCase($value)
     {
-        return Laravel::kebabCase($value);
+        return Str::kebab($value);
     }
-}
 
-if (! function_exists('last')) {
     /**
      * Get the last element from an array.
      *
      * @param  array  $array
      * @return mixed
      */
-    function last($array)
+    public static function last($array)
     {
-        return Laravel::last($array);
+        return end($array);
     }
-}
 
-if (! function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.
      *
@@ -575,13 +668,23 @@ if (! function_exists('object_get')) {
      * @param  mixed   $default
      * @return mixed
      */
-    function object_get($object, $key, $default = null)
+    public static function objectGet($object, $key, $default = null)
     {
-        return Laravel::objectGet($object, $key, $default);
-    }
-}
+        if (is_null($key) || trim($key) == '') {
+            return $object;
+        }
 
-if (! function_exists('optional')) {
+        foreach (explode('.', $key) as $segment) {
+            if (! is_object($object) || ! isset($object->{$segment})) {
+                return value($default);
+            }
+
+            $object = $object->{$segment};
+        }
+
+        return $object;
+    }
+
     /**
      * Provide access to optional objects.
      *
@@ -589,13 +692,15 @@ if (! function_exists('optional')) {
      * @param  callable|null  $callback
      * @return mixed
      */
-    function optional($value = null, callable $callback = null)
+    public static function optional($value = null, callable $callback = null)
     {
-        return Laravel::optional($value, $callback);
+        if (is_null($callback)) {
+            return new Optional($value);
+        } elseif (! is_null($value)) {
+            return $callback($value);
+        }
     }
-}
 
-if (! function_exists('preg_replace_array')) {
     /**
      * Replace a given pattern with each value in the array in sequentially.
      *
@@ -604,13 +709,15 @@ if (! function_exists('preg_replace_array')) {
      * @param  string  $subject
      * @return string
      */
-    function preg_replace_array($pattern, array $replacements, $subject)
+    public static function pregReplaceArray($pattern, array $replacements, $subject)
     {
-        return Laravel::pregReplaceArray($pattern, $replacements, $subject);
+        return preg_replace_callback($pattern, function () use (&$replacements) {
+            foreach ($replacements as $key => $value) {
+                return array_shift($replacements);
+            }
+        }, $subject);
     }
-}
 
-if (! function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
      *
@@ -621,13 +728,31 @@ if (! function_exists('retry')) {
      *
      * @throws \Exception
      */
-    function retry($times, callable $callback, $sleep = 0)
+    public static function retry($times, callable $callback, $sleep = 0)
     {
-        return Laravel::retry($times, $callback, $sleep);
-    }
-}
+        $attempts = 0;
+        $times--;
 
-if (! function_exists('snake_case')) {
+        beginning:
+        $attempts++;
+
+        try {
+            return $callback($attempts);
+        } catch (Exception $e) {
+            if (! $times) {
+                throw $e;
+            }
+
+            $times--;
+
+            if ($sleep) {
+                usleep($sleep * 1000);
+            }
+
+            goto beginning;
+        }
+    }
+
     /**
      * Convert a string to snake case.
      *
@@ -637,13 +762,11 @@ if (! function_exists('snake_case')) {
      *
      * @deprecated Str::snake() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function snake_case($value, $delimiter = '_')
+    public static function snakeCase($value, $delimiter = '_')
     {
-        return Laravel::snakeCase($value, $delimiter);
+        return Str::snake($value, $delimiter);
     }
-}
 
-if (! function_exists('starts_with')) {
     /**
      * Determine if a given string starts with a given substring.
      *
@@ -653,13 +776,11 @@ if (! function_exists('starts_with')) {
      *
      * @deprecated Str::startsWith() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function starts_with($haystack, $needles)
+    public static function startsWith($haystack, $needles)
     {
-        return Laravel::startsWith($haystack, $needles);
+        return Str::startsWith($haystack, $needles);
     }
-}
 
-if (! function_exists('str_after')) {
     /**
      * Return the remainder of a string after a given value.
      *
@@ -669,13 +790,11 @@ if (! function_exists('str_after')) {
      *
      * @deprecated Str::after() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_after($subject, $search)
+    public static function strAfter($subject, $search)
     {
-        return Laravel::strAfter($subject, $search);
+        return Str::after($subject, $search);
     }
-}
 
-if (! function_exists('str_before')) {
     /**
      * Get the portion of a string before a given value.
      *
@@ -685,13 +804,11 @@ if (! function_exists('str_before')) {
      *
      * @deprecated Str::before() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_before($subject, $search)
+    public static function strBefore($subject, $search)
     {
-        return Laravel::strBefore($subject, $search);
+        return Str::before($subject, $search);
     }
-}
 
-if (! function_exists('str_contains')) {
     /**
      * Determine if a given string contains a given substring.
      *
@@ -701,13 +818,11 @@ if (! function_exists('str_contains')) {
      *
      * @deprecated Str::contains() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_contains($haystack, $needles)
+    public static function strContains($haystack, $needles)
     {
-        return Laravel::strContains($haystack, $needles);
+        return Str::contains($haystack, $needles);
     }
-}
 
-if (! function_exists('str_finish')) {
     /**
      * Cap a string with a single instance of a given value.
      *
@@ -717,13 +832,11 @@ if (! function_exists('str_finish')) {
      *
      * @deprecated Str::finish() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_finish($value, $cap)
+    public static function strFinish($value, $cap)
     {
-        return Laravel::strFinish($value, $cap);
+        return Str::finish($value, $cap);
     }
-}
 
-if (! function_exists('str_is')) {
     /**
      * Determine if a given string matches a given pattern.
      *
@@ -733,13 +846,11 @@ if (! function_exists('str_is')) {
      *
      * @deprecated Str::is() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_is($pattern, $value)
+    public static function strIs($pattern, $value)
     {
-        return Laravel::strIs($pattern, $value);
+        return Str::is($pattern, $value);
     }
-}
 
-if (! function_exists('str_limit')) {
     /**
      * Limit the number of characters in a string.
      *
@@ -750,13 +861,11 @@ if (! function_exists('str_limit')) {
      *
      * @deprecated Str::limit() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_limit($value, $limit = 100, $end = '...')
+    public static function strLimit($value, $limit = 100, $end = '...')
     {
-        return Laravel::strLimit($value, $limit, $end);
+        return Str::limit($value, $limit, $end);
     }
-}
 
-if (! function_exists('str_plural')) {
     /**
      * Get the plural form of an English word.
      *
@@ -766,13 +875,11 @@ if (! function_exists('str_plural')) {
      *
      * @deprecated Str::plural() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_plural($value, $count = 2)
+    public static function strPlural($value, $count = 2)
     {
-        return Laravel::strPlural($value, $count);
+        return Str::plural($value, $count);
     }
-}
 
-if (! function_exists('str_random')) {
     /**
      * Generate a more truly "random" alpha-numeric string.
      *
@@ -783,13 +890,11 @@ if (! function_exists('str_random')) {
      *
      * @deprecated Str::random() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_random($length = 16)
+    public static function strRandom($length = 16)
     {
-        return Laravel::strRandom($length);
+        return Str::random($length);
     }
-}
 
-if (! function_exists('str_replace_array')) {
     /**
      * Replace a given value in the string sequentially with an array.
      *
@@ -800,13 +905,11 @@ if (! function_exists('str_replace_array')) {
      *
      * @deprecated Str::replaceArray() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_replace_array($search, array $replace, $subject)
+    public static function strReplaceArray($search, array $replace, $subject)
     {
-        return Laravel::strReplaceArray($search, $replace, $subject);
+        return Str::replaceArray($search, $replace, $subject);
     }
-}
 
-if (! function_exists('str_replace_first')) {
     /**
      * Replace the first occurrence of a given value in the string.
      *
@@ -817,13 +920,11 @@ if (! function_exists('str_replace_first')) {
      *
      * @deprecated Str::replaceFirst() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_replace_first($search, $replace, $subject)
+    public static function strReplaceFirst($search, $replace, $subject)
     {
-        return Laravel::strReplaceFirst($search, $replace, $subject);
+        return Str::replaceFirst($search, $replace, $subject);
     }
-}
 
-if (! function_exists('str_replace_last')) {
     /**
      * Replace the last occurrence of a given value in the string.
      *
@@ -834,13 +935,11 @@ if (! function_exists('str_replace_last')) {
      *
      * @deprecated Str::replaceLast() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_replace_last($search, $replace, $subject)
+    public static function strReplaceLast($search, $replace, $subject)
     {
-        return Laravel::strReplaceLast($search, $replace, $subject);
+        return Str::replaceLast($search, $replace, $subject);
     }
-}
 
-if (! function_exists('str_singular')) {
     /**
      * Get the singular form of an English word.
      *
@@ -849,13 +948,11 @@ if (! function_exists('str_singular')) {
      *
      * @deprecated Str::singular() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_singular($value)
+    public static function strSingular($value)
     {
-        return Laravel::strSingular($value);
+        return Str::singular($value);
     }
-}
 
-if (! function_exists('str_slug')) {
     /**
      * Generate a URL friendly "slug" from a given string.
      *
@@ -866,13 +963,11 @@ if (! function_exists('str_slug')) {
      *
      * @deprecated Str::slug() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_slug($title, $separator = '-', $language = 'en')
+    public static function strSlug($title, $separator = '-', $language = 'en')
     {
-        return Laravel::strSlug($title, $separator, $language);
+        return Str::slug($title, $separator, $language);
     }
-}
 
-if (! function_exists('str_start')) {
     /**
      * Begin a string with a single instance of a given value.
      *
@@ -882,13 +977,11 @@ if (! function_exists('str_start')) {
      *
      * @deprecated Str::start() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function str_start($value, $prefix)
+    public static function strStart($value, $prefix)
     {
-        return Laravel::strStart($value, $prefix);
+        return Str::start($value, $prefix);
     }
-}
 
-if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
      *
@@ -897,13 +990,11 @@ if (! function_exists('studly_case')) {
      *
      * @deprecated Str::studly() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function studly_case($value)
+    public static function studlyCase($value)
     {
-        return Laravel::studlyCase($value);
+        return Str::studly($value);
     }
-}
 
-if (! function_exists('tap')) {
     /**
      * Call the given Closure with the given value then return the value.
      *
@@ -911,13 +1002,17 @@ if (! function_exists('tap')) {
      * @param  callable|null  $callback
      * @return mixed
      */
-    function tap($value, $callback = null)
+    public static function tap($value, $callback = null)
     {
-        return Laravel::tap($value, $callback);
-    }
-}
+        if (is_null($callback)) {
+            return new HigherOrderTapProxy($value);
+        }
 
-if (! function_exists('throw_if')) {
+        $callback($value);
+
+        return $value;
+    }
+
     /**
      * Throw the given exception if the given condition is true.
      *
@@ -928,13 +1023,15 @@ if (! function_exists('throw_if')) {
      *
      * @throws \Throwable
      */
-    function throw_if($condition, $exception, ...$parameters)
+    public static function throwIf($condition, $exception, ...$parameters)
     {
-        return Laravel::throwIf($condition, $exception, ...$parameters);
-    }
-}
+        if ($condition) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
 
-if (! function_exists('throw_unless')) {
+        return $condition;
+    }
+
     /**
      * Throw the given exception unless the given condition is true.
      *
@@ -944,13 +1041,15 @@ if (! function_exists('throw_unless')) {
      * @return mixed
      * @throws \Throwable
      */
-    function throw_unless($condition, $exception, ...$parameters)
+    public static function throwUnless($condition, $exception, ...$parameters)
     {
-        return Laravel::throwUnless($condition, $exception, ...$parameters);
-    }
-}
+        if (! $condition) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
 
-if (! function_exists('title_case')) {
+        return $condition;
+    }
+
     /**
      * Convert a value to title case.
      *
@@ -959,26 +1058,28 @@ if (! function_exists('title_case')) {
      *
      * @deprecated Str::title() should be used directly instead. Will be removed in Laravel 5.9.
      */
-    function title_case($value)
+    public static function titleCase($value)
     {
-        return Laravel::titleCase($value);
+        return Str::title($value);
     }
-}
 
-if (! function_exists('trait_uses_recursive')) {
     /**
      * Returns all traits used by a trait and its traits.
      *
      * @param  string  $trait
      * @return array
      */
-    function trait_uses_recursive($trait)
+    public static function traitUsesRecursive($trait)
     {
-        return Laravel::traitUsesRecursive($trait);
-    }
-}
+        $traits = class_uses($trait);
 
-if (! function_exists('transform')) {
+        foreach ($traits as $trait) {
+            $traits += trait_uses_recursive($trait);
+        }
+
+        return $traits;
+    }
+
     /**
      * Transform the given value if it is present.
      *
@@ -987,38 +1088,40 @@ if (! function_exists('transform')) {
      * @param  mixed  $default
      * @return mixed|null
      */
-    function transform($value, callable $callback, $default = null)
+    public static function transform($value, callable $callback, $default = null)
     {
-        return Laravel::transform($value, $callback, $default);
-    }
-}
+        if (filled($value)) {
+            return $callback($value);
+        }
 
-if (! function_exists('value')) {
+        if (is_callable($default)) {
+            return $default($value);
+        }
+
+        return $default;
+    }
+
     /**
      * Return the default value of the given value.
      *
      * @param  mixed  $value
      * @return mixed
      */
-    function value($value)
+    public static function value($value)
     {
-        return Laravel::value($value);
+        return $value instanceof Closure ? $value() : $value;
     }
-}
 
-if (! function_exists('windows_os')) {
     /**
      * Determine whether the current environment is Windows based.
      *
      * @return bool
      */
-    function windows_os()
+    public static function windowsOs()
     {
-        return Laravel::windowsOs();
+        return strtolower(substr(PHP_OS, 0, 3)) === 'win';
     }
-}
 
-if (! function_exists('with')) {
     /**
      * Return the given value, optionally passed through the given callback.
      *
@@ -1026,8 +1129,9 @@ if (! function_exists('with')) {
      * @param  callable|null  $callback
      * @return mixed
      */
-    function with($value, callable $callback = null)
+    public static function with($value, callable $callback = null)
     {
-        return Laravel::with($value, $callback);
+        return is_null($callback) ? $value : $callback($value);
     }
+
 }
