@@ -41,9 +41,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(true);
     }
 
-    public function test_register_custom_DBAL_type()
+    public function test_register_custom_doctrine_type()
     {
-        Schema::registerCustomDBALType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
+        Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
         Schema::create('test', function (Blueprint $table) {
             $table->string('test_column');

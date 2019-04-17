@@ -8,16 +8,18 @@ use Illuminate\Database\Schema\Types\TinyInteger;
 class MySqlBuilder extends Builder
 {
     /**
-     * MySqlBuilder constructor.
+     * Create a new builder instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     *
      * @throws \Doctrine\DBAL\DBALException
      */
     public function __construct(Connection $connection)
     {
         parent::__construct($connection);
 
-        $this->registerCustomDBALTypes();
+        $this->registerCustomDoctrineTypes();
     }
 
     /**
@@ -129,18 +131,18 @@ class MySqlBuilder extends Builder
     }
 
     /**
-     * Register custom DBAL types for the MySQL builder.
+     * Register the custom Doctrine mapping types for the MySQL builder.
      *
      * @return void
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    private function registerCustomDBALTypes()
+    protected function registerCustomDoctrineTypes()
     {
-        if (! $this->connection->isDoctrineAvailable()) {
-            return;
+        if ($this->connection->isDoctrineAvailable()) {
+            $this->registerCustomDoctrineType(
+                TinyInteger::class, TinyInteger::NAME, 'TINYINT'
+            );
         }
-
-        $this->registerCustomDBALType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
     }
 }
