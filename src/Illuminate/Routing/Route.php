@@ -932,4 +932,18 @@ class Route
     {
         return $this->parameter($key);
     }
+
+    /**
+     * Call middleware alias fluently.
+     *
+     * @param string $method
+     * @param array  $arguments
+     * @return $this
+     */
+    public function __call($method, $args)
+    {
+        $this->middleware($args ? "{$method}:" . implode($args, ",") : $method);
+
+        return $this;
+    }    
 }
