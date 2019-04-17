@@ -45,13 +45,10 @@ class ScheduleRunCommand extends Command
     /**
      * Create a new command instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    public function __construct(Schedule $schedule)
+    public function __construct()
     {
-        $this->schedule = $schedule;
-
         $this->startedAt = Date::now();
 
         parent::__construct();
@@ -60,10 +57,13 @@ class ScheduleRunCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    public function handle()
+    public function handle(Schedule $schedule)
     {
+        $this->schedule = $schedule;
+
         foreach ($this->schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 continue;
