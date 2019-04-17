@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 
@@ -354,7 +355,7 @@ class SqlServerGrammar extends Grammar
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = collect($values)->map(function ($value, $key) {
+        $columns = Laravel::collect($values)->map(function ($value, $key) {
             return $this->wrap($key).' = '.$this->parameter($value);
         })->implode(', ');
 

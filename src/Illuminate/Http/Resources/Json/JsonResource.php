@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources\Json;
 
+use Laravel;
 use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Container\Container;
@@ -75,7 +76,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public static function collection($resource)
     {
-        return tap(new AnonymousResourceCollection($resource, static::class), function ($collection) {
+        return Laravel::tap(new AnonymousResourceCollection($resource, static::class), function ($collection) {
             if (property_exists(static::class, 'preserveKeys')) {
                 $collection->preserveKeys = (new static([]))->preserveKeys === true;
             }

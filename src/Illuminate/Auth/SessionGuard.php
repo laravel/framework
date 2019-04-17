@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth;
 
+use Laravel;
 use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -546,7 +547,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        $result = tap($this->user()->forceFill([
+        $result = Laravel::tap($this->user()->forceFill([
             $attribute => Hash::make($password),
         ]))->save();
 

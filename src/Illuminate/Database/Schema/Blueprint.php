@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use Laravel;
 use BadMethodCallException;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
@@ -162,7 +163,7 @@ class Blueprint
      */
     protected function commandsNamed(array $names)
     {
-        return collect($this->commands)->filter(function ($command) use ($names) {
+        return Laravel::collect($this->commands)->filter(function ($command) use ($names) {
             return in_array($command->name, $names);
         });
     }
@@ -250,7 +251,7 @@ class Blueprint
      */
     protected function creating()
     {
-        return collect($this->commands)->contains(function ($command) {
+        return Laravel::collect($this->commands)->contains(function ($command) {
             return $command->name === 'create';
         });
     }

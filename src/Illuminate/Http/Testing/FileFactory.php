@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Testing;
 
+use Laravel;
 use Illuminate\Support\Str;
 
 class FileFactory
@@ -15,7 +16,7 @@ class FileFactory
      */
     public function create($name, $kilobytes = 0)
     {
-        return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
+        return Laravel::tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
             $file->sizeToReport = $kilobytes * 1024;
         });
     }
@@ -45,7 +46,7 @@ class FileFactory
      */
     protected function generateImage($width, $height, $type)
     {
-        return tap(tmpfile(), function ($temp) use ($width, $height, $type) {
+        return Laravel::tap(tmpfile(), function ($temp) use ($width, $height, $type) {
             ob_start();
 
             $image = imagecreatetruecolor($width, $height);

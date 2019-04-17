@@ -20,7 +20,7 @@ class DiscoverEvents
      */
     public static function within($listenerPath, $basePath)
     {
-        return collect(static::getListenerEvents(
+        return Laravel::collect(static::getListenerEvents(
             (new Finder)->files()->in($listenerPath), $basePath
         ))->mapToDictionary(function ($event, $listener) {
             return [$event => $listener];
@@ -50,7 +50,7 @@ class DiscoverEvents
                 }
 
                 $listenerEvents[$listener->name.'@'.$method->name] =
-                                optional($method->getParameters()[0]->getClass())->name;
+                                Laravel::optional($method->getParameters()[0]->getClass())->name;
             }
         }
 

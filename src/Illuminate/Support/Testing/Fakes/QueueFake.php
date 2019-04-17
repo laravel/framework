@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Laravel;
 use BadMethodCallException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Contracts\Queue\Queue;
@@ -85,7 +86,7 @@ class QueueFake extends QueueManager implements Queue
         );
 
         PHPUnit::assertTrue(
-            collect($expectedChain)->isNotEmpty(),
+            Laravel::collect($expectedChain)->isNotEmpty(),
             'The expected chain can not be empty.'
         );
 
@@ -104,7 +105,7 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function assertPushedWithChainOfObjects($job, $expectedChain, $callback)
     {
-        $chain = collect($expectedChain)->map(function ($job) {
+        $chain = Laravel::collect($expectedChain)->map(function ($job) {
             return serialize($job);
         })->all();
 
@@ -127,7 +128,7 @@ class QueueFake extends QueueManager implements Queue
     protected function assertPushedWithChainOfClasses($job, $expectedChain, $callback)
     {
         $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
-            return collect($chain)->map(function ($job) {
+            return Laravel::collect($chain)->map(function ($job) {
                 return get_class(unserialize($job));
             });
         })->filter(function ($chain) use ($expectedChain) {
@@ -147,7 +148,7 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function isChainOfObjects($chain)
     {
-        return ! collect($chain)->contains(function ($job) {
+        return ! Laravel::collect($chain)->contains(function ($job) {
             return ! is_object($job);
         });
     }
@@ -187,14 +188,14 @@ class QueueFake extends QueueManager implements Queue
     public function pushed($job, $callback = null)
     {
         if (! $this->hasPushed($job)) {
-            return collect();
+            return Laravel::collect();
         }
 
         $callback = $callback ?: function () {
             return true;
         };
 
-        return collect($this->jobs[$job])->filter(function ($data) use ($callback) {
+        return Laravel::collect($this->jobs[$job])->filter(function ($data) use ($callback) {
             return $callback($data['job'], $data['queue']);
         })->pluck('job');
     }

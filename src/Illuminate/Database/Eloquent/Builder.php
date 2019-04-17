@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use Laravel;
 use Exception;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
@@ -416,7 +417,7 @@ class Builder
             return $instance;
         }
 
-        return tap($this->newModelInstance($attributes + $values), function ($instance) {
+        return Laravel::tap($this->newModelInstance($attributes + $values), function ($instance) {
             $instance->save();
         });
     }
@@ -430,7 +431,7 @@ class Builder
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return Laravel::tap($this->firstOrNew($attributes), function ($instance) use ($values) {
             $instance->fill($values)->save();
         });
     }
@@ -789,7 +790,7 @@ class Builder
      */
     public function create(array $attributes = [])
     {
-        return tap($this->newModelInstance($attributes), function ($instance) {
+        return Laravel::tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
         });
     }
@@ -1042,7 +1043,7 @@ class Builder
      */
     protected function groupWhereSliceForScope(QueryBuilder $query, $whereSlice)
     {
-        $whereBooleans = collect($whereSlice)->pluck('boolean');
+        $whereBooleans = Laravel::collect($whereSlice)->pluck('boolean');
 
         // Here we'll check if the given subset of where clauses contains any "or"
         // booleans and in this case create a nested where expression. That way

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -120,7 +121,7 @@ trait AsPivot
 
         $this->touchOwners();
 
-        return tap($this->getDeleteQuery()->delete(), function () {
+        return Laravel::tap($this->getDeleteQuery()->delete(), function () {
             $this->fireModelEvent('deleted', false);
         });
     }
@@ -147,7 +148,7 @@ trait AsPivot
     {
         if (! isset($this->table)) {
             $this->setTable(str_replace(
-                '\\', '', Str::snake(Str::singular(class_basename($this)))
+                '\\', '', Str::snake(Str::singular(Laravel::classBasename($this)))
             ));
         }
 

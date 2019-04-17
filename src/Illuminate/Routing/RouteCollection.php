@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Laravel;
 use Countable;
 use ArrayIterator;
 use IteratorAggregate;
@@ -189,7 +190,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function matchAgainstRoutes(array $routes, $request, $includingMethod = true)
     {
-        [$fallbacks, $routes] = collect($routes)->partition(function ($route) {
+        [$fallbacks, $routes] = Laravel::collect($routes)->partition(function ($route) {
             return $route->isFallback;
         });
 

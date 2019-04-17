@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
@@ -57,7 +58,7 @@ class EventListCommand extends Command
             $events = $this->filterEvents($events);
         }
 
-        return collect($events)->map(function ($listeners, $event) {
+        return Laravel::collect($events)->map(function ($listeners, $event) {
             return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
         })->sortBy('Event')->values()->toArray();
     }
@@ -74,7 +75,7 @@ class EventListCommand extends Command
             return $events;
         }
 
-        return collect($events)->filter(function ($listeners, $event) use ($eventName) {
+        return Laravel::collect($events)->filter(function ($listeners, $event) use ($eventName) {
             return Str::contains($event, $eventName);
         })->toArray();
     }

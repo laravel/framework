@@ -89,7 +89,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function discoverEvents()
     {
-        return collect($this->discoverEventsWithin())
+        return Laravel::collect($this->discoverEventsWithin())
                     ->reject(function ($directory) {
                         return ! is_dir($directory);
                     })

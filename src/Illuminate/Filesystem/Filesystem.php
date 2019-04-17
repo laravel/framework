@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Laravel;
 use ErrorException;
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
@@ -248,7 +249,7 @@ class Filesystem
      */
     public function link($target, $link)
     {
-        if (! windows_os()) {
+        if (! Laravel::windowsOs()) {
             return symlink($target, $link);
         }
 

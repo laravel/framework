@@ -3,6 +3,7 @@
 namespace Illuminate\Session;
 
 use Closure;
+use Laravel;
 use stdClass;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -177,7 +178,7 @@ class Store implements Session
     {
         $placeholder = new stdClass;
 
-        return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
+        return ! Laravel::collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
             return $this->get($key, $placeholder) === $placeholder;
         });
     }
@@ -190,7 +191,7 @@ class Store implements Session
      */
     public function has($key)
     {
-        return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
+        return ! Laravel::collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
             return is_null($this->get($key));
         });
     }
@@ -286,7 +287,7 @@ class Store implements Session
             return $value;
         }
 
-        return tap($callback(), function ($value) use ($key) {
+        return Laravel::tap($callback(), function ($value) use ($key) {
             $this->put($key, $value);
         });
     }
@@ -475,7 +476,7 @@ class Store implements Session
      */
     public function regenerate($destroy = false)
     {
-        return tap($this->migrate($destroy), function () {
+        return Laravel::tap($this->migrate($destroy), function () {
             $this->regenerateToken();
         });
     }

@@ -3,6 +3,7 @@
 namespace Illuminate\Redis\Connectors;
 
 use Redis;
+use Laravel;
 use RedisCluster;
 use Illuminate\Support\Arr;
 use Illuminate\Redis\Connections\PhpRedisConnection;
@@ -62,7 +63,7 @@ class PhpRedisConnector
      */
     protected function createClient(array $config)
     {
-        return tap(new Redis, function ($client) use ($config) {
+        return Laravel::tap(new Redis, function ($client) use ($config) {
             $this->establishConnection($client, $config);
 
             if (! empty($config['password'])) {

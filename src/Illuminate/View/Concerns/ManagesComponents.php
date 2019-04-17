@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Concerns;
 
+use Laravel;
 use Illuminate\Support\HtmlString;
 
 trait ManagesComponents
@@ -106,7 +107,7 @@ trait ManagesComponents
      */
     public function endSlot()
     {
-        last($this->componentStack);
+        Laravel::last($this->componentStack);
 
         $currentSlot = array_pop(
             $this->slotStack[$this->currentComponent()]

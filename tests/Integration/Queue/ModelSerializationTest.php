@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Schema;
+use Laravel;
 use LogicException;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Queue\SerializesModels;
@@ -149,7 +150,7 @@ class ModelSerializationTest extends TestCase
 
     public function test_it_reloads_relationships()
     {
-        $order = tap(Order::create(), function (Order $order) {
+        $order = Laravel::tap(Order::create(), function (Order $order) {
             $order->wasRecentlyCreated = false;
         });
 
@@ -169,7 +170,7 @@ class ModelSerializationTest extends TestCase
 
     public function test_it_reloads_nested_relationships()
     {
-        $order = tap(Order::create(), function (Order $order) {
+        $order = Laravel::tap(Order::create(), function (Order $order) {
             $order->wasRecentlyCreated = false;
         });
 
@@ -192,7 +193,7 @@ class ModelSerializationTest extends TestCase
      */
     public function test_it_can_unserialize_nested_relationships_without_pivot()
     {
-        $user = tap(User::create([
+        $user = Laravel::tap(User::create([
             'email' => 'taylor@laravel.com',
         ]), function (User $user) {
             $user->wasRecentlyCreated = false;

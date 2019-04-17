@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Laravel;
 use Exception;
 use ReflectionClass;
 use Illuminate\Contracts\Queue\Job;
@@ -85,7 +86,7 @@ class CallQueuedHandler
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
+        if (in_array(InteractsWithQueue::class, Laravel::classUsesRecursive($instance))) {
             $instance->setJob($job);
         }
 

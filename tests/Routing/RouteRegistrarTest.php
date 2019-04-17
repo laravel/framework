@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Laravel;
 use Mockery as m;
 use BadMethodCallException;
 use Illuminate\Http\Request;
@@ -518,7 +519,7 @@ class RouteRegistrarTest extends TestCase
      */
     protected function getRoute()
     {
-        return last($this->router->getRoutes()->get());
+        return Laravel::last($this->router->getRoutes()->get());
     }
 
     /**

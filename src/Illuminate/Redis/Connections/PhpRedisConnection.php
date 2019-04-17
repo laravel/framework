@@ -4,6 +4,7 @@ namespace Illuminate\Redis\Connections;
 
 use Redis;
 use Closure;
+use Laravel;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 
 /**
@@ -56,7 +57,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function exists(...$keys)
     {
-        $keys = collect($keys)->map(function ($key) {
+        $keys = Laravel::collect($keys)->map(function ($key) {
             return $this->applyPrefix($key);
         })->all();
 
@@ -122,7 +123,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         if (count($dictionary) === 1) {
             $dictionary = $dictionary[0];
         } else {
-            $input = collect($dictionary);
+            $input = Laravel::collect($dictionary);
 
             $dictionary = $input->nth(2)->combine($input->nth(2, 1))->toArray();
         }
@@ -301,7 +302,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
         return is_null($callback)
             ? $pipeline
-            : tap($pipeline, $callback)->exec();
+            : Laravel::tap($pipeline, $callback)->exec();
     }
 
     /**
@@ -316,7 +317,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
         return is_null($callback)
             ? $transaction
-            : tap($transaction, $callback)->exec();
+            : Laravel::tap($transaction, $callback)->exec();
     }
 
     /**

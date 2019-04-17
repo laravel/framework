@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Laravel;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -158,7 +159,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileJoins(Builder $query, $joins)
     {
-        return collect($joins)->map(function ($join) use ($query) {
+        return Laravel::collect($joins)->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
 
             $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
@@ -202,7 +203,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileWheresToArray($query)
     {
-        return collect($query->wheres)->map(function ($where) use ($query) {
+        return Laravel::collect($query->wheres)->map(function ($where) use ($query) {
             return $where['boolean'].' '.$this->{"where{$where['type']}"}($query, $where);
         })->all();
     }
@@ -700,9 +701,9 @@ class Grammar extends BaseGrammar
 
         $column = $this->wrap($having['column']);
 
-        $min = $this->parameter(head($having['values']));
+        $min = $this->parameter(Laravel::head($having['values']));
 
-        $max = $this->parameter(last($having['values']));
+        $max = $this->parameter(Laravel::last($having['values']));
 
         return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
     }
@@ -867,7 +868,7 @@ class Grammar extends BaseGrammar
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same amount of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = collect($values)->map(function ($record) {
+        $parameters = Laravel::collect($values)->map(function ($record) {
             return '('.$this->parameterize($record).')';
         })->implode(', ');
 
@@ -914,7 +915,7 @@ class Grammar extends BaseGrammar
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = collect($values)->map(function ($value, $key) {
+        $columns = Laravel::collect($values)->map(function ($value, $key) {
             return $this->wrap($key).' = '.$this->parameter($value);
         })->implode(', ');
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Laravel;
 use RuntimeException;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\TableDiff;
@@ -259,7 +260,7 @@ abstract class Grammar extends BaseGrammar
     {
         $table = $this->getTablePrefix().$blueprint->getTable();
 
-        return tap(new TableDiff($table), function ($tableDiff) use ($schema, $table) {
+        return Laravel::tap(new TableDiff($table), function ($tableDiff) use ($schema, $table) {
             $tableDiff->fromTable = $schema->listTableDetails($table);
         });
     }

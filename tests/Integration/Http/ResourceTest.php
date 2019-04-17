@@ -423,7 +423,7 @@ class ResourceTest extends TestCase
     public function test_collections_are_not_doubled_wrapped()
     {
         Route::get('/', function () {
-            return new PostCollectionResource(collect([new Post([
+            return new PostCollectionResource(Laravel::collect([new Post([
                 'id' => 5,
                 'title' => 'Test Title',
             ])]));
@@ -449,7 +449,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $paginator = new LengthAwarePaginator(
-                collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
+                Laravel::collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
                 10, 15, 1
             );
 
@@ -491,7 +491,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new EmptyPostCollectionResource(new LengthAwarePaginator(
-                collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
+                Laravel::collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
                 10, 15, 1
             ));
         });
@@ -565,7 +565,7 @@ class ResourceTest extends TestCase
 
     public function test_original_on_response_is_collection_of_model_when_collection_resource()
     {
-        $createdPosts = collect([
+        $createdPosts = Laravel::collect([
             new Post(['id' => 5, 'title' => 'Test Title']),
             new Post(['id' => 6, 'title' => 'Test Title 2']),
         ]);
@@ -582,7 +582,7 @@ class ResourceTest extends TestCase
 
     public function test_collection_resources_are_countable()
     {
-        $posts = collect([
+        $posts = Laravel::collect([
             new Post(['id' => 1, 'title' => 'Test title']),
             new Post(['id' => 2, 'title' => 'Test title 2']),
         ]);
@@ -821,7 +821,7 @@ class ResourceTest extends TestCase
 
             public function work()
             {
-                $posts = collect([
+                $posts = Laravel::collect([
                     new Post(['id' => 1, 'title' => 'Test title 1']),
                     new Post(['id' => 2, 'title' => 'Test title 2']),
                 ]);

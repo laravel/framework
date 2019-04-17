@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -115,7 +116,7 @@ class NotificationSender
      */
     protected function preferredLocale($notifiable, $notification)
     {
-        return $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
+        return $notification->locale ?? $this->locale ?? Laravel::value(function () use ($notifiable) {
             if ($notifiable instanceof HasLocalePreference) {
                 return $notifiable->preferredLocale();
             }

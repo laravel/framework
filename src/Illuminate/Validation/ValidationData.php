@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -40,7 +41,7 @@ class ValidationData
             return $data;
         }
 
-        return data_set($data, $attribute, null, true);
+        return Laravel::dataSet($data, $attribute, null, true);
     }
 
     /**

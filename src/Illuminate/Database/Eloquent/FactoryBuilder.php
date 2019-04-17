@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Laravel;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
@@ -178,9 +179,9 @@ class FactoryBuilder
         $results = $this->make($attributes);
 
         if ($results instanceof Model) {
-            $this->store(collect([$results]));
+            $this->store(Laravel::collect([$results]));
 
-            $this->callAfterCreating(collect([$results]));
+            $this->callAfterCreating(Laravel::collect([$results]));
         } else {
             $this->store($results);
 
@@ -216,8 +217,8 @@ class FactoryBuilder
     public function make(array $attributes = [])
     {
         if ($this->amount === null) {
-            return tap($this->makeInstance($attributes), function ($instance) {
-                $this->callAfterMaking(collect([$instance]));
+            return Laravel::tap($this->makeInstance($attributes), function ($instance) {
+                $this->callAfterMaking(Laravel::collect([$instance]));
             });
         }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Laravel;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Query\Expression;
 
@@ -96,7 +97,7 @@ abstract class Grammar
      */
     protected function wrapSegments($segments)
     {
-        return collect($segments)->map(function ($segment, $key) use ($segments) {
+        return Laravel::collect($segments)->map(function ($segment, $key) use ($segments) {
             return $key == 0 && count($segments) > 1
                             ? $this->wrapTable($segment)
                             : $this->wrapValue($segment);

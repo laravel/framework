@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Middleware;
 
 use Closure;
+use Laravel;
 
 class SetCacheHeaders
 {
@@ -46,7 +47,7 @@ class SetCacheHeaders
      */
     protected function parseOptions($options)
     {
-        return collect(explode(';', $options))->mapWithKeys(function ($option) {
+        return Laravel::collect(explode(';', $options))->mapWithKeys(function ($option) {
             $data = explode('=', $option, 2);
 
             return [$data[0] => $data[1] ?? true];

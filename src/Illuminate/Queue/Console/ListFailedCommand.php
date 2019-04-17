@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 
@@ -51,7 +52,7 @@ class ListFailedCommand extends Command
     {
         $failed = $this->laravel['queue.failer']->all();
 
-        return collect($failed)->map(function ($failed) {
+        return Laravel::collect($failed)->map(function ($failed) {
             return $this->parseFailedJob((array) $failed);
         })->filter()->all();
     }

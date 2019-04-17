@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
@@ -181,7 +182,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileUpdateColumns($values)
     {
-        return collect($values)->map(function ($value, $key) {
+        return Laravel::collect($values)->map(function ($value, $key) {
             if ($this->isJsonSelector($key)) {
                 return $this->compileJsonUpdateColumn($key, new JsonExpression($value));
             }
@@ -215,7 +216,7 @@ class MySqlGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $values = collect($values)->reject(function ($value, $column) {
+        $values = Laravel::collect($values)->reject(function ($value, $column) {
             return $this->isJsonSelector($column) && is_bool($value);
         })->all();
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Encryption;
 
+use Laravel;
 use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
@@ -39,7 +40,7 @@ class EncryptionServiceProvider extends ServiceProvider
      */
     protected function key(array $config)
     {
-        return tap($config['key'], function ($key) {
+        return Laravel::tap($config['key'], function ($key) {
             if (empty($key)) {
                 throw new RuntimeException(
                     'No application encryption key has been specified.'

@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Closure;
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Routing\Route;
@@ -85,7 +86,7 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $routes = collect($this->routes)->map(function ($route) {
+        $routes = Laravel::collect($this->routes)->map(function ($route) {
             return $this->getRouteInformation($route);
         })->filter()->all();
 
@@ -164,7 +165,7 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        return collect($route->gatherMiddleware())->map(function ($middleware) {
+        return Laravel::collect($route->gatherMiddleware())->map(function ($middleware) {
             return $middleware instanceof Closure ? 'Closure' : $middleware;
         })->implode(',');
     }

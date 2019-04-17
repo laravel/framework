@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Laravel;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
@@ -74,7 +75,7 @@ class SQLiteGrammar extends Grammar
     {
         $foreigns = $this->getCommandsByName($blueprint, 'foreign');
 
-        return collect($foreigns)->reduce(function ($sql, $foreign) {
+        return Laravel::collect($foreigns)->reduce(function ($sql, $foreign) {
             // Once we have all the foreign key commands for the table creation statement
             // we'll loop through each of them and add them to the create table SQL we
             // are building, since SQLite needs foreign keys on the tables creation.
@@ -137,7 +138,7 @@ class SQLiteGrammar extends Grammar
     {
         $columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
-        return collect($columns)->map(function ($column) use ($blueprint) {
+        return Laravel::collect($columns)->map(function ($column) use ($blueprint) {
             return 'alter table '.$this->wrapTable($blueprint).' '.$column;
         })->all();
     }

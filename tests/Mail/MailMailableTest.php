@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Laravel;
 use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
 
@@ -39,13 +40,13 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
-        $mailable->to(collect([new MailableTestUserStub]));
+        $mailable->to(Laravel::collect([new MailableTestUserStub]));
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->to);
         $this->assertTrue($mailable->hasTo(new MailableTestUserStub));
         $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
-        $mailable->to(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $mailable->to(Laravel::collect([new MailableTestUserStub, new MailableTestUserStub]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
@@ -86,13 +87,13 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
-        $mailable->replyTo(collect([new MailableTestUserStub]));
+        $mailable->replyTo(Laravel::collect([new MailableTestUserStub]));
         $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->replyTo);
         $this->assertTrue($mailable->hasReplyTo(new MailableTestUserStub));
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
 
         $mailable = new WelcomeMailableStub;
-        $mailable->replyTo(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $mailable->replyTo(Laravel::collect([new MailableTestUserStub, new MailableTestUserStub]));
         $this->assertEquals([
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
             ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],

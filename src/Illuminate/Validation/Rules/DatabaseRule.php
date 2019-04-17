@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Rules;
 
 use Closure;
+use Laravel;
 
 trait DatabaseRule
 {
@@ -165,7 +166,7 @@ trait DatabaseRule
      */
     protected function formatWheres()
     {
-        return collect($this->wheres)->map(function ($where) {
+        return Laravel::collect($this->wheres)->map(function ($where) {
             return $where['column'].','.$where['value'];
         })->implode(',');
     }

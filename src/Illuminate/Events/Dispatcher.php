@@ -2,6 +2,7 @@
 
 namespace Illuminate\Events;
 
+use Laravel;
 use Exception;
 use ReflectionClass;
 use Illuminate\Support\Arr;
@@ -498,7 +499,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function propagateListenerOptions($listener, $job)
     {
-        return tap($job, function ($job) use ($listener) {
+        return Laravel::tap($job, function ($job) use ($listener) {
             $job->tries = $listener->tries ?? null;
             $job->timeout = $listener->timeout ?? null;
             $job->timeoutAt = method_exists($listener, 'retryUntil')

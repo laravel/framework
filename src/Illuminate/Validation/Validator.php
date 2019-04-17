@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Laravel;
 use RuntimeException;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
@@ -336,7 +337,7 @@ class Validator implements ValidatorContract
         $missingValue = Str::random(10);
 
         foreach (array_keys($this->getRules()) as $key) {
-            $value = data_get($this->getData(), $key, $missingValue);
+            $value = Laravel::dataGet($this->getData(), $key, $missingValue);
 
             if ($value !== $missingValue) {
                 Arr::set($results, $key, $value);
@@ -667,7 +668,7 @@ class Validator implements ValidatorContract
      */
     protected function attributesThatHaveMessages()
     {
-        return collect($this->messages()->toArray())->map(function ($message, $key) {
+        return Laravel::collect($this->messages()->toArray())->map(function ($message, $key) {
             return explode('.', $key)[0];
         })->unique()->flip()->all();
     }
@@ -1087,7 +1088,7 @@ class Validator implements ValidatorContract
      */
     public function getPresenceVerifierFor($connection)
     {
-        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
+        return Laravel::tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
             $verifier->setConnection($connection);
         });
     }

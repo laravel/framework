@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -300,7 +301,7 @@ class Migrator
         // Since the getRan method that retrieves the migration name just gives us the
         // migration name, we will format the names into objects with the name as a
         // property on the objects so that we can pass it to the rollback method.
-        $migrations = collect($migrations)->map(function ($m) {
+        $migrations = Laravel::collect($migrations)->map(function ($m) {
             return (object) ['migration' => $m];
         })->all();
 

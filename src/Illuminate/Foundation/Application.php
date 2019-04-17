@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Closure;
+use Laravel;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1196,7 +1197,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $composer = json_decode(file_get_contents($this->basePath('composer.json')), true);
 
-        foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
+        foreach ((array) Laravel::dataGet($composer, 'autoload.psr-4') as $namespace => $path) {
             foreach ((array) $path as $pathChoice) {
                 if (realpath($this->path()) === realpath($this->basePath($pathChoice))) {
                     return $this->namespace = $namespace;

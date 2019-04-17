@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
@@ -189,7 +190,7 @@ class SQLiteGrammar extends Grammar
     {
         $table = $this->wrapTable($query->from);
 
-        $columns = collect($values)->map(function ($value, $key) use ($query) {
+        $columns = Laravel::collect($values)->map(function ($value, $key) use ($query) {
             return $this->wrap(Str::after($key, $query->from.'.')).' = '.$this->parameter($value);
         })->implode(', ');
 

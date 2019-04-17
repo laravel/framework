@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
@@ -222,7 +223,7 @@ abstract class Relation
      */
     protected function getKeys(array $models, $key = null)
     {
-        return collect($models)->map(function ($value) use ($key) {
+        return Laravel::collect($models)->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
         })->values()->unique(null, true)->sort()->all();
     }
@@ -316,7 +317,7 @@ abstract class Relation
      */
     protected function whereInMethod(Model $model, $key)
     {
-        return $model->getKeyName() === last(explode('.', $key))
+        return $model->getKeyName() === Laravel::last(explode('.', $key))
                     && $model->getIncrementing()
                     && in_array($model->getKeyType(), ['int', 'integer'])
                         ? 'whereIntegerInRaw'

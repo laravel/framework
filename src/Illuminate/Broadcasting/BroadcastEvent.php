@@ -2,6 +2,7 @@
 
 namespace Illuminate\Broadcasting;
 
+use Laravel;
 use ReflectionClass;
 use ReflectionProperty;
 use Illuminate\Support\Arr;
@@ -59,7 +60,7 @@ class BroadcastEvent implements ShouldQueue
     {
         if (method_exists($event, 'broadcastWith')) {
             return array_merge(
-                $event->broadcastWith(), ['socket' => data_get($event, 'socket')]
+                $event->broadcastWith(), ['socket' => Laravel::dataGet($event, 'socket')]
             );
         }
 

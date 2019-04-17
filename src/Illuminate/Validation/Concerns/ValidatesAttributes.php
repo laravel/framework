@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Concerns;
 
+use Laravel;
 use DateTime;
 use Countable;
 use Exception;
@@ -817,7 +818,7 @@ trait ValidatesAttributes
     public function guessColumnForQuery($attribute)
     {
         if (in_array($attribute, Arr::collapse($this->implicitAttributes))
-                && ! is_numeric($last = last(explode('.', $attribute)))) {
+                && ! is_numeric($last = Laravel::last(explode('.', $attribute)))) {
             return $last;
         }
 

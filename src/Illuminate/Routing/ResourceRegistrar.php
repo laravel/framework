@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Laravel;
 use Illuminate\Support\Str;
 
 class ResourceRegistrar
@@ -88,7 +89,7 @@ class ResourceRegistrar
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route parameters, which should be the base resources.
-        $base = $this->getResourceWildcard(last(explode('.', $name)));
+        $base = $this->getResourceWildcard(Laravel::last(explode('.', $name)));
 
         $defaults = $this->resourceDefaults;
 

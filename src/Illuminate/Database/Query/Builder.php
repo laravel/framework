@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
+use Laravel;
 use RuntimeException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -2119,7 +2120,7 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        return collect($this->onceWithColumns(Arr::wrap($columns), function () {
+        return Laravel::collect($this->onceWithColumns(Arr::wrap($columns), function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
     }
@@ -2151,7 +2152,7 @@ class Builder
 
         $total = $this->getCountForPagination($columns);
 
-        $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
+        $results = $total ? $this->forPage($page, $perPage)->get($columns) : Laravel::collect();
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -2332,7 +2333,7 @@ class Builder
         );
 
         if (empty($queryResult)) {
-            return collect();
+            return Laravel::collect();
         }
 
         // If the columns are qualified with a table or have an alias, we cannot use
@@ -2355,7 +2356,7 @@ class Builder
      */
     protected function stripTableForPluck($column)
     {
-        return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
+        return is_null($column) ? $column : Laravel::last(preg_split('~\.| ~', $column));
     }
 
     /**
@@ -2380,7 +2381,7 @@ class Builder
             }
         }
 
-        return collect($results);
+        return Laravel::collect($results);
     }
 
     /**
@@ -2405,7 +2406,7 @@ class Builder
             }
         }
 
-        return collect($results);
+        return Laravel::collect($results);
     }
 
     /**
@@ -2967,7 +2968,7 @@ class Builder
      */
     public function cloneWithout(array $properties)
     {
-        return tap(clone $this, function ($clone) use ($properties) {
+        return Laravel::tap(clone $this, function ($clone) use ($properties) {
             foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
@@ -2982,7 +2983,7 @@ class Builder
      */
     public function cloneWithoutBindings(array $except)
     {
-        return tap(clone $this, function ($clone) use ($except) {
+        return Laravel::tap(clone $this, function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }

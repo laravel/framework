@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Closure;
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
@@ -174,7 +175,7 @@ class ValidationRuleParser
      */
     protected function mergeRulesForAttribute($results, $attribute, $rules)
     {
-        $merge = head($this->explodeRules([$rules]));
+        $merge = Laravel::head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
             isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute]) : [], $merge

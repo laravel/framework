@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -157,7 +158,7 @@ class MorphToMany extends BelongsToMany
     {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey, $this->morphType];
 
-        return collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
+        return Laravel::collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
             return $this->table.'.'.$column.' as pivot_'.$column;
         })->unique()->all();
     }

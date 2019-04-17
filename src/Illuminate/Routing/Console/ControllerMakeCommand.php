@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Console\GeneratorCommand;
@@ -117,8 +118,8 @@ class ControllerMakeCommand extends GeneratorCommand
 
         return [
             'ParentDummyFullModelClass' => $parentModelClass,
-            'ParentDummyModelClass' => class_basename($parentModelClass),
-            'ParentDummyModelVariable' => lcfirst(class_basename($parentModelClass)),
+            'ParentDummyModelClass' => Laravel::classBasename($parentModelClass),
+            'ParentDummyModelVariable' => lcfirst(Laravel::classBasename($parentModelClass)),
         ];
     }
 
@@ -140,8 +141,8 @@ class ControllerMakeCommand extends GeneratorCommand
 
         return array_merge($replace, [
             'DummyFullModelClass' => $modelClass,
-            'DummyModelClass' => class_basename($modelClass),
-            'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+            'DummyModelClass' => Laravel::classBasename($modelClass),
+            'DummyModelVariable' => lcfirst(Laravel::classBasename($modelClass)),
         ]);
     }
 

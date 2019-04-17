@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Laravel;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
@@ -36,7 +37,7 @@ class LoadEnvironmentVariablesTest extends TestCase
 
         (new LoadEnvironmentVariables)->bootstrap($this->getAppMock('.env'));
 
-        $this->assertSame('BAR', env('FOO'));
+        $this->assertSame('BAR', Laravel::env('FOO'));
         $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('BAR', $_ENV['FOO']);
         $this->assertSame('BAR', $_SERVER['FOO']);

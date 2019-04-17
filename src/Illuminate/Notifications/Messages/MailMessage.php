@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications\Messages;
 
+use Laravel;
 use Traversable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -254,7 +255,7 @@ class MailMessage extends SimpleMessage
      */
     protected function parseAddresses($value)
     {
-        return collect($value)->map(function ($address, $name) {
+        return Laravel::collect($value)->map(function ($address, $name) {
             return [$address, is_numeric($name) ? null : $name];
         })->values()->all();
     }

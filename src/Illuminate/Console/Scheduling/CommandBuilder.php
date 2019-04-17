@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Laravel;
 use Illuminate\Console\Application;
 use Illuminate\Support\ProcessUtils;
 
@@ -52,7 +53,7 @@ class CommandBuilder
         $finished = Application::formatCommandString('schedule:finish').' "'.$event->mutexName().'"';
 
         return $this->ensureCorrectUser($event,
-            '('.$event->command.$redirect.$output.' 2>&1 '.(windows_os() ? '&' : ';').' '.$finished.') > '
+            '('.$event->command.$redirect.$output.' 2>&1 '.(Laravel::windowsOs() ? '&' : ';').' '.$finished.') > '
             .ProcessUtils::escapeArgument($event->getDefaultOutput()).' 2>&1 &'
         );
     }
@@ -66,6 +67,6 @@ class CommandBuilder
      */
     protected function ensureCorrectUser(Event $event, $command)
     {
-        return $event->user && ! windows_os() ? 'sudo -u '.$event->user.' -- sh -c \''.$command.'\'' : $command;
+        return $event->user && ! Laravel::windowsOs() ? 'sudo -u '.$event->user.' -- sh -c \''.$command.'\'' : $command;
     }
 }

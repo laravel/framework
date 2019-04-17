@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -625,7 +626,7 @@ trait HasRelationships
         // just sort the models and join them together to get the table name.
         $segments = [
             $instance ? $instance->joiningTableSegment()
-                      : Str::snake(class_basename($related)),
+                      : Str::snake(Laravel::classBasename($related)),
             $this->joiningTableSegment(),
         ];
 
@@ -644,7 +645,7 @@ trait HasRelationships
      */
     public function joiningTableSegment()
     {
-        return Str::snake(class_basename($this));
+        return Str::snake(Laravel::classBasename($this));
     }
 
     /**
@@ -717,7 +718,7 @@ trait HasRelationships
      */
     protected function newRelatedInstance($class)
     {
-        return tap(new $class, function ($instance) {
+        return Laravel::tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
                 $instance->setConnection($this->connection);
             }

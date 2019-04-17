@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Console\GeneratorCommand;
 
 class ChannelMakeCommand extends GeneratorCommand
@@ -37,7 +38,7 @@ class ChannelMakeCommand extends GeneratorCommand
     {
         return str_replace(
             'DummyUser',
-            class_basename($this->userProviderModel()),
+            Laravel::classBasename($this->userProviderModel()),
             parent::buildClass($name)
         );
     }

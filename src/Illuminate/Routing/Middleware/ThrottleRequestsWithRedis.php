@@ -3,6 +3,7 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
+use Laravel;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Contracts\Redis\Factory as Redis;
 
@@ -83,7 +84,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
             $this->redis, $key, $maxAttempts, $decayMinutes * 60
         );
 
-        return tap(! $limiter->acquire(), function () use ($limiter) {
+        return Laravel::tap(! $limiter->acquire(), function () use ($limiter) {
             [$this->decaysAt, $this->remaining] = [
                 $limiter->decaysAt, $limiter->remaining,
             ];

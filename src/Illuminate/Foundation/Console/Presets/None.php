@@ -17,7 +17,7 @@ class None extends Preset
         static::updatePackages();
         static::updateBootstrapping();
 
-        tap(new Filesystem, function ($filesystem) {
+        Laravel::tap(new Filesystem, function ($filesystem) {
             $filesystem->deleteDirectory(Laravel::resourcePath('js/components'));
             $filesystem->delete(Laravel::resourcePath('sass/_variables.scss'));
             $filesystem->deleteDirectory(Laravel::basePath('node_modules'));

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail\Transport;
 
+use Laravel;
 use Swift_Mime_SimpleMessage;
 use GuzzleHttp\ClientInterface;
 
@@ -111,7 +112,7 @@ class MailgunTransport extends Transport
      */
     protected function getTo(Swift_Mime_SimpleMessage $message)
     {
-        return collect($this->allContacts($message))->map(function ($display, $address) {
+        return Laravel::collect($this->allContacts($message))->map(function ($display, $address) {
             return $display ? $display." <{$address}>" : $address;
         })->values()->implode(',');
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Laravel;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\MailQueue;
@@ -158,7 +159,7 @@ class MailFake implements Mailer, MailQueue
     public function sent($mailable, $callback = null)
     {
         if (! $this->hasSent($mailable)) {
-            return collect();
+            return Laravel::collect();
         }
 
         $callback = $callback ?: function () {
@@ -191,7 +192,7 @@ class MailFake implements Mailer, MailQueue
     public function queued($mailable, $callback = null)
     {
         if (! $this->hasQueued($mailable)) {
-            return collect();
+            return Laravel::collect();
         }
 
         $callback = $callback ?: function () {
@@ -222,7 +223,7 @@ class MailFake implements Mailer, MailQueue
      */
     protected function mailablesOf($type)
     {
-        return collect($this->mailables)->filter(function ($mailable) use ($type) {
+        return Laravel::collect($this->mailables)->filter(function ($mailable) use ($type) {
             return $mailable instanceof $type;
         });
     }
@@ -235,7 +236,7 @@ class MailFake implements Mailer, MailQueue
      */
     protected function queuedMailablesOf($type)
     {
-        return collect($this->queuedMailables)->filter(function ($mailable) use ($type) {
+        return Laravel::collect($this->queuedMailables)->filter(function ($mailable) use ($type) {
             return $mailable instanceof $type;
         });
     }

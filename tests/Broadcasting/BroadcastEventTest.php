@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Laravel;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\BroadcastEvent;
@@ -50,7 +51,7 @@ class TestBroadcastEvent
 
     public function __construct()
     {
-        $this->collection = collect(['foo' => 'bar']);
+        $this->collection = Laravel::collect(['foo' => 'bar']);
     }
 
     public function broadcastOn()

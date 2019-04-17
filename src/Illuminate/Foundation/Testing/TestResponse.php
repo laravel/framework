@@ -616,7 +616,7 @@ class TestResponse
     {
         if ($key) {
             PHPUnit::assertCount(
-                $count, data_get($this->json(), $key),
+                $count, Laravel::dataGet($this->json(), $key),
                 "Failed to assert that the response count matched the expected {$count}"
             );
 
@@ -714,7 +714,7 @@ class TestResponse
             }
         }
 
-        return data_get($decodedResponse, $key);
+        return Laravel::dataGet($decodedResponse, $key);
     }
 
     /**

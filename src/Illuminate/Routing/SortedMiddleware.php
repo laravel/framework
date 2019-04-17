@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Laravel;
 use Illuminate\Support\Collection;
 
 class SortedMiddleware extends Collection
@@ -40,7 +41,7 @@ class SortedMiddleware extends Collection
                 continue;
             }
 
-            $stripped = head(explode(':', $middleware));
+            $stripped = Laravel::head(explode(':', $middleware));
 
             if (in_array($stripped, $priorityMap)) {
                 $priorityIndex = array_search($stripped, $priorityMap);

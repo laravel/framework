@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Laravel;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
@@ -44,7 +45,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(0);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(Laravel::collect());
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
@@ -58,7 +59,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder = $this->mockCountBuilder(0);
 
         $builder->shouldReceive('take')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
+        $builder->shouldReceive('get')->andReturn(Laravel::collect([['title' => 'Forge']]));
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
@@ -73,7 +74,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder->shouldReceive('take')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(
-            collect(array_fill(0, 5, 'data'))
+            Laravel::collect(array_fill(0, 5, 'data'))
         );
 
         $this->assertDatabaseHas($this->table, $this->data);
@@ -93,7 +94,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder = $this->mockCountBuilder(1);
 
         $builder->shouldReceive('take')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
+        $builder->shouldReceive('get')->andReturn(Laravel::collect([$this->data]));
 
         $this->assertDatabaseMissing($this->table, $this->data);
     }
@@ -112,7 +113,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(0);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(Laravel::collect());
 
         $this->assertSoftDeleted($this->table, $this->data);
     }
@@ -126,7 +127,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(0);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(Laravel::collect());
 
         $this->assertSoftDeleted(new ProductStub($this->data));
     }

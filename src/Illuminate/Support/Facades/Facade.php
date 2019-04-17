@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 use Closure;
+use Laravel;
 use Mockery;
 use RuntimeException;
 use Mockery\MockInterface;
@@ -46,7 +47,7 @@ abstract class Facade
         if (! static::isMock()) {
             $class = static::getMockableClass();
 
-            return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+            return Laravel::tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
                 static::swap($spy);
             });
         }
@@ -75,7 +76,7 @@ abstract class Facade
      */
     protected static function createFreshMockInstance()
     {
-        return tap(static::createMock(), function ($mock) {
+        return Laravel::tap(static::createMock(), function ($mock) {
             static::swap($mock);
 
             $mock->shouldAllowMockingProtectedMethods();

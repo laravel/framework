@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Factories;
 
+use Laravel;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -50,7 +51,7 @@ class FactoryMakeCommand extends GeneratorCommand
                         ? $this->qualifyClass($this->option('model'))
                         : trim($this->rootNamespace(), '\\').'\\Model';
 
-        $model = class_basename($namespaceModel);
+        $model = Laravel::classBasename($namespaceModel);
 
         return str_replace(
             [

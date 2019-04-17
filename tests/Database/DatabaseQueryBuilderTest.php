@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Laravel;
 use stdClass;
 use Mockery as m;
 use RuntimeException;
@@ -2660,9 +2661,9 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect(['foo1', 'foo2']);
-        $chunk2 = collect(['foo3', 'foo4']);
-        $chunk3 = collect([]);
+        $chunk1 = Laravel::collect(['foo1', 'foo2']);
+        $chunk2 = Laravel::collect(['foo3', 'foo4']);
+        $chunk3 = Laravel::collect([]);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
         $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
@@ -2683,8 +2684,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect(['foo1', 'foo2']);
-        $chunk2 = collect(['foo3']);
+        $chunk1 = Laravel::collect(['foo1', 'foo2']);
+        $chunk2 = Laravel::collect(['foo3']);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
@@ -2703,8 +2704,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect(['foo1', 'foo2']);
-        $chunk2 = collect(['foo3']);
+        $chunk1 = Laravel::collect(['foo1', 'foo2']);
+        $chunk2 = Laravel::collect(['foo3']);
         $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
         $builder->shouldReceive('forPage')->never()->with(2, 2);
         $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
@@ -2725,7 +2726,7 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk = collect([]);
+        $chunk = Laravel::collect([]);
         $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
@@ -2742,9 +2743,9 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $chunk2 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
-        $chunk3 = collect([]);
+        $chunk1 = Laravel::collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
+        $chunk2 = Laravel::collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
+        $chunk3 = Laravel::collect([]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
@@ -2765,8 +2766,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $chunk2 = collect([(object) ['someIdField' => 10]]);
+        $chunk1 = Laravel::collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
+        $chunk2 = Laravel::collect([(object) ['someIdField' => 10]]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
@@ -2785,7 +2786,7 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk = collect([]);
+        $chunk = Laravel::collect([]);
         $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
@@ -2802,8 +2803,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]);
-        $chunk2 = collect([]);
+        $chunk1 = Laravel::collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]);
+        $chunk2 = Laravel::collect([]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
@@ -2826,7 +2827,7 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = Laravel::collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
@@ -2853,7 +2854,7 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = Laravel::collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();

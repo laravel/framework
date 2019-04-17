@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Engines;
 
+use Laravel;
 use Exception;
 use ErrorException;
 use Illuminate\View\Compilers\CompilerInterface;
@@ -87,7 +88,7 @@ class CompilerEngine extends PhpEngine
      */
     protected function getMessage(Exception $e)
     {
-        return $e->getMessage().' (View: '.realpath(last($this->lastCompiled)).')';
+        return $e->getMessage().' (View: '.realpath(Laravel::last($this->lastCompiled)).')';
     }
 
     /**

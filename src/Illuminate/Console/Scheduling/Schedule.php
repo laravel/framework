@@ -143,9 +143,9 @@ class Schedule
      */
     protected function compileParameters(array $parameters)
     {
-        return collect($parameters)->map(function ($value, $key) {
+        return Laravel::collect($parameters)->map(function ($value, $key) {
             if (is_array($value)) {
-                $value = collect($value)->map(function ($value) {
+                $value = Laravel::collect($value)->map(function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');
             } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
@@ -176,7 +176,7 @@ class Schedule
      */
     public function dueEvents($app)
     {
-        return collect($this->events)->filter->isDue($app);
+        return Laravel::collect($this->events)->filter->isDue($app);
     }
 
     /**

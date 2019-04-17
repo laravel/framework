@@ -331,7 +331,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function renderExceptionWithWhoops(Exception $e)
     {
-        return tap(new Whoops, function ($whoops) {
+        return Laravel::tap(new Whoops, function ($whoops) {
             $whoops->pushHandler($this->whoopsHandler());
 
             $whoops->writeToOutput(false);
@@ -391,7 +391,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function registerErrorViewPaths()
     {
-        $paths = collect(Laravel::config('view.paths'));
+        $paths = Laravel::collect(Laravel::config('view.paths'));
 
         View::replaceNamespace('errors', $paths->map(function ($path) {
             return "{$path}/errors";
@@ -450,7 +450,7 @@ class Handler implements ExceptionHandlerContract
             'exception' => get_class($e),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
-            'trace' => collect($e->getTrace())->map(function ($trace) {
+            'trace' => Laravel::collect($e->getTrace())->map(function ($trace) {
                 return Arr::except($trace, ['args']);
             })->all(),
         ] : [

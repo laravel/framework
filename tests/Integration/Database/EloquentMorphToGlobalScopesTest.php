@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToGlobalScopesTest;
 
+use Laravel;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -32,7 +33,7 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         $post = Post::create();
         (new Comment)->commentable()->associate($post)->save();
 
-        $post = tap(Post::create())->delete();
+        $post = Laravel::tap(Post::create())->delete();
         (new Comment)->commentable()->associate($post)->save();
     }
 

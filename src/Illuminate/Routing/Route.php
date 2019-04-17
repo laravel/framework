@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Laravel;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
@@ -724,7 +725,7 @@ class Route
      */
     protected function addGroupNamespaceToStringUses($action)
     {
-        $groupStack = last($this->router->getGroupStack());
+        $groupStack = Laravel::last($this->router->getGroupStack());
 
         if (isset($groupStack['namespace']) && strpos($action, '\\') !== 0) {
             return $groupStack['namespace'].'\\'.$action;

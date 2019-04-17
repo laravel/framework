@@ -2,6 +2,7 @@
 
 namespace Illuminate\Translation;
 
+use Laravel;
 use RuntimeException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Translation\Loader;
@@ -136,7 +137,7 @@ class FileLoader implements Loader
      */
     protected function loadJsonPaths($locale)
     {
-        return collect(array_merge($this->jsonPaths, [$this->path]))
+        return Laravel::collect(array_merge($this->jsonPaths, [$this->path]))
             ->reduce(function ($output, $path) use ($locale) {
                 if ($this->files->exists($full = "{$path}/{$locale}.json")) {
                     $decoded = json_decode($this->files->get($full), true);

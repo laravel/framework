@@ -384,7 +384,7 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        return collect(array_merge($this->defaultHeaders, $headers))->mapWithKeys(function ($value, $name) {
+        return Laravel::collect(array_merge($this->defaultHeaders, $headers))->mapWithKeys(function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
             return [$this->formatServerHeaderKey($name) => $value];

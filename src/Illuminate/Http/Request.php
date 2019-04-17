@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http;
 
+use Laravel;
 use Closure;
 use ArrayAccess;
 use RuntimeException;
@@ -353,7 +354,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->json;
         }
 
-        return data_get($this->json->all(), $key, $default);
+        return Laravel::dataGet($this->json->all(), $key, $default);
     }
 
     /**

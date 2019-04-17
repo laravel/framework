@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,7 +49,7 @@ class ListenerMakeCommand extends GeneratorCommand
         }
 
         $stub = str_replace(
-            'DummyEvent', class_basename($event), parent::buildClass($name)
+            'DummyEvent', Laravel::classBasename($event), parent::buildClass($name)
         );
 
         return str_replace(

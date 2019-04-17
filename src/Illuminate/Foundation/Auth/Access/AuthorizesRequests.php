@@ -83,7 +83,7 @@ trait AuthorizesRequests
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
-        $parameter = $parameter ?: Str::snake(class_basename($model));
+        $parameter = $parameter ?: Str::snake(Laravel::classBasename($model));
 
         $middleware = [];
 

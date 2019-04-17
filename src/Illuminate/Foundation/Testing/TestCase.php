@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Laravel;
 use Mockery;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -99,7 +100,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTraits()
     {
-        $uses = array_flip(class_uses_recursive(static::class));
+        $uses = array_flip(Laravel::classUsesRecursive(static::class));
 
         if (isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();

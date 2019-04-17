@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support;
 
+use Closure;
+use Laravel;
 use Exception;
 use PhpOption\Option;
 use Illuminate\Support\Arr;
@@ -406,7 +408,7 @@ trait SupportHelpers
         $results = [];
 
         foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
-            $results += trait_uses_recursive($class);
+            $results += static::traitUsesRecursive($class);
         }
 
         return array_unique($results);
@@ -433,7 +435,7 @@ trait SupportHelpers
      */
     public static function dataFill(&$target, $key, $value)
     {
-        return data_set($target, $key, $value, false);
+        return static::dataSet($target, $key, $value, false);
     }
 
     /**
@@ -457,13 +459,13 @@ trait SupportHelpers
                 if ($target instanceof Collection) {
                     $target = $target->all();
                 } elseif (! is_array($target)) {
-                    return value($default);
+                    return static::value($default);
                 }
 
                 $result = [];
 
                 foreach ($target as $item) {
-                    $result[] = data_get($item, $key);
+                    $result[] = static::dataGet($item, $key);
                 }
 
                 return in_array('*', $key) ? Arr::collapse($result) : $result;
@@ -474,7 +476,7 @@ trait SupportHelpers
             } elseif (is_object($target) && isset($target->{$segment})) {
                 $target = $target->{$segment};
             } else {
-                return value($default);
+                return static::value($default);
             }
         }
 
@@ -501,7 +503,7 @@ trait SupportHelpers
 
             if ($segments) {
                 foreach ($target as &$inner) {
-                    data_set($inner, $segments, $value, $overwrite);
+                    static::dataSet($inner, $segments, $value, $overwrite);
                 }
             } elseif ($overwrite) {
                 foreach ($target as &$inner) {
@@ -514,7 +516,7 @@ trait SupportHelpers
                     $target[$segment] = [];
                 }
 
-                data_set($target[$segment], $segments, $value, $overwrite);
+                static::dataSet($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite || ! Arr::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
@@ -524,7 +526,7 @@ trait SupportHelpers
                     $target->{$segment} = [];
                 }
 
-                data_set($target->{$segment}, $segments, $value, $overwrite);
+                static::dataSet($target->{$segment}, $segments, $value, $overwrite);
             } elseif ($overwrite || ! isset($target->{$segment})) {
                 $target->{$segment} = $value;
             }
@@ -532,7 +534,7 @@ trait SupportHelpers
             $target = [];
 
             if ($segments) {
-                data_set($target[$segment], $segments, $value, $overwrite);
+                static::dataSet($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
                 $target[$segment] = $value;
             }
@@ -610,7 +612,7 @@ trait SupportHelpers
                 return $value;
             })
             ->getOrCall(function () use ($default) {
-                return value($default);
+                return static::value($default);
             });
     }
 
@@ -622,7 +624,7 @@ trait SupportHelpers
      */
     public static function filled($value)
     {
-        return ! blank($value);
+        return ! static::blank($value);
     }
 
     /**
@@ -676,7 +678,7 @@ trait SupportHelpers
 
         foreach (explode('.', $key) as $segment) {
             if (! is_object($object) || ! isset($object->{$segment})) {
-                return value($default);
+                return static::value($default);
             }
 
             $object = $object->{$segment};
@@ -1074,7 +1076,7 @@ trait SupportHelpers
         $traits = class_uses($trait);
 
         foreach ($traits as $trait) {
-            $traits += trait_uses_recursive($trait);
+            $traits += static::traitUsesRecursive($trait);
         }
 
         return $traits;
@@ -1090,7 +1092,7 @@ trait SupportHelpers
      */
     public static function transform($value, callable $callback, $default = null)
     {
-        if (filled($value)) {
+        if (static::filled($value)) {
             return $callback($value);
         }
 

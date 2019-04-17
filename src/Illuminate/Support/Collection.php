@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Laravel;
 use stdClass;
 use Countable;
 use Exception;
@@ -285,7 +286,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (func_num_args() === 2) {
             return $this->contains(function ($item) use ($key, $value) {
-                return data_get($item, $key) === $value;
+                return Laravel::dataGet($item, $key) === $value;
             });
         }
 
@@ -670,7 +671,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return function ($item) use ($key, $operator, $value) {
-            $retrieved = data_get($item, $key);
+            $retrieved = Laravel::dataGet($item, $key);
 
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
@@ -721,7 +722,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $values = $this->getArrayableItems($values);
 
         return $this->filter(function ($item) use ($key, $values, $strict) {
-            return in_array(data_get($item, $key), $values, $strict);
+            return in_array(Laravel::dataGet($item, $key), $values, $strict);
         });
     }
 
@@ -759,7 +760,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function whereNotBetween($key, $values)
     {
         return $this->filter(function ($item) use ($key, $values) {
-            return data_get($item, $key) < reset($values) || data_get($item, $key) > end($values);
+            return Laravel::dataGet($item, $key) < reset($values) || Laravel::dataGet($item, $key) > end($values);
         });
     }
 
@@ -776,7 +777,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $values = $this->getArrayableItems($values);
 
         return $this->reject(function ($item) use ($key, $values, $strict) {
-            return in_array(data_get($item, $key), $values, $strict);
+            return in_array(Laravel::dataGet($item, $key), $values, $strict);
         });
     }
 
@@ -879,7 +880,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $this->items[$key];
         }
 
-        return value($default);
+        return Laravel::value($default);
     }
 
     /**
@@ -1866,7 +1867,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return function ($item) use ($value) {
-            return data_get($item, $value);
+            return Laravel::dataGet($item, $value);
         };
     }
 

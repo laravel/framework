@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Laravel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -54,7 +55,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function make(array $attributes = [])
     {
-        return tap($this->related->newInstance($attributes), function ($instance) {
+        return Laravel::tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
         });
     }
@@ -232,7 +233,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return Laravel::tap($this->firstOrNew($attributes), function ($instance) use ($values) {
             $instance->fill($values);
 
             $instance->save();
@@ -275,7 +276,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function create(array $attributes = [])
     {
-        return tap($this->related->newInstance($attributes), function ($instance) {
+        return Laravel::tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
 
             $instance->save();

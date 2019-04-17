@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Laravel;
 use Illuminate\Contracts\Bus\Dispatcher;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -73,14 +74,14 @@ class BusFake implements Dispatcher
     public function dispatched($command, $callback = null)
     {
         if (! $this->hasDispatched($command)) {
-            return collect();
+            return Laravel::collect();
         }
 
         $callback = $callback ?: function () {
             return true;
         };
 
-        return collect($this->commands[$command])->filter(function ($command) use ($callback) {
+        return Laravel::collect($this->commands[$command])->filter(function ($command) use ($callback) {
             return $callback($command);
         });
     }

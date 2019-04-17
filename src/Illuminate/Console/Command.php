@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -223,7 +224,7 @@ class Command extends SymfonyCommand
      */
     protected function createInputFromArguments(array $arguments)
     {
-        return tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
+        return Laravel::tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
             if ($input->hasParameterOption(['--no-interaction'], true)) {
                 $input->setInteractive(false);
             }
@@ -237,7 +238,7 @@ class Command extends SymfonyCommand
      */
     protected function context()
     {
-        return collect($this->option())->only([
+        return Laravel::collect($this->option())->only([
             'ansi',
             'no-ansi',
             'no-interaction',

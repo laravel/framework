@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Laravel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -112,7 +113,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     public function getMorphType()
     {
-        return last(explode('.', $this->morphType));
+        return Laravel::last(explode('.', $this->morphType));
     }
 
     /**

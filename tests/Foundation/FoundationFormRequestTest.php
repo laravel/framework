@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Laravel;
 use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -137,7 +138,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createRequest($payload = [], $class = FoundationTestFormRequestStub::class)
     {
-        $container = tap(new Container, function ($container) {
+        $container = Laravel::tap(new Container, function ($container) {
             $container->instance(
                 ValidationFactoryContract::class,
                 $this->createValidationFactory($container)

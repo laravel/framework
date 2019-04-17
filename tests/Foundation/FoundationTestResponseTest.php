@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Laravel;
 use Mockery as m;
 use JsonSerializable;
 use Illuminate\Http\Response;
@@ -135,7 +136,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = Laravel::tap(new Response, function ($response) {
             $response->header('Location', '/foo');
         });
 
@@ -149,7 +150,7 @@ class FoundationTestResponseTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected header [Location] is present on response.');
 
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = Laravel::tap(new Response, function ($response) {
             $response->header('Location', '/foo');
         });
 
@@ -357,7 +358,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertJsonMissingValidationErrors()
     {
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = Laravel::tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
                     'foo' => [],
                     'bar' => ['one', 'two'],
@@ -369,7 +370,7 @@ class FoundationTestResponseTest extends TestCase
 
         $response->assertJsonMissingValidationErrors('baz');
 
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = Laravel::tap(new Response, function ($response) {
             $response->setContent(json_encode(['foo' => 'bar']));
         });
 
@@ -381,7 +382,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = Laravel::tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
                     'foo' => [],
                     'bar' => ['one', 'two'],
@@ -398,7 +399,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = Laravel::tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
                     'foo' => [],
                     'bar' => ['one', 'two'],
@@ -486,7 +487,7 @@ class FoundationTestResponseTest extends TestCase
 
     private function makeMockResponse($content)
     {
-        $baseResponse = tap(new Response, function ($response) use ($content) {
+        $baseResponse = Laravel::tap(new Response, function ($response) use ($content) {
             $response->setContent(m::mock(View::class, $content));
         });
 

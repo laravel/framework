@@ -138,7 +138,7 @@ class DynamoDbStore implements Store, LockProvider
             'RequestItems' => [
                 $this->table => [
                     'ConsistentRead' => false,
-                    'Keys' => collect($prefixedKeys)->map(function ($key) {
+                    'Keys' => Laravel::collect($prefixedKeys)->map(function ($key) {
                         return [
                             $this->keyAttribute => [
                                 'S' => $key,
@@ -151,9 +151,9 @@ class DynamoDbStore implements Store, LockProvider
 
         $now = Carbon::now();
 
-        return array_merge(collect(array_flip($keys))->map(function () {
+        return array_merge(Laravel::collect(array_flip($keys))->map(function () {
             return null;
-        })->all(), collect($response['Responses'][$this->table])->mapWithKeys(function ($response) use ($now) {
+        })->all(), Laravel::collect($response['Responses'][$this->table])->mapWithKeys(function ($response) use ($now) {
             if ($this->isExpired($response, $now)) {
                 $value = null;
             } else {
@@ -224,7 +224,7 @@ class DynamoDbStore implements Store, LockProvider
 
         $this->dynamo->batchWriteItem([
             'RequestItems' => [
-                $this->table => collect($values)->map(function ($value, $key) use ($expiration) {
+                $this->table => Laravel::collect($values)->map(function ($value, $key) use ($expiration) {
                     return [
                         'PutRequest' => [
                             'Item' => [

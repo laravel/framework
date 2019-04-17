@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
+use Laravel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
@@ -131,7 +132,7 @@ trait InteractsWithPivotTable
      */
     protected function formatRecordsList(array $records)
     {
-        return collect($records)->mapWithKeys(function ($attributes, $id) {
+        return Laravel::collect($records)->mapWithKeys(function ($attributes, $id) {
             if (! is_array($attributes)) {
                 [$id, $attributes] = [$attributes, []];
             }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Laravel;
 use Illuminate\Validation\Rule;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Rules\In;
@@ -27,7 +28,7 @@ class ValidationInRuleTest extends TestCase
 
         $this->assertEquals('in:"1","2","3","4"', (string) $rule);
 
-        $rule = Rule::in(collect([1, 2, 3, 4]));
+        $rule = Rule::in(Laravel::collect([1, 2, 3, 4]));
 
         $this->assertEquals('in:"1","2","3","4"', (string) $rule);
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Laravel;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Support\DeferrableProvider;
 
@@ -207,7 +208,7 @@ abstract class ServiceProvider
             return $paths;
         }
 
-        return collect(static::$publishes)->reduce(function ($paths, $p) {
+        return Laravel::collect(static::$publishes)->reduce(function ($paths, $p) {
             return array_merge($paths, $p);
         }, []);
     }

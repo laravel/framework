@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Laravel;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
@@ -68,7 +69,7 @@ class ValidationException extends Exception
      */
     public static function withMessages(array $messages)
     {
-        return new static(tap(ValidatorFacade::make([], []), function ($validator) use ($messages) {
+        return new static(Laravel::tap(ValidatorFacade::make([], []), function ($validator) use ($messages) {
             foreach ($messages as $key => $value) {
                 foreach (Arr::wrap($value) as $message) {
                     $validator->errors()->add($key, $message);

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Laravel;
+
 trait SoftDeletes
 {
     /**
@@ -40,7 +42,7 @@ trait SoftDeletes
     {
         $this->forceDeleting = true;
 
-        return tap($this->delete(), function ($deleted) {
+        return Laravel::tap($this->delete(), function ($deleted) {
             $this->forceDeleting = false;
 
             if ($deleted) {

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Mail\Markdown;
@@ -129,7 +130,7 @@ class MailChannel
         $this->addressMessage($mailMessage, $notifiable, $notification, $message);
 
         $mailMessage->subject($message->subject ?: Str::title(
-            Str::snake(class_basename($notification), ' ')
+            Str::snake(Laravel::classBasename($notification), ' ')
         ));
 
         $this->addAttachments($mailMessage, $message);
@@ -201,7 +202,7 @@ class MailChannel
             $recipients = [$recipients];
         }
 
-        return collect($recipients)->mapWithKeys(function ($recipient, $email) {
+        return Laravel::collect($recipients)->mapWithKeys(function ($recipient, $email) {
             return is_numeric($email)
                     ? [$email => (is_string($recipient) ? $recipient : $recipient->email)]
                     : [$email => $recipient];

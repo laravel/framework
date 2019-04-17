@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Laravel;
 use Closure;
 use stdClass;
 use Mockery as m;
@@ -115,7 +116,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFindWithManyUsingCollection()
     {
-        $ids = collect([1, 2]);
+        $ids = Laravel::collect([1, 2]);
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', $ids);
         $builder->setModel($this->getMockModel());

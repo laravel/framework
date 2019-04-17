@@ -1,7 +1,8 @@
 <?php
 
-namespace Illuminate\Tests\Routing;
+namespace Illuminate\Tests\Routing;#
 
+use Laravel;
 use DateTime;
 use stdClass;
 use Exception;
@@ -983,7 +984,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->group(['prefix' => 'api'], __DIR__.'/fixtures/routes.php');
 
-        $route = last($router->getRoutes()->get());
+        $route = Laravel::last($router->getRoutes()->get());
         $request = Request::create('api/users', 'GET');
 
         $this->assertTrue($route->matches($request));

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
@@ -115,7 +116,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     public function assertTimesSent($expectedCount, $notification)
     {
-        $actualCount = collect($this->notifications)
+        $actualCount = Laravel::collect($this->notifications)
             ->flatten(1)
             ->reduce(function ($count, $sent) use ($notification) {
                 return $count + count($sent[$notification] ?? []);
@@ -138,14 +139,14 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     public function sent($notifiable, $notification, $callback = null)
     {
         if (! $this->hasSent($notifiable, $notification)) {
-            return collect();
+            return Laravel::collect();
         }
 
         $callback = $callback ?: function () {
             return true;
         };
 
-        $notifications = collect($this->notificationsFor($notifiable, $notification));
+        $notifications = Laravel::collect($this->notificationsFor($notifiable, $notification));
 
         return $notifications->filter(function ($arguments) use ($callback) {
             return $callback(...array_values($arguments));
@@ -214,7 +215,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
                 'notification' => $notification,
                 'channels' => $notification->via($notifiable),
                 'notifiable' => $notifiable,
-                'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
+                'locale' => $notification->locale ?? $this->locale ?? Laravel::value(function () use ($notifiable) {
                     if ($notifiable instanceof HasLocalePreference) {
                         return $notifiable->preferredLocale();
                     }

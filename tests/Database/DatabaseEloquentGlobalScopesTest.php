@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Laravel;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         parent::setUp();
 
-        tap(new DB)->addConnection([
+        Laravel::tap(new DB)->addConnection([
             'driver'    => 'sqlite',
             'database'  => ':memory:',
         ])->bootEloquent();

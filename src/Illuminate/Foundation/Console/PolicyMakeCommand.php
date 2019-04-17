@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -90,9 +91,9 @@ class PolicyMakeCommand extends GeneratorCommand
             "use {$namespaceModel};\nuse {$namespaceModel};", "use {$namespaceModel};", $stub
         );
 
-        $model = class_basename(trim($model, '\\'));
+        $model = Laravel::classBasename(trim($model, '\\'));
 
-        $dummyUser = class_basename($this->userProviderModel());
+        $dummyUser = Laravel::classBasename($this->userProviderModel());
 
         $dummyModel = Str::camel($model) === 'user' ? 'model' : $model;
 

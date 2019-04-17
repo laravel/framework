@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Laravel;
 use stdClass;
 use ArrayObject;
 use Illuminate\Support\Arr;
@@ -39,7 +40,7 @@ class SupportArrTest extends TestCase
         $data = [['foo', 'bar'], ['baz']];
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
 
-        $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
+        $array = [[1], [2], [3], ['foo', 'bar'], Laravel::collect(['baz', 'boom'])];
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
     }
 

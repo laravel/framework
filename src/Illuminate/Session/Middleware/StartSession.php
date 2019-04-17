@@ -3,6 +3,7 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
+use Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
@@ -75,7 +76,7 @@ class StartSession
      */
     protected function startSession(Request $request)
     {
-        return tap($this->getSession($request), function ($session) use ($request) {
+        return Laravel::tap($this->getSession($request), function ($session) use ($request) {
             $session->setRequestOnHandler($request);
 
             $session->start();
@@ -90,7 +91,7 @@ class StartSession
      */
     public function getSession(Request $request)
     {
-        return tap($this->manager->driver(), function ($session) use ($request) {
+        return Laravel::tap($this->manager->driver(), function ($session) use ($request) {
             $session->setId($request->cookies->get($session->getName()));
         });
     }

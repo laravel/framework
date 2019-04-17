@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Middleware;
 
 use Closure;
+use Laravel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
 
@@ -58,7 +59,7 @@ class Authorize
             return [];
         }
 
-        return collect($models)->map(function ($model) use ($request) {
+        return Laravel::collect($models)->map(function ($model) use ($request) {
             return $model instanceof Model ? $model : $this->getModel($request, $model);
         })->all();
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Laravel;
 use Illuminate\Console\Command;
 
 class ScheduleFinishCommand extends Command
@@ -54,7 +55,7 @@ class ScheduleFinishCommand extends Command
      */
     public function handle()
     {
-        collect($this->schedule->events())->filter(function ($value) {
+        Laravel::collect($this->schedule->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');
         })->each->callAfterCallbacks($this->laravel);
     }

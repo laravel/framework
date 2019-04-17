@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\AbstractPaginator;
 
@@ -41,7 +42,7 @@ trait CollectsResources
             return $this->collects;
         }
 
-        if (Str::endsWith(class_basename($this), 'Collection') &&
+        if (Str::endsWith(Laravel::classBasename($this), 'Collection') &&
             class_exists($class = Str::replaceLast('Collection', '', get_class($this)))) {
             return $class;
         }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -79,7 +80,7 @@ class ObserverMakeCommand extends GeneratorCommand
             "use {$namespaceModel};\nuse {$namespaceModel};", "use {$namespaceModel};", $stub
         );
 
-        $model = class_basename(trim($model, '\\'));
+        $model = Laravel::classBasename(trim($model, '\\'));
 
         $stub = str_replace('DocDummyModel', Str::snake($model, ' '), $stub);
 

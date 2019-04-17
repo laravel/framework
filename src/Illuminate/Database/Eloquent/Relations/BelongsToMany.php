@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Laravel;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Model;
@@ -646,7 +647,7 @@ class BelongsToMany extends Relation
     {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey];
 
-        return collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
+        return Laravel::collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
             return $this->table.'.'.$column.' as pivot_'.$column;
         })->unique()->all();
     }
@@ -664,7 +665,7 @@ class BelongsToMany extends Relation
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
+        return Laravel::tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
             $this->hydratePivotRelation($paginator->items());
         });
     }
@@ -682,7 +683,7 @@ class BelongsToMany extends Relation
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), function ($paginator) {
+        return Laravel::tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), function ($paginator) {
             $this->hydratePivotRelation($paginator->items());
         });
     }
@@ -824,7 +825,7 @@ class BelongsToMany extends Relation
      */
     protected function guessInverseRelation()
     {
-        return Str::camel(Str::pluralStudly(class_basename($this->getParent())));
+        return Str::camel(Str::pluralStudly(Laravel::classBasename($this->getParent())));
     }
 
     /**

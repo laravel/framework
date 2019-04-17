@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Laravel;
 use LogicException;
 use DateTimeInterface;
 use Carbon\CarbonInterface;
@@ -418,7 +419,7 @@ trait HasAttributes
             ));
         }
 
-        return tap($relation->getResults(), function ($results) use ($method) {
+        return Laravel::tap($relation->getResults(), function ($results) use ($method) {
             $this->setRelation($method, $results);
         });
     }
@@ -651,7 +652,7 @@ trait HasAttributes
      */
     protected function getArrayAttributeWithValue($path, $key, $value)
     {
-        return tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
+        return Laravel::tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
             Arr::set($array, str_replace('->', '.', $path), $value);
         });
     }
@@ -1225,7 +1226,7 @@ trait HasAttributes
      */
     public static function cacheMutatedAttributes($class)
     {
-        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(function ($match) {
+        static::$mutatorCache[$class] = Laravel::collect(static::getMutatorMethods($class))->map(function ($match) {
             return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
         })->all();
     }

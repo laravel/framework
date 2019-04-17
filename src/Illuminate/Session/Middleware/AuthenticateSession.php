@@ -3,6 +3,7 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
+use Laravel;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 
@@ -55,7 +56,7 @@ class AuthenticateSession
             $this->logout($request);
         }
 
-        return tap($next($request), function () use ($request) {
+        return Laravel::tap($next($request), function () use ($request) {
             $this->storePasswordHashInSession($request);
         });
     }

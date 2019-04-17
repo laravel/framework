@@ -57,7 +57,7 @@ class Preset
      */
     protected static function removeNodeModules()
     {
-        tap(new Filesystem, function ($files) {
+        Laravel::tap(new Filesystem, function ($files) {
             $files->deleteDirectory(Laravel::basePath('node_modules'));
 
             $files->delete(Laravel::basePath('yarn.lock'));

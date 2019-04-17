@@ -35,7 +35,7 @@ class ResourceResponse implements Responsable
      */
     public function toResponse($request)
     {
-        return tap(Laravel::response()->json(
+        return Laravel::tap(Laravel::response()->json(
             $this->wrap(
                 $this->resource->resolve($request),
                 $this->resource->with($request),

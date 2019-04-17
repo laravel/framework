@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Schema;
 
+use Laravel;
+
 class PostgresBuilder extends Builder
 {
     /**
@@ -133,7 +135,7 @@ class PostgresBuilder extends Builder
                 return [array_shift($table), implode('.', $table)];
             }
 
-            $schema = head($schema);
+            $schema = Laravel::head($schema);
         }
 
         return [$schema ?: 'public', implode('.', $table)];

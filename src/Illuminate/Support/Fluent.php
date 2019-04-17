@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Laravel;
 use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -42,7 +43,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
             return $this->attributes[$key];
         }
 
-        return value($default);
+        return Laravel::value($default);
     }
 
     /**

@@ -124,7 +124,7 @@ class AliasLoader
     {
         $replacements = [
             str_replace('/', '\\', dirname(str_replace('\\', '/', $alias))),
-            class_basename($alias),
+            Laravel::classBasename($alias),
             substr($alias, strlen(static::$facadeNamespace)),
         ];
 

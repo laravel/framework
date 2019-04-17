@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Laravel;
 use ArrayObject;
 use JsonSerializable;
 use Illuminate\Support\Str;
@@ -594,7 +595,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function respondWithRoute($name)
     {
-        $route = tap($this->routes->getByName($name))->bind($this->currentRequest);
+        $route = Laravel::tap($this->routes->getByName($name))->bind($this->currentRequest);
 
         return $this->runRoute($this->currentRequest, $route);
     }
@@ -690,7 +691,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function gatherRouteMiddleware(Route $route)
     {
-        $middleware = collect($route->gatherMiddleware())->map(function ($name) {
+        $middleware = Laravel::collect($route->gatherMiddleware())->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten();
 

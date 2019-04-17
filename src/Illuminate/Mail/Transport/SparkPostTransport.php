@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail\Transport;
 
+use Laravel;
 use Swift_Mime_SimpleMessage;
 use GuzzleHttp\ClientInterface;
 
@@ -110,7 +111,7 @@ class SparkPostTransport extends Transport
      */
     protected function getTransmissionId($response)
     {
-        return object_get(
+        return Laravel::objectGet(
             json_decode($response->getBody()->getContents()), 'results.id'
         );
     }

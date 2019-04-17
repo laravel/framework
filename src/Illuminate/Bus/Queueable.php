@@ -123,7 +123,7 @@ trait Queueable
      */
     public function chain($chain)
     {
-        $this->chained = collect($chain)->map(function ($job) {
+        $this->chained = Laravel::collect($chain)->map(function ($job) {
             return serialize($job);
         })->all();
 
@@ -138,7 +138,7 @@ trait Queueable
     public function dispatchNextJobInChain()
     {
         if (! empty($this->chained)) {
-            Laravel::dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
+            Laravel::dispatch(Laravel::tap(unserialize(array_shift($this->chained)), function ($next) {
                 $next->chained = $this->chained;
 
                 $next->onConnection($next->connection ?: $this->chainConnection);

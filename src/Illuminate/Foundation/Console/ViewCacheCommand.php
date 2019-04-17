@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Finder;
@@ -62,7 +63,7 @@ class ViewCacheCommand extends Command
      */
     protected function bladeFilesIn(array $paths)
     {
-        return collect(
+        return Laravel::collect(
             Finder::create()
                 ->in($paths)
                 ->exclude('vendor')
@@ -80,8 +81,8 @@ class ViewCacheCommand extends Command
     {
         $finder = $this->laravel['view']->getFinder();
 
-        return collect($finder->getPaths())->merge(
-            collect($finder->getHints())->flatten()
+        return Laravel::collect($finder->getPaths())->merge(
+            Laravel::collect($finder->getHints())->flatten()
         );
     }
 }

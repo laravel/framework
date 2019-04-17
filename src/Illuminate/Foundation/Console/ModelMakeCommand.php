@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -67,7 +68,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createFactory()
     {
-        $factory = Str::studly(class_basename($this->argument('name')));
+        $factory = Str::studly(Laravel::classBasename($this->argument('name')));
 
         $this->call('make:factory', [
             'name' => "{$factory}Factory",
@@ -82,7 +83,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
+        $table = Str::snake(Str::pluralStudly(Laravel::classBasename($this->argument('name'))));
 
         if ($this->option('pivot')) {
             $table = Str::singular($table);
@@ -101,7 +102,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createController()
     {
-        $controller = Str::studly(class_basename($this->argument('name')));
+        $controller = Str::studly(Laravel::classBasename($this->argument('name')));
 
         $modelName = $this->qualifyClass($this->getNameInput());
 

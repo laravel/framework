@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cookie;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\InteractsWithTime;
@@ -132,8 +133,8 @@ class CookieJar implements JarContract
      */
     public function queue(...$parameters)
     {
-        if (head($parameters) instanceof Cookie) {
-            $cookie = head($parameters);
+        if (Laravel::head($parameters) instanceof Cookie) {
+            $cookie = Laravel::head($parameters);
         } else {
             $cookie = call_user_func_array([$this, 'make'], $parameters);
         }

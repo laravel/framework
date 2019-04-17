@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Laravel;
 use Exception;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Filesystem\Filesystem;
@@ -92,7 +93,7 @@ class FileStore implements Store
     {
         $raw = $this->getPayload($key);
 
-        return tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
+        return Laravel::tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
             $this->put($key, $newValue, $raw['time'] ?? 0);
         });
     }

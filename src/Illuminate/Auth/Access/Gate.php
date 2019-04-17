@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Access;
 
+use Laravel;
 use Exception;
 use ReflectionClass;
 use ReflectionFunction;
@@ -272,7 +273,7 @@ class Gate implements GateContract
      */
     public function check($abilities, $arguments = [])
     {
-        return collect($abilities)->every(function ($ability) use ($arguments) {
+        return Laravel::collect($abilities)->every(function ($ability) use ($arguments) {
             try {
                 return (bool) $this->raw($ability, $arguments);
             } catch (AuthorizationException $e) {
@@ -290,7 +291,7 @@ class Gate implements GateContract
      */
     public function any($abilities, $arguments = [])
     {
-        return collect($abilities)->contains(function ($ability) use ($arguments) {
+        return Laravel::collect($abilities)->contains(function ($ability) use ($arguments) {
             return $this->check($ability, $arguments);
         });
     }
@@ -578,7 +579,7 @@ class Gate implements GateContract
 
         $classDirname = str_replace('/', '\\', dirname(str_replace('\\', '/', $class)));
 
-        return [$classDirname.'\\Policies\\'.class_basename($class).'Policy'];
+        return [$classDirname.'\\Policies\\'.Laravel::classBasename($class).'Policy'];
     }
 
     /**

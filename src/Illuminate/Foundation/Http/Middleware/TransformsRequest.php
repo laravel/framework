@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Laravel;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class TransformsRequest
@@ -58,7 +59,7 @@ class TransformsRequest
      */
     protected function cleanArray(array $data, $keyPrefix = '')
     {
-        return collect($data)->map(function ($value, $key) use ($keyPrefix) {
+        return Laravel::collect($data)->map(function ($value, $key) use ($keyPrefix) {
             return $this->cleanValue($keyPrefix.$key, $value);
         })->all();
     }

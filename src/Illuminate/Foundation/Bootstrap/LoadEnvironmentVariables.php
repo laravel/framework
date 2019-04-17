@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
+use Laravel;
 use Dotenv\Dotenv;
 use Dotenv\Environment\DotenvFactory;
 use Dotenv\Exception\InvalidFileException;
@@ -51,12 +52,12 @@ class LoadEnvironmentVariables
             }
         }
 
-        if (! env('APP_ENV')) {
+        if (! Laravel::env('APP_ENV')) {
             return;
         }
 
         $this->setEnvironmentFilePath(
-            $app, $app->environmentFile().'.'.env('APP_ENV')
+            $app, $app->environmentFile().'.'.Laravel::env('APP_ENV')
         );
     }
 

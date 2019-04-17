@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Laravel;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
@@ -212,8 +213,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         static::$traitInitializers[$class] = [];
 
-        foreach (class_uses_recursive($class) as $trait) {
-            $method = 'boot'.class_basename($trait);
+        foreach (Laravel::classUsesRecursive($class) as $trait) {
+            $method = 'boot'.Laravel::classBasename($trait);
 
             if (method_exists($class, $method) && ! in_array($method, $booted)) {
                 forward_static_call([$class, $method]);
@@ -221,7 +222,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 $booted[] = $method;
             }
 
-            if (method_exists($class, $method = 'initialize'.class_basename($trait))) {
+            if (method_exists($class, $method = 'initialize'.Laravel::classBasename($trait))) {
                 static::$traitInitializers[$class][] = $method;
 
                 static::$traitInitializers[$class] = array_unique(
@@ -370,7 +371,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function removeTableFromKey($key)
     {
-        return Str::contains($key, '.') ? last(explode('.', $key)) : $key;
+        return Str::contains($key, '.') ? Laravel::last(explode('.', $key)) : $key;
     }
 
     /**
@@ -1146,7 +1147,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             static::newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
         );
 
-        $this->load(collect($this->relations)->except('pivot')->keys()->toArray());
+        $this->load(Laravel::collect($this->relations)->except('pivot')->keys()->toArray());
 
         $this->syncOriginal();
 
@@ -1171,7 +1172,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->attributes, $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
 
-        return tap(new static, function ($instance) use ($attributes) {
+        return Laravel::tap(new static, function ($instance) use ($attributes) {
             $instance->setRawAttributes($attributes);
 
             $instance->setRelations($this->relations);
@@ -1289,7 +1290,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         return isset($this->table)
             ? $this->table
-            : Str::snake(Str::pluralStudly(class_basename($this)));
+            : Str::snake(Str::pluralStudly(Laravel::classBasename($this)));
     }
 
     /**
@@ -1484,7 +1485,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getForeignKey()
     {
-        return Str::snake(class_basename($this)).'_'.$this->getKeyName();
+        return Str::snake(Laravel::classBasename($this)).'_'.$this->getKeyName();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Laravel;
 use stdClass;
 use SplFileInfo;
 use Illuminate\Support\Arr;
@@ -205,7 +206,7 @@ trait InteractsWithInput
      */
     public function input($key = null, $default = null)
     {
-        return data_get(
+        return Laravel::dataGet(
             $this->getInputSource()->all() + $this->query->all(), $key, $default
         );
     }
@@ -225,7 +226,7 @@ trait InteractsWithInput
         $placeholder = new stdClass;
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            $value = data_get($input, $key, $placeholder);
+            $value = Laravel::dataGet($input, $key, $placeholder);
 
             if ($value !== $placeholder) {
                 Arr::set($results, $key, $value);
@@ -372,7 +373,7 @@ trait InteractsWithInput
      */
     public function file($key = null, $default = null)
     {
-        return data_get($this->allFiles(), $key, $default);
+        return Laravel::dataGet($this->allFiles(), $key, $default);
     }
 
     /**

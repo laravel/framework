@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Laravel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Session\Store as SessionStore;
@@ -200,7 +201,7 @@ class Redirector
      */
     protected function createRedirect($path, $status, $headers)
     {
-        return tap(new RedirectResponse($path, $status, $headers), function ($redirect) {
+        return Laravel::tap(new RedirectResponse($path, $status, $headers), function ($redirect) {
             if (isset($this->session)) {
                 $redirect->setSession($this->session);
             }

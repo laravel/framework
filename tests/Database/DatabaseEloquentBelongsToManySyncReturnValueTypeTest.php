@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Laravel;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -85,7 +86,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
 
         $changes = $user->articles()->sync($articleIDs);
 
-        collect($changes['attached'])->map(function ($id) {
+        Laravel::collect($changes['attached'])->map(function ($id) {
             $this->assertTrue(gettype($id) === (new BelongsToManySyncTestTestArticle)->getKeyType());
         });
     }

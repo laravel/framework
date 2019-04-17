@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Auth\ApiAuthenticationWithEloquentTest;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
@@ -22,7 +23,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
         $app['config']->set('database.connections.testbench', [
             'driver' => 'mysql',
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => Laravel::env('DB_HOST', '127.0.0.1'),
             'username' => 'root',
             'password' => 'invalid-credentials',
             'database' => 'forge',

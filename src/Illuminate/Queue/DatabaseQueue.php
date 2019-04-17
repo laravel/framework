@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Laravel;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
@@ -126,7 +127,7 @@ class DatabaseQueue extends Queue implements QueueContract
 
         $availableAt = $this->availableAt();
 
-        return $this->database->table($this->table)->insert(collect((array) $jobs)->map(
+        return $this->database->table($this->table)->insert(Laravel::collect((array) $jobs)->map(
             function ($job) use ($queue, $data, $availableAt) {
                 return $this->buildDatabaseRecord($queue, $this->createPayload($job, $this->getQueue($queue), $data), $availableAt);
             }

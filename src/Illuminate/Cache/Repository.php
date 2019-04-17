@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Closure;
+use Laravel;
 use ArrayAccess;
 use DateTimeInterface;
 use BadMethodCallException;
@@ -102,7 +103,7 @@ class Repository implements CacheContract, ArrayAccess
         if (is_null($value)) {
             $this->event(new CacheMissed($key));
 
-            $value = value($default);
+            $value = Laravel::value($default);
         } else {
             $this->event(new CacheHit($key, $value));
         }
@@ -120,11 +121,11 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function many(array $keys)
     {
-        $values = $this->store->many(collect($keys)->map(function ($value, $key) {
+        $values = $this->store->many(Laravel::collect($keys)->map(function ($value, $key) {
             return is_string($key) ? $key : $value;
         })->values()->all());
 
-        return collect($values)->map(function ($value, $key) use ($keys) {
+        return Laravel::collect($values)->map(function ($value, $key) use ($keys) {
             return $this->handleManyResult($keys, $key, $value);
         })->all();
     }
@@ -163,7 +164,7 @@ class Repository implements CacheContract, ArrayAccess
         if (is_null($value)) {
             $this->event(new CacheMissed($key));
 
-            return isset($keys[$key]) ? value($keys[$key]) : null;
+            return isset($keys[$key]) ? Laravel::value($keys[$key]) : null;
         }
 
         // If we found a valid value we will fire the "hit" event and return the value
@@ -183,7 +184,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function pull($key, $default = null)
     {
-        return tap($this->get($key, $default), function () use ($key) {
+        return Laravel::tap($this->get($key, $default), function () use ($key) {
             $this->forget($key);
         });
     }
@@ -432,7 +433,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function forget($key)
     {
-        return tap($this->store->forget($this->itemKey($key)), function ($result) use ($key) {
+        return Laravel::tap($this->store->forget($this->itemKey($key)), function ($result) use ($key) {
             if ($result) {
                 $this->event(new KeyForgotten($key));
             }

@@ -3,6 +3,7 @@
 namespace Illuminate\Log;
 
 use Closure;
+use Laravel;
 use Throwable;
 use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
@@ -99,11 +100,11 @@ class LogManager implements LoggerInterface
     protected function get($name)
     {
         try {
-            return $this->channels[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
+            return $this->channels[$name] ?? Laravel::with($this->resolve($name), function ($logger) use ($name) {
                 return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']));
             });
         } catch (Throwable $e) {
-            return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
+            return Laravel::tap($this->createEmergencyLogger(), function ($logger) use ($e) {
                 $logger->emergency('Unable to create configured logger. Using emergency logger.', [
                     'exception' => $e,
                 ]);
@@ -213,7 +214,7 @@ class LogManager implements LoggerInterface
      */
     protected function createStackDriver(array $config)
     {
-        $handlers = collect($config['channels'])->flatMap(function ($channel) {
+        $handlers = Laravel::collect($config['channels'])->flatMap(function ($channel) {
             return $this->channel($channel)->getHandlers();
         })->all();
 
@@ -381,7 +382,7 @@ class LogManager implements LoggerInterface
      */
     protected function formatter()
     {
-        return tap(new LineFormatter(null, null, true, true), function ($formatter) {
+        return Laravel::tap(new LineFormatter(null, null, true, true), function ($formatter) {
             $formatter->includeStacktraces();
         });
     }

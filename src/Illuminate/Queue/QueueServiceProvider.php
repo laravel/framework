@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Laravel;
 use Illuminate\Support\Str;
 use Opis\Closure\SerializableClosure;
 use Illuminate\Support\ServiceProvider;
@@ -44,7 +45,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             // Once we have an instance of the queue manager, we will register the various
             // resolvers for the queue connectors. These connectors are responsible for
             // creating the classes that accept queue configs and instantiate queues.
-            return tap(new QueueManager($app), function ($manager) {
+            return Laravel::tap(new QueueManager($app), function ($manager) {
                 $this->registerConnectors($manager);
             });
         });

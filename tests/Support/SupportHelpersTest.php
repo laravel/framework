@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Laravel;
 use stdClass;
 use ArrayAccess;
 use Mockery as m;
@@ -20,22 +21,22 @@ class SupportHelpersTest extends TestCase
     public function testE()
     {
         $str = 'A \'quote\' is <b>bold</b>';
-        $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
+        $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', Laravel::e($str));
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
-        $this->assertEquals($str, e($html));
+        $this->assertEquals($str, Laravel::e($html));
     }
 
     public function testClassBasename()
     {
-        $this->assertEquals('Baz', class_basename('Foo\Bar\Baz'));
-        $this->assertEquals('Baz', class_basename('Baz'));
+        $this->assertEquals('Baz', Laravel::classBasename('Foo\Bar\Baz'));
+        $this->assertEquals('Baz', Laravel::classBasename('Baz'));
     }
 
     public function testValue()
     {
-        $this->assertEquals('foo', value('foo'));
-        $this->assertEquals('foo', value(function () {
+        $this->assertEquals('foo', Laravel::value('foo'));
+        $this->assertEquals('foo', Laravel::value(function () {
             return 'foo';
         }));
     }
@@ -46,7 +47,7 @@ class SupportHelpersTest extends TestCase
         $class->name = new stdClass;
         $class->name->first = 'Taylor';
 
-        $this->assertEquals('Taylor', object_get($class, 'name.first'));
+        $this->assertEquals('Taylor', Laravel::objectGet($class, 'name.first'));
     }
 
     public function testDataGet()
@@ -56,23 +57,23 @@ class SupportHelpersTest extends TestCase
         $dottedArray = ['users' => ['first.name' => 'Taylor', 'middle.name' => null]];
         $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John']), 'email' => null]);
 
-        $this->assertEquals('Taylor', data_get($object, 'users.name.0'));
-        $this->assertEquals('Taylor', data_get($array, '0.users.0.name'));
-        $this->assertNull(data_get($array, '0.users.3'));
-        $this->assertEquals('Not found', data_get($array, '0.users.3', 'Not found'));
-        $this->assertEquals('Not found', data_get($array, '0.users.3', function () {
+        $this->assertEquals('Taylor', Laravel::dataGet($object, 'users.name.0'));
+        $this->assertEquals('Taylor', Laravel::dataGet($array, '0.users.0.name'));
+        $this->assertNull(Laravel::dataGet($array, '0.users.3'));
+        $this->assertEquals('Not found', Laravel::dataGet($array, '0.users.3', 'Not found'));
+        $this->assertEquals('Not found', Laravel::dataGet($array, '0.users.3', function () {
             return 'Not found';
         }));
-        $this->assertEquals('Taylor', data_get($dottedArray, ['users', 'first.name']));
-        $this->assertNull(data_get($dottedArray, ['users', 'middle.name']));
-        $this->assertEquals('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
-        $this->assertEquals(56, data_get($arrayAccess, 'price'));
-        $this->assertEquals('John', data_get($arrayAccess, 'user.name'));
-        $this->assertEquals('void', data_get($arrayAccess, 'foo', 'void'));
-        $this->assertEquals('void', data_get($arrayAccess, 'user.foo', 'void'));
-        $this->assertNull(data_get($arrayAccess, 'foo'));
-        $this->assertNull(data_get($arrayAccess, 'user.foo'));
-        $this->assertNull(data_get($arrayAccess, 'email', 'Not found'));
+        $this->assertEquals('Taylor', Laravel::dataGet($dottedArray, ['users', 'first.name']));
+        $this->assertNull(Laravel::dataGet($dottedArray, ['users', 'middle.name']));
+        $this->assertEquals('Not found', Laravel::dataGet($dottedArray, ['users', 'last.name'], 'Not found'));
+        $this->assertEquals(56, Laravel::dataGet($arrayAccess, 'price'));
+        $this->assertEquals('John', Laravel::dataGet($arrayAccess, 'user.name'));
+        $this->assertEquals('void', Laravel::dataGet($arrayAccess, 'foo', 'void'));
+        $this->assertEquals('void', Laravel::dataGet($arrayAccess, 'user.foo', 'void'));
+        $this->assertNull(Laravel::dataGet($arrayAccess, 'foo'));
+        $this->assertNull(Laravel::dataGet($arrayAccess, 'user.foo'));
+        $this->assertNull(Laravel::dataGet($arrayAccess, 'email', 'Not found'));
     }
 
     public function testDataGetWithNestedArrays()
@@ -83,8 +84,8 @@ class SupportHelpersTest extends TestCase
             ['name' => 'dayle'],
         ];
 
-        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
-        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], Laravel::dataGet($array, '*.name'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], Laravel::dataGet($array, '*.email', 'irrelevant'));
 
         $array = [
             'users' => [
@@ -95,10 +96,10 @@ class SupportHelpersTest extends TestCase
             'posts' => null,
         ];
 
-        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
-        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
-        $this->assertEquals('not found', data_get($array, 'posts.*.date', 'not found'));
-        $this->assertNull(data_get($array, 'posts.*.date'));
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], Laravel::dataGet($array, 'users.*.first'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], Laravel::dataGet($array, 'users.*.email', 'irrelevant'));
+        $this->assertEquals('not found', Laravel::dataGet($array, 'posts.*.date', 'not found'));
+        $this->assertNull(Laravel::dataGet($array, 'posts.*.date'));
     }
 
     public function testDataGetWithDoubleNestedArraysCollapsesResult()
@@ -126,22 +127,22 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
-        $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
-        $this->assertEquals([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
-        $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
+        $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], Laravel::dataGet($array, 'posts.*.comments.*.author'));
+        $this->assertEquals([4, 3, 2, null, null, 1], Laravel::dataGet($array, 'posts.*.comments.*.likes'));
+        $this->assertEquals([], Laravel::dataGet($array, 'posts.*.users.*.name', 'irrelevant'));
+        $this->assertEquals([], Laravel::dataGet($array, 'posts.*.users.*.name'));
     }
 
     public function testDataFill()
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_fill($data, 'baz', 'boom'));
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_fill($data, 'baz', 'noop'));
-        $this->assertEquals(['foo' => [], 'baz' => 'boom'], data_fill($data, 'foo.*', 'noop'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], Laravel::dataFill($data, 'baz', 'boom'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], Laravel::dataFill($data, 'baz', 'noop'));
+        $this->assertEquals(['foo' => [], 'baz' => 'boom'], Laravel::dataFill($data, 'foo.*', 'noop'));
         $this->assertEquals(
             ['foo' => ['bar' => 'kaboom'], 'baz' => 'boom'],
-            data_fill($data, 'foo.bar', 'kaboom')
+            Laravel::dataFill($data, 'foo.bar', 'kaboom')
         );
     }
 
@@ -151,22 +152,22 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(
             ['foo' => []],
-            data_fill($data, 'foo.*.bar', 'noop')
+            Laravel::dataFill($data, 'foo.*.bar', 'noop')
         );
 
         $this->assertEquals(
             ['foo' => [], 'bar' => [['baz' => 'original'], []]],
-            data_fill($data, 'bar', [['baz' => 'original'], []])
+            Laravel::dataFill($data, 'bar', [['baz' => 'original'], []])
         );
 
         $this->assertEquals(
             ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
-            data_fill($data, 'bar.*.baz', 'boom')
+            Laravel::dataFill($data, 'bar.*.baz', 'boom')
         );
 
         $this->assertEquals(
             ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
-            data_fill($data, 'bar.*', 'noop')
+            Laravel::dataFill($data, 'bar.*', 'noop')
         );
     }
 
@@ -189,7 +190,7 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        data_fill($data, 'posts.*.comments.*.name', 'Filled');
+        Laravel::dataFill($data, 'posts.*.comments.*.name', 'Filled');
 
         $this->assertEquals([
             'posts' => [
@@ -215,32 +216,32 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(
             ['foo' => 'bar', 'baz' => 'boom'],
-            data_set($data, 'baz', 'boom')
+            Laravel::dataSet($data, 'baz', 'boom')
         );
 
         $this->assertEquals(
             ['foo' => 'bar', 'baz' => 'kaboom'],
-            data_set($data, 'baz', 'kaboom')
+            Laravel::dataSet($data, 'baz', 'kaboom')
         );
 
         $this->assertEquals(
             ['foo' => [], 'baz' => 'kaboom'],
-            data_set($data, 'foo.*', 'noop')
+            Laravel::dataSet($data, 'foo.*', 'noop')
         );
 
         $this->assertEquals(
             ['foo' => ['bar' => 'boom'], 'baz' => 'kaboom'],
-            data_set($data, 'foo.bar', 'boom')
+            Laravel::dataSet($data, 'foo.bar', 'boom')
         );
 
         $this->assertEquals(
             ['foo' => ['bar' => 'boom'], 'baz' => ['bar' => 'boom']],
-            data_set($data, 'baz.bar', 'boom')
+            Laravel::dataSet($data, 'baz.bar', 'boom')
         );
 
         $this->assertEquals(
             ['foo' => ['bar' => 'boom'], 'baz' => ['bar' => ['boom' => ['kaboom' => 'boom']]]],
-            data_set($data, 'baz.bar.boom.kaboom', 'boom')
+            Laravel::dataSet($data, 'baz.bar.boom.kaboom', 'boom')
         );
     }
 
@@ -250,22 +251,22 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(
             ['foo' => []],
-            data_set($data, 'foo.*.bar', 'noop')
+            Laravel::dataSet($data, 'foo.*.bar', 'noop')
         );
 
         $this->assertEquals(
             ['foo' => [], 'bar' => [['baz' => 'original'], []]],
-            data_set($data, 'bar', [['baz' => 'original'], []])
+            Laravel::dataSet($data, 'bar', [['baz' => 'original'], []])
         );
 
         $this->assertEquals(
             ['foo' => [], 'bar' => [['baz' => 'boom'], ['baz' => 'boom']]],
-            data_set($data, 'bar.*.baz', 'boom')
+            Laravel::dataSet($data, 'bar.*.baz', 'boom')
         );
 
         $this->assertEquals(
             ['foo' => [], 'bar' => ['overwritten', 'overwritten']],
-            data_set($data, 'bar.*', 'overwritten')
+            Laravel::dataSet($data, 'bar.*', 'overwritten')
         );
     }
 
@@ -288,7 +289,7 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        data_set($data, 'posts.*.comments.*.name', 'Filled');
+        Laravel::dataSet($data, 'posts.*.comments.*.name', 'Filled');
 
         $this->assertEquals([
             'posts' => [
@@ -311,13 +312,13 @@ class SupportHelpersTest extends TestCase
     public function testHead()
     {
         $array = ['a', 'b', 'c'];
-        $this->assertEquals('a', head($array));
+        $this->assertEquals('a', Laravel::head($array));
     }
 
     public function testLast()
     {
         $array = ['a', 'b', 'c'];
-        $this->assertEquals('c', last($array));
+        $this->assertEquals('c', Laravel::last($array));
     }
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
@@ -326,7 +327,7 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitTwo::class => SupportTestTraitTwo::class,
             SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
-        class_uses_recursive(SupportTestClassTwo::class));
+        Laravel::classUsesRecursive(SupportTestClassTwo::class));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
@@ -335,7 +336,7 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitTwo::class => SupportTestTraitTwo::class,
             SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
-        class_uses_recursive(new SupportTestClassTwo));
+        Laravel::classUsesRecursive(new SupportTestClassTwo));
     }
 
     public function testClassUsesRecursiveReturnParentTraitsFirst()
@@ -345,31 +346,31 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitOne::class => SupportTestTraitOne::class,
             SupportTestTraitThree::class => SupportTestTraitThree::class,
         ],
-        class_uses_recursive(SupportTestClassThree::class));
+        Laravel::classUsesRecursive(SupportTestClassThree::class));
     }
 
     public function testTap()
     {
         $object = (object) ['id' => 1];
-        $this->assertEquals(2, tap($object, function ($object) {
+        $this->assertEquals(2, Laravel::tap($object, function ($object) {
             $object->id = 2;
         })->id);
 
         $mock = m::mock();
         $mock->shouldReceive('foo')->once()->andReturn('bar');
-        $this->assertEquals($mock, tap($mock)->foo());
+        $this->assertEquals($mock, Laravel::tap($mock)->foo());
     }
 
     public function testThrow()
     {
         $this->expectException(RuntimeException::class);
 
-        throw_if(true, new RuntimeException);
+        Laravel::throwIf(true, new RuntimeException);
     }
 
     public function testThrowReturnIfNotThrown()
     {
-        $this->assertSame('foo', throw_unless('foo', new RuntimeException));
+        $this->assertSame('foo', Laravel::throwUnless('foo', new RuntimeException));
     }
 
     public function testThrowWithString()
@@ -377,14 +378,14 @@ class SupportHelpersTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Test Message');
 
-        throw_if(true, RuntimeException::class, 'Test Message');
+        Laravel::throwIf(true, RuntimeException::class, 'Test Message');
     }
 
     public function testOptional()
     {
-        $this->assertNull(optional(null)->something());
+        $this->assertNull(Laravel::optional(null)->something());
 
-        $this->assertEquals(10, optional(new class {
+        $this->assertEquals(10, Laravel::optional(new class {
             public function something()
             {
                 return 10;
@@ -394,57 +395,57 @@ class SupportHelpersTest extends TestCase
 
     public function testOptionalWithCallback()
     {
-        $this->assertNull(optional(null, function () {
+        $this->assertNull(Laravel::optional(null, function () {
             throw new RuntimeException(
                 'The optional callback should not be called for null'
             );
         }));
 
-        $this->assertEquals(10, optional(5, function ($number) {
+        $this->assertEquals(10, Laravel::optional(5, function ($number) {
             return $number * 2;
         }));
     }
 
     public function testOptionalWithArray()
     {
-        $this->assertEquals('here', optional(['present' => 'here'])['present']);
-        $this->assertNull(optional(null)['missing']);
-        $this->assertNull(optional(['present' => 'here'])->missing);
+        $this->assertEquals('here', Laravel::optional(['present' => 'here'])['present']);
+        $this->assertNull(Laravel::optional(null)['missing']);
+        $this->assertNull(Laravel::optional(['present' => 'here'])->missing);
     }
 
     public function testOptionalReturnsObjectPropertyOrNull()
     {
-        $this->assertSame('bar', optional((object) ['foo' => 'bar'])->foo);
-        $this->assertNull(optional(['foo' => 'bar'])->foo);
-        $this->assertNull(optional((object) ['foo' => 'bar'])->bar);
+        $this->assertSame('bar', Laravel::optional((object) ['foo' => 'bar'])->foo);
+        $this->assertNull(Laravel::optional(['foo' => 'bar'])->foo);
+        $this->assertNull(Laravel::optional((object) ['foo' => 'bar'])->bar);
     }
 
     public function testOptionalDeterminesWhetherKeyIsSet()
     {
-        $this->assertTrue(isset(optional(['foo' => 'bar'])['foo']));
-        $this->assertFalse(isset(optional(['foo' => 'bar'])['bar']));
-        $this->assertFalse(isset(optional()['bar']));
+        $this->assertTrue(isset(Laravel::optional(['foo' => 'bar'])['foo']));
+        $this->assertFalse(isset(Laravel::optional(['foo' => 'bar'])['bar']));
+        $this->assertFalse(isset(Laravel::optional()['bar']));
     }
 
     public function testOptionalAllowsToSetKey()
     {
-        $optional = optional([]);
+        $optional = Laravel::optional([]);
         $optional['foo'] = 'bar';
         $this->assertSame('bar', $optional['foo']);
 
-        $optional = optional(null);
+        $optional = Laravel::optional(null);
         $optional['foo'] = 'bar';
         $this->assertFalse(isset($optional['foo']));
     }
 
     public function testOptionalAllowToUnsetKey()
     {
-        $optional = optional(['foo' => 'bar']);
+        $optional = Laravel::optional(['foo' => 'bar']);
         $this->assertTrue(isset($optional['foo']));
         unset($optional['foo']);
         $this->assertFalse(isset($optional['foo']));
 
-        $optional = optional((object) ['foo' => 'bar']);
+        $optional = Laravel::optional((object) ['foo' => 'bar']);
         $this->assertFalse(isset($optional['foo']));
         $optional['foo'] = 'bar';
         $this->assertFalse(isset($optional['foo']));
@@ -460,9 +461,9 @@ class SupportHelpersTest extends TestCase
             return new Optional(null);
         });
 
-        $this->assertNull(optional(null)->present()->something());
+        $this->assertNull(Laravel::optional(null)->present()->something());
 
-        $this->assertEquals('$10.00', optional(new class {
+        $this->assertEquals('$10.00', Laravel::optional(new class {
             public function present()
             {
                 return new class {
@@ -479,7 +480,7 @@ class SupportHelpersTest extends TestCase
     {
         $startTime = microtime(true);
 
-        $attempts = retry(2, function ($attempts) {
+        $attempts = Laravel::retry(2, function ($attempts) {
             if ($attempts > 1) {
                 return $attempts;
             }
@@ -496,22 +497,22 @@ class SupportHelpersTest extends TestCase
 
     public function testTransform()
     {
-        $this->assertEquals(10, transform(5, function ($value) {
+        $this->assertEquals(10, Laravel::transform(5, function ($value) {
             return $value * 2;
         }));
 
-        $this->assertNull(transform(null, function () {
+        $this->assertNull(Laravel::transform(null, function () {
             return 10;
         }));
     }
 
     public function testTransformDefaultWhenBlank()
     {
-        $this->assertEquals('baz', transform(null, function () {
+        $this->assertEquals('baz', Laravel::transform(null, function () {
             return 'bar';
         }, 'baz'));
 
-        $this->assertEquals('baz', transform('', function () {
+        $this->assertEquals('baz', Laravel::transform('', function () {
             return 'bar';
         }, function () {
             return 'baz';
@@ -520,9 +521,9 @@ class SupportHelpersTest extends TestCase
 
     public function testWith()
     {
-        $this->assertEquals(10, with(10));
+        $this->assertEquals(10, Laravel::with(10));
 
-        $this->assertEquals(10, with(5, function ($five) {
+        $this->assertEquals(10, Laravel::with(5, function ($five) {
             return $five + 5;
         }));
     }
@@ -530,80 +531,80 @@ class SupportHelpersTest extends TestCase
     public function testEnv()
     {
         $_SERVER['foo'] = 'bar';
-        $this->assertSame('bar', env('foo'));
+        $this->assertSame('bar', Laravel::env('foo'));
     }
 
     public function testEnvTrue()
     {
         $_SERVER['foo'] = 'true';
-        $this->assertTrue(env('foo'));
+        $this->assertTrue(Laravel::env('foo'));
 
         $_SERVER['foo'] = '(true)';
-        $this->assertTrue(env('foo'));
+        $this->assertTrue(Laravel::env('foo'));
     }
 
     public function testEnvFalse()
     {
         $_SERVER['foo'] = 'false';
-        $this->assertFalse(env('foo'));
+        $this->assertFalse(Laravel::env('foo'));
 
         $_SERVER['foo'] = '(false)';
-        $this->assertFalse(env('foo'));
+        $this->assertFalse(Laravel::env('foo'));
     }
 
     public function testEnvEmpty()
     {
         $_SERVER['foo'] = '';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', Laravel::env('foo'));
 
         $_SERVER['foo'] = 'empty';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', Laravel::env('foo'));
 
         $_SERVER['foo'] = '(empty)';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', Laravel::env('foo'));
     }
 
     public function testEnvNull()
     {
         $_SERVER['foo'] = 'null';
-        $this->assertNull(env('foo'));
+        $this->assertNull(Laravel::env('foo'));
 
         $_SERVER['foo'] = '(null)';
-        $this->assertNull(env('foo'));
+        $this->assertNull(Laravel::env('foo'));
     }
 
     public function testEnvDefault()
     {
         $_SERVER['foo'] = 'bar';
-        $this->assertEquals('bar', env('foo', 'default'));
+        $this->assertEquals('bar', Laravel::env('foo', 'default'));
 
         $_SERVER['foo'] = '';
-        $this->assertEquals('', env('foo', 'default'));
+        $this->assertEquals('', Laravel::env('foo', 'default'));
 
         unset($_SERVER['foo']);
-        $this->assertEquals('default', env('foo', 'default'));
+        $this->assertEquals('default', Laravel::env('foo', 'default'));
 
         $_SERVER['foo'] = null;
-        $this->assertEquals('default', env('foo', 'default'));
+        $this->assertEquals('default', Laravel::env('foo', 'default'));
     }
 
     public function testEnvEscapedString()
     {
         $_SERVER['foo'] = '"null"';
-        $this->assertSame('null', env('foo'));
+        $this->assertSame('null', Laravel::env('foo'));
 
         $_SERVER['foo'] = "'null'";
-        $this->assertSame('null', env('foo'));
+        $this->assertSame('null', Laravel::env('foo'));
 
         $_SERVER['foo'] = 'x"null"x'; // this should not be unquoted
-        $this->assertSame('x"null"x', env('foo'));
+        $this->assertSame('x"null"x', Laravel::env('foo'));
     }
 
     public function testGetFromENVFirst()
     {
         $_ENV['foo'] = 'From $_ENV';
         $_SERVER['foo'] = 'From $_SERVER';
-        $this->assertSame('From $_ENV', env('foo'));
+        $this->assertSame('From $_ENV', Laravel::env('foo'));
     }
 }
 

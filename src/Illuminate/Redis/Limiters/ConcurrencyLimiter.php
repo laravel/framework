@@ -2,6 +2,7 @@
 
 namespace Illuminate\Redis\Limiters;
 
+use Laravel;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
@@ -79,7 +80,7 @@ class ConcurrencyLimiter
 
         if (is_callable($callback)) {
             try {
-                return tap($callback(), function () use ($slot, $id) {
+                return Laravel::tap($callback(), function () use ($slot, $id) {
                     $this->release($slot, $id);
                 });
             } catch (Exception $exception) {

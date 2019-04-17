@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Laravel;
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -126,8 +127,8 @@ class MorphTo extends BelongsTo
      */
     protected function gatherKeysByType($type)
     {
-        return collect($this->dictionary[$type])->map(function ($models) {
-            return head($models)->{$this->foreignKey};
+        return Laravel::collect($this->dictionary[$type])->map(function ($models) {
+            return Laravel::head($models)->{$this->foreignKey};
         })->values()->unique()->all();
     }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
+use Laravel;
 use Illuminate\Support\Arr;
 
 trait ConditionallyLoadsAttributes
@@ -102,10 +103,10 @@ trait ConditionallyLoadsAttributes
     protected function when($condition, $value, $default = null)
     {
         if ($condition) {
-            return value($value);
+            return Laravel::value($value);
         }
 
-        return func_num_args() === 3 ? value($default) : new MissingValue;
+        return func_num_args() === 3 ? Laravel::value($default) : new MissingValue;
     }
 
     /**
@@ -128,7 +129,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function mergeWhen($condition, $value)
     {
-        return $condition ? new MergeValue(value($value)) : new MissingValue;
+        return $condition ? new MergeValue(Laravel::value($value)) : new MissingValue;
     }
 
     /**
@@ -159,7 +160,7 @@ trait ConditionallyLoadsAttributes
         }
 
         if (! $this->resource->relationLoaded($relationship)) {
-            return value($default);
+            return Laravel::value($default);
         }
 
         if (func_num_args() === 1) {
@@ -170,7 +171,7 @@ trait ConditionallyLoadsAttributes
             return null;
         }
 
-        return value($value);
+        return Laravel::value($value);
     }
 
     /**
@@ -219,7 +220,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function transform($value, callable $callback, $default = null)
     {
-        return transform(
+        return Laravel::transform(
             $value, $callback, func_num_args() === 3 ? $default : new MissingValue
         );
     }

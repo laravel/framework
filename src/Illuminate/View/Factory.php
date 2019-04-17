@@ -2,6 +2,7 @@
 
 namespace Illuminate\View;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -111,7 +112,7 @@ class Factory implements FactoryContract
     {
         $data = array_merge($mergeData, $this->parseData($data));
 
-        return tap($this->viewInstance($path, $path, $data), function ($view) {
+        return Laravel::tap($this->viewInstance($path, $path, $data), function ($view) {
             $this->callCreator($view);
         });
     }
@@ -135,7 +136,7 @@ class Factory implements FactoryContract
         // the caller for rendering or performing other view manipulations on this.
         $data = array_merge($mergeData, $this->parseData($data));
 
-        return tap($this->viewInstance($view, $path, $data), function ($view) {
+        return Laravel::tap($this->viewInstance($view, $path, $data), function ($view) {
             $this->callCreator($view);
         });
     }

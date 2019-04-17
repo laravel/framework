@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Laravel;
 use stdClass;
 use Exception;
 use ArrayAccess;
@@ -1172,7 +1173,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Taylor'], $data->except(['last', 'email', 'missing'])->all());
         $this->assertEquals(['first' => 'Taylor'], $data->except('last', 'email', 'missing')->all());
 
-        $this->assertEquals(['first' => 'Taylor'], $data->except(collect(['last', 'email', 'missing']))->all());
+        $this->assertEquals(['first' => 'Taylor'], $data->except(Laravel::collect(['last', 'email', 'missing']))->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except(['last'])->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except('last')->all());
     }
@@ -2352,11 +2353,11 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($data->all(), $data->only(null)->all());
         $this->assertEquals(['first' => 'Taylor'], $data->only(['first', 'missing'])->all());
         $this->assertEquals(['first' => 'Taylor'], $data->only('first', 'missing')->all());
-        $this->assertEquals(['first' => 'Taylor'], $data->only(collect(['first', 'missing']))->all());
+        $this->assertEquals(['first' => 'Taylor'], $data->only(Laravel::collect(['first', 'missing']))->all());
 
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(['first', 'email'])->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only('first', 'email')->all());
-        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(collect(['first', 'email']))->all());
+        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(Laravel::collect(['first', 'email']))->all());
     }
 
     public function testGettingAvgItemsFromCollection()
@@ -2735,7 +2736,7 @@ class SupportCollectionTest extends TestCase
 
     public function testHigherOrderCollectionGroupBy()
     {
-        $collection = collect([
+        $collection = Laravel::collect([
             new TestSupportCollectionHigherOrderItem,
             new TestSupportCollectionHigherOrderItem('TAYLOR'),
             new TestSupportCollectionHigherOrderItem('foo'),
@@ -2758,11 +2759,11 @@ class SupportCollectionTest extends TestCase
         $person1 = (object) ['name' => 'Taylor'];
         $person2 = (object) ['name' => 'Yaz'];
 
-        $collection = collect([$person1, $person2]);
+        $collection = Laravel::collect([$person1, $person2]);
 
         $this->assertEquals(['Taylor', 'Yaz'], $collection->map->name->toArray());
 
-        $collection = collect([new TestSupportCollectionHigherOrderItem, new TestSupportCollectionHigherOrderItem]);
+        $collection = Laravel::collect([new TestSupportCollectionHigherOrderItem, new TestSupportCollectionHigherOrderItem]);
 
         $this->assertEquals(['TAYLOR', 'TAYLOR'], $collection->each->uppercase()->map->name->toArray());
     }
@@ -2772,11 +2773,11 @@ class SupportCollectionTest extends TestCase
         $person1 = ['name' => 'Taylor'];
         $person2 = ['name' => 'Yaz'];
 
-        $collection = collect([$person1, $person2]);
+        $collection = Laravel::collect([$person1, $person2]);
 
         $this->assertEquals(['Taylor', 'Yaz'], $collection->map->name->toArray());
 
-        $collection = collect([new TestSupportCollectionHigherOrderItem, new TestSupportCollectionHigherOrderItem]);
+        $collection = Laravel::collect([new TestSupportCollectionHigherOrderItem, new TestSupportCollectionHigherOrderItem]);
 
         $this->assertEquals(['TAYLOR', 'TAYLOR'], $collection->each->uppercase()->map->name->toArray());
     }

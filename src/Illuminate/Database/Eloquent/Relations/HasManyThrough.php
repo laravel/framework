@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Laravel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -135,7 +136,7 @@ class HasManyThrough extends Relation
      */
     public function throughParentSoftDeletes()
     {
-        return in_array(SoftDeletes::class, class_uses_recursive($this->throughParent));
+        return in_array(SoftDeletes::class, Laravel::classUsesRecursive($this->throughParent));
     }
 
     /**

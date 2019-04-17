@@ -2,6 +2,7 @@
 
 namespace Illuminate\Translation;
 
+use Laravel;
 use Illuminate\Support\Str;
 
 class MessageSelector
@@ -91,7 +92,7 @@ class MessageSelector
      */
     private function stripConditions($segments)
     {
-        return collect($segments)->map(function ($part) {
+        return Laravel::collect($segments)->map(function ($part) {
             return preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part);
         })->all();
     }

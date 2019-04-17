@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Http\Fixtures;
 
+use Laravel;
+
 class AuthorResourceWithOptionalRelationship extends PostResource
 {
     public function toArray($request)
@@ -14,7 +16,7 @@ class AuthorResourceWithOptionalRelationship extends PostResource
                 return 'not loaded';
             }),
             'latest_post_title' => $this->whenLoaded('posts', function () {
-                return optional($this->posts->first())->title ?: 'no posts yet';
+                return Laravel::optional($this->posts->first())->title ?: 'no posts yet';
             }, 'not loaded'),
         ];
     }

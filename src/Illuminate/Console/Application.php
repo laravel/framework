@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Closure;
+use Laravel;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
@@ -284,7 +285,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     protected function getDefaultInputDefinition()
     {
-        return tap(parent::getDefaultInputDefinition(), function ($definition) {
+        return Laravel::tap(parent::getDefaultInputDefinition(), function ($definition) {
             $definition->addOption($this->getEnvironmentOption());
         });
     }

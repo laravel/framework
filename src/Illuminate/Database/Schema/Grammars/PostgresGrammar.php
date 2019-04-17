@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Laravel;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -510,7 +511,7 @@ class PostgresGrammar extends Grammar
         }
 
         if ($column->autoIncrement && is_null($column->generatedAs)) {
-            return with([
+            return Laravel::with([
                 'integer' => 'serial',
                 'bigint' => 'bigserial',
                 'smallint' => 'smallserial',

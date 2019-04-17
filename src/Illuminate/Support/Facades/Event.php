@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Laravel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Testing\Fakes\EventFake;
 
@@ -48,7 +49,7 @@ class Event extends Facade
 
         static::fake($eventsToFake);
 
-        return tap($callable(), function () use ($originalDispatcher) {
+        return Laravel::tap($callable(), function () use ($originalDispatcher) {
             static::swap($originalDispatcher);
 
             Model::setEventDispatcher($originalDispatcher);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Laravel;
 use Mockery as m;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -150,8 +151,8 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertCount(1, $c->find([2]));
         $this->assertEquals(2, $c->find([2])->first()->id);
         $this->assertCount(2, $c->find([2, 3, 4]));
-        $this->assertCount(2, $c->find(collect([2, 3, 4])));
-        $this->assertEquals([2, 3], $c->find(collect([2, 3, 4]))->pluck('id')->all());
+        $this->assertCount(2, $c->find(Laravel::collect([2, 3, 4])));
+        $this->assertEquals([2, 3], $c->find(Laravel::collect([2, 3, 4]))->pluck('id')->all());
         $this->assertEquals([2, 3], $c->find([2, 3, 4])->pluck('id')->all());
     }
 

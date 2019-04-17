@@ -2,6 +2,7 @@
 
 namespace Illuminate\Events;
 
+use Laravel;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\InteractsWithQueue;
@@ -96,7 +97,7 @@ class CallQueuedListener implements ShouldQueue
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
+        if (in_array(InteractsWithQueue::class, Laravel::classUsesRecursive($instance))) {
             $instance->setJob($job);
         }
 

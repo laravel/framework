@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use Laravel;
 use Illuminate\Support\Arr;
 use SessionHandlerInterface;
 use Illuminate\Support\Carbon;
@@ -182,7 +183,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
             return $payload;
         }
 
-        return tap($payload, function (&$payload) {
+        return Laravel::tap($payload, function (&$payload) {
             $this->addUserInformation($payload)
                  ->addRequestInformation($payload);
         });

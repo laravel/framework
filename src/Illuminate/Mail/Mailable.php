@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+use Laravel;
 use ReflectionClass;
 use ReflectionProperty;
 use Illuminate\Support\Str;
@@ -349,7 +350,7 @@ class Mailable implements MailableContract, Renderable
         if ($this->subject) {
             $message->subject($this->subject);
         } else {
-            $message->subject(Str::title(Str::snake(class_basename($this), ' ')));
+            $message->subject(Str::title(Str::snake(Laravel::classBasename($this), ' ')));
         }
 
         return $this;
@@ -640,7 +641,7 @@ class Mailable implements MailableContract, Renderable
             'address' => $expected->email,
         ];
 
-        return collect($this->{$property})->contains(function ($actual) use ($expected) {
+        return Laravel::collect($this->{$property})->contains(function ($actual) use ($expected) {
             if (! isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
             }

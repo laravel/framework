@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Laravel;
 use Exception;
 use Throwable;
 use Illuminate\Foundation\Mix;
@@ -622,7 +623,7 @@ trait FoundationHelpers
 
         $value = static::app('request')->__get($key);
 
-        return is_null($value) ? value($default) : $value;
+        return is_null($value) ? static::value($default) : $value;
     }
 
     /**
@@ -639,7 +640,7 @@ trait FoundationHelpers
         } catch (Throwable $e) {
             static::report($e);
 
-            return value($rescue);
+            return static::value($rescue);
         }
     }
 

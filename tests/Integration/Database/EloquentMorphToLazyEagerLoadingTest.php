@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToLazyEagerLoadingTest;
 
 use DB;
+use Laravel;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -38,7 +39,7 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
 
         $user = User::create();
 
-        $post = tap((new Post)->user()->associate($user))->save();
+        $post = Laravel::tap((new Post)->user()->associate($user))->save();
 
         $video = Video::create();
 

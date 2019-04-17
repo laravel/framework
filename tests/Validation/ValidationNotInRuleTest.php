@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Laravel;
 use Illuminate\Validation\Rule;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Rules\NotIn;
@@ -18,7 +19,7 @@ class ValidationNotInRuleTest extends TestCase
 
         $this->assertEquals('not_in:"1","2","3","4"', (string) $rule);
 
-        $rule = Rule::notIn(collect([1, 2, 3, 4]));
+        $rule = Rule::notIn(Laravel::collect([1, 2, 3, 4]));
 
         $this->assertEquals('not_in:"1","2","3","4"', (string) $rule);
 

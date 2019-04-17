@@ -15,7 +15,7 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
-        return tap(Laravel::response()->json(
+        return Laravel::tap(Laravel::response()->json(
             $this->wrap(
                 $this->resource->resolve($request),
                 array_merge_recursive(
