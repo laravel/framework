@@ -324,7 +324,7 @@ class Builder
      *
      * @param  string  $class
      * @param  string  $name
-     * @param  string $type
+     * @param  string  $type
      * @return void
      *
      * @throws \Doctrine\DBAL\DBALException

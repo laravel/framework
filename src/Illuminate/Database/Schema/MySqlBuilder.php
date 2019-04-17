@@ -10,8 +10,7 @@ class MySqlBuilder extends Builder
     /**
      * MySqlBuilder constructor.
      *
-     * @param  Connection  $connection
-     *
+     * @param  \Illuminate\Database\Connection  $connection
      * @throws \Doctrine\DBAL\DBALException
      */
     public function __construct(Connection $connection)

@@ -18,7 +18,7 @@ class TinyInteger extends Type
      * Gets the SQL declaration snippet for a field of this type.
      *
      * @param  array  $fieldDeclaration
-     * @param  AbstractPlatform  $platform
+     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @return string
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
