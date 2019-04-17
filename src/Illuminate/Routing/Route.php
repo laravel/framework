@@ -942,7 +942,7 @@ class Route
      */
     public function __call($method, $args)
     {
-        $this->middleware($args ? "{$method}:".implode($args, ",") : $method);
+        $this->middleware($args ? "{$method}:".implode($args, ',') : $method);
 
         return $this;
     }
