@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database;
 
-use PDOException;
 use Illuminate\Support\Str;
+use PDOException;
 
 class QueryException extends PDOException
 {
@@ -53,7 +53,11 @@ class QueryException extends PDOException
      */
     protected function formatMessage($sql, $bindings, $previous)
     {
-        return $previous->getMessage().' (SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+        $search = str_repeat('?, ', count($bindings) - 1).'?';
+        $replace = implode(', ', $bindings);
+        $query = ' (SQL: '.str_replace($search, $replace, $sql).')';
+
+        return $previous->getMessage().$query;
     }
 
     /**
