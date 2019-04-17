@@ -92,6 +92,9 @@
         "true/punycode": "^2.1"
     },
     "autoload": {
+        "classmap": [
+            "src/Laravel.php"
+        ],
         "files": [
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
