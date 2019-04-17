@@ -2,8 +2,24 @@
 
 namespace Illuminate\Database\Schema;
 
+use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Types\TinyInteger;
+
 class MySqlBuilder extends Builder
 {
+    /**
+     * MySqlBuilder constructor.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function __construct(Connection $connection)
+    {
+        parent::__construct($connection);
+
+        $this->registerCustomDBALTypes();
+    }
+
     /**
      * Determine if the given table exists.
      *
@@ -110,5 +126,21 @@ class MySqlBuilder extends Builder
         return $this->connection->select(
             $this->grammar->compileGetAllViews()
         );
+    }
+
+    /**
+     * Register custom DBAL types for the MySQL builder.
+     *
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function registerCustomDBALTypes()
+    {
+        if (! $this->connection->isDoctrineAvailable()) {
+            return;
+        }
+
+        $this->registerCustomDBALType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
     }
 }
