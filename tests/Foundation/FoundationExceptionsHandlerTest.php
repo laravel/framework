@@ -15,6 +15,7 @@ use Illuminate\Container\Container;
 use Illuminate\Validation\Validator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Translation\Translator;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Support\Responsable;
@@ -152,6 +153,16 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $argumentExpected = ['input' => 'My input value'];
         $argumentActual = null;
+
+        $this->container->singleton('translator', function () {
+            $translator = m::mock(Translator::class);
+
+            $translator->shouldReceive('getFromJson')->once()
+                ->with('The given data was invalid.', [], null)
+                ->andReturn('The given data was invalid.');
+
+            return $translator;
+        });
 
         $this->container->singleton('redirect', function () use (&$argumentActual) {
             $redirector = m::mock(Redirector::class);

@@ -79,6 +79,16 @@ class ValidationValidatorTest extends TestCase
     {
         $this->expectException(ValidationException::class);
 
+        \Illuminate\Container\Container::getInstance()->singleton('translator', function () {
+            $translator = m::mock(Translator::class);
+
+            $translator->shouldReceive('getFromJson')->once()
+                ->with('The given data was invalid.', [], null)
+                ->andReturn('The given data was invalid.');
+
+            return $translator;
+        });
+
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar'], ['baz' => 'required']);
 
