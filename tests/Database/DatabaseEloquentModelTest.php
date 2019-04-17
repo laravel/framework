@@ -1821,15 +1821,35 @@ class DatabaseEloquentModelTest extends TestCase
     public function testIsWithNull()
     {
         $firstInstance = new EloquentModelStub(['id' => 1]);
+        $firstInstance->exists = true;
         $secondInstance = null;
 
         $this->assertFalse($firstInstance->is($secondInstance));
     }
 
+    public function testIsWithUnpersistedModelInstance()
+    {
+        $firstInstance = new EloquentModelStub(['id' => 1]);
+        $firstInstance->exists = true;
+        $secondInstance = new EloquentModelStub;
+        $result = $firstInstance->is($secondInstance);
+        $this->assertFalse($result);
+    }
+
+    public function testIsWithUnpersistedModelInstances()
+    {
+        $firstInstance = new EloquentModelStub;
+        $secondInstance = new EloquentModelStub;
+        $result = $firstInstance->is($secondInstance);
+        $this->assertFalse($result);
+    }
+
     public function testIsWithTheSameModelInstance()
     {
         $firstInstance = new EloquentModelStub(['id' => 1]);
+        $firstInstance->exists = true;
         $secondInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance->exists = true;
         $result = $firstInstance->is($secondInstance);
         $this->assertTrue($result);
     }
@@ -1837,7 +1857,9 @@ class DatabaseEloquentModelTest extends TestCase
     public function testIsWithAnotherModelInstance()
     {
         $firstInstance = new EloquentModelStub(['id' => 1]);
+        $firstInstance->exists = true;
         $secondInstance = new EloquentModelStub(['id' => 2]);
+        $secondInstance->exists = true;
         $result = $firstInstance->is($secondInstance);
         $this->assertFalse($result);
     }
@@ -1845,7 +1867,9 @@ class DatabaseEloquentModelTest extends TestCase
     public function testIsWithAnotherTable()
     {
         $firstInstance = new EloquentModelStub(['id' => 1]);
+        $firstInstance->exists = true;
         $secondInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance->exists = true;
         $secondInstance->setTable('foo');
         $result = $firstInstance->is($secondInstance);
         $this->assertFalse($result);
@@ -1854,7 +1878,9 @@ class DatabaseEloquentModelTest extends TestCase
     public function testIsWithAnotherConnection()
     {
         $firstInstance = new EloquentModelStub(['id' => 1]);
+        $firstInstance->exists = true;
         $secondInstance = new EloquentModelStub(['id' => 1]);
+        $secondInstance->exists = true;
         $secondInstance->setConnection('foo');
         $result = $firstInstance->is($secondInstance);
         $this->assertFalse($result);
