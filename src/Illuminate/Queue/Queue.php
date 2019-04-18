@@ -124,7 +124,7 @@ abstract class Queue
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
-            'delay' => $job->delay ?? null,
+            'delay' => $this->getJobRetryDelay($job),
             'timeout' => $job->timeout ?? null,
             'timeoutAt' => $this->getJobExpiration($job),
             'data' => [
@@ -151,6 +151,24 @@ abstract class Queue
     {
         return method_exists($job, 'displayName')
                         ? $job->displayName() : get_class($job);
+    }
+
+    /**
+     * Get the retry delay for an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    public function getJobRetryDelay($job)
+    {
+        if (! method_exists($job, 'retryAfter') && ! isset($job->retryAfter)) {
+            return;
+        }
+
+        $delay = $job->retryAfter ?? $job->retryAfter();
+
+        return $delay instanceof DateTimeInterface
+                        ? $this->secondsUntil($delay) : $delay;
     }
 
     /**
