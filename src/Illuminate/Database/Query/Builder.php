@@ -619,11 +619,11 @@ class Builder
         // If the operator is a literal string 'in' or 'not in', we will assume that
         // the developer wants to use the "whereIn / whereNotIn" methods for this
         // operation and proxy the query through those methods from this point.
-        if ($operator == 'in') {
+        if ($operator === 'in') {
             return $this->whereIn($column, $value, $boolean);
         }
 
-        if ($operator == 'not in') {
+        if ($operator === 'not in') {
             return $this->whereNotIn($column, $value, $boolean);
         }
 

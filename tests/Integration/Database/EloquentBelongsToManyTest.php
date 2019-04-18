@@ -604,6 +604,24 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals(['id' => 1], $tags[0]->getAttributes());
     }
+
+    public function test_where_pivot_with_boolean_column_query()
+    {
+        Schema::table('posts_tags', function (Blueprint $table) {
+            $table->boolean('primary')->default(false)->after('flag');
+        });
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'primary' => true]
+        ]);
+
+        $relationTag = $post->tags()->wherePivot('primary', true)->first();
+
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
 }
 
 class Post extends Model
