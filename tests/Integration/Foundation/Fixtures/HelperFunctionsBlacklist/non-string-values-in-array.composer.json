@@ -1,0 +1,11 @@
+{
+    "extra": {
+        "laravel": {
+            "disabled-functions": [
+                {
+                    "non-string": true
+                }
+            ]
+        }
+    }
+}

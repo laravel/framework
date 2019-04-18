@@ -1,0 +1,7 @@
+{
+    "extra": {
+        "laravel": {
+            "disabled-functions": false
+        }
+    }
+}
