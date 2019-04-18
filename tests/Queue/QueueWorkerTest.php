@@ -243,7 +243,6 @@ class QueueWorkerTest extends TestCase
         $this->assertNull($job->failedWith);
     }
 
-
     public function test_job_based_failed_delay()
     {
         $job = new WorkerFakeJob(function ($job) {
@@ -258,7 +257,6 @@ class QueueWorkerTest extends TestCase
 
         $this->assertEquals(10, $job->releaseAfter);
     }
-
 
     /**
      * Helpers...
