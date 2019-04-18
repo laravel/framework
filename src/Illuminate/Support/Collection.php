@@ -67,9 +67,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $items
      * @return void
      */
-    public function __construct($items = [])
+    public function __construct($items = null)
     {
-        $this->items = $this->getArrayableItems($items);
+        if (isset($items)) {
+            $this->items = $this->getArrayableItems($items);
+        }
     }
 
     /**

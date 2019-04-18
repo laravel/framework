@@ -3127,6 +3127,13 @@ class SupportCollectionTest extends TestCase
         $collection = new Collection([1, 2, 3]);
         $this->assertNull($collection->get(null));
     }
+
+    public function testPrePopulatedCollection()
+    {
+        $collection = new TestPrePopulatedCollection();
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertSame(['foo', 'bar', 'baz'], $collection->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
@@ -3247,4 +3254,9 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+class TestPrePopulatedCollection extends Collection
+{
+    protected $items = ['foo', 'bar', 'baz'];
 }
