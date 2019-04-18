@@ -4,7 +4,10 @@ namespace Illuminate\Support\Facades;
 
 use Closure;
 use Mockery;
+use TypeError;
+use ReflectionMethod;
 use RuntimeException;
+use ReflectionParameter;
 use Mockery\MockInterface;
 
 abstract class Facade
@@ -218,6 +221,30 @@ abstract class Facade
     }
 
     /**
+     * Adds missing dependencies to the user-provided input.
+     *
+     * @param ReflectionParameter[] $parameters
+     * @param array $inputData
+     *
+     * @return array
+     */
+    private static function addMissingDependencies($parameters, array $inputData)
+    {
+        $injectedInputData = $inputData;
+        $c = 0;
+        foreach ($parameters as $i => $parameter) {
+            $class = $parameter->getClass();
+            if ($class && ! is_a($inputData[$c] ?? null, $class->name)) {
+                array_splice($injectedInputData, $i, 0, [self::$app[$class->name]]);
+            } else {
+                $c++;
+            }
+        }
+
+        return $injectedInputData;
+    }
+
+    /**
      * Handle dynamic, static calls to the object.
      *
      * @param  string  $method
@@ -234,6 +261,13 @@ abstract class Facade
             throw new RuntimeException('A facade root has not been set.');
         }
 
-        return $instance->$method(...$args);
+        try {
+            return $instance->$method(...$args);
+        } catch (TypeError $error) {
+            $params = (new ReflectionMethod($instance, $method))->getParameters();
+            $newArgs = self::addMissingDependencies($params, $args);
+
+            return $instance->$method(...$newArgs);
+        }
     }
 }
