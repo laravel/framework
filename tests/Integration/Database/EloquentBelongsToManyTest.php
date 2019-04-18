@@ -524,13 +524,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
         ]);
 
-        $relationTag = $post->tags()->wherePivot('flag', 'empty')->first();
+        $relationTag = $post->tags()->wherePivot('flag', 'foo')->first();
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
 
-        $relationTag = $post->tags()->wherePivot('flag', '=', 'empty')->first();
+        $relationTag = $post->tags()->wherePivot('flag', '=', 'foo')->first();
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
@@ -547,6 +547,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
 
         $relationTag = $post->tags()->wherePivot('flag', '=', true)->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
+    public function test_where_pivot_in_method()
+    {
+        $tag = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+        ]);
+
+        $relationTag = $post->tags()->wherePivotIn('flag', ['foo'])->first();
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
