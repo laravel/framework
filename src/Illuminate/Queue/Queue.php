@@ -124,6 +124,7 @@ abstract class Queue
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
+            'delay' => $job->delay ?? null,
             'timeout' => $job->timeout ?? null,
             'timeoutAt' => $this->getJobExpiration($job),
             'data' => [
@@ -184,6 +185,7 @@ abstract class Queue
             'displayName' => is_string($job) ? explode('@', $job)[0] : null,
             'job' => $job,
             'maxTries' => null,
+            'delay' => null,
             'timeout' => null,
             'data' => $data,
         ]);

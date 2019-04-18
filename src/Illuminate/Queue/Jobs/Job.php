@@ -234,6 +234,16 @@ abstract class Job
     }
 
     /**
+     * Get the number of seconds to delay a failed job before retrying it.
+     *
+     * @return int|null
+     */
+    public function delaySeconds()
+    {
+        return $this->payload()['delay'] ?? null;
+    }
+
+    /**
      * Get the number of seconds the job can run.
      *
      * @return int|null
