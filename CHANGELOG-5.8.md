@@ -1,6 +1,31 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.11...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.12...5.8)
+
+
+## [v5.8.12 (2019-04-16)](https://github.com/laravel/framework/compare/v5.8.11...v5.8.12)
+
+### Added
+- Added `Illuminate\Support\Collection::duplicates()` ([#28181](https://github.com/laravel/framework/pull/28181))
+- Added `Illuminate\Database\Eloquent\Collection::duplicates()` ([#28194](https://github.com/laravel/framework/pull/28194))
+- Added `Illuminate\View\FileViewFinder::getViews()` ([#28198](https://github.com/laravel/framework/pull/28198))
+- Added helper methods `onSuccess()` \ `onFailure()` \ `pingOnSuccess()` \ `pingOnFailure()` \ `emailOnFailure()` to `Illuminate\Console\Scheduling\Event` ([#28167](https://github.com/laravel/framework/pull/28167))
+- Added `SET` datatype on MySQL Grammar ([#28171](https://github.com/laravel/framework/pull/28171))
+- Added possibility for use `in` / `not in` operators in the query builder ([#28192](https://github.com/laravel/framework/pull/28192))
+
+### Fixed
+- Fixed memory leak in JOIN queries ([#28220](https://github.com/laravel/framework/pull/28220))
+- Fixed circular dependency in `Support\Testing\Fakes\QueueFake` for undefined methods ([#28164](https://github.com/laravel/framework/pull/28164))
+- Fixed exception in `lt` \ `lte` \ `gt` \ `gte` validations with different types ([#28174](https://github.com/laravel/framework/pull/28174))
+- Fixed `string quoting` for `SQL Server` ([#28176](https://github.com/laravel/framework/pull/28176))
+- Fixed `whereDay` and `whereMonth` when passing `int` values ([#28185](https://github.com/laravel/framework/pull/28185))
+
+### Changed
+- Added `autocomplete` attributes to the html stubs ([#28226](https://github.com/laravel/framework/pull/28226)) 
+- Improved `event:list` command ([#28177](https://github.com/laravel/framework/pull/28177), [cde1c5d](https://github.com/laravel/framework/commit/cde1c5d8b38a9b040e70c344bba82781239a0bbf))
+- Updated `Illuminate\Database\Console\Factories\FactoryMakeCommand` to generate more IDE friendly code ([#28188](https://github.com/laravel/framework/pull/28188))
+- Added missing `LockProvider` interface on `DynamoDbStore` ([#28203](https://github.com/laravel/framework/pull/28203))
+- Change session's user_id to unsigned big integer in the stub ([#28206](https://github.com/laravel/framework/pull/28206))
 
 
 ## [v5.8.11 (2019-04-10)](https://github.com/laravel/framework/compare/v5.8.10...v5.8.11)

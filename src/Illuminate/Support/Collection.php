@@ -36,8 +36,6 @@ use Illuminate\Contracts\Support\Arrayable;
  * @property-read HigherOrderCollectionProxy $sortByDesc
  * @property-read HigherOrderCollectionProxy $sum
  * @property-read HigherOrderCollectionProxy $unique
- *
- * Class Collection
  */
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
@@ -420,12 +418,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $uniqueItems = $items->unique(null, $strict);
 
-        $compare = $strict ? function ($a, $b) {
-            return $a === $b;
-        }
-        : function ($a, $b) {
-            return $a == $b;
-        };
+        $compare = $this->duplicateComparator($strict);
 
         $duplicates = new static;
 
@@ -449,6 +442,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function duplicatesStrict($callback = null)
     {
         return $this->duplicates($callback, true);
+    }
+
+    /**
+     * Get the comparison function to detect duplicates.
+     *
+     * @param  bool  $strict
+     * @return \Closure
+     */
+    protected function duplicateComparator($strict)
+    {
+        if ($strict) {
+            return function ($a, $b) {
+                return $a === $b;
+            };
+        }
+
+        return function ($a, $b) {
+            return $a == $b;
+        };
     }
 
     /**
