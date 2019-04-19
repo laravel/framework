@@ -50,7 +50,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $primaryKey = 'id';
 
     /**
-     * The "type" of primary key ID.
+     * The "type" of the primary key ID.
      *
      * @var string
      */
