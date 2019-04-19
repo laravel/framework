@@ -518,6 +518,51 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotEquals('2017-10-10 10:10:10', Tag::find(300)->updated_at);
     }
 
+    public function test_where_pivot_on_string()
+    {
+        $tag = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+        ]);
+
+        $relationTag = $post->tags()->wherePivot('flag', 'foo')->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+
+        $relationTag = $post->tags()->wherePivot('flag', '=', 'foo')->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
+    public function test_where_pivot_on_boolean()
+    {
+        $tag = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => true],
+        ]);
+
+        $relationTag = $post->tags()->wherePivot('flag', true)->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+
+        $relationTag = $post->tags()->wherePivot('flag', '=', true)->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
+    public function test_where_pivot_in_method()
+    {
+        $tag = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+        ]);
+
+        $relationTag = $post->tags()->wherePivotIn('flag', ['foo'])->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
     public function test_can_update_existing_pivot()
     {
         $tag = Tag::create(['name' => Str::random()]);
