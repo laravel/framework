@@ -12,9 +12,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Carbon;
+use GuzzleHttp\Client as HttpClient;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\PwnedVerifier;
 use Illuminate\Validation\ValidationData;
 use Egulias\EmailValidator\EmailValidator;
 use Symfony\Component\HttpFoundation\File\File;
@@ -1250,6 +1252,40 @@ trait ValidatesAttributes
     public function validatePresent($attribute, $value)
     {
         return Arr::has($this->data, $attribute);
+    }
+
+    /**
+     * Validate that a password has not been 'pwned'.
+     *
+     * Validation is done via the HaveIBeenPwned API.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function validatePwned($attribute, $value, $parameters)
+    {
+        if (! is_string($value) && ! is_scalar($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+            return false;
+        }
+
+        $password = (string) $value;
+
+        if ('' === $password) {
+            return false;
+        }
+
+        $parameters = $this->parseNamedParameters($parameters);
+
+        $threshold = $parameters['threshold'] ?? 1;
+
+        $skipOnError = isset($parameters['skipOnError']) ?: false;
+
+        $guzzle = new HttpClient(['connect_timeout', 60]);
+
+        return (new PwnedVerifier($guzzle))->isNotPwned($password, $threshold, $skipOnError);
     }
 
     /**

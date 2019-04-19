@@ -63,6 +63,18 @@ class Rule
     }
 
     /**
+     * Get a pwned constraint builder instance.
+     *
+     * @param int $threshold
+     * @param bool $skipOnError
+     * @return \Illuminate\Validation\Rules\Pwned
+     */
+    public static function pwned($threshold = 1, $skipOnError = false)
+    {
+        return new Rules\Pwned($threshold, $skipOnError);
+    }
+
+    /**
      * Get a required_if constraint builder instance.
      *
      * @param  callable|bool  $callback
