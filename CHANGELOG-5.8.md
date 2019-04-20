@@ -2,6 +2,12 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.13...5.8)
 
+### Changed
+- Update auth stubs with `@error` blade directive ([#28273](https://github.com/laravel/framework/pull/28273))
+
+### TODO:
+- Job Based Retry Delay ([#28265](https://github.com/laravel/framework/pull/28265))
+- Use Null Coalesce Operator ([#28280](https://github.com/laravel/framework/pull/28280))
 
 ## [v5.8.13 (2019-04-18)](https://github.com/laravel/framework/compare/v5.8.12...v5.8.13)
 
