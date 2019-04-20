@@ -131,7 +131,7 @@ class Factory implements FactoryContract
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function validate(array $data, array $rules, array $messages = [], array $customAttributes = [])
+    public function validate(array $data, array $rules = [], array $messages = [], array $customAttributes = [])
     {
         return $this->make($data, $rules, $messages, $customAttributes)->validate();
     }
