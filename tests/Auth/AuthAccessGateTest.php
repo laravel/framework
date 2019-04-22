@@ -31,7 +31,6 @@ class AuthAccessGateTest extends TestCase
     public function test_before_can_take_an_array_callback_as_object()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->before([new AccessGateTestBeforeCallback, 'allowEverything']);
@@ -42,7 +41,6 @@ class AuthAccessGateTest extends TestCase
     public function test_before_can_take_an_array_callback_as_object_static()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->before([new AccessGateTestBeforeCallback, 'allowEverythingStatically']);
@@ -53,7 +51,6 @@ class AuthAccessGateTest extends TestCase
     public function test_before_can_take_an_array_callback_with_static_method()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->before([AccessGateTestBeforeCallback::class, 'allowEverythingStatically']);
@@ -64,7 +61,6 @@ class AuthAccessGateTest extends TestCase
     public function test_before_can_allow_guests()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->before(function (?StdClass $user) {
@@ -77,7 +73,6 @@ class AuthAccessGateTest extends TestCase
     public function test_after_can_allow_guests()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->after(function (?StdClass $user) {
@@ -90,7 +85,6 @@ class AuthAccessGateTest extends TestCase
     public function test_closures_can_allow_guest_users()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->define('foo', function (?StdClass $user) {
@@ -110,7 +104,6 @@ class AuthAccessGateTest extends TestCase
         unset($_SERVER['__laravel.testBefore']);
 
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyThatAllowsGuests::class);
@@ -134,7 +127,6 @@ class AuthAccessGateTest extends TestCase
         $_SERVER['__laravel.testBefore'] = false;
 
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNonGuestBefore::class);
@@ -154,7 +146,6 @@ class AuthAccessGateTest extends TestCase
         $_SERVER['__laravel.gateAfter2'] = false;
 
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->before(function (?StdClass $user) {
@@ -726,7 +717,6 @@ class AuthAccessGateTest extends TestCase
     public function test_classes_can_be_defined_as_callbacks_using_at_notation_for_guests()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->define('foo', AccessGateTestClassForGuest::class.'@foo');
