@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-class BladeStopTest extends AbstractBladeTestCase
+class BladeEndSectionTest extends AbstractBladeTestCase
 {
     public function testStopSectionsAreCompiled()
     {
