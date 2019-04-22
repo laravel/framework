@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Notifications;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class NotificationsMailMessageTest extends TestCase
+class NotificationMailMessageTest extends TestCase
 {
     public function setUp()
     {
