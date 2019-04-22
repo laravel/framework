@@ -141,7 +141,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * @param  array  $path
      * @return void
      */
-    protected function loadMissingRelation(Collection $models, array $path)
+    protected function loadMissingRelation(self $models, array $path)
     {
         $relation = array_shift($path);
 
