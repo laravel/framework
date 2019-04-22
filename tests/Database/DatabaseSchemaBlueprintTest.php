@@ -170,4 +170,18 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    public function testCreateForeign()
+    {
+        $fluent = m::mock(\Illuminate\Support\Fluent::class);
+        $fluent->shouldReceive('references')->once()->with('id')->andReturn($fluent);
+        $fluent->shouldReceive('on')->once()->with('jobs')->andReturn($fluent);
+
+        $blueprint = m::mock(Blueprint::class)->makePartial();
+
+        $blueprint->shouldReceive('unsignedBigInteger')->once()->with('job_id');
+        $blueprint->shouldReceive('foreign')->once()->with('job_id')->andReturn($fluent);
+
+        $blueprint->createForeign('job');
+    }
 }

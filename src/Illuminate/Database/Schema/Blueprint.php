@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use BadMethodCallException;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\SQLiteConnection;
@@ -1403,5 +1404,19 @@ class Blueprint
         return array_filter($this->columns, function ($column) {
             return (bool) $column->change;
         });
+    }
+
+    /**
+     * Specify a new column and foreign key for the table at the same tame.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function createForeign($model)
+    {
+        $column = "{$model}_id";
+        $table = Str::snake(Str::pluralStudly($model));
+        $this->unsignedBigInteger($column);
+        return $this->foreign($column)->references('id')->on($table);
     }
 }
