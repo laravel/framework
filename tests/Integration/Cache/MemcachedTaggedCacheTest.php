@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use Memcached;
 use Illuminate\Support\Facades\Cache;
 
 /**

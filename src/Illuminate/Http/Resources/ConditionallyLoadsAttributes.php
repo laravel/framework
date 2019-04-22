@@ -167,7 +167,7 @@ trait ConditionallyLoadsAttributes
         }
 
         if ($this->resource->{$relationship} === null) {
-            return null;
+            return;
         }
 
         return value($value);

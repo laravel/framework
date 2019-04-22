@@ -1,0 +1,3 @@
+php:
+  preset: laravel
+css: true

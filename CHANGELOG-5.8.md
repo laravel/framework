@@ -1,6 +1,25 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.12...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.13...5.8)
+
+### Changed
+- Update auth stubs with `@error` blade directive ([#28273](https://github.com/laravel/framework/pull/28273))
+
+### TODO:
+- Job Based Retry Delay ([#28265](https://github.com/laravel/framework/pull/28265))
+- Use Null Coalesce Operator ([#28280](https://github.com/laravel/framework/pull/28280))
+
+## [v5.8.13 (2019-04-18)](https://github.com/laravel/framework/compare/v5.8.12...v5.8.13)
+
+### Added
+- Added `@error` blade directive ([#28062](https://github.com/laravel/framework/pull/28062))
+- Added the ability to register `custom Doctrine DBAL` types in the schema builder ([#28214](https://github.com/laravel/framework/pull/28214), [91a6afe](https://github.com/laravel/framework/commit/91a6afe1f9f8d18283f3ee9a72b636a121f06da5))
+
+### Fixed
+- Fixed: [Event::fake() does not replace dispatcher for guard](https://github.com/laravel/framework/issues/27451) ([#28238](https://github.com/laravel/framework/pull/28238), [be89773](https://github.com/laravel/framework/commit/be89773c52e7491de05dee053b18a38b177d6030))
+
+### Reverted
+- Reverted of [`possibility for use in / not in operators in the query builder`](https://github.com/laravel/framework/pull/28192) since of [issue with `wherePivot()` method](https://github.com/laravel/framework/issues/28251) ([04a547ee](https://github.com/laravel/framework/commit/04a547ee25f78ddd738610cdbda2cb393c6795e9))
 
 
 ## [v5.8.12 (2019-04-16)](https://github.com/laravel/framework/compare/v5.8.11...v5.8.12)

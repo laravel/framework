@@ -580,7 +580,7 @@ class Migrator
     }
 
     /**
-     * Write a note to the conosle's output.
+     * Write a note to the console's output.
      *
      * @param  string  $message
      * @return void
