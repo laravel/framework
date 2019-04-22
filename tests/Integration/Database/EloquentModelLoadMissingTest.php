@@ -53,7 +53,7 @@ class Comment extends Model
 
     public function parent()
     {
-        return $this->belongsTo(Comment::class);
+        return $this->belongsTo(self::class);
     }
 }
 
