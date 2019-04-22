@@ -92,6 +92,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     {
         if ($query->getQuery()->from == $parentQuery->getQuery()->from) {
             $query = parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+
             return $query->where(
                 $query->getModel()->getTable().'.'.$this->getMorphType(), $this->morphClass
             );
