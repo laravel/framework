@@ -2,12 +2,12 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\Arr;
 use function array_map;
-use function array_merge;
 use function parse_str;
 use function parse_url;
+use function array_merge;
 use function preg_replace;
+use Illuminate\Support\Arr;
 
 class UrlParser
 {
@@ -48,7 +48,7 @@ class UrlParser
         $url = $config['url'] ?? null;
         $config = Arr::except($config, 'url');
 
-        if (!$url) {
+        if (! $url) {
             return $config;
         }
 
@@ -81,7 +81,7 @@ class UrlParser
             return array_map([$this, 'parseStringsToNativeTypes'], $value);
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return $value;
         }
 
@@ -112,7 +112,7 @@ class UrlParser
     {
         $alias = $this->getInUrl('scheme');
 
-        if (!$alias) {
+        if (! $alias) {
             return null;
         }
 
@@ -128,7 +128,7 @@ class UrlParser
     {
         $path = $this->getInUrl('path');
 
-        if (!$path) {
+        if (! $path) {
             return null;
         }
 
@@ -139,7 +139,7 @@ class UrlParser
     {
         $queryString = $this->getInUrl('query');
 
-        if (!$queryString) {
+        if (! $queryString) {
             return [];
         }
 

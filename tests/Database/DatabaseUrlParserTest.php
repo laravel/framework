@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\UrlParser;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\UrlParser;
 
 class DatabaseUrlParserTest extends TestCase
 {
