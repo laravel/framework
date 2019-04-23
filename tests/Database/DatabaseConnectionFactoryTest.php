@@ -25,6 +25,10 @@ class DatabaseConnectionFactoryTest extends TestCase
         ]);
 
         $this->db->addConnection([
+            'url' => 'sqlite:///:memory:',
+        ], 'url');
+
+        $this->db->addConnection([
             'driver' => 'sqlite',
             'read' => [
                 'database'  => ':memory:',
@@ -48,6 +52,8 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertInstanceOf(PDO::class, $this->db->connection()->getReadPdo());
         $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getPdo());
         $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getReadPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('url')->getPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('url')->getReadPdo());
     }
 
     public function testSingleConnectionNotCreatedUntilNeeded()
@@ -105,9 +111,7 @@ class DatabaseConnectionFactoryTest extends TestCase
     public function testSqliteForeignKeyConstraints()
     {
         $this->db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'foreign_key_constraints' => true,
+            'url' => 'sqlite:///:memory:?foreign_key_constraints=true',
         ], 'constraints_set');
 
         $this->assertEquals(0, $this->db->connection()->select('PRAGMA foreign_keys')[0]->foreign_keys);
