@@ -60,7 +60,7 @@ class HttpResourceTest extends TestCase
                     'id' => 5,
                     'title' => 'Test Title',
                     'custom' => true,
-                ]
+                ],
             ],
             'links' => [
                 'first' => '/?page=1',
