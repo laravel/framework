@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Http;
 
+use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Request;
 
 class HttpResourceTest extends TestCase
 {
@@ -63,19 +63,19 @@ class HttpResourceTest extends TestCase
                 ]
             ],
             'links' => [
-                "first" => "/?page=1",
-                "last" => "/?page=1",
-                "prev" => null,
-                "next" => null,
+                'first' => '/?page=1',
+                'last' => '/?page=1',
+                'prev' => null,
+                'next' => null,
             ],
             'meta' => [
-                "current_page" => 1,
-                "from" => 1,
-                "last_page" => 1,
-                "path" => "/",
-                "per_page" => 15,
-                "to" => 1,
-                "total" => 10,
+                'current_page' => 1,
+                'from' => 1,
+                'last_page' => 1,
+                'path' => '/',
+                'per_page' => 15,
+                'to' => 1,
+                'total' => 10,
             ],
         ]);
     }
