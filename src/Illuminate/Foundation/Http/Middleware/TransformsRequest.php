@@ -8,6 +8,13 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class TransformsRequest
 {
     /**
+     * The request instance.
+     *
+     * @var \Illuminate\Http\Request
+     */
+    protected $request;
+    
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -16,25 +23,26 @@ class TransformsRequest
      */
     public function handle($request, Closure $next)
     {
-        $this->clean($request);
+        $this->request = $request;
+        
+        $this->clean();
 
-        return $next($request);
+        return $next($this->request);
     }
 
     /**
      * Clean the request's data.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    protected function clean($request)
+    protected function clean()
     {
-        $this->cleanParameterBag($request->query);
+        $this->cleanParameterBag($this->request->query);
 
-        if ($request->isJson()) {
-            $this->cleanParameterBag($request->json());
-        } elseif ($request->request !== $request->query) {
-            $this->cleanParameterBag($request->request);
+        if ($this->request->isJson()) {
+            $this->cleanParameterBag($this->request->json());
+        } elseif ($this->request->request !== $this->request->query) {
+            $this->cleanParameterBag($this->request->request);
         }
     }
 
