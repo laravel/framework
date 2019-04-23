@@ -1,13 +1,23 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.13...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.14...5.8)
+
+
+## [v5.8.14 (2019-04-23)](https://github.com/laravel/framework/compare/v5.8.13...v5.8.14)
+
+### Added
+- Implemented `Job Based Retry Delay` ([#28265](https://github.com/laravel/framework/pull/28265))
 
 ### Changed
 - Update auth stubs with `@error` blade directive ([#28273](https://github.com/laravel/framework/pull/28273))
+- Convert email data tables to layout tables ([#28286](https://github.com/laravel/framework/pull/28286))
 
-### TODO:
-- Job Based Retry Delay ([#28265](https://github.com/laravel/framework/pull/28265))
-- Use Null Coalesce Operator ([#28280](https://github.com/laravel/framework/pull/28280))
+### Reverted
+- Partial reverted [ability of register custom Doctrine DBAL](https://github.com/laravel/framework/pull/28214), since of [#28282](https://github.com/laravel/framework/issues/28282) issue ([#28301](https://github.com/laravel/framework/pull/28301))
+
+### Refactoring
+- Replace code with `Null Coalescing Operator` ([#28280](https://github.com/laravel/framework/pull/28280), [#28287](https://github.com/laravel/framework/pull/28287))
+
 
 ## [v5.8.13 (2019-04-18)](https://github.com/laravel/framework/compare/v5.8.12...v5.8.13)
 
