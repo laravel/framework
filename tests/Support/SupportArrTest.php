@@ -373,6 +373,7 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::isAssoc(['a' => 'a', 0 => 'b']));
         $this->assertTrue(Arr::isAssoc([1 => 'a', 0 => 'b']));
         $this->assertTrue(Arr::isAssoc([1 => 'a', 2 => 'b']));
+        $this->assertTrue(Arr::isAssoc([]));
         $this->assertFalse(Arr::isAssoc([0 => 'a', 1 => 'b']));
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }

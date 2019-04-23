@@ -348,6 +348,10 @@ class Arr
      */
     public static function isAssoc(array $array)
     {
+        if ($array === []) {
+            return true;
+        }
+
         $keys = array_keys($array);
 
         return array_keys($keys) !== $keys;
