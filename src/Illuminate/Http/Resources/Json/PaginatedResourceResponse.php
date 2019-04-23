@@ -15,20 +15,31 @@ class PaginatedResourceResponse extends ResourceResponse
     public function toResponse($request)
     {
         return tap(response()->json(
-            $this->wrap(
-                $this->resource->resolve($request),
-                array_merge_recursive(
-                    $this->paginationInformation($request),
-                    $this->resource->with($request),
-                    $this->resource->additional
-                )
-            ),
+            $this->toArray($request),
             $this->calculateStatus()
         ), function ($response) use ($request) {
             $response->original = $this->resource->resource->pluck('resource');
 
             $this->resource->withResponse($request, $response);
         });
+    }
+
+    /**
+     * Create an array that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return $this->wrap(
+            $this->resource->resolve($request),
+            array_merge_recursive(
+                $this->paginationInformation($request),
+                $this->resource->with($request),
+                $this->resource->additional
+            )
+        );
     }
 
     /**
