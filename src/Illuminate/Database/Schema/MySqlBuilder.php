@@ -113,20 +113,4 @@ class MySqlBuilder extends Builder
             $this->grammar->compileGetAllViews()
         );
     }
-
-    /**
-     * Register the custom Doctrine mapping types for the MySQL builder.
-     *
-     * @return void
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    protected function registerCustomDoctrineTypes()
-    {
-        if ($this->connection->isDoctrineAvailable()) {
-            $this->registerCustomDoctrineType(
-                TinyInteger::class, TinyInteger::NAME, 'TINYINT'
-            );
-        }
-    }
 }

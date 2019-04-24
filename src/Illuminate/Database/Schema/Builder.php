@@ -286,30 +286,6 @@ class Builder
     }
 
     /**
-     * Register a custom Doctrine mapping type.
-     *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  string  $type
-     * @return void
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public function registerCustomDoctrineType($class, $name, $type)
-    {
-        if (Type::hasType($name)) {
-            return;
-        }
-
-        Type::addType($name, $class);
-
-        $this->connection
-            ->getDoctrineSchemaManager()
-            ->getDatabasePlatform()
-            ->registerDoctrineTypeMapping($type, $name);
-    }
-
-    /**
      * Get the database connection instance.
      *
      * @return \Illuminate\Database\Connection
