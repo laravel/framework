@@ -35,12 +35,14 @@ class CookieSessionHandler implements SessionHandlerInterface
     /**
      * Create a new cookie driven handler instance.
      *
+     * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
      * @param  int  $minutes
      * @return void
      */
-    public function __construct(CookieJar $cookie, $minutes)
+    public function __construct(Request $request, CookieJar $cookie, $minutes)
     {
+        $this->request = $request;
         $this->cookie = $cookie;
         $this->minutes = $minutes;
     }
@@ -106,16 +108,5 @@ class CookieSessionHandler implements SessionHandlerInterface
     public function gc($lifetime)
     {
         return true;
-    }
-
-    /**
-     * Set the request instance.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @return void
-     */
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
     }
 }

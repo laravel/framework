@@ -23,8 +23,6 @@ namespace Illuminate\Support\Facades;
  * @method static string|null previousUrl()
  * @method static void setPreviousUrl(string $url)
  * @method static \SessionHandlerInterface getHandler()
- * @method static bool handlerNeedsRequest()
- * @method static void setRequestOnHandler(\Illuminate\Http\Request $request)
  *
  * @see \Illuminate\Session\SessionManager
  * @see \Illuminate\Session\Store

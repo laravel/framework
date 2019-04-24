@@ -75,9 +75,7 @@ class StartSession
      */
     protected function startSession(Request $request)
     {
-        return tap($this->getSession($request), function ($session) use ($request) {
-            $session->setRequestOnHandler($request);
-
+        return tap($this->getSession($request), function ($session) {
             $session->start();
         });
     }

@@ -635,27 +635,4 @@ class Store implements Session
     {
         return $this->handler;
     }
-
-    /**
-     * Determine if the session handler needs a request.
-     *
-     * @return bool
-     */
-    public function handlerNeedsRequest()
-    {
-        return $this->handler instanceof CookieSessionHandler;
-    }
-
-    /**
-     * Set the request on the handler instance.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
-    public function setRequestOnHandler($request)
-    {
-        if ($this->handlerNeedsRequest()) {
-            $this->handler->setRequest($request);
-        }
-    }
 }

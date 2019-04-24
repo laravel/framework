@@ -7,9 +7,6 @@ use ReflectionClass;
 use SessionHandlerInterface;
 use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cookie\CookieJar;
-use Illuminate\Session\CookieSessionHandler;
-use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
@@ -286,19 +283,6 @@ class SessionStoreTest extends TestCase
 
         $session->flashInput(['foo' => 'bar']);
         $this->assertTrue($session->hasOldInput());
-    }
-
-    public function testHandlerNeedsRequest()
-    {
-        $session = $this->getSession();
-        $this->assertFalse($session->handlerNeedsRequest());
-        $session->getHandler()->shouldReceive('setRequest')->never();
-
-        $session = new Store('test', m::mock(new CookieSessionHandler(new CookieJar, 60)));
-        $this->assertTrue($session->handlerNeedsRequest());
-        $session->getHandler()->shouldReceive('setRequest')->once();
-        $request = new Request;
-        $session->setRequestOnHandler($request);
     }
 
     public function testToken()
