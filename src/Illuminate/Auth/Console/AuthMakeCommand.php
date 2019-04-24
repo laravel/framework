@@ -74,13 +74,23 @@ class AuthMakeCommand extends Command
      */
     protected function createDirectories()
     {
-        if (! is_dir($directory = resource_path('views/layouts'))) {
+        if (! is_dir($directory = $this->getViewsPath('layouts'))) {
             mkdir($directory, 0755, true);
         }
 
-        if (! is_dir($directory = resource_path('views/auth/passwords'))) {
+        if (! is_dir($directory = $this->getViewsPath('auth/passwords'))) {
             mkdir($directory, 0755, true);
         }
+    }
+
+    /**
+     * Get full path relative to the app's configured view path.
+     *
+     * @return string
+     */
+    protected function getViewsPath($path)
+    {
+        return implode(DIRECTORY_SEPARATOR, [config('view.paths')[0] ?? resource_path('views'), $path]);
     }
 
     /**
@@ -91,7 +101,7 @@ class AuthMakeCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            if (file_exists($view = resource_path('views/'.$value)) && ! $this->option('force')) {
+            if (file_exists($view = $this->getViewsPath($value)) && ! $this->option('force')) {
                 if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
                     continue;
                 }
