@@ -139,7 +139,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var array
      */
     protected static $ignoreOnTouch = [];
-    
+
     /**
      * The Array of Excepts will be remove or unset variables to escape from Insert/Update into table.
      *
