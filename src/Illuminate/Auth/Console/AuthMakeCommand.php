@@ -74,23 +74,13 @@ class AuthMakeCommand extends Command
      */
     protected function createDirectories()
     {
-        if (! is_dir($directory = $this->getViewsPath('layouts'))) {
+        if (! is_dir($directory = $this->getViewPath('layouts'))) {
             mkdir($directory, 0755, true);
         }
 
-        if (! is_dir($directory = $this->getViewsPath('auth/passwords'))) {
+        if (! is_dir($directory = $this->getViewPath('auth/passwords'))) {
             mkdir($directory, 0755, true);
         }
-    }
-
-    /**
-     * Get full path relative to the app's configured view path.
-     *
-     * @return string
-     */
-    protected function getViewsPath($path)
-    {
-        return implode(DIRECTORY_SEPARATOR, [config('view.paths')[0] ?? resource_path('views'), $path]);
     }
 
     /**
@@ -101,7 +91,7 @@ class AuthMakeCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            if (file_exists($view = $this->getViewsPath($value)) && ! $this->option('force')) {
+            if (file_exists($view = $this->getViewPath($value)) && ! $this->option('force')) {
                 if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
                     continue;
                 }
@@ -126,5 +116,17 @@ class AuthMakeCommand extends Command
             $this->getAppNamespace(),
             file_get_contents(__DIR__.'/stubs/make/controllers/HomeController.stub')
         );
+    }
+
+    /**
+     * Get full view path relative to the app's configured view path.
+     *
+     * @return string
+     */
+    protected function getViewPath($path)
+    {
+        return implode(DIRECTORY_SEPARATOR, [
+            config('view.paths')[0] ?? resource_path('views'), $path
+        ]);
     }
 }
