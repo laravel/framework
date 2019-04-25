@@ -117,7 +117,7 @@ class Post extends Model
 
     public function linkedPost()
     {
-        return $this->hasOne(Post::class);
+        return $this->hasOne(self::class);
     }
 }
 
@@ -129,7 +129,7 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'custom' => true,
-            'linkedPost' => PostResource::make($this->whenLoaded('linkedPost')),
+            'linkedPost' => self::make($this->whenLoaded('linkedPost')),
         ];
     }
 
