@@ -4,9 +4,8 @@ namespace DummyNamespace;
 
 use DummyFullModelClass;
 use Illuminate\Http\Request;
-use DummyRootNamespaceHttp\Controllers\Controller;
 
-class DummyClass extends Controller
+class DummyClass
 {
     /**
      * Display a listing of the resource.
