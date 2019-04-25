@@ -13,7 +13,6 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 
 class DatabaseConnectionFactoryTest extends TestCase
 {
-    /** @var DB */
     protected $db;
 
     protected function setUp(): void

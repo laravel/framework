@@ -22,14 +22,14 @@ class UrlParser
     /**
      * @var array
      */
-    private $parsedUrl;
+    protected $parsedUrl;
 
     public static function getDriverAliases(): array
     {
         return self::$driverAliases;
     }
 
-    public static function addDriverAlias(string $alias, string $driver)
+    public static function addDriverAlias($alias, $driver)
     {
         self::$driverAliases[$alias] = $driver;
     }
@@ -61,7 +61,7 @@ class UrlParser
         );
     }
 
-    private function parseUrl(string $url): array
+    protected function parseUrl($url): array
     {
         // sqlite3?:///... => sqlite3?://null/... or else the URL will be invalid
         $url = preg_replace('#^(sqlite3?):///#', '$1://null/', $url);
@@ -75,7 +75,7 @@ class UrlParser
         return $this->parseStringsToNativeTypes(array_map('rawurldecode', $parsedUrl));
     }
 
-    private function parseStringsToNativeTypes($value)
+    protected function parseStringsToNativeTypes($value)
     {
         if (is_array($value)) {
             return array_map([$this, 'parseStringsToNativeTypes'], $value);
@@ -94,7 +94,7 @@ class UrlParser
         return $value;
     }
 
-    private function getMainAttributes(): array
+    protected function getMainAttributes(): array
     {
         return array_filter([
             'driver' => $this->getDriver(),
@@ -108,7 +108,7 @@ class UrlParser
         });
     }
 
-    private function getDriver(): ?string
+    protected function getDriver()
     {
         $alias = $this->getInUrl('scheme');
 
@@ -119,12 +119,12 @@ class UrlParser
         return self::$driverAliases[$alias] ?? $alias;
     }
 
-    private function getInUrl(string $key): ?string
+    protected function getInUrl($key)
     {
         return $this->parsedUrl[$key] ?? null;
     }
 
-    private function getNormalizedPath(): ?string
+    protected function getNormalizedPath()
     {
         $path = $this->getInUrl('path');
 
@@ -135,7 +135,7 @@ class UrlParser
         return substr($path, 1);
     }
 
-    private function getOtherOptions(): array
+    protected function getOtherOptions(): array
     {
         $queryString = $this->getInUrl('query');
 
