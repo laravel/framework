@@ -39,13 +39,14 @@ class ThrottleRequests
      * @param  \Closure  $next
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
+     * @param  string|null $group
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
+    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $group = null)
     {
-        $key = $this->resolveRequestSignature($request);
+        $key = $this->resolveRequestSignature($request, $group);
 
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
 
@@ -91,17 +92,63 @@ class ThrottleRequests
      *
      * @throws \RuntimeException
      */
-    protected function resolveRequestSignature($request)
+    protected function resolveRequestSignature($request, $group = null)
     {
-        if ($user = $request->user()) {
-            return sha1($user->getAuthIdentifier());
+        if ($group) {
+            return $this->resolveGroupSignature($group, $request);
         }
 
-        if ($route = $request->route()) {
-            return sha1($route->getDomain().'|'.$request->ip());
-        }
+        $this->guardAgainstMissingRoute($request);
 
-        throw new RuntimeException('Unable to generate the request signature. Route unavailable.');
+        return sha1(implode('|', [$this->getRouteSignature($request->route()), $this->getClientIdentifier($request)]));
+    }
+
+    /**
+     * Resolve group signature.
+     *
+     * @param string $group
+     * @param \Illuminate\Http\Request $request
+     * @return string
+     */
+    protected function resolveGroupSignature($group, $request)
+    {
+        return sha1(implode('|', [$group, $this->getClientIdentifier($request)]));
+    }
+
+    /**
+     * Guard against a request that hasn't been matched to a route.
+     *
+     * @param Request $request
+     * @return void
+     * @throws \RuntimeException
+     */
+    protected function guardAgainstMissingRoute($request)
+    {
+        if (! $request->route()) {
+            throw new RuntimeException('Unable to generate the request signature. Route unavailable.');
+        }
+    }
+
+    /**
+     * Get the route signature.
+     *
+     * @param Route $route
+     * @return string
+     */
+    protected function getRouteSignature($route)
+    {
+        return implode('|', array_merge($route->methods(), [$route->getDomain(), $route->uri()]));
+    }
+
+    /**
+     * Get the client identifier (authed id / ip).
+     *
+     * @param Request $request
+     * @return string
+     */
+    protected function getClientIdentifier($request)
+    {
+        return $request->user() ? $request->user()->getAuthIdentifier() : $request->ip();
     }
 
     /**

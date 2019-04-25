@@ -47,13 +47,14 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  \Closure  $next
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
+     * @param  string|null $group
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
+    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $group = null)
     {
-        $key = $this->resolveRequestSignature($request);
+        $key = $this->resolveRequestSignature($request, $group);
 
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
 
