@@ -301,7 +301,7 @@ class DatabaseUrlParserTest extends TestCase
 
             'Full example from doc with url overwriting parameters' => [
                 [
-                    'url' => 'pgsql://root:pass@db/local',
+                    'url' => 'mysql://root:pass@db/local',
                     'driver' => 'mysql',
                     'host' => '127.0.0.1',
                     'port' => '3306',
@@ -318,7 +318,7 @@ class DatabaseUrlParserTest extends TestCase
                     'options' => ['foo' => 'bar'],
                 ],
                 [
-                    'driver' => 'pgsql',
+                    'driver' => 'mysql',
                     'host' => 'db',
                     'port' => '3306',
                     'database' => 'local',
