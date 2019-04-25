@@ -682,6 +682,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->finishSave($options);
         }
 
+        // We need to check the excepts variable, if it have any values.
+        // If it is "passed", it must be call the except function to trigger the unset
+        // varaibles and remove it from the current model.
         if (count($this->excepts) > 0) {
             $this->except();
         }
