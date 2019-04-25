@@ -8,9 +8,17 @@ use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Events\Dispatcher;
 
 class Migrator
 {
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected static $dispatcher;
+
     /**
      * The migration repository implementation.
      *
@@ -140,6 +148,8 @@ class Migrator
 
         $step = $options['step'] ?? false;
 
+        $this->fireMigrationEvent('beforeAll:up');
+
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
@@ -150,6 +160,8 @@ class Migrator
                 $batch++;
             }
         }
+
+        $this->fireMigrationEvent('afterAll:up');
     }
 
     /**
@@ -239,6 +251,8 @@ class Migrator
 
         $this->requireFiles($files = $this->getMigrationFiles($paths));
 
+        $this->fireMigrationEvent('beforeAll:down');
+
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order. This getLast method on the
         // repository already returns these migration's names in reverse order.
@@ -258,6 +272,8 @@ class Migrator
                 $options['pretend'] ?? false
             );
         }
+
+        $this->fireMigrationEvent('afterAll:down');
 
         return $rolledBack;
     }
@@ -357,7 +373,15 @@ class Migrator
 
         $callback = function () use ($migration, $method) {
             if (method_exists($migration, $method)) {
+                $this->fireMigrationEvent("before:{$method}", [
+                    'migration' => $migration,
+                ]);
+
                 $migration->{$method}();
+
+                $this->fireMigrationEvent("after:{$method}", [
+                    'migration' => $migration,
+                ]);
             }
         };
 
@@ -590,5 +614,32 @@ class Migrator
         if ($this->output) {
             $this->output->writeln($message);
         }
+    }
+
+    /**
+     * Set the event dispatcher instance.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @return void
+     */
+    public static function setEventDispatcher(Dispatcher $dispatcher)
+    {
+        static::$dispatcher = $dispatcher;
+    }
+
+    /**
+     * Fire the given event for the model.
+     *
+     * @param  string  $event
+     * @param  array  $params
+     * @return mixed
+     */
+    public function fireMigrationEvent($name, $params = [])
+    {
+        if (! isset(static::$dispatcher)) {
+            return true;
+        }
+
+        return static::$dispatcher->dispatch("migrations.{$name}", $params);
     }
 }
