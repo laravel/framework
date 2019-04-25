@@ -2,16 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
 class MiddlewareTest extends TestCase
 {
-
     public function test_request_in_middleware_is_shared()
     {
         $this->app[Kernel::class]->prependMiddleware(MiddlewareStub::class);
@@ -31,7 +30,6 @@ class MiddlewareTest extends TestCase
 
 class MiddlewareStub
 {
-
     public function handle($request, $next)
     {
         $request->attributes->set('middleware', 'yes');
