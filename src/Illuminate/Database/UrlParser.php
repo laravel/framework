@@ -8,10 +8,16 @@ use function parse_url;
 use function array_merge;
 use function preg_replace;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 class UrlParser
 {
-    private static $driverAliases = [
+    /**
+     * The drivers aliases map.
+     *
+     * @var array
+     */
+    protected static $driverAliases = [
         'mssql' => 'sqlsrv',
         'mysql2' => 'mysql', // Amazon RDS, for some weird reason
         'postgres' => 'pgsql',
@@ -20,23 +26,38 @@ class UrlParser
     ];
 
     /**
+     * The different components of parsed url.
+     *
      * @var array
      */
     protected $parsedUrl;
 
+    /**
+     * Get all of the current drivers aliases.
+     *
+     * @return array
+     */
     public static function getDriverAliases(): array
     {
-        return self::$driverAliases;
-    }
-
-    public static function addDriverAlias($alias, $driver)
-    {
-        self::$driverAliases[$alias] = $driver;
+        return static::$driverAliases;
     }
 
     /**
-     * @param array|string $config
+     * Add the driver alias to the driver aliases array.
      *
+     * @param  string  $alias
+     * @param  string  $driver
+     * @return void
+     */
+    public static function addDriverAlias($alias, $driver)
+    {
+        static::$driverAliases[$alias] = $driver;
+    }
+
+    /**
+     * Transform the url string or config array with url key to a parsed classic config array.
+     *
+     * @param  array|string  $config
      * @return array
      */
     public function parseDatabaseConfigWithUrl($config): array
@@ -61,6 +82,12 @@ class UrlParser
         );
     }
 
+    /**
+     * Decode the string url, to an array of all of its components.
+     *
+     * @param  string  $url
+     * @return array
+     */
     protected function parseUrl($url): array
     {
         // sqlite3?:///... => sqlite3?://null/... or else the URL will be invalid
@@ -69,12 +96,19 @@ class UrlParser
         $parsedUrl = parse_url($url);
 
         if ($parsedUrl === false) {
-            throw new \InvalidArgumentException('Malformed parameter "url".');
+            throw new InvalidArgumentException('Malformed parameter "url".');
         }
 
         return $this->parseStringsToNativeTypes(array_map('rawurldecode', $parsedUrl));
     }
 
+    /**
+     * Convert string casted values to there native types.
+     * Ex: 'false' => false, '42' => 42, 'foo' => 'foo'
+     *
+     * @param  string  $url
+     * @return mixed
+     */
     protected function parseStringsToNativeTypes($value)
     {
         if (is_array($value)) {
@@ -94,11 +128,16 @@ class UrlParser
         return $value;
     }
 
+    /**
+     * Return the main attributes of the database connection config from url.
+     *
+     * @return array
+     */
     protected function getMainAttributes(): array
     {
         return array_filter([
             'driver' => $this->getDriver(),
-            'database' => $this->getNormalizedPath(),
+            'database' => $this->getDatabase(),
             'host' => $this->getInUrl('host'),
             'port' => $this->getInUrl('port'),
             'username' => $this->getInUrl('user'),
@@ -108,6 +147,11 @@ class UrlParser
         });
     }
 
+    /**
+     * Find connection driver from url.
+     *
+     * @return string|null
+     */
     protected function getDriver()
     {
         $alias = $this->getInUrl('scheme');
@@ -116,15 +160,26 @@ class UrlParser
             return null;
         }
 
-        return self::$driverAliases[$alias] ?? $alias;
+        return static::$driverAliases[$alias] ?? $alias;
     }
 
+    /**
+     * Get a component of the parsed url.
+     *
+     * @param  string  $key
+     * @return string|null
+     */
     protected function getInUrl($key)
     {
         return $this->parsedUrl[$key] ?? null;
     }
 
-    protected function getNormalizedPath()
+    /**
+     * Find connection database from url.
+     *
+     * @return string|null
+     */
+    protected function getDatabase()
     {
         $path = $this->getInUrl('path');
 
@@ -135,6 +190,11 @@ class UrlParser
         return substr($path, 1);
     }
 
+    /**
+     * Return all the options added to the url with query params.
+     *
+     * @return array
+     */
     protected function getOtherOptions(): array
     {
         $queryString = $this->getInUrl('query');
