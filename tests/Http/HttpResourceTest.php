@@ -18,7 +18,7 @@ class HttpResourceTest extends TestCase
             'title' => 'Test Title',
         ]));
 
-        $this->assertEquals($resource->toResponseArray($request), [
+        $this->assertEquals($resource->toArrayResponse($request), [
             'data' => [
                 'id' => 5,
                 'title' => 'Test Title',
@@ -35,7 +35,7 @@ class HttpResourceTest extends TestCase
             10, 15, 1
         );
 
-        $this->assertEquals($resource->toResponseArray($request), [
+        $this->assertEquals($resource->toArrayResponse($request), [
             'data' => [
                 [
                     'id' => 5,
@@ -54,7 +54,7 @@ class HttpResourceTest extends TestCase
             10, 15, 1
         ));
 
-        $this->assertEquals($resource->toResponseArray($request), [
+        $this->assertEquals($resource->toArrayResponse($request), [
             'data' => [
                 [
                     'id' => 5,
