@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http;
 
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -23,6 +24,35 @@ class HttpResourceTest extends TestCase
                 'id' => 5,
                 'title' => 'Test Title',
                 'custom' => true,
+            ],
+        ]);
+    }
+
+    public function testNestedToResourceArray()
+    {
+        Container::getInstance()->instance(
+            'request',
+            $request = Request::create('https://example.com')
+        );
+
+        $resource = PostResource::make((new Post([
+            'id' => 5,
+            'title' => 'Test Title',
+        ]))->setRelation('linkedPost', new Post([
+            'id' => 10,
+            'title' => 'Linked Title',
+        ])));
+
+        $this->assertEquals($resource->toArrayResponse($request), [
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+                'custom' => true,
+                'linkedPost' => [
+                    'id' => 10,
+                    'title' => 'Linked Title',
+                    'custom' => true,
+                ],
             ],
         ]);
     }
@@ -84,13 +114,23 @@ class HttpResourceTest extends TestCase
 class Post extends Model
 {
     protected $guarded = [];
+
+    public function linkedPost()
+    {
+        return $this->hasOne(Post::class);
+    }
 }
 
 class PostResource extends JsonResource
 {
     public function toArray($request)
     {
-        return ['id' => $this->id, 'title' => $this->title, 'custom' => true];
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'custom' => true,
+            'linkedPost' => PostResource::make($this->whenLoaded('linkedPost')),
+        ];
     }
 
     public function withResponse($request, $response)

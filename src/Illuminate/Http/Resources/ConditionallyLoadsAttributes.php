@@ -32,8 +32,14 @@ trait ConditionallyLoadsAttributes
                 );
             }
 
-            if ($value instanceof self && is_null($value->resource)) {
-                $data[$key] = null;
+            if ($value instanceof self) {
+                if (is_null($value->resource)) {
+                    $data[$key] = null;
+                } elseif ($value->resource instanceof MissingValue) {
+                    $data[$key] = $value->resource;
+                } else {
+                    $data[$key] = $value->resolve();
+                }
             }
         }
 
@@ -74,10 +80,7 @@ trait ConditionallyLoadsAttributes
         $numericKeys = true;
 
         foreach ($data as $key => $value) {
-            if (($value instanceof PotentiallyMissing && $value->isMissing()) ||
-                ($value instanceof self &&
-                $value->resource instanceof PotentiallyMissing &&
-                $value->isMissing())) {
+            if ($this->isMissingValue($value)) {
                 unset($data[$key]);
             } else {
                 $numericKeys = $numericKeys && is_numeric($key);
@@ -89,6 +92,20 @@ trait ConditionallyLoadsAttributes
         }
 
         return $numericKeys ? array_values($data) : $data;
+    }
+
+    /**
+     * Check if value is missing.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isMissingValue($value)
+    {
+        return ($value instanceof PotentiallyMissing && $value->isMissing()) ||
+            ($value instanceof self &&
+            $value->resource instanceof PotentiallyMissing &&
+            $value->isMissing());
     }
 
     /**
