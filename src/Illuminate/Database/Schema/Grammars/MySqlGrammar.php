@@ -422,6 +422,61 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * The SQL declaration for the "tinyint" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeTinyInteger($fieldDeclaration)
+    {
+        return 'TINYINT';
+    }
+
+    /**
+     * The SQL declaration for the "year" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeYear($fieldDeclaration)
+    {
+        return 'YEAR';
+    }
+
+    /**
+     * The SQL declaration for the "char" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeChar($fieldDeclaration)
+    {
+        return "CHAR({$fieldDeclaration['length']})";
+    }
+
+    /**
+     * The SQL declaration for the "double" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeDouble($fieldDeclaration)
+    {
+        return "DOUBLE({$fieldDeclaration['precision']}, {$fieldDeclaration['scale']})";
+    }
+
+    /**
+     * The SQL declaration for the "enum" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeEnum($fieldDeclaration)
+    {
+        return sprintf('enum(%s)', $this->quoteString($fieldDeclaration['allowed']));
+    }
+
+    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column
