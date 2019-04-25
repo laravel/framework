@@ -4,11 +4,11 @@ namespace Illuminate\Database\Migrations;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Events\Dispatcher;
 
 class Migrator
 {
@@ -622,9 +622,11 @@ class Migrator
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public static function setEventDispatcher(Dispatcher $dispatcher)
+    public function setEventDispatcher(Dispatcher $dispatcher)
     {
         static::$dispatcher = $dispatcher;
+
+        return $this;
     }
 
     /**
