@@ -141,6 +141,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $ignoreOnTouch = [];
 
     /**
+     * The Array of Excepts will be remove or unset variables to escape from Insert/Update into table.
+     * 
+     * @var array
+     */
+    protected $excepts = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string
@@ -674,6 +681,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($saved) {
             $this->finishSave($options);
         }
+
+        if (count($this->excepts) > 0)
+            $this->except();
 
         return $saved;
     }
@@ -1644,5 +1654,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __wakeup()
     {
         $this->bootIfNotBooted();
+    }
+
+    /**
+     * We can use this function to except the fields from Insert/Update into table.
+     * We can call this function directly from model or use $excepts variable.
+     * Note: All fields to except will be release to null or unset variables.
+     * @param array $fields
+     */
+    protected function except(array $fields = [])
+    {
+        $all_fields = array_merge($this->excepts, $fields);
+
+        foreach ($all_fields as $field) {
+            unset($this->$field);
+        }
     }
 }
