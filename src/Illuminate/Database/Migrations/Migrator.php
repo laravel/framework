@@ -9,6 +9,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Events\MigrationsStarted;
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Events\MigrationStarted;
+use Illuminate\Database\Events\MigrationEnded;
 
 class Migrator
 {
@@ -17,7 +21,7 @@ class Migrator
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected static $dispatcher;
+    protected $events;
 
     /**
      * The migration repository implementation.
@@ -71,11 +75,13 @@ class Migrator
      */
     public function __construct(MigrationRepositoryInterface $repository,
                                 Resolver $resolver,
-                                Filesystem $files)
+                                Filesystem $files,
+                                Dispatcher $dispatcher = null)
     {
         $this->files = $files;
         $this->resolver = $resolver;
         $this->repository = $repository;
+        $this->events = $dispatcher;
     }
 
     /**
@@ -148,7 +154,7 @@ class Migrator
 
         $step = $options['step'] ?? false;
 
-        $this->fireMigrationEvent('beforeAll:up');
+        $this->fireMigrationEvent(new MigrationsStarted);
 
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
@@ -161,7 +167,7 @@ class Migrator
             }
         }
 
-        $this->fireMigrationEvent('afterAll:up');
+        $this->fireMigrationEvent(new MigrationsEnded);
     }
 
     /**
@@ -373,15 +379,11 @@ class Migrator
 
         $callback = function () use ($migration, $method) {
             if (method_exists($migration, $method)) {
-                $this->fireMigrationEvent("before:{$method}", [
-                    'migration' => $migration,
-                ]);
+                $this->fireMigrationEvent(new MigrationStarted($migration, $method));
 
                 $migration->{$method}();
 
-                $this->fireMigrationEvent("after:{$method}", [
-                    'migration' => $migration,
-                ]);
+                $this->fireMigrationEvent(new MigrationEnded($migration, $method));
             }
         };
 
@@ -617,31 +619,15 @@ class Migrator
     }
 
     /**
-     * Set the event dispatcher instance.
+     * Fire the given event for the migration.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  object $event
      * @return void
      */
-    public function setEventDispatcher(Dispatcher $dispatcher)
+    public function fireMigrationEvent($event)
     {
-        static::$dispatcher = $dispatcher;
-
-        return $this;
-    }
-
-    /**
-     * Fire the given event for the model.
-     *
-     * @param  string  $event
-     * @param  array  $params
-     * @return mixed
-     */
-    public function fireMigrationEvent($name, $params = [])
-    {
-        if (! isset(static::$dispatcher)) {
-            return true;
+        if ($this->events) {
+            $this->events->dispatch($event);
         }
-
-        return static::$dispatcher->dispatch("migrations.{$name}", $params);
     }
 }
