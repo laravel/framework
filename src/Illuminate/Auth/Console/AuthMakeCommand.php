@@ -126,7 +126,7 @@ class AuthMakeCommand extends Command
     protected function getViewPath($path)
     {
         return implode(DIRECTORY_SEPARATOR, [
-            config('view.paths')[0] ?? resource_path('views'), $path
+            config('view.paths')[0] ?? resource_path('views'), $path,
         ]);
     }
 }
