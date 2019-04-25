@@ -71,4 +71,17 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
                     ? (new PaginatedResourceResponse($this))->toResponse($request)
                     : parent::toResponse($request);
     }
+
+    /**
+     * Create an array that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toResponseArray($request)
+    {
+        return $this->resource instanceof AbstractPaginator
+                    ? (new PaginatedResourceResponse($this))->toArray($request)
+                    : parent::toResponseArray($request);
+    }
 }

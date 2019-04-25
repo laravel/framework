@@ -202,6 +202,17 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
+     * Create an array response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toResponseArray($request)
+    {
+        return (new ResourceResponse($this))->toArray($request);
+    }
+
+    /**
      * Prepare the resource for JSON serialization.
      *
      * @return array
