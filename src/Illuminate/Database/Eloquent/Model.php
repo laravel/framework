@@ -1666,7 +1666,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Note: All fields to except will be release to null or unset variables.
      * @param array $fields
      */
-    protected function except(array $fields = [])
+    public function except(array $fields = [])
     {
         $all_fields = array_merge($this->excepts, $fields);
 
