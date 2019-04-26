@@ -79,7 +79,7 @@ class VerifyCsrfToken
             });
         }
 
-        throw new TokenMismatchException('Tokens mismatch');
+        throw new TokenMismatchException('CSRF token mismatch.');
     }
 
     /**
