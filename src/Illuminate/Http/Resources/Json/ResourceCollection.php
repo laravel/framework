@@ -78,10 +78,10 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArrayResponse($request)
+    public function toResponseArray($request)
     {
         return $this->resource instanceof AbstractPaginator
                     ? (new PaginatedResourceResponse($this))->toArray($request)
-                    : parent::toArrayResponse($request);
+                    : parent::toResponseArray($request);
     }
 }
