@@ -450,4 +450,26 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         return parent::__call(strtolower($method), $parameters);
     }
+
+    /**
+     * Serialize the value. Using PhpRedis's native serialize methods
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function serialize($value)
+    {
+        return $this->client->_serialize($value);
+    }
+
+    /**
+     * Unserialize the value.  Using PhpRedis's native serialize methods
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function unserialize($value)
+    {
+        return $this->client->_unserialize($value);
+    }
 }

@@ -61,4 +61,26 @@ class PredisConnection extends Connection implements ConnectionContract
             $node->executeCommand(new ServerFlushDatabase);
         }
     }
+
+    /** 
+     * Serialize the value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function serialize($value)
+    {
+        return serialize($value);
+    }
+
+    /**
+     * Unserialize the value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function unserialize($value)
+    {
+        return unserialize($value);
+    }
 }
