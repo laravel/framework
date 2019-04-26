@@ -35,28 +35,17 @@ class ResourceResponse implements Responsable
     public function toResponse($request)
     {
         return tap(response()->json(
-            $this->toArray($request),
+            $this->wrap(
+                $this->resource->resolve($request),
+                $this->resource->with($request),
+                $this->resource->additional
+            ),
             $this->calculateStatus()
         ), function ($response) use ($request) {
             $response->original = $this->resource->resource;
 
             $this->resource->withResponse($request, $response);
         });
-    }
-
-    /**
-     * Create an array that represents the object.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function toArray($request)
-    {
-        return $this->wrap(
-            $this->resource->resolve($request),
-            $this->resource->with($request),
-            $this->resource->additional
-        );
     }
 
     /**
