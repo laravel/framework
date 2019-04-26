@@ -503,8 +503,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return bool
      */
-    public function every($key, $operator = null, $value = null)
+    public function every($key = null, $operator = null, $value = null)
     {
+        if (is_null($key)) {
+            foreach ($this->items as $v) {
+                if (! $v) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         if (func_num_args() === 1) {
             $callback = $this->valueRetriever($key);
 

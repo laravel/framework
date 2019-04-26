@@ -1169,6 +1169,19 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($c->every('active'));
         $this->assertTrue($c->every->active);
         $this->assertFalse($c->push(['active' => false])->every->active);
+
+        $c = new Collection([true, true]);
+        $this->assertTrue($c->every());
+        $this->assertFalse($c->push(false)->every());
+
+        $c = new Collection([null, true]);
+        $this->assertFalse($c->every());
+
+        $c = new Collection([[], []]);
+        $this->assertFalse($c->every());
+
+        $c = new Collection([null, 1, []]);
+        $this->assertFalse($c->every());
     }
 
     public function testExcept()
