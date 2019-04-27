@@ -635,6 +635,8 @@ class Event
     {
         $this->onOneServer = true;
 
+        $this->description($this->mutexName());
+
         return $this;
     }
 
