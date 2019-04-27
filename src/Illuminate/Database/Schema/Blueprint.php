@@ -857,6 +857,18 @@ class Blueprint
     }
 
     /**
+     * Create a new set column on the table.
+     *
+     * @param  string  $column
+     * @param  array  $allowed
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function set($column, array $allowed)
+    {
+        return $this->addColumn('set', $column, compact('allowed'));
+    }
+
+    /**
      * Create a new json column on the table.
      *
      * @param  string  $column

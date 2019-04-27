@@ -29,7 +29,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.8.5';
+    const VERSION = '5.8.14';
 
     /**
      * The base path for the Laravel installation.
@@ -934,6 +934,26 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function getCachedRoutesPath()
     {
         return $_ENV['APP_ROUTES_CACHE'] ?? $this->bootstrapPath().'/cache/routes.php';
+    }
+
+    /**
+     * Determine if the application events are cached.
+     *
+     * @return bool
+     */
+    public function eventsAreCached()
+    {
+        return $this['files']->exists($this->getCachedEventsPath());
+    }
+
+    /**
+     * Get the path to the events cache file.
+     *
+     * @return string
+     */
+    public function getCachedEventsPath()
+    {
+        return $_ENV['APP_EVENTS_CACHE'] ?? $this->bootstrapPath().'/cache/events.php';
     }
 
     /**

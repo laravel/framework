@@ -202,7 +202,7 @@ class DatabaseStore implements Store
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, 5256000);
+        return $this->put($key, $value, 315360000);
     }
 
     /**

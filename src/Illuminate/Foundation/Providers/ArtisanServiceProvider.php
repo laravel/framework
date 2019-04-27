@@ -19,6 +19,7 @@ use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
+use Illuminate\Foundation\Console\EventListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
@@ -26,6 +27,8 @@ use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Foundation\Console\EventCacheCommand;
+use Illuminate\Foundation\Console\EventClearCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
@@ -89,6 +92,9 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConfigClear' => 'command.config.clear',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
+        'EventCache' => 'command.event.cache',
+        'EventClear' => 'command.event.clear',
+        'EventList' => 'command.event.list',
         'KeyGenerate' => 'command.key.generate',
         'Migrate' => 'command.migrate',
         'MigrateFresh' => 'command.migrate.fresh',
@@ -399,6 +405,42 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.environment', function () {
             return new EnvironmentCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerEventCacheCommand()
+    {
+        $this->app->singleton('command.event.cache', function () {
+            return new EventCacheCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerEventClearCommand()
+    {
+        $this->app->singleton('command.event.clear', function ($app) {
+            return new EventClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerEventListCommand()
+    {
+        $this->app->singleton('command.event.list', function () {
+            return new EventListCommand();
         });
     }
 

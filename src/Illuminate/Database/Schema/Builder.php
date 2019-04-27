@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use LogicException;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 
 class Builder
@@ -282,6 +283,30 @@ class Builder
         }
 
         return new Blueprint($table, $callback, $prefix);
+    }
+
+    /**
+     * Register a custom Doctrine mapping type.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string  $type
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function registerCustomDoctrineType($class, $name, $type)
+    {
+        if (Type::hasType($name)) {
+            return;
+        }
+
+        Type::addType($name, $class);
+
+        $this->connection
+            ->getDoctrineSchemaManager()
+            ->getDatabasePlatform()
+            ->registerDoctrineTypeMapping($type, $name);
     }
 
     /**

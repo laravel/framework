@@ -191,6 +191,9 @@ class SupportStrTest extends TestCase
 
         $this->assertTrue(Str::is('foo/bar/baz', $valueObject));
         $this->assertTrue(Str::is($patternObject, $valueObject));
+
+        //empty patterns
+        $this->assertFalse(Str::is([], 'test'));
     }
 
     public function testKebab()
@@ -228,6 +231,7 @@ class SupportStrTest extends TestCase
     public function testLength()
     {
         $this->assertEquals(11, Str::length('foo bar baz'));
+        $this->assertEquals(11, Str::length('foo bar baz', 'UTF-8'));
     }
 
     public function testRandom()
@@ -244,6 +248,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo/bar/baz/?', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?/?'));
         $this->assertEquals('foo/bar', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?'));
         $this->assertEquals('?/?/?', Str::replaceArray('x', ['foo', 'bar', 'baz'], '?/?/?'));
+        $this->assertEquals('foo?/bar/baz', Str::replaceArray('?', ['foo?', 'bar', 'baz'], '?/?/?'));
     }
 
     public function testReplaceFirst()

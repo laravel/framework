@@ -13,6 +13,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesComponents,
         Concerns\CompilesConditionals,
         Concerns\CompilesEchos,
+        Concerns\CompilesErrors,
         Concerns\CompilesHelpers,
         Concerns\CompilesIncludes,
         Concerns\CompilesInjections,
@@ -118,11 +119,42 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         if (! is_null($this->cachePath)) {
-            $contents = $this->compileString($this->files->get($this->getPath())).
-                        "\n<?php /* {$this->getPath()} */ ?>";
+            $contents = $this->compileString(
+                $this->files->get($this->getPath())
+            );
 
-            $this->files->put($this->getCompiledPath($this->getPath()), $contents);
+            if (! empty($this->getPath())) {
+                $tokens = $this->getOpenAndClosingPhpTokens($contents);
+
+                // If the tokens we retrieved from the compiled contents have at least
+                // one opening tag and if that last token isn't the closing tag, we
+                // need to close the statement before adding the path at the end.
+                if ($tokens->isNotEmpty() && $tokens->last() !== T_CLOSE_TAG) {
+                    $contents .= ' ?>';
+                }
+
+                $contents .= "<?php /**PATH {$this->getPath()} ENDPATH**/ ?>";
+            }
+
+            $this->files->put(
+                $this->getCompiledPath($this->getPath()), $contents
+            );
         }
+    }
+
+    /**
+     * Get the open and closing PHP tag tokens from the given string.
+     *
+     * @param  string  $contents
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getOpenAndClosingPhpTokens($contents)
+    {
+        return collect(token_get_all($contents))
+            ->pluck($tokenNumber = 0)
+            ->filter(function ($token) {
+                return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
+            });
     }
 
     /**

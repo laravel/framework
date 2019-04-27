@@ -1507,6 +1507,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($replicated->updated_at);
     }
 
+    public function testReplicatingEventIsFiredWhenReplicatingModel()
+    {
+        $model = new EloquentModelStub;
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->once()->with('eloquent.replicating: '.get_class($model), m::on(function ($m) use ($model) {
+            return $model->is($m);
+        }));
+
+        $model->replicate();
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
@@ -1854,7 +1866,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $called = false;
 
-        EloquentModelStub::withoutTouching(function () use (&$called, $model) {
+        EloquentModelStub::withoutTouching(function () use (&$called) {
             $called = true;
         });
 
@@ -1867,7 +1879,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $called = false;
 
-        Model::withoutTouchingOn([EloquentModelStub::class], function () use (&$called, $model) {
+        Model::withoutTouchingOn([EloquentModelStub::class], function () use (&$called) {
             $called = true;
         });
 

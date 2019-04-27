@@ -711,6 +711,10 @@ trait ValidatesAttributes
 
         if (isset($parameters[2])) {
             [$idColumn, $id] = $this->getUniqueIds($parameters);
+
+            if (! is_null($id)) {
+                $id = stripslashes($id);
+            }
         }
 
         // The presence verifier is responsible for counting rows within this store
@@ -887,7 +891,9 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
-        $this->requireSameType($value, $comparedToValue);
+        if (! $this->isSameType($value, $comparedToValue)) {
+            return false;
+        }
 
         return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue);
     }
@@ -912,7 +918,9 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
-        $this->requireSameType($value, $comparedToValue);
+        if (! $this->isSameType($value, $comparedToValue)) {
+            return false;
+        }
 
         return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue);
     }
@@ -937,7 +945,9 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
-        $this->requireSameType($value, $comparedToValue);
+        if (! $this->isSameType($value, $comparedToValue)) {
+            return false;
+        }
 
         return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue);
     }
@@ -962,7 +972,9 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
-        $this->requireSameType($value, $comparedToValue);
+        if (! $this->isSameType($value, $comparedToValue)) {
+            return false;
+        }
 
         return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue);
     }
@@ -1717,19 +1729,15 @@ trait ValidatesAttributes
     }
 
     /**
-     * Require comparison values to be of the same type.
+     * Check if the parameters are of the same type.
      *
      * @param  mixed  $first
      * @param  mixed  $second
-     * @return void
-     *
-     * @throws \InvalidArgumentException
+     * @return bool
      */
-    protected function requireSameType($first, $second)
+    protected function isSameType($first, $second)
     {
-        if (gettype($first) != gettype($second)) {
-            throw new InvalidArgumentException('The values under comparison must be of the same type');
-        }
+        return gettype($first) == gettype($second);
     }
 
     /**

@@ -214,7 +214,7 @@ trait InteractsWithPivotTable
     protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch)
     {
         $updated = $this->newPivot([
-            $this->foreignPivotKey => $this->parent->getKey(),
+            $this->foreignPivotKey => $this->parent->{$this->parentKey},
             $this->relatedPivotKey => $this->parseId($id),
         ], true)->fill($attributes)->save();
 
@@ -403,7 +403,7 @@ trait InteractsWithPivotTable
      */
     public function detach($ids = null, $touch = true)
     {
-        if ($this->using && ! empty($ids)) {
+        if ($this->using && ! empty($ids) && empty($this->pivotWheres) && empty($this->pivotWhereIns)) {
             $results = $this->detachUsingCustomClass($ids);
         } else {
             $query = $this->newPivotQuery();
@@ -446,7 +446,7 @@ trait InteractsWithPivotTable
 
         foreach ($this->parseIds($ids) as $id) {
             $results += $this->newPivot([
-                $this->foreignPivotKey => $this->parent->getKey(),
+                $this->foreignPivotKey => $this->parent->{$this->parentKey},
                 $this->relatedPivotKey => $id,
             ], true)->delete();
         }

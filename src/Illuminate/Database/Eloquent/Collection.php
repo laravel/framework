@@ -141,7 +141,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * @param  array  $path
      * @return void
      */
-    protected function loadMissingRelation(Collection $models, array $path)
+    protected function loadMissingRelation(self $models, array $path)
     {
         $relation = array_shift($path);
 
@@ -491,6 +491,19 @@ class Collection extends BaseCollection implements QueueableCollection
     public function pad($size, $value)
     {
         return $this->toBase()->pad($size, $value);
+    }
+
+    /**
+     * Get the comparison function to detect duplicates.
+     *
+     * @param  bool  $strict
+     * @return \Closure
+     */
+    protected function duplicateComparator($strict)
+    {
+        return function ($a, $b) {
+            return $a->is($b);
+        };
     }
 
     /**

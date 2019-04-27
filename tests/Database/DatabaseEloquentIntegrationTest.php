@@ -14,13 +14,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Tests\Integration\Database\Post;
-use Illuminate\Tests\Integration\Database\User;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Tests\Integration\Database\Fixtures\Post;
+use Illuminate\Tests\Integration\Database\Fixtures\User;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseEloquentIntegrationTest extends TestCase
@@ -1090,6 +1090,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNotNull(EloquentTestUserWithGlobalScopeRemovingOtherScope::find($user->id));
     }
 
+    public function testForPageBeforeIdCorrectlyPaginates()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::forPageBeforeId(15, 2);
+        $this->assertInstanceOf(Builder::class, $results);
+        $this->assertEquals(1, $results->first()->id);
+
+        $results = EloquentTestUser::orderBy('id', 'desc')->forPageBeforeId(15, 2);
+        $this->assertInstanceOf(Builder::class, $results);
+        $this->assertEquals(1, $results->first()->id);
+    }
+
     public function testForPageAfterIdCorrectlyPaginates()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -1586,17 +1600,17 @@ class EloquentTestUser extends Eloquent
 
     public function friends()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id');
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id');
     }
 
     public function friendsOne()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
     }
 
     public function friendsTwo()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
     }
 
     public function posts()
@@ -1704,12 +1718,12 @@ class EloquentTestPost extends Eloquent
 
     public function childPosts()
     {
-        return $this->hasMany(EloquentTestPost::class, 'parent_id');
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function parentPost()
     {
-        return $this->belongsTo(EloquentTestPost::class, 'parent_id');
+        return $this->belongsTo(self::class, 'parent_id');
     }
 }
 

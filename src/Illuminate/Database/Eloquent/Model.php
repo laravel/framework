@@ -50,7 +50,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $primaryKey = 'id';
 
     /**
-     * The "type" of the auto-incrementing ID.
+     * The "type" of the primary key ID.
      *
      * @var string
      */
@@ -1175,6 +1175,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $instance->setRawAttributes($attributes);
 
             $instance->setRelations($this->relations);
+
+            $instance->fireModelEvent('replicating', false);
         });
     }
 
@@ -1285,9 +1287,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getTable()
     {
-        return isset($this->table)
-            ? $this->table
-            : Str::snake(Str::pluralStudly(class_basename($this)));
+        return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**

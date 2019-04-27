@@ -35,8 +35,8 @@ class Unique
             return $this->ignoreModel($id, $idColumn);
         }
 
-        $this->ignore = str_replace(',', '', $id);
-        $this->idColumn = str_replace(',', '', $idColumn ?? 'id');
+        $this->ignore = $id;
+        $this->idColumn = $idColumn ?? 'id';
 
         return $this;
     }
@@ -50,8 +50,8 @@ class Unique
      */
     public function ignoreModel($model, $idColumn = null)
     {
-        $this->idColumn = str_replace(',', '', $idColumn ?? $model->getKeyName());
-        $this->ignore = str_replace(',', '', $model->{$this->idColumn});
+        $this->idColumn = $idColumn ?? $model->getKeyName();
+        $this->ignore = $model->{$this->idColumn};
 
         return $this;
     }
@@ -66,7 +66,7 @@ class Unique
         return rtrim(sprintf('unique:%s,%s,%s,%s,%s',
             $this->table,
             $this->column,
-            $this->ignore ? '"'.$this->ignore.'"' : 'NULL',
+            $this->ignore ? '"'.addslashes($this->ignore).'"' : 'NULL',
             $this->idColumn,
             $this->formatWheres()
         ), ',');

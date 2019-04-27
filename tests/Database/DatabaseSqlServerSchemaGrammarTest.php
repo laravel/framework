@@ -472,7 +472,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "role" nvarchar(255) check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "role" nvarchar(255) check ("role" in (N\'member\', N\'admin\')) not null', $statements[0]);
     }
 
     public function testAddingJson()
@@ -791,6 +791,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $c = $this->getGrammar()::compileReplace();
 
         $this->assertTrue($c);
+    }
+
+    public function testQuoteString()
+    {
+        $this->assertSame("N'中文測試'", $this->getGrammar()->quoteString('中文測試'));
+    }
+
+    public function testQuoteStringOnArray()
+    {
+        $this->assertSame("N'中文', N'測試'", $this->getGrammar()->quoteString(['中文', '測試']));
     }
 
     protected function getConnection()
