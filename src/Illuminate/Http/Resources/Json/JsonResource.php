@@ -23,6 +23,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public $resource;
 
     /**
+     * The additional data that can be used to construct the resource array.
+     *
+     * @var array
+     */
+    protected $extra = [];
+
+    /**
      * The additional data that should be added to the top-level resource array.
      *
      * @var array
@@ -118,6 +125,19 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
         return is_array($this->resource)
             ? $this->resource
             : $this->resource->toArray();
+    }
+
+    /**
+     * Add additional data to construct the resource array.
+     *
+     * @param array $data
+     * @return $this
+     */
+    public function using(array $data)
+    {
+        $this->extra = $data;
+
+        return $this;
     }
 
     /**
