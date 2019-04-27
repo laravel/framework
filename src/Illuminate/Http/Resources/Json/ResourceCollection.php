@@ -26,6 +26,13 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     public $collection;
 
     /**
+     * The additional data that can be used to construct each of the resource arrays.
+     *
+     * @var array
+     */
+    protected $extra = [];
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
@@ -36,6 +43,19 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
         parent::__construct($resource);
 
         $this->resource = $this->collectResource($resource);
+    }
+
+    /**
+     * Add additional data to construct each of the resource arrays.
+     *
+     * @param array $data
+     * @return $this
+     */
+    public function using(array $data)
+    {
+        $this->extra = $data;
+
+        return $this;
     }
 
     /**
@@ -56,6 +76,8 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      */
     public function toArray($request)
     {
+        $this->collection->map->using($this->extra);
+
         return $this->collection->map->toArray($request)->all();
     }
 
