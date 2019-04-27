@@ -2,10 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Http\Fixtures;
 
-class PostResourceWithExtraData extends PostResource
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class PostResourceWithExtraData extends JsonResource
 {
-    public function with($request)
+    public function toArray($request)
     {
-        return ['foo' => 'bar'];
+        return [
+            'id' => $this->id,
+            'extra_value' => $this->extra['value'],
+        ];
     }
 }

@@ -23,7 +23,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public $resource;
 
     /**
-     * The additional data that can be used to construct the resource array.
+     * The extra data that can be used to construct the resource array.
      *
      * @var array
      */
@@ -128,7 +128,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Add additional data to construct the resource array.
+     * Add extra data to construct the resource array.
      *
      * @param array $data
      * @return $this

@@ -26,7 +26,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     public $collection;
 
     /**
-     * The additional data that can be used to construct each of the resource arrays.
+     * The extra data that can be used to construct each of the resource arrays.
      *
      * @var array
      */
@@ -46,7 +46,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     }
 
     /**
-     * Add additional data to construct each of the resource arrays.
+     * Add extra data to construct each of the resource arrays.
      *
      * @param array $data
      * @return $this

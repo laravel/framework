@@ -22,6 +22,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraMetaData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
@@ -51,6 +52,59 @@ class ResourceTest extends TestCase
             'data' => [
                 'id' => 5,
                 'title' => 'Test Title',
+            ],
+        ]);
+    }
+
+    public function test_resources_may_have_extra_values()
+    {
+        Route::get('/', function () {
+            return (new PostResourceWithExtraData(new Post([
+                'id' => 5,
+            ])))->using(['value' => 'Test Extra Value']);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'extra_value' => 'Test Extra Value',
+            ],
+        ]);
+    }
+
+    public function test_resource_collection_may_have_extra_values_passed_to_each_resource()
+    {
+        Route::get('/', function () {
+            $posts = collect([
+                new Post(['id' => 1]),
+                new Post(['id' => 2]),
+            ]);
+
+            return PostResourceWithExtraData::collection($posts)->using(['value' => 'Test Extra Value']);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 1,
+                    'extra_value' => 'Test Extra Value',
+                ],
+                [
+                    'id' => 2,
+                    'extra_value' => 'Test Extra Value',
+                ]
             ],
         ]);
     }
@@ -337,10 +391,10 @@ class ResourceTest extends TestCase
         $response->assertHeader('X-Resource', 'True');
     }
 
-    public function test_resources_may_customize_extra_data()
+    public function test_resources_may_customize_extra_meta_data()
     {
         Route::get('/', function () {
-            return new PostResourceWithExtraData(new Post([
+            return new PostResourceWithExtraMetaData(new Post([
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
@@ -359,10 +413,10 @@ class ResourceTest extends TestCase
         ]);
     }
 
-    public function test_resources_may_customize_extra_data_when_building_response()
+    public function test_resources_may_customize_extra_meta_data_when_building_response()
     {
         Route::get('/', function () {
-            return (new PostResourceWithExtraData(new Post([
+            return (new PostResourceWithExtraMetaData(new Post([
                 'id' => 5,
                 'title' => 'Test Title',
             ])))->additional(['baz' => 'qux']);
