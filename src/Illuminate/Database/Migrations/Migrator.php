@@ -79,9 +79,9 @@ class Migrator
                                 Dispatcher $dispatcher = null)
     {
         $this->files = $files;
+        $this->events = $dispatcher;
         $this->resolver = $resolver;
         $this->repository = $repository;
-        $this->events = $dispatcher;
     }
 
     /**
@@ -257,7 +257,7 @@ class Migrator
 
         $this->requireFiles($files = $this->getMigrationFiles($paths));
 
-        $this->fireMigrationEvent('beforeAll:down');
+        $this->fireMigrationEvent(new MigrationsStarted);
 
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order. This getLast method on the
@@ -279,7 +279,7 @@ class Migrator
             );
         }
 
-        $this->fireMigrationEvent('afterAll:down');
+        $this->fireMigrationEvent(new MigrationsEnded);
 
         return $rolledBack;
     }
