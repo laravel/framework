@@ -828,6 +828,40 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('boom', $array['namesList'][1]['bam']);
     }
 
+    public function testToArrayDates()
+    {
+        Carbon::setTestNow('2019-08-07 06:05:04');
+
+        $model = new EloquentDateModelStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+
+        $model->setCreatedAt(now());
+        $this->assertSame(['created_at' => '2019-08-07 06:05:04'], $model->toArray());
+
+        $model->setCreatedAt(0);
+        $this->assertSame(['created_at' => '1970-01-01 00:00:00'], $model->toArray());
+
+        $model->setCreatedAt(null);
+        $this->assertSame(['created_at' => null], $model->toArray());
+
+        $model->setCreatedAt(false);
+        $this->assertSame(['created_at' => false], $model->toArray());
+
+        $model->setCreatedAt('');
+        $this->assertSame(['created_at' => ''], $model->toArray());
+
+        $model->setCreatedAt(now());
+        $model->setUpdatedAt(now());
+        $this->assertSame(
+            ['created_at' => '2019-08-07 06:05:04', 'updated_at' => '2019-08-07 06:05:04'],
+            $model->toArray()
+        );
+
+        $model->non_date_field = now();
+        $this->assertArrayHasKey('non_date_field', $model->toArray());
+        $this->assertIsNotString($model->toArray()['non_date_field']);
+    }
+
     public function testToArrayUsesMutators()
     {
         $model = new EloquentModelStub;
