@@ -16,7 +16,7 @@ abstract class MigrationEvent implements MigrationContract
 
     /**
      * The direction of the migration.
-     * 
+     *
      * @var string
      */
     public $direction;
