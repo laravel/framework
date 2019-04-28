@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Schema;
 
-use Illuminate\Database\Schema\Types\TinyInteger;
-
 class MySqlBuilder extends Builder
 {
     /**

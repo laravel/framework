@@ -5,14 +5,14 @@ namespace Illuminate\Database\Schema\Types;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-class TinyInteger extends Type
+class MultiPolygon extends Type
 {
     /**
      * The name of the custom type.
      *
      * @var string
      */
-    const NAME = 'tinyinteger';
+    const NAME = 'multipolygon';
 
     /**
      * Gets the SQL declaration snippet for a field of this type.
@@ -29,11 +29,11 @@ class TinyInteger extends Type
             $platform->getName()
         );
 
-        if (! method_exists($grammar, 'doctrineTypeTinyInteger')) {
-            throw DBALException::notSupported('doctrineTypeTinyInteger');
+        if (! method_exists($grammar, 'doctrineTypeMultiPolygon')) {
+            throw DBALException::notSupported('doctrineTypeMultiPolygon');
         }
 
-        return $grammar->doctrineTypeTinyInteger(
+        return $grammar->doctrineTypeMultiPolygon(
             $fieldDeclaration
         );
     }

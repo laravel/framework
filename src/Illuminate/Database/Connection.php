@@ -9,13 +9,32 @@ use PDOStatement;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Schema\Types\Uuid;
+use Illuminate\Database\Schema\Types\Year;
+use Illuminate\Database\Schema\Types\Char;
+use Illuminate\Database\Schema\Types\Enum;
+use Illuminate\Database\Schema\Types\JsonB;
+use Illuminate\Database\Schema\Types\Point;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Schema\Types\Double;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Schema\Types\Polygon;
+use Illuminate\Database\Schema\Types\Geometry;
+use Illuminate\Database\Schema\Types\IpAddress;
+use Illuminate\Database\Schema\Types\LineString;
+use Illuminate\Database\Schema\Types\MacAddress;
+use Illuminate\Database\Schema\Types\MultiPoint;
+use Illuminate\Database\Schema\Types\TinyInteger;
+use Illuminate\Database\Schema\Types\MultiPolygon;
+use Illuminate\Database\Schema\Types\MediumInteger;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Schema\Types\MultiLineString;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Database\Schema\Types\GeometryCollection;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 
 class Connection implements ConnectionInterface
@@ -149,6 +168,32 @@ class Connection implements ConnectionInterface
      * @var array
      */
     protected static $resolvers = [];
+
+    /**
+     * The custom Doctrine DBAL types.
+     *
+     * @var array
+     */
+    private $doctrineTypes = [
+        TinyInteger::NAME           => TinyInteger::class,
+        MediumInteger::NAME         => MediumInteger::class,
+        Year::NAME                  => Year::class,
+        Char::NAME                  => Char::class,
+        Double::NAME                => Double::class,
+        Enum::NAME                  => Enum::class,
+        Uuid::NAME                  => Uuid::class,
+        Polygon::NAME               => Polygon::class,
+        MultiPolygon::NAME          => MultiPolygon::class,
+        Point::NAME                 => Point::class,
+        MultiPoint::NAME            => MultiPoint::class,
+        MultiLineString::NAME       => MultiLineString::class,
+        MacAddress::NAME            => MacAddress::class,
+        LineString::NAME            => LineString::class,
+        JsonB::NAME                 => JsonB::class,
+        IpAddress::NAME             => IpAddress::class,
+        GeometryCollection::NAME    => GeometryCollection::class,
+        Geometry::NAME              => Geometry::class
+    ];
 
     /**
      * Create a new database connection instance.
@@ -891,6 +936,8 @@ class Connection implements ConnectionInterface
      * Get the Doctrine DBAL database connection instance.
      *
      * @return \Doctrine\DBAL\Connection
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function getDoctrineConnection()
     {
@@ -902,6 +949,8 @@ class Connection implements ConnectionInterface
                 'dbname' => $this->getConfig('database'),
                 'driver' => $driver->getName(),
             ], $driver);
+
+            $this->registerCustomDoctrineTypes();
         }
 
         return $this->doctrineConnection;
@@ -1259,5 +1308,45 @@ class Connection implements ConnectionInterface
     public static function getResolver($driver)
     {
         return static::$resolvers[$driver] ?? null;
+    }
+
+
+    /**
+     * Register the custom Doctrine mapping types.
+     *
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function registerCustomDoctrineTypes()
+    {
+        foreach($this->doctrineTypes as $name => $class) {
+            $this->registerCustomDoctrineType($class, $name, $name);
+        }
+    }
+
+    /**
+     * Register a custom Doctrine mapping type.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string  $type
+     *
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function registerCustomDoctrineType($class, $name, $type)
+    {
+        if (Type::hasType($name)) {
+            return;
+        }
+
+        Type::addType($name, $class);
+
+        $this
+            ->getDoctrineSchemaManager()
+            ->getDatabasePlatform()
+            ->registerDoctrineTypeMapping($type, $name);
     }
 }

@@ -5,14 +5,14 @@ namespace Illuminate\Database\Schema\Types;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-class TinyInteger extends Type
+class Char extends Type
 {
     /**
      * The name of the custom type.
      *
      * @var string
      */
-    const NAME = 'tinyinteger';
+    const NAME = 'char';
 
     /**
      * Gets the SQL declaration snippet for a field of this type.
@@ -29,11 +29,11 @@ class TinyInteger extends Type
             $platform->getName()
         );
 
-        if (! method_exists($grammar, 'doctrineTypeTinyInteger')) {
-            throw DBALException::notSupported('doctrineTypeTinyInteger');
+        if (! method_exists($grammar, 'doctrineTypeChar')) {
+            throw DBALException::notSupported('doctrineTypeChar');
         }
 
-        return $grammar->doctrineTypeTinyInteger(
+        return $grammar->doctrineTypeChar(
             $fieldDeclaration
         );
     }

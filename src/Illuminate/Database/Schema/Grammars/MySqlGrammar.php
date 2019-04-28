@@ -422,6 +422,243 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * The SQL declaration for the "tinyint" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeTinyInteger($fieldDeclaration)
+    {
+        return $this->typeTinyInteger(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "mediumint" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeMediumInteger($fieldDeclaration)
+    {
+        return $this->typeMediumInteger(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "year" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeYear($fieldDeclaration)
+    {
+        return $this->typeYear(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "char" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeChar($fieldDeclaration)
+    {
+        return $this->typeChar(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "double" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeDouble($fieldDeclaration)
+    {
+        $fieldDeclaration['total'] = $fieldDeclaration['precision'];
+        $fieldDeclaration['places'] = $fieldDeclaration['scale'];
+
+        return $this->typeDouble(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "enum" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeEnum($fieldDeclaration)
+    {
+        return $this->typeEnum(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "uuid" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeUuid($fieldDeclaration)
+    {
+        return $this->typeUuid(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "polygon" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypePolygon($fieldDeclaration)
+    {
+        return $this->typePolygon(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "multiPolygon" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeMultiPolygon($fieldDeclaration)
+    {
+        return $this->typeMultiPolygon(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "point" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypePoint($fieldDeclaration)
+    {
+        return $this->typePoint(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "multiPoint" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeMultiPoint($fieldDeclaration)
+    {
+        return $this->typeMultiPoint(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "lineString" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeLineString($fieldDeclaration)
+    {
+        return $this->typeLineString(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "multiLineString" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeMultiLineString($fieldDeclaration)
+    {
+        return $this->typeMultiLineString(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "macAddress" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeMacAddress($fieldDeclaration)
+    {
+        return $this->typeMacAddress(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "jsonB" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeJsonB($fieldDeclaration)
+    {
+        return $this->typeJsonb(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "ipAddress" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeIpAddress($fieldDeclaration)
+    {
+        return $this->typeIpAddress(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "geometry" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeGeometry($fieldDeclaration)
+    {
+        return $this->typeGeometry(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
+     * The SQL declaration for the "geometryCollection" type.
+     *
+     * @param  array  $fieldDeclaration
+     * @return string
+     */
+    public function doctrineTypeGeometryCollection($fieldDeclaration)
+    {
+        return $this->typeGeometryCollection(
+            new Fluent($fieldDeclaration)
+        );
+    }
+
+    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column
