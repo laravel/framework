@@ -13,6 +13,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Concerns\HasDebugMethods;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
@@ -21,7 +22,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
  */
 class Builder
 {
-    use BuildsQueries, Concerns\QueriesRelationships, ForwardsCalls;
+    use BuildsQueries, Concerns\QueriesRelationships, ForwardsCalls, HasDebugMethods;
 
     /**
      * The base query builder instance.
