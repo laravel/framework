@@ -4,7 +4,6 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use LogicException;
-use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 
 class Builder
