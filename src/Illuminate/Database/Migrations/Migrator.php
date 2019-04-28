@@ -8,11 +8,11 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Events\MigrationsStarted;
+use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationStarted;
-use Illuminate\Database\Events\MigrationEnded;
+use Illuminate\Database\Events\MigrationsStarted;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
 {
@@ -621,7 +621,7 @@ class Migrator
     /**
      * Fire the given event for the migration.
      *
-     * @param  object $event
+     * @param  \Illuminate\Contracts\Database\Events\Migration $event
      * @return void
      */
     public function fireMigrationEvent($event)
