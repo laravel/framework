@@ -2,11 +2,18 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Illuminate\Database\Schema\Types\Enum;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Schema\Types\Char;
+use Illuminate\Database\Schema\Types\Year;
+use Illuminate\Database\Schema\Types\Double;
+use Illuminate\Database\Schema\Types\TinyInteger;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
@@ -348,12 +355,17 @@ class Migrator
      * @param  object  $migration
      * @param  string  $method
      * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Throwable
      */
     protected function runMigration($migration, $method)
     {
         $connection = $this->resolveConnection(
             $migration->getConnection()
         );
+
+        $this->registerCustomDoctrineTypes($connection);
 
         $callback = function () use ($migration, $method) {
             if (method_exists($migration, $method)) {
@@ -590,5 +602,51 @@ class Migrator
         if ($this->output) {
             $this->output->writeln($message);
         }
+    }
+
+    /**
+     * Register the custom Doctrine mapping types for the migrator.
+     *
+     * @param  Connection  $connection
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function registerCustomDoctrineTypes($connection)
+    {
+        if (! $connection->isDoctrineAvailable()) {
+            return;
+        }
+
+        $this->registerCustomDoctrineType($connection, TinyInteger::class, TinyInteger::NAME, 'TINYINT');
+        $this->registerCustomDoctrineType($connection, Year::class, Year::NAME, 'YEAR');
+        $this->registerCustomDoctrineType($connection, Char::class, Char::NAME, 'CHAR');
+        $this->registerCustomDoctrineType($connection, Double::class, Double::NAME, 'DOUBLE');
+        $this->registerCustomDoctrineType($connection, Enum::class, Enum::NAME, 'ENUM');
+    }
+
+    /**
+     * Register a custom Doctrine mapping type.
+     *
+     * @param  Connection  $connection
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string  $type
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function registerCustomDoctrineType($connection, $class, $name, $type)
+    {
+        if (Type::hasType($name)) {
+            return;
+        }
+
+        Type::addType($name, $class);
+
+        $connection
+            ->getDoctrineSchemaManager()
+            ->getDatabasePlatform()
+            ->registerDoctrineTypeMapping($type, $name);
     }
 }
