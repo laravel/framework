@@ -170,32 +170,6 @@ class Connection implements ConnectionInterface
     protected static $resolvers = [];
 
     /**
-     * The custom Doctrine DBAL types.
-     *
-     * @var array
-     */
-    private $doctrineTypes = [
-        TinyInteger::NAME           => TinyInteger::class,
-        MediumInteger::NAME         => MediumInteger::class,
-        Year::NAME                  => Year::class,
-        Char::NAME                  => Char::class,
-        Double::NAME                => Double::class,
-        Enum::NAME                  => Enum::class,
-        Uuid::NAME                  => Uuid::class,
-        Polygon::NAME               => Polygon::class,
-        MultiPolygon::NAME          => MultiPolygon::class,
-        Point::NAME                 => Point::class,
-        MultiPoint::NAME            => MultiPoint::class,
-        MultiLineString::NAME       => MultiLineString::class,
-        MacAddress::NAME            => MacAddress::class,
-        LineString::NAME            => LineString::class,
-        JsonB::NAME                 => JsonB::class,
-        IpAddress::NAME             => IpAddress::class,
-        GeometryCollection::NAME    => GeometryCollection::class,
-        Geometry::NAME              => Geometry::class
-    ];
-
-    /**
      * Create a new database connection instance.
      *
      * @param  \PDO|\Closure     $pdo
@@ -950,7 +924,9 @@ class Connection implements ConnectionInterface
                 'driver' => $driver->getName(),
             ], $driver);
 
-            $this->registerCustomDoctrineTypes();
+            $this->registerCustomDoctrineTypes(
+                $this->getDoctrineTypes()
+            );
         }
 
         return $this->doctrineConnection;
@@ -1310,17 +1286,17 @@ class Connection implements ConnectionInterface
         return static::$resolvers[$driver] ?? null;
     }
 
-
     /**
      * Register the custom Doctrine mapping types.
      *
+     * @param  array  $types
      * @return void
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    private function registerCustomDoctrineTypes()
+    private function registerCustomDoctrineTypes($types)
     {
-        foreach($this->doctrineTypes as $name => $class) {
+        foreach($types as $name => $class) {
             $this->registerCustomDoctrineType($class, $name, $name);
         }
     }
@@ -1348,5 +1324,34 @@ class Connection implements ConnectionInterface
             ->getDoctrineSchemaManager()
             ->getDatabasePlatform()
             ->registerDoctrineTypeMapping($type, $name);
+    }
+
+    /**
+     * Get a list of custom Doctrine DBAL types.
+     *
+     * @return array
+     */
+    private function getDoctrineTypes()
+    {
+        return [
+            TinyInteger::NAME           => TinyInteger::class,
+            MediumInteger::NAME         => MediumInteger::class,
+            Year::NAME                  => Year::class,
+            Char::NAME                  => Char::class,
+            Double::NAME                => Double::class,
+            Enum::NAME                  => Enum::class,
+            Uuid::NAME                  => Uuid::class,
+            Polygon::NAME               => Polygon::class,
+            MultiPolygon::NAME          => MultiPolygon::class,
+            Point::NAME                 => Point::class,
+            MultiPoint::NAME            => MultiPoint::class,
+            MultiLineString::NAME       => MultiLineString::class,
+            MacAddress::NAME            => MacAddress::class,
+            LineString::NAME            => LineString::class,
+            JsonB::NAME                 => JsonB::class,
+            IpAddress::NAME             => IpAddress::class,
+            GeometryCollection::NAME    => GeometryCollection::class,
+            Geometry::NAME              => Geometry::class
+        ];
     }
 }
