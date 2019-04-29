@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class TransformsRequest
@@ -10,11 +11,9 @@ class TransformsRequest
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         $this->clean($request);
 
@@ -23,11 +22,8 @@ class TransformsRequest
 
     /**
      * Clean the request's data.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
-    protected function clean($request)
+    protected function clean(Request $request): void
     {
         $this->cleanParameterBag($request->query);
 
@@ -40,23 +36,16 @@ class TransformsRequest
 
     /**
      * Clean the data in the parameter bag.
-     *
-     * @param  \Symfony\Component\HttpFoundation\ParameterBag  $bag
-     * @return void
      */
-    protected function cleanParameterBag(ParameterBag $bag)
+    protected function cleanParameterBag(ParameterBag $bag): void
     {
         $bag->replace($this->cleanArray($bag->all()));
     }
 
     /**
      * Clean the data in the given array.
-     *
-     * @param  array  $data
-     * @param  string  $keyPrefix
-     * @return array
      */
-    protected function cleanArray(array $data, $keyPrefix = '')
+    protected function cleanArray(array $data, string $keyPrefix = ''): array
     {
         return collect($data)->map(function ($value, $key) use ($keyPrefix) {
             return $this->cleanValue($keyPrefix.$key, $value);
