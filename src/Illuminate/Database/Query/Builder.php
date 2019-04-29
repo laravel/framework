@@ -2999,4 +2999,24 @@ class Builder
 
         static::throwBadMethodCallException($method);
     }
+
+    /**
+     * Debug the current query builder instance.
+     *
+     * @return void
+     */
+    public function dump()
+    {
+        dump($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Debug the current query builder instance.
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        dd($this->toSql(), $this->getBindings());
+    }
 }
