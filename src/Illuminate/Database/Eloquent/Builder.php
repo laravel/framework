@@ -1294,16 +1294,6 @@ class Builder
     }
 
     /**
-     * Debug the current query builder instance.
-     *
-     * @return void
-     */
-    public function dd()
-    {
-        dd($this->toSql(), $this->getBindings());
-    }
-
-    /**
      * Dynamically access builder proxies.
      *
      * @param  string  $key
