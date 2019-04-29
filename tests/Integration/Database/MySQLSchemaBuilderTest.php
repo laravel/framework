@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 
 class MySQLSchemaBuilderTest extends TestCase
 {
@@ -177,6 +177,48 @@ class MySQLSchemaBuilderTest extends TestCase
         );
     }
 
+    public function test_if_changing_column_to_unsigned_mediuminteger_works()
+    {
+        $b = new Blueprint('table');
+        $b->unsignedMediumInteger('test_column')->change();
+
+        $statements = $b->toSql($this->db->connection(), new MySqlGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'ALTER TABLE `table` CHANGE test_column test_column mediumint UNSIGNED NOT NULL COLLATE utf8mb4_unicode_ci',
+            $statements[0]
+        );
+    }
+
+    public function test_if_changing_column_to_unsigned_biginteger_works()
+    {
+        $b = new Blueprint('table');
+        $b->unsignedBigInteger('test_column')->change();
+
+        $statements = $b->toSql($this->db->connection(), new MySqlGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'ALTER TABLE `table` CHANGE test_column test_column BIGINT UNSIGNED NOT NULL COLLATE utf8mb4_unicode_ci',
+            $statements[0]
+        );
+    }
+
+    public function test_if_changing_column_to_unsigned_smallinteger_works()
+    {
+        $b = new Blueprint('table');
+        $b->unsignedSmallInteger('test_column')->change();
+
+        $statements = $b->toSql($this->db->connection(), new MySqlGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'ALTER TABLE `table` CHANGE test_column test_column SMALLINT UNSIGNED NOT NULL COLLATE utf8mb4_unicode_ci',
+            $statements[0]
+        );
+    }
+
     public function test_if_changing_column_to_multilinestring_works()
     {
         $b = new Blueprint('table');
@@ -257,6 +299,20 @@ class MySQLSchemaBuilderTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertEquals(
             'ALTER TABLE `table` CHANGE test_column test_column tinyint NOT NULL COLLATE utf8mb4_unicode_ci',
+            $statements[0]
+        );
+    }
+
+    public function test_if_changing_column_to_unsigned_tinyinteger_works()
+    {
+        $b = new Blueprint('table');
+        $b->unsignedTinyInteger('test_column')->change();
+
+        $statements = $b->toSql($this->db->connection(), new MySqlGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'ALTER TABLE `table` CHANGE test_column test_column tinyint UNSIGNED NOT NULL COLLATE utf8mb4_unicode_ci',
             $statements[0]
         );
     }

@@ -431,7 +431,7 @@ class MySqlGrammar extends Grammar
     {
         return $this->typeTinyInteger(
             new Fluent($fieldDeclaration)
-        );
+        ) . ($fieldDeclaration['unsigned'] === true ? ' UNSIGNED' : '');
     }
 
     /**
@@ -444,7 +444,7 @@ class MySqlGrammar extends Grammar
     {
         return $this->typeMediumInteger(
             new Fluent($fieldDeclaration)
-        );
+        )  . ($fieldDeclaration['unsigned'] === true ? ' UNSIGNED' : '');
     }
 
     /**
