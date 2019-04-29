@@ -915,7 +915,7 @@ class TestResponse
         $keys = (array) $keys;
 
         if (empty($keys)) {
-            return $this->assertSessionMissing('errors');
+            return $this->assertSessionHasNoErrors();
         }
 
         if (is_null($this->session()->get('errors'))) {
