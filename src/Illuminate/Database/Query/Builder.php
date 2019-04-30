@@ -2900,6 +2900,26 @@ class Builder
     }
 
     /**
+     * Dump the current SQL and bindings.
+     *
+     * @return void
+     */
+    public function dump()
+    {
+        dump($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Die and dump the current SQL and bindings.
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
      * Handle dynamic method calls into the method.
      *
      * @param  string  $method

@@ -22,8 +22,16 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         parent::setUp();
 
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('uuid');
+            $table->string('name');
+            $table->timestamps();
+        });
+
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('uuid');
             $table->string('title');
             $table->timestamps();
         });
@@ -31,6 +39,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('users_posts', function (Blueprint $table) {
+            $table->string('user_uuid');
+            $table->string('post_uuid');
+            $table->tinyInteger('is_draft')->default(1);
             $table->timestamps();
         });
 
@@ -119,10 +134,10 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tagsWithCustomPivot()->attach($tag->id);
 
-        $this->assertInstanceOf(CustomPivot::class, $post->tagsWithCustomPivot[0]->pivot);
+        $this->assertInstanceOf(PostTagPivot::class, $post->tagsWithCustomPivot[0]->pivot);
         $this->assertEquals('1507630210', $post->tagsWithCustomPivot[0]->pivot->getAttributes()['created_at']);
 
-        $this->assertInstanceOf(CustomPivot::class, $post->tagsWithCustomPivotClass[0]->pivot);
+        $this->assertInstanceOf(PostTagPivot::class, $post->tagsWithCustomPivotClass[0]->pivot);
         $this->assertEquals('posts_tags', $post->tagsWithCustomPivotClass()->getTable());
 
         $this->assertEquals([
@@ -134,9 +149,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $pivot->tag_id = 2;
         $pivot->save();
 
-        $this->assertEquals(1, CustomPivot::count());
-        $this->assertEquals(1, CustomPivot::first()->post_id);
-        $this->assertEquals(2, CustomPivot::first()->tag_id);
+        $this->assertEquals(1, PostTagPivot::count());
+        $this->assertEquals(1, PostTagPivot::first()->post_id);
+        $this->assertEquals(2, PostTagPivot::first()->tag_id);
     }
 
     public function test_attach_method()
@@ -649,6 +664,49 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals(['id' => 1], $tags[0]->getAttributes());
     }
+
+    public function test_pivot_doesnt_have_primary_key()
+    {
+        $user = User::create(['name' => Str::random()]);
+        $post1 = Post::create(['title' => Str::random()]);
+        $post2 = Post::create(['title' => Str::random()]);
+
+        $user->postsWithCustomPivot()->sync([$post1->uuid]);
+        $this->assertEquals($user->uuid, $user->postsWithCustomPivot()->first()->pivot->user_uuid);
+        $this->assertEquals($post1->uuid, $user->postsWithCustomPivot()->first()->pivot->post_uuid);
+        $this->assertEquals(1, $user->postsWithCustomPivot()->first()->pivot->is_draft);
+
+        $user->postsWithCustomPivot()->sync([$post2->uuid]);
+        $this->assertEquals($user->uuid, $user->postsWithCustomPivot()->first()->pivot->user_uuid);
+        $this->assertEquals($post2->uuid, $user->postsWithCustomPivot()->first()->pivot->post_uuid);
+        $this->assertEquals(1, $user->postsWithCustomPivot()->first()->pivot->is_draft);
+
+        $user->postsWithCustomPivot()->updateExistingPivot($post2->uuid, ['is_draft' => 0]);
+        $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
+    }
+}
+
+class User extends Model
+{
+    public $table = 'users';
+    public $timestamps = true;
+    protected $guarded = ['id'];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $model->setAttribute('uuid', Str::random());
+        });
+    }
+
+    public function postsWithCustomPivot()
+    {
+        return $this->belongsToMany(Post::class, 'users_posts', 'user_uuid', 'post_uuid', 'uuid', 'uuid')
+            ->using(UserPostPivot::class)
+            ->withPivot('is_draft')
+            ->withTimestamps();
+    }
 }
 
 class Post extends Model
@@ -657,6 +715,14 @@ class Post extends Model
     public $timestamps = true;
     protected $guarded = ['id'];
     protected $touches = ['touchingTags'];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $model->setAttribute('uuid', Str::random());
+        });
+    }
 
     public function tags()
     {
@@ -681,19 +747,19 @@ class Post extends Model
     public function tagsWithCustomPivot()
     {
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
-            ->using(CustomPivot::class)
+            ->using(PostTagPivot::class)
             ->withTimestamps();
     }
 
     public function tagsWithCustomPivotClass()
     {
-        return $this->belongsToMany(TagWithCustomPivot::class, CustomPivot::class, 'post_id', 'tag_id');
+        return $this->belongsToMany(TagWithCustomPivot::class, PostTagPivot::class, 'post_id', 'tag_id');
     }
 
     public function tagsWithCustomAccessor()
     {
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
-            ->using(CustomPivot::class)
+            ->using(PostTagPivot::class)
             ->as('tag');
     }
 
@@ -746,7 +812,12 @@ class TagWithCustomPivot extends Model
     }
 }
 
-class CustomPivot extends Pivot
+class UserPostPivot extends Pivot
+{
+    protected $table = 'users_posts';
+}
+
+class PostTagPivot extends Pivot
 {
     protected $table = 'posts_tags';
     protected $dateFormat = 'U';
