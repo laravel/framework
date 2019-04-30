@@ -550,7 +550,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             $attribute => Hash::make($password),
         ]))->save();
 
-        if ($this->recaller() || $this->getCookieJar()->hasQueued($this->getRecallerName())) {
+        if ($this->recaller() ||
+            $this->getCookieJar()->hasQueued($this->getRecallerName())) {
             $this->queueRecallerCookie($this->user());
         }
 
