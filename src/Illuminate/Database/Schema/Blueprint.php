@@ -408,6 +408,26 @@ class Blueprint
     }
 
     /**
+     * Indicate that the timestamp columns should be dropped.
+     *
+     * @return void
+     */
+    public function dropDateTimes()
+    {
+        $this->dropTimestamps();
+    }
+
+    /**
+     * Indicate that the timestamp columns should be dropped.
+     *
+     * @return void
+     */
+    public function dropDateTimesTz()
+    {
+        $this->dropTimestamps();
+    }
+
+    /**
      * Indicate that the soft delete column should be dropped.
      *
      * @param  string  $column
@@ -923,6 +943,32 @@ class Blueprint
     public function dateTimeTz($column, $precision = 0)
     {
         return $this->addColumn('dateTimeTz', $column, compact('precision'));
+    }
+
+    /**
+     * Add nullable creation and update dateTimes to the table.
+     *
+     * @param  int  $precision
+     * @return void
+     */
+    public function dateTimes($precision = 0)
+    {
+        $this->dateTime('created_at', $precision)->nullable();
+
+        $this->dateTime('updated_at', $precision)->nullable();
+    }
+
+    /**
+     * Add creation and update dateTimeTz columns to the table.
+     *
+     * @param  int  $precision
+     * @return void
+     */
+    public function dateTimesTz($precision = 0)
+    {
+        $this->dateTimeTz('created_at', $precision)->nullable();
+
+        $this->dateTimeTz('updated_at', $precision)->nullable();
     }
 
     /**
