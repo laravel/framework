@@ -80,7 +80,7 @@ class ConfigurationUrlParser
         $alias = $url['scheme'] ?? null;
 
         if (! $alias) {
-            return null;
+            return;
         }
 
         return static::$driverAliases[$alias] ?? $alias;
