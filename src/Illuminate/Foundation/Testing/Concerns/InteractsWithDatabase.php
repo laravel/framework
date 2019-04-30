@@ -55,14 +55,15 @@ trait InteractsWithDatabase
      * @param  string  $connection
      * @return $this
      */
-    protected function assertDatabaseHasJSON($table, array $data, $column, $connection = null) {
+    protected function assertDatabaseHasJSON($table, array $data, $column, $connection = null)
+    {
         // Prepend array keys with "$column->" to enable the JSON database lookup.
         foreach ($data as $key => $value) {
             $data["$column->$key"] = $value;
             unset($data[$key]);
         }
 
-        $this->assertDatabaseHas($table, $data, $connection);
+        return $this->assertDatabaseHas($table, $data, $connection);
     }
 
     /**
