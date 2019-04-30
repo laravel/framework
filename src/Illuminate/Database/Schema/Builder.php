@@ -217,6 +217,18 @@ class Builder
     }
 
     /**
+     * Drop all types from the database.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllTypes()
+    {
+        throw new LogicException('This database driver does not support dropping all types.');
+    }
+
+    /**
      * Rename a table on the schema.
      *
      * @param  string  $from
