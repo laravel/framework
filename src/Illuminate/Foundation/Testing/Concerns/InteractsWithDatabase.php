@@ -47,6 +47,25 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Assert that a given where condition for a JSON column exists in the database.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $column
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function assertDatabaseHasJSON($table, array $data, $column, $connection = null) {
+        // Prepend array keys with "$column->" to enable the JSON database lookup.
+        foreach ($data as $key => $value) {
+            $data["$column->$key"] = $value;
+            unset($data[$key]);
+        }
+
+        $this->assertDatabaseHas($table, $data, $connection);
+    }
+
+    /**
      * Assert the given record has been deleted.
      *
      * @param  string|\Illuminate\Database\Eloquent\Model  $table
