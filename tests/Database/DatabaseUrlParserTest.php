@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\UrlParser;
+use Illuminate\Database\ConfigurationUrlParser;
 
 class DatabaseUrlParserTest extends TestCase
 {
@@ -12,7 +12,7 @@ class DatabaseUrlParserTest extends TestCase
      */
     public function testDatabaseUrlsAreParsed($config, $expectedOutput)
     {
-        $this->assertEquals($expectedOutput, (new UrlParser)->parseDatabaseConfigWithUrl($config));
+        $this->assertEquals($expectedOutput, (new ConfigurationUrlParser)->parseConfiguration($config));
     }
 
     public function testDriversAliases()
@@ -23,9 +23,9 @@ class DatabaseUrlParserTest extends TestCase
             'postgres' => 'pgsql',
             'postgresql' => 'pgsql',
             'sqlite3' => 'sqlite',
-        ], UrlParser::getDriverAliases());
+        ], ConfigurationUrlParser::getDriverAliases());
 
-        UrlParser::addDriverAlias('some-particular-alias', 'mysql');
+        ConfigurationUrlParser::addDriverAlias('some-particular-alias', 'mysql');
 
         $this->assertEquals([
             'mssql' => 'sqlsrv',
@@ -34,11 +34,11 @@ class DatabaseUrlParserTest extends TestCase
             'postgresql' => 'pgsql',
             'sqlite3' => 'sqlite',
             'some-particular-alias' => 'mysql',
-        ], UrlParser::getDriverAliases());
+        ], ConfigurationUrlParser::getDriverAliases());
 
         $this->assertEquals([
             'driver' => 'mysql',
-        ], (new UrlParser)->parseDatabaseConfigWithUrl('some-particular-alias://null'));
+        ], (new ConfigurationUrlParser)->parseConfiguration('some-particular-alias://null'));
     }
 
     public function databaseUrls()
