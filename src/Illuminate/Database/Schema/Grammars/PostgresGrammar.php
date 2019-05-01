@@ -259,7 +259,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileGetAllTypes()
     {
-        return "select distinct pg_type.typname from pg_type inner join pg_enum on pg_enum.enumtypid = pg_type.oid";
+        return 'select distinct pg_type.typname from pg_type inner join pg_enum on pg_enum.enumtypid = pg_type.oid';
     }
 
     /**
