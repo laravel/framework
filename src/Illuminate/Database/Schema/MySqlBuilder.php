@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Schema;
 
-use Illuminate\Database\Schema\Types\TinyInteger;
-
 class MySqlBuilder extends Builder
 {
     /**
@@ -112,21 +110,5 @@ class MySqlBuilder extends Builder
         return $this->connection->select(
             $this->grammar->compileGetAllViews()
         );
-    }
-
-    /**
-     * Register the custom Doctrine mapping types for the MySQL builder.
-     *
-     * @return void
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    protected function registerCustomDoctrineTypes()
-    {
-        if ($this->connection->isDoctrineAvailable()) {
-            $this->registerCustomDoctrineType(
-                TinyInteger::class, TinyInteger::NAME, 'TINYINT'
-            );
-        }
     }
 }
