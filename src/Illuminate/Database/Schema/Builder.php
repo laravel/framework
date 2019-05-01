@@ -300,7 +300,7 @@ class Builder
     {
         if (! $this->connection->isDoctrineAvailable()) {
             throw new RuntimeException(
-                'Registering a custom Doctrine type requires Doctrine DBAL; install "doctrine/dbal".'
+                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
             );
         }
 
