@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications\Messages;
 
 use Traversable;
+use Illuminate\Mail\Markdown;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 
@@ -272,7 +273,7 @@ class MailMessage extends SimpleMessage implements Renderable
                $address instanceof Arrayable ||
                $address instanceof Traversable;
     }
-    
+
     /**
      * Render the mail object into an HTML string.
      *
@@ -280,6 +281,6 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function render()
     {
-        return app(\Illuminate\Mail\Markdown::class)->render($this->markdown, $this->data());
+        return app(Markdown::class)->render($this->markdown, $this->data());
     }
 }
