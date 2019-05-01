@@ -4,8 +4,9 @@ namespace Illuminate\Notifications\Messages;
 
 use Traversable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Renderable;
 
-class MailMessage extends SimpleMessage
+class MailMessage extends SimpleMessage implements Renderable
 {
     /**
      * The view to be rendered.
@@ -270,5 +271,15 @@ class MailMessage extends SimpleMessage
         return is_array($address) ||
                $address instanceof Arrayable ||
                $address instanceof Traversable;
+    }
+    
+    /**
+     * Render the mail object into an HTML string.
+     *
+     * @return string
+     */
+    public function render()
+    {
+        return app(\Illuminate\Mail\Markdown::class)->render($this->markdown, $this->data());
     }
 }
