@@ -126,7 +126,7 @@ interface Gate
      * @return array
      */
     public function abilities();
-    
+
     /**
      * Define abilities for a resource.
      *
