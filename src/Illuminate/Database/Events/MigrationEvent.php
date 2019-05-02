@@ -3,34 +3,34 @@
 namespace Illuminate\Database\Events;
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Contracts\Database\Events\Migration as MigrationContract;
+use Illuminate\Contracts\Database\Events\MigrationEvent as MigrationEventContract;
 
-abstract class MigrationEvent implements MigrationContract
+abstract class MigrationEvent implements MigrationEventContract
 {
     /**
-     * An instance of the migration.
+     * An migration instance.
      *
      * @var \Illuminate\Database\Migrations\Migration
      */
     public $migration;
 
     /**
-     * The direction of the migration.
+     * The migration method that was called.
      *
      * @var string
      */
-    public $direction;
+    public $method;
 
     /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Migrations\Migration  $migration
-     * @param  string  $direction
+     * @param  string  $method
      * @return void
      */
-    public function __construct(Migration $migration, $direction)
+    public function __construct(Migration $migration, $method)
     {
+        $this->method = $method;
         $this->migration = $migration;
-        $this->direction = $direction;
     }
 }

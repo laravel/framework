@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Events;
 
-use Illuminate\Contracts\Database\Events\Migration as MigrationContract;
+use Illuminate\Contracts\Database\Events\MigrationEvent as MigrationEventContract;
 
-class MigrationsEnded implements MigrationContract
+class MigrationsEnded implements MigrationEventContract
 {
     //
 }
