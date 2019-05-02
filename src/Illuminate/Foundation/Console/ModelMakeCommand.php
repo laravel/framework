@@ -45,6 +45,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->input->setOption('migration', true);
             $this->input->setOption('controller', true);
             $this->input->setOption('resource', true);
+            $this->input->setOption('policy', true);
         }
 
         if ($this->option('factory')) {
@@ -57,6 +58,10 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('controller') || $this->option('resource')) {
             $this->createController();
+        }
+
+        if ($this->option('policy')) {
+            $this->createPolicy();
         }
     }
 
@@ -112,6 +117,21 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create a policy for the model.
+     *
+     * @return void
+     */
+    protected function createPolicy()
+    {
+        $policy = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:policy', [
+            'name' => "{$policy}Policy",
+            '--model' => $this->getNameInput(),
+        ]);
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -143,9 +163,11 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
 
-            ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
+            ['pivot', null, InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+
+            ['policy', 'p', InputOption::VALUE_NONE, 'Create a new policy for the model'],
         ];
     }
 }
