@@ -49,7 +49,11 @@ class CommandBuilder
 
         $redirect = $event->shouldAppendOutput ? ' >> ' : ' > ';
 
-        $finished = Application::formatCommandString('schedule:finish').' "'.$event->mutexName().'"';
+        $finished = '';
+
+        if ($event->hasAfterCallbacks()) {
+            $finished = Application::formatCommandString('schedule:finish').' "'.$event->mutexName().'"';
+        }
 
         return $this->ensureCorrectUser($event,
             '('.$event->command.$redirect.$output.' 2>&1 '.(windows_os() ? '&' : ';').' '.$finished.') > '
