@@ -818,6 +818,6 @@ class Event
      */
     public function hasAfterCallbacks()
     {
-      return !empty($this->afterCallbacks);
+        return !empty($this->afterCallbacks);
     }
 }
