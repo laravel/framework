@@ -810,7 +810,7 @@ class Event
 
         return $this;
     }
-    
+
     /**
      * Determine if there's any callback to run after.
      *
