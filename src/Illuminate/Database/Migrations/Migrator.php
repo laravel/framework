@@ -622,7 +622,7 @@ class Migrator
     /**
      * Fire the given event for the migration.
      *
-     * @param  \Illuminate\Contracts\Database\Events\Migration $event
+     * @param  \Illuminate\Contracts\Database\Events\MigrationEvent $event
      * @return void
      */
     public function fireMigrationEvent($event)
