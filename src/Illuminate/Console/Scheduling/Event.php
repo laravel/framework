@@ -812,12 +812,12 @@ class Event
     }
     
     /**
-     * Determine if there is any callback to run after
+     * Determine if there's any callback to run after.
      *
      * @return bool
      */
     public function hasAfterCallbacks()
     {
-        return !empty($this->afterCallbacks);
+        return ! empty($this->afterCallbacks);
     }
 }
