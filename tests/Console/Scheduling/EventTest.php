@@ -25,6 +25,7 @@ class EventTest extends TestCase
         $this->assertSame("php -i > {$quote}{$defaultOutput}{$quote} 2>&1", $event->buildCommand());
 
         $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->after(function(){});
         $event->runInBackground();
 
         $commandSeparator = ($isWindows ? '&' : ';');
