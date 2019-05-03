@@ -152,19 +152,6 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the given input key is an empty string for "has".
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isEmptyString($key)
-    {
-        $value = $this->input($key);
-
-        return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
-    }
-
-    /**
      * Get the keys for all of the input and files.
      *
      * @return array
