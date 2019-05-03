@@ -810,4 +810,14 @@ class Event
 
         return $this;
     }
+    
+    /**
+     * Determine if there is any callback to run after
+     *
+     * @return bool
+     */
+    public function hasAfterCallbacks()
+    {
+      return !empty($this->afterCallbacks);
+    }
 }
