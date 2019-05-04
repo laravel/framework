@@ -342,8 +342,8 @@ class SupportStrTest extends TestCase
 
     public function testUuid()
     {
-        $this->assertInstanceOf(UuidInterface::class, Str::uuid());
-        $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
+        $this->assertIsString($uuid = Str::uuid());
+        $this->assertIsString($orderedUuid = Str::orderedUuid());
     }
 }
 

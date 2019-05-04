@@ -97,7 +97,7 @@ class NotificationSender
             }
 
             $this->withLocale($this->preferredLocale($notifiable, $notification), function () use ($viaChannels, $notifiable, $original) {
-                $notificationId = Str::uuid()->toString();
+                $notificationId = Str::uuid();
 
                 foreach ((array) $viaChannels as $channel) {
                     $this->sendToNotifiable($notifiable, $notificationId, clone $original, $channel);
@@ -177,7 +177,7 @@ class NotificationSender
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
-            $notificationId = Str::uuid()->toString();
+            $notificationId = Str::uuid();
 
             foreach ((array) $original->via($notifiable) as $channel) {
                 $notification = clone $original;

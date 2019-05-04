@@ -544,17 +544,17 @@ class Str
     /**
      * Generate a UUID (version 4).
      *
-     * @return \Ramsey\Uuid\UuidInterface
+     * @return string
      */
     public static function uuid()
     {
-        return Uuid::uuid4();
+        return Uuid::uuid4()->toString();
     }
 
     /**
      * Generate a time-ordered UUID (version 4).
      *
-     * @return \Ramsey\Uuid\UuidInterface
+     * @return string
      */
     public static function orderedUuid()
     {
@@ -569,7 +569,7 @@ class Str
             $factory->getUuidBuilder()
         ));
 
-        return $factory->uuid4();
+        return $factory->uuid4()->toString();
     }
 
     /**
