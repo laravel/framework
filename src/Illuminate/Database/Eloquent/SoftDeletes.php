@@ -82,7 +82,8 @@ trait SoftDeletes
 
         $time = $this->freshTimestamp();
 
-        $columns = [$this->getDeletedAtColumn() => $this->fromDateTime($time)];
+        $columns = $this->getDirty();
+        $columns[$this->getDeletedAtColumn()] = $this->fromDateTime($time);
 
         $this->{$this->getDeletedAtColumn()} = $time;
 
