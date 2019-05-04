@@ -2,9 +2,8 @@
 
 namespace Illuminate\View\Compilers;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\{ Arr, Str };
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
