@@ -4,10 +4,16 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
 
 trait InteractsWithPivotTable
 {
+    /**
+     * @var Collection
+     */
+    private $current;
+
     /**
      * Toggles a model (or models) from the parent.
      *
@@ -88,11 +94,9 @@ trait InteractsWithPivotTable
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
-        $current = $this->newPivotQuery()->pluck(
-            $this->relatedPivotKey
-        )->all();
+        $currentKeys = $this->getCurrent()->pluck($this->relatedPivotKey)->all();
 
-        $detach = array_diff($current, array_keys(
+        $detach = array_diff($currentKeys, array_keys(
             $records = $this->formatRecordsList($this->parseIds($ids))
         ));
 
@@ -109,7 +113,7 @@ trait InteractsWithPivotTable
         // touching until after the entire operation is complete so we don't fire a
         // ton of touch operations until we are totally done syncing the records.
         $changes = array_merge(
-            $changes, $this->attachNew($records, $current, false)
+            $changes, $this->attachNew($records, $currentKeys, false)
         );
 
         // Once we have finished attaching or detaching the records, we will see if we
@@ -213,10 +217,12 @@ trait InteractsWithPivotTable
      */
     protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch)
     {
-        $updated = (new $this->using)->setTable($this->table)->where([
-            $this->foreignPivotKey => $this->parent->{$this->parentKey},
-            $this->relatedPivotKey => $this->parseId($id),
-        ])->first()->fill($attributes)->isDirty();
+        $current = $this->getCurrent()
+            ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
+            ->where($this->relatedPivotKey, $this->parseId($id))
+            ->first();
+
+        $updated = $current->fill($attributes)->isDirty();
 
         $this->newPivot([
             $this->foreignPivotKey => $this->parent->{$this->parentKey},
@@ -228,6 +234,20 @@ trait InteractsWithPivotTable
         }
 
         return (int) $updated;
+    }
+
+    /**
+     * Get the existing records.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getCurrent()
+    {
+        return $this->current ?: $this->newPivotQuery()->get()->map(function($record){
+            $class = $this->using ? $this->using : Pivot::class;
+
+            return (new $class)->setRawAttributes((array) $record, true);
+        });
     }
 
     /**
