@@ -163,13 +163,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $tag = TagWithCustomPivot::create(['name' => Str::random()]);
 
         $results = $post->tagsWithCustomPivot()->sync([
-            $tag->id => ['flag' => 1]
+            $tag->id => ['flag' => 1],
         ]);
 
         $this->assertNotEmpty($results['attached']);
 
         $results = $post->tagsWithCustomPivot()->sync([
-            $tag->id => ['flag' => 1]
+            $tag->id => ['flag' => 1],
         ]);
 
         $this->assertEmpty($results['updated']);
