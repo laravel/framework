@@ -94,9 +94,9 @@ trait InteractsWithPivotTable
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
-        $currentKeys = $this->getCurrent()->pluck($this->relatedPivotKey)->all();
+        $current = $this->getCurrent()->pluck($this->relatedPivotKey)->all();
 
-        $detach = array_diff($currentKeys, array_keys(
+        $detach = array_diff($current, array_keys(
             $records = $this->formatRecordsList($this->parseIds($ids))
         ));
 
@@ -113,7 +113,7 @@ trait InteractsWithPivotTable
         // touching until after the entire operation is complete so we don't fire a
         // ton of touch operations until we are totally done syncing the records.
         $changes = array_merge(
-            $changes, $this->attachNew($records, $currentKeys, false)
+            $changes, $this->attachNew($records, $current, false)
         );
 
         // Once we have finished attaching or detaching the records, we will see if we
