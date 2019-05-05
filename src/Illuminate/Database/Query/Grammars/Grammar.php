@@ -849,6 +849,17 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * 
+     */
+    public function compileUpsert(Builder $query, array $values)
+    {
+        $insert = $this->compileInsert($query, $values);
+
+        $insert = str_replace('insert', 'insert ignore', $insert);
+        return $insert;
+    }
+
+    /**
      * Compile an insert and get ID statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

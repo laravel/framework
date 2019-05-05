@@ -109,6 +109,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * @todo Remove here if deemed OK to have in the base Grammar class
+     */
+    public function compileUpsert(Builder $query, array $values)
+    {
+        return parent::compileUpsert($query, $values);
+    }
+
+    /**
      * Compile the lock into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -203,6 +211,7 @@ class MySqlGrammar extends Grammar
 
         return "{$field} = json_set({$field}{$path}, {$value->getValue()})";
     }
+    
 
     /**
      * Prepare the bindings for an update statement.

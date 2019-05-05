@@ -179,6 +179,17 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * 
+     */
+    public function compileUpsert(Builder $query, array $values)
+    {
+        $insert = $this->compileInsert($query, $values);
+        $insert = str_replace('insert', 'insert or ignore', $insert);
+
+        return $insert;
+    }
+
+    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

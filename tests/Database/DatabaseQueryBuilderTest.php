@@ -36,6 +36,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "users"', $builder->toSql());
     }
 
+    public function testUpsertMethod()
+    {
+        // -----------------------------------------------------------------
+        $builder = $this->getBuilder();
+        $builder->getConnection()
+            ->shouldReceive('upsert')
+            ->once()
+            ->with('insert ignore into "users" ("email") values (?), (?)', ['foo', 'foo'])
+            ->andReturn(true);
+
+        $result = $builder->from('users')->upsert([['email' => 'foo'], ['email' => 'foo']]);
+        $this->assertTrue($result);
+    }
+
+    public function testUpsert()
+    {
+    }
+
     public function testBasicSelectWithGetColumns()
     {
         $builder = $this->getBuilder();

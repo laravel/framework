@@ -62,6 +62,16 @@ interface ConnectionInterface
     public function insert($query, $bindings = []);
 
     /**
+     * Run an insert statement against the database that updates rows if they exist,
+     * or inserts them if not.
+     *
+     * @param  string  $query
+     * @param  array   $bindings
+     * @return bool
+     */
+    public function upsert($query, $bindings = []);
+
+    /**
      * Run an update statement against the database.
      *
      * @param  string  $query
