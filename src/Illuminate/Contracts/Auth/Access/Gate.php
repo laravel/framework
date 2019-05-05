@@ -22,6 +22,16 @@ interface Gate
     public function define($ability, $callback);
 
     /**
+     * Define abilities for a resource.
+     *
+     * @param  string  $name
+     * @param  string  $class
+     * @param  array|null   $abilities
+     * @return $this
+     */
+    public function resource($name, $class, array $abilities = null);
+
+    /**
      * Define a policy class for a given class type.
      *
      * @param  string  $class
@@ -126,14 +136,4 @@ interface Gate
      * @return array
      */
     public function abilities();
-
-    /**
-     * Define abilities for a resource.
-     *
-     * @param  string  $name
-     * @param  string  $class
-     * @param  array|null   $abilities
-     * @return $this
-     */
-    public function resource($name, $class, array $abilities = null);
 }
