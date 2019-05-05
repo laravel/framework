@@ -849,9 +849,10 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * 
+     * Compile an insert statement, that ignore errors and silently skips erronous rows, 
+     * into SQL.
      */
-    public function compileUpsert(Builder $query, array $values)
+    public function compileInsertOrIgnore(Builder $query, array $values)
     {
         $insert = $this->compileInsert($query, $values);
 

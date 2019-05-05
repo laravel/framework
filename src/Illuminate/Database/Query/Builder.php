@@ -2552,7 +2552,13 @@ class Builder
         );
     }
 
-    public function upsert(array $values)
+    /**
+     * Insert a new record into the database.
+     *
+     * @param  array  $values
+     * @return bool
+     */
+    public function insertOrIgnore(array $values)
     {
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient when building these
@@ -2579,8 +2585,8 @@ class Builder
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.
-        return $this->connection->upsert(
-            $this->grammar->compileUpsert($this, $values),
+        return $this->connection->insertOrIgnore(
+            $this->grammar->compileInsertOrIgnore($this, $values),
             $this->cleanBindings(Arr::flatten($values, 1))
         );
     }

@@ -411,8 +411,17 @@ class Connection implements ConnectionInterface
         return $this->statement($query, $bindings);
     }
 
-    
-    public function upsert($query, $bindings = [])
+    /**
+     * Run an insert statement against the database, ignoring erronous rows.
+     * The rows with invalid data that cause the error are 
+     * ignored and the rows with valid data are inserted 
+     * into the table.
+     * 
+     * @param  string  $query
+     * @param  array   $bindings
+     * @return bool
+     */
+    public function insertOrIgnore($query, $bindings = [])
     {
         return $this->statement($query, $bindings);
     }

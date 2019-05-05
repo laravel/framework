@@ -111,9 +111,9 @@ class MySqlGrammar extends Grammar
     /**
      * @todo Remove here if deemed OK to have in the base Grammar class
      */
-    public function compileUpsert(Builder $query, array $values)
+    public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        return parent::compileUpsert($query, $values);
+        return parent::compileInsertOrIgnore($query, $values);
     }
 
     /**
