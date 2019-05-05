@@ -130,7 +130,7 @@ class DatabaseSoftDeletingTraitStub
 
         return $dirty;
     }
-    
+
     public function getAttributes()
     {
         return $this->attributes;
