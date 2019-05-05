@@ -237,20 +237,6 @@ trait InteractsWithPivotTable
     }
 
     /**
-     * Get the existing records.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getCurrent()
-    {
-        return $this->current ?: $this->newPivotQuery()->get()->map(function($record){
-            $class = $this->using ? $this->using : Pivot::class;
-
-            return (new $class)->setRawAttributes((array) $record, true);
-        });
-    }
-
-    /**
      * Attach a model to the parent.
      *
      * @param  mixed  $id
@@ -658,5 +644,19 @@ trait InteractsWithPivotTable
             default:
                 return $value;
         }
+    }
+
+    /**
+     * Get the existing records.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getCurrent()
+    {
+        return $this->current ?: $this->newPivotQuery()->get()->map(function ($record) {
+            $class = $this->using ? $this->using : Pivot::class;
+
+            return (new $class)->setRawAttributes((array) $record, true);
+        });
     }
 }
