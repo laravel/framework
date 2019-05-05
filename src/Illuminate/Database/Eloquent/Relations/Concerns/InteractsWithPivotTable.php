@@ -217,12 +217,12 @@ trait InteractsWithPivotTable
      */
     protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch)
     {
-        $current = $this->getCurrent()
-            ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
-            ->where($this->relatedPivotKey, $this->parseId($id))
-            ->first();
-
-        $updated = $current->fill($attributes)->isDirty();
+        $updated = $this->getCurrent()
+                    ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
+                    ->where($this->relatedPivotKey, $this->parseId($id))
+                    ->first()
+                    ->fill($attributes)
+                    ->isDirty();
 
         $this->newPivot([
             $this->foreignPivotKey => $this->parent->{$this->parentKey},
