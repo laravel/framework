@@ -203,6 +203,7 @@ class MySqlGrammar extends Grammar
 
         return "{$field} = json_set({$field}{$path}, {$value->getValue()})";
     }
+    
 
     /**
      * Prepare the bindings for an update statement.

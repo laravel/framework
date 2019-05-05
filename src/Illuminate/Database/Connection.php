@@ -411,6 +411,12 @@ class Connection implements ConnectionInterface
         return $this->statement($query, $bindings);
     }
 
+    
+    public function upsert($query, $bindings = [])
+    {
+        return $this->statement($query, $bindings);
+    }
+
     /**
      * Run an update statement against the database.
      *
