@@ -179,11 +179,13 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * 
+     * {@inheritdoc}
      */
-    public function compileUpsert(Builder $query, array $values)
+    public function compileInsertOrIgnore(Builder $query, array $values)
     {
+        // "upserts" are insert statements with additional "modifiers" to the insert.
         $insert = $this->compileInsert($query, $values);
+        // We don't need to do more work than adding 'or ignore' to the typical 'insert' statement.
         $insert = str_replace('insert', 'insert or ignore', $insert);
 
         return $insert;

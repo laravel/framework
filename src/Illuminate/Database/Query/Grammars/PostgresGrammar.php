@@ -198,10 +198,9 @@ class PostgresGrammar extends Grammar
     /**
      * {@inheritdoc}
      */
-    public function compileUpsert(Builder $query, array $values)
+    public function compileInsertOrIgnore(Builder $query, array $values)
     {
         $insert = $this->compileInsert($query, $values);
-
         return $insert." on conflict do nothing";
     }
 
