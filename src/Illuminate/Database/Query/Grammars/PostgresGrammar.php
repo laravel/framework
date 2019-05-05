@@ -196,6 +196,16 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function compileUpsert(Builder $query, array $values)
+    {
+        $insert = $this->compileInsert($query, $values);
+
+        return $insert." on conflict do nothing";
+    }
+
+    /**
      * Compile an insert and get ID statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

@@ -853,25 +853,10 @@ class Grammar extends BaseGrammar
      */
     public function compileUpsert(Builder $query, array $values)
     {
-        // Essentially we will force every insert to be treated as a batch insert which
-        // simply makes creating the SQL easier for us since we can utilize the same
-        // basic routine regardless of an amount of records given to us to insert.
-        $table = $this->wrapTable($query->from);
+        $insert = $this->compileInsert($query, $values);
 
-        if (! is_array(reset($values))) {
-            $values = [$values];
-        }
-
-        $columns = $this->columnize(array_keys(reset($values)));
-
-        // We need to build a list of parameter place-holders of values that are bound
-        // to the query. Each insert should have the exact same amount of parameter
-        // bindings so we will loop through the record and parameterize them all.
-        $parameters = collect($values)->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
-
-        return "insert ignore into $table ($columns) values $parameters";
+        $insert = str_replace('insert', 'insert ignore', $insert);
+        return $insert;
     }
 
     /**
