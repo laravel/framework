@@ -118,6 +118,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->timestamps();
                 $table->softDeletes();
             });
+
+            $this->schema($connection)->create('unique_users', function ($table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                $table->string('email')->unique();
+                $table->timestamps();
+            });
         }
 
         $this->schema($connection)->create('non_incrementing_users', function ($table) {
@@ -138,6 +145,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $this->schema($connection)->drop('posts');
             $this->schema($connection)->drop('friend_levels');
             $this->schema($connection)->drop('photos');
+            $this->schema($connection)->drop('unique_users');
         }
 
         Relation::morphMap([], false);
@@ -979,6 +987,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(2, EloquentTestPost::count());
     }
 
+    public function testMultiInsertsOrIgnoreWithSameUniqueValues()
+    {
+        $date = '1970-01-01';
+        $result = EloquentTestUniqueUser::insertOrIgnore([
+            ['name' => 'Foo', 'email' => 'foo@bar.com', 'created_at' => $date, 'updated_at' => $date],
+            ['name' => 'Bar', 'email' => 'foo@bar.com', 'created_at' => $date, 'updated_at' => $date],
+        ]);
+
+        $this->assertTrue($result);
+        $this->assertEquals(1, EloquentTestUniqueUser::count());
+    }
+
     public function testNestedTransactions()
     {
         $user = EloquentTestUser::create(['email' => 'taylor@laravel.com']);
@@ -1713,6 +1733,12 @@ class EloquentTestUserWithGlobalScopeRemovingOtherScope extends Eloquent
 
         parent::boot();
     }
+}
+
+class EloquentTestUniqueUser extends Eloquent
+{
+    protected $table = 'unique_users';
+    protected $guarded = [];
 }
 
 class EloquentTestPost extends Eloquent
