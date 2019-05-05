@@ -59,6 +59,7 @@ class DatabaseSoftDeletingTraitStub
     public $deleted_at;
     public $updated_at;
     public $timestamps = true;
+    protected $attributes = [];
 
     public function newQuery()
     {
@@ -115,5 +116,21 @@ class DatabaseSoftDeletingTraitStub
     protected function getKeyForSaveQuery()
     {
         return 1;
+    }
+
+    public function getDirty() {
+        $dirty = [];
+
+        foreach ($this->getAttributes() as $key => $value) {
+            if (! $this->originalIsEquivalent($key, $value)) {
+                $dirty[$key] = $value;
+            }
+        }
+
+        return $dirty;
+    }
+    public function getAttributes()
+    {
+        return $this->attributes;
     }
 }
