@@ -118,7 +118,8 @@ class DatabaseSoftDeletingTraitStub
         return 1;
     }
 
-    public function getDirty() {
+    public function getDirty()
+    {
         $dirty = [];
 
         foreach ($this->getAttributes() as $key => $value) {
@@ -129,6 +130,7 @@ class DatabaseSoftDeletingTraitStub
 
         return $dirty;
     }
+    
     public function getAttributes()
     {
         return $this->attributes;
