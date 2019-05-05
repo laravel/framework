@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Iterator;
 use Closure;
 use ArrayObject;
 use JsonSerializable;
@@ -360,7 +361,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Create a route group with shared attributes.
      *
      * @param  array  $attributes
-     * @param  \Closure|string  $routes
+     * @param  \Closure|string|iterable  $routes
      * @return void
      */
     public function group(array $attributes, $routes)
@@ -370,8 +371,26 @@ class Router implements RegistrarContract, BindingRegistrar
         // Once we have updated the group stack, we'll load the provided routes and
         // merge in the group's attributes when the routes are created. After we
         // have created the routes, we will pop the attributes off the stack.
-        $this->loadRoutes($routes);
 
+        if($routes instanceof Iterator){
+            $this->groupIterable($routes);
+            return ;
+        }
+
+        $this->loadRoutes($routes);
+        array_pop($this->groupStack);
+    }
+
+    /**
+     * Create a route group from an iterator with shared attributes.
+     *
+     * @param Iterator $routes
+     * @return void
+     */
+    public function groupIterable(\Iterator $routes){
+        foreach($routes as $route) {
+            $this->loadRoutes($route);
+        }
         array_pop($this->groupStack);
     }
 

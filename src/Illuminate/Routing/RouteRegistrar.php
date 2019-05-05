@@ -113,7 +113,7 @@ class RouteRegistrar
     /**
      * Create a route group with shared attributes.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string|iterable  $callback
      * @return void
      */
     public function group($callback)
