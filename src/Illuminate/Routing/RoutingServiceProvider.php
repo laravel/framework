@@ -62,12 +62,15 @@ class RoutingServiceProvider extends ServiceProvider
                 ), $app['config']['app.asset_url']
             );
 
-            // Next we will set a few service resolvers on the URL generator so it can
-            // get the information it needs to function. This just provides some of
-            // the convenience features to this URL generator like "signed" URLs.
-            $url->setSessionResolver(function () {
-                return $this->app['session'];
-            });
+            // If the session is set on the application instance, we'll set a few
+            // service resolvers on the URL generator so it can get the information
+            // it needs to function. This just provides some of the convenience features
+            // to this URL generator like "signed" URLs.
+            if (isset($app['session'])) {
+                $url->setSessionResolver(function () {
+                    return $this->app['session'];
+                });
+            }
 
             $url->setKeyResolver(function () {
                 return $this->app->make('config')->get('app.key');
