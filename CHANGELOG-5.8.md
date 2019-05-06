@@ -1,6 +1,36 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.14...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.15...5.8)
+
+### TODO:
+- Migration Events ([#28342](https://github.com/laravel/framework/pull/28342))
+- Fix the remaining issues with registering custom Doctrine types. ([#28375](https://github.com/laravel/framework/pull/28375))
+- Add ability to drop types when running the migrate:fresh command ([#28382](https://github.com/laravel/framework/pull/28382))
+- Add renderable functionality to MailMessage ([#28386](https://github.com/laravel/framework/pull/28386))
+- DELETE: Database migration - add schema foreign key definition meta class ([#28387](https://github.com/laravel/framework/pull/28387), [#28399](https://github.com/laravel/framework/pull/28399))
+- Modified None And React presets to exclude vue-template-compiler ([#28389](https://github.com/laravel/framework/pull/28389))
+- Fix Error Message issue for Missing Method with Alternative Route Registering Syntax ([#28397](https://github.com/laravel/framework/pull/28397))
+- Fix fromSub() and joinSub() with table prefix ([#28400](https://github.com/laravel/framework/pull/28400))
+- Fix false positives for Schema::hasTable() with views ([#28401](https://github.com/laravel/framework/pull/28401))
+- Fix many to many sync results with custom pivot model ([#28416](https://github.com/laravel/framework/pull/28416), [e31d131](https://github.com/laravel/framework/commit/e31d13111da02fed6bd2ce7a6393431a4b34f924))
+- Change navbar-laravel class for bootstrap classes ([#28417](https://github.com/laravel/framework/pull/28417))
+- Replace only last occurrence to find class name from path on event discovery ([#28421](https://github.com/laravel/framework/pull/28421))
+
+
+## [v5.8.15 (2019-04-27)](https://github.com/laravel/framework/compare/v5.8.14...v5.8.15)
+
+### Added
+- Added handling of database URL as database connections ([#28308](https://github.com/laravel/framework/pull/28308), [4560d28](https://github.com/laravel/framework/commit/4560d28a8a5829253b3dea360c4fffb208962f83), [05b029e](https://github.com/laravel/framework/commit/05b029e58d545ee3489d45de01b8306ac0e6cf9e))
+
+### TODO:
+- Fix BelongsToMany read wrong parent key ([#28317](https://github.com/laravel/framework/pull/28317))
+- Fix make:auth not using apps configured views path ([#28324](https://github.com/laravel/framework/pull/28324), [e78cf02](https://github.com/laravel/framework/commit/e78cf0244d530b81e44c0249ded14512aaeb0ef9))
+- Add custom message to thrown exception ([#28335](https://github.com/laravel/framework/pull/28335))
+- Fix recursive replacements in Str::replaceArray() ([#28338](https://github.com/laravel/framework/pull/28338))
+- Add the `dd` method to the query builder ([#28357](https://github.com/laravel/framework/pull/28357))
+- Improve output of "assertSessionDoesntHaveErrors" when called with no arguments ([#28359](https://github.com/laravel/framework/pull/28359))
+- Allow logging out other devices without setting remember me cookie ([#28366](https://github.com/laravel/framework/pull/28366))
+- Break out password reset credentials into a method ([#28370](https://github.com/laravel/framework/pull/28370))
 
 
 ## [v5.8.14 (2019-04-23)](https://github.com/laravel/framework/compare/v5.8.13...v5.8.14)
