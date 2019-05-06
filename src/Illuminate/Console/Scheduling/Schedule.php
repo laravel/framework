@@ -32,12 +32,22 @@ class Schedule
     protected $schedulingMutex;
 
     /**
+     * The timezone the date should be evaluated on.
+     *
+     * @var \DateTimeZone|string
+     */
+    protected $timezone;
+
+    /**
      * Create a new schedule instance.
      *
+     * @param  \DateTimeZone|string|null  $timezone
      * @return void
      */
-    public function __construct()
+    public function __construct($timezone = null)
     {
+        $this->timezone = $timezone;
+
         $container = Container::getInstance();
 
         $this->eventMutex = $container->bound(EventMutex::class)
@@ -97,7 +107,9 @@ class Schedule
             $job = is_string($job) ? resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
-                dispatch($job)->onConnection($connection)->onQueue($queue);
+                dispatch($job)
+                    ->onConnection($connection ?? $job->connection)
+                    ->onQueue($queue ?? $job->queue);
             } else {
                 dispatch_now($job);
             }
@@ -117,7 +129,7 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($this->eventMutex, $command);
+        $this->events[] = $event = new Event($this->eventMutex, $command, $this->timezone);
 
         return $event;
     }

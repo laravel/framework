@@ -82,7 +82,15 @@ class Redirector
      */
     public function guest($path, $status = 302, $headers = [], $secure = null)
     {
-        $this->session->put('url.intended', $this->generator->full());
+        $request = $this->generator->getRequest();
+
+        $intended = $request->method() === 'GET' && $request->route() && ! $request->expectsJson()
+                        ? $this->generator->full()
+                        : $this->generator->previous();
+
+        if ($intended) {
+            $this->setIntendedUrl($intended);
+        }
 
         return $this->to($path, $status, $headers, $secure);
     }
@@ -101,6 +109,17 @@ class Redirector
         $path = $this->session->pull('url.intended', $default);
 
         return $this->to($path, $status, $headers, $secure);
+    }
+
+    /**
+     * Set the intended url.
+     *
+     * @param  string  $url
+     * @return void
+     */
+    public function setIntendedUrl($url)
+    {
+        $this->session->put('url.intended', $url);
     }
 
     /**
@@ -160,7 +179,7 @@ class Redirector
     /**
      * Create a new redirect response to a controller action.
      *
-     * @param  string  $action
+     * @param  string|array  $action
      * @param  mixed   $parameters
      * @param  int     $status
      * @param  array   $headers

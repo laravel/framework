@@ -3,9 +3,11 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
+use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -29,6 +31,10 @@ trait QueriesRelationships
 
         $relation = $this->getRelationWithoutConstraints($relation);
 
+        if ($relation instanceof MorphTo) {
+            throw new RuntimeException('has() and whereHas() do not support MorphTo relationships.');
+        }
+
         // If we only need to check for the existence of the relation, then we can optimize
         // the subquery to only run a "where exists" clause instead of this full "count"
         // clause. This will make these queries run much faster compared with a count.
@@ -37,7 +43,7 @@ trait QueriesRelationships
                         : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
-            $relation->getRelated()->newQuery(), $this
+            $relation->getRelated()->newQueryWithoutRelationships(), $this
         );
 
         // Next we will call any given callback as an "anonymous" scope so they can get the
@@ -68,6 +74,13 @@ trait QueriesRelationships
     {
         $relations = explode('.', $relations);
 
+        $doesntHave = $operator === '<' && $count === 1;
+
+        if ($doesntHave) {
+            $operator = '>=';
+            $count = 1;
+        }
+
         $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback) {
             // In order to nest "has", we need to add count relation constraints on the
             // callback Closure. We'll do this by simply passing the Closure its own
@@ -77,7 +90,7 @@ trait QueriesRelationships
                 : $q->has(array_shift($relations), $operator, $count, 'and', $callback);
         };
 
-        return $this->has(array_shift($relations), '>=', 1, $boolean, $closure);
+        return $this->has(array_shift($relations), $doesntHave ? '<' : '>=', 1, $boolean, $closure);
     }
 
     /**
@@ -195,8 +208,8 @@ trait QueriesRelationships
 
             unset($alias);
 
-            if (count($segments) == 3 && Str::lower($segments[1]) == 'as') {
-                list($name, $alias) = [$segments[0], $segments[2]];
+            if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
+                [$name, $alias] = [$segments[0], $segments[2]];
             }
 
             $relation = $this->getRelationWithoutConstraints($name);

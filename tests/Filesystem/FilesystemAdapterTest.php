@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
@@ -15,13 +16,13 @@ class FilesystemAdapterTest extends TestCase
     private $tempDir;
     private $filesystem;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tempDir = __DIR__.'/tmp';
         $this->filesystem = new Filesystem(new Local($this->tempDir));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
         $filesystem->deleteDir(basename($this->tempDir));
@@ -62,7 +63,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
-        $this->assertEquals($this->tempDir.'/file.txt', $filesystemAdapter->path('file.txt'));
+        $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
     }
 
     public function testGet()
@@ -91,7 +92,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->prepend('file.txt', 'Hello ');
-        $this->assertStringEqualsFile($this->tempDir.'/file.txt', "Hello \nWorld");
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello '.PHP_EOL.'World');
     }
 
     public function testAppend()
@@ -99,7 +100,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello ');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->append('file.txt', 'Moon');
-        $this->assertStringEqualsFile($this->tempDir.'/file.txt', "Hello \nMoon");
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello '.PHP_EOL.'Moon');
     }
 
     public function testDelete()
@@ -107,7 +108,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertTrue($filesystemAdapter->delete('file.txt'));
-        $this->assertFalse(file_exists($this->tempDir.'/file.txt'));
+        $this->assertFileNotExists($this->tempDir.'/file.txt');
     }
 
     public function testDeleteReturnsFalseWhenFileNotFound()
@@ -186,7 +187,7 @@ class FilesystemAdapterTest extends TestCase
 
     public function testStreamInvalidResourceThrows()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }

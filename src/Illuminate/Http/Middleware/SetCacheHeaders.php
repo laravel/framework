@@ -13,6 +13,7 @@ class SetCacheHeaders
      * @param  \Closure  $next
      * @param  string|array  $options
      * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @throws \InvalidArgumentException
      */
     public function handle($request, Closure $next, $options = [])

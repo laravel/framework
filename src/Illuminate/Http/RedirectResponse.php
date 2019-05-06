@@ -2,11 +2,11 @@
 
 namespace Illuminate\Http;
 
-use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
 class RedirectResponse extends BaseRedirectResponse
 {
-    use ResponseTrait, Macroable {
+    use ForwardsCalls, ResponseTrait, Macroable {
         Macroable::__call as macroCall;
     }
 
@@ -26,7 +26,7 @@ class RedirectResponse extends BaseRedirectResponse
     protected $request;
 
     /**
-     * The session store implementation.
+     * The session store instance.
      *
      * @var \Illuminate\Session\Store
      */
@@ -37,7 +37,7 @@ class RedirectResponse extends BaseRedirectResponse
      *
      * @param  string|array  $key
      * @param  mixed  $value
-     * @return \Illuminate\Http\RedirectResponse
+     * @return $this
      */
     public function with($key, $value = null)
     {
@@ -68,7 +68,7 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Flash an array of input to the session.
      *
-     * @param  array  $input
+     * @param  array|null  $input
      * @return $this
      */
     public function withInput(array $input = null)
@@ -114,7 +114,7 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Flash an array of input to the session.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return $this
      */
     public function exceptInput()
     {
@@ -192,7 +192,7 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
-     * Get the session store implementation.
+     * Get the session store instance.
      *
      * @return \Illuminate\Session\Store|null
      */
@@ -202,7 +202,7 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
-     * Set the session store implementation.
+     * Set the session store instance.
      *
      * @param  \Illuminate\Session\Store  $session
      * @return void
@@ -217,7 +217,7 @@ class RedirectResponse extends BaseRedirectResponse
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return $this
+     * @return mixed
      *
      * @throws \BadMethodCallException
      */
@@ -231,8 +231,6 @@ class RedirectResponse extends BaseRedirectResponse
             return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
         }
 
-        throw new BadMethodCallException(sprintf(
-            'Method %s::%s does not exist.', static::class, $method
-        ));
+        static::throwBadMethodCallException($method);
     }
 }

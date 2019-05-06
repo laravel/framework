@@ -10,7 +10,10 @@ use Illuminate\Container\Container;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 
@@ -18,7 +21,7 @@ class FoundationFormRequestTest extends TestCase
 {
     protected $mocks = [];
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
 
@@ -45,11 +48,44 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $request->validated());
     }
 
-    /**
-     * @expectedException \Illuminate\Validation\ValidationException
-     */
+    public function test_validated_method_returns_the_validated_data_nested_child_rules()
+    {
+        $payload = ['nested' => ['foo' => 'bar', 'with' => 'extras']];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestNestedChildStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar']], $request->validated());
+    }
+
+    public function test_validated_method_returns_the_validated_data_nested_array_rules()
+    {
+        $payload = ['nested' => [['bar' => 'baz', 'with' => 'extras'], ['bar' => 'baz2', 'with' => 'extras']]];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestNestedArrayStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $request->validated());
+    }
+
+    public function test_validated_method_not_validate_twice()
+    {
+        $payload = ['name' => 'specified', 'with' => 'extras'];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestTwiceStub::class);
+
+        $request->validateResolved();
+        $request->validated();
+
+        $this->assertEquals(1, FoundationTestFormRequestTwiceStub::$count);
+    }
+
     public function test_validate_throws_when_validation_fails()
     {
+        $this->expectException(ValidationException::class);
+
         $request = $this->createRequest(['no' => 'name']);
 
         $this->mocks['redirect']->shouldReceive('withInput->withErrors');
@@ -57,12 +93,11 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage This action is unauthorized.
-     */
     public function test_validate_method_throws_when_authorization_fails()
     {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
 
@@ -198,6 +233,54 @@ class FoundationTestFormRequestNestedStub extends FormRequest
     }
 }
 
+class FoundationTestFormRequestNestedChildStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['nested.foo' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestNestedArrayStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['nested.*.bar' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestTwiceStub extends FormRequest
+{
+    public static $count = 0;
+
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+            self::$count++;
+        });
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
 class FoundationTestFormRequestForbiddenStub extends FormRequest
 {
     public function authorize()
@@ -205,6 +288,7 @@ class FoundationTestFormRequestForbiddenStub extends FormRequest
         return false;
     }
 }
+
 class FoundationTestFormRequestHooks extends FormRequest
 {
     public function rules()

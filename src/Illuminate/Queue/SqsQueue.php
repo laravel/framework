@@ -72,7 +72,7 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $data), $queue);
+        return $this->pushRaw($this->createPayload($job, $queue ?: $this->default, $data), $queue);
     }
 
     /**
@@ -103,7 +103,7 @@ class SqsQueue extends Queue implements QueueContract
     {
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue),
-            'MessageBody' => $this->createPayload($job, $data),
+            'MessageBody' => $this->createPayload($job, $queue ?: $this->default, $data),
             'DelaySeconds' => $this->secondsUntil($delay),
         ])->get('MessageId');
     }

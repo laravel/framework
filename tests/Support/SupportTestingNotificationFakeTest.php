@@ -8,10 +8,26 @@ use Illuminate\Notifications\Notification;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 
 class SupportTestingNotificationFakeTest extends TestCase
 {
-    protected function setUp()
+    /**
+     * @var NotificationFake
+     */
+    private $fake;
+
+    /**
+     * @var NotificationStub
+     */
+    private $notification;
+
+    /**
+     * @var UserStub
+     */
+    private $user;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new NotificationFake;
@@ -49,22 +65,20 @@ class SupportTestingNotificationFakeTest extends TestCase
 
     public function testResettingNotificationId()
     {
-        $notification = new NotificationStub();
+        $this->fake->send($this->user, $this->notification);
 
-        $this->fake->send($this->user, $notification);
+        $id = $this->notification->id;
 
-        $id = $notification->id;
+        $this->fake->send($this->user, $this->notification);
 
-        $this->fake->send($this->user, $notification);
+        $this->assertSame($id, $this->notification->id);
 
-        $this->assertSame($id, $notification->id);
+        $this->notification->id = null;
 
-        $notification->id = null;
+        $this->fake->send($this->user, $this->notification);
 
-        $this->fake->send($this->user, $notification);
-
-        $this->assertNotNull($notification->id);
-        $this->assertNotSame($id, $notification->id);
+        $this->assertNotNull($this->notification->id);
+        $this->assertNotSame($id, $this->notification->id);
     }
 
     public function testAssertTimesSent()
@@ -79,6 +93,17 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->assertTimesSent(3, NotificationStub::class);
     }
+
+    public function testAssertSentToWhenNotifiableHasPreferredLocale()
+    {
+        $user = new LocalizedUserStub;
+
+        $this->fake->send($user, new NotificationStub);
+
+        $this->fake->assertSentTo($user, NotificationStub::class, function ($notification, $channels, $notifiable, $locale) use ($user) {
+            return $notifiable === $user && $locale === 'au';
+        });
+    }
 }
 
 class NotificationStub extends Notification
@@ -91,4 +116,13 @@ class NotificationStub extends Notification
 
 class UserStub extends User
 {
+    //
+}
+
+class LocalizedUserStub extends User implements HasLocalePreference
+{
+    public function preferredLocale()
+    {
+        return 'au';
+    }
 }

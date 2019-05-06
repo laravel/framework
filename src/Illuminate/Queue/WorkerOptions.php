@@ -47,6 +47,13 @@ class WorkerOptions
     public $force;
 
     /**
+     * Indicates if the worker should stop when queue is empty.
+     *
+     * @var bool
+     */
+    public $stopWhenEmpty;
+
+    /**
      * Create a new worker options instance.
      *
      * @param  int  $delay
@@ -55,9 +62,10 @@ class WorkerOptions
      * @param  int  $sleep
      * @param  int  $maxTries
      * @param  bool  $force
+     * @param  bool  $stopWhenEmpty
      * @return void
      */
-    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false)
+    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false, $stopWhenEmpty = false)
     {
         $this->delay = $delay;
         $this->sleep = $sleep;
@@ -65,5 +73,6 @@ class WorkerOptions
         $this->memory = $memory;
         $this->timeout = $timeout;
         $this->maxTries = $maxTries;
+        $this->stopWhenEmpty = $stopWhenEmpty;
     }
 }

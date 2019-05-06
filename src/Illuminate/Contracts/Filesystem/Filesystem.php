@@ -61,7 +61,7 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  resource $resource
-     * @param  mixed  $options
+     * @param  array  $options
      * @return bool
      *
      * @throws \InvalidArgumentException If $resource is not a file handle.
@@ -91,7 +91,7 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @return int
+     * @return bool
      */
     public function prepend($path, $data);
 
@@ -100,7 +100,7 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @return int
+     * @return bool
      */
     public function append($path, $data);
 

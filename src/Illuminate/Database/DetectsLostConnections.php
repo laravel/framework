@@ -34,6 +34,10 @@ trait DetectsLostConnections
             'reset by peer',
             'Physical connection is not usable',
             'TCP Provider: Error code 0x68',
+            'ORA-03114',
+            'Packets out of order. Expected',
+            'Adaptive Server connection failed',
+            'Communication link failure',
         ]);
     }
 }

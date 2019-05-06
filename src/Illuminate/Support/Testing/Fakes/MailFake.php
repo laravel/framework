@@ -37,9 +37,15 @@ class MailFake implements Mailer, MailQueue
             return $this->assertSentTimes($mailable, $callback);
         }
 
+        $message = "The expected [{$mailable}] mailable was not sent.";
+
+        if (count($this->queuedMailables) > 0) {
+            $message .= ' Did you mean to use assertQueued() instead?';
+        }
+
         PHPUnit::assertTrue(
             $this->sent($mailable, $callback)->count() > 0,
-            "The expected [{$mailable}] mailable was not sent."
+            $message
         );
     }
 
@@ -257,7 +263,7 @@ class MailFake implements Mailer, MailQueue
     }
 
     /**
-     * Send a new message when only a raw text part.
+     * Send a new message with only a raw text part.
      *
      * @param  string  $text
      * @param  \Closure|string  $callback

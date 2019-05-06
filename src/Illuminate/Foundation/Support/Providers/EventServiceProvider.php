@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Support\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Events\DiscoverEvents;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -28,8 +29,13 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        foreach ($this->listens() as $event => $listeners) {
-            foreach ($listeners as $listener) {
+        $events = array_merge_recursive(
+            $this->discoveredEvents(),
+            $this->listens()
+        );
+
+        foreach ($events as $event => $listeners) {
+            foreach (array_unique($listeners) as $listener) {
                 Event::listen($event, $listener);
             }
         }
@@ -40,14 +46,6 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function register()
-    {
-        //
-    }
-
-    /**
      * Get the events and handlers.
      *
      * @return array
@@ -55,5 +53,62 @@ class EventServiceProvider extends ServiceProvider
     public function listens()
     {
         return $this->listen;
+    }
+
+    /**
+     * Get the discovered events and listeners for the application.
+     *
+     * @return array
+     */
+    protected function discoveredEvents()
+    {
+        if ($this->app->eventsAreCached()) {
+            return require $this->app->getCachedEventsPath();
+        }
+
+        return $this->shouldDiscoverEvents()
+                    ? $this->discoverEvents()
+                    : [];
+    }
+
+    /**
+     * Determine if events and listeners should be automatically discovered.
+     *
+     * @return bool
+     */
+    public function shouldDiscoverEvents()
+    {
+        return false;
+    }
+
+    /**
+     * Discover the events and listeners for the application.
+     *
+     * @return array
+     */
+    public function discoverEvents()
+    {
+        return collect($this->discoverEventsWithin())
+                    ->reject(function ($directory) {
+                        return ! is_dir($directory);
+                    })
+                    ->reduce(function ($discovered, $directory) {
+                        return array_merge_recursive(
+                            $discovered,
+                            DiscoverEvents::within($directory, base_path())
+                        );
+                    }, []);
+    }
+
+    /**
+     * Get the listener directories that should be used to discover events.
+     *
+     * @return array
+     */
+    protected function discoverEventsWithin()
+    {
+        return [
+            $this->app->path('Listeners'),
+        ];
     }
 }

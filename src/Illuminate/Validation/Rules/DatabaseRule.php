@@ -21,7 +21,7 @@ trait DatabaseRule
     protected $column;
 
     /**
-     * There extra where clauses for the query.
+     * The extra where clauses for the query.
      *
      * @var array
      */

@@ -28,22 +28,22 @@ class UrlWindow
      * Create a new URL window instance.
      *
      * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
-     * @param  int  $onEachSide
      * @return array
      */
-    public static function make(PaginatorContract $paginator, $onEachSide = 3)
+    public static function make(PaginatorContract $paginator)
     {
-        return (new static($paginator))->get($onEachSide);
+        return (new static($paginator))->get();
     }
 
     /**
      * Get the window of URLs to be shown.
      *
-     * @param  int  $onEachSide
      * @return array
      */
-    public function get($onEachSide = 3)
+    public function get()
     {
+        $onEachSide = $this->paginator->onEachSide;
+
         if ($this->paginator->lastPage() < ($onEachSide * 2) + 6) {
             return $this->getSmallSlider();
         }

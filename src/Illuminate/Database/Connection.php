@@ -552,7 +552,7 @@ class Connection implements ConnectionInterface
 
         // Now we'll execute this callback and capture the result. Once it has been
         // executed we will restore the value of query logging and give back the
-        // value of hte callback so the original callers can have the results.
+        // value of the callback so the original callers can have the results.
         $result = $callback();
 
         $this->loggingQueries = $loggingQueries;
@@ -705,6 +705,7 @@ class Connection implements ConnectionInterface
      * @param  array  $bindings
      * @param  \Closure  $callback
      * @return mixed
+     *
      * @throws \Exception
      */
     protected function handleQueryException($e, $query, $bindings, Closure $callback)
@@ -750,6 +751,8 @@ class Connection implements ConnectionInterface
     public function reconnect()
     {
         if (is_callable($this->reconnector)) {
+            $this->doctrineConnection = null;
+
             return call_user_func($this->reconnector, $this);
         }
 
@@ -1115,7 +1118,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Determine if the connection in a "dry run".
+     * Determine if the connection is in a "dry run".
      *
      * @return bool
      */

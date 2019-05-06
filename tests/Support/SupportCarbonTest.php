@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Support;
 
 use DateTime;
 use DateTimeInterface;
+use BadMethodCallException;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Carbon\Carbon as BaseCarbon;
@@ -15,14 +17,14 @@ class SupportCarbonTest extends TestCase
      */
     protected $now;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         Carbon::setTestNow($this->now = Carbon::create(2017, 6, 27, 13, 14, 15, 'UTC'));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         Carbon::setTestNow();
         Carbon::serializeUsing(null);
@@ -56,21 +58,19 @@ class SupportCarbonTest extends TestCase
         $this->assertSame('2017-06-25 12:00:00', Carbon::twoDaysAgoAtNoon()->toDateTimeString());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage nonExistingStaticMacro does not exist.
-     */
     public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('nonExistingStaticMacro does not exist.');
+
         Carbon::nonExistingStaticMacro();
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage nonExistingMacro does not exist.
-     */
     public function testCarbonRaisesExceptionWhenMacroIsNotFound()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('nonExistingMacro does not exist.');
+
         Carbon::now()->nonExistingMacro();
     }
 
@@ -87,7 +87,7 @@ class SupportCarbonTest extends TestCase
 
     public function testCarbonCanSerializeToJson()
     {
-        $this->assertSame([
+        $this->assertSame(class_exists(CarbonImmutable::class) ? '2017-06-27T13:14:15.000000Z' : [
             'date' => '2017-06-27 13:14:15.000000',
             'timezone_type' => 3,
             'timezone' => 'UTC',

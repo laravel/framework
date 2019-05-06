@@ -18,12 +18,7 @@ class AuthenticateMiddlewareTest extends TestCase
 {
     protected $auth;
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
-    public function setUp()
+    protected function setUp(): void
     {
         $container = Container::setInstance(new Container);
 
@@ -34,12 +29,18 @@ class AuthenticateMiddlewareTest extends TestCase
         });
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\AuthenticationException
-     * @expectedExceptionMessage Unauthenticated.
-     */
+    protected function tearDown(): void
+    {
+        m::close();
+
+        Container::setInstance(null);
+    }
+
     public function testDefaultUnauthenticatedThrows()
     {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Unauthenticated.');
+
         $this->registerAuthDriver('default', false);
 
         $this->authenticate();
@@ -80,12 +81,11 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($secondary, $this->auth->guard());
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\AuthenticationException
-     * @expectedExceptionMessage Unauthenticated.
-     */
     public function testMultipleDriversUnauthenticatedThrows()
     {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Unauthenticated.');
+
         $this->registerAuthDriver('default', false);
 
         $this->registerAuthDriver('secondary', false);

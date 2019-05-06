@@ -17,7 +17,7 @@ class RouteViewTest extends TestCase
 
         View::addLocation(__DIR__.'/Fixtures');
 
-        $this->assertContains('Test bar', $this->get('/route')->getContent());
+        $this->assertStringContainsString('Test bar', $this->get('/route')->getContent());
     }
 
     public function test_route_view_with_params()
@@ -26,7 +26,7 @@ class RouteViewTest extends TestCase
 
         View::addLocation(__DIR__.'/Fixtures');
 
-        $this->assertContains('Test bar', $this->get('/route/value1/value2')->getContent());
-        $this->assertContains('Test bar', $this->get('/route/value1')->getContent());
+        $this->assertStringContainsString('Test bar', $this->get('/route/value1/value2')->getContent());
+        $this->assertStringContainsString('Test bar', $this->get('/route/value1')->getContent());
     }
 }

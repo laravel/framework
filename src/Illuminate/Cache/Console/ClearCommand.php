@@ -60,15 +60,19 @@ class ClearCommand extends Command
      */
     public function handle()
     {
-        $this->laravel['events']->fire(
+        $this->laravel['events']->dispatch(
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
 
-        $this->cache()->flush();
+        $successful = $this->cache()->flush();
 
         $this->flushFacades();
 
-        $this->laravel['events']->fire(
+        if (! $successful) {
+            return $this->error('Failed to clear cache. Make sure you have the appropriate permissions.');
+        }
+
+        $this->laravel['events']->dispatch(
             'cache:cleared', [$this->argument('store'), $this->tags()]
         );
 

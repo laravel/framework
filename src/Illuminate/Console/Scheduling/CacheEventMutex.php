@@ -40,7 +40,7 @@ class CacheEventMutex implements EventMutex
     public function create(Event $event)
     {
         return $this->cache->store($this->store)->add(
-            $event->mutexName(), true, $event->expiresAt
+            $event->mutexName(), true, $event->expiresAt * 60
         );
     }
 
