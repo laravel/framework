@@ -54,9 +54,11 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return Arr::first($acceptable, function ($value, $key) {
-			return Str::contains($value, ['/json', '+json']);
-		}, null);
+        return !is_null(
+			Arr::first($acceptable, function ($value, $key) {
+				return Str::contains($value, ['/json', '+json']);
+			}, null)
+		);
     }
 
     /**
