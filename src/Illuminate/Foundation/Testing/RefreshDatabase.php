@@ -124,6 +124,6 @@ trait RefreshDatabase
     protected function shouldDropTypes()
     {
         return property_exists($this, 'dropTypes')
-            ? $this->dropTypes : false;
+                            ? $this->dropTypes : false;
     }
 }
