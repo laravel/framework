@@ -33,6 +33,9 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->integer('project_id');
             $table->string('role')->nullable();
         });
+
+        // clear event log between requests
+        PivotEventsTestCollaborator::$eventsCalled = [];
     }
 
     public function test_pivot_will_trigger_events_to_be_fired()
