@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 trait InteractsWithContentTypes
@@ -53,7 +54,9 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && Str::contains($acceptable[0], ['/json', '+json']);
+        return Arr::first($acceptable, function ($value, $key) {
+			return Str::contains($value, ['/json', '+json']);
+		}, null);
     }
 
     /**
@@ -128,7 +131,7 @@ trait InteractsWithContentTypes
         $acceptable = $this->getAcceptableContentTypes();
 
         return count($acceptable) === 0 || (
-            isset($acceptable[0]) && ($acceptable[0] === '*/*' || $acceptable[0] === '*')
+            in_array('*/*', $acceptable) || in_array('*', $acceptable)
         );
     }
 

@@ -732,6 +732,12 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest', 'HTTP_X_PJAX' => 'true']);
         $this->assertFalse($request->expectsJson());
+
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html, application/xhtml+xml, */*', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+		$this->assertTrue($request->expectsJson());
+
+		$request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html, application/json, application/xhtml+xml']);
+		$this->assertTrue($request->expectsJson());
     }
 
     public function testFormatReturnsAcceptableFormat()
