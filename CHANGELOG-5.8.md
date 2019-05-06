@@ -7,7 +7,6 @@
 - Fix the remaining issues with registering custom Doctrine types. ([#28375](https://github.com/laravel/framework/pull/28375))
 - Add ability to drop types when running the migrate:fresh command ([#28382](https://github.com/laravel/framework/pull/28382))
 - Add renderable functionality to MailMessage ([#28386](https://github.com/laravel/framework/pull/28386))
-- DELETE: Database migration - add schema foreign key definition meta class ([#28387](https://github.com/laravel/framework/pull/28387), [#28399](https://github.com/laravel/framework/pull/28399))
 - Modified None And React presets to exclude vue-template-compiler ([#28389](https://github.com/laravel/framework/pull/28389))
 - Fix Error Message issue for Missing Method with Alternative Route Registering Syntax ([#28397](https://github.com/laravel/framework/pull/28397))
 - Fix fromSub() and joinSub() with table prefix ([#28400](https://github.com/laravel/framework/pull/28400))
