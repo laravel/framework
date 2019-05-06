@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Foundation\Events\DiscoverEvents;
 use Mockery;
-use Orchestra\Testbench\TestCase;
 use ReflectionClass;
+use Orchestra\Testbench\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
+use Illuminate\Foundation\Events\DiscoverEvents;
 
 class DiscoverEventsTest extends TestCase
 {
