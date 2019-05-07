@@ -62,7 +62,7 @@ class Command extends SymfonyCommand
     protected $description;
 
     /**
-     * The console command help.
+     * The console command help text.
      *
      * @var string
      */
