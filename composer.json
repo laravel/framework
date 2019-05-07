@@ -120,7 +120,7 @@
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6).",
         "filp/whoops": "Required for friendly error pages in development (^2.1.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (^1.4).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (^6.0).",
+        "guzzlehttp/guzzle": "Required to use the Mailgun mail driver and the ping methods on schedules (^6.0).",
         "laravel/tinker": "Required to use the tinker console command (^1.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^1.0).",
         "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
