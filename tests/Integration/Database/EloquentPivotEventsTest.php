@@ -33,6 +33,9 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->integer('project_id');
             $table->string('role')->nullable();
         });
+
+        // clear event log between requests
+        PivotEventsTestCollaborator::$eventsCalled = [];
     }
 
     public function test_pivot_will_trigger_events_to_be_fired()
@@ -51,6 +54,24 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->collaborators()->sync([$user->id => ['role' => 'owner'], $user2->id => ['role' => 'contributor']]);
         $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->collaborators()->detach($user);
+        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
+    }
+
+    public function test_pivot_with_pivot_criteria_trigger_events_to_be_fired_on_create_update_none_on_detach()
+    {
+        $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
+        $user2 = PivotEventsTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);
+        $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
+
+        $project->contributors()->sync([$user->id, $user2->id]);
+        $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->contributors()->detach($user->id);
+        $this->assertEquals([], PivotEventsTestCollaborator::$eventsCalled);
     }
 }
 
@@ -68,6 +89,13 @@ class PivotEventsTestProject extends Model
         return $this->belongsToMany(
             PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id'
         )->using(PivotEventsTestCollaborator::class);
+    }
+
+    public function contributors()
+    {
+        return $this->belongsToMany(PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id')
+            ->using(PivotEventsTestCollaborator::class)
+            ->wherePivot('role', 'contributor');
     }
 }
 

@@ -154,6 +154,31 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(2, PostTagPivot::first()->tag_id);
     }
 
+    public function test_custom_pivot_class_using_sync()
+    {
+        Carbon::setTestNow('2017-10-10 10:10:10');
+
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = TagWithCustomPivot::create(['name' => Str::random()]);
+
+        $results = $post->tagsWithCustomPivot()->sync([
+            $tag->id => ['flag' => 1],
+        ]);
+
+        $this->assertNotEmpty($results['attached']);
+
+        $results = $post->tagsWithCustomPivot()->sync([
+            $tag->id => ['flag' => 1],
+        ]);
+
+        $this->assertEmpty($results['updated']);
+
+        $results = $post->tagsWithCustomPivot()->sync([]);
+
+        $this->assertNotEmpty($results['detached']);
+    }
+
     public function test_attach_method()
     {
         $post = Post::create(['title' => Str::random()]);
