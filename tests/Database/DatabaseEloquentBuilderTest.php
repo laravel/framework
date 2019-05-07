@@ -151,7 +151,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $ids = collect([1, 2]);
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', $ids);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
 
