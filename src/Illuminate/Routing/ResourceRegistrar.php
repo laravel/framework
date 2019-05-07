@@ -327,6 +327,12 @@ class ResourceRegistrar
      */
     public function getResourceWildcard($value)
     {
+        // If a null value is passed,
+        // we get it from the previous route prefix
+        if (empty($value)) {
+            $value = trim($this->router->getLastGroupPrefix(), '/');
+        }
+
         if (isset($this->parameters[$value])) {
             $value = $this->parameters[$value];
         } elseif (isset(static::$parameterMap[$value])) {
