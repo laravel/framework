@@ -4,7 +4,6 @@ namespace Illuminate\Filesystem;
 
 use Closure;
 use Aws\S3\S3Client;
-use OpenCloud\Rackspace;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use League\Flysystem\AdapterInterface;
@@ -13,7 +12,6 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Adapter\Ftp as FtpAdapter;
-use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
 use League\Flysystem\Cached\Storage\Memory as MemoryStore;
@@ -224,41 +222,6 @@ class FilesystemManager implements FactoryContract
         }
 
         return $config;
-    }
-
-    /**
-     * Create an instance of the Rackspace driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Cloud
-     */
-    public function createRackspaceDriver(array $config)
-    {
-        $client = new Rackspace($config['endpoint'], [
-            'username' => $config['username'], 'apiKey' => $config['key'],
-        ], $config['options'] ?? []);
-
-        $root = $config['root'] ?? null;
-
-        return $this->adapt($this->createFlysystem(
-            new RackspaceAdapter($this->getRackspaceContainer($client, $config), $root), $config
-        ));
-    }
-
-    /**
-     * Get the Rackspace Cloud Files container.
-     *
-     * @param  \OpenCloud\Rackspace  $client
-     * @param  array  $config
-     * @return \OpenCloud\ObjectStore\Resource\Container
-     */
-    protected function getRackspaceContainer(Rackspace $client, array $config)
-    {
-        $urlType = $config['url_type'] ?? null;
-
-        $store = $client->objectStoreService('cloudFiles', $config['region'], $urlType);
-
-        return $store->getContainer($config['container']);
     }
 
     /**
