@@ -31,7 +31,7 @@
 ### Added
 - Added handling of database URL as database connections ([#28308](https://github.com/laravel/framework/pull/28308), [4560d28](https://github.com/laravel/framework/commit/4560d28a8a5829253b3dea360c4fffb208962f83), [05b029e](https://github.com/laravel/framework/commit/05b029e58d545ee3489d45de01b8306ac0e6cf9e))
 
-### Changed:
+### TODO:
 - Fix BelongsToMany read wrong parent key ([#28317](https://github.com/laravel/framework/pull/28317))
 - Fix make:auth not using apps configured views path ([#28324](https://github.com/laravel/framework/pull/28324), [e78cf02](https://github.com/laravel/framework/commit/e78cf0244d530b81e44c0249ded14512aaeb0ef9))
 - Add custom message to thrown exception ([#28335](https://github.com/laravel/framework/pull/28335))
