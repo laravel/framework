@@ -520,11 +520,16 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string  $name
-     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
+     * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function foreign($columns, $name = null)
     {
-        return $this->indexCommand('foreign', $columns, $name);
+        $parameters = $this->indexCommandParameters('foreign', $columns, $name);
+        $name = 'foreign';
+
+        $this->commands[] = $command = new ForeignKeyDefinition(array_merge(compact('name'), $parameters));
+
+        return $command;
     }
 
     /**
@@ -1245,6 +1250,22 @@ class Blueprint
      */
     protected function indexCommand($type, $columns, $index, $algorithm = null)
     {
+        $parameters = $this->indexCommandParameters($type, $columns, $index, $algorithm);
+
+        return $this->addCommand($type, $parameters);
+    }
+
+    /**
+     * Creates parameters array for index command
+     *
+     * @param  string  $type
+     * @param  string|array  $columns
+     * @param  string  $index
+     * @param  string|null  $algorithm
+     * @return array
+     */
+    protected function indexCommandParameters($type, $columns, $index, $algorithm = null)
+    {
         $columns = (array) $columns;
 
         // If no name was specified for this index, we will create one using a basic
@@ -1252,9 +1273,7 @@ class Blueprint
         // index type, such as primary or index, which makes the index unique.
         $index = $index ?: $this->createIndexName($type, $columns);
 
-        return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm')
-        );
+        return compact('index', 'columns', 'algorithm');
     }
 
     /**
