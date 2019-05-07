@@ -338,7 +338,7 @@ class Builder
      */
     public function findMany($ids, $columns = ['*'])
     {
-        $empty = $ids instanceOf Arrayable
+        $empty = $ids instanceof Arrayable
             ? empty($ids->toArray())
             : empty($ids);
 
