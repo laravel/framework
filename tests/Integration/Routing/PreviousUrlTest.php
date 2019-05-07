@@ -6,8 +6,6 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Session\SessionServiceProvider;
-use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\TestCase;
 
 class PreviousUrlTest extends TestCase
 {
