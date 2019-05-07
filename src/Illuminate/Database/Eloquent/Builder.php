@@ -338,7 +338,11 @@ class Builder
      */
     public function findMany($ids, $columns = ['*'])
     {
-        if (empty($ids)) {
+        $empty = $ids instanceOf Arrayable
+            ? empty($ids->toArray())
+            : empty($ids);
+
+        if ($empty) {
             return $this->model->newCollection();
         }
 
