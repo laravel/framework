@@ -1256,7 +1256,7 @@ class Blueprint
     }
 
     /**
-     * Creates parameters array for index command
+     * Creates parameters array for index command.
      *
      * @param  string  $type
      * @param  string|array  $columns
