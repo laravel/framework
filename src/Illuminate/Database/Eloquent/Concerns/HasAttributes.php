@@ -998,6 +998,19 @@ trait HasAttributes
     }
 
     /**
+     * Returns all of the model's attributes except those with the specified keys
+     *
+     * @param  array|mixed  $attributes
+     * @return array
+     */
+    public function except($attributes)
+    {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        return Arr::except($this->toArray(),$attributes);
+    }
+
+    /**
      * Sync the original attributes with the current.
      *
      * @return $this
