@@ -62,6 +62,13 @@ class Command extends SymfonyCommand
     protected $description;
 
     /**
+     * The console command help.
+     *
+     * @var string
+     */
+    protected $help;
+
+    /**
      * Indicates whether the command should be shown in the Artisan command list.
      *
      * @var bool
@@ -108,6 +115,8 @@ class Command extends SymfonyCommand
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
         $this->setDescription($this->description);
+
+        $this->setHelp($this->help);
 
         $this->setHidden($this->isHidden());
 
