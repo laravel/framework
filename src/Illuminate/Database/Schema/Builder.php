@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use LogicException;
+use RuntimeException;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 
@@ -217,6 +218,18 @@ class Builder
     }
 
     /**
+     * Drop all types from the database.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllTypes()
+    {
+        throw new LogicException('This database driver does not support dropping all types.');
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @return void
@@ -309,16 +322,20 @@ class Builder
      */
     public function registerCustomDoctrineType($class, $name, $type)
     {
-        if (Type::hasType($name)) {
-            return;
+        if (! $this->connection->isDoctrineAvailable()) {
+            throw new RuntimeException(
+                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
+            );
         }
 
-        Type::addType($name, $class);
+        if (! Type::hasType($name)) {
+            Type::addType($name, $class);
 
-        $this->connection
-            ->getDoctrineSchemaManager()
-            ->getDatabasePlatform()
-            ->registerDoctrineTypeMapping($type, $name);
+            $this->connection
+                ->getDoctrineSchemaManager()
+                ->getDatabasePlatform()
+                ->registerDoctrineTypeMapping($type, $name);
+        }
     }
 
     /**

@@ -100,9 +100,19 @@ class Kernel implements KernelContract
     {
         $this->app->singleton(Schedule::class, function ($app) {
             return tap(new Schedule($this->scheduleTimezone()), function ($schedule) {
-                $this->schedule($schedule);
+                $this->schedule($schedule->useCache($this->scheduleCache()));
             });
         });
+    }
+
+    /**
+     * Get the name of the cache store that should manage scheduling mutexes.
+     *
+     * @return string
+     */
+    protected function scheduleCache()
+    {
+        return $_ENV['SCHEDULE_CACHE_DRIVER'] ?? null;
     }
 
     /**

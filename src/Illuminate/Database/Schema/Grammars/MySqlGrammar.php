@@ -33,7 +33,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return 'select * from information_schema.tables where table_schema = ? and table_name = ?';
+        return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
     }
 
     /**

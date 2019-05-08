@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Database\Schema\Types;
+namespace Illuminate\Tests\Integration\Database\Fixtures;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;

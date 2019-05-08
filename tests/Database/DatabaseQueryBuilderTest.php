@@ -1572,6 +1572,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo', 1, 'bar'], $builder->getRawBindings()['join']);
     }
 
+    public function testJoinSubWithPrefix()
+    {
+        $builder = $this->getBuilder();
+        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder->from('users')->joinSub('select * from "contacts"', 'sub', 'users.id', '=', 'sub.id');
+        $this->assertEquals('select * from "prefix_users" inner join (select * from "contacts") as "prefix_sub" on "prefix_users"."id" = "prefix_sub"."id"', $builder->toSql());
+    }
+
     public function testLeftJoinSub()
     {
         $builder = $this->getBuilder();
@@ -3129,6 +3137,17 @@ SQL;
             $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions')->where('foo', '=', '1');
         }, 'sessions')->where('bar', '<', '10');
         $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "user_sessions" where "foo" = ?) as "sessions" where "bar" < ?', $builder->toSql());
+        $this->assertEquals(['1', '10'], $builder->getBindings());
+    }
+
+    public function testFromSubWithPrefix()
+    {
+        $builder = $this->getBuilder();
+        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder->fromSub(function ($query) {
+            $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions')->where('foo', '=', '1');
+        }, 'sessions')->where('bar', '<', '10');
+        $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "prefix_user_sessions" where "foo" = ?) as "prefix_sessions" where "bar" < ?', $builder->toSql());
         $this->assertEquals(['1', '10'], $builder->getBindings());
     }
 

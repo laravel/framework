@@ -39,6 +39,40 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('baz', $result);
     }
 
+    public function testFindManyMethod()
+    {
+        // ids are not empty
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', ['one', 'two']);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(['baz']);
+
+        $result = $builder->findMany(['one', 'two'], ['column']);
+        $this->assertEquals(['baz'], $result);
+
+        // ids are empty array
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('newCollection')->once()->withNoArgs()->andReturn('emptycollection');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldNotReceive('whereIn');
+        $builder->shouldNotReceive('get');
+
+        $result = $builder->findMany([], ['column']);
+        $this->assertEquals('emptycollection', $result);
+
+        // ids are empty collection
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('newCollection')->once()->withNoArgs()->andReturn('emptycollection');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldNotReceive('whereIn');
+        $builder->shouldNotReceive('get');
+
+        $result = $builder->findMany(collect(), ['column']);
+        $this->assertEquals('emptycollection', $result);
+    }
+
     public function testFindOrNewMethodModelFound()
     {
         $model = $this->getMockModel();
@@ -117,7 +151,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $ids = collect([1, 2]);
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', $ids);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
 

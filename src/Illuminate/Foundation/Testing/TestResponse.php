@@ -1023,6 +1023,16 @@ class TestResponse
     }
 
     /**
+     * Dump the headers from the response.
+     *
+     * @return void
+     */
+    public function dumpHeaders()
+    {
+        dd($this->headers->all());
+    }
+
+    /**
      * Get the streamed content from the response.
      *
      * @return string

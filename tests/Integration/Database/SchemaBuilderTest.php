@@ -6,9 +6,9 @@ use Doctrine\DBAL\Types\Type;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Types\TinyInteger;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
 /**
  * @group integration
