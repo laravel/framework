@@ -134,7 +134,7 @@ class FileLoader implements Loader
      *
      * @throws \RuntimeException
      */
-    protected function loadJsonPaths($locale)
+    public function loadJsonPaths($locale)
     {
         return collect(array_merge($this->jsonPaths, [$this->path]))
             ->reduce(function ($output, $path) use ($locale) {
