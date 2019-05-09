@@ -471,6 +471,24 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the ends_with rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceEndsWith($message, $attribute, $rule, $parameters)
+    {
+        foreach ($parameters as &$parameter) {
+            $parameter = $this->getDisplayableValue($attribute, $parameter);
+        }
+
+        return str_replace(':values', implode(', ', $parameters), $message);
+    }
+
+    /**
      * Replace all place-holders for the starts_with rule.
      *
      * @param  string  $message
