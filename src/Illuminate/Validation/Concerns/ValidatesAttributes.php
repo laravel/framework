@@ -1535,22 +1535,22 @@ trait ValidatesAttributes
      * @param  array   $parameters
      * @return bool
      */
-    public function validateEndsWith($attribute, $value, $parameters)
+    public function validateStartsWith($attribute, $value, $parameters)
     {
-        return Str::endsWith($value, $parameters);
+        return Str::startsWith($value, $parameters);
     }
 
     /**
-     * Validate the attribute starts with a given substring.
+     * Validate the attribute ends with a given substring.
      *
      * @param  string  $attribute
      * @param  mixed   $value
      * @param  array   $parameters
      * @return bool
      */
-    public function validateStartsWith($attribute, $value, $parameters)
+    public function validateEndsWith($attribute, $value, $parameters)
     {
-        return Str::startsWith($value, $parameters);
+        return Str::endsWith($value, $parameters);
     }
 
     /**
