@@ -415,9 +415,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function readStream($path)
     {
         try {
-            $resource = $this->driver->readStream($path);
-
-            return $resource ? $resource : null;
+            return $this->driver->readStream($path) ?: null;
         } catch (FileNotFoundException $e) {
             throw new ContractFileNotFoundException($e->getMessage(), $e->getCode(), $e);
         }
