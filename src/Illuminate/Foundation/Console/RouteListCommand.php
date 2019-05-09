@@ -27,11 +27,11 @@ class RouteListCommand extends Command
     protected $description = 'List all registered routes';
 
     /**
-     * An array of all the registered routes.
+     * The router instance.
      *
-     * @var \Illuminate\Routing\RouteCollection
+     * @var \Illuminate\Routing\Router
      */
-    protected $routes;
+    protected $router;
 
     /**
      * The table headers for the command.
