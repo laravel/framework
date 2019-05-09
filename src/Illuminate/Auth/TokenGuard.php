@@ -39,6 +39,13 @@ class TokenGuard implements Guard
     protected $hash = false;
 
     /**
+     * The name of the header from the request containing the bearer token.
+     *
+     * @var string
+     */
+    protected $bearerKey;
+
+    /**
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
@@ -46,6 +53,7 @@ class TokenGuard implements Guard
      * @param  string  $inputKey
      * @param  string  $storageKey
      * @param  bool  $hash
+     * @param  string  $bearerKey
      * @return void
      */
     public function __construct(
@@ -53,13 +61,15 @@ class TokenGuard implements Guard
         Request $request,
         $inputKey = 'api_token',
         $storageKey = 'api_token',
-        $hash = false)
+        $hash = false,
+        $bearerKey = 'Authorization')
     {
         $this->hash = $hash;
         $this->request = $request;
         $this->provider = $provider;
         $this->inputKey = $inputKey;
         $this->storageKey = $storageKey;
+        $this->bearerKey = $bearerKey;
     }
 
     /**
@@ -103,7 +113,7 @@ class TokenGuard implements Guard
         }
 
         if (empty($token)) {
-            $token = $this->request->bearerToken();
+            $token = $this->request->bearerToken($this->bearerKey);
         }
 
         if (empty($token)) {

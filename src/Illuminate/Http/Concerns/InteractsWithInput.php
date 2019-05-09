@@ -48,11 +48,12 @@ trait InteractsWithInput
     /**
      * Get the bearer token from the request headers.
      *
+     * @param  string  $key
      * @return string|null
      */
-    public function bearerToken()
+    public function bearerToken($key = 'Authorization')
     {
-        $header = $this->header('Authorization', '');
+        $header = $this->header($key, '');
 
         if (Str::startsWith($header, 'Bearer ')) {
             return Str::substr($header, 7);
