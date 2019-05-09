@@ -236,6 +236,7 @@ class RouteListCommand extends Command
 
         return $results;
     }
+
     /**
      * Get the console command options.
      *
