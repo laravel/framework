@@ -57,7 +57,7 @@ class RouteListCommand extends Command
     {
         parent::__construct();
 
-        $this->routes = $router->getRoutes();
+        $this->router = $router;
     }
 
     /**
@@ -67,7 +67,7 @@ class RouteListCommand extends Command
      */
     public function handle()
     {
-        if (empty($this->routes)) {
+        if (empty($this->router->getRoutes())) {
             return $this->error("Your application doesn't have any routes.");
         }
 
@@ -85,7 +85,7 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $routes = collect($this->routes)->map(function ($route) {
+        $routes = collect($this->router->getRoutes())->map(function ($route) {
             return $this->getRouteInformation($route);
         })->filter()->all();
 
