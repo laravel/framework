@@ -217,7 +217,7 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Parse the exact listing of columns.
+     * Parse the column list.
      *
      * @param  array  $columns
      * @return array
@@ -246,17 +246,11 @@ class RouteListCommand extends Command
     {
         return [
             ['columns', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Columns to include in the route table'],
-
             ['compact', 'c', InputOption::VALUE_NONE, 'Only show method, URI and action columns'],
-
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
-
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
-
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
-
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
-
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
     }
