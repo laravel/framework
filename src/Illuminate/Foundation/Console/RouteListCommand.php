@@ -210,10 +210,31 @@ class RouteListCommand extends Command
         }
 
         if ($columns = $this->option('columns')) {
-            return array_intersect($availableColumns, $columns);
+            return array_intersect($availableColumns, $this->parseColumns($columns));
         }
 
         return $availableColumns;
+    }
+
+    /**
+     * Parse the exact listing of columns.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function parseColumns(array $columns)
+    {
+        $results = [];
+
+        foreach ($columns as $i => $column) {
+            if (Str::contains($column, ',')) {
+                $results = array_merge($results, explode(',', $column));
+            } else {
+                $results[] = $column;
+            }
+        }
+
+        return $results;
     }
 
     /**
