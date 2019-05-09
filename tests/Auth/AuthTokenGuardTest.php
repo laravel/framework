@@ -175,8 +175,8 @@ class AuthTokenGuardTest extends TestCase
     {
         $provider = m::mock(UserProvider::class);
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn((object) ['id' => 1]);
-        $request = Request::create('/', 'GET', [], [], [], ['HTTP_CUSTOM_BEARER' => 'Bearer foo']);
-        $guard = new TokenGuard($provider, $request, 'api_token', 'api_token', false, 'CUSTOM_BEARER');
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_X_CUSTOM_AUTH' => 'Bearer foo']);
+        $guard = new TokenGuard($provider, $request, 'api_token', 'api_token', false, 'x-custom-auth');
         $user = $guard->user();
         $this->assertEquals(1, $user->id);
     }
