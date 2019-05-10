@@ -104,7 +104,7 @@ class SendQueuedNotifications implements ShouldQueue
     public function retryAfter()
     {
         if (! method_exists($this->notification, 'retryAfter') && ! isset($this->notification->retryAfter)) {
-            return null;
+            return;
         }
 
         return $this->notification->retryAfter ?? $this->notification->retryAfter();
