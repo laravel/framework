@@ -166,11 +166,11 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
         $router->get('test', function () {
-            return (new SymfonyResponse('test', 304, ['foo' => 'bar']))->setLastModified(new DateTime);
+            return (new SymfonyResponse('test', SymfonyResponse::HTTP_NOT_MODIFIED, ['foo' => 'bar']))->setLastModified(new DateTime);
         });
 
         $response = $router->dispatch(Request::create('test', 'GET'));
-        $this->assertSame(304, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_NOT_MODIFIED, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
         $this->assertSame('bar', $response->headers->get('foo'));
         $this->assertNull($response->getLastModified());
@@ -408,7 +408,7 @@ class RoutingRouteTest extends TestCase
         });
         $response = $router->dispatch(Request::create('foo/bar', 'OPTIONS'));
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('GET,HEAD,POST', $response->headers->get('Allow'));
     }
 
@@ -420,11 +420,11 @@ class RoutingRouteTest extends TestCase
         });
 
         $response = $router->dispatch(Request::create('foo', 'OPTIONS'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('GET,HEAD,POST', $response->headers->get('Allow'));
 
         $response = $router->dispatch(Request::create('foo', 'HEAD'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
 
         $router = $this->getRouter();
@@ -433,7 +433,7 @@ class RoutingRouteTest extends TestCase
         });
 
         $response = $router->dispatch(Request::create('foo', 'OPTIONS'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('GET,HEAD', $response->headers->get('Allow'));
 
         $router = $this->getRouter();
@@ -442,7 +442,7 @@ class RoutingRouteTest extends TestCase
         });
 
         $response = $router->dispatch(Request::create('foo', 'OPTIONS'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('POST', $response->headers->get('Allow'));
     }
 
@@ -1568,7 +1568,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch(Request::create('contact_us', 'GET'));
         $this->assertTrue($response->isRedirect('contact'));
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_FOUND, $response->getStatusCode());
     }
 
     public function testRouteRedirectWithCustomStatus()
@@ -1577,11 +1577,11 @@ class RoutingRouteTest extends TestCase
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');
         });
-        $router->redirect('contact_us', 'contact', 301);
+        $router->redirect('contact_us', 'contact', Response::HTTP_MOVED_PERMANENTLY);
 
         $response = $router->dispatch(Request::create('contact_us', 'GET'));
         $this->assertTrue($response->isRedirect('contact'));
-        $this->assertEquals(301, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_MOVED_PERMANENTLY, $response->getStatusCode());
     }
 
     public function testRoutePermanentRedirect()
@@ -1594,7 +1594,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch(Request::create('contact_us', 'GET'));
         $this->assertTrue($response->isRedirect('contact'));
-        $this->assertEquals(301, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_MOVED_PERMANENTLY, $response->getStatusCode());
     }
 
     protected function getRouter()

@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Exceptions;
 
 use Exception;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ThrottleRequestsException extends HttpException
@@ -18,6 +19,6 @@ class ThrottleRequestsException extends HttpException
      */
     public function __construct($message = null, Exception $previous = null, array $headers = [], $code = 0)
     {
-        parent::__construct(429, $message, $previous, $headers, $code);
+        parent::__construct(Response::HTTP_TOO_MANY_REQUESTS, $message, $previous, $headers, $code);
     }
 }

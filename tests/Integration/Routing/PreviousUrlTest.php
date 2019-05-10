@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Illuminate\Http\Response;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Http\FormRequest;
@@ -17,7 +18,7 @@ class PreviousUrlTest extends TestCase
 
         $response = $this->postJson('/previous-url');
 
-        $this->assertEquals(422, $response->status());
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->status());
     }
 
     protected function getApplicationProviders($app)

@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Pusher\Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Http\Response;
 use Illuminate\Broadcasting\BroadcastException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -111,7 +112,7 @@ class PusherBroadcaster extends Broadcaster
             $this->formatChannels($channels), $event, $payload, $socket, true
         );
 
-        if ((is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
+        if ((is_array($response) && $response['status'] >= Response::HTTP_OK && $response['status'] <= 299)
             || $response === true) {
             return;
         }

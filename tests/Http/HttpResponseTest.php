@@ -109,8 +109,8 @@ class HttpResponseTest extends TestCase
     public function testSetAndRetrieveStatusCode()
     {
         $response = new Response('foo');
-        $response->setStatusCode(404);
-        $this->assertSame(404, $response->getStatusCode());
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
     public function testOnlyInputOnRedirect()
@@ -170,7 +170,7 @@ class HttpResponseTest extends TestCase
 
     public function testWithHeaders()
     {
-        $response = new Response(null, 200, ['foo' => 'bar']);
+        $response = new Response(null, Response::HTTP_OK, ['foo' => 'bar']);
         $this->assertSame('bar', $response->headers->get('foo'));
 
         $response->withHeaders(['foo' => 'BAR', 'bar' => 'baz']);

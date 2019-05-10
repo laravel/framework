@@ -7,6 +7,7 @@ use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
@@ -978,7 +979,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function abort($code, $message = '', array $headers = [])
     {
-        if ($code == 404) {
+        if ($code == Response::HTTP_NOT_FOUND) {
             throw new NotFoundHttpException($message);
         }
 

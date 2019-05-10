@@ -175,7 +175,7 @@ if (! function_exists('back')) {
      * @param  mixed  $fallback
      * @return \Illuminate\Http\RedirectResponse
      */
-    function back($status = 302, $headers = [], $fallback = false)
+    function back($status = Response::HTTP_FOUND, $headers = [], $fallback = false)
     {
         return app('redirect')->back($status, $headers, $fallback);
     }
@@ -645,7 +645,7 @@ if (! function_exists('redirect')) {
      * @param  bool    $secure
      * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
      */
-    function redirect($to = null, $status = 302, $headers = [], $secure = null)
+    function redirect($to = null, $status = Response::HTTP_FOUND, $headers = [], $secure = null)
     {
         if (is_null($to)) {
             return app('redirect');
@@ -753,7 +753,7 @@ if (! function_exists('response')) {
      * @param  array   $headers
      * @return \Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory
      */
-    function response($content = '', $status = 200, array $headers = [])
+    function response($content = '', $status = Response::HTTP_OK, array $headers = [])
     {
         $factory = app(ResponseFactory::class);
 

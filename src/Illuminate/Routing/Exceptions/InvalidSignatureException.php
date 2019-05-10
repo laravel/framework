@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing\Exceptions;
 
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class InvalidSignatureException extends HttpException
@@ -13,6 +14,6 @@ class InvalidSignatureException extends HttpException
      */
     public function __construct()
     {
-        parent::__construct(403, 'Invalid signature.');
+        parent::__construct(Response::HTTP_FORBIDDEN, 'Invalid signature.');
     }
 }

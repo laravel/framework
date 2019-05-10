@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Auth;
 
 use Illuminate\Support\Str;
+use Illuminate\Http\Response;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Events\Dispatcher;
@@ -73,7 +74,7 @@ class AuthenticationTest extends TestCase
 
     public function test_basic_auth_protects_route()
     {
-        $this->get('basic')->assertStatus(401);
+        $this->get('basic')->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     public function test_basic_auth_passes_on_correct_credentials()
@@ -82,7 +83,7 @@ class AuthenticationTest extends TestCase
             'Authorization' => 'Basic '.base64_encode('email:password'),
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
         $this->assertEquals('email', $response->decodeResponseJson()['email']);
     }
 
@@ -97,18 +98,18 @@ class AuthenticationTest extends TestCase
 
         $this->get('basicWithCondition', [
             'Authorization' => 'Basic '.base64_encode('email2:password2'),
-        ])->assertStatus(401);
+        ])->assertStatus(Response::HTTP_UNAUTHORIZED);
 
         $this->get('basicWithCondition', [
             'Authorization' => 'Basic '.base64_encode('email:password'),
-        ])->assertStatus(200);
+        ])->assertStatus(Response::HTTP_OK);
     }
 
     public function test_basic_auth_fails_on_wrong_credentials()
     {
         $this->get('basic', [
             'Authorization' => 'Basic '.base64_encode('email:wrong_password'),
-        ])->assertStatus(401);
+        ])->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     public function test_logging_in_fails_via_attempt()

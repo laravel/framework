@@ -217,7 +217,7 @@ class Handler implements ExceptionHandlerContract
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $request->expectsJson()
-                    ? response()->json(['message' => $exception->getMessage()], 401)
+                    ? response()->json(['message' => $exception->getMessage()], Response::HTTP_UNAUTHORIZED)
                     : redirect()->guest($exception->redirectTo() ?? route('login'));
     }
 
@@ -282,7 +282,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         if (! $this->isHttpException($e)) {
-            $e = new HttpException(500, $e->getMessage());
+            $e = new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
 
         return $this->toIlluminateResponse(
@@ -300,7 +300,7 @@ class Handler implements ExceptionHandlerContract
     {
         return SymfonyResponse::create(
             $this->renderExceptionContent($e),
-            $this->isHttpException($e) ? $e->getStatusCode() : 500,
+            $this->isHttpException($e) ? $e->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR,
             $this->isHttpException($e) ? $e->getHeaders() : []
         );
     }
@@ -430,7 +430,7 @@ class Handler implements ExceptionHandlerContract
     {
         return new JsonResponse(
             $this->convertExceptionToArray($e),
-            $this->isHttpException($e) ? $e->getStatusCode() : 500,
+            $this->isHttpException($e) ? $e->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR,
             $this->isHttpException($e) ? $e->getHeaders() : [],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );

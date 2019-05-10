@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Exception;
 use Illuminate\Support\Arr;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
 class ValidationException extends Exception
@@ -27,7 +28,7 @@ class ValidationException extends Exception
      *
      * @var int
      */
-    public $status = 422;
+    public $status = Response::HTTP_UNPROCESSABLE_ENTITY;
 
     /**
      * The name of the error bag.

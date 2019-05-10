@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\URL;
@@ -70,7 +71,7 @@ class UrlSigningTest extends TestCase
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
 
         $response = $this->get($url);
-        $response->assertStatus(403);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function test_signed_middleware_with_routable_parameter()

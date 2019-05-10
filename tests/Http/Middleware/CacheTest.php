@@ -71,7 +71,7 @@ class CacheTest extends TestCase
             return new Response('some content');
         }, 'etag;max_age=100;s_maxage=200');
 
-        $this->assertSame(304, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_MODIFIED, $response->getStatusCode());
     }
 
     public function testInvalidOption()

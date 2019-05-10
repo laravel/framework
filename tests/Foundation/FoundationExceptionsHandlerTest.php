@@ -8,6 +8,7 @@ use Mockery as m;
 use RuntimeException;
 use Illuminate\Http\Request;
 use Psr\Log\LoggerInterface;
+use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\MessageBag;
@@ -123,7 +124,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
 
-        $response = $this->handler->render($this->request, new HttpException(403, 'My custom error message'))->getContent();
+        $response = $this->handler->render($this->request, new HttpException(Response::HTTP_FORBIDDEN, 'My custom error message'))->getContent();
 
         $this->assertStringContainsString('"message": "My custom error message"', $response);
         $this->assertStringNotContainsString('<!DOCTYPE html>', $response);

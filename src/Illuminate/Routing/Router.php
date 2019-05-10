@@ -239,7 +239,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  int  $status
      * @return \Illuminate\Routing\Route
      */
-    public function redirect($uri, $destination, $status = 302)
+    public function redirect($uri, $destination, $status = Response::HTTP_FOUND)
     {
         return $this->any($uri, '\Illuminate\Routing\RedirectController')
                 ->defaults('destination', $destination)
@@ -255,7 +255,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function permanentRedirect($uri, $destination)
     {
-        return $this->redirect($uri, $destination, 301);
+        return $this->redirect($uri, $destination, Response::HTTP_MOVED_PERMANENTLY);
     }
 
     /**
@@ -736,7 +736,7 @@ class Router implements RegistrarContract, BindingRegistrar
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
         } elseif ($response instanceof Model && $response->wasRecentlyCreated) {
-            $response = new JsonResponse($response, 201);
+            $response = new JsonResponse($response, Response::HTTP_CREATED);
         } elseif (! $response instanceof SymfonyResponse &&
                    ($response instanceof Arrayable ||
                     $response instanceof Jsonable ||

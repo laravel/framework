@@ -24,7 +24,7 @@ class JsonResponse extends BaseJsonResponse
      * @param  int    $options
      * @return void
      */
-    public function __construct($data = null, $status = 200, $headers = [], $options = 0)
+    public function __construct($data = null, $status = Response::HTTP_OK, $headers = [], $options = 0)
     {
         $this->encodingOptions = $options;
 

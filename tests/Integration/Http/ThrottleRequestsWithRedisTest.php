@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Throwable;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
@@ -53,7 +54,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
             try {
                 $this->withoutExceptionHandling()->get('/');
             } catch (Throwable $e) {
-                $this->assertEquals(429, $e->getStatusCode());
+                $this->assertEquals(Response::HTTP_TOO_MANY_REQUESTS, $e->getStatusCode());
                 $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
                 $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
                 // $this->assertTrue(in_array($e->getHeaders()['Retry-After'], [2, 3]));

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources\Json;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Responsable;
@@ -115,6 +116,6 @@ class ResourceResponse implements Responsable
     protected function calculateStatus()
     {
         return $this->resource->resource instanceof Model &&
-               $this->resource->resource->wasRecentlyCreated ? 201 : 200;
+               $this->resource->resource->wasRecentlyCreated ? Response::HTTP_CREATED : Response::HTTP_OK;
     }
 }

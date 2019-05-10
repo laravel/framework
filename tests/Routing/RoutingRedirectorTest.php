@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Routing;
 
 use Mockery as m;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\Redirector;
@@ -56,16 +57,16 @@ class RoutingRedirectorTest extends TestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_FOUND, $response->getStatusCode());
         $this->assertEquals($this->session, $response->getSession());
     }
 
     public function testComplexRedirectTo()
     {
-        $response = $this->redirect->to('bar', 303, ['X-RateLimit-Limit' => 60, 'X-RateLimit-Remaining' => 59], true);
+        $response = $this->redirect->to('bar', Response::HTTP_SEE_OTHER, ['X-RateLimit-Limit' => 60, 'X-RateLimit-Remaining' => 59], true);
 
         $this->assertEquals('https://foo.com/bar', $response->getTargetUrl());
-        $this->assertEquals(303, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_SEE_OTHER, $response->getStatusCode());
         $this->assertEquals(60, $response->headers->get('X-RateLimit-Limit'));
         $this->assertEquals(59, $response->headers->get('X-RateLimit-Remaining'));
     }

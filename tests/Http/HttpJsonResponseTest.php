@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http;
 
 use stdClass;
 use JsonSerializable;
+use Illuminate\Http\Response;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\JsonResponse;
@@ -60,12 +61,12 @@ class HttpJsonResponseTest extends TestCase
 
     public function testSetAndRetrieveStatusCode()
     {
-        $response = new JsonResponse(['foo' => 'bar'], 404);
-        $this->assertSame(404, $response->getStatusCode());
+        $response = new JsonResponse(['foo' => 'bar'], Response::HTTP_NOT_FOUND);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
 
         $response = new JsonResponse(['foo' => 'bar']);
-        $response->setStatusCode(404);
-        $this->assertSame(404, $response->getStatusCode());
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
     /**
@@ -85,7 +86,7 @@ class HttpJsonResponseTest extends TestCase
      */
     public function testGracefullyHandledSomeJsonErrorsWithPartialOutputOnError($data)
     {
-        new JsonResponse(['data' => $data], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
+        new JsonResponse(['data' => $data], Response::HTTP_OK, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 
     /**
