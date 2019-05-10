@@ -883,7 +883,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'gt');
 
-	    $comparedToValue = $this->getValue($parameters[0] ?? '');
+        $comparedToValue = $this->getValue($parameters[0] ?? '');
 
         $this->shouldBeNumeric($attribute, 'Gt');
 
@@ -891,8 +891,8 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
-	    if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
-	        return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
+        if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
+            return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
         }
 
         return true;
@@ -910,7 +910,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'lt');
 
-	    $comparedToValue = $this->getValue($parameters[0] ?? '');
+        $comparedToValue = $this->getValue($parameters[0] ?? '');
 
         $this->shouldBeNumeric($attribute, 'Lt');
 
@@ -918,8 +918,8 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
-	    if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
-		    return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
+        if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
+            return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
         }
 
         return true;
@@ -937,7 +937,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'gte');
 
-	    $comparedToValue = $this->getValue($parameters[0] ?? '');
+        $comparedToValue = $this->getValue($parameters[0] ?? '');
 
         $this->shouldBeNumeric($attribute, 'Gte');
 
@@ -945,8 +945,8 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
-	    if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
-		    return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
+        if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
+            return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
         }
 
         return true;
@@ -964,7 +964,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'lte');
 
-	    $comparedToValue = $this->getValue($parameters[0] ?? '');
+        $comparedToValue = $this->getValue($parameters[0] ?? '');
 
         $this->shouldBeNumeric($attribute, 'Lte');
 
@@ -972,8 +972,8 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
-	    if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
-		    return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
+        if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
+            return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
         }
 
         return true;
@@ -1741,37 +1741,36 @@ trait ValidatesAttributes
         }
     }
 
-	/**
-	 * Check if the values to be compared are of the same type.
-	 *
-	 * @param  string $attribute
-	 * @param  mixed  $value
-	 * @param  mixed  $comparedToValue
-	 * @return bool
-	 */
-	protected function isSameType($attribute, $value, $comparedToValue)
-	{
-		$requiredType = gettype($comparedToValue);
+    /**
+     * Check if the values to be compared are of the same type.
+     *
+     * @param  string $attribute
+     * @param  mixed  $value
+     * @param  mixed  $comparedToValue
+     * @return bool
+     */
+    protected function isSameType($attribute, $value, $comparedToValue)
+    {
+        $requiredType = gettype($comparedToValue);
 
-		if (is_numeric($comparedToValue) && ! is_numeric($value)) {
-			$requiredType = 'numeric';
-		} elseif ($comparedToValue instanceof File && ! $value instanceof File) {
-			$requiredType = 'file';
-		}
+        if (is_numeric($comparedToValue) && ! is_numeric($value)) {
+            $requiredType = 'numeric';
+        } elseif ($comparedToValue instanceof File && ! $value instanceof File) {
+            $requiredType = 'file';
+        }
 
-		if (gettype($value) != $requiredType) {
+        if (gettype($value) != $requiredType) {
+            if (! in_array($requiredType, ['array', 'file', 'numeric', 'string'])) {
+                throw new InvalidArgumentException('The field under comparison must be an array, file, number or string.');
+            }
 
-			if (! in_array($requiredType, ['array', 'file', 'numeric', 'string'])) {
-				throw new InvalidArgumentException('The field under comparison must be an array, file, number or string.');
-			}
+            $this->addFailure($attribute, $requiredType);
 
-			$this->addFailure($attribute, $requiredType);
+            return false;
+        }
 
-			return false;
-		}
-
-		return true;
-	}
+        return true;
+    }
 
     /**
      * Adds the existing rule to the numericRules array if the attribute's value is numeric.
