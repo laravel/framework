@@ -102,10 +102,9 @@ trait ResetsPasswords
      */
     protected function resetPassword($user, $password)
     {
-        if(!method_exists($user, 'setPasswordAttribute')) {
+        if (!method_exists($user, 'setPasswordAttribute')) {
             $user->password = Hash::make($password);
-        }
-        else {
+        } else {
             $user->password = $password;
         }
 
