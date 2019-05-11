@@ -97,6 +97,20 @@ class SendQueuedNotifications implements ShouldQueue
     }
 
     /**
+     * Get the retry delay for the notification.
+     *
+     * @return mixed
+     */
+    public function retryAfter()
+    {
+        if (! method_exists($this->notification, 'retryAfter') && ! isset($this->notification->retryAfter)) {
+            return;
+        }
+
+        return $this->notification->retryAfter ?? $this->notification->retryAfter();
+    }
+
+    /**
      * Prepare the instance for cloning.
      *
      * @return void
