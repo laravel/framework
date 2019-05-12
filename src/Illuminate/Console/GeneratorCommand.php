@@ -212,6 +212,10 @@ abstract class GeneratorCommand extends Command
      */
     protected function getNameInput()
     {
+        if ($this->type == 'Controller' && !Str::endsWith(strtolower($this->argument('name')), 'controller')) {
+            return trim(sprintf("%sController", $this->argument('name')));
+        }
+
         return trim($this->argument('name'));
     }
 
