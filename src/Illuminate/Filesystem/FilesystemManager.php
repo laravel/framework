@@ -75,7 +75,7 @@ class FilesystemManager implements FactoryContract
      */
     public function disk($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = $name ?? $this->getDefaultDriver();
 
         return $this->disks[$name] = $this->get($name);
     }
