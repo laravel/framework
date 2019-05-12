@@ -612,5 +612,4 @@ class ContainerFactoryStub implements Factory
 
         return $stub;
     }
-    
 }
