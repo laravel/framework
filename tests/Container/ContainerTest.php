@@ -5,10 +5,10 @@ namespace Illuminate\Tests\Container;
 use stdClass;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Factory;
 use Psr\Container\ContainerExceptionInterface;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Container\Factory;
 
 class ContainerTest extends TestCase
 {
@@ -607,8 +607,10 @@ class ContainerFactoryStub implements Factory
 {
     public function build()
     {
-        $stub = new \StdClass;
+        $stub = new stdClass;
         $stub->something = 'Foo';
+
         return $stub;
     }
+    
 }

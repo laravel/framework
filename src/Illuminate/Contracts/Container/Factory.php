@@ -10,5 +10,4 @@ interface Factory
      * @return mixed
      */
     public function build();
-
 }

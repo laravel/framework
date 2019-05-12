@@ -419,7 +419,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function bindFactory($abstract, $factoryClass)
     {
-         $this->bind($abstract, function() use($factoryClass) {
+        $this->bind($abstract, function() use($factoryClass) {
             return $this->make($factoryClass)->build();
         });
     }
