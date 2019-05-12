@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Psr\Container\ContainerExceptionInterface;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\Factory;
 
 class ContainerTest extends TestCase
 {
@@ -506,6 +507,14 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
+
+    public function testBindFactoryBuild()
+    {
+        $container = new Container;
+        $container->bindFactory('Bar', ContainerFactoryStub::class);
+
+        $this->assertSame('Foo', $container->get('Bar')->something);
+    }
 }
 
 class ContainerConcreteStub
@@ -591,5 +600,15 @@ class ContainerInjectVariableStubWithInterfaceImplementation implements IContain
     public function __construct(ContainerConcreteStub $concrete, $something)
     {
         $this->something = $something;
+    }
+}
+
+class ContainerFactoryStub implements Factory
+{
+    public function build()
+    {
+        $stub = new \StdClass;
+        $stub->something = 'Foo';
+        return $stub;
     }
 }

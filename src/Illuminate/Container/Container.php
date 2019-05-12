@@ -411,6 +411,20 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Register a factory class to create a binding in the container.
+     *
+     * @param  string  $abstract
+     * @param  string  $factoryClass
+     * @return void
+     */
+    public function bindFactory($abstract, $factoryClass)
+    {
+         $this->bind($abstract, function() use($factoryClass) {
+            return $this->make($factoryClass)->build();
+        });
+    }
+
+    /**
      * Remove an alias from the contextual binding alias cache.
      *
      * @param  string  $searched
