@@ -640,8 +640,9 @@ class Arr
         }
 
         $array = self::first($args);
+        
         $keys = array_slice($args, 1);
-
+        
         for ($i = 0; $i < count($keys); $i++) {
             $value = self::only($array, $keys[$i]);
             if ($value) {
