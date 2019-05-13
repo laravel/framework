@@ -1541,6 +1541,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the attribute ends with a given substring.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateEndsWith($attribute, $value, $parameters)
+    {
+        return Str::endsWith($value, $parameters);
+    }
+
+    /**
      * Validate that an attribute is a string.
      *
      * @param  string  $attribute

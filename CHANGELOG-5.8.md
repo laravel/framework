@@ -2,6 +2,20 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.16...5.8)
 
+### Added
+- Added `Illuminate\Foundation\Testing\TestResponse::dumpHeaders()` ([#28450](https://github.com/laravel/framework/pull/28450))
+- Added `ends_with` validation rule ([#28455](https://github.com/laravel/framework/pull/28455))
+- Added possibility to use a few `columns` arguments in the `route:list` command ([#28459](https://github.com/laravel/framework/pull/28459))
+- Added `retryAfter` in `Mail\SendQueuedMailable` and `Notifications\SendQueuedNotifications` object ([#28484](https://github.com/laravel/framework/pull/28484))
+- Added `Illuminate\Foundation\Console\Kernel::scheduleCache()` ([6587e78](https://github.com/laravel/framework/commit/6587e78383c4ecc8d7f3791f54cf6f536a1fc089))
+
+### Fixed
+- Fixed session resolver  in `RoutingServiceProvider` (without bind of `session` in `Container`) ([#28438](https://github.com/laravel/framework/pull/28438))
+- Fixed `route:list` command when routes were dynamically modified ([#28460](https://github.com/laravel/framework/pull/28460), [#28463](https://github.com/laravel/framework/pull/28463))
+
+### TODO:
+- Reset webpack file for none preset ([#28462](https://github.com/laravel/framework/pull/28462))
+
 
 ## [v5.8.16 (2019-05-07)](https://github.com/laravel/framework/compare/v5.8.15...v5.8.16)
 
@@ -30,16 +44,19 @@
 
 ### Added
 - Added handling of database URL as database connections ([#28308](https://github.com/laravel/framework/pull/28308), [4560d28](https://github.com/laravel/framework/commit/4560d28a8a5829253b3dea360c4fffb208962f83), [05b029e](https://github.com/laravel/framework/commit/05b029e58d545ee3489d45de01b8306ac0e6cf9e))
+- Added the `dd()` / `dump` methods to the `Illuminate\Database\Query\Builder.php` ([#28357](https://github.com/laravel/framework/pull/28357))
 
-### TODO:
-- Fix BelongsToMany read wrong parent key ([#28317](https://github.com/laravel/framework/pull/28317))
-- Fix make:auth not using apps configured views path ([#28324](https://github.com/laravel/framework/pull/28324), [e78cf02](https://github.com/laravel/framework/commit/e78cf0244d530b81e44c0249ded14512aaeb0ef9))
-- Add custom message to thrown exception ([#28335](https://github.com/laravel/framework/pull/28335))
-- Fix recursive replacements in Str::replaceArray() ([#28338](https://github.com/laravel/framework/pull/28338))
-- Add the `dd` method to the query builder ([#28357](https://github.com/laravel/framework/pull/28357))
-- Improve output of "assertSessionDoesntHaveErrors" when called with no arguments ([#28359](https://github.com/laravel/framework/pull/28359))
-- Allow logging out other devices without setting remember me cookie ([#28366](https://github.com/laravel/framework/pull/28366))
-- Break out password reset credentials into a method ([#28370](https://github.com/laravel/framework/pull/28370))
+### Fixed
+- Fixed `BelongsToMany` parent key ([#28317](https://github.com/laravel/framework/pull/28317))
+- Fixed `make:auth` command with apps configured views path ([#28324](https://github.com/laravel/framework/pull/28324), [e78cf02](https://github.com/laravel/framework/commit/e78cf0244d530b81e44c0249ded14512aaeb0ef9))
+- Fixed recursive replacements in `Str::replaceArray()` ([#28338](https://github.com/laravel/framework/pull/28338))
+
+### Improved
+- Added custom message to `TokenMismatchException` exception within `VerifyCsrfToken` class ([#28335](https://github.com/laravel/framework/pull/28335))
+- Improved output of `Foundation\Testing\TestResponse::assertSessionDoesntHaveErrors` when called with no arguments ([#28359](https://github.com/laravel/framework/pull/28359))
+
+### Changed
+- Allowed logging out other devices without setting remember me cookie ([#28366](https://github.com/laravel/framework/pull/28366))
 
 
 ## [v5.8.14 (2019-04-23)](https://github.com/laravel/framework/compare/v5.8.13...v5.8.14)
