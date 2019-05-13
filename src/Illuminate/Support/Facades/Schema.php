@@ -11,6 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static void defaultStringLength(int $length)
  * @method static \Illuminate\Database\Schema\Builder disableForeignKeyConstraints()
  * @method static \Illuminate\Database\Schema\Builder enableForeignKeyConstraints()
+ * @method static void registerCustomDoctrineType(string $class, string $name, string $type)
  *
  * @see \Illuminate\Database\Schema\Builder
  */

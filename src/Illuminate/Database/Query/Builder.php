@@ -273,7 +273,7 @@ class Builder
     {
         [$query, $bindings] = $this->createSub($query);
 
-        return $this->fromRaw('('.$query.') as '.$this->grammar->wrap($as), $bindings);
+        return $this->fromRaw('('.$query.') as '.$this->grammar->wrapTable($as), $bindings);
     }
 
     /**
@@ -442,7 +442,7 @@ class Builder
     {
         [$query, $bindings] = $this->createSub($query);
 
-        $expression = '('.$query.') as '.$this->grammar->wrap($as);
+        $expression = '('.$query.') as '.$this->grammar->wrapTable($as);
 
         $this->addBinding($bindings, 'join');
 
@@ -614,17 +614,6 @@ class Builder
         // We'll add that Closure to the query then return back out immediately.
         if ($column instanceof Closure) {
             return $this->whereNested($column, $boolean);
-        }
-
-        // If the operator is a literal string 'in' or 'not in', we will assume that
-        // the developer wants to use the "whereIn / whereNotIn" methods for this
-        // operation and proxy the query through those methods from this point.
-        if ($operator == 'in') {
-            return $this->whereIn($column, $value, $boolean);
-        }
-
-        if ($operator == 'not in') {
-            return $this->whereNotIn($column, $value, $boolean);
         }
 
         // If the given operator is not found in the list of valid operators we will
@@ -2987,6 +2976,26 @@ class Builder
                 $clone->bindings[$type] = [];
             }
         });
+    }
+
+    /**
+     * Dump the current SQL and bindings.
+     *
+     * @return void
+     */
+    public function dump()
+    {
+        dump($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Die and dump the current SQL and bindings.
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        dd($this->toSql(), $this->getBindings());
     }
 
     /**

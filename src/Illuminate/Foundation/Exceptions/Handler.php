@@ -151,7 +151,7 @@ class Handler implements ExceptionHandlerContract
         try {
             return array_filter([
                 'userId' => Auth::id(),
-                // 'email' => Auth::user() ? Auth::user()->email : null,
+                // 'email' => optional(Auth::user())->email,
             ]);
         } catch (Throwable $e) {
             return [];

@@ -1118,7 +1118,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Determine if the connection in a "dry run".
+     * Determine if the connection is in a "dry run".
      *
      * @return bool
      */

@@ -76,6 +76,20 @@ class SendQueuedMailable
     }
 
     /**
+     * Get the retry delay for the mailable object.
+     *
+     * @return mixed
+     */
+    public function retryAfter()
+    {
+        if (! method_exists($this->mailable, 'retryAfter') && ! isset($this->mailable->retryAfter)) {
+            return;
+        }
+
+        return $this->mailable->retryAfter ?? $this->mailable->retryAfter();
+    }
+
+    /**
      * Prepare the instance for cloning.
      *
      * @return void

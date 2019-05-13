@@ -1235,6 +1235,33 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateEndsWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'ends_with:hello']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'ends_with:world']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'ends_with:world,hello']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.ends_with' => 'The :attribute must end with one of the following values :values'], 'en');
+        $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'ends_with:http']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The url must end with one of the following values http', $v->messages()->first('url'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.ends_with' => 'The :attribute must end with one of the following values :values'], 'en');
+        $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'ends_with:http,https']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals('The url must end with one of the following values http, https', $v->messages()->first('url'));
+    }
+
     public function testValidateStartsWith()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4384,6 +4411,14 @@ class ValidationValidatorTest extends TestCase
 
         $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
         $this->assertEquals(1, $validateCount);
+    }
+
+    public function testMultiplePassesCalls()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['foo' => 'string|required']);
+        $this->assertFalse($v->passes());
+        $this->assertFalse($v->passes());
     }
 
     /**

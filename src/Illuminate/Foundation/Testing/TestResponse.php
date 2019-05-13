@@ -915,7 +915,7 @@ class TestResponse
         $keys = (array) $keys;
 
         if (empty($keys)) {
-            return $this->assertSessionMissing('errors');
+            return $this->assertSessionHasNoErrors();
         }
 
         if (is_null($this->session()->get('errors'))) {
@@ -1018,6 +1018,16 @@ class TestResponse
         }
 
         dd($content);
+    }
+
+    /**
+     * Dump the headers from the response.
+     *
+     * @return void
+     */
+    public function dumpHeaders()
+    {
+        dd($this->headers->all());
     }
 
     /**
