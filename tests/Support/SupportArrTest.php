@@ -845,7 +845,7 @@ class SupportArrTest extends TestCase
                 'first',
                 'second',
                 'third',
-            ]
+            ],
         ]);
 
         $result = Arr::getFirst('not-an-array', 'city');
