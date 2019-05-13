@@ -652,7 +652,7 @@ class Arr
                 }
             }
         }
-        
+
         return [];
     }
 }
