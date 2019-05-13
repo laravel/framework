@@ -4413,6 +4413,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(1, $validateCount);
     }
 
+    public function testMultiplePassesCalls()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['foo' => 'string|required']);
+        $this->assertFalse($v->passes());
+        $this->assertFalse($v->passes());
+    }
+
     /**
      * @dataProvider validUuidList
      */
