@@ -48,7 +48,7 @@ class FactoryMakeCommand extends GeneratorCommand
     {
         $namespaceModel = $this->option('model')
                         ? $this->qualifyClass($this->option('model'))
-                        : trim($this->rootNamespace(), '\\').'\\Model';
+                        : trim($this->rootNamespace(), '\\').'\\'. ucfirst(str_replace('Factory', '', $name));
 
         $model = class_basename($namespaceModel);
 
