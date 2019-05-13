@@ -155,9 +155,14 @@ trait AuthenticatesUsers
      */
     public function logout(Request $request)
     {
+        // Logout current user only by guard
         $this->guard()->logout();
-
-        $request->session()->invalidate();
+        
+        // Get the session key for this user
+        $sessionKey = $this->guard()->getName();
+        
+        // Delete single session key (just for this guard's user)
+        $request->session()->forget($sessionKey);
 
         return $this->loggedOut($request) ?: redirect('/');
     }
