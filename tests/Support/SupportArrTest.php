@@ -832,7 +832,7 @@ class SupportArrTest extends TestCase
             ],
             'zipCode' => '1234',
         ];
-                    
+
         $result = Arr::getFirst();
         $this->assertEquals($result, []);
 

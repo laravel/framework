@@ -628,7 +628,7 @@ class Arr
      * @param  mixed  $value
      * @return array
      */
-    public static function getFirst() 
+    public static function getFirst()
     {
         $args = func_get_args();
 
