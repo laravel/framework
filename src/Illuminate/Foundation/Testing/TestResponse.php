@@ -556,27 +556,32 @@ class TestResponse
      * @param  array $rules
      * @return $this
      */
-    public function assertValidationWithJsonResponse(Array $rules)
+    public function assertValidationWithJsonResponse(Array $rules, $wrapper)
     {
-        //Get First Array in json resopnse if not empty
-        $data = $this->json()['data'][0] ?? $this->json()['data'];
+        $data = data_get($this->json(), $wrapper);
         if (empty($data)) {
-            return PHPUnit::fail('Response Does not contain data');
-        }
-        $validator = Validator::make($data, $rules);
-        if (!$validator->fails()) {
-            return PHPUnit::assertTrue(true);
-        }
-        $errors = $validator->errors();
-        if (count($errors) > 0) {
-            PHPUnit::fail(
-                'Response has validation errors: ' . PHP_EOL . PHP_EOL .
-                json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            return PHPUnit::fail(
+                "Response Dos not Have wrapper called  ${wrapper} "
             );
         }
+        $data = isset($data[0]) ? $data : [$data];
+        foreach ($data as $datum) {
+            $validator = Validator::make($datum, $rules);
+            if (!$validator->fails()) {
+                return PHPUnit::assertTrue(true);
+            }
+            $errors = $validator->errors();
+            if (count($errors) > 0) {
+                return PHPUnit::fail(
+                    'Response has validation errors: ' . PHP_EOL . PHP_EOL .
+                    json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                );
+            }
 
+        }
         return $this;
     }
+
 
     /**
      * Get the strings we need to search for when examining the JSON.
