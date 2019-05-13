@@ -865,8 +865,8 @@ class SupportArrTest extends TestCase
 
         $result = Arr::getFirst($a, 'phone', 'zipCode', 'mobile');
         $this->assertEquals($result, ['zipCode' => '1234']);
-        
-        $result = Arr::getFirst($a, 'phone',  'mobile', 'zipCode');
+
+        $result = Arr::getFirst($a, 'phone', 'mobile', 'zipCode');
         $this->assertEquals($result, ['mobile' => '85674634']);
     }
 }

@@ -623,15 +623,16 @@ class Arr
     }
 
     /**
-     * Get the first element corresponding with the key and where value is set
+     * Get the first element corresponding with the key and where value is set.
      *
      * @param  mixed  $value
      * @return array
      */
-    public static function getFirst() {
+    public static function getFirst() 
+    {
         $args = func_get_args();
 
-        if(count($args) < 2) {
+        if (count($args) < 2) {
             return [];
         }
 
