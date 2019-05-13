@@ -417,6 +417,7 @@ class Gate implements GateContract
      *
      * @param  callable  $callback
      * @return bool
+     * @throws \ReflectionException
      */
     protected function callbackAllowsGuests($callback)
     {
@@ -598,6 +599,7 @@ class Gate implements GateContract
      *
      * @param  object|string  $class
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function resolvePolicy($class)
     {
