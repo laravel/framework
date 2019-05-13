@@ -212,8 +212,8 @@ class ChangeColumn
      * Get the matching Doctrine value for a given Fluent attribute.
      *
      * @param string $option
-     * @param mixed $value
-     * 
+     * @param mixed  $value
+     *
      * @return mixed
      */
     protected static function mapFluentValueToDoctrine($option, $value)
