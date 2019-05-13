@@ -623,7 +623,7 @@ class Arr
     }
 
     /**
-     * Get the first element corresponding with the key which and has value set
+     * Get the first element corresponding with the key and where value is set
      *
      * @param  mixed  $value
      * @return array
@@ -640,9 +640,9 @@ class Arr
         }
 
         $array = self::first($args);
-        
+
         $keys = array_slice($args, 1);
-        
+
         for ($i = 0; $i < count($keys); $i++) {
             $value = self::only($array, $keys[$i]);
             if ($value) {
