@@ -95,7 +95,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             'DROP TABLE users',
             'CREATE TABLE users (age INTEGER NOT NULL COLLATE RTRIM)',
             'INSERT INTO users (age) SELECT age FROM __temp__users',
-            'DROP TABLE __temp__users'
+            'DROP TABLE __temp__users',
         ];
 
         $expected2 = [
@@ -103,7 +103,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             'DROP TABLE users',
             'CREATE TABLE users (age INTEGER NOT NULL COLLATE NOCASE)',
             'INSERT INTO users (age) SELECT age FROM __temp__users',
-            'DROP TABLE __temp__users'
+            'DROP TABLE __temp__users',
         ];
 
         $this->assertEquals($expected, $queries);
