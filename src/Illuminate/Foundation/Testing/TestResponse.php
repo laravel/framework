@@ -12,6 +12,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Foundation\Testing\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * @mixin \Illuminate\Http\Response
@@ -548,6 +549,33 @@ class TestResponse
             'within'.PHP_EOL.PHP_EOL.
             "[{$actual}]."
         );
+    }
+    /**
+     * Assert that the response is pass validation rule.
+     *
+     * @param  array $rules
+     * @return $this
+     */
+    public function assertValidationWithJsonResponse(Array $rules)
+    {
+        //Get First Array in json resopnse if not empty
+        $data = $this->json()['data'][0] ?? $this->json()['data'];
+        if (empty($data)) {
+            return PHPUnit::fail('Response Does not contain data');
+        }
+        $validator = Validator::make($data, $rules);
+        if (!$validator->fails()) {
+            return PHPUnit::assertTrue(true);
+        }
+        $errors = $validator->errors();
+        if (count($errors) > 0) {
+            PHPUnit::fail(
+                'Response has validation errors: ' . PHP_EOL . PHP_EOL .
+                json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            );
+        }
+
+        return $this;
     }
 
     /**
