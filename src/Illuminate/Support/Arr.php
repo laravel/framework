@@ -621,4 +621,35 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Get the first element corresponding with the key which and has value set
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function getFirst() {
+        $args = func_get_args();
+
+        if(count($args) < 2) {
+            return [];
+        }
+
+        if (! self::accessible(self::first($args))) {
+            return [];
+        }
+
+        $array = self::first($args);
+        $keys = array_slice($args, 1);
+
+        for ($i = 0; $i < count($keys); $i++) {
+            $value = self::only($array, $keys[$i]);
+            if ($value) {
+                if (! is_null($value[$keys[$i]]) && ! empty($value[$keys[$i]])) {
+                    return $value;
+                }
+            }
+        }
+        return [];
+    }
 }

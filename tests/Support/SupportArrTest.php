@@ -815,4 +815,58 @@ class SupportArrTest extends TestCase
         $this->assertEquals([$obj], Arr::wrap($obj));
         $this->assertSame($obj, Arr::wrap($obj)[0]);
     }
+
+    public function testGetFirst()
+    {
+        $a = [
+            'lastName' => 'Doe',
+            'firstName' => 'John',
+            'phone' => '',
+            'email' => 'john.doe@example.com',
+            'mobile' => '85674634',
+            'city' => '',
+            'nested' => [
+                'first',
+                'second',
+                'third',
+            ],
+            'zipCode' => '1234',
+        ];
+                    
+        $result = Arr::getFirst();
+        $this->assertEquals($result, []);
+
+        $result = Arr::getFirst($a);
+        $this->assertEquals($result, []);
+
+        $result = Arr::getFirst($a, 'nested');
+        $this->assertEquals($result, [
+            'nested' => [
+                'first',
+                'second',
+                'third',
+            ]
+        ]);
+
+        $result = Arr::getFirst('not-an-array', 'city');
+        $this->assertEquals($result, []);
+
+        $result = Arr::getFirst($a, 'city');
+        $this->assertEquals($result, []);
+
+        $result = Arr::getFirst($a, 'email');
+        $this->assertEquals($result, ['email' => 'john.doe@example.com']);
+
+        $result = Arr::getFirst($a, 'phone', 'mobile');
+        $this->assertEquals($result, ['mobile' => '85674634']);
+
+        $result = Arr::getFirst($a, 'zipCode', 'phone', 'mobile');
+        $this->assertEquals($result, ['zipCode' => '1234']);
+
+        $result = Arr::getFirst($a, 'phone', 'zipCode', 'mobile');
+        $this->assertEquals($result, ['zipCode' => '1234']);
+        
+        $result = Arr::getFirst($a, 'phone',  'mobile', 'zipCode');
+        $this->assertEquals($result, ['mobile' => '85674634']);
+    }
 }
