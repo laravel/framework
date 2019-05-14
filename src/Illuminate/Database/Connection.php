@@ -662,11 +662,11 @@ class Connection implements ConnectionInterface
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
             $exc = ltrim($e, 'PDOException:');
-            $exc_r = strtok($exc, "No");
+            $exc_r = strtok($exc, 'No');
            
             /*Check for specific SQL Error Code. in this case 2002 means database connection error return a
               nice error page instead a frustrating exception page ( "nice page" construction needed, I've just passed a string )  */
-            if(strpos($exc_r , "SQLSTATE[HY000] [2002]") !== false){
+            if(strpos($exc_r , "SQLSTATE[HY000] [2002]") !== false) {
                 $err ="DB Connection is Missing.";
                 echo $err;
                 die();
