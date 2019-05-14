@@ -661,6 +661,16 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
+            $exc = ltrim($e, 'PDOException:');
+            $exc_r = strtok($exc, "No");
+           
+            /*Check for specific SQL Error Code. in this case 2002 means database connection error return a
+              nice error page instead a frustrating exception page ( "nice page" construction needed, I've just passed a string )  */
+            if(strpos($exc_r , "SQLSTATE[HY000] [2002]") !== false){
+                $err ="DB Connection is Missing.";
+                echo $err;
+                die();
+            }
             throw new QueryException(
                 $query, $this->prepareBindings($bindings), $e
             );
