@@ -160,7 +160,7 @@ class DatabaseSoftDeletingTraitWithOtherColumnsStub extends DatabaseSoftDeleting
     public function getDirty()
     {
         return [
-            'somecolumn' => 'somevalue'
+            'somecolumn' => 'somevalue',
         ];
     }
 }
@@ -172,7 +172,7 @@ class DatabaseSoftDeletingTraitWithOtherColumnsOverridesSystemColumnsStub extend
         return [
             'deleted_at' => 'new-date-time',
             'updated_at' => 'new-date-time',
-            'somecolumn' => 'somevalue'
+            'somecolumn' => 'somevalue',
         ];
     }
 }
