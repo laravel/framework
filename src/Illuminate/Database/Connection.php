@@ -667,7 +667,7 @@ class Connection implements ConnectionInterface
             /*Check for specific SQL Error Code. in this case 2002 means database connection error return a
               nice error page instead a frustrating exception page ( "nice page" construction needed, I've just passed a string )  */
             if(strpos($exc_r , "SQLSTATE[HY000] [2002]") !== false) {
-                $err ="DB Connection is Missing.";
+                $err ='DB Connection is Missing.';
                 echo $err;
                 die();
             }
