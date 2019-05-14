@@ -372,6 +372,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add constraint `users_foo_id_foreign` foreign key (`foo_id`) references `orders` (`id`)', $statements[0]);
     }
 
+    public function testAddingColumnWithForeignKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('user_group_id')->foreign();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('alter table `users` add `user_group_id` int not null', $statements[0]);
+        $this->assertEquals('alter table `users` add constraint `users_user_group_id_foreign` foreign key (`user_group_id`) references `user_groups` (`id`)', $statements[1]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

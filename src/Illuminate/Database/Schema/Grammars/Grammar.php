@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use RuntimeException;
+use Illuminate\Support\Str;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
@@ -72,6 +73,8 @@ abstract class Grammar extends BaseGrammar
             $this->wrap($command->index)
         );
 
+        $this->suggestForeign($command);
+
         // Once we have the initial portion of the SQL statement we will add on the
         // key name, table name, and referenced columns. These will complete the
         // main portion of the SQL statement and this SQL will almost be done.
@@ -93,6 +96,21 @@ abstract class Grammar extends BaseGrammar
         }
 
         return $sql;
+    }
+
+    /**
+     * Suggest a foreign
+     *
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return void
+     */
+    protected function suggestForeign(Fluent $command)
+    {
+        if (count($command->columns) === 1 && is_null($command->on) && is_null($command->references)) {
+            $segments = explode('_', $command->columns[0]);
+            $command->references(array_pop($segments));
+            $command->on(Str::plural(implode('_', $segments)));
+        }
     }
 
     /**

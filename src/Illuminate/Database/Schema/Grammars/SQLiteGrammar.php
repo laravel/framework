@@ -103,6 +103,8 @@ class SQLiteGrammar extends Grammar
      */
     protected function getForeignKey($foreign)
     {
+        $this->suggestForeign($foreign);
+
         // We need to columnize the columns that the foreign key is being defined for
         // so that it is a properly formatted list. Once we have done this, we can
         // return the foreign key SQL declaration to the calling method for use.
