@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.17...5.8)
 
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.16...v5.8.17)
+## [v5.8.17 (2019-05-14)](https://github.com/laravel/framework/compare/v5.8.16...v5.8.17)
 
 ### Added
 - Added `Illuminate\Foundation\Testing\TestResponse::dumpHeaders()` ([#28450](https://github.com/laravel/framework/pull/28450))
