@@ -663,7 +663,6 @@ class Connection implements ConnectionInterface
         catch (Exception $e) {
             $exc = ltrim($e, 'PDOException:');
             $exc_r = strtok($exc, 'No');
-           
             /*Check for specific SQL Error Code. in this case 2002 means database connection error return a
               nice error page instead a frustrating exception page ( "nice page" construction needed, I've just passed a string )  */
             if (strpos($exc_r, 'SQLSTATE[HY000] [2002]') !== false) {
