@@ -29,6 +29,38 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $model->deleted_at);
     }
 
+    public function testDeleteSetsSoftDeletedAndOtherColumns()
+    {
+        $model = m::mock(DatabaseSoftDeletingTraitWithOtherColumnsStub::class);
+        $model->makePartial();
+        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
+        $query->shouldReceive('update')->once()->with([
+            'deleted_at' => 'date-time',
+            'updated_at' => 'date-time',
+            'somecolumn' => 'somevalue',
+        ]);
+        $model->delete();
+
+        $this->assertInstanceOf(Carbon::class, $model->deleted_at);
+    }
+
+    public function testDeleteSetsSoftDeletedAndOtherColumnsOverridesSystemColumns()
+    {
+        $model = m::mock(DatabaseSoftDeletingTraitWithOtherColumnsOverridesSystemColumnsStub::class);
+        $model->makePartial();
+        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
+        $query->shouldReceive('update')->once()->with([
+            'deleted_at' => 'date-time',
+            'updated_at' => 'date-time',
+            'somecolumn' => 'somevalue',
+        ]);
+        $model->delete();
+
+        $this->assertInstanceOf(Carbon::class, $model->deleted_at);
+    }
+
     public function testRestore()
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);
@@ -63,6 +95,11 @@ class DatabaseSoftDeletingTraitStub
     public function newQuery()
     {
         //
+    }
+
+    public function getDirty()
+    {
+        return [];
     }
 
     public function getKey()
@@ -115,5 +152,27 @@ class DatabaseSoftDeletingTraitStub
     protected function getKeyForSaveQuery()
     {
         return 1;
+    }
+}
+
+class DatabaseSoftDeletingTraitWithOtherColumnsStub extends DatabaseSoftDeletingTraitStub
+{
+    public function getDirty()
+    {
+        return [
+            'somecolumn' => 'somevalue'
+        ];
+    }
+}
+
+class DatabaseSoftDeletingTraitWithOtherColumnsOverridesSystemColumnsStub extends DatabaseSoftDeletingTraitStub
+{
+    public function getDirty()
+    {
+        return [
+            'deleted_at' => 'new-date-time',
+            'updated_at' => 'new-date-time',
+            'somecolumn' => 'somevalue'
+        ];
     }
 }
