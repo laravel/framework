@@ -99,7 +99,7 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
-     * Suggest a foreign
+     * Suggest a foreign.
      *
      * @param  \Illuminate\Support\Fluent  $command
      * @return void
