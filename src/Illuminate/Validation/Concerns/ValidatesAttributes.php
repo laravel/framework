@@ -895,7 +895,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
         }
 
-        return true;
+        return $this->validateBail();
     }
 
     /**
@@ -922,7 +922,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
         }
 
-        return true;
+	    return $this->validateBail();
     }
 
     /**
@@ -949,7 +949,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
         }
 
-        return true;
+	    return $this->validateBail();
     }
 
     /**
@@ -976,7 +976,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
         }
 
-        return true;
+	    return $this->validateBail();
     }
 
     /**
