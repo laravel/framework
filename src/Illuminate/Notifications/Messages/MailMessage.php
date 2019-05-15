@@ -74,18 +74,18 @@ class MailMessage extends SimpleMessage implements Renderable
     public $rawAttachments = [];
 
     /**
-     * The callbacks for the message.
-     *
-     * @var array
-     */
-    public $callbacks = [];
-
-    /**
      * Priority level of the message.
      *
      * @var int
      */
     public $priority;
+
+    /**
+     * The callbacks for the message.
+     *
+     * @var array
+     */
+    public $callbacks = [];
 
     /**
      * Set the view for the mail message.
@@ -232,19 +232,6 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
-     * Add a callback for the message.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function withSwiftMessage($callback)
-    {
-        $this->callbacks[] = $callback;
-
-        return $this;
-    }
-
-    /**
      * Set the priority of this message.
      *
      * The value is an integer where 1 is the highest priority and 5 is the lowest.
@@ -305,5 +292,18 @@ class MailMessage extends SimpleMessage implements Renderable
         return Container::getInstance()
             ->make(Markdown::class)
             ->render($this->markdown, $this->data());
+    }
+
+    /**
+     * Register a callback to be called with the Swift message instance.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function withSwiftMessage($callback)
+    {
+        $this->callbacks[] = $callback;
+
+        return $this;
     }
 }
