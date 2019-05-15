@@ -74,4 +74,16 @@ class NotificationMailMessageTest extends TestCase
 
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
     }
+
+    public function testCallbackIsSetCorrectly()
+    {
+        $callback = function () {
+            //
+        };
+
+        $message = new MailMessage;
+        $message->withSwiftMessage($callback);
+
+        $this->assertSame([$callback], $message->callbacks);
+    }
 }
