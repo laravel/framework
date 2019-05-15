@@ -105,9 +105,7 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (empty($credentials) ||
-           (count($credentials) === 1 &&
-            array_key_exists('password', $credentials))) {
+        if ( !$this->areCredentialsValid($credentials) ) {
             return;
         }
 
@@ -214,5 +212,18 @@ class EloquentUserProvider implements UserProvider
         $this->model = $model;
 
         return $this;
+    }
+
+    /**
+     *  Check and validate The passed $credentials values
+     *
+     * @param $credentials
+     * @return bool
+     */
+    private function areCredentialsValid($credentials)
+    {
+        return ( empty($credentials) ||
+        ( count($credentials) === 1 &&
+            array_key_exists('password', $credentials) ) );
     }
 }
