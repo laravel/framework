@@ -190,7 +190,7 @@ class FileStore implements Store
             $data = unserialize(substr($contents, 10));
         } catch (Exception $e) {
             $this->forget($key);
-            
+
             return $this->emptyPayload();
         }
 
