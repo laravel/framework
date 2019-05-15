@@ -43,6 +43,8 @@ class Schedule
      *
      * @param  \DateTimeZone|string|null  $timezone
      * @return void
+     *
+     * * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function __construct($timezone = null)
     {
@@ -81,6 +83,8 @@ class Schedule
      * @param  string  $command
      * @param  array  $parameters
      * @return \Illuminate\Console\Scheduling\Event
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function command($command, array $parameters = [])
     {
