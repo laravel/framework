@@ -137,6 +137,8 @@ class MailChannel
         if (! is_null($message->priority)) {
             $mailMessage->setPriority($message->priority);
         }
+
+        $this->runCallbacks($mailMessage, $message);
     }
 
     /**
@@ -224,5 +226,21 @@ class MailChannel
         foreach ($message->rawAttachments as $attachment) {
             $mailMessage->attachData($attachment['data'], $attachment['name'], $attachment['options']);
         }
+    }
+
+    /**
+     * Run the callbacks for the message.
+     *
+     * @param  \Illuminate\Mail\Message  $mailMessage
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return $this
+     */
+    protected function runCallbacks($mailMessage, $message)
+    {
+        foreach ($message->callbacks as $callback) {
+            $callback($mailMessage->getSwiftMessage());
+        }
+
+        return $this;
     }
 }

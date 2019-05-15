@@ -74,6 +74,13 @@ class MailMessage extends SimpleMessage implements Renderable
     public $rawAttachments = [];
 
     /**
+     * The callbacks for the message.
+     *
+     * @var array
+     */
+    public $callbacks = [];
+
+    /**
      * Priority level of the message.
      *
      * @var int
@@ -220,6 +227,19 @@ class MailMessage extends SimpleMessage implements Renderable
     public function attachData($data, $name, array $options = [])
     {
         $this->rawAttachments[] = compact('data', 'name', 'options');
+
+        return $this;
+    }
+
+    /**
+     * Add a callback for the message.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function withSwiftMessage($callback)
+    {
+        $this->callbacks[] = $callback;
 
         return $this;
     }
