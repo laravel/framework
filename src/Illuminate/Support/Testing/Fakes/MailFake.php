@@ -331,6 +331,6 @@ class MailFake implements Mailer, MailQueue
      */
     public function failures()
     {
-        //
+        return [];
     }
 }
