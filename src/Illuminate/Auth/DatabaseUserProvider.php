@@ -138,9 +138,8 @@ class DatabaseUserProvider implements UserProvider
      */
     protected function getGenericUser($user)
     {
-        if (! is_null($user)) {
-            return new GenericUser((array) $user);
-        }
+        return ! is_null($user) ?
+            new GenericUser((array) $user) : null;
     }
 
     /**
