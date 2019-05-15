@@ -74,4 +74,12 @@ class NotificationMailMessageTest extends TestCase
 
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
     }
+
+    public function testHeaderIsSetCorrectly()
+    {
+        $message = new Mailmessage;
+        $message->header('Name', 'Value');
+
+        $this->assertSame(['Name' => 'Value'], $message->headers);
+    }
 }

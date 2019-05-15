@@ -134,6 +134,8 @@ class MailChannel
 
         $this->addAttachments($mailMessage, $message);
 
+        $this->addHeaders($mailMessage, $message);
+
         if (! is_null($message->priority)) {
             $mailMessage->setPriority($message->priority);
         }
@@ -223,6 +225,20 @@ class MailChannel
 
         foreach ($message->rawAttachments as $attachment) {
             $mailMessage->attachData($attachment['data'], $attachment['name'], $attachment['options']);
+        }
+    }
+
+    /**
+     * Add the headers to the message.
+     *
+     * @param  \Illuminate\Mail\Message  $mailMessage
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return void
+     */
+    protected function addHeaders($mailMessage, $message)
+    {
+        foreach ($message->headers as $name => $value) {
+            $mailMessage->getHeaders()->addTextHeader($name, $value);
         }
     }
 }

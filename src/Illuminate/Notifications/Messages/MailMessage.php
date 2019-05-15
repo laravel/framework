@@ -74,6 +74,13 @@ class MailMessage extends SimpleMessage implements Renderable
     public $rawAttachments = [];
 
     /**
+     * The headers for the message.
+     *
+     * @var array
+     */
+    public $headers = [];
+
+    /**
      * Priority level of the message.
      *
      * @var int
@@ -220,6 +227,20 @@ class MailMessage extends SimpleMessage implements Renderable
     public function attachData($data, $name, array $options = [])
     {
         $this->rawAttachments[] = compact('data', 'name', 'options');
+
+        return $this;
+    }
+
+    /**
+     * Set a header for the message.
+     *
+     * @param  string  $name
+     * @param  string  $value
+     * @return $this
+     */
+    public function header($name, $value)
+    {
+        $this->headers[$name] = $value;
 
         return $this;
     }
