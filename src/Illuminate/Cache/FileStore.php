@@ -188,7 +188,7 @@ class FileStore implements Store
 
         try {
             $data = unserialize(substr($contents, 10));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->forget($key);
             
             return $this->emptyPayload();
