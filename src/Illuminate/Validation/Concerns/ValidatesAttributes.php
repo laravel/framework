@@ -891,11 +891,12 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
-        if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
-            return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
-        }
+	    if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
+		    $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
+		    return $this->validateBail();
+	    }
 
-        return $this->validateBail();
+	    return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
     }
 
     /**
@@ -918,11 +919,12 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
-        if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
-            return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
-        }
+	    if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
+		    $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
+		    return $this->validateBail();
+	    }
 
-        return $this->validateBail();
+	    return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
     }
 
     /**
@@ -945,11 +947,12 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
-        if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
-            return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
+        if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
+        	$this->addIncorrectTypeFailureMessage($attribute, $requiredType);
+	        return $this->validateBail();
         }
 
-        return $this->validateBail();
+        return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
     }
 
     /**
@@ -972,11 +975,12 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
-        if ($this->isSameType($attribute, $value, $comparedToValue ?? $parameters[0])) {
-            return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
-        }
+	    if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
+		    $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
+		    return $this->validateBail();
+	    }
 
-        return $this->validateBail();
+	    return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
     }
 
     /**
@@ -1741,35 +1745,48 @@ trait ValidatesAttributes
         }
     }
 
+	/**
+	 * Check if the values to be compared are of the same
+	 * type, and if not return the required type.
+	 *
+	 * @param  mixed  $value
+	 * @param  mixed  $comparedToValue
+	 * @return mixed
+	 */
+	protected function compareTypes($value, $comparedToValue)
+	{
+		$requiredType = gettype($comparedToValue);
+
+		if (is_numeric($comparedToValue) && ! is_numeric($value)) {
+			$requiredType = 'numeric';
+		} elseif ($comparedToValue instanceof File && ! $value instanceof File) {
+			$requiredType = 'file';
+		}
+
+		if (gettype($value) != $requiredType) {
+			return $requiredType;
+		}
+
+		return null;
+	}
+
     /**
-     * Check if the values to be compared are of the same type.
+     * Add a failure message to the validator specifying the
+     * required type for the field under comparison.
      *
      * @param  string $attribute
-     * @param  mixed  $value
-     * @param  mixed  $comparedToValue
-     * @return bool
+     * @param  string $requiredType
+     * @return void
+     *
+     * @throws \InvalidArgumentException
      */
-    protected function isSameType($attribute, $value, $comparedToValue)
+    protected function addIncorrectTypeFailureMessage($attribute, $requiredType)
     {
-        $requiredType = gettype($comparedToValue);
-
-        if (is_numeric($comparedToValue) && ! is_numeric($value)) {
-            $requiredType = 'numeric';
-        } elseif ($comparedToValue instanceof File && ! $value instanceof File) {
-            $requiredType = 'file';
+        if (! in_array($requiredType, ['array', 'file', 'numeric', 'string'])) {
+            throw new InvalidArgumentException('The field under comparison must be an array, file, number or string.');
         }
 
-        if (gettype($value) != $requiredType) {
-            if (! in_array($requiredType, ['array', 'file', 'numeric', 'string'])) {
-                throw new InvalidArgumentException('The field under comparison must be an array, file, number or string.');
-            }
-
-            $this->addFailure($attribute, $requiredType);
-
-            return false;
-        }
-
-        return true;
+        $this->addFailure($attribute, $requiredType);
     }
 
     /**
