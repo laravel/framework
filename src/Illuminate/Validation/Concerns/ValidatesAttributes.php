@@ -891,12 +891,13 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
-	    if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
-		    $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
-		    return $this->validateBail();
-	    }
+        if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
+            $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
 
-	    return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
+            return $this->validateBail();
+        }
+
+        return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
     }
 
     /**
@@ -919,12 +920,13 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
-	    if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
-		    $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
-		    return $this->validateBail();
-	    }
+        if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
+            $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
 
-	    return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
+            return $this->validateBail();
+        }
+
+        return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
     }
 
     /**
@@ -948,8 +950,9 @@ trait ValidatesAttributes
         }
 
         if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
-        	$this->addIncorrectTypeFailureMessage($attribute, $requiredType);
-	        return $this->validateBail();
+            $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
+
+            return $this->validateBail();
         }
 
         return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
@@ -975,12 +978,13 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
-	    if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
-		    $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
-		    return $this->validateBail();
-	    }
+        if ($requiredType = $this->compareTypes($value, $comparedToValue ?? $parameters[0])) {
+            $this->addIncorrectTypeFailureMessage($attribute, $requiredType);
 
-	    return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
+            return $this->validateBail();
+        }
+
+        return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue ?? $parameters[0]);
     }
 
     /**
@@ -1745,30 +1749,28 @@ trait ValidatesAttributes
         }
     }
 
-	/**
-	 * Check if the values to be compared are of the same
-	 * type, and if not return the required type.
-	 *
-	 * @param  mixed  $value
-	 * @param  mixed  $comparedToValue
-	 * @return mixed
-	 */
-	protected function compareTypes($value, $comparedToValue)
-	{
-		$requiredType = gettype($comparedToValue);
+    /**
+     * Check if the values to be compared are of the same
+     * type, and if not return the required type.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $comparedToValue
+     * @return mixed
+     */
+    protected function compareTypes($value, $comparedToValue)
+    {
+        $requiredType = gettype($comparedToValue);
 
-		if (is_numeric($comparedToValue) && ! is_numeric($value)) {
-			$requiredType = 'numeric';
-		} elseif ($comparedToValue instanceof File && ! $value instanceof File) {
-			$requiredType = 'file';
-		}
+        if (is_numeric($comparedToValue) && ! is_numeric($value)) {
+            $requiredType = 'numeric';
+        } elseif ($comparedToValue instanceof File && ! $value instanceof File) {
+            $requiredType = 'file';
+        }
 
-		if (gettype($value) != $requiredType) {
-			return $requiredType;
-		}
-
-		return null;
-	}
+        if (gettype($value) != $requiredType) {
+            return $requiredType;
+        }
+    }
 
     /**
      * Add a failure message to the validator specifying the
