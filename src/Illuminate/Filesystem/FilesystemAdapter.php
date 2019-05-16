@@ -174,7 +174,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  string  $path
      * @param  string|resource  $contents
      * @param  mixed  $options
-     * @return bool
+     * @return bool|string
      */
     public function put($path, $contents, $options = [])
     {
