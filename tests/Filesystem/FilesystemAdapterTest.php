@@ -63,8 +63,6 @@ class FilesystemAdapterTest extends TestCase
 
     public function testDownloadNonAsciiEmptyFilename()
     {
-        setlocale(LC_ALL,'en_US.UTF-8');
-
         $this->filesystem->write('пиздюк.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem);
         $response = $files->download('пиздюк.txt');
