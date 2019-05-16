@@ -52,6 +52,15 @@ class FilesystemAdapterTest extends TestCase
         // $this->assertEquals('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
     }
 
+    public function testDownloadNonAsciiFilename()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem);
+        $response = $files->download('file.txt', 'пиздюк.txt');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        // $this->assertEquals('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
+    }
+
     public function testExists()
     {
         $this->filesystem->write('file.txt', 'Hello World');
