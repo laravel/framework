@@ -138,7 +138,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         $response = new StreamedResponse;
 
-        $disposition = $response->headers->makeDisposition($disposition, $name ?? basename($path));
+        $targetName = $name ?? basename($path);
+        $disposition = $response->headers->makeDisposition($disposition, $targetName, Str::ascii($targetName));
 
         $response->headers->replace($headers + [
             'Content-Type' => $this->mimeType($path),
