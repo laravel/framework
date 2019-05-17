@@ -127,7 +127,7 @@ class BusFake implements Dispatcher
      */
     public function pipeThrough(array $pipes)
     {
-        //
+        return $this;
     }
 
     /**
