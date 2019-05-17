@@ -378,7 +378,7 @@ trait InteractsWithInput
     /**
      * Check the list of expected keys, and return the keys among them that are
      * present in the request.
-     * 
+     *
      * @param array $expectedKeys
      * @return array
      */
@@ -387,7 +387,7 @@ trait InteractsWithInput
         $presentKeys = [];
 
         foreach ($expectedKeys as $expectedKey) {
-            if($this->has($expectedKey)){
+            if ($this->has($expectedKey)) {
                 $presentKeys[] = $expectedKey;
             }
         }
@@ -398,14 +398,14 @@ trait InteractsWithInput
     /**
      * Check the list of expected keys, and return the values of the keys that
      * are present in the request.
-     * 
+     *
      * @param array $expectedKeys
      * @return array
      */
     public function valuesOfPresentKeys(array $expectedKeys): array
     {
         $presentKeys = $this->presentKeys($expectedKeys);
-        
+
         return $this->all($presentKeys);
     }
 
