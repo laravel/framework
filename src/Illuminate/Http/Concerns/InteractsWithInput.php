@@ -380,8 +380,9 @@ trait InteractsWithInput
      * present in the request.
      * 
      * @param array $expectedKeys
+     * @return array
      */
-    public function presentKeys(array $expectedKeys)
+    public function presentKeys(array $expectedKeys): array
     {
         $presentKeys = [];
 
@@ -394,7 +395,19 @@ trait InteractsWithInput
         return $presentKeys;
     }
     
-    
+    /**
+     * Check the list of expected keys, and return the values of the keys that
+     * are present in the request.
+     * 
+     * @param array $expectedKeys
+     * @return array
+     */
+    public function valuesOfPresentKeys(array $expectedKeys): array
+    {
+        $presentKeys = $this->presentKeys($expectedKeys);
+        
+        return $this->all($presentKeys);
+    }
 
     /**
      * Retrieve a parameter item from a given source.
