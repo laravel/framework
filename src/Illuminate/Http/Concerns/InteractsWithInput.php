@@ -379,7 +379,7 @@ trait InteractsWithInput
      * Check the list of expected keys, and return the keys among them that are
      * present in the request.
      *
-     * @param array $expectedKeys
+     * @param  array  $expectedKeys
      * @return array
      */
     public function presentKeys(array $expectedKeys): array
