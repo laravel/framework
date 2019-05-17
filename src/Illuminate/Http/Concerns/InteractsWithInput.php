@@ -382,7 +382,7 @@ trait InteractsWithInput
      * @param  array  $expectedKeys
      * @return array
      */
-    public function presentKeys(array $expectedKeys): array
+    public function presentKeys(array $expectedKeys)
     {
         $presentKeys = [];
 
