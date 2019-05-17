@@ -331,8 +331,8 @@ class Str
 
         $result = array_shift($segments);
 
-        foreach ($segments as $segment) {
-            $result .= (array_shift($replace) ?? $search).$segment;
+        foreach ($segments as $i => $segment) {
+            $result .= ($replace[$i] ?? $search).$segment;
         }
 
         return $result;
