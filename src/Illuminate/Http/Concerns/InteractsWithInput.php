@@ -402,7 +402,7 @@ trait InteractsWithInput
      * @param  array  $expectedKeys
      * @return array
      */
-    public function valuesOfPresentKeys(array $expectedKeys): array
+    public function valuesOfPresentKeys(array $expectedKeys)
     {
         $presentKeys = $this->presentKeys($expectedKeys);
 
