@@ -248,7 +248,11 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo/bar/baz/?', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?/?'));
         $this->assertEquals('foo/bar', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?'));
         $this->assertEquals('?/?/?', Str::replaceArray('x', ['foo', 'bar', 'baz'], '?/?/?'));
+        // Ensure recursive replacements are avoided
         $this->assertEquals('foo?/bar/baz', Str::replaceArray('?', ['foo?', 'bar', 'baz'], '?/?/?'));
+        // Test for associative array support
+        $this->assertEquals('foo/bar', Str::replaceArray('?', [1 => 'foo', 2 => 'bar'], '?/?'));
+        $this->assertEquals('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
     }
 
     public function testReplaceFirst()
