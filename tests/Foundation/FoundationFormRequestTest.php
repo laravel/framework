@@ -160,6 +160,9 @@ class FoundationFormRequestTest extends TestCase
     {
         $translator = m::mock(Translator::class)->shouldReceive('trans')
                        ->zeroOrMoreTimes()->andReturn('error')->getMock();
+        $translator->shouldReceive('getFromJson')
+                   ->zeroOrMoreTimes()
+                   ->andReturn('error');
 
         return new ValidationFactory($translator, $container);
     }
