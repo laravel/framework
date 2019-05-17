@@ -394,7 +394,7 @@ trait InteractsWithInput
 
         return $presentKeys;
     }
-    
+
     /**
      * Check the list of expected keys, and return the values of the keys that
      * are present in the request.
