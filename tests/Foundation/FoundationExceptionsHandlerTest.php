@@ -20,7 +20,6 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Contracts\Translation\Translator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -182,9 +181,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         $request = Request::create('/', 'POST', $argumentExpected, [], ['photo' => $file]);
 
         $validator = m::mock(Validator::class);
-        $translator = m::mock(Translator::class);
-        $translator->shouldReceive('getFromJson')->once()->andReturn('Custom message');
-        $validator->shouldReceive('getTranslator')->once()->andReturn($translator);
         $validator->shouldReceive('errors')->andReturn(new MessageBag(['error' => 'My custom validation exception']));
 
         $validationException = new ValidationException($validator);
