@@ -376,6 +376,27 @@ trait InteractsWithInput
     }
 
     /**
+     * Check the list of expected keys, and return the keys among them that are
+     * present in the request.
+     * 
+     * @param array $expectedKeys
+     */
+    public function presentKeys(array $expectedKeys)
+    {
+        $presentKeys = [];
+
+        foreach ($expectedKeys as $expectedKey) {
+            if($this->has($expectedKey)){
+                $presentKeys[] = $expectedKey;
+            }
+        }
+
+        return $presentKeys;
+    }
+    
+    
+
+    /**
      * Retrieve a parameter item from a given source.
      *
      * @param  string  $source
