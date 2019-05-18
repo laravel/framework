@@ -1639,6 +1639,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate ansi attributes.
+     *
+     * Always returns true, just lets us put "ansi" in rules.
+     *
+     * @return bool
+     */
+    public function validateAnsi()
+    {
+        return true;
+    }
+
+    /**
      * Get the size of an attribute.
      *
      * @param  string  $attribute
@@ -1647,18 +1659,18 @@ trait ValidatesAttributes
      */
     protected function getSize($attribute, $value)
     {
-        $hasNumeric = $this->hasRule($attribute, $this->numericRules);
-
         // This method will determine if the attribute is a number, string, or file and
         // return the proper size accordingly. If it is a number, then number itself
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
-        if (is_numeric($value) && $hasNumeric) {
+        if (is_numeric($value) && $this->hasRule($attribute, $this->numericRules)) {
             return $value;
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
             return $value->getSize() / 1024;
+        } elseif ($this->hasRule($attribute, ['Ansi'])) {
+            return mb_strwidth($value);
         }
 
         return mb_strlen($value);
