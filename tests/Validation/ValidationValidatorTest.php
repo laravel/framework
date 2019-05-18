@@ -4441,6 +4441,16 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateAnsi()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => '武生'], ['name' => 'required|ansi|between:4,25']);
+        $this->assertTrue($v->passes());
+
+        $v->setData(['name' => '武']);
+        $this->assertTrue($v->fails());
+    }
+
     public function validUuidList()
     {
         return [
