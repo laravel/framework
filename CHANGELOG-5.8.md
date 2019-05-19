@@ -2,6 +2,16 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.17...5.8)
 
+### Added
+- Added `html` as a new valid extension for views ([#28541](https://github.com/laravel/framework/pull/28541))
+
+### TODO:
+- Provide notification callback with Swift message ([#28535](https://github.com/laravel/framework/pull/28535))
+- Small feature\fix in case of broken\edited cache ([#28536](https://github.com/laravel/framework/pull/28536))
+- MailFake::failures() returns an empty array ([#28538](https://github.com/laravel/framework/pull/28538))
+- Fix exception: The filename fallback must only contain ASCII characters ([#28551](https://github.com/laravel/framework/pull/28551))
+- BusFake::pipeThrough() returns $this ([#28564](https://github.com/laravel/framework/pull/28564))
+
 
 ## [v5.8.17 (2019-05-14)](https://github.com/laravel/framework/compare/v5.8.16...v5.8.17)
 
