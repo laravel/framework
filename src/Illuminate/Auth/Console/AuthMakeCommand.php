@@ -74,13 +74,14 @@ class AuthMakeCommand extends Command
      */
     protected function createDirectories()
     {
-        if (! is_dir($directory = $this->getViewPath('layouts'))) {
-            mkdir($directory, 0755, true);
-        }
+        $make_dir_func = function ($view_path){
+            if (! is_dir($directory = $this->getViewPath($view_path))) {
+                mkdir($directory, 0755, true);
+            }
+        };
 
-        if (! is_dir($directory = $this->getViewPath('auth/passwords'))) {
-            mkdir($directory, 0755, true);
-        }
+        $make_dir_func('layouts');
+        $make_dir_func('auth/passwords');
     }
 
     /**
