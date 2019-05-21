@@ -81,6 +81,13 @@ class MailMessage extends SimpleMessage implements Renderable
     public $priority;
 
     /**
+     * The callbacks for the message.
+     *
+     * @var array
+     */
+    public $callbacks = [];
+
+    /**
      * Set the view for the mail message.
      *
      * @param  array|string  $view
@@ -285,5 +292,18 @@ class MailMessage extends SimpleMessage implements Renderable
         return Container::getInstance()
             ->make(Markdown::class)
             ->render($this->markdown, $this->data());
+    }
+
+    /**
+     * Register a callback to be called with the Swift message instance.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function withSwiftMessage($callback)
+    {
+        $this->callbacks[] = $callback;
+
+        return $this;
     }
 }

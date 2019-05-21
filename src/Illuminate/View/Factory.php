@@ -66,6 +66,7 @@ class Factory implements FactoryContract
         'blade.php' => 'blade',
         'php' => 'php',
         'css' => 'file',
+        'html' => 'file',
     ];
 
     /**

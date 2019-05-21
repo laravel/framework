@@ -82,7 +82,10 @@ class ChangeColumn
                 if (! is_null($option = static::mapFluentOptionToDoctrine($key))) {
                     if (method_exists($column, $method = 'set'.ucfirst($option))) {
                         $column->{$method}(static::mapFluentValueToDoctrine($option, $value));
+                        continue;
                     }
+
+                    $column->setCustomSchemaOption($option, static::mapFluentValueToDoctrine($option, $value));
                 }
             }
         }

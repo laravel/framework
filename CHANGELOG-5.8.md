@@ -1,6 +1,19 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.16...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.17...5.8)
+
+### Added
+- Added `html` as a new valid extension for views ([#28541](https://github.com/laravel/framework/pull/28541))
+
+### TODO:
+- Provide notification callback with Swift message ([#28535](https://github.com/laravel/framework/pull/28535))
+- Small feature\fix in case of broken\edited cache ([#28536](https://github.com/laravel/framework/pull/28536))
+- MailFake::failures() returns an empty array ([#28538](https://github.com/laravel/framework/pull/28538))
+- Fix exception: The filename fallback must only contain ASCII characters ([#28551](https://github.com/laravel/framework/pull/28551))
+- BusFake::pipeThrough() returns $this ([#28564](https://github.com/laravel/framework/pull/28564))
+
+
+## [v5.8.17 (2019-05-14)](https://github.com/laravel/framework/compare/v5.8.16...v5.8.17)
 
 ### Added
 - Added `Illuminate\Foundation\Testing\TestResponse::dumpHeaders()` ([#28450](https://github.com/laravel/framework/pull/28450))
@@ -8,12 +21,21 @@
 - Added possibility to use a few `columns` arguments in the `route:list` command ([#28459](https://github.com/laravel/framework/pull/28459))
 - Added `retryAfter` in `Mail\SendQueuedMailable` and `Notifications\SendQueuedNotifications` object ([#28484](https://github.com/laravel/framework/pull/28484))
 - Added `Illuminate\Foundation\Console\Kernel::scheduleCache()` ([6587e78](https://github.com/laravel/framework/commit/6587e78383c4ecc8d7f3791f54cf6f536a1fc089))
+- Added support for multiple `--path` options within migrate commands ([#28495](https://github.com/laravel/framework/pull/28495))
+- Added `Tappable` trait ([#28507](https://github.com/laravel/framework/pull/28507))
+- Added support auto-discovery for events in a custom application directory, that sets via `Illuminate\Foundation\Application::useAppPath()` ([#28493](https://github.com/laravel/framework/pull/28493))
+- Added passing of notifiable email through reset link ([#28475](https://github.com/laravel/framework/pull/28475))
+- Added support flush db on clusters in `PhpRedisConnection` and `PredisConnection` ([f4e8d5c](https://github.com/laravel/framework/commit/f4e8d5c1f1b72e24baac33c336233cca24230783))
 
 ### Fixed
 - Fixed session resolver  in `RoutingServiceProvider` (without bind of `session` in `Container`) ([#28438](https://github.com/laravel/framework/pull/28438))
 - Fixed `route:list` command when routes were dynamically modified ([#28460](https://github.com/laravel/framework/pull/28460), [#28463](https://github.com/laravel/framework/pull/28463))
+- Fixed `required` validation with multiple `passes()` calls ([#28502](https://github.com/laravel/framework/pull/28502))
+- Fixed the collation bug when changing columns in a migration ([#28514](https://github.com/laravel/framework/pull/28514))
+- Added password to the `RedisCluster` only if `redis` >= `4.3.0` ([1371940](https://github.com/laravel/framework/commit/1371940abe17b7b6008e136060fcf5534f15f03f))
+- Used `escapeshellarg` on windows symlink in `Filesystem::link()`([44c3feb](https://github.com/laravel/framework/commit/44c3feb604944599ad1c782a9942981c3991fa31))
 
-### TODO:
+### Changed
 - Reset webpack file for none preset ([#28462](https://github.com/laravel/framework/pull/28462))
 
 

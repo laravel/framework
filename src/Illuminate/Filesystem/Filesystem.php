@@ -254,7 +254,7 @@ class Filesystem
 
         $mode = $this->isDirectory($target) ? 'J' : 'H';
 
-        exec("mklink /{$mode} \"{$link}\" \"{$target}\"");
+        exec("mklink /{$mode} ".escapeshellarg($link).' '.escapeshellarg($target));
     }
 
     /**

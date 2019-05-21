@@ -121,6 +121,7 @@ class AuthMakeCommand extends Command
     /**
      * Get full view path relative to the app's configured view path.
      *
+     * @param  string  $path
      * @return string
      */
     protected function getViewPath($path)

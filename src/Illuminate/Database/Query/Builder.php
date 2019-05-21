@@ -2033,7 +2033,7 @@ class Builder
     /**
      * Execute a query for a single record by ID.
      *
-     * @param  int    $id
+     * @param  int|string  $id
      * @param  array  $columns
      * @return mixed|static
      */
