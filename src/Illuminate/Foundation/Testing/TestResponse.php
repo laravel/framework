@@ -1031,6 +1031,21 @@ class TestResponse
     }
 
     /**
+     * Dump the validation errors.
+     *
+     * @param string $errorBag
+     */
+    public function dumpValidationErrors($errorBag = 'default')
+    {
+        if ($this->session()->get('errors')) {
+            dd($this->session()->get('errors')->getBag($errorBag)->messages());
+        }
+
+        $json = json_decode($this->getContent(), true);
+        dd($json['errors'] ?? []);
+    }
+
+    /**
      * Get the streamed content from the response.
      *
      * @return string
