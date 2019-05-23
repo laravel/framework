@@ -448,11 +448,18 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertJsonMissingValidationErrorsOnAnEmptyResponse()
     {
-        $testResponse = TestResponse::fromBaseResponse(
+        $emptyTestResponse204 = TestResponse::fromBaseResponse(
             (new Response)->setContent('')
         );
+        $emptyTestResponse204->setStatusCode(204);
+        $emptyTestResponse204->assertJsonMissingValidationErrors();
 
-        $testResponse->assertJsonMissingValidationErrors();
+        $this->expectException(AssertionFailedError::class);
+
+        $emptyTestResponseNot204 = TestResponse::fromBaseResponse(
+            (new Response)->setContent('')
+        );
+        $emptyTestResponseNot204->assertJsonMissingValidationErrors();
     }
 
     public function testMacroable()
