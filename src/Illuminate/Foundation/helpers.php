@@ -580,6 +580,20 @@ if (! function_exists('mix')) {
     }
 }
 
+if (! function_exists('newObj')) {
+    /**
+     * Instantiate a new instance of $class, passing $args as constructor input.
+     *
+     * @param  string $class
+     * @param  mixed $args
+     * @return object
+     */
+    function newObj($class, ...$args)
+    {
+        return new $class(...$args);
+    }
+}
+
 if (! function_exists('now')) {
     /**
      * Create a new Carbon instance for the current time.
