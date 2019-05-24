@@ -580,7 +580,7 @@ if (! function_exists('mix')) {
     }
 }
 
-if (! function_exists('newObj')) {
+if (! function_exists('new_obj')) {
     /**
      * Instantiate a new instance of $class, passing $args as constructor input.
      *
@@ -588,7 +588,7 @@ if (! function_exists('newObj')) {
      * @param  mixed $args
      * @return object
      */
-    function newObj($class, ...$args)
+    function new_obj($class, ...$args)
     {
         return new $class(...$args);
     }
