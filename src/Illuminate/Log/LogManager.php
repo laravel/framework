@@ -246,7 +246,8 @@ class LogManager implements LoggerInterface
                 new StreamHandler(
                     $config['path'], $this->level($config),
                     $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-                )
+                ),
+		$config
             ),
         ]);
     }
@@ -263,7 +264,8 @@ class LogManager implements LoggerInterface
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config),
                 $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-            )),
+            ), $config
+	),
         ]);
     }
 
@@ -285,7 +287,9 @@ class LogManager implements LoggerInterface
                 $config['short'] ?? false,
                 $config['context'] ?? true,
                 $this->level($config)
-            )),
+            ),
+            $config
+	),
         ]);
     }
 
@@ -299,7 +303,8 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config))
+                $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config)),
+		$config
             ),
         ]);
     }
@@ -314,7 +319,8 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new ErrorLogHandler(
-                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config))
+                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config)),
+		$config
             ),
         ]);
     }
