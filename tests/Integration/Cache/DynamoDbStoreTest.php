@@ -82,6 +82,7 @@ class DynamoDbStoreTest extends TestCase
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => 'us-east-1',
             'table' => env('DYNAMODB_CACHE_TABLE', 'laravel_test'),
+            'endpoint' => env('DYNAMODB_ENDPOINT'),
         ]);
     }
 }
