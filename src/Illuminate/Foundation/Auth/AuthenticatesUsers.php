@@ -10,6 +10,8 @@ trait AuthenticatesUsers
 {
     use RedirectsUsers, ThrottlesLogins;
 
+    protected $intended_redirect = null;
+
     /**
      * Show the application's login form.
      *
@@ -102,12 +104,14 @@ trait AuthenticatesUsers
      */
     protected function sendLoginResponse(Request $request)
     {
+        $this->intended_redirect = redirect()->intended($this->redirectPath());
+
         $request->session()->regenerate();
 
         $this->clearLoginAttempts($request);
 
         return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
+                ?: $this->intended_redirect;
     }
 
     /**
