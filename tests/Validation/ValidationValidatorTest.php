@@ -957,6 +957,87 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('The last field is required unless first is in taylor, sven.', $v->messages()->first('last'));
     }
 
+    public function requiredIfAcceptedNotAcceptedProvider()
+    {
+        return [
+            ['off'],
+            ['no'],
+            ['false'],
+            [false],
+            ['0'],
+            [0],
+        ];
+    }
+
+    public function requiredIfAcceptedAcceptedProvider()
+    {
+        return [
+            ['on'],
+            ['yes'],
+            ['true'],
+            [true],
+            ['1'],
+            [1],
+        ];
+    }
+
+    /**
+     * @dataProvider requiredIfAcceptedAcceptedProvider
+     * @param $validChecked
+     */
+    public function testRequiredIfAcceptedReplacesAttributeAndOther()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines([
+            'validation.required_if_accepted' => 'The :attribute field is required when :other is accepted.'
+        ], 'en');
+        $v = new Validator($trans, ['checked' => true], ['last' => 'required_if_accepted:checked']);
+        $this->assertTrue($v->fails());
+        $this->assertSame(
+            'The last field is required when checked is accepted.',
+            $v->messages()->get('last')[0]
+        );
+    }
+
+    /**
+     * @dataProvider requiredIfAcceptedNotAcceptedProvider
+     * @param $notAcceptedChecked
+     */
+    public function testRequiredIfAcceptedNotAccepted($notAcceptedChecked)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'checked' => $notAcceptedChecked,
+            'last' => 'here',
+        ], ['last' => 'required_if_accepted:checked']);
+        $this->assertTrue($v->passes());
+    }
+
+    /**
+     * @dataProvider requiredIfAcceptedAcceptedProvider
+     * @param $validChecked
+     */
+    public function testRequiredIfAccepted($validChecked)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'checked' => $validChecked
+        ], ['last' => 'required_if_accepted:checked']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [
+            'checked' => $validChecked,
+            'last' => '',
+        ], ['last' => 'required_if_accepted:checked']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [
+            'checked' => $validChecked,
+            'last' => null,
+        ], ['last' => 'required_if_accepted:checked']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testFailedFileUploads()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4029,6 +4110,45 @@ class ValidationValidatorTest extends TestCase
             ['start' => '2016-04-19', 'end' => '2017-04-19'],
         ]], ['foo.*.start' => ['after:foo.*.end']]);
         $this->assertTrue($v->fails());
+    }
+
+    public function testValidateImplicitEachWithAsterisksRequiredIfAccepted()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // required_if_accepted passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'foo', 'checked' => false],
+            ['name' => 'second', 'last' => 'bar', 'checked' => true],
+        ]], ['foo.*.name' => ['Required_if_accepted:foo.*.checked']]);
+        $this->assertTrue($v->passes());
+
+        // nested required_if_accepted passes
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'foo', 'checked' => false],
+            ['name' => null, 'last' => 'bar', 'checked' => false],
+        ]], ['foo.*.bar.*.name' => ['Required_if_accepted:foo.*.checked']]);
+        $this->assertTrue($v->passes());
+
+        // required_if_accepted fails
+        $v = new Validator($trans, ['foo' => [
+            ['name' => null, 'last' => 'foo', 'checked' => false],
+            ['name' => null, 'last' => 'bar', 'checked' => true],
+        ]], ['foo.*.name' => ['Required_if_accepted:foo.*.checked']]);
+        $this->assertFalse($v->passes());
+        $this->assertFalse($v->messages()->has('foo.0.name'));
+        $this->assertTrue($v->messages()->has('foo.1.name'));
+
+        // nested required_if_accepted fails
+        $v = new Validator($trans, ['foo' => [
+            ['bar' => [
+                ['name' => null, 'last' => 'foo', 'checked' => true],
+                ['name' => null, 'last' => 'bar', 'checked' => true],
+            ]],
+        ]], ['foo.*.bar.*.name' => ['Required_if_accepted:foo.*.bar.*.checked']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.bar.0.name'));
+        $this->assertTrue($v->messages()->has('foo.0.bar.1.name'));
     }
 
     public function testGetLeadingExplicitAttributePath()

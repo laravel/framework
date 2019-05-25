@@ -1340,6 +1340,28 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute exists when another attribute has been accepted (validateAccepted),
+     * this differs to RequiredIf as it supports all the values of the other field being accepted
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  mixed   $parameters
+     * @return bool
+     */
+    public function validateRequiredIfAccepted($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_accepted');
+
+        $other = Arr::get($this->data, $parameters[0]);
+        $otherAccepted = $this->validateAccepted($parameters[0], $other);
+        if (!$otherAccepted) {
+            return true;
+        }
+
+        return $this->validateRequired($attribute, $value);
+    }
+
+    /**
      * Convert the given values to boolean if they are string "true" / "false".
      *
      * @param  array  $values

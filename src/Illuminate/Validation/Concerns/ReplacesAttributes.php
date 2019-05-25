@@ -361,6 +361,22 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the required_if_accepted rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceRequiredIfAccepted($message, $attribute, $rule, $parameters)
+    {
+        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
+
+        return str_replace([':other'], $parameters, $message);
+    }
+
+    /**
      * Replace all place-holders for the same rule.
      *
      * @param  string  $message
