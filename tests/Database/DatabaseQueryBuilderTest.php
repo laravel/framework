@@ -1115,7 +1115,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->skip(-5)->take(-10);
-        $this->assertEquals('select * from "users"', $builder->toSql());
+        $this->assertEquals('select * from "users" offset 0', $builder->toSql());
     }
 
     public function testForPage()
