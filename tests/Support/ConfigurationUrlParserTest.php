@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Support\ConfigurationUrlParser;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\ConfigurationUrlParser;
 
 class ConfigurationUrlParserTest extends TestCase
 {
