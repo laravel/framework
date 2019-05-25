@@ -957,34 +957,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('The last field is required unless first is in taylor, sven.', $v->messages()->first('last'));
     }
 
-    public function requiredIfAcceptedNotAcceptedProvider()
-    {
-        return [
-            ['off'],
-            ['no'],
-            ['false'],
-            [false],
-            ['0'],
-            [0],
-        ];
-    }
-
-    public function requiredIfAcceptedAcceptedProvider()
-    {
-        return [
-            ['on'],
-            ['yes'],
-            ['true'],
-            [true],
-            ['1'],
-            [1],
-        ];
-    }
-
-    /**
-     * @dataProvider requiredIfAcceptedAcceptedProvider
-     * @param $validChecked
-     */
     public function testRequiredIfAcceptedReplacesAttributeAndOther()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -1009,6 +981,16 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [
             'checked' => $notAcceptedChecked,
             'last' => 'here',
+        ], ['last' => 'required_if_accepted:checked']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testRequiredIfAcceptedNotPresent()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            // Not present
+            'last' => null,
         ], ['last' => 'required_if_accepted:checked']);
         $this->assertTrue($v->passes());
     }
@@ -4603,5 +4585,30 @@ class ValidationValidatorTest extends TestCase
         return new Translator(
             new ArrayLoader, 'en'
         );
+    }
+
+    public function requiredIfAcceptedNotAcceptedProvider()
+    {
+        return [
+            ['off'],
+            ['no'],
+            ['false'],
+            [false],
+            ['0'],
+            [0],
+            [null],
+        ];
+    }
+
+    public function requiredIfAcceptedAcceptedProvider()
+    {
+        return [
+            ['on'],
+            ['yes'],
+            ['true'],
+            [true],
+            ['1'],
+            [1],
+        ];
     }
 }
