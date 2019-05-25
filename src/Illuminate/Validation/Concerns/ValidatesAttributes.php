@@ -1341,7 +1341,7 @@ trait ValidatesAttributes
 
     /**
      * Validate that an attribute exists when another attribute has been accepted (validateAccepted),
-     * this differs to RequiredIf as it supports all the values of the other field being accepted
+     * this differs to RequiredIf as it supports all the values of the other field being accepted.
      *
      * @param  string  $attribute
      * @param  mixed   $value
@@ -1354,7 +1354,7 @@ trait ValidatesAttributes
 
         $other = Arr::get($this->data, $parameters[0]);
         $otherAccepted = $this->validateAccepted($parameters[0], $other);
-        if (!$otherAccepted) {
+        if (! $otherAccepted) {
             return true;
         }
 

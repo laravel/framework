@@ -989,7 +989,7 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines([
-            'validation.required_if_accepted' => 'The :attribute field is required when :other is accepted.'
+            'validation.required_if_accepted' => 'The :attribute field is required when :other is accepted.',
         ], 'en');
         $v = new Validator($trans, ['checked' => true], ['last' => 'required_if_accepted:checked']);
         $this->assertTrue($v->fails());
@@ -1021,7 +1021,7 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [
-            'checked' => $validChecked
+            'checked' => $validChecked,
         ], ['last' => 'required_if_accepted:checked']);
         $this->assertTrue($v->fails());
 
