@@ -769,7 +769,13 @@ class Grammar extends BaseGrammar
      */
     protected function compileOffset(Builder $query, $offset)
     {
-        return 'offset '.(int) $offset;
+        $property = $query->unions ? 'unionLimit' : 'limit';
+
+        if (isset($query->$property)) {
+            return 'offset '.(int) $offset;
+        }
+
+        return '';
     }
 
     /**
