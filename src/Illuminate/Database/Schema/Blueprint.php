@@ -123,7 +123,8 @@ class Blueprint
                 if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
-            } catch (BadMethodCallException $e) {}
+            } catch (BadMethodCallException $e) {
+            }
         }
 
         return $statements;
