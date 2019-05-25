@@ -109,6 +109,24 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the "offset" portions of the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  int  $offset
+     * @return string
+     */
+    protected function compileOffset(Builder $query, $offset)
+    {
+        $property = $query->unions ? 'unionLimit' : 'limit';
+
+        if (isset($query->$property)) {
+            return 'offset '.(int) $offset;
+        }
+
+        return '';
+    }
+
+    /**
      * Compile the lock into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
