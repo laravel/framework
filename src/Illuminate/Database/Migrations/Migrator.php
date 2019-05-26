@@ -282,7 +282,7 @@ class Migrator
             );
         }
 
-	    $this->restoreDefaultConnection();
+        $this->restoreDefaultConnection();
 
         $this->fireMigrationEvent(new MigrationsEnded);
 
@@ -550,17 +550,17 @@ class Migrator
         return $this->resolver->connection($connection ?: $this->connection);
     }
 
-	/**
-	 * Restore connection to default instance from .env file.
-	 *
-	 * @return void
-	 */
-	public function restoreDefaultConnection()
-	{
-		if ($defaultConnection = env('DB_CONNECTION')) {
-			$this->resolver->setDefaultConnection($defaultConnection);
-		}
-	}
+    /**
+     * Restore connection to default instance from .env file.
+     *
+     * @return void
+     */
+    protected function restoreDefaultConnection()
+    {
+        if ($defaultConnection = env('DB_CONNECTION')) {
+            $this->resolver->setDefaultConnection($defaultConnection);
+        }
+    }
 
     /**
      * Get the schema grammar out of a migration connection.
