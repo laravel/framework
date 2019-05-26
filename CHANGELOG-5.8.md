@@ -8,7 +8,7 @@
 
 ### Fixed
 - Fixed Eloquent UPDATE queries with alias ([#28607](https://github.com/laravel/framework/pull/28607))
-- Changed `Illuminate\Cache\DynamoDbStore::forever()` returns ([#28618](https://github.com/laravel/framework/pull/28618))
+- Fixed `Illuminate\Cache\DynamoDbStore::forever()` ([#28618](https://github.com/laravel/framework/pull/28618))
 
 ### Performance improvement
 - Improve performance for `Arr::flatten()` ([#28614](https://github.com/laravel/framework/pull/28614))
