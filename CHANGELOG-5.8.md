@@ -2,6 +2,23 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.18...5.8)
 
+### Added
+- Added optional `DYNAMODB_ENDPOINT` env variable to configure endpoint for DynamoDB ([#28600](https://github.com/laravel/framework/pull/28600))
+- Added `Illuminate\Foundation\Application::isProduction()` method ([#28602](https://github.com/laravel/framework/pull/28602))
+
+### Fixed
+- Fixed Eloquent UPDATE queries with alias ([#28607](https://github.com/laravel/framework/pull/28607))
+- Changed `Illuminate\Cache\DynamoDbStore::forever()` returns ([#28618](https://github.com/laravel/framework/pull/28618))
+
+### Performance improvement
+- Improve performance for `Arr::flatten()` ([#28614](https://github.com/laravel/framework/pull/28614))
+
+### Changed
+- Added `id` to `ModelNotFoundException` exception in `ImplicitRouteBinding` ([#28588](https://github.com/laravel/framework/pull/28588))
+
+### TODO:
+- Allow rescued exception reporting to be disabled ([#28617](https://github.com/laravel/framework/pull/28617))
+
 
 ## [v5.8.18 (2019-05-21)](https://github.com/laravel/framework/compare/v5.8.17...v5.8.18)
 
