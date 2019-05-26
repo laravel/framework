@@ -390,7 +390,7 @@ class DynamoDbStore implements Store, LockProvider
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, now()->addYears(5));
+        return $this->put($key, $value, now()->addYears(5)->getTimestamp());
     }
 
     /**
