@@ -146,6 +146,7 @@ class DatabaseFailedJobProvider implements QueryableFailedJobProviderInterface
         }
 
         $query = $query->orderBy('id', $order);
+
         return $query->pluck('id')->all();
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Failed;
 
-
 interface QueryableFailedJobProviderInterface extends FailedJobProviderInterface
 {
     /**
