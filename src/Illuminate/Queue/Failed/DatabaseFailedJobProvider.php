@@ -5,7 +5,7 @@ namespace Illuminate\Queue\Failed;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Database\ConnectionResolverInterface;
 
-class DatabaseFailedJobProvider implements FailedJobProviderInterface
+class DatabaseFailedJobProvider implements QueryableFailedJobProviderInterface
 {
     /**
      * The connection resolver implementation.
