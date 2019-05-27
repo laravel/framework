@@ -12,7 +12,13 @@ class RetryCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:retry {id* : The ID of the failed job or "all" to retry all jobs}';
+    protected $signature = 'queue:retry-limited 
+                            {id* : The ID of the failed job or "all" to retry all jobs}
+                            {--limit=0 : The number of jobs to retry}
+                            {--offset=0 : Offset}
+                            {--queue= : The names of the queues to work}
+                            {--order=asc : Order of jobs to execute}
+                            ';
 
     /**
      * The console command description.
@@ -50,10 +56,32 @@ class RetryCommand extends Command
      */
     protected function getJobIds()
     {
+        $limit = $this->option('limit');
+        $offset = $this->option('offset');
+        $queue = $this->option('queue');
+        $order = $this->option('order');
+
         $ids = (array) $this->argument('id');
 
         if (count($ids) === 1 && $ids[0] === 'all') {
-            $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
+            $query = $this->laravel['queue.failer2']->getQuery()->orderBy('id', 'desc');
+
+
+            if ($limit != 0)
+                $query = $query->limit($limit);
+
+            if ($offset != 0)
+                $query = $query->offset($offset);
+
+            if ($queue)
+                $query= $query->where('queue', $queue);
+
+            $query = $query->orderBy('id', $order);
+
+
+            $data = $query->get('id');
+
+            $ids = Arr::pluck($data, 'id');
         }
 
         return $ids;

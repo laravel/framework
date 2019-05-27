@@ -114,4 +114,13 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     {
         return $this->resolver->connection($this->database)->table($this->table);
     }
+
+    /**
+     * Get a new query builder instance for the table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function getQuery() {
+        return $this->getTable();
+    }
 }

@@ -44,4 +44,11 @@ interface FailedJobProviderInterface
      * @return void
      */
     public function flush();
+
+    /**
+     * Get a new query builder instance for the table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function getQuery();
 }
