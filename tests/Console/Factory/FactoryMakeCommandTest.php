@@ -92,6 +92,36 @@ class FactoryMakeCommandTest extends TestCase
         $this->assertTrue((bool) strpos($slug, 'App\\Models\\factory'));
     }
 
+    /** @test */
+    public function it_has_factory_lowercase_on_the_middle_of_the_name()
+    {
+        $command = $this->setupEnvironment();
+
+        $name = 'UserfactoryExample';
+
+        $this->runCommand($command, ['name' => $name]);
+
+        $slug = $this->filesystem->get(__DIR__."/database/factories/{$name}.php");
+
+        $this->assertTrue((bool) strpos($slug, 'UserfactoryExample::class'));
+        $this->assertTrue((bool) strpos($slug, 'App\\Models\\UserfactoryExample'));
+    }
+
+    /** @test */
+    public function it_has_Factory_uppercase_on_the_middle_of_the_name()
+    {
+        $command = $this->setupEnvironment();
+
+        $name = 'UserFactoryExample';
+
+        $this->runCommand($command, ['name' => $name]);
+
+        $slug = $this->filesystem->get(__DIR__."/database/factories/{$name}.php");
+
+        $this->assertTrue((bool) strpos($slug, 'UserFactoryExample::class'));
+        $this->assertTrue((bool) strpos($slug, 'App\\Models\\UserFactoryExample'));
+    }
+
     protected function setupEnvironment()
     {
         $command = new FactoryMakeCommand($this->filesystem);

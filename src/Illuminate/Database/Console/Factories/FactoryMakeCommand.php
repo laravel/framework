@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Factories;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class FactoryMakeCommand extends GeneratorCommand
@@ -49,8 +50,8 @@ class FactoryMakeCommand extends GeneratorCommand
         $model = class_basename($this->option('model') ?? $name);
 
         foreach (['factory', 'Factory'] as $name) {
-            if (strpos($model, $name)) {
-                $model = substr($model, 0, strpos($model, $name));
+            if (Str::endsWith($model, $name) && strpos($model, $name)) {
+                $model = substr($model, 0, 4);
                 break;
             }
         }
