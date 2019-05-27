@@ -48,7 +48,7 @@ class EventListCommand extends Command
         $events = [];
 
         foreach ($this->laravel->getProviders(EventServiceProvider::class) as $provider) {
-            $providerEvents = array_merge($provider->discoverEvents(), $provider->listens());
+            $providerEvents = array_merge_recursive($provider->discoverEvents(), $provider->listens());
 
             $events = array_merge_recursive($events, $providerEvents);
         }
