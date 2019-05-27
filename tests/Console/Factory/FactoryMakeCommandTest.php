@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Console\Factory;
 
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Config\Repository as Config;
@@ -24,8 +23,6 @@ class FactoryMakeCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         $this->filesystem->deleteDirectory(__DIR__.'/database');
     }
 
