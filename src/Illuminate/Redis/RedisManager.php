@@ -97,7 +97,8 @@ class RedisManager implements Factory
 
         if (isset($this->config[$name])) {
             return $this->connector()->connect(
-                $this->parseConnectionConfigWithUrl($this->config[$name]), $options
+                $this->parseConnectionConfiguration($this->config[$name]),
+                $options
             );
         }
 
@@ -117,7 +118,7 @@ class RedisManager implements Factory
     protected function resolveCluster($name)
     {
         return $this->connector()->connectToCluster(
-            $this->parseConnectionConfigWithUrl($this->config['clusters'][$name]),
+            $this->parseConnectionConfiguration($this->config['clusters'][$name]),
             $this->config['clusters']['options'] ?? [],
             $this->config['options'] ?? []
         );
@@ -157,16 +158,16 @@ class RedisManager implements Factory
     }
 
     /**
-     * Parse the redis configuration, hydrating options using a redis configuration URL if possible.
+     * Parse the Redis connection configuration.
      *
-     * @param  array  $config
+     * @param  mixed  $config
      * @return array
      */
-    protected function parseConnectionConfigWithUrl($config)
+    protected function parseConnectionConfiguration($config)
     {
-        $parsedConfig = (new ConfigurationUrlParser)->parseConfiguration($config);
+        $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
 
-        return array_filter($parsedConfig, function ($key) {
+        return array_filter($parsed, function ($key) {
             return ! in_array($key, ['driver', 'username']);
         }, ARRAY_FILTER_USE_KEY);
     }
