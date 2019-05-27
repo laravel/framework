@@ -93,7 +93,7 @@ class FactoryMakeCommandTest extends TestCase
     }
 
     /** @test */
-    public function it_has_factory_lowercase_on_the_middle_of_the_name()
+    public function it_has_factory_lowercase_in_the_middle_of_the_name()
     {
         $command = $this->setupEnvironment();
 
@@ -108,7 +108,7 @@ class FactoryMakeCommandTest extends TestCase
     }
 
     /** @test */
-    public function it_has_Factory_uppercase_on_the_middle_of_the_name()
+    public function it_has_Factory_uppercase_in_the_middle_of_the_name()
     {
         $command = $this->setupEnvironment();
 
