@@ -2,12 +2,18 @@
 
 namespace Illuminate\Queue\Failed;
 
+
 interface QueryableFailedJobProviderInterface extends FailedJobProviderInterface
 {
     /**
-     * Get a new query builder instance for the table.
+     * Retrieve job ids from specific connection and queue
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @param string|null $connection
+     * @param string|null $queue
+     * @param string|null $order
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return array
      */
-    public function getQuery();
+    public function getJobIds($connection, $queue, $order, $limit, $offset);
 }

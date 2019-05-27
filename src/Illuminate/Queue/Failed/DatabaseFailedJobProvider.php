@@ -110,18 +110,42 @@ class DatabaseFailedJobProvider implements QueryableFailedJobProviderInterface
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function getTable()
+    public function getTable()
     {
         return $this->resolver->connection($this->database)->table($this->table);
     }
 
     /**
-     * Get a new query builder instance for the table.
+     * Retrieve job ids from specific connection and queue
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @param string|null $connection
+     * @param string|null $queue
+     * @param string|null $order
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return array
      */
-    public function getQuery()
+    public function getJobIds($connection, $queue, $order, $limit, $offset)
     {
-        return $this->getTable();
+        $query = $this->getTable();
+
+        if ($connection) {
+            $query = $query->where('connection', $connection);
+        }
+
+        if ($queue) {
+            $query = $query->where('queue', $queue);
+        }
+
+        if ($limit) {
+            $query = $query->limit($limit);
+        }
+
+        if ($offset) {
+            $query = $query->offset($offset);
+        }
+
+        $query = $query->orderBy('id', $order);
+        return $query->pluck('id')->all();
     }
 }

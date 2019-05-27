@@ -15,8 +15,8 @@ class RetryCommand extends Command
      */
     protected $signature = 'queue:retry 
         {id* : The ID of the failed job or "all" to retry all jobs}
-        {--limit=0 : The number of jobs to retry}
-        {--offset=0 : Offset}
+        {--limit= : The number of jobs to retry}
+        {--offset= : Offset}
         {--queue= : The name of the queue to retry}
         {--connection= : The name of the connection}
         {--order=asc : Order of jobs to execute}';
@@ -57,11 +57,11 @@ class RetryCommand extends Command
      */
     protected function getJobIds()
     {
+        $connection = $this->option('connection');
+        $queue = $this->option('queue');
+        $order = $this->option('order');
         $limit = $this->option('limit');
         $offset = $this->option('offset');
-        $queue = $this->option('queue');
-        $connection = $this->option('connection');
-        $order = $this->option('order');
 
         $ids = (array) $this->argument('id');
 
@@ -69,26 +69,7 @@ class RetryCommand extends Command
             $provider = $this->laravel['queue.failer'];
 
             if ($provider instanceof QueryableFailedJobProviderInterface) {
-                $query = $provider->getQuery()->orderBy('id', 'desc');
-
-                if ($limit != 0) {
-                    $query = $query->limit($limit);
-                }
-
-                if ($offset != 0) {
-                    $query = $query->offset($offset);
-                }
-
-                if ($queue) {
-                    $query = $query->where('queue', $queue);
-                }
-
-                if ($connection) {
-                    $query = $query->where('connection', $connection);
-                }
-
-                $query = $query->orderBy('id', $order);
-                $ids = $query->pluck('id');
+                $ids = $provider->getJobIds($connection, $queue, $order, $limit, $offset);
             } else {
                 $ids = Arr::pluck($provider->all(), 'id');
             }
