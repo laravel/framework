@@ -66,7 +66,6 @@ class RetryCommand extends Command
         if (count($ids) === 1 && $ids[0] === 'all') {
             $query = $this->laravel['queue.failer2']->getQuery()->orderBy('id', 'desc');
 
-
             if ($limit != 0)
                 $query = $query->limit($limit);
 
@@ -77,7 +76,6 @@ class RetryCommand extends Command
                 $query= $query->where('queue', $queue);
 
             $query = $query->orderBy('id', $order);
-
 
             $data = $query->get('id');
 

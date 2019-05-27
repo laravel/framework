@@ -120,7 +120,8 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    public function getQuery() {
+    public function getQuery()
+    {
         return $this->getTable();
     }
 }
