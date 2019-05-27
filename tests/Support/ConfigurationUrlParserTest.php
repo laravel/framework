@@ -1,11 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Support;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\ConfigurationUrlParser;
+use Illuminate\Support\ConfigurationUrlParser;
 
-class DatabaseUrlParserTest extends TestCase
+class ConfigurationUrlParserTest extends TestCase
 {
     /**
      * @dataProvider databaseUrls
@@ -23,7 +23,7 @@ class DatabaseUrlParserTest extends TestCase
             'postgres' => 'pgsql',
             'postgresql' => 'pgsql',
             'sqlite3' => 'sqlite',
-        ], ConfigurationUrlParser::getDriverAliases());
+        ], \Illuminate\Support\ConfigurationUrlParser::getDriverAliases());
 
         ConfigurationUrlParser::addDriverAlias('some-particular-alias', 'mysql');
 
@@ -332,6 +332,24 @@ class DatabaseUrlParserTest extends TestCase
                     'strict' => true,
                     'engine' => null,
                     'options' => ['foo' => 'bar'],
+                ],
+            ],
+            'Redis Example' => [
+                [
+                    // Coming directly from Heroku documentation
+                    'url' => 'redis://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                    'host' => '127.0.0.1',
+                    'password' =>  null,
+                    'port' =>  6379,
+                    'database' => 0,
+                ],
+                [
+                    'driver' => 'redis',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 0,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
                 ],
             ],
         ];

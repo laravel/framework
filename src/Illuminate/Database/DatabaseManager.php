@@ -6,6 +6,7 @@ use PDO;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 /**
