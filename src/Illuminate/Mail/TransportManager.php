@@ -53,6 +53,21 @@ class TransportManager extends Manager
         if (isset($config['stream'])) {
             $transport->setStreamOptions($config['stream']);
         }
+        
+        // Set the source ip for servers which have more than one ip address.
+        // This will cause Swift SMTP transport to make requests only via that 
+        // IP address, which is useful for firewalled smtp servers like gmail
+        // smtp relay.
+        if (isset($config['sourceip'])) {
+            $transport->setSourceIp($config['sourceip']);
+        }
+        
+        // Allow setting the local domain which Swift SMTP transport will use
+        // to identify the request domain to the smtp server, which is useful
+        // for shared smtp servers like gmail's smtp relay.
+        if (isset($config['localdomain'])) {
+            $transport->setLocalDomain($config['localdomain']);
+        }
 
         return $transport;
     }
