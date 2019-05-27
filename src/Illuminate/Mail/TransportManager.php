@@ -47,26 +47,28 @@ class TransportManager extends Manager
             $transport->setPassword($config['password']);
         }
 
-        // Next we will set any stream context options specified for the transport
-        // and then return it. The option is not required any may not be inside
-        // the configuration array at all so we'll verify that before adding.
+        return $this->configureSmtpDriver($transport, $config);
+    }
+
+    /**
+     * Configure the additional SMTP driver options.
+     *
+     * @param  \Swift_SmtpTransport  $transport
+     * @param  array  $config
+     * @return \Swift_SmtpTransport
+     */
+    protected function configureSmtpDriver($transport, $config)
+    {
         if (isset($config['stream'])) {
             $transport->setStreamOptions($config['stream']);
         }
-        
-        // Set the source ip for servers which have more than one ip address.
-        // This will cause Swift SMTP transport to make requests only via that 
-        // IP address, which is useful for firewalled smtp servers like gmail
-        // smtp relay.
-        if (isset($config['sourceip'])) {
-            $transport->setSourceIp($config['sourceip']);
+
+        if (isset($config['source_ip'])) {
+            $transport->setSourceIp($config['source_ip']);
         }
-        
-        // Allow setting the local domain which Swift SMTP transport will use
-        // to identify the request domain to the smtp server, which is useful
-        // for shared smtp servers like gmail's smtp relay.
-        if (isset($config['localdomain'])) {
-            $transport->setLocalDomain($config['localdomain']);
+
+        if (isset($config['local_domain'])) {
+            $transport->setLocalDomain($config['local_domain']);
         }
 
         return $transport;
