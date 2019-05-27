@@ -51,6 +51,13 @@ class Migrator
      */
     protected $connection;
 
+	/**
+	 * The connection name before migration is run.
+	 *
+	 * @var string
+	 */
+	protected $previousConnection = null;
+
     /**
      * The paths to all of the migration files.
      *
@@ -143,6 +150,8 @@ class Migrator
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to migrate.</info>');
 
+	        $this->restorePriorConnection();
+
             return;
         }
 
@@ -168,7 +177,7 @@ class Migrator
             }
         }
 
-        $this->restoreDefaultConnection();
+        $this->restorePriorConnection();
 
         $this->fireMigrationEvent(new MigrationsEnded);
     }
@@ -224,6 +233,8 @@ class Migrator
 
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to rollback.</info>');
+
+	        $this->restorePriorConnection();
 
             return [];
         }
@@ -282,7 +293,7 @@ class Migrator
             );
         }
 
-        $this->restoreDefaultConnection();
+	    $this->restorePriorConnection();
 
         $this->fireMigrationEvent(new MigrationsEnded);
 
@@ -307,6 +318,8 @@ class Migrator
 
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to rollback.</info>');
+
+	        $this->restorePriorConnection();
 
             return [];
         }
@@ -530,7 +543,8 @@ class Migrator
      */
     public function setConnection($name)
     {
-        if (! is_null($name)) {
+        if ($name) {
+	        $this->previousConnection = $this->resolver->getDefaultConnection();
             $this->resolver->setDefaultConnection($name);
         }
 
@@ -551,15 +565,18 @@ class Migrator
     }
 
     /**
-     * Restore connection to default instance from .env file.
+     * Restore prior connection after migration runs.
+     *
+	 * @param  string  $passedPreviousConnection
      *
      * @return void
      */
-    protected function restoreDefaultConnection()
+    public function restorePriorConnection($passedPreviousConnection = null)
     {
-        if ($defaultConnection = env('DB_CONNECTION')) {
-            $this->resolver->setDefaultConnection($defaultConnection);
-        }
+
+    	if ($previousConnection = $passedPreviousConnection ?? $this->previousConnection) {
+		    $this->resolver->setDefaultConnection($previousConnection);
+	    }
     }
 
     /**
