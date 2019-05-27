@@ -2,9 +2,9 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Queue\Failed\QueryableFailedJobProviderInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
+use Illuminate\Queue\Failed\QueryableFailedJobProviderInterface;
 
 class RetryCommand extends Command
 {
@@ -71,17 +71,21 @@ class RetryCommand extends Command
             if ($provider instanceof QueryableFailedJobProviderInterface) {
                 $query = $provider->getQuery()->orderBy('id', 'desc');
 
-                if ($limit != 0)
+                if ($limit != 0) {
                     $query = $query->limit($limit);
+                }
 
-                if ($offset != 0)
+                if ($offset != 0) {
                     $query = $query->offset($offset);
+                }
 
-                if ($queue)
+                if ($queue) {
                     $query = $query->where('queue', $queue);
+                }
 
-                if ($connection)
+                if ($connection) {
                     $query = $query->where('connection', $connection);
+                }
 
                 $query = $query->orderBy('id', $order);
                 $ids = $query->pluck('id');
