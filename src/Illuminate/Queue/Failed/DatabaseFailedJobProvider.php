@@ -116,7 +116,7 @@ class DatabaseFailedJobProvider implements QueryableFailedJobProviderInterface
     }
 
     /**
-     * Retrieve job ids from specific connection and queue
+     * Retrieve job ids from specific connection and queue.
      *
      * @param string|null $connection
      * @param string|null $queue
