@@ -49,7 +49,7 @@ class StatusCommand extends BaseCommand
      */
     public function handle()
     {
-	    $previousConnection = $this->migrator->getConnection();
+        $previousConnection = $this->migrator->getConnection();
         $this->migrator->setConnection($this->option('database'));
 
         if (! $this->migrator->repositoryExists()) {
@@ -67,7 +67,6 @@ class StatusCommand extends BaseCommand
         }
 
         $this->migrator->restorePriorConnection($previousConnection);
-
     }
 
     /**

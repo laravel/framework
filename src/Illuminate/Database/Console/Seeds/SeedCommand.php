@@ -57,7 +57,7 @@ class SeedCommand extends Command
             return;
         }
 
-	    $previousConnection = $this->resolver->getDefaultConnection();
+        $previousConnection = $this->resolver->getDefaultConnection();
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
@@ -66,7 +66,7 @@ class SeedCommand extends Command
         });
 
         if ($previousConnection) {
-	        $this->resolver->setDefaultConnection($previousConnection);
+            $this->resolver->setDefaultConnection($previousConnection);
         }
 
         $this->info('Database seeding completed successfully.');
