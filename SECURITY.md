@@ -20,7 +20,7 @@ Version | Security Fixes Until
 
 If you discover a security vulnerability within Laravel, please send an email to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
 
-Public PGP Key:
+### Public PGP Key
 
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
