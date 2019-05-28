@@ -246,12 +246,14 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Run a map over each of the items.
      *
-     * @param  callable  $callback
+     * @param  mixed  $callback
+     * @param  mixed  $replace
+     * @param  bool  $strict
      * @return \Illuminate\Support\Collection|static
      */
-    public function map(callable $callback)
+    public function map($callback, $search = null, $replace = false)
     {
-        $result = parent::map($callback);
+        $result = parent::map(...func_get_args());
 
         return $result->contains(function ($item) {
             return ! $item instanceof Model;

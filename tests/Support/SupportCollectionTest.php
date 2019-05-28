@@ -1521,6 +1521,14 @@ class SupportCollectionTest extends TestCase
             return $key.'-'.strrev($item);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
+
+        $data = new Collection(['1', 1, 2]);
+        $data = $data->map('1', null);
+        $this->assertEquals([null, null, 2], $data->all());
+
+        $data = new Collection(['1', 1, 2]);
+        $data = $data->map('1', null, true);
+        $this->assertEquals([null, 1, 2], $data->all());
     }
 
     public function testMapSpread()
@@ -1740,6 +1748,14 @@ class SupportCollectionTest extends TestCase
             return $key.'-'.strrev($item);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
+
+        $data = new Collection(['1', 1, 2]);
+        $data->transform('1', null);
+        $this->assertEquals([null, null, 2], $data->all());
+
+        $data = new Collection(['1', 1, 2]);
+        $data->transform('1', null, true);
+        $this->assertEquals([null, 1, 2], $data->all());
     }
 
     public function testGroupByAttribute()

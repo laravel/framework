@@ -1110,11 +1110,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Run a map over each of the items.
      *
-     * @param  callable  $callback
+     * @param  mixed  $callback
+     * @param  mixed  $replace
+     * @param  bool  $strict
      * @return static
      */
-    public function map(callable $callback)
+    public function map($callback, $replace = null, $strict = false)
     {
+        if (! is_callable($callback)) {
+            $callback = function ($item) use ($callback, $replace, $strict) {
+                if ($strict) {
+                    return $item === $callback ? $replace : $item;
+                }
+
+                return $item == $callback ? $replace : $item;
+            };
+        }
+
         $keys = array_keys($this->items);
 
         $items = array_map($callback, $this->items, $keys);
@@ -1798,12 +1810,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Transform each item in the collection using a callback.
      *
-     * @param  callable  $callback
+     * @param  mixed  $callback
+     * @param  mixed  $replace
+     * @param  bool  $strict
      * @return $this
      */
-    public function transform(callable $callback)
+    public function transform($callback, $replace = null, $strict = false)
     {
-        $this->items = $this->map($callback)->all();
+        $this->items = $this->map(...func_get_args())->all();
 
         return $this;
     }
