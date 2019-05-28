@@ -105,11 +105,10 @@ class SqlServerGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('create unique index %s on %s (%s) where %s is not null',
+        return sprintf('create unique index %s on %s (%s)',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
-            $this->columnize($command->columns),
-            implode(' is not null and ', $this->wrapArray($command->columns))
+            $this->columnize($command->columns)
         );
     }
 
