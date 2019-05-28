@@ -42,7 +42,7 @@ class FactoryMakeCommandTest extends TestCase
     }
 
     /** @test */
-    public function it_is_giving_a_default_model_name_from_the_factory_name_long_carachter()
+    public function it_is_giving_a_default_model_name_from_the_factory_name_long_character()
     {
         $command = $this->setupEnvironment();
 
