@@ -1,23 +1,28 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.18...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.19...5.8)
+
+
+
+## [v5.8.19 (2019-05-28)](https://github.com/laravel/framework/compare/v5.8.18...v5.8.19)
 
 ### Added
 - Added optional `DYNAMODB_ENDPOINT` env variable to configure endpoint for DynamoDB ([#28600](https://github.com/laravel/framework/pull/28600))
 - Added `Illuminate\Foundation\Application::isProduction()` method ([#28602](https://github.com/laravel/framework/pull/28602))
+- Allowed exception reporting in `rescue()` to be disabled ([#28617](https://github.com/laravel/framework/pull/28617))
+- Allowed to parse Url in Redis configuration ([#28612](https://github.com/laravel/framework/pull/28612), [f4cfb32](https://github.com/laravel/framework/commit/f4cfb3287b358b41735072895a485f8e68c1c7f0))
+- Allowed setting additional (`sourceip` and `localdomain`) smtp config options ([#28631](https://github.com/laravel/framework/pull/28631), [435c05b](https://github.com/laravel/framework/commit/435c05b96a241d3d5e37ce524de9ea134714a9be))
 
 ### Fixed
 - Fixed Eloquent UPDATE queries with alias ([#28607](https://github.com/laravel/framework/pull/28607))
 - Fixed `Illuminate\Cache\DynamoDbStore::forever()` ([#28618](https://github.com/laravel/framework/pull/28618))
+- Fixed `event:list` command, when using a combination of manually registering events and event auto discovering ([#28624](https://github.com/laravel/framework/pull/28624))
 
 ### Performance improvement
 - Improve performance for `Arr::flatten()` ([#28614](https://github.com/laravel/framework/pull/28614))
 
 ### Changed
 - Added `id` to `ModelNotFoundException` exception in `ImplicitRouteBinding` ([#28588](https://github.com/laravel/framework/pull/28588))
-
-### TODO:
-- Allow rescued exception reporting to be disabled ([#28617](https://github.com/laravel/framework/pull/28617))
 
 
 ## [v5.8.18 (2019-05-21)](https://github.com/laravel/framework/compare/v5.8.17...v5.8.18)
