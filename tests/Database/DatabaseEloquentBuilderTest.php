@@ -1165,6 +1165,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpdateWithAlias()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', $now])->andReturn(1);
+
+        $result = $builder->from('table as alias')->update(['foo' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        Carbon::setTestNow(null);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';

@@ -5,6 +5,7 @@ namespace Illuminate\Redis;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Support\ConfigurationUrlParser;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
@@ -95,7 +96,10 @@ class RedisManager implements Factory
         $options = $this->config['options'] ?? [];
 
         if (isset($this->config[$name])) {
-            return $this->connector()->connect($this->config[$name], $options);
+            return $this->connector()->connect(
+                $this->parseConnectionConfiguration($this->config[$name]),
+                $options
+            );
         }
 
         if (isset($this->config['clusters'][$name])) {
@@ -113,10 +117,10 @@ class RedisManager implements Factory
      */
     protected function resolveCluster($name)
     {
-        $clusterOptions = $this->config['clusters']['options'] ?? [];
-
         return $this->connector()->connectToCluster(
-            $this->config['clusters'][$name], $clusterOptions, $this->config['options'] ?? []
+            $this->parseConnectionConfiguration($this->config['clusters'][$name]),
+            $this->config['clusters']['options'] ?? [],
+            $this->config['options'] ?? []
         );
     }
 
@@ -151,6 +155,21 @@ class RedisManager implements Factory
             case 'phpredis':
                 return new Connectors\PhpRedisConnector;
         }
+    }
+
+    /**
+     * Parse the Redis connection configuration.
+     *
+     * @param  mixed  $config
+     * @return array
+     */
+    protected function parseConnectionConfiguration($config)
+    {
+        $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
+
+        return array_filter($parsed, function ($key) {
+            return ! in_array($key, ['driver', 'username']);
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**

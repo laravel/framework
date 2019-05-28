@@ -213,10 +213,14 @@ class Arr
 
             if (! is_array($item)) {
                 $result[] = $item;
-            } elseif ($depth === 1) {
-                $result = array_merge($result, array_values($item));
             } else {
-                $result = array_merge($result, static::flatten($item, $depth - 1));
+                $values = $depth === 1
+                    ? array_values($item)
+                    : static::flatten($item, $depth - 1);
+
+                foreach ($values as $value) {
+                    $result[] = $value;
+                }
             }
         }
 

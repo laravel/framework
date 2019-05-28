@@ -190,6 +190,30 @@ class FoundationApplicationTest extends TestCase
         $this->assertFalse($app->environment(['qux', 'bar']));
     }
 
+    public function testEnvironmentHelpers()
+    {
+        $local = new Application;
+        $local['env'] = 'local';
+
+        $this->assertTrue($local->isLocal());
+        $this->assertFalse($local->isProduction());
+        $this->assertFalse($local->runningUnitTests());
+
+        $production = new Application;
+        $production['env'] = 'production';
+
+        $this->assertTrue($production->isProduction());
+        $this->assertFalse($production->isLocal());
+        $this->assertFalse($production->runningUnitTests());
+
+        $testing = new Application;
+        $testing['env'] = 'testing';
+
+        $this->assertTrue($testing->runningUnitTests());
+        $this->assertFalse($testing->isLocal());
+        $this->assertFalse($testing->isProduction());
+    }
+
     public function testMethodAfterLoadingEnvironmentAddsClosure()
     {
         $app = new Application;
