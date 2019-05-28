@@ -8,6 +8,7 @@ use Zend\Diactoros\Response as PsrResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Illuminate\Contracts\View\Factory as ViewFactoryContract;
+use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
@@ -56,12 +57,14 @@ class RoutingServiceProvider extends ServiceProvider
             // and all the registered routes will be available to the generator.
             $app->instance('routes', $routes);
 
-            $url = new UrlGenerator(
+            return new UrlGenerator(
                 $routes, $app->rebinding(
                     'request', $this->requestRebinder()
                 ), $app['config']['app.asset_url']
             );
+        });
 
+        $this->app->extend('url', function (UrlGeneratorContract $url, $app) {
             // Next we will set a few service resolvers on the URL generator so it can
             // get the information it needs to function. This just provides some of
             // the convenience features to this URL generator like "signed" URLs.
