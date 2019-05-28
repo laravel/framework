@@ -57,11 +57,17 @@ class SeedCommand extends Command
             return;
         }
 
+        $previousConnection = $this->resolver->getDefaultConnection();
+
         $this->resolver->setDefaultConnection($this->getDatabase());
 
         Model::unguarded(function () {
             $this->getSeeder()->__invoke();
         });
+
+        if ($previousConnection) {
+            $this->resolver->setDefaultConnection($previousConnection);
+        }
 
         $this->info('Database seeding completed successfully.');
     }
