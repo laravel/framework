@@ -42,6 +42,21 @@ class FactoryMakeCommandTest extends TestCase
     }
 
     /** @test */
+    public function it_is_giving_a_default_model_name_from_the_factory_name_long_carachter()
+    {
+        $command = $this->setupEnvironment();
+
+        $name = 'UserExampleModelFactory';
+
+        $this->runCommand($command, ['name' => $name]);
+
+        $slug = $this->filesystem->get(__DIR__."/database/factories/{$name}.php");
+
+        $this->assertTrue((bool) strpos($slug, 'UserExampleModel::class'));
+        $this->assertTrue((bool) strpos($slug, 'App\\Models\\UserExampleModel'));
+    }
+
+    /** @test */
     public function it_is_giving_the_specified_model_name()
     {
         $command = $this->setupEnvironment();

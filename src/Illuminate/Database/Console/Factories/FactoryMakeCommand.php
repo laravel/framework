@@ -51,7 +51,7 @@ class FactoryMakeCommand extends GeneratorCommand
 
         foreach (['factory', 'Factory'] as $name) {
             if (Str::endsWith($model, $name) && strpos($model, $name)) {
-                $model = substr($model, 0, 4);
+                $model = substr($model, 0, -7);
                 break;
             }
         }
