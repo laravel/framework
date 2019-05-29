@@ -38,7 +38,7 @@ class MorphTo extends BelongsTo
     protected $macroBuffer = [];
 
     /**
-     * A map of relations to load for each individual morph type
+     * A map of relations to load for each individual morph type.
      *
      * @var array
      */
@@ -264,7 +264,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Specify which relations to load for a given morph type
+     * Specify which relations to load for a given morph type.
      *
      * @param string $modelClass
      * @param array $with
