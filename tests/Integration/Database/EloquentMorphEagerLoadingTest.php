@@ -2,17 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToLazyEagerLoadingTest;
 
-use DB;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration
  */
-class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
+class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 {
     protected function setUp(): void
     {
