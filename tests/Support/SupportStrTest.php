@@ -3,13 +3,11 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Str;
+use Ramsey\Uuid\UuidInterface;
 use PHPUnit\Framework\TestCase;
 
 class SupportStrTest extends TestCase
 {
-    /**
-     * Test the Str::words method.
-     */
     public function testStringCanBeLimitedByWords()
     {
         $this->assertEquals('Taylor...', Str::words('Taylor Otwell', 1));
@@ -287,6 +285,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals('Laravel framework', Str::ucfirst('laravel framework'));
         $this->assertEquals('Мама', Str::ucfirst('мама'));
         $this->assertEquals('Мама мыла раму', Str::ucfirst('мама мыла раму'));
+    }
+
+    public function testUuid()
+    {
+        $this->assertInstanceOf(UuidInterface::class, Str::uuid());
+        $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
     }
 }
 

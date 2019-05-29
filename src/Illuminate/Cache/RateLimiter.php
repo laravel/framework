@@ -32,10 +32,9 @@ class RateLimiter
      *
      * @param  string  $key
      * @param  int  $maxAttempts
-     * @param  float|int  $decayMinutes
      * @return bool
      */
-    public function tooManyAttempts($key, $maxAttempts, $decayMinutes = 1)
+    public function tooManyAttempts($key, $maxAttempts)
     {
         if ($this->attempts($key) >= $maxAttempts) {
             if ($this->cache->has($key.':timer')) {

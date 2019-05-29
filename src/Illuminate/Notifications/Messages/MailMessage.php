@@ -144,7 +144,7 @@ class MailMessage extends SimpleMessage
      */
     public function replyTo($address, $name = null)
     {
-        $this->replyTo = [$address, $name];
+        $this->replyTo[] = [$address, $name];
 
         return $this;
     }
@@ -158,7 +158,7 @@ class MailMessage extends SimpleMessage
      */
     public function cc($address, $name = null)
     {
-        $this->cc = [$address, $name];
+        $this->cc[] = [$address, $name];
 
         return $this;
     }
@@ -172,7 +172,7 @@ class MailMessage extends SimpleMessage
      */
     public function bcc($address, $name = null)
     {
-        $this->bcc = [$address, $name];
+        $this->bcc[] = [$address, $name];
 
         return $this;
     }

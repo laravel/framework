@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Process\ProcessUtils;
+use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -26,17 +26,19 @@ class ServeCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      *
      * @throws \Exception
      */
     public function handle()
     {
-        chdir($this->laravel->publicPath());
+        chdir(public_path());
 
         $this->line("<info>Laravel development server started:</info> <http://{$this->host()}:{$this->port()}>");
 
-        passthru($this->serverCommand());
+        passthru($this->serverCommand(), $status);
+
+        return $status;
     }
 
     /**
@@ -46,11 +48,11 @@ class ServeCommand extends Command
      */
     protected function serverCommand()
     {
-        return sprintf('%s -S %s:%s %s/server.php',
+        return sprintf('%s -S %s:%s %s',
             ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)),
             $this->host(),
             $this->port(),
-            ProcessUtils::escapeArgument($this->laravel->basePath())
+            ProcessUtils::escapeArgument(base_path('server.php'))
         );
     }
 
@@ -82,9 +84,9 @@ class ServeCommand extends Command
     protected function getOptions()
     {
         return [
-            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', '127.0.0.1'],
+            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', '127.0.0.1'],
 
-            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000],
+            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', 8000],
         ];
     }
 }

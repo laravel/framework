@@ -3,10 +3,14 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Tests\Integration\Database\Post;
+use Illuminate\Tests\Integration\Database\User;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -81,6 +85,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->timestamps();
             });
 
+            $this->schema($connection)->create('comments', function ($table) {
+                $table->increments('id');
+                $table->integer('post_id');
+                $table->string('content');
+                $table->timestamps();
+            });
+
             $this->schema($connection)->create('friend_levels', function ($table) {
                 $table->increments('id');
                 $table->string('level');
@@ -124,6 +135,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
 
         Relation::morphMap([], false);
+        Eloquent::unsetConnectionResolver();
     }
 
     /**
@@ -135,6 +147,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $this->assertEquals(2, EloquentTestUser::count());
+
+        $this->assertFalse(EloquentTestUser::where('email', 'taylorotwell@gmail.com')->doesntExist());
+        $this->assertTrue(EloquentTestUser::where('email', 'mohamed@laravel.com')->doesntExist());
 
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
         $this->assertEquals('taylorotwell@gmail.com', $model->email);
@@ -154,11 +169,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $collection = EloquentTestUser::find([]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
-        $this->assertEquals(0, $collection->count());
+        $this->assertCount(0, $collection);
 
         $collection = EloquentTestUser::find([1, 2, 3]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
-        $this->assertEquals(2, $collection->count());
+        $this->assertCount(2, $collection);
 
         $models = EloquentTestUser::where('id', 1)->cursor();
         foreach ($models as $model) {
@@ -183,7 +198,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $models = EloquentTestUser::oldest('id')->get();
 
-        $this->assertEquals(2, $models->count());
+        $this->assertCount(2, $models);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[1]);
@@ -202,7 +217,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(2, $models->count());
+        $this->assertCount(2, $models);
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[1]);
@@ -214,7 +229,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(1, $models->count());
+        $this->assertCount(1, $models);
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertEquals('foo@gmail.com', $models[0]->email);
@@ -227,7 +242,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(0, $models->count());
+        $this->assertCount(0, $models);
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
 
         Paginator::currentPageResolver(function () {
@@ -235,14 +250,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(0, $models->count());
+        $this->assertCount(0, $models);
     }
 
     public function testPaginatedModelCollectionRetrievalWhenNoElementsAndDefaultPerPage()
     {
         $models = EloquentTestUser::oldest('id')->paginate();
 
-        $this->assertEquals(0, $models->count());
+        $this->assertCount(0, $models);
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
     }
 
@@ -361,6 +376,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse($model->wasRecentlyCreated);
     }
 
+    public function testChunkByIdWithNonIncrementingKey()
+    {
+        EloquentTestNonIncrementingSecond::create(['name' => ' First']);
+        EloquentTestNonIncrementingSecond::create(['name' => ' Second']);
+        EloquentTestNonIncrementingSecond::create(['name' => ' Third']);
+
+        $i = 0;
+        EloquentTestNonIncrementingSecond::query()->chunkById(2, function (Collection $users) use (&$i) {
+            if (! $i) {
+                $this->assertEquals(' First', $users[0]->name);
+                $this->assertEquals(' Second', $users[1]->name);
+            } else {
+                $this->assertEquals(' Third', $users[0]->name);
+            }
+            $i++;
+        }, 'name');
+        $this->assertEquals(2, $i);
+    }
+
     public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -455,7 +489,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $post2 = $user->posts()->where('name', 'Second Post')->first();
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $posts);
-        $this->assertEquals(2, $posts->count());
+        $this->assertCount(2, $posts);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPost', $posts[0]);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPost', $posts[1]);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPost', $post2);
@@ -480,7 +514,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertEquals('abigailotwell@gmail.com', $models[0]->email);
         $this->assertEquals('second_connection', $models[0]->getConnectionName());
-        $this->assertEquals(1, $models->count());
+        $this->assertCount(1, $models);
     }
 
     public function testHasOnSelfReferencingBelongsToManyRelationship()
@@ -740,8 +774,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPhoto', $user->photos[0]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $post->photos);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPhoto', $post->photos[0]);
-        $this->assertEquals(2, $user->photos->count());
-        $this->assertEquals(2, $post->photos->count());
+        $this->assertCount(2, $user->photos);
+        $this->assertCount(2, $post->photos);
         $this->assertEquals('Avatar 1', $user->photos[0]->name);
         $this->assertEquals('Avatar 2', $user->photos[1]->name);
         $this->assertEquals('Hero 1', $post->photos[0]->name);
@@ -750,7 +784,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $photos = EloquentTestPhoto::orderBy('name')->get();
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $photos);
-        $this->assertEquals(4, $photos->count());
+        $this->assertCount(4, $photos);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $photos[0]->imageable);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPost', $photos[2]->imageable);
         $this->assertEquals('taylorotwell@gmail.com', $photos[1]->imageable->email);
@@ -775,8 +809,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPhoto', $user->photos[0]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $post->photos);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPhoto', $post->photos[0]);
-        $this->assertEquals(2, $user->photos->count());
-        $this->assertEquals(2, $post->photos->count());
+        $this->assertCount(2, $user->photos);
+        $this->assertCount(2, $post->photos);
         $this->assertEquals('Avatar 1', $user->photos[0]->name);
         $this->assertEquals('Avatar 2', $user->photos[1]->name);
         $this->assertEquals('Hero 1', $post->photos[0]->name);
@@ -1138,6 +1172,364 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals($users->map->fresh(), $users->fresh());
     }
 
+    public function testTimestampsUsingDefaultDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s'); // Default MySQL/PostgreSQL/SQLite date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19', $model->fromDateTime($model->getAttribute('created_at')));
+    }
+
+    public function testTimestampsUsingDefaultSqlServerDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.v'); // Default SQL Server date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.000',
+            'updated_at' => '2017-11-14 08:23:19.734',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734', $model->fromDateTime($model->getAttribute('updated_at')));
+    }
+
+    public function testTimestampsUsingCustomDateFormat()
+    {
+        // Simulating using custom precisions with timestamps(4)
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.u'); // Custom date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.0000',
+            'updated_at' => '2017-11-14 08:23:19.7348',
+        ]);
+
+        // Note: when storing databases would truncate the value to the given precision
+        $this->assertEquals('2017-11-14 08:23:19.000000', $model->fromDateTime($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734800', $model->fromDateTime($model->getAttribute('updated_at')));
+    }
+
+    public function testTimestampsUsingOldSqlServerDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.000',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testTimestampsUsingOldSqlServerDateFormatFailInEdgeCases()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
+        $model->setRawAttributes([
+            'updated_at' => '2017-11-14 08:23:19.734',
+        ]);
+
+        $attribute = $model->fromDateTime($model->getAttribute('updated_at'));
+    }
+
+    public function testUpdatingChildModelTouchesParent()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        $post->update(['name' => 'Updated']);
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testMultiLevelTouchingWorks()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching models related timestamps.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testDeletingChildModelTouchesParentTimestamps()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        $post->delete();
+
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testTouchingChildModelUpdatesParentsTimestamps()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        $post->touch();
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testTouchingChildModelRespectsParentNoTouching()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () use ($post) {
+            $post->touch();
+        });
+
+        $this->assertTrue(
+            $future->isSameDay($post->fresh()->updated_at),
+            'It is not touching model own timestamps in withoutTouching scope.'
+        );
+
+        $this->assertTrue(
+            $before->isSameDay($user->fresh()->updated_at),
+            'It is touching model own timestamps in withoutTouching scope, when it should not.'
+        );
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testUpdatingChildPostRespectsNoTouchingDefinition()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () use ($post) {
+            $post->update(['name' => 'Updated']);
+        });
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps when it should.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models relationships when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testUpdatingModelInTheDisabledScopeTouchesItsOwnTimestamps()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        Model::withoutTouching(function () use ($post) {
+            $post->update(['name' => 'Updated']);
+        });
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testDeletingChildModelRespectsTheNoTouchingRule()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () use ($post) {
+            $post->delete();
+        });
+
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testRespectedMultiLevelTouchingChain()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () {
+            EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+        });
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testTouchesGreatParentEvenWhenParentIsInNoTouchScope()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingPost::withoutTouching(function () {
+            EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+        });
+
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testCanNestCallsOfNoTouching()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () {
+            EloquentTouchingPost::withoutTouching(function () {
+                EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+            });
+        });
+
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testCanPassArrayOfModelsToIgnore()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        Model::withoutTouchingOn([EloquentTouchingUser::class, EloquentTouchingPost::class], function () {
+            EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+        });
+
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testWhenBaseModelIsIgnoredAllChildModelsAreIgnored()
+    {
+        $this->assertFalse(Model::isIgnoringTouch());
+        $this->assertFalse(User::isIgnoringTouch());
+
+        Model::withoutTouching(function () {
+            $this->assertTrue(Model::isIgnoringTouch());
+            $this->assertTrue(User::isIgnoringTouch());
+        });
+
+        $this->assertFalse(User::isIgnoringTouch());
+        $this->assertFalse(Model::isIgnoringTouch());
+    }
+
+    public function testChildModelsAreIgnored()
+    {
+        $this->assertFalse(Model::isIgnoringTouch());
+        $this->assertFalse(User::isIgnoringTouch());
+        $this->assertFalse(Post::isIgnoringTouch());
+
+        User::withoutTouching(function () {
+            $this->assertFalse(Model::isIgnoringTouch());
+            $this->assertFalse(Post::isIgnoringTouch());
+            $this->assertTrue(User::isIgnoringTouch());
+        });
+
+        $this->assertFalse(Post::isIgnoringTouch());
+        $this->assertFalse(User::isIgnoringTouch());
+        $this->assertFalse(Model::isIgnoringTouch());
+    }
+
     /**
      * Helpers...
      */
@@ -1225,6 +1617,11 @@ class EloquentTestNonIncrementing extends Eloquent
     protected $guarded = [];
     public $incrementing = false;
     public $timestamps = false;
+}
+
+class EloquentTestNonIncrementingSecond extends EloquentTestNonIncrementing
+{
+    protected $connection = 'second_connection';
 }
 
 class EloquentTestUserWithGlobalScope extends EloquentTestUser
@@ -1366,5 +1763,41 @@ class EloquentTestFriendPivot extends Pivot
     public function level()
     {
         return $this->belongsTo(EloquentTestFriendLevel::class, 'friend_level_id');
+    }
+}
+
+class EloquentTouchingUser extends Eloquent
+{
+    protected $table = 'users';
+    protected $guarded = [];
+}
+
+class EloquentTouchingPost extends Eloquent
+{
+    protected $table = 'posts';
+    protected $guarded = [];
+
+    protected $touches = [
+        'user',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo('Illuminate\Tests\Database\EloquentTouchingUser', 'user_id');
+    }
+}
+
+class EloquentTouchingComment extends Eloquent
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+
+    protected $touches = [
+        'post',
+    ];
+
+    public function post()
+    {
+        return $this->belongsTo('Illuminate\Tests\Database\EloquentTouchingPost', 'post_id');
     }
 }

@@ -14,6 +14,7 @@ class Pluralizer
     public static $uncountable = [
         'audio',
         'bison',
+        'cattle',
         'chassis',
         'compensation',
         'coreopsis',
@@ -31,6 +32,7 @@ class Pluralizer
         'hardware',
         'information',
         'jedi',
+        'kin',
         'knowledge',
         'love',
         'metadata',
@@ -46,6 +48,7 @@ class Pluralizer
         'rice',
         'series',
         'sheep',
+        'software',
         'species',
         'swine',
         'traffic',

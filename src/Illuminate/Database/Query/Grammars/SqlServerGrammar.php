@@ -14,7 +14,7 @@ class SqlServerGrammar extends Grammar
      */
     protected $operators = [
         '=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!=',
-        'like', 'not like', 'between', 'ilike',
+        'like', 'not like', 'ilike',
         '&', '&=', '|', '|=', '^', '^=',
     ];
 
@@ -101,6 +101,35 @@ class SqlServerGrammar extends Grammar
         $value = $this->parameter($where['value']);
 
         return 'cast('.$this->wrap($where['column']).' as date) '.$where['operator'].' '.$value;
+    }
+
+    /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        $parts = explode('->', $column, 2);
+
+        $field = $this->wrap($parts[0]);
+
+        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+
+        return $value.' in (select [value] from openjson('.$field.$path.'))';
+    }
+
+    /**
+     * Prepare the binding for a "JSON contains" statement.
+     *
+     * @param  mixed  $binding
+     * @return string
+     */
+    public function prepareBindingForJsonContains($binding)
+    {
+        return is_bool($binding) ? json_encode($binding) : $binding;
     }
 
     /**
@@ -400,7 +429,7 @@ class SqlServerGrammar extends Grammar
      */
     public function getDateFormat()
     {
-        return 'Y-m-d H:i:s.000';
+        return 'Y-m-d H:i:s.v';
     }
 
     /**
@@ -412,6 +441,32 @@ class SqlServerGrammar extends Grammar
     protected function wrapValue($value)
     {
         return $value === '*' ? $value : '['.str_replace(']', ']]', $value).']';
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        $parts = explode('->', $value, 2);
+
+        $field = $this->wrapSegments(explode('.', array_shift($parts)));
+
+        return 'json_value('.$field.', '.$this->wrapJsonPath($parts[0]).')';
+    }
+
+    /**
+     * Wrap the given JSON path.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonPath($value)
+    {
+        return '\'$."'.str_replace('->', '"."', $value).'"\'';
     }
 
     /**

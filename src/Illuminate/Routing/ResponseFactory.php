@@ -43,7 +43,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new response from the application.
+     * Create a new response instance.
      *
      * @param  string  $content
      * @param  int  $status
@@ -56,7 +56,19 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new view response from the application.
+     * Create a new "no content" response.
+     *
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function noContent($status = 204, array $headers = [])
+    {
+        return $this->make('', $status, $headers);
+    }
+
+    /**
+     * Create a new response for a given view.
      *
      * @param  string  $view
      * @param  array  $data
@@ -70,7 +82,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new JSON response from the application.
+     * Create a new JSON response instance.
      *
      * @param  mixed  $data
      * @param  int  $status
@@ -84,7 +96,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new JSONP response from the application.
+     * Create a new JSONP response instance.
      *
      * @param  string  $callback
      * @param  mixed  $data
@@ -99,7 +111,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new streamed response from the application.
+     * Create a new streamed response instance.
      *
      * @param  \Closure  $callback
      * @param  int  $status
@@ -112,10 +124,34 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Create a new streamed response instance as a file download.
+     *
+     * @param  \Closure  $callback
+     * @param  string|null  $name
+     * @param  array  $headers
+     * @param  string|null  $disposition
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment')
+    {
+        $response = new StreamedResponse($callback, 200, $headers);
+
+        if (! is_null($name)) {
+            $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+                $disposition,
+                $name,
+                $this->fallbackName($name)
+            ));
+        }
+
+        return $response;
+    }
+
+    /**
      * Create a new file download response.
      *
      * @param  \SplFileInfo|string  $file
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  array  $headers
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
@@ -125,10 +161,21 @@ class ResponseFactory implements FactoryContract
         $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
         if (! is_null($name)) {
-            return $response->setContentDisposition($disposition, $name, str_replace('%', '', Str::ascii($name)));
+            return $response->setContentDisposition($disposition, $name, $this->fallbackName($name));
         }
 
         return $response;
+    }
+
+    /**
+     * Convert the string to ASCII characters that are equivalent to the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function fallbackName($name)
+    {
+        return str_replace('%', '', Str::ascii($name));
     }
 
     /**

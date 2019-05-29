@@ -1,22 +1,24 @@
 <?php
 
-use Predis\Client;
+namespace Illuminate\Tests\Redis;
+
 use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 /**
  * @group redislimiters
  */
 class ConcurrentLimiterTest extends TestCase
 {
-    public $redis;
+    use InteractsWithRedis;
 
-    public function setup()
+    public function setUp()
     {
-        parent::setup();
+        parent::setUp();
 
-        $this->redis()->flushall();
+        $this->setUpRedis();
     }
 
     /**
@@ -145,21 +147,9 @@ class ConcurrentLimiterTest extends TestCase
         $this->assertEquals([1], $store);
     }
 
-    /**
-     * @return Client
-     */
-    public function redis()
+    private function redis()
     {
-        return $this->redis ?
-            $this->redis :
-            $this->redis = (new \Illuminate\Redis\RedisManager('predis', [
-                'default' => [
-                    'host' => '127.0.0.1',
-                    'password' => null,
-                    'port' => 6379,
-                    'database' => 0,
-                ],
-            ]))->connection();
+        return $this->redis['predis']->connection();
     }
 }
 

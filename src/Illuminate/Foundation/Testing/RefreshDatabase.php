@@ -50,7 +50,9 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh');
+            $this->artisan('migrate:fresh', $this->shouldDropViews() ? [
+                '--drop-views' => true,
+            ] : []);
 
             $this->app[Kernel::class]->setArtisan(null);
 
@@ -70,12 +72,23 @@ trait RefreshDatabase
         $database = $this->app->make('db');
 
         foreach ($this->connectionsToTransact() as $name) {
-            $database->connection($name)->beginTransaction();
+            $connection = $database->connection($name);
+            $dispatcher = $connection->getEventDispatcher();
+
+            $connection->unsetEventDispatcher();
+            $connection->beginTransaction();
+            $connection->setEventDispatcher($dispatcher);
         }
 
         $this->beforeApplicationDestroyed(function () use ($database) {
             foreach ($this->connectionsToTransact() as $name) {
-                $database->connection($name)->rollBack();
+                $connection = $database->connection($name);
+                $dispatcher = $connection->getEventDispatcher();
+
+                $connection->unsetEventDispatcher();
+                $connection->rollback();
+                $connection->setEventDispatcher($dispatcher);
+                $connection->disconnect();
             }
         });
     }
@@ -89,5 +102,16 @@ trait RefreshDatabase
     {
         return property_exists($this, 'connectionsToTransact')
                             ? $this->connectionsToTransact : [null];
+    }
+
+    /**
+     * Determine if views should be dropped when refreshing the database.
+     *
+     * @return bool
+     */
+    protected function shouldDropViews()
+    {
+        return property_exists($this, 'dropViews')
+                            ? $this->dropViews : false;
     }
 }

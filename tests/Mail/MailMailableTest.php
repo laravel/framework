@@ -109,7 +109,7 @@ class MailMailableTest extends TestCase
 
         $expected = [
             'first_name' => 'Taylor',
-            'last_name' => 'Otwell',
+            'lastName' => 'Otwell',
             'framework' => 'Laravel',
         ];
 

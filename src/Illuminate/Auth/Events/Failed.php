@@ -23,6 +23,7 @@ class Failed
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $credentials
+     * @return void
      */
     public function __construct($user, $credentials)
     {

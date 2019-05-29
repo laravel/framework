@@ -61,7 +61,7 @@ class MigrationCreator
         // Next, we will fire any hooks that are supposed to fire after a migration is
         // created. Once that is done we'll be ready to return the full path to the
         // migration file so it can be used however it's needed by the developer.
-        $this->firePostCreateHooks();
+        $this->firePostCreateHooks($table);
 
         return $path;
     }
@@ -97,11 +97,9 @@ class MigrationCreator
         // We also have stubs for creating new tables and modifying existing tables
         // to save the developer some typing when they are creating a new tables
         // or modifying existing tables. We'll grab the appropriate stub here.
-        else {
-            $stub = $create ? 'create.stub' : 'update.stub';
+        $stub = $create ? 'create.stub' : 'update.stub';
 
-            return $this->files->get($this->stubPath()."/{$stub}");
-        }
+        return $this->files->get($this->stubPath()."/{$stub}");
     }
 
     /**
@@ -152,12 +150,13 @@ class MigrationCreator
     /**
      * Fire the registered post create hooks.
      *
+     * @param  string  $table
      * @return void
      */
-    protected function firePostCreateHooks()
+    protected function firePostCreateHooks($table)
     {
         foreach ($this->postCreate as $callback) {
-            call_user_func($callback);
+            call_user_func($callback, $table);
         }
     }
 

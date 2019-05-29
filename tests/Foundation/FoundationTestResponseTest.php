@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Exception;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
@@ -41,6 +42,32 @@ class FoundationTestResponseTest extends TestCase
         $response->assertViewHas('foo');
     }
 
+    public function testAssertSeeInOrder()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeInOrder(['foo', 'bar', 'baz']);
+        $response->assertSeeInOrder(['foo', 'bar', 'baz', 'foo']);
+
+        try {
+            $response->assertSeeInOrder(['baz', 'bar', 'foo']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
+
+        try {
+            $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
+    }
+
     public function testAssertSeeText()
     {
         $baseResponse = tap(new Response, function ($response) {
@@ -54,6 +81,32 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeText('foobar');
     }
 
+    public function testAssertSeeTextInOrder()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeTextInOrder(['foobar', 'baz']);
+        $response->assertSeeTextInOrder(['foobar', 'baz', 'foo']);
+
+        try {
+            $response->assertSeeTextInOrder(['baz', 'foobar']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
+
+        try {
+            $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
+    }
+
     public function testAssertHeader()
     {
         $baseResponse = tap(new Response, function ($response) {
@@ -64,10 +117,26 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertHeader('Location', '/bar');
+            $this->fail('No exception was thrown');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->assertEquals('/bar', $e->getComparisonFailure()->getExpected());
             $this->assertEquals('/foo', $e->getComparisonFailure()->getActual());
         }
+    }
+
+    /**
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage Unexpected header [Location] is present on response.
+     */
+    public function testAssertHeaderMissing()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('Location', '/foo');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertHeaderMissing('Location');
     }
 
     public function testAssertJsonWithArray()
@@ -132,6 +201,56 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
+    public function testAssertJsonCount()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // With simple key
+        $response->assertJsonCount(3, 'bars');
+
+        // With nested key
+        $response->assertJsonCount(1, 'barfoo.0.bar');
+        $response->assertJsonCount(3, 'barfoo.2.bar');
+
+        // Without structure
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response->assertJsonCount(4);
+    }
+
+    public function testAssertJsonMissingValidationErrors()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(json_encode(['errors' => [
+                    'foo' => [],
+                    'bar' => ['one', 'two'],
+                ]]
+            ));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        try {
+            $response->assertJsonMissingValidationErrors('foo');
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+
+        try {
+            $response->assertJsonMissingValidationErrors('bar');
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+
+        $response->assertJsonMissingValidationErrors('baz');
+
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(json_encode(['foo' => 'bar']));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertJsonMissingValidationErrors('foo');
+    }
+
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {
@@ -158,6 +277,17 @@ class FoundationTestResponseTest extends TestCase
 
         $files->deleteDirectory($tempDir);
     }
+
+    public function testJsonHelper()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $this->assertEquals('foo', $response->json('foobar.foobar_foo'));
+        $this->assertEquals(
+            json_decode($response->getContent(), true),
+            $response->json()
+        );
+    }
 }
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable
@@ -178,6 +308,11 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
             'baz'    => [
                 ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
                 ['foo' => 'bar 1', 'bar' => ['foo' => 'bar 1', 'bar' => 'foo 1']],
+            ],
+            'barfoo' => [
+                ['bar' => ['bar' => 'foo 0']],
+                ['bar' => ['bar' => 'foo 0', 'bar' => 'foo 0']],
+                ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
             ],
         ];
     }

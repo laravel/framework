@@ -71,7 +71,7 @@ trait InteractsWithExceptionHandling
             /**
              * Create a new class instance.
              *
-             * @param \Illuminate\Contracts\Debug\ExceptionHandler
+             * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $originalHandler
              * @param  array  $except
              * @return void
              */
@@ -121,7 +121,7 @@ trait InteractsWithExceptionHandling
             /**
              * Render the exception for the console.
              *
-             * @param  \Symfony\Component\Console\Output\OutputInterface
+             * @param  \Symfony\Component\Console\Output\OutputInterface  $output
              * @param  \Exception  $e
              * @return void
              */

@@ -165,7 +165,7 @@ class ViewTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method [badMethodCall] does not exist on view.
+     * @expectedExceptionMessage Method Illuminate\View\View::badMethodCall does not exist.
      */
     public function testViewBadMethod()
     {

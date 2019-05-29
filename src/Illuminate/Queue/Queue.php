@@ -18,13 +18,6 @@ abstract class Queue
     protected $container;
 
     /**
-     * The encrypter implementation.
-     *
-     * @var \Illuminate\Contracts\Encryption\Encrypter
-     */
-    protected $encrypter;
-
-    /**
      * The connection name for the queue.
      *
      * @var string
@@ -98,8 +91,8 @@ abstract class Queue
     /**
      * Create a payload array from the given job and data.
      *
-     * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $job
+     * @param  mixed  $data
      * @return array
      */
     protected function createPayloadArray($job, $data = '')

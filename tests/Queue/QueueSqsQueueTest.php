@@ -52,6 +52,10 @@ class QueueSqsQueueTest extends TestCase
             ],
         ]);
 
+        $this->mockedReceiveEmptyMessageResponseModel = new Result([
+            'Messages' => null,
+        ]);
+
         $this->mockedQueueAttributesResponseModel = new Result([
             'Attributes' => [
                 'ApproximateNumberOfMessages' => 1,
@@ -67,6 +71,16 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveMessageResponseModel);
         $result = $queue->pop($this->queueName);
         $this->assertInstanceOf('Illuminate\Queue\Jobs\SqsJob', $result);
+    }
+
+    public function testPopProperlyHandlesEmptyMessage()
+    {
+        $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->setContainer(m::mock('Illuminate\Container\Container'));
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
+        $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveEmptyMessageResponseModel);
+        $result = $queue->pop($this->queueName);
+        $this->assertNull($result);
     }
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()

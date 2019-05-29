@@ -5,6 +5,7 @@ namespace Illuminate\Mail;
 use Swift_Mailer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Swift_DependencyContainer;
 use Illuminate\Support\ServiceProvider;
 
 class MailServiceProvider extends ServiceProvider
@@ -92,6 +93,12 @@ class MailServiceProvider extends ServiceProvider
         // mailer instance, passing in the transport instances, which allows us to
         // override this transporter instances during app start-up if necessary.
         $this->app->singleton('swift.mailer', function ($app) {
+            if ($domain = $app->make('config')->get('mail.domain')) {
+                Swift_DependencyContainer::getInstance()
+                                ->register('mime.idgenerator.idright')
+                                ->asValue($domain);
+            }
+
             return new Swift_Mailer($app['swift.transport']->driver());
         });
     }

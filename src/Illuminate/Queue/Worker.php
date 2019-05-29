@@ -84,7 +84,9 @@ class Worker
      */
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
-        $this->listenForSignals();
+        if ($this->supportsAsyncSignals()) {
+            $this->listenForSignals();
+        }
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
@@ -105,7 +107,9 @@ class Worker
                 $this->manager->connection($connectionName), $queue
             );
 
-            $this->registerTimeoutHandler($job, $options);
+            if ($this->supportsAsyncSignals()) {
+                $this->registerTimeoutHandler($job, $options);
+            }
 
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
@@ -124,7 +128,7 @@ class Worker
     }
 
     /**
-     * Register the worker timeout handler (PHP 7.1+).
+     * Register the worker timeout handler.
      *
      * @param  \Illuminate\Contracts\Queue\Job|null  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
@@ -132,18 +136,16 @@ class Worker
      */
     protected function registerTimeoutHandler($job, WorkerOptions $options)
     {
-        if ($this->supportsAsyncSignals()) {
-            // We will register a signal handler for the alarm signal so that we can kill this
-            // process if it is running too long because it has frozen. This uses the async
-            // signals supported in recent versions of PHP to accomplish it conveniently.
-            pcntl_signal(SIGALRM, function () {
-                $this->kill(1);
-            });
+        // We will register a signal handler for the alarm signal so that we can kill this
+        // process if it is running too long because it has frozen. This uses the async
+        // signals supported in recent versions of PHP to accomplish it conveniently.
+        pcntl_signal(SIGALRM, function () {
+            $this->kill(1);
+        });
 
-            pcntl_alarm(
-                max($this->timeoutForJob($job, $options), 0)
-            );
-        }
+        pcntl_alarm(
+            max($this->timeoutForJob($job, $options), 0)
+        );
     }
 
     /**
@@ -282,7 +284,7 @@ class Worker
     /**
      * Stop the worker if we have lost connection to a database.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
     protected function stopWorkerIfLostConnection($e)
@@ -306,7 +308,7 @@ class Worker
     {
         try {
             // First we will raise the before job event and determine if the job has already ran
-            // over the its maximum attempt limit, which could primarily happen if the job is
+            // over its maximum attempt limits, which could primarily happen when this job is
             // continually timing out and not actually throwing any exceptions from itself.
             $this->raiseBeforeJobEvent($connectionName, $job);
 
@@ -392,7 +394,7 @@ class Worker
         }
 
         $this->failJob($connectionName, $job, $e = new MaxAttemptsExceededException(
-            'A queued job has been attempted too many times or run too long. The job may have previously timed out.'
+            $job->resolveName().' has been attempted too many times or run too long. The job may have previously timed out.'
         ));
 
         throw $e;
@@ -477,21 +479,6 @@ class Worker
     }
 
     /**
-     * Raise the failed queue job event.
-     *
-     * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Exception  $e
-     * @return void
-     */
-    protected function raiseFailedJobEvent($connectionName, $job, $e)
-    {
-        $this->events->dispatch(new Events\JobFailed(
-            $connectionName, $job, $e
-        ));
-    }
-
-    /**
      * Determine if the queue worker should restart.
      *
      * @param  int|null  $lastRestart
@@ -521,21 +508,19 @@ class Worker
      */
     protected function listenForSignals()
     {
-        if ($this->supportsAsyncSignals()) {
-            pcntl_async_signals(true);
+        pcntl_async_signals(true);
 
-            pcntl_signal(SIGTERM, function () {
-                $this->shouldQuit = true;
-            });
+        pcntl_signal(SIGTERM, function () {
+            $this->shouldQuit = true;
+        });
 
-            pcntl_signal(SIGUSR2, function () {
-                $this->paused = true;
-            });
+        pcntl_signal(SIGUSR2, function () {
+            $this->paused = true;
+        });
 
-            pcntl_signal(SIGCONT, function () {
-                $this->paused = false;
-            });
-        }
+        pcntl_signal(SIGCONT, function () {
+            $this->paused = false;
+        });
     }
 
     /**
@@ -545,8 +530,7 @@ class Worker
      */
     protected function supportsAsyncSignals()
     {
-        return version_compare(PHP_VERSION, '7.1.0') >= 0 &&
-               extension_loaded('pcntl');
+        return extension_loaded('pcntl');
     }
 
     /**
@@ -568,7 +552,7 @@ class Worker
      */
     public function stop($status = 0)
     {
-        $this->events->dispatch(new Events\WorkerStopping);
+        $this->events->dispatch(new Events\WorkerStopping($status));
 
         exit($status);
     }
@@ -581,6 +565,8 @@ class Worker
      */
     public function kill($status = 0)
     {
+        $this->events->dispatch(new Events\WorkerStopping($status));
+
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
         }
@@ -591,12 +577,16 @@ class Worker
     /**
      * Sleep the script for a given number of seconds.
      *
-     * @param  int   $seconds
+     * @param  int|float   $seconds
      * @return void
      */
     public function sleep($seconds)
     {
-        sleep($seconds);
+        if ($seconds < 1) {
+            usleep($seconds * 1000000);
+        } else {
+            sleep($seconds);
+        }
     }
 
     /**

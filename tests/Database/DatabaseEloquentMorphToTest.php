@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
+    protected $builder;
+
+    protected $related;
+
     public function tearDown()
     {
         m::close();
@@ -37,6 +41,51 @@ class DatabaseEloquentMorphToTest extends TestCase
                 ],
             ],
         ], $dictionary);
+    }
+
+    public function testMorphToWithDefault()
+    {
+        $relation = $this->getRelation()->withDefault();
+
+        $this->builder->shouldReceive('first')->once()->andReturnNull();
+
+        $newModel = new EloquentMorphToModelStub();
+
+        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+
+        $this->assertSame($newModel, $relation->getResults());
+    }
+
+    public function testMorphToWithDynamicDefault()
+    {
+        $relation = $this->getRelation()->withDefault(function ($newModel) {
+            $newModel->username = 'taylor';
+        });
+
+        $this->builder->shouldReceive('first')->once()->andReturnNull();
+
+        $newModel = new EloquentMorphToModelStub();
+
+        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+
+        $this->assertSame($newModel, $relation->getResults());
+
+        $this->assertSame('taylor', $newModel->username);
+    }
+
+    public function testMorphToWithArrayDefault()
+    {
+        $relation = $this->getRelation()->withDefault(['username' => 'taylor']);
+
+        $this->builder->shouldReceive('first')->once()->andReturnNull();
+
+        $newModel = new EloquentMorphToModelStub();
+
+        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+
+        $this->assertSame($newModel, $relation->getResults());
+
+        $this->assertSame('taylor', $newModel->username);
     }
 
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
@@ -99,16 +148,15 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function getRelation($parent = null, $builder = null)
     {
-        $builder = $builder ?: m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
-        $related->shouldReceive('getKeyName')->andReturn('id');
-        $related->shouldReceive('getTable')->andReturn('relation');
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $this->builder = $builder ?: m::mock('Illuminate\Database\Eloquent\Builder');
+        $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
+        $this->related = m::mock('Illuminate\Database\Eloquent\Model');
+        $this->related->shouldReceive('getKeyName')->andReturn('id');
+        $this->related->shouldReceive('getTable')->andReturn('relation');
+        $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $parent = $parent ?: new EloquentMorphToModelStub;
-        $morphTo = m::mock('Illuminate\Database\Eloquent\Relations\MorphTo[createModelByType]', [$builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
 
-        return $morphTo;
+        return m::mock('Illuminate\Database\Eloquent\Relations\MorphTo[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
     }
 }
 

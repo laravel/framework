@@ -47,7 +47,7 @@ class MemcachedConnector
     {
         $memcached = $this->createMemcachedInstance($connectionId);
 
-        if (count($credentials) == 2) {
+        if (count($credentials) === 2) {
             $this->setCredentials($memcached, $credentials);
         }
 

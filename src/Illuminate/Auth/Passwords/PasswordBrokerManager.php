@@ -39,7 +39,7 @@ class PasswordBrokerManager implements FactoryContract
     /**
      * Attempt to get the broker from the local cache.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Contracts\Auth\PasswordBroker
      */
     public function broker($name = null)

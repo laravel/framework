@@ -68,7 +68,7 @@ class RouteListCommand extends Command
      */
     public function handle()
     {
-        if (count($this->routes) == 0) {
+        if (count($this->routes) === 0) {
             return $this->error("Your application doesn't have any routes.");
         }
 
@@ -110,7 +110,7 @@ class RouteListCommand extends Command
             'method' => implode('|', $route->methods()),
             'uri'    => $route->uri(),
             'name'   => $route->getName(),
-            'action' => $route->getActionName(),
+            'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
         ]);
     }
@@ -163,7 +163,7 @@ class RouteListCommand extends Command
     {
         if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
              $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
-             $this->option('method') && ! Str::contains($route['method'], $this->option('method'))) {
+             $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
             return;
         }
 
@@ -178,15 +178,15 @@ class RouteListCommand extends Command
     protected function getOptions()
     {
         return [
-            ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method.'],
+            ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
 
-            ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'],
+            ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
 
-            ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path.'],
+            ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
 
-            ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes.'],
+            ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
 
-            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (host, method, uri, name, action, middleware) to sort by.', 'uri'],
+            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (host, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
     }
 }

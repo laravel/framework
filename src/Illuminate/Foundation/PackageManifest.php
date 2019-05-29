@@ -65,7 +65,7 @@ class PackageManifest
      */
     public function providers()
     {
-        return collect($this->getManifest())->flatMap(function ($configuration, $name) {
+        return collect($this->getManifest())->flatMap(function ($configuration) {
             return (array) ($configuration['providers'] ?? []);
         })->filter()->all();
     }
@@ -77,7 +77,7 @@ class PackageManifest
      */
     public function aliases()
     {
-        return collect($this->getManifest())->flatMap(function ($configuration, $name) {
+        return collect($this->getManifest())->flatMap(function ($configuration) {
             return (array) ($configuration['aliases'] ?? []);
         })->filter()->all();
     }
@@ -119,7 +119,7 @@ class PackageManifest
         $this->write(collect($packages)->mapWithKeys(function ($package) {
             return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
         })->each(function ($configuration) use (&$ignore) {
-            $ignore += $configuration['dont-discover'] ?? [];
+            $ignore = array_merge($ignore, $configuration['dont-discover'] ?? []);
         })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
             return $ignoreAll || in_array($package, $ignore);
         })->filter()->all());

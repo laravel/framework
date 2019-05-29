@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Http\Fixtures;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class ReallyEmptyPostResource extends Resource
+class ReallyEmptyPostResource extends JsonResource
 {
     //
 }

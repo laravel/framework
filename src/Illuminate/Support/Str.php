@@ -2,7 +2,11 @@
 
 namespace Illuminate\Support;
 
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
 use Illuminate\Support\Traits\Macroable;
+use Ramsey\Uuid\Generator\CombGenerator;
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 
 class Str
 {
@@ -118,7 +122,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if (mb_substr($haystack, -mb_strlen($needle)) === (string) $needle) {
+            if (substr($haystack, -strlen($needle)) === (string) $needle) {
                 return true;
             }
         }
@@ -149,7 +153,7 @@ class Str
      */
     public static function is($pattern, $value)
     {
-        $patterns = is_array($pattern) ? $pattern : (array) $pattern;
+        $patterns = Arr::wrap($pattern);
 
         if (empty($patterns)) {
             return false;
@@ -328,10 +332,10 @@ class Str
             return $subject;
         }
 
-        $position = mb_strpos($subject, $search);
+        $position = strpos($subject, $search);
 
         if ($position !== false) {
-            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position + mb_strlen($search));
+            return substr_replace($subject, $replace, $position, strlen($search));
         }
 
         return $subject;
@@ -347,10 +351,10 @@ class Str
      */
     public static function replaceLast($search, $replace, $subject)
     {
-        $position = mb_strrpos($subject, $search);
+        $position = strrpos($subject, $search);
 
         if ($position !== false) {
-            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position + mb_strlen($search));
+            return substr_replace($subject, $replace, $position, strlen($search));
         }
 
         return $subject;
@@ -466,7 +470,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_substr($haystack, 0, mb_strlen($needle)) === (string) $needle) {
+            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
                 return true;
             }
         }
@@ -515,6 +519,37 @@ class Str
     public static function ucfirst($string)
     {
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
+    }
+
+    /**
+     * Generate a UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function uuid()
+    {
+        return Uuid::uuid4();
+    }
+
+    /**
+     * Generate a time-ordered UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function orderedUuid()
+    {
+        $factory = new UuidFactory;
+
+        $factory->setRandomGenerator(new CombGenerator(
+            $factory->getRandomGenerator(),
+            $factory->getNumberConverter()
+        ));
+
+        $factory->setCodec(new TimestampFirstCombCodec(
+            $factory->getUuidBuilder()
+        ));
+
+        return $factory->uuid4();
     }
 
     /**

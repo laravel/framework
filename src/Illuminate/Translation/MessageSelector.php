@@ -60,7 +60,7 @@ class MessageSelector
     {
         preg_match('/^[\{\[]([^\[\]\{\}]*)[\}\]](.*)/s', $part, $matches);
 
-        if (count($matches) != 3) {
+        if (count($matches) !== 3) {
             return;
         }
 

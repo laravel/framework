@@ -54,6 +54,25 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertSame(1, $newModel->getAttribute('foreign_key'));
     }
 
+    public function testHasOneWithDynamicDefaultUseParentModel()
+    {
+        $relation = $this->getRelation()->withDefault(function ($newModel, $parentModel) {
+            $newModel->username = $parentModel->username;
+        });
+
+        $this->builder->shouldReceive('first')->once()->andReturnNull();
+
+        $newModel = new EloquentHasOneModelStub;
+
+        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+
+        $this->assertSame($newModel, $relation->getResults());
+
+        $this->assertSame('taylor', $newModel->username);
+
+        $this->assertSame(1, $newModel->getAttribute('foreign_key'));
+    }
+
     public function testHasOneWithArrayDefault()
     {
         $attributes = ['username' => 'taylor'];
@@ -117,6 +136,16 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals('results', $relation->update(['foo' => 'bar']));
     }
 
+    public function testUpdateMethodUpdatesModelsWithNullUpdatedAt()
+    {
+        $relation = $this->getRelation();
+        $relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
+        $relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn(null);
+        $relation->getQuery()->shouldReceive('update')->once()->with(['foo' => 'bar'])->andReturn('results');
+
+        $this->assertEquals('results', $relation->update(['foo' => 'bar']));
+    }
+
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
@@ -175,8 +204,9 @@ class DatabaseEloquentHasOneTest extends TestCase
         $builder->shouldReceive('getQuery')->once()->andReturn($parentQuery);
 
         $builder->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'))->andReturnSelf();
-        $relation->getParent()->shouldReceive('getTable')->andReturn('table');
-        $builder->shouldReceive('whereColumn')->once()->with('table.id', '=', 'table.foreign_key');
+        $relation->getParent()->shouldReceive('qualifyColumn')->andReturn('table.id');
+        $builder->shouldReceive('whereColumn')->once()->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
+        $baseQuery->shouldReceive('setBindings')->once()->with([], 'select');
 
         $relation->getRelationExistenceCountQuery($builder, $builder);
     }
@@ -190,6 +220,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $this->parent = m::mock('Illuminate\Database\Eloquent\Model');
         $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
         $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $this->parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         $this->parent->shouldReceive('newQueryWithoutScopes')->andReturn($this->builder);

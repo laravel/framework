@@ -12,9 +12,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-/**
- * @method array validate(array $rules, array $messages = [], array $customAttributes = [])
- */
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
     use Concerns\InteractsWithContentTypes,
@@ -25,7 +22,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * The decoded JSON content for the request.
      *
-     * @var string
+     * @var \Symfony\Component\HttpFoundation\ParameterBag|null
      */
     protected $json;
 
@@ -127,8 +124,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $question = $this->getBaseUrl().$this->getPathInfo() == '/' ? '/?' : '?';
 
         return count($this->query()) > 0
-            ? $this->url().$question.http_build_query(array_merge($this->query(), $query))
-            : $this->fullUrl().$question.http_build_query($query);
+            ? $this->url().$question.Arr::query(array_merge($this->query(), $query))
+            : $this->fullUrl().$question.Arr::query($query);
     }
 
     /**
@@ -144,7 +141,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Get the current encoded path info for the request.
+     * Get the current decoded path info for the request.
      *
      * @return string
      */
@@ -174,8 +171,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $segments = explode('/', $this->decodedPath());
 
-        return array_values(array_filter($segments, function ($v) {
-            return $v !== '';
+        return array_values(array_filter($segments, function ($value) {
+            return $value !== '';
         }));
     }
 
@@ -290,22 +287,40 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
-     * @return void
+     * @return \Illuminate\Http\Request
      */
     public function merge(array $input)
     {
         $this->getInputSource()->add($input);
+
+        return $this;
     }
 
     /**
      * Replace the input for the current request.
      *
      * @param  array  $input
-     * @return void
+     * @return \Illuminate\Http\Request
      */
     public function replace(array $input)
     {
         $this->getInputSource()->replace($input);
+
+        return $this;
+    }
+
+    /**
+     * This method belongs to Symfony HttpFoundation and is not usually needed when using Laravel.
+     *
+     * Instead, you may use the "input" method.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function get($key, $default = null)
+    {
+        return parent::get($key, $default);
     }
 
     /**
@@ -313,7 +328,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $default
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
      */
     public function json($key = null, $default = null)
     {
@@ -339,7 +354,45 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->json();
         }
 
-        return $this->getRealMethod() == 'GET' ? $this->query : $this->request;
+        return in_array($this->getRealMethod(), ['GET', 'HEAD']) ? $this->query : $this->request;
+    }
+
+    /**
+     * Create a new request instance from the given Laravel request.
+     *
+     * @param  \Illuminate\Http\Request  $from
+     * @param  \Illuminate\Http\Request|null  $to
+     * @return static
+     */
+    public static function createFrom(self $from, $to = null)
+    {
+        $request = $to ?: new static;
+
+        $files = $from->files->all();
+
+        $files = is_array($files) ? array_filter($files) : $files;
+
+        $request->initialize(
+            $from->query->all(),
+            $from->request->all(),
+            $from->attributes->all(),
+            $from->cookies->all(),
+            $files,
+            $from->server->all(),
+            $from->getContent()
+        );
+
+        $request->setJson($from->json());
+
+        if ($session = $from->getSession()) {
+            $request->setLaravelSession($session);
+        }
+
+        $request->setUserResolver($from->getUserResolver());
+
+        $request->setRouteResolver($from->getRouteResolver());
+
+        return $request;
     }
 
     /**
@@ -414,7 +467,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Session store not set on request.');
         }
 
-        return $this->getSession();
+        return $this->session;
+    }
+
+    /**
+     * Get the session associated with the request.
+     *
+     * @return \Illuminate\Session\Store|null
+     */
+    public function getSession()
+    {
+        return $this->session;
     }
 
     /**
@@ -443,10 +506,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the route handling the request.
      *
      * @param  string|null  $param
-     *
+     * @param  mixed   $default
      * @return \Illuminate\Routing\Route|object|string
      */
-    public function route($param = null)
+    public function route($param = null, $default = null)
     {
         $route = call_user_func($this->getRouteResolver());
 
@@ -454,7 +517,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $route;
         }
 
-        return $route->parameter($param);
+        return $route->parameter($param, $default);
     }
 
     /**
@@ -471,14 +534,15 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return sha1(implode('|', array_merge(
-            $route->methods(), [$route->getDomain(), $route->uri(), $this->ip()]
+            $route->methods(),
+            [$route->getDomain(), $route->uri(), $this->ip()]
         )));
     }
 
     /**
      * Set the JSON payload for the request.
      *
-     * @param  array  $json
+     * @param  \Symfony\Component\HttpFoundation\ParameterBag  $json
      * @return $this
      */
     public function setJson($json)
@@ -556,8 +620,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetExists($offset)
     {
-        return array_key_exists(
-            $offset, $this->all() + $this->route()->parameters()
+        return Arr::has(
+            $this->all() + $this->route()->parameters(),
+            $offset
         );
     }
 
@@ -614,10 +679,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __get($key)
     {
-        if (array_key_exists($key, $this->all())) {
-            return data_get($this->all(), $key);
-        }
-
-        return $this->route($key);
+        return Arr::get($this->all(), $key, function () use ($key) {
+            return $this->route($key);
+        });
     }
 }

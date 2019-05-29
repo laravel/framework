@@ -60,12 +60,17 @@ class ValidationFactoryTest extends TestCase
         $factory = m::mock(Factory::class.'[make]', [$translator]);
 
         $factory->shouldReceive('make')->once()
-                ->with(['foo' => 'bar'], ['foo' => 'required'], [], [])
+                ->with(['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'required'], [], [])
                 ->andReturn($validator);
 
-        $validator->shouldReceive('validate')->once();
+        $validator->shouldReceive('validate')->once()->andReturn(['foo' => 'bar']);
 
-        $factory->validate(['foo' => 'bar'], ['foo' => 'required']);
+        $validated = $factory->validate(
+            ['foo' => 'bar', 'baz' => 'boom'],
+            ['foo' => 'required']
+        );
+
+        $this->assertEquals($validated, ['foo' => 'bar']);
     }
 
     public function testCustomResolverIsCalled()

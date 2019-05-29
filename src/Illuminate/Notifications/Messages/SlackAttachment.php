@@ -23,6 +23,13 @@ class SlackAttachment
     public $url;
 
     /**
+     * The attachment's pretext.
+     *
+     * @var string
+     */
+    public $pretext;
+
+    /**
      * The attachment's text content.
      *
      * @var string
@@ -72,6 +79,27 @@ class SlackAttachment
     public $thumbUrl;
 
     /**
+     * The attachment author's name.
+     *
+     * @var string
+     */
+    public $authorName;
+
+    /**
+     * The attachment author's link.
+     *
+     * @var string
+     */
+    public $authorLink;
+
+    /**
+     * The attachment author's icon.
+     *
+     * @var string
+     */
+    public $authorIcon;
+
+    /**
      * The attachment's footer.
      *
      * @var string
@@ -96,13 +124,26 @@ class SlackAttachment
      * Set the title of the attachment.
      *
      * @param  string  $title
-     * @param  string  $url
+     * @param  string|null  $url
      * @return $this
      */
     public function title($title, $url = null)
     {
         $this->title = $title;
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Set the pretext of the attachment.
+     *
+     * @param  string  $pretext
+     * @return $this
+     */
+    public function pretext($pretext)
+    {
+        $this->pretext = $pretext;
 
         return $this;
     }
@@ -218,6 +259,23 @@ class SlackAttachment
     public function thumb($url)
     {
         $this->thumbUrl = $url;
+
+        return $this;
+    }
+
+    /**
+     * Set the author of the attachment.
+     *
+     * @param  string  $name
+     * @param  string|null  $link
+     * @param  string|null  $icon
+     * @return $this
+     */
+    public function author($name, $link = null, $icon = null)
+    {
+        $this->authorName = $name;
+        $this->authorLink = $link;
+        $this->authorIcon = $icon;
 
         return $this;
     }

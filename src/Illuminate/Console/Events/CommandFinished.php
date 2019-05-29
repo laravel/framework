@@ -26,7 +26,7 @@ class CommandFinished
      *
      * @var \Symfony\Component\Console\Output\OutputInterface|null
      */
-    protected $output;
+    public $output;
 
     /**
      * The command exit code.

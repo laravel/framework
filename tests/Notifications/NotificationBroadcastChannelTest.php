@@ -42,6 +42,36 @@ class NotificationBroadcastChannelTest extends TestCase
         $this->assertEquals(new PrivateChannel('custom-channel'), $channels[0]);
     }
 
+    public function testNotificationIsBroadcastedWithCustomEventName()
+    {
+        $notification = new CustomEventNameTestNotification;
+        $notification->id = 1;
+        $notifiable = Mockery::mock();
+
+        $event = new \Illuminate\Notifications\Events\BroadcastNotificationCreated(
+            $notifiable, $notification, $notification->toArray($notifiable)
+        );
+
+        $eventName = $event->broadcastType();
+
+        $this->assertSame('custom.type', $eventName);
+    }
+
+    public function testNotificationIsBroadcastedWithCustomDataType()
+    {
+        $notification = new CustomEventNameTestNotification;
+        $notification->id = 1;
+        $notifiable = Mockery::mock();
+
+        $event = new \Illuminate\Notifications\Events\BroadcastNotificationCreated(
+            $notifiable, $notification, $notification->toArray($notifiable)
+        );
+
+        $data = $event->broadcastWith();
+
+        $this->assertSame('custom.type', $data['type']);
+    }
+
     public function testNotificationIsBroadcastedNow()
     {
         $notification = new TestNotificationBroadCastedNow;
@@ -75,6 +105,19 @@ class CustomChannelsTestNotification extends Notification
     public function broadcastOn()
     {
         return [new PrivateChannel('custom-channel')];
+    }
+}
+
+class CustomEventNameTestNotification extends Notification
+{
+    public function toArray($notifiable)
+    {
+        return ['invoice_id' => 1];
+    }
+
+    public function broadcastType()
+    {
+        return 'custom.type';
     }
 }
 

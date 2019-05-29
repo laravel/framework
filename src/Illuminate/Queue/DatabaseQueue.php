@@ -171,11 +171,11 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         return [
             'queue' => $queue,
-            'payload' => $payload,
             'attempts' => $attempts,
             'reserved_at' => null,
             'available_at' => $availableAt,
             'created_at' => $this->currentTime(),
+            'payload' => $payload,
         ];
     }
 
@@ -184,18 +184,19 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
+     * @throws \Exception|\Throwable
      */
     public function pop($queue = null)
     {
         $queue = $this->getQueue($queue);
 
-        $this->database->beginTransaction();
+        return $this->database->transaction(function () use ($queue) {
+            if ($job = $this->getNextAvailableJob($queue)) {
+                return $this->marshalJob($queue, $job);
+            }
 
-        if ($job = $this->getNextAvailableJob($queue)) {
-            return $this->marshalJob($queue, $job);
-        }
-
-        $this->database->commit();
+            return null;
+        });
     }
 
     /**
@@ -259,8 +260,6 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $job = $this->markJobAsReserved($job);
 
-        $this->database->commit();
-
         return new DatabaseJob(
             $this->container, $this, $job, $this->connectionName, $queue
         );
@@ -288,16 +287,15 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string  $queue
      * @param  string  $id
      * @return void
+     * @throws \Exception|\Throwable
      */
     public function deleteReserved($queue, $id)
     {
-        $this->database->beginTransaction();
-
-        if ($this->database->table($this->table)->lockForUpdate()->find($id)) {
-            $this->database->table($this->table)->where('id', $id)->delete();
-        }
-
-        $this->database->commit();
+        $this->database->transaction(function () use ($id) {
+            if ($this->database->table($this->table)->lockForUpdate()->find($id)) {
+                $this->database->table($this->table)->where('id', $id)->delete();
+            }
+        });
     }
 
     /**

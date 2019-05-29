@@ -189,6 +189,10 @@ trait HasAttributes
                 ($value === 'date' || $value === 'datetime')) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
+
+            if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
+                $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
+            }
         }
 
         return $attributes;
@@ -407,7 +411,9 @@ trait HasAttributes
         $relation = $this->$method();
 
         if (! $relation instanceof Relation) {
-            throw new LogicException(get_class($this).'::'.$method.' must return a relationship instance.');
+            throw new LogicException(sprintf(
+                '%s::%s must return a relationship instance.', static::class, $method
+            ));
         }
 
         return tap($relation->getResults(), function ($results) use ($method) {
@@ -488,6 +494,7 @@ trait HasAttributes
             case 'date':
                 return $this->asDate($value);
             case 'datetime':
+            case 'custom_datetime':
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
@@ -504,7 +511,23 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
+        if ($this->isCustomDateTimeCast($this->getCasts()[$key])) {
+            return 'custom_datetime';
+        }
+
         return trim(strtolower($this->getCasts()[$key]));
+    }
+
+    /**
+     * Determine if the cast type is a custom date time cast.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isCustomDateTimeCast($cast)
+    {
+        return strncmp($cast, 'date:', 5) === 0 ||
+               strncmp($cast, 'datetime:', 9) === 0;
     }
 
     /**
@@ -512,7 +535,7 @@ trait HasAttributes
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return $this
+     * @return mixed
      */
     public function setAttribute($key, $value)
     {
@@ -520,9 +543,7 @@ trait HasAttributes
         // which simply lets the developers tweak the attribute as it is set on
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
-            $method = 'set'.Str::studly($key).'Attribute';
-
-            return $this->{$method}($value);
+            return $this->setMutatedAttributeValue($key, $value);
         }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime
@@ -557,6 +578,18 @@ trait HasAttributes
     public function hasSetMutator($key)
     {
         return method_exists($this, 'set'.Str::studly($key).'Attribute');
+    }
+
+    /**
+     * Set the value of an attribute using its mutator.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function setMutatedAttributeValue($key, $value)
+    {
+        return $this->{'set'.Str::studly($key).'Attribute'}($value);
     }
 
     /**
@@ -712,7 +745,7 @@ trait HasAttributes
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
         return Carbon::createFromFormat(
-            $this->getDateFormat(), $value
+            str_replace('.v', '.u', $this->getDateFormat()), $value
         );
     }
 
@@ -735,7 +768,7 @@ trait HasAttributes
      */
     public function fromDateTime($value)
     {
-        return is_null($value) ? $value : $this->asDateTime($value)->format(
+        return empty($value) ? $value : $this->asDateTime($value)->format(
             $this->getDateFormat()
         );
     }
@@ -781,7 +814,7 @@ trait HasAttributes
      *
      * @return string
      */
-    protected function getDateFormat()
+    public function getDateFormat()
     {
         return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
     }
@@ -1029,7 +1062,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the attributes that was changed.
+     * Get the attributes that were changed.
      *
      * @return array
      */

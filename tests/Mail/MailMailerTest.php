@@ -55,6 +55,26 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
     }
 
+    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlMethod()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
+        $message = m::mock('Swift_Mime_SimpleMessage');
+        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $view = m::mock('stdClass');
+        $mailer->getViewFactory()->shouldReceive('make')->never();
+        $view->shouldReceive('render')->never();
+        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
+        $message->shouldReceive('setFrom')->never();
+        $this->setSwiftMailer($mailer);
+        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
+        $mailer->html('rendered.view', function ($m) {
+            $_SERVER['__mailer.test'] = $m;
+        });
+        unset($_SERVER['__mailer.test']);
+    }
+
     public function testMailerSendSendsMessageWithProperPlainViewContent()
     {
         unset($_SERVER['__mailer.test']);

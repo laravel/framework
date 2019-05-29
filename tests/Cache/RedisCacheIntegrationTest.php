@@ -6,7 +6,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
-use Illuminate\Tests\Redis\InteractsWithRedis;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 class RedisCacheIntegrationTest extends TestCase
 {

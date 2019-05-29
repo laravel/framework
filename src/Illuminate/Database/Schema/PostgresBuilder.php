@@ -12,11 +12,7 @@ class PostgresBuilder extends Builder
      */
     public function hasTable($table)
     {
-        if (is_array($schema = $this->connection->getConfig('schema'))) {
-            $schema = head($schema);
-        }
-
-        $schema = $schema ? $schema : 'public';
+        list($schema, $table) = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
@@ -34,10 +30,16 @@ class PostgresBuilder extends Builder
     {
         $tables = [];
 
+        $excludedTables = ['spatial_ref_sys'];
+
         foreach ($this->getAllTables() as $row) {
             $row = (array) $row;
 
-            $tables[] = reset($row);
+            $table = reset($row);
+
+            if (! in_array($table, $excludedTables)) {
+                $tables[] = $table;
+            }
         }
 
         if (empty($tables)) {
@@ -46,6 +48,30 @@ class PostgresBuilder extends Builder
 
         $this->connection->statement(
             $this->grammar->compileDropAllTables($tables)
+        );
+    }
+
+    /**
+     * Drop all views from the database.
+     *
+     * @return void
+     */
+    public function dropAllViews()
+    {
+        $views = [];
+
+        foreach ($this->getAllViews() as $row) {
+            $row = (array) $row;
+
+            $views[] = reset($row);
+        }
+
+        if (empty($views)) {
+            return;
+        }
+
+        $this->connection->statement(
+            $this->grammar->compileDropAllViews($views)
         );
     }
 
@@ -62,6 +88,18 @@ class PostgresBuilder extends Builder
     }
 
     /**
+     * Get all of the view names for the database.
+     *
+     * @return array
+     */
+    protected function getAllViews()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllViews($this->connection->getConfig('schema'))
+        );
+    }
+
+    /**
      * Get the column listing for a given table.
      *
      * @param  string  $table
@@ -69,11 +107,7 @@ class PostgresBuilder extends Builder
      */
     public function getColumnListing($table)
     {
-        if (is_array($schema = $this->connection->getConfig('schema'))) {
-            $schema = head($schema);
-        }
-
-        $schema = $schema ? $schema : 'public';
+        list($schema, $table) = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
@@ -82,5 +116,26 @@ class PostgresBuilder extends Builder
         );
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
+    }
+
+    /**
+     * Parse the table name and extract the schema and table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    protected function parseSchemaAndTable($table)
+    {
+        $table = explode('.', $table);
+
+        if (is_array($schema = $this->connection->getConfig('schema'))) {
+            if (in_array($table[0], $schema)) {
+                return [array_shift($table), implode('.', $table)];
+            }
+
+            $schema = head($schema);
+        }
+
+        return [$schema ?: 'public', implode('.', $table)];
     }
 }

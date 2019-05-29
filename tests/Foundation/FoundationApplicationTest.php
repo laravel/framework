@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Foundation;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\ServiceProvider;
 
 class FoundationApplicationTest extends TestCase
 {
@@ -35,6 +36,30 @@ class FoundationApplicationTest extends TestCase
         $app->register($provider);
 
         $this->assertTrue(in_array($class, $app->getLoadedProviders()));
+    }
+
+    public function testClassesAreBoundWhenServiceProviderIsRegistered()
+    {
+        $app = new Application;
+        $provider = new ServiceProviderForTestingThree($app);
+        $app->register($provider);
+
+        $this->assertTrue(in_array(get_class($provider), $app->getLoadedProviders()));
+
+        $this->assertInstanceOf(ConcreteClass::class, $app->make(AbstractClass::class));
+    }
+
+    public function testSingletonsAreCreatedWhenServiceProviderIsRegistered()
+    {
+        $app = new Application;
+        $provider = new ServiceProviderForTestingThree($app);
+        $app->register($provider);
+
+        $this->assertTrue(in_array(get_class($provider), $app->getLoadedProviders()));
+
+        $instance = $app->make(AbstractClass::class);
+
+        $this->assertSame($instance, $app->make(AbstractClass::class));
     }
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent()
@@ -258,4 +283,33 @@ class ApplicationMultiProviderStub extends \Illuminate\Support\ServiceProvider
             return $app['foo'].'bar';
         });
     }
+}
+
+class ServiceProviderForTestingThree extends ServiceProvider
+{
+    public $bind = [
+        AbstractClass::class => ConcreteClass::class,
+    ];
+
+    public $singletons = [
+        AbstractClass::class => ConcreteClass::class,
+    ];
+
+    public function register()
+    {
+    }
+
+    public function boot()
+    {
+    }
+}
+
+abstract class AbstractClass
+{
+    //
+}
+
+class ConcreteClass extends AbstractClass
+{
+    //
 }

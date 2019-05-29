@@ -14,8 +14,8 @@ class MySqlGrammar extends Grammar
      * @var array
      */
     protected $modifiers = [
-        'VirtualAs', 'StoredAs', 'Unsigned', 'Charset', 'Collate', 'Nullable',
-        'Default', 'Increment', 'Comment', 'After', 'First',
+        'Unsigned', 'VirtualAs', 'StoredAs', 'Charset', 'Collate', 'Nullable',
+        'Default', 'Increment', 'Comment', 'After', 'First', 'Srid',
     ];
 
     /**
@@ -114,9 +114,9 @@ class MySqlGrammar extends Grammar
         // added to either this create table blueprint or the configuration for this
         // connection that the query is targeting. We'll add it to this SQL query.
         if (isset($blueprint->collation)) {
-            $sql .= ' collate '.$blueprint->collation;
+            $sql .= " collate '{$blueprint->collation}'";
         } elseif (! is_null($collation = $connection->getConfig('collation'))) {
-            $sql .= ' collate '.$collation;
+            $sql .= " collate '{$collation}'";
         }
 
         return $sql;
@@ -303,6 +303,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a drop spatial index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropSpatialIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileDropIndex($blueprint, $command);
+    }
+
+    /**
      * Compile a drop foreign key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -331,6 +343,22 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a rename index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param  \Illuminate\Support\Fluent $command
+     * @return string
+     */
+    public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s rename index %s to %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->from),
+            $this->wrap($command->to)
+        );
+    }
+
+    /**
      * Compile the SQL needed to drop all tables.
      *
      * @param  array  $tables
@@ -342,6 +370,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all views.
+     *
+     * @param  array  $views
+     * @return string
+     */
+    public function compileDropAllViews($views)
+    {
+        return 'drop view '.implode(',', $this->wrapArray($views));
+    }
+
+    /**
      * Compile the SQL needed to retrieve all table names.
      *
      * @return string
@@ -349,6 +388,16 @@ class MySqlGrammar extends Grammar
     public function compileGetAllTables()
     {
         return 'SHOW FULL TABLES WHERE table_type = \'BASE TABLE\'';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return 'SHOW FULL TABLES WHERE table_type = \'VIEW\'';
     }
 
     /**
@@ -530,14 +579,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for an enum type.
+     * Create the column definition for an enumeration type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeEnum(Fluent $column)
     {
-        return "enum('".implode("', '", $column->allowed)."')";
+        return sprintf('enum(%s)', $this->quoteString($column->allowed));
     }
 
     /**
@@ -585,7 +634,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -603,18 +652,18 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time';
+        return $column->precision ? "time($column->precision)" : 'time';
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
@@ -625,17 +674,13 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return $column->precision
-                    ? "timestamp($column->precision) default CURRENT_TIMESTAMP"
-                    : 'timestamp default CURRENT_TIMESTAMP';
-        }
+        $columnType = $column->precision ? "timestamp($column->precision)" : 'timestamp';
 
-        return $column->precision ? "timestamp($column->precision)" : 'timestamp';
+        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -643,6 +688,17 @@ class MySqlGrammar extends Grammar
     protected function typeTimestampTz(Fluent $column)
     {
         return $this->typeTimestamp($column);
+    }
+
+    /**
+     * Create the column definition for a year type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeYear(Fluent $column)
+    {
+        return 'year';
     }
 
     /**
@@ -690,7 +746,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a geometry type.
+     * Create the column definition for a spatial Geometry type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -701,7 +757,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a point type.
+     * Create the column definition for a spatial Point type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -712,18 +768,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a linestring type.
+     * Create the column definition for a spatial LineString type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-    public function typeLinestring(Fluent $column)
+    public function typeLineString(Fluent $column)
     {
         return 'linestring';
     }
 
     /**
-     * Create the column definition for a polygon type.
+     * Create the column definition for a spatial Polygon type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -734,45 +790,45 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a geometrycollection type.
+     * Create the column definition for a spatial GeometryCollection type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-    public function typeGeometrycollection(Fluent $column)
+    public function typeGeometryCollection(Fluent $column)
     {
         return 'geometrycollection';
     }
 
     /**
-     * Create the column definition for a multipoint type.
+     * Create the column definition for a spatial MultiPoint type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-    public function typeMultipoint(Fluent $column)
+    public function typeMultiPoint(Fluent $column)
     {
         return 'multipoint';
     }
 
     /**
-     * Create the column definition for a multilinestring type.
+     * Create the column definition for a spatial MultiLineString type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-    public function typeMultilinestring(Fluent $column)
+    public function typeMultiLineString(Fluent $column)
     {
         return 'multilinestring';
     }
 
     /**
-     * Create the column definition for a multipolygon type.
+     * Create the column definition for a spatial MultiPolygon type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-    public function typeMultipolygon(Fluent $column)
+    public function typeMultiPolygon(Fluent $column)
     {
         return 'multipolygon';
     }
@@ -843,7 +899,7 @@ class MySqlGrammar extends Grammar
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
         if (! is_null($column->collation)) {
-            return ' collate '.$column->collation;
+            return " collate '{$column->collation}'";
         }
     }
 
@@ -928,6 +984,20 @@ class MySqlGrammar extends Grammar
     {
         if (! is_null($column->comment)) {
             return " comment '".addslashes($column->comment)."'";
+        }
+    }
+
+    /**
+     * Get the SQL for a SRID column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifySrid(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->srid) && is_int($column->srid) && $column->srid > 0) {
+            return ' srid '.$column->srid;
         }
     }
 

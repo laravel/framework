@@ -141,6 +141,9 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('http://foo.com/foo/bar/?name=taylor', 'GET');
         $this->assertEquals('http://foo.com/foo/bar?name=graham', $request->fullUrlWithQuery(['name' => 'graham']));
+
+        $request = Request::create('https://foo.com', 'GET');
+        $this->assertEquals('https://foo.com/?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
     }
 
     public function testIsMethod()
@@ -155,6 +158,18 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET');
 
         $this->assertTrue($request->is('/'));
+    }
+
+    public function testFullUrlIsMethod()
+    {
+        $request = Request::create('http://example.com/foo/bar', 'GET');
+
+        $this->assertTrue($request->fullUrlIs('http://example.com/foo/bar'));
+        $this->assertFalse($request->fullUrlIs('example.com*'));
+        $this->assertTrue($request->fullUrlIs('http://*'));
+        $this->assertTrue($request->fullUrlIs('*foo*'));
+        $this->assertTrue($request->fullUrlIs('*bar'));
+        $this->assertTrue($request->fullUrlIs('*'));
     }
 
     public function testRouteIsMethod()
@@ -173,6 +188,23 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->routeIs('foo.bar'));
         $this->assertTrue($request->routeIs('foo*', '*bar'));
         $this->assertFalse($request->routeIs('foo.foo'));
+    }
+
+    public function testRouteMethod()
+    {
+        $request = Request::create('/foo/bar', 'GET');
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/{required}/{optional?}', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        $this->assertEquals('bar', $request->route('required'));
+        $this->assertEquals('bar', $request->route('required', 'default'));
+        $this->assertNull($request->route('optional'));
+        $this->assertEquals('default', $request->route('optional', 'default'));
     }
 
     public function testAjaxMethod()
@@ -250,15 +282,18 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->hasAny('city'));
         $this->assertFalse($request->hasAny('foo'));
         $this->assertTrue($request->hasAny('name', 'email'));
+        $this->assertTrue($request->hasAny(['name', 'email']));
 
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $this->assertTrue($request->hasAny('name', 'email'));
         $this->assertFalse($request->hasAny('surname', 'password'));
+        $this->assertFalse($request->hasAny(['surname', 'password']));
 
         $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
         $this->assertTrue($request->hasAny('foo.bar'));
         $this->assertTrue($request->hasAny('foo.baz'));
         $this->assertFalse($request->hasAny('foo.bax'));
+        $this->assertTrue($request->hasAny(['foo.bax', 'foo.baz']));
     }
 
     public function testFilledMethod()
@@ -282,6 +317,32 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->filled('foo.bar'));
     }
 
+    public function testFilledAnyMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+
+        $this->assertTrue($request->anyFilled(['name']));
+        $this->assertTrue($request->anyFilled('name'));
+
+        $this->assertFalse($request->anyFilled(['age']));
+        $this->assertFalse($request->anyFilled('age'));
+
+        $this->assertFalse($request->anyFilled(['foo']));
+        $this->assertFalse($request->anyFilled('foo'));
+
+        $this->assertTrue($request->anyFilled(['age', 'name']));
+        $this->assertTrue($request->anyFilled('age', 'name'));
+
+        $this->assertTrue($request->anyFilled(['foo', 'name']));
+        $this->assertTrue($request->anyFilled('foo', 'name'));
+
+        $this->assertFalse($request->anyFilled('age', 'city'));
+        $this->assertFalse($request->anyFilled('age', 'city'));
+
+        $this->assertFalse($request->anyFilled('foo', 'bar'));
+        $this->assertFalse($request->anyFilled('foo', 'bar'));
+    }
+
     public function testInputMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
@@ -291,6 +352,36 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('/', 'GET', [], [], ['file' => new \Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
+    }
+
+    public function testArrayAccess()
+    {
+        $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/bar/{id}/{name}', []);
+            $route->bind($request);
+            $route->setParameter('id', 'foo');
+            $route->setParameter('name', 'Taylor');
+
+            return $route;
+        });
+
+        $this->assertFalse(isset($request['non-existant']));
+        $this->assertNull($request['non-existant']);
+
+        $this->assertTrue(isset($request['name']));
+        $this->assertEquals(null, $request['name']);
+
+        $this->assertNotEquals('Taylor', $request['name']);
+
+        $this->assertTrue(isset($request['foo.bar']));
+        $this->assertEquals(null, $request['foo.bar']);
+        $this->assertTrue(isset($request['foo.baz']));
+        $this->assertEquals('', $request['foo.baz']);
+
+        $this->assertTrue(isset($request['id']));
+        $this->assertEquals('foo', $request['id']);
     }
 
     public function testAllMethod()
@@ -441,6 +532,13 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Dayle', $request->input('buddy'));
     }
 
+    public function testOffsetUnsetMethod()
+    {
+        $request = Request::create('/', 'HEAD', ['name' => 'Taylor']);
+        $request->offsetUnset('name');
+        $this->assertNull($request->input('name'));
+    }
+
     public function testHeaderMethod()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_DO_THIS' => 'foo']);
@@ -581,6 +679,33 @@ class HttpRequestTest extends TestCase
         $session->shouldReceive('flashInput')->once();
         $request->setLaravelSession($session);
         $request->flush();
+    }
+
+    public function testExpectsJson()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $this->assertTrue($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+        $this->assertFalse($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+        $this->assertTrue($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => null, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+        $this->assertTrue($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest', 'HTTP_X_PJAX' => 'true']);
+        $this->assertFalse($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
+        $this->assertFalse($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+        $this->assertFalse($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest', 'HTTP_X_PJAX' => 'true']);
+        $this->assertFalse($request->expectsJson());
     }
 
     public function testFormatReturnsAcceptableFormat()
@@ -772,7 +897,7 @@ class HttpRequestTest extends TestCase
         // Parameter 'empty' is '', then it ISSET and is EMPTY.
         $this->assertEquals($request->empty, '');
         $this->assertTrue(isset($request->empty));
-        $this->assertTrue(empty($request->empty));
+        $this->assertEmpty($request->empty);
 
         // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
         $this->assertEquals($request->undefined, null);

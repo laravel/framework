@@ -96,9 +96,9 @@ trait MocksApplicationServices
      */
     protected function withoutEvents()
     {
-        $mock = Mockery::mock(EventsDispatcherContract::class);
+        $mock = Mockery::mock(EventsDispatcherContract::class)->shouldIgnoreMissing();
 
-        $mock->shouldReceive('fire', 'dispatch')->andReturnUsing(function ($called) {
+        $mock->shouldReceive('dispatch')->andReturnUsing(function ($called) {
             $this->firedEvents[] = $called;
         });
 

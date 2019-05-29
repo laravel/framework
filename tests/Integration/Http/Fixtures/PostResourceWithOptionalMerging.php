@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Http\Fixtures;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class PostResourceWithOptionalMerging extends Resource
+class PostResourceWithOptionalMerging extends JsonResource
 {
     public function toArray($request)
     {

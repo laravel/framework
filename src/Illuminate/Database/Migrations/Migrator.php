@@ -124,7 +124,7 @@ class Migrator
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
         // that all of the migrations have been run against this database system.
-        if (count($migrations) == 0) {
+        if (count($migrations) === 0) {
             $this->note('<info>Nothing to migrate.</info>');
 
             return;
@@ -204,9 +204,9 @@ class Migrator
             $this->note('<info>Nothing to rollback.</info>');
 
             return [];
-        } else {
-            return $this->rollbackMigrations($migrations, $paths, $options);
         }
+
+        return $this->rollbackMigrations($migrations, $paths, $options);
     }
 
     /**
@@ -219,9 +219,9 @@ class Migrator
     {
         if (($steps = $options['step'] ?? 0) > 0) {
             return $this->repository->getMigrations($steps);
-        } else {
-            return $this->repository->getLast();
         }
+
+        return $this->repository->getLast();
     }
 
     /**
@@ -281,9 +281,9 @@ class Migrator
             $this->note('<info>Nothing to rollback.</info>');
 
             return [];
-        } else {
-            return $this->resetMigrations($migrations, $paths, $pretend);
         }
+
+        return $this->resetMigrations($migrations, $paths, $pretend);
     }
 
     /**
@@ -361,6 +361,7 @@ class Migrator
         };
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
+            && $migration->withinTransaction
                     ? $connection->transaction($callback)
                     : $callback();
     }
@@ -477,6 +478,16 @@ class Migrator
     public function paths()
     {
         return $this->paths;
+    }
+
+    /**
+     * Get the default connection name.
+     *
+     * @return string
+     */
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
     /**

@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
@@ -124,6 +125,16 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->first();
         $this->assertEquals('bar', $result);
+    }
+
+    public function testQualifyColumn()
+    {
+        $builder = new Builder(m::mock(BaseBuilder::class));
+        $builder->shouldReceive('from')->with('stub');
+
+        $builder->setModel(new EloquentModelStub);
+
+        $this->assertEquals('stub.column', $builder->qualifyColumn('column'));
     }
 
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
@@ -366,7 +377,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testLocalMacrosAreCalledOnBuilder()
     {
         unset($_SERVER['__test.builder']);
-        $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
+        $builder = new Builder(new BaseBuilder(
             m::mock('Illuminate\Database\ConnectionInterface'),
             m::mock('Illuminate\Database\Query\Grammars\Grammar'),
             m::mock('Illuminate\Database\Query\Processors\Processor')
@@ -389,7 +400,12 @@ class DatabaseEloquentBuilderTest extends TestCase
             return $bar;
         });
 
-        $this->assertEquals($this->getBuilder()->foo('bar'), 'bar');
+        Builder::macro('bam', [Builder::class, 'getQuery']);
+
+        $builder = $this->getBuilder();
+
+        $this->assertEquals($builder->foo('bar'), 'bar');
+        $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
     public function testGetModelsProperlyHydratesModels()
@@ -559,7 +575,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
         $model = $this->getMockModel()->makePartial();
-        $model->shouldReceive('newQueryWithoutScopes')->once()->andReturn($nestedQuery);
+        $model->shouldReceive('newModelQuery')->once()->andReturn($nestedQuery);
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('from');
         $builder->setModel($model);
@@ -953,6 +969,70 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKeyNot($collection);
     }
 
+    public function testLatestWithoutColumnWithCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+
+        $builder->latest();
+    }
+
+    public function testLatestWithoutColumnWithoutCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+
+        $builder->latest();
+    }
+
+    public function testLatestWithColumn()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+
+        $builder->latest('foo');
+    }
+
+    public function testOldestWithoutColumnWithCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo');
+
+        $builder->oldest();
+    }
+
+    public function testOldestWithoutColumnWithoutCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('created_at');
+
+        $builder->oldest();
+    }
+
+    public function testOldestWithColumn()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo');
+
+        $builder->oldest('foo');
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -982,7 +1062,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     protected function getMockQueryBuilder()
     {
-        $query = m::mock('Illuminate\Database\Query\Builder');
+        $query = m::mock(BaseBuilder::class);
         $query->shouldReceive('from')->with('foo_table');
 
         return $query;

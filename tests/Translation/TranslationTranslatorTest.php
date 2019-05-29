@@ -66,6 +66,16 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testGetMethodProperlyLoadsAndRetrievesItemForFallback()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->setFallback('lv');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('lv', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
+        $this->assertEquals('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
+        $this->assertEquals('foo', $t->get('foo::bar.foo'));
+    }
+
     public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()
     {
         $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');

@@ -25,5 +25,9 @@ class ValidationDimensionsRuleTest extends TestCase
         $rule = new Dimensions(['ratio' => '2/3']);
 
         $this->assertEquals('dimensions:ratio=2/3', (string) $rule);
+
+        $rule = Rule::dimensions()->minWidth(300)->minHeight(400);
+
+        $this->assertEquals('dimensions:min_width=300,min_height=400', (string) $rule);
     }
 }

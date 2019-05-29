@@ -148,6 +148,8 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertCount(1, $c->find([2]));
         $this->assertEquals(2, $c->find([2])->first()->id);
         $this->assertCount(2, $c->find([2, 3, 4]));
+        $this->assertCount(2, $c->find(collect([2, 3, 4])));
+        $this->assertEquals([2, 3], $c->find(collect([2, 3, 4]))->pluck('id')->all());
         $this->assertEquals([2, 3], $c->find([2, 3, 4])->pluck('id')->all());
     }
 
@@ -156,7 +158,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = $this->getMockBuilder('Illuminate\Database\Eloquent\Collection')->setMethods(['first'])->setConstructorArgs([['foo']])->getMock();
         $mockItem = m::mock('stdClass');
         $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
-        $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
+        $mockItem->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($mockItem);
         $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);
         $mockItem->shouldReceive('eagerLoadRelations')->once()->with(['foo'])->andReturn(['results']);
         $c->load('bar', 'baz');

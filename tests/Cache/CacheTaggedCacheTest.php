@@ -52,6 +52,24 @@ class CacheTaggedCacheTest extends TestCase
         $this->assertEquals('bar', $store->tags('bop')->get('foo'));
     }
 
+    public function testTagsWithIncrementCanBeFlushed()
+    {
+        $store = new ArrayStore;
+        $store->tags('bop')->increment('foo', 5);
+        $this->assertEquals(5, $store->tags('bop')->get('foo'));
+        $store->tags('bop')->flush();
+        $this->assertNull($store->tags('bop')->get('foo'));
+    }
+
+    public function testTagsWithDecrementCanBeFlushed()
+    {
+        $store = new ArrayStore;
+        $store->tags('bop')->decrement('foo', 5);
+        $this->assertEquals(-5, $store->tags('bop')->get('foo'));
+        $store->tags('bop')->flush();
+        $this->assertNull($store->tags('bop')->get('foo'));
+    }
+
     public function testTagsCacheForever()
     {
         $store = new ArrayStore;

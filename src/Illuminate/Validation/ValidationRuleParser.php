@@ -87,9 +87,9 @@ class ValidationRuleParser
             return explode('|', $rule);
         } elseif (is_object($rule)) {
             return [$this->prepareRule($rule)];
-        } else {
-            return array_map([$this, 'prepareRule'], $rule);
         }
+
+        return array_map([$this, 'prepareRule'], $rule);
     }
 
     /**
@@ -248,7 +248,9 @@ class ValidationRuleParser
      */
     protected static function parseParameters($rule, $parameter)
     {
-        if (strtolower($rule) == 'regex') {
+        $rule = strtolower($rule);
+
+        if (in_array($rule, ['regex', 'not_regex', 'notregex'], true)) {
             return [$parameter];
         }
 

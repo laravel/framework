@@ -204,6 +204,18 @@ class Builder
     }
 
     /**
+     * Drop all views from the database.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllViews()
+    {
+        throw new LogicException('This database driver does not support dropping all views.');
+    }
+
+    /**
      * Rename a table on the schema.
      *
      * @param  string  $from

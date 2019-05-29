@@ -1,6 +1,10 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
 
@@ -24,15 +28,15 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $db->setAsGlobal();
 
-        $container = new Illuminate\Container\Container;
+        $container = new Container;
         $container->instance('db', $db->getDatabaseManager());
-        Illuminate\Support\Facades\Facade::setFacadeApplication($container);
+        Facade::setFacadeApplication($container);
     }
 
     public function tearDown()
     {
-        Illuminate\Support\Facades\Facade::clearResolvedInstances();
-        Illuminate\Support\Facades\Facade::setFacadeApplication(null);
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
     }
 
     public function testRenamingAndChangingColumnsWork()
@@ -60,6 +64,55 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             'CREATE TABLE users (age VARCHAR(255) NOT NULL COLLATE BINARY, first_name VARCHAR(255) NOT NULL)',
             'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
             'DROP TABLE __temp__users',
+        ];
+
+        $this->assertEquals($expected, $queries);
+    }
+
+    public function testRenameIndexWorks()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->string('name');
+            $table->string('age');
+        });
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function ($table) {
+            $table->index(['name'], 'index1');
+        });
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->renameIndex('index1', 'index2');
+        });
+
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SQLiteGrammar);
+
+        $expected = [
+            'DROP INDEX index1',
+            'CREATE INDEX index2 ON users (name)',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SqlServerGrammar());
+
+        $expected = [
+            'sp_rename N\'"users"."index1"\', "index2", N\'INDEX\'',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\MySqlGrammar());
+
+        $expected = [
+            'alter table `users` rename index `index1` to `index2`',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\PostgresGrammar());
+
+        $expected = [
+            'alter index "index1" rename to "index2"',
         ];
 
         $this->assertEquals($expected, $queries);

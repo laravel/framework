@@ -15,6 +15,7 @@ class SupportPluralizerTest extends TestCase
     public function testBasicPlural()
     {
         $this->assertEquals('children', Str::plural('child'));
+        $this->assertEquals('cod', Str::plural('cod'));
     }
 
     public function testCaseSensitiveSingularUsage()

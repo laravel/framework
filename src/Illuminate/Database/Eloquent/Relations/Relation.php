@@ -52,7 +52,7 @@ abstract class Relation
      *
      * @var array
      */
-    protected static $morphMap = [];
+    public static $morphMap = [];
 
     /**
      * Create a new relation instance.
@@ -161,9 +161,13 @@ abstract class Relation
      */
     public function touch()
     {
-        $column = $this->getRelated()->getUpdatedAtColumn();
+        $model = $this->getRelated();
 
-        $this->rawUpdate([$column => $this->getRelated()->freshTimestampString()]);
+        if (! $model::isIgnoringTouch()) {
+            $this->rawUpdate([
+                $model->getUpdatedAtColumn() => $model->freshTimestampString(),
+            ]);
+        }
     }
 
     /**
@@ -174,7 +178,7 @@ abstract class Relation
      */
     public function rawUpdate(array $attributes = [])
     {
-        return $this->query->update($attributes);
+        return $this->query->withoutGlobalScopes()->update($attributes);
     }
 
     /**
@@ -188,7 +192,7 @@ abstract class Relation
     {
         return $this->getRelationExistenceQuery(
             $query, $parentQuery, new Expression('count(*)')
-        );
+        )->setBindings([], 'select');
     }
 
     /**
@@ -315,7 +319,7 @@ abstract class Relation
 
         if (is_array($map)) {
             static::$morphMap = $merge && static::$morphMap
-                            ? array_merge(static::$morphMap, $map) : $map;
+                            ? $map + static::$morphMap : $map;
         }
 
         return static::$morphMap;
@@ -346,9 +350,7 @@ abstract class Relation
      */
     public static function getMorphedModel($alias)
     {
-        return array_key_exists($alias, self::$morphMap)
-            ? self::$morphMap[$alias]
-            : null;
+        return self::$morphMap[$alias] ?? null;
     }
 
     /**

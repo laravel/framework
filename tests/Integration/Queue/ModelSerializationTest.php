@@ -146,7 +146,9 @@ class ModelSerializationTest extends TestCase
      */
     public function it_reloads_relationships()
     {
-        $order = Order::create();
+        $order = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
 
         $product1 = Product::create();
         $product2 = Product::create();
@@ -154,7 +156,7 @@ class ModelSerializationTest extends TestCase
         Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
         Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
 
-        $order->load('line', 'lines');
+        $order->load('line', 'lines', 'products');
 
         $serialized = serialize(new ModelRelationSerializationTestClass($order));
         $unSerialized = unserialize($serialized);
@@ -167,7 +169,9 @@ class ModelSerializationTest extends TestCase
      */
     public function it_reloads_nested_relationships()
     {
-        $order = Order::create();
+        $order = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
 
         $product1 = Product::create();
         $product2 = Product::create();
@@ -175,12 +179,22 @@ class ModelSerializationTest extends TestCase
         Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
         Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
 
-        $order->load('line.product', 'lines', 'lines.product');
+        $order->load('line.product', 'lines', 'lines.product', 'products');
 
         $nestedSerialized = serialize(new ModelRelationSerializationTestClass($order));
         $nestedUnSerialized = unserialize($nestedSerialized);
 
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
+    }
+
+    /** @test */
+    public function it_serializes_an_empty_collection()
+    {
+        $serialized = serialize(new ModelSerializationTestClass(
+            new \Illuminate\Database\Eloquent\Collection([])
+        ));
+
+        unserialize($serialized);
     }
 }
 
@@ -204,6 +218,11 @@ class Order extends Model
     public function lines()
     {
         return $this->hasMany(Line::class);
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'lines');
     }
 }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Events;
 
+use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
@@ -104,6 +105,23 @@ class EventsDispatcherTest extends TestCase
         $this->assertEquals('wildcard', $_SERVER['__event.test']);
     }
 
+    public function testWildcardListenersCacheFlushing()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('foo.*', function () {
+            $_SERVER['__event.test'] = 'cached_wildcard';
+        });
+        $d->fire('foo.bar');
+        $this->assertEquals('cached_wildcard', $_SERVER['__event.test']);
+
+        $d->listen('foo.*', function () {
+            $_SERVER['__event.test'] = 'new_wildcard';
+        });
+        $d->fire('foo.bar');
+        $this->assertEquals('new_wildcard', $_SERVER['__event.test']);
+    }
+
     public function testListenersCanBeRemoved()
     {
         unset($_SERVER['__event.test']);
@@ -153,14 +171,14 @@ class EventsDispatcherTest extends TestCase
     public function testEventPassedFirstToWildcards()
     {
         $d = new Dispatcher;
-        $d->listen('foo.*', function ($event, $data) use ($d) {
+        $d->listen('foo.*', function ($event, $data) {
             $this->assertEquals('foo.bar', $event);
             $this->assertEquals(['first', 'second'], $data);
         });
         $d->fire('foo.bar', ['first', 'second']);
 
         $d = new Dispatcher;
-        $d->listen('foo.bar', function ($first, $second) use ($d) {
+        $d->listen('foo.bar', function ($first, $second) {
             $this->assertEquals('first', $first);
             $this->assertEquals('second', $second);
         });
