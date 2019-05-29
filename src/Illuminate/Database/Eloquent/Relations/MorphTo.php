@@ -38,6 +38,13 @@ class MorphTo extends BelongsTo
     protected $macroBuffer = [];
 
     /**
+     * A map of relations to load for each individual morph type
+     *
+     * @var array
+     */
+    protected $typedEagerLoads = [];
+
+    /**
      * Create a new morph to relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -111,7 +118,10 @@ class MorphTo extends BelongsTo
 
         $query = $this->replayMacros($instance->newQuery())
                             ->mergeConstraintsFrom($this->getQuery())
-                            ->with($this->getQuery()->getEagerLoads());
+                            ->with(array_merge(
+                                $this->getQuery()->getEagerLoads(),
+                                $this->typedEagerLoads[get_class($instance)] ?? []
+                            ));
 
         return $query->whereIn(
             $instance->getTable().'.'.$ownerKey, $this->gatherKeysByType($type)
@@ -251,6 +261,24 @@ class MorphTo extends BelongsTo
     public function getDictionary()
     {
         return $this->dictionary;
+    }
+
+    /**
+     * Specify which relations to load for a given morph type
+     *
+     * @param string $modelClass
+     * @param array $with
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function withMorph(string $modelClass, array $with): self
+    {
+        $this->typedEagerLoads[$modelClass] = array_merge(
+            $this->typedEagerLoads[$modelClass] ?? [],
+            $with
+        );
+
+        return $this;
     }
 
     /**
