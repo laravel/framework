@@ -271,7 +271,7 @@ class MorphTo extends BelongsTo
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function withMorph(string $modelClass, array $with): self
+    public function withMorph(string $modelClass, array $with)
     {
         $this->typedEagerLoads[$modelClass] = array_merge(
             $this->typedEagerLoads[$modelClass] ?? [],
