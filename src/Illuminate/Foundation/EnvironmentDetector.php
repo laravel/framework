@@ -48,10 +48,25 @@ class EnvironmentDetector
         // and if it was that automatically overrides as the environment. Otherwise, we
         // will check the environment as a "web" request like a typical HTTP request.
         if (! is_null($value = $this->getEnvironmentArgument($args))) {
-            return head(array_slice(explode('=', $value), 1));
+            $env = head(array_slice(explode('=', $value), 1));
+            $this->validateConsoleEnvironment($env);
+            return $env;
         }
 
         return $this->detectWebEnvironment($callback);
+    }
+    
+    /**
+     * Check if environment, passed as command parameter, exists.
+     * 
+     * @param string $env
+     * @throws \Exception
+     */
+    private function validateConsoleEnvironment(string $env)
+    {
+        $files = scandir('.');
+        if (!in_array('.env.' . $env, $files))
+            throw new \Exception($env . ' environment not found.');
     }
 
     /**
