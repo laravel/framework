@@ -655,9 +655,17 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_intersect_key(
+        $invalid_top_level = array_intersect_key(
             $this->data, $this->attributesThatHaveMessages()
         );
+        
+        $invalid_restructured = [];
+        $failed = array_only(array_dot($invalid_top_level), array_keys($this->failed()));
+        foreach($failed as $key => $failure){
+            array_set($invalid_restructured, $key, $failure);
+        }
+        
+        return $invalid_restructured;
     }
 
     /**
