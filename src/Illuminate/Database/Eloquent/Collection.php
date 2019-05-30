@@ -244,21 +244,6 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Run a map over each of the items.
-     *
-     * @param  callable  $callback
-     * @return \Illuminate\Support\Collection|static
-     */
-    public function map(callable $callback)
-    {
-        $result = parent::map($callback);
-
-        return $result->contains(function ($item) {
-            return ! $item instanceof Model;
-        }) ? $result->toBase() : $result;
-    }
-
-    /**
      * Reload a fresh model instance from the database for all the entities.
      *
      * @param  array|string  $with
@@ -578,5 +563,22 @@ class Collection extends BaseCollection implements QueueableCollection
         });
 
         return $connection;
+    }
+
+    /**
+     * Create a new collection instance from a higher order operation
+     * and convert to a base collection if the resulting collection
+     * does not solely contain models.
+     *
+     * @param  mixed  $items
+     * @return \Illuminate\Support\Collection|static
+     */
+    protected function makeFromHigherOrderOperation($items = [])
+    {
+        $collection = static::make($items);
+
+        return $collection->contains(function ($item) {
+            return ! $item instanceof Model;
+        }) ? $collection->toBase() : $collection;
     }
 }

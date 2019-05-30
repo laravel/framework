@@ -192,9 +192,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $values->get($middle);
         }
 
-        return (new static([
+        return $this->makeFromHigherOrderOperation([
             $values->get($middle - 1), $values->get($middle),
-        ]))->average();
+        ])->average();
     }
 
     /**
@@ -233,7 +233,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function collapse()
     {
-        return new static(Arr::collapse($this->items));
+        return $this->makeFromHigherOrderOperation(Arr::collapse($this->items));
     }
 
     /**
@@ -302,7 +302,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function crossJoin(...$lists)
     {
-        return new static(Arr::crossJoin(
+        return $this->makeFromHigherOrderOperation(Arr::crossJoin(
             $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
         ));
     }
@@ -327,7 +327,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function dump()
     {
-        (new static(func_get_args()))
+        $this->makeFromHigherOrderOperation(func_get_args())
             ->push($this)
             ->each(function ($item) {
                 VarDumper::dump($item);
@@ -344,7 +344,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diff($items)
     {
-        return new static(array_diff($this->items, $this->getArrayableItems($items)));
+        return $this->makeFromHigherOrderOperation(
+            array_diff($this->items, $this->getArrayableItems($items))
+        );
     }
 
     /**
@@ -356,7 +358,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffUsing($items, callable $callback)
     {
-        return new static(array_udiff($this->items, $this->getArrayableItems($items), $callback));
+        return $this->makeFromHigherOrderOperation(
+            array_udiff($this->items, $this->getArrayableItems($items), $callback)
+        );
     }
 
     /**
@@ -367,7 +371,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffAssoc($items)
     {
-        return new static(array_diff_assoc($this->items, $this->getArrayableItems($items)));
+        return $this->makeFromHigherOrderOperation(
+            array_diff_assoc($this->items, $this->getArrayableItems($items))
+        );
     }
 
     /**
@@ -379,7 +385,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffAssocUsing($items, callable $callback)
     {
-        return new static(array_diff_uassoc($this->items, $this->getArrayableItems($items), $callback));
+        return $this->makeFromHigherOrderOperation(
+            array_diff_uassoc($this->items, $this->getArrayableItems($items), $callback)
+        );
     }
 
     /**
@@ -390,7 +398,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffKeys($items)
     {
-        return new static(array_diff_key($this->items, $this->getArrayableItems($items)));
+        return $this->makeFromHigherOrderOperation(
+            array_diff_key($this->items, $this->getArrayableItems($items))
+        );
     }
 
     /**
@@ -402,7 +412,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffKeysUsing($items, callable $callback)
     {
-        return new static(array_diff_ukey($this->items, $this->getArrayableItems($items), $callback));
+        return $this->makeFromHigherOrderOperation(
+            array_diff_ukey($this->items, $this->getArrayableItems($items), $callback)
+        );
     }
 
     /**
@@ -420,7 +432,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $compare = $this->duplicateComparator($strict);
 
-        $duplicates = new static;
+        $duplicates = $this->makeFromHigherOrderOperation();
 
         foreach ($items as $key => $value) {
             if ($uniqueItems->isNotEmpty() && $compare($value, $uniqueItems->first())) {
@@ -534,7 +546,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $keys = func_get_args();
         }
 
-        return new static(Arr::except($this->items, $keys));
+        return $this->makeFromHigherOrderOperation(Arr::except($this->items, $keys));
     }
 
     /**
@@ -546,10 +558,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function filter(callable $callback = null)
     {
         if ($callback) {
-            return new static(Arr::where($this->items, $callback));
+            return $this->makeFromHigherOrderOperation(Arr::where($this->items, $callback));
         }
 
-        return new static(array_filter($this->items));
+        return $this->makeFromHigherOrderOperation(array_filter($this->items));
     }
 
     /**
@@ -836,7 +848,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function flatten($depth = INF)
     {
-        return new static(Arr::flatten($this->items, $depth));
+        return $this->makeFromHigherOrderOperation(Arr::flatten($this->items, $depth));
     }
 
     /**
@@ -846,7 +858,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function flip()
     {
-        return new static(array_flip($this->items));
+        return $this->makeFromHigherOrderOperation(array_flip($this->items));
     }
 
     /**
@@ -910,14 +922,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
 
                 if (! array_key_exists($groupKey, $results)) {
-                    $results[$groupKey] = new static;
+                    $results[$groupKey] = $this->makeFromHigherOrderOperation();
                 }
 
                 $results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
             }
         }
 
-        $result = new static($results);
+        $result = $this->makeFromHigherOrderOperation($results);
 
         if (! empty($nextGroups)) {
             return $result->map->groupBy($nextGroups, $preserveKeys);
@@ -948,7 +960,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $results[$resolvedKey] = $item;
         }
 
-        return new static($results);
+        return $this->makeFromHigherOrderOperation($results);
     }
 
     /**
@@ -996,7 +1008,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function intersect($items)
     {
-        return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+        return $this->makeFromHigherOrderOperation(
+            array_intersect($this->items, $this->getArrayableItems($items))
+        );
     }
 
     /**
@@ -1007,7 +1021,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function intersectByKeys($items)
     {
-        return new static(array_intersect_key(
+        return $this->makeFromHigherOrderOperation(array_intersect_key(
             $this->items, $this->getArrayableItems($items)
         ));
     }
@@ -1066,7 +1080,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $this->last();
         }
 
-        $collection = new static($this->items);
+        $collection = $this->makeFromHigherOrderOperation($this->items);
 
         $finalItem = $collection->pop();
 
@@ -1080,7 +1094,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function keys()
     {
-        return new static(array_keys($this->items));
+        return $this->makeFromHigherOrderOperation(array_keys($this->items));
     }
 
     /**
@@ -1104,7 +1118,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function pluck($value, $key = null)
     {
-        return new static(Arr::pluck($this->items, $value, $key));
+        return $this->makeFromHigherOrderOperation(Arr::pluck($this->items, $value, $key));
     }
 
     /**
@@ -1119,7 +1133,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $items = array_map($callback, $this->items, $keys);
 
-        return new static(array_combine($keys, $items));
+        return $this->makeFromHigherOrderOperation(array_combine($keys, $items));
     }
 
     /**
@@ -1163,7 +1177,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $dictionary[$key][] = $value;
         }
 
-        return new static($dictionary);
+        return $this->makeFromHigherOrderOperation($dictionary);
     }
 
     /**
@@ -1201,7 +1215,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             }
         }
 
-        return new static($result);
+        return $this->makeFromHigherOrderOperation($result);
     }
 
     /**
@@ -1255,7 +1269,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function merge($items)
     {
-        return new static(array_merge($this->items, $this->getArrayableItems($items)));
+        return $this->makeFromHigherOrderOperation(
+            array_merge($this->items, $this->getArrayableItems($items))
+        );
     }
 
     /**
@@ -1266,7 +1282,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function combine($values)
     {
-        return new static(array_combine($this->all(), $this->getArrayableItems($values)));
+        return $this->makeFromHigherOrderOperation(
+            array_combine($this->all(), $this->getArrayableItems($values))
+        );
     }
 
     /**
@@ -1277,7 +1295,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function union($items)
     {
-        return new static($this->items + $this->getArrayableItems($items));
+        return $this->makeFromHigherOrderOperation($this->items + $this->getArrayableItems($items));
     }
 
     /**
@@ -1320,7 +1338,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $position++;
         }
 
-        return new static($new);
+        return $this->makeFromHigherOrderOperation($new);
     }
 
     /**
@@ -1332,7 +1350,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function only($keys)
     {
         if (is_null($keys)) {
-            return new static($this->items);
+            return $this->makeFromHigherOrderOperation($this->items);
         }
 
         if ($keys instanceof self) {
@@ -1341,7 +1359,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        return new static(Arr::only($this->items, $keys));
+        return $this->makeFromHigherOrderOperation(Arr::only($this->items, $keys));
     }
 
     /**
@@ -1378,7 +1396,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $partitions[(int) ! $callback($item, $key)][$key] = $item;
         }
 
-        return new static($partitions);
+        return $this->makeFromHigherOrderOperation($partitions);
     }
 
     /**
@@ -1437,7 +1455,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function concat($source)
     {
-        $result = new static($this);
+        $result = $this->makeFromHigherOrderOperation($this);
 
         foreach ($source as $item) {
             $result->push($item);
@@ -1486,7 +1504,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return Arr::random($this->items);
         }
 
-        return new static(Arr::random($this->items, $number));
+        return $this->makeFromHigherOrderOperation(Arr::random($this->items, $number));
     }
 
     /**
@@ -1525,7 +1543,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function reverse()
     {
-        return new static(array_reverse($this->items, true));
+        return $this->makeFromHigherOrderOperation(
+            array_reverse($this->items, true)
+        );
     }
 
     /**
@@ -1568,7 +1588,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function shuffle($seed = null)
     {
-        return new static(Arr::shuffle($this->items, $seed));
+        return $this->makeFromHigherOrderOperation(Arr::shuffle($this->items, $seed));
     }
 
     /**
@@ -1580,7 +1600,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function slice($offset, $length = null)
     {
-        return new static(array_slice($this->items, $offset, $length, true));
+        return $this->makeFromHigherOrderOperation(
+            array_slice($this->items, $offset, $length, true)
+        );
     }
 
     /**
@@ -1592,10 +1614,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function split($numberOfGroups)
     {
         if ($this->isEmpty()) {
-            return new static;
+            return $this->makeFromHigherOrderOperation();
         }
 
-        $groups = new static;
+        $groups = $this->makeFromHigherOrderOperation();
 
         $groupSize = floor($this->count() / $numberOfGroups);
 
@@ -1611,7 +1633,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             }
 
             if ($size) {
-                $groups->push(new static(array_slice($this->items, $start, $size)));
+                $groups->push($this->makeFromHigherOrderOperation(array_slice($this->items, $start, $size)));
 
                 $start += $size;
             }
@@ -1629,16 +1651,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function chunk($size)
     {
         if ($size <= 0) {
-            return new static;
+            return $this->makeFromHigherOrderOperation();
         }
 
         $chunks = [];
 
         foreach (array_chunk($this->items, $size, true) as $chunk) {
-            $chunks[] = new static($chunk);
+            $chunks[] = $this->makeFromHigherOrderOperation($chunk);
         }
 
-        return new static($chunks);
+        return $this->makeFromHigherOrderOperation($chunks);
     }
 
     /**
@@ -1655,7 +1677,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             ? uasort($items, $callback)
             : asort($items);
 
-        return new static($items);
+        return $this->makeFromHigherOrderOperation($items);
     }
 
     /**
@@ -1689,7 +1711,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $results[$key] = $this->items[$key];
         }
 
-        return new static($results);
+        return $this->makeFromHigherOrderOperation($results);
     }
 
     /**
@@ -1717,7 +1739,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $descending ? krsort($items, $options) : ksort($items, $options);
 
-        return new static($items);
+        return $this->makeFromHigherOrderOperation($items);
     }
 
     /**
@@ -1742,10 +1764,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function splice($offset, $length = null, $replacement = [])
     {
         if (func_num_args() === 1) {
-            return new static(array_splice($this->items, $offset));
+            return $this->makeFromHigherOrderOperation(array_splice($this->items, $offset));
         }
 
-        return new static(array_splice($this->items, $offset, $length, $replacement));
+        return $this->makeFromHigherOrderOperation(
+            array_splice($this->items, $offset, $length, $replacement)
+        );
     }
 
     /**
@@ -1790,7 +1814,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function tap(callable $callback)
     {
-        $callback(new static($this->items));
+        $callback($this->makeFromHigherOrderOperation($this->items));
 
         return $this;
     }
@@ -1848,7 +1872,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function values()
     {
-        return new static(array_values($this->items));
+        return $this->makeFromHigherOrderOperation(array_values($this->items));
     }
 
     /**
@@ -1884,10 +1908,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }, func_get_args());
 
         $params = array_merge([function () {
-            return new static(func_get_args());
+            return $this->makeFromHigherOrderOperation(func_get_args());
         }, $this->items], $arrayableItems);
 
-        return new static(call_user_func_array('array_map', $params));
+        return $this->makeFromHigherOrderOperation(call_user_func_array('array_map', $params));
     }
 
     /**
@@ -1899,7 +1923,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function pad($size, $value)
     {
-        return new static(array_pad($this->items, $size, $value));
+        return $this->makeFromHigherOrderOperation(array_pad($this->items, $size, $value));
     }
 
     /**
@@ -1990,9 +2014,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             };
         }
 
-        return new static($this->groupBy($callback)->map(function ($value) {
-            return $value->count();
-        }));
+        return $this->makeFromHigherOrderOperation(
+            $this->groupBy($callback)->map(function ($value) {
+                return $value->count();
+            })
+        );
     }
 
     /**
@@ -2128,5 +2154,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return new HigherOrderCollectionProxy($this, $key);
+    }
+
+    /**
+     * Create a new collection instance from a higher order operation (like map or reduce)
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    protected function makeFromHigherOrderOperation($items = [])
+    {
+        return static::make($items);
     }
 }
