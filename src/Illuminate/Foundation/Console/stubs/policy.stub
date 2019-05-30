@@ -11,12 +11,12 @@ class DummyClass
     use HandlesAuthorization;
     
     /**
-     * Determine whether the user can manage the DocDummyModel.
+     * Determine whether the user can list the DocDummyPluralModel.
      *
      * @param  \NamespacedDummyUserModel  $user
      * @return mixed
      */
-    public function manage(DummyUser $user)
+    public function list(DummyUser $user)
     {
         //
     }
