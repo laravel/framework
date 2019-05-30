@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\Collection;
 use stdClass;
 use Mockery as m;
 use RuntimeException;
@@ -10,10 +9,11 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;

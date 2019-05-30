@@ -408,7 +408,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['name' => 'Third', 'email' => 'third@gmail.com']);
 
         $names = EloquentTestUser::query()->map(function (EloquentTestUser $user) {
-           return $user->name;
+            return $user->name;
         }, 2);
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $names);

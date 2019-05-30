@@ -2,11 +2,11 @@
 
 namespace Illuminate\Database\Concerns;
 
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Container\Container;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 trait BuildsQueries
 {
@@ -84,7 +84,7 @@ trait BuildsQueries
             $mapped = $callback($value, $key);
 
             // If we encounter a non-Model instance, we'll set the useEloquent flag to false
-            if ($useEloquent && !($mapped instanceof Model)) {
+            if ($useEloquent && ! $mapped instanceof Model) {
                 $useEloquent = false;
             }
 
