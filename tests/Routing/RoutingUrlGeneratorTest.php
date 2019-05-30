@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
@@ -612,6 +613,36 @@ class RoutingUrlGeneratorTest extends TestCase
         $request = Request::create($url->signedRoute('foo', [], null, false).'?tempered=true');
 
         $this->assertFalse($url->hasValidSignature($request, false));
+    }
+
+    public function testSignedUrlExpiration()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+
+        $routes->add($route);
+
+        $result = $url->signedRoute('foo', [], Carbon::now()->subMinute(), false);
+
+        $request = Request::create($result);
+
+        $this->assertTrue($url->isExpired($request));
+
+        $result = $url->signedRoute('foo', [], Carbon::now()->addMinute(), false);
+
+        $request = Request::create($result);
+
+        $this->assertFalse($url->isExpired($request));
     }
 }
 
