@@ -9,20 +9,30 @@ class InvalidSignatureException extends HttpException
     /**
      * Create a new exception instance.
      *
-     * @return void
+     * @param string $message
      */
-    public function __construct()
+    public function __construct($message = 'Invalid signature.')
     {
-        parent::__construct(403, 'Invalid signature.');
+        parent::__construct(403, $message);
     }
 
+    /**
+     * Create a new exception for an invalid signature.
+     *
+     * @return HttpException
+     */
     public static function forInvalidSignature()
     {
-        return new parent(403, 'Invalid signature.');
+        return new self('Invalid signature.');
     }
 
+    /**
+     * Create a new exception for an expired link.
+     *
+     * @return HttpException
+     */
     public static function forExpiredLink()
     {
-        return new parent(403, 'Link has expired.');
+        return new self('Link has expired.');
     }
 }
