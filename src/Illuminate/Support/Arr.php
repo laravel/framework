@@ -56,7 +56,7 @@ class Arr
             }
 
             foreach ($values as $item) {
-                array_push($results, $item);
+                $results[] = $item;
             }
         }
 
