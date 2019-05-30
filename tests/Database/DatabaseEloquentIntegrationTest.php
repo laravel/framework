@@ -426,6 +426,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $users = EloquentTestUser::query()->map(function (EloquentTestUser $user) {
             $user->name = "Modified:{$user->name}";
+
             return $user;
         }, 2);
 
