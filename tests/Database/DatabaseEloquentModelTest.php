@@ -1886,6 +1886,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($called);
     }
 
+    public function testTouchingModelWithTimestamps() {
+        $this->assertFalse(
+            Model::isIgnoringTouch(Model::class)
+        );
+    }
+
+    public function testNotTouchingModelWithoutTimestamps() {
+        $this->assertTrue(
+            Model::isIgnoringTouch(EloquentModelWithoutTimestamps::class)
+        );
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
@@ -2302,4 +2314,10 @@ class EloquentModelEventObjectStub extends Model
     protected $dispatchesEvents = [
         'saving' => EloquentModelSavingEventStub::class,
     ];
+}
+
+class EloquentModelWithoutTimestamps extends Model
+{
+    protected $table = 'stub';
+    public $timestamps = false;
 }
