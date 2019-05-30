@@ -573,7 +573,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * @param  mixed  $items
      * @return \Illuminate\Support\Collection|static
      */
-    protected function makeFromHigherOrderOperation($items = [])
+    protected function makeForValueOperation($items = [])
     {
         $collection = static::make($items);
 
