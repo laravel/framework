@@ -294,6 +294,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $class = $class ?: static::class;
 
+        if (! get_class_vars($class)['timestamps']) {
+            return true;
+        }
+
         foreach (static::$ignoreOnTouch as $ignoredClass) {
             if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
                 return true;

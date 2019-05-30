@@ -1903,6 +1903,13 @@ class DatabaseEloquentModelTest extends TestCase
             Model::isIgnoringTouch(Model::class)
         );
     }
+
+    public function testNotTouchingModelWithoutTimestamps()
+    {
+        $this->assertTrue(
+            Model::isIgnoringTouch(EloquentModelWithoutTimestamps::class)
+        );
+    }
 }
 
 class EloquentTestObserverStub
