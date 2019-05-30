@@ -19,7 +19,7 @@ class InvalidSignatureException extends HttpException
     /**
      * Create a new exception for an invalid signature.
      *
-     * @return InvalidSignatureException
+     * @return \Illuminate\Routing\Exceptions\InvalidSignatureException
      */
     public static function forInvalidSignature()
     {
@@ -29,7 +29,7 @@ class InvalidSignatureException extends HttpException
     /**
      * Create a new exception for an expired link.
      *
-     * @return InvalidSignatureException
+     * @return \Illuminate\Routing\Exceptions\InvalidSignatureException
      */
     public static function forExpiredLink()
     {
