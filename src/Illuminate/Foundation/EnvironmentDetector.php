@@ -50,6 +50,7 @@ class EnvironmentDetector
         if (! is_null($value = $this->getEnvironmentArgument($args))) {
             $env = head(array_slice(explode('=', $value), 1));
             $this->validateConsoleEnvironment($env);
+
             return $env;
         }
 
