@@ -344,7 +344,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diff($items)
     {
-        return $this->makeForValueOperation(
+        return $this->makeForFilterOperation(
             array_diff($this->items, $this->getArrayableItems($items))
         );
     }
@@ -358,7 +358,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffUsing($items, callable $callback)
     {
-        return $this->makeForValueOperation(
+        return $this->makeForFilterOperation(
             array_udiff($this->items, $this->getArrayableItems($items), $callback)
         );
     }
@@ -371,7 +371,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffAssoc($items)
     {
-        return $this->makeForValueOperation(
+        return $this->makeForFilterOperation(
             array_diff_assoc($this->items, $this->getArrayableItems($items))
         );
     }
@@ -385,7 +385,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffAssocUsing($items, callable $callback)
     {
-        return $this->makeForValueOperation(
+        return $this->makeForFilterOperation(
             array_diff_uassoc($this->items, $this->getArrayableItems($items), $callback)
         );
     }
