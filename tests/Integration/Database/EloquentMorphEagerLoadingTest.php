@@ -50,7 +50,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         $comments = Comment::query()
             ->with(['commentable' => function (MorphTo $morphTo) {
-                $morphTo->withMorph(Post::class, ['user']);
+                $morphTo->withMorph([Post::class =>['user']]);
             }])
             ->get();
 
