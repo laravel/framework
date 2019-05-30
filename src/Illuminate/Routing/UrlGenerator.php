@@ -370,6 +370,19 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Determine if the given request has an expired timestamp.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    public function isExpired(Request $request)
+    {
+        $expires = $request->query('expires');
+
+        return $expires && Carbon::now()->getTimestamp() > $expires;
+    }
+
+    /**
      * Get the URL to a named route.
      *
      * @param  string  $name
