@@ -55,10 +55,12 @@ class Arr
                 continue;
             }
 
-            $results[] = $values;
+            foreach ($values as $item) {
+                array_push($results, $item);
+            }
         }
 
-        return array_merge(...$results);
+        return $results;
     }
 
     /**
