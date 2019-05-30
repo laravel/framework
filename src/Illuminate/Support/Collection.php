@@ -1504,7 +1504,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return Arr::random($this->items);
         }
 
-        return $this->makeForFilerOperation(Arr::random($this->items, $number));
+        return $this->makeForFilterOperation(Arr::random($this->items, $number));
     }
 
     /**
