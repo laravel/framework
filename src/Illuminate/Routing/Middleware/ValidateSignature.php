@@ -3,6 +3,7 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
 
 class ValidateSignature
@@ -18,10 +19,14 @@ class ValidateSignature
      */
     public function handle($request, Closure $next)
     {
-        if ($request->hasValidSignature()) {
+        if (URL::hasValidSignature($request)) {
             return $next($request);
         }
 
-        throw new InvalidSignatureException;
+        if (URL::isExpired($request)) {
+            throw InvalidSignatureException::forExpiredLink();
+        }
+
+        throw InvalidSignatureException::forInvalidSignature();
     }
 }

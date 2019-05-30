@@ -15,4 +15,14 @@ class InvalidSignatureException extends HttpException
     {
         parent::__construct(403, 'Invalid signature.');
     }
+
+    public static function forInvalidSignature()
+    {
+        return new parent(403, 'Invalid signature.');
+    }
+
+    public static function forExpiredLink()
+    {
+        return new parent(403, 'Link has expired.');
+    }
 }
