@@ -55,18 +55,19 @@ class EnvironmentDetector
 
         return $this->detectWebEnvironment($callback);
     }
-    
+
     /**
      * Check if environment, passed as command parameter, exists.
-     * 
+     *
      * @param string $env
      * @throws \Exception
      */
     private function validateConsoleEnvironment(string $env)
     {
         $files = scandir('.');
-        if (!in_array('.env.' . $env, $files))
-            throw new \Exception($env . ' environment not found.');
+        if (! in_array('.env.'.$env, $files)) {
+            throw new \Exception($env.' environment not found.');
+        }
     }
 
     /**
