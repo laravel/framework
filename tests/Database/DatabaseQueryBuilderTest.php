@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Collection;
 use stdClass;
 use Mockery as m;
 use RuntimeException;
@@ -12,6 +13,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
@@ -2815,6 +2817,78 @@ SQL;
         }, 'table.id', 'table_id');
     }
 
+    public function testMap()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $row1 = new stdClass();
+        $row2 = new stdClass();
+        $row3 = new stdClass();
+        $row4 = new stdClass();
+        $row5 = new stdClass();
+
+        $chunk1 = collect([$row1, $row2]);
+        $chunk2 = collect([$row3, $row4]);
+        $chunk3 = collect([$row5]);
+
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
+        $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
+
+        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($row1)->andReturn(1);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($row2)->andReturn(2);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($row3)->andReturn(3);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($row4)->andReturn(4);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($row5)->andReturn(5);
+
+        $results = $builder->map(function ($results) use ($callbackAssertor) {
+            return $callbackAssertor->doMap($results);
+        }, 2);
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $results);
+        $this->assertEquals(5, $results->count());
+        $this->assertEquals(5, $results->pop());
+        $this->assertEquals(4, $results->pop());
+        $this->assertEquals(3, $results->pop());
+        $this->assertEquals(2, $results->pop());
+        $this->assertEquals(1, $results->pop());
+    }
+
+    public function testMapWithModels()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $model1 = new TestModel();
+        $model2 = new TestModel();
+        $model3 = new TestModel();
+        $model4 = new TestModel();
+
+        $chunk1 = collect([$model1, $model2]);
+        $chunk2 = collect([$model3, $model4]);
+        $chunk3 = collect();
+
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
+        $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
+
+        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($model1)->andReturn($model1);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($model2)->andReturn($model2);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($model3)->andReturn($model3);
+        $callbackAssertor->shouldReceive('doMap')->once()->with($model4)->andReturn($model4);
+
+        $results = $builder->map(function ($results) use ($callbackAssertor) {
+            return $callbackAssertor->doMap($results);
+        }, 2);
+
+        $this->assertInstanceOf(Collection::class, $results);
+    }
+
     public function testPaginate()
     {
         $perPage = 16;
@@ -3241,4 +3315,8 @@ SQL;
             m::mock(Processor::class),
         ])->makePartial();
     }
+}
+
+class TestModel extends Model
+{
 }

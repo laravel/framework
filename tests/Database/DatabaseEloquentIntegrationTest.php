@@ -401,6 +401,41 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(2, $i);
     }
 
+    public function testMap()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@gmail.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@gmail.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@gmail.com']);
+
+        $names = EloquentTestUser::query()->map(function (EloquentTestUser $user) {
+           return $user->name;
+        }, 2);
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $names);
+        $this->assertEquals(3, $names->count());
+        $this->assertTrue($names->contains('First'));
+        $this->assertTrue($names->contains('Second'));
+        $this->assertTrue($names->contains('Third'));
+    }
+
+    public function testMapToModels()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@gmail.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@gmail.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@gmail.com']);
+
+        $users = EloquentTestUser::query()->map(function (EloquentTestUser $user) {
+            $user->name = "Modified:{$user->name}";
+            return $user;
+        }, 2);
+
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertEquals(3, $users->count());
+        $this->assertTrue($users->contains('name', '=', 'Modified:First'));
+        $this->assertTrue($users->contains('name', '=', 'Modified:Second'));
+        $this->assertTrue($users->contains('name', '=', 'Modified:Third'));
+    }
+
     public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);

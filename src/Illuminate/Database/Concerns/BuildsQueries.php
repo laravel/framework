@@ -3,8 +3,10 @@
 namespace Illuminate\Database\Concerns;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 trait BuildsQueries
 {
@@ -64,6 +66,32 @@ trait BuildsQueries
                 }
             }
         });
+    }
+
+    /**
+     * Run a map over each of the results.
+     *
+     * @param  callable  $callback
+     * @param  int  $count
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
+     */
+    public function map(callable $callback, $count = 1000)
+    {
+        $useEloquent = true;
+        $results = [];
+
+        $this->each(function ($value, $key) use ($callback, &$useEloquent, &$results) {
+            $mapped = $callback($value, $key);
+
+            // If we encounter a non-Model instance, we'll set the useEloquent flag to false
+            if ($useEloquent && !($mapped instanceof Model)) {
+                $useEloquent = false;
+            }
+
+            $results[] = $mapped;
+        }, $count);
+
+        return $useEloquent ? reset($results)->newCollection($results) : new Collection($results);
     }
 
     /**
