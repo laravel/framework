@@ -2157,7 +2157,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection instance from a higher order operation (like map or reduce)
+     * Create a new collection instance from a higher order operation (like map or reduce).
      *
      * @param  mixed  $items
      * @return static
