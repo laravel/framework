@@ -304,8 +304,8 @@ abstract class Relation
 
     /**
      * Normalize the dictionary key.
-     * @param  mixed  $key - int | string
-     * @return mixed - int | string
+     * @param  string|mixed  $key
+     * @return string|mixed
      */
     protected function normalizeDictionaryKey($key)
     {
