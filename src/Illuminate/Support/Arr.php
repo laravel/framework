@@ -58,7 +58,7 @@ class Arr
             $results[] = $values;
         }
 
-        return array_merge([], [], ...$results);
+        return array_merge([], ...$results);
     }
 
     /**
