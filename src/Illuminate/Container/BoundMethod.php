@@ -5,6 +5,7 @@ namespace Illuminate\Container;
 use Closure;
 use ReflectionMethod;
 use ReflectionFunction;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 class BoundMethod
@@ -104,6 +105,36 @@ class BoundMethod
     }
 
     /**
+     * Adds missing dependencies to the user-provided input.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @param  callable|string  $callback
+     * @param  array  $inputData
+     *
+     * @return array
+     */
+    protected static function addMissingDependencies($container, $callback, array $inputData)
+    {
+        $parameters = static::getCallReflector($callback)->getParameters();
+
+        if (count($parameters) <= count($inputData)) {
+            return $inputData;
+        }
+
+        foreach ($parameters as $i => $parameter) {
+            // Injects missing type hinted parameters within the array
+            $class = $parameter->getClass()->name ?? false;
+            if ($class && ! ($inputData[$i] ?? false) instanceof $class) {
+                array_splice($inputData, $i, 0, [$container->make($class)]);
+            } elseif (! array_key_exists($i, $inputData) && $parameter->isDefaultValueAvailable()) {
+                $inputData[] = $parameter->getDefaultValue();
+            }
+        }
+
+        return $inputData;
+    }
+
+    /**
      * Get all dependencies for a given method.
      *
      * @param  \Illuminate\Container\Container  $container
@@ -115,6 +146,10 @@ class BoundMethod
      */
     protected static function getMethodDependencies($container, $callback, array $parameters = [])
     {
+        if ($parameters !== [] && ! Arr::isAssoc($parameters)) {
+            return static::addMissingDependencies($container, $callback, $parameters);
+        }
+
         $dependencies = [];
 
         foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
