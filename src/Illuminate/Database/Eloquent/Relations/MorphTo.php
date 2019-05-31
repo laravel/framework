@@ -266,7 +266,7 @@ class MorphTo extends BelongsTo
     /**
      * Specify which relations to load for a given morph type.
      *
-     * @param array $with
+     * @param  array  $with
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function withMorph(array $with)
