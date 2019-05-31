@@ -303,6 +303,16 @@ abstract class Relation
     }
 
     /**
+     * Normalize the dictionary key.
+     * @param  mixed  $key - int | string
+     * @return mixed - int | string
+     */
+    protected function normalizeDictionaryKey($key)
+    {
+        return is_string($key) ? strtolower($key) : $key;
+    }
+
+    /**
      * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map

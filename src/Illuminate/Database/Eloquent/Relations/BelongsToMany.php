@@ -236,7 +236,7 @@ class BelongsToMany extends Relation
         // children back to their parent using the dictionary and the keys on the
         // the parent models. Then we will return the hydrated models back out.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->{$this->parentKey}])) {
+            if (isset($dictionary[$key = $this->normalizeDictionaryKey($model->{$this->parentKey})])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );
@@ -260,7 +260,8 @@ class BelongsToMany extends Relation
         $dictionary = [];
 
         foreach ($results as $result) {
-            $dictionary[$result->{$this->accessor}->{$this->foreignPivotKey}][] = $result;
+            $normalizedKey = $this->normalizeDictionaryKey($result->{$this->accessor}->{$this->foreignPivotKey});
+            $dictionary[$normalizedKey][] = $result;
         }
 
         return $dictionary;
