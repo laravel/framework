@@ -50,13 +50,25 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         $comments = Comment::query()
             ->with(['commentable' => function (MorphTo $morphTo) {
-                $morphTo->withMorph([Post::class =>['user']]);
+                $morphTo->withMorph([Post::class => ['user']]);
             }])
             ->get();
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
+    }
+
+    public function test_with_morph_loading_with_single_relation()
+    {
+        $comments = Comment::query()
+            ->with(['commentable' => function (MorphTo $morphTo) {
+                $morphTo->withMorph([Post::class => 'user']);
+            }])
+            ->get();
+
+        $this->assertTrue($comments[0]->relationLoaded('commentable'));
+        $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
     }
 }
 

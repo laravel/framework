@@ -120,7 +120,7 @@ class MorphTo extends BelongsTo
                             ->mergeConstraintsFrom($this->getQuery())
                             ->with(array_merge(
                                 $this->getQuery()->getEagerLoads(),
-                                $this->typedEagerLoads[get_class($instance)] ?? []
+                                (array) ($this->typedEagerLoads[get_class($instance)] ?? [])
                             ));
 
         return $query->whereIn(
@@ -266,9 +266,7 @@ class MorphTo extends BelongsTo
     /**
      * Specify which relations to load for a given morph type.
      *
-     * @param string $modelClass
      * @param array $with
-     *
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function withMorph(array $with)
