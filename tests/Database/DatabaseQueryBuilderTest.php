@@ -971,6 +971,32 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testBasicWhereEmpties()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereEmpty('id');
+        $this->assertEquals('select * from "users" where nullif ("id", \'\') is null', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereEmpty('id');
+        $this->assertEquals('select * from "users" where "id" = ? or nullif ("id", \'\') is null', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    public function testBasicWhereNotEmpties()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotEmpty('id');
+        $this->assertEquals('select * from "users" where nullif ("id", \'\') is not null', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '>', 1)->orWhereNotEmpty('id');
+        $this->assertEquals('select * from "users" where "id" > ? or nullif ("id", \'\') is not null', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testGroupBys()
     {
         $builder = $this->getBuilder();
