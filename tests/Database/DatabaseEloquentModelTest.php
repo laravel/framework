@@ -1904,6 +1904,13 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
+    public function testTouchingModelWithUpdatedAtNull()
+    {
+        $this->assertFalse(
+            Model::isIgnoringTouch(EloquentModelWithUpdatedAtNull::class)
+        );
+    }
+
     public function testNotTouchingModelWithoutTimestamps()
     {
         $this->assertTrue(
@@ -2323,3 +2330,10 @@ class EloquentModelWithoutTimestamps extends Model
     protected $table = 'stub';
     public $timestamps = false;
 }
+
+class EloquentModelWithUpdatedAtNull extends Model
+{
+    protected $table = 'stub';
+    const UPDATED_AT = null;
+}
+
