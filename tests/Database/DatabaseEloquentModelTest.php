@@ -2336,4 +2336,3 @@ class EloquentModelWithUpdatedAtNull extends Model
     protected $table = 'stub';
     const UPDATED_AT = null;
 }
-
