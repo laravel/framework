@@ -99,14 +99,23 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|array  $needles
+     * @param  bool  $containsAll
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains($haystack, $needles, $containsAll = false)
     {
-        foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
-                return true;
+        if (!$containsAll) {
+            foreach ((array)$needles as $needle) {
+                if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
+                    return true;
+                }
             }
+
+            return false;
+        }
+
+        if (count((array)$needles) == count(array_intersect(explode(' ', strtolower($haystack)), (array)$needles))) {
+            return true;
         }
 
         return false;
