@@ -113,6 +113,22 @@ class Str
     }
 
     /**
+     * Determine if a given string contains all array values.
+     *
+     * @param  string  $haystack
+     * @param  string|array  $needles
+     * @return bool
+     */
+    public static function containsAll($haystack, $needles)
+    {
+        if (count((array) $needles) == count(array_intersect(explode(' ', strtolower($haystack)), (array) $needles))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
