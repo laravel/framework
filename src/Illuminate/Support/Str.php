@@ -105,7 +105,7 @@ class Str
     public static function contains($haystack, $needles, $containsAll = false)
     {
         if (!$containsAll) {
-            foreach ((array)$needles as $needle) {
+            foreach ((array) $needles as $needle) {
                 if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
                     return true;
                 }
@@ -114,7 +114,7 @@ class Str
             return false;
         }
 
-        if (count((array)$needles) == count(array_intersect(explode(' ', strtolower($haystack)), (array)$needles))) {
+        if (count((array) $needles) == count(array_intersect(explode(' ', strtolower($haystack)), (array) $needles))) {
             return true;
         }
 
