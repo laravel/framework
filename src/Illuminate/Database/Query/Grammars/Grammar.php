@@ -366,9 +366,8 @@ class Grammar extends BaseGrammar
     /**
      * Compile a where nullif clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereEmpty(Builder $query, $where)
@@ -379,9 +378,8 @@ class Grammar extends BaseGrammar
     /**
      * Compile a where nullif clause.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $where
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereNotEmpty(Builder $query, $where)
