@@ -1034,6 +1034,57 @@ class Builder
     }
 
     /**
+     * Add a "where nullif" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @param  bool    $not
+     * @return $this
+     */
+    public function whereEmpty($column, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotEmpty' : 'Empty';
+
+        $this->wheres[] = compact('type', 'column', 'boolean');
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where nullif" clause to the query.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereEmpty($column)
+    {
+        return $this->whereEmpty($column, 'or');
+    }
+
+    /**
+     * Add a "where not nullif" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotEmpty($column, $boolean = 'and')
+    {
+        return $this->whereEmpty($column, $boolean, true);
+    }
+
+    /**
+     * Add a "or where not nullif" clause to the query.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNotEmpty($column)
+    {
+        return $this->whereNotEmpty($column, 'or');
+    }
+
+    /**
      * Add a where between statement to the query.
      *
      * @param  string  $column

@@ -364,6 +364,32 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a where nullif clause.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array                              $where
+     *
+     * @return string
+     */
+    protected function whereEmpty(Builder $query, $where)
+    {
+        return 'nullif ('.$this->wrap($where['column']).', '.$this->quoteString('').') is null';
+    }
+
+    /**
+     * Compile a where nullif clause.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array                              $where
+     *
+     * @return string
+     */
+    protected function whereNotEmpty(Builder $query, $where)
+    {
+        return 'nullif ('.$this->wrap($where['column']).', '.$this->quoteString('').') is not null';
+    }
+
+    /**
      * Compile a "between" where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
