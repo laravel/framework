@@ -68,7 +68,7 @@ class PredisConnection extends Connection implements ConnectionContract
      * @param  mixed  $value
      * @return mixed
      */
-    protected function serialize($value)
+    public function serialize($value)
     {
         return serialize($value);
     }
@@ -79,7 +79,7 @@ class PredisConnection extends Connection implements ConnectionContract
      * @param  mixed  $value
      * @return mixed
      */
-    protected function unserialize($value)
+    public function unserialize($value)
     {
         return unserialize($value);
     }
