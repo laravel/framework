@@ -2,6 +2,11 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.19...5.8)
 
+### Added
+- Added `viewAny()` to dummy policy class ([#28654](https://github.com/laravel/framework/pull/28654), [#28671](https://github.com/laravel/framework/pull/28671))
+
+### Performance improvement
+- Improve performance for `Arr::collapse()` ([#28662](https://github.com/laravel/framework/pull/28662), [#28676](https://github.com/laravel/framework/pull/28676))
 
 
 ## [v5.8.19 (2019-05-28)](https://github.com/laravel/framework/compare/v5.8.18...v5.8.19)
