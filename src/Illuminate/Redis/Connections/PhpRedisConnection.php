@@ -452,7 +452,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Serialize the value. Using PhpRedis's native serialize methods
+     * Serialize the value. Using PhpRedis's native serialize methods.
      *
      * @param  mixed  $value
      * @return mixed
@@ -463,7 +463,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Unserialize the value.  Using PhpRedis's native serialize methods
+     * Unserialize the value.  Using PhpRedis's native serialize methods.
      *
      * @param  mixed  $value
      * @return mixed

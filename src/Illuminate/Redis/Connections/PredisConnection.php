@@ -62,7 +62,7 @@ class PredisConnection extends Connection implements ConnectionContract
         }
     }
 
-    /** 
+    /**
      * Serialize the value.
      *
      * @param  mixed  $value
