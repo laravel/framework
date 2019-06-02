@@ -111,7 +111,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $connection = Schema::getConnection();
 
         if ($connection->getDriverName() != 'sqlite') {
-            $this->markTestSkipped("DB needs to be configured with sqlite");
+            $this->markTestSkipped('DB needs to be configured with sqlite');
         }
 
         Schema::dropIfExists('items');
