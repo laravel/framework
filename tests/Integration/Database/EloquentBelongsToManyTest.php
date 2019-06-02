@@ -38,6 +38,26 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $table->timestamps();
         });
 
+        Schema::create('items', function ($table) {
+            $table->increments('id');
+            $table->string('uuid')->unique();
+            $table->string('title');
+            $table->timestamps();
+        });
+
+        Schema::create('labels', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('items_labels', function ($table) {
+            $table->string('item_uuid');
+            $table->integer('label_id');
+            $table->string('flag')->default('');
+            $table->timestamps();
+        });
+
         Carbon::setTestNow(null);
     }
 
@@ -80,6 +100,108 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
                 'created_at' => '2017-10-10 10:10:10', 'updated_at' => '2017-10-10 10:10:10',
             ],
             $post->tags[0]->pivot->toArray()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function basic_create_and_retrieve_with_ci_string_foreign_keys()
+    {
+        $connection = Schema::getConnection();
+
+        if ($connection->getDriverName() != 'sqlite') {
+            $this->markTestSkipped("DB needs to be configured with sqlite");
+        }
+
+        Schema::dropIfExists('items');
+        Schema::dropIfExists('labels');
+        Schema::dropIfExists('items_labels');
+
+        \DB::statement("CREATE TABLE items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uuid TEXT unique NOT NULL COLLATE NOCASE,
+            title TEXT,
+            created_at DATETIME,
+            updated_at DATETIME
+        )");
+
+        \DB::statement("CREATE TABLE labels (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            created_at DATETIME,
+            updated_at DATETIME
+        )");
+
+        \DB::statement("CREATE TABLE items_labels (
+            item_uuid TEXT NOT NULL COLLATE NOCASE,
+            label_id INTEGER NOT NULL,
+            flag TEXT DEFAULT '',
+            created_at DATETIME,
+            updated_at DATETIME
+        )");
+
+        Carbon::setTestNow(
+            Carbon::createFromFormat('Y-m-d H:i:s', '2019-05-31 10:10:10')
+        );
+
+        $item = Item::create(['uuid' => 'abc', 'title' => str_random()]);
+
+        $label = Label::create(['name' => str_random()]);
+        $label2 = Label::create(['name' => str_random()]);
+        $label3 = Label::create(['name' => str_random()]);
+
+        $item->labels()->sync([
+            $label->id => ['flag' => 'tisho'],
+            $label2->id => ['flag' => ''],
+            $label3->id => ['flag' => 'exclude'],
+        ]);
+
+        // Tags with flag = exclude should be excluded
+        $this->assertCount(2, $item->labels);
+        $this->assertInstanceOf(Collection::class, $item->labels);
+        $this->assertEquals($label->name, $item->labels[0]->name);
+        $this->assertEquals($label2->name, $item->labels[1]->name);
+
+        // Testing on the pivot model
+        $this->assertInstanceOf(Pivot::class, $item->labels[0]->pivot);
+        $this->assertEquals($item->uuid, $item->labels[0]->pivot->item_uuid);
+        $this->assertEquals('item_uuid', $item->labels[0]->pivot->getForeignKey());
+        $this->assertEquals('label_id', $item->labels[0]->pivot->getOtherKey());
+        $this->assertEquals('items_labels', $item->labels[0]->pivot->getTable());
+        $this->assertEquals(
+            [
+                'item_uuid' => 'abc', 'label_id' => '1', 'flag' => 'tisho',
+                'created_at' => '2019-05-31 10:10:10', 'updated_at' => '2019-05-31 10:10:10',
+            ],
+            $item->labels[0]->pivot->toArray()
+        );
+
+        // Change the uuid to uppercase
+        $item->uuid = 'ABC';
+        $item->save();
+
+        $item = Item::with('labels')->find($item->id)->first();
+
+        $this->assertCount(2, $item->labels);
+        $this->assertInstanceOf(Collection::class, $item->labels);
+        $this->assertEquals($label->name, $item->labels[0]->name);
+        $this->assertEquals($label2->name, $item->labels[1]->name);
+
+        // Testing on the pivot model
+        $this->assertInstanceOf(Pivot::class, $item->labels[0]->pivot);
+        // assert that the keys are kept as they are in the DB (ABC vs abc)
+        $this->assertNotEquals($item->uuid, $item->labels[0]->pivot->item_uuid);
+        $this->assertEquals(strtolower($item->uuid), strtolower($item->labels[0]->pivot->item_uuid));
+        $this->assertEquals('item_uuid', $item->labels[0]->pivot->getForeignKey());
+        $this->assertEquals('label_id', $item->labels[0]->pivot->getOtherKey());
+        $this->assertEquals('items_labels', $item->labels[0]->pivot->getTable());
+        $this->assertEquals(
+            [
+                'item_uuid' => 'abc', 'label_id' => '1', 'flag' => 'tisho',
+                'created_at' => '2019-05-31 10:10:10', 'updated_at' => '2019-05-31 10:10:10',
+            ],
+            $item->labels[0]->pivot->toArray()
         );
     }
 
@@ -642,6 +764,33 @@ class Post extends Model
     {
         return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id', 'id', 'name')
             ->withPivot('flag');
+    }
+}
+
+class Item extends Model
+{
+    public $table = 'items';
+    public $timestamps = true;
+    protected $guarded = ['id'];
+
+    public function labels()
+    {
+        return $this->belongsToMany(Label::class, 'items_labels', 'item_uuid', 'label_id', 'uuid', 'id')
+            ->withPivot('flag')
+            ->withTimestamps()
+            ->wherePivot('flag', '<>', 'exclude');
+    }
+}
+
+class Label extends Model
+{
+    public $table = 'labels';
+    public $timestamps = true;
+    protected $guarded = ['id'];
+
+    public function items()
+    {
+        return $this->belongsToMany(Item::class, 'items_labels', 'label_id', 'item_uuid');
     }
 }
 
