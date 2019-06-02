@@ -1367,7 +1367,7 @@ class Builder
         }
 
         if (Str::startsWith($method, 'find')) {
-            return $this->findBy(strtolower(substr($method, 4)), ...$parameters);
+            return $this->findBy(Str::snake(substr($method, 4)), ...$parameters);
         }
 
         $this->forwardCallTo($this->query, $method, $parameters);
