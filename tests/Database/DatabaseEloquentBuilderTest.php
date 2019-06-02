@@ -159,6 +159,17 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('baz', $result);
     }
 
+    public function testFindByMethod()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn('baz');
+
+        $result = $builder->findBy('foo', 'bar', ['column']);
+        $this->assertEquals('baz', $result);
+    }
+
     public function testFirstMethod()
     {
         $builder = m::mock(Builder::class.'[get,take]', [$this->getMockQueryBuilder()]);

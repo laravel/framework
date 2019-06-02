@@ -390,6 +390,19 @@ class Builder
     }
 
     /**
+     * Find a model by a specified key.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $value
+     * @param  array  $columns
+     * @return mixed
+     */
+    public function findBy($key, $value, $columns = ['*'])
+    {
+        return $this->where($key, $value)->first($columns);
+    }
+
+    /**
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
@@ -1351,6 +1364,10 @@ class Builder
 
         if (in_array($method, $this->passthru)) {
             return $this->toBase()->{$method}(...$parameters);
+        }
+
+        if (Str::startsWith($method, 'find')) {
+            return $this->findBy(strtolower(substr($method, 4)), ...$parameters);
         }
 
         $this->forwardCallTo($this->query, $method, $parameters);
