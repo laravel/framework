@@ -457,7 +457,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  mixed  $value
      * @return mixed
      */
-    protected function serialize($value)
+    public function serialize($value)
     {
         return $this->client->_serialize($value);
     }
@@ -468,7 +468,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  mixed  $value
      * @return mixed
      */
-    protected function unserialize($value)
+    public function unserialize($value)
     {
         return $this->client->_unserialize($value);
     }
