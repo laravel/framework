@@ -157,7 +157,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $label3->id => ['flag' => 'exclude'],
         ]);
 
-        // Tags with flag = exclude should be excluded
+        // Labels with flag = exclude should be excluded
         $this->assertCount(2, $item->labels);
         $this->assertInstanceOf(Collection::class, $item->labels);
         $this->assertEquals($label->name, $item->labels[0]->name);
@@ -190,7 +190,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         // Testing on the pivot model
         $this->assertInstanceOf(Pivot::class, $item->labels[0]->pivot);
-        // assert that the keys are kept as they are in the DB (ABC vs abc)
+        // Assert that the keys are kept as they are in the DB (ABC vs abc)
         $this->assertNotEquals($item->uuid, $item->labels[0]->pivot->item_uuid);
         $this->assertEquals(strtolower($item->uuid), strtolower($item->labels[0]->pivot->item_uuid));
         $this->assertEquals('item_uuid', $item->labels[0]->pivot->getForeignKey());
@@ -203,6 +203,18 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             ],
             $item->labels[0]->pivot->toArray()
         );
+
+        // reverse test
+        $label = Label::with('items')->find(1);
+
+        $this->assertCount(1, $label->items);
+        $this->assertInstanceOf(Collection::class, $label->items);
+        $this->assertEquals($item->uuid, $label->items[0]->uuid);
+        // Testing on the pivot model
+        $this->assertInstanceOf(Pivot::class, $label->items[0]->pivot);
+        // Assert that the keys are kept as they are in the DB (ABC vs abc)
+        $this->assertNotEquals($item->uuid, $label->items[0]->pivot->item_uuid);
+        $this->assertEquals(strtolower($item->uuid), strtolower($label->items[0]->pivot->item_uuid));
     }
 
     /**
@@ -790,7 +802,7 @@ class Label extends Model
 
     public function items()
     {
-        return $this->belongsToMany(Item::class, 'items_labels', 'label_id', 'item_uuid');
+        return $this->belongsToMany(Item::class, 'items_labels', 'label_id', 'item_uuid', 'id', 'uuid');
     }
 }
 
