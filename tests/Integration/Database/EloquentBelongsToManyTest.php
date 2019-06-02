@@ -118,28 +118,28 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         Schema::dropIfExists('labels');
         Schema::dropIfExists('items_labels');
 
-        \DB::statement("CREATE TABLE items (
+        \DB::statement('CREATE TABLE items (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT unique NOT NULL COLLATE NOCASE,
             title TEXT,
             created_at DATETIME,
             updated_at DATETIME
-        )");
+        )');
 
-        \DB::statement("CREATE TABLE labels (
+        \DB::statement('CREATE TABLE labels (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             created_at DATETIME,
             updated_at DATETIME
-        )");
+        )');
 
-        \DB::statement("CREATE TABLE items_labels (
+        \DB::statement('CREATE TABLE items_labels (
             item_uuid TEXT NOT NULL COLLATE NOCASE,
             label_id INTEGER NOT NULL,
-            flag TEXT DEFAULT '',
+            flag TEXT DEFAULT \'\',
             created_at DATETIME,
             updated_at DATETIME
-        )");
+        )');
 
         Carbon::setTestNow(
             Carbon::createFromFormat('Y-m-d H:i:s', '2019-05-31 10:10:10')
