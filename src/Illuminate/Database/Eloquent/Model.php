@@ -294,7 +294,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $class = $class ?: static::class;
 
-        if (! get_class_vars($class)['timestamps']) {
+        if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
             return true;
         }
 

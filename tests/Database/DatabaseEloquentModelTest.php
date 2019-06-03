@@ -1904,9 +1904,9 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
-    public function testTouchingModelWithUpdatedAtNull()
+    public function testNotTouchingModelWithUpdatedAtNull()
     {
-        $this->assertFalse(
+        $this->assertTrue(
             Model::isIgnoringTouch(EloquentModelWithUpdatedAtNull::class)
         );
     }
