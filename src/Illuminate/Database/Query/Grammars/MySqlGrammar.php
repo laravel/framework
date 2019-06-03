@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
 
@@ -43,6 +42,10 @@ class MySqlGrammar extends Grammar
      */
     public function compileSelect(Builder $query)
     {
+        if ($query->unions && $query->aggregate) {
+            return $this->compileUnionAggregate($query);
+        }
+
         $sql = parent::compileSelect($query);
 
         if ($query->unions) {
@@ -61,7 +64,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonContains($column, $value)
     {
-        return 'json_contains('.$this->wrap($column).', '.$value.')';
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+
+        return 'json_contains('.$field.', '.$value.$path.')';
     }
 
     /**
@@ -74,7 +79,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonLength($column, $operator, $value)
     {
-        list($field, $path) = $this->wrapJsonFieldAndPath($column);
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_length('.$field.$path.') '.$operator.' '.$value;
     }
@@ -194,13 +199,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonUpdateColumn($key, JsonExpression $value)
     {
-        $path = explode('->', $key);
+        [$field, $path] = $this->wrapJsonFieldAndPath($key);
 
-        $field = $this->wrapValue(array_shift($path));
-
-        $accessor = "'$.\"".implode('"."', $path)."\"'";
-
-        return "{$field} = json_set({$field}, {$accessor}, {$value->getValue()})";
+        return "{$field} = json_set({$field}{$path}, {$value->getValue()})";
     }
 
     /**
@@ -215,8 +216,7 @@ class MySqlGrammar extends Grammar
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = collect($values)->reject(function ($value, $column) {
-            return $this->isJsonSelector($column) &&
-                in_array(gettype($value), ['boolean', 'integer', 'double']);
+            return $this->isJsonSelector($column) && is_bool($value);
         })->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);
@@ -317,16 +317,21 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $delimiter = Str::contains($value, '->>')
-            ? '->>'
-            : '->';
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
-        $path = explode($delimiter, $value);
+        return 'json_unquote(json_extract('.$field.$path.'))';
+    }
 
-        $field = $this->wrapSegments(explode('.', array_shift($path)));
+    /**
+     * Wrap the given JSON selector for boolean values.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanSelector($value)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
-        return sprintf('%s'.$delimiter.'\'$.%s\'', $field, collect($path)->map(function ($part) {
-            return '"'.$part.'"';
-        })->implode('.'));
+        return 'json_extract('.$field.$path.')';
     }
 }

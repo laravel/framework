@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentPaginateTest;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -11,11 +12,11 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentPaginateTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
             $table->timestamps();

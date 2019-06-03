@@ -21,6 +21,8 @@ interface Container extends ContainerInterface
      * @param  string  $abstract
      * @param  string  $alias
      * @return void
+     *
+     * @throws \LogicException
      */
     public function alias($abstract, $alias);
 
@@ -37,7 +39,7 @@ interface Container extends ContainerInterface
      * Resolve all of the bindings for a given tag.
      *
      * @param  string  $tag
-     * @return array
+     * @return iterable
      */
     public function tagged($tag);
 
@@ -91,9 +93,19 @@ interface Container extends ContainerInterface
     public function instance($abstract, $instance);
 
     /**
-     * Define a contextual binding.
+     * Add a contextual binding to the container.
      *
      * @param  string  $concrete
+     * @param  string  $abstract
+     * @param  \Closure|string  $implementation
+     * @return void
+     */
+    public function addContextualBinding($concrete, $abstract, $implementation);
+
+    /**
+     * Define a contextual binding.
+     *
+     * @param  string|array  $concrete
      * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
     public function when($concrete);
@@ -107,11 +119,20 @@ interface Container extends ContainerInterface
     public function factory($abstract);
 
     /**
+     * Flush the container of all bindings and resolved instances.
+     *
+     * @return void
+     */
+    public function flush();
+
+    /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function make($abstract, array $parameters = []);
 

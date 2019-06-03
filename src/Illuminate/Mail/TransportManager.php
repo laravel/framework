@@ -5,16 +5,15 @@ namespace Illuminate\Mail;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
+use Illuminate\Log\LogManager;
 use Illuminate\Support\Manager;
 use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\SesTransport;
+use Postmark\Transport as PostmarkTransport;
 use Illuminate\Mail\Transport\ArrayTransport;
-use Swift_SendmailTransport as MailTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
-use Illuminate\Mail\Transport\MandrillTransport;
-use Illuminate\Mail\Transport\SparkPostTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
 class TransportManager extends Manager
@@ -46,11 +45,28 @@ class TransportManager extends Manager
             $transport->setPassword($config['password']);
         }
 
-        // Next we will set any stream context options specified for the transport
-        // and then return it. The option is not required any may not be inside
-        // the configuration array at all so we'll verify that before adding.
+        return $this->configureSmtpDriver($transport, $config);
+    }
+
+    /**
+     * Configure the additional SMTP driver options.
+     *
+     * @param  \Swift_SmtpTransport  $transport
+     * @param  array  $config
+     * @return \Swift_SmtpTransport
+     */
+    protected function configureSmtpDriver($transport, $config)
+    {
         if (isset($config['stream'])) {
             $transport->setStreamOptions($config['stream']);
+        }
+
+        if (isset($config['source_ip'])) {
+            $transport->setSourceIp($config['source_ip']);
+        }
+
+        if (isset($config['local_domain'])) {
+            $transport->setLocalDomain($config['local_domain']);
         }
 
         return $transport;
@@ -77,9 +93,10 @@ class TransportManager extends Manager
             'version' => 'latest', 'service' => 'email',
         ]);
 
-        return new SesTransport(new SesClient(
-            $this->addSesCredentials($config)
-        ));
+        return new SesTransport(
+            new SesClient($this->addSesCredentials($config)),
+            $config['options'] ?? []
+        );
     }
 
     /**
@@ -104,7 +121,7 @@ class TransportManager extends Manager
      */
     protected function createMailDriver()
     {
-        return new MailTransport;
+        return new SendmailTransport;
     }
 
     /**
@@ -125,30 +142,14 @@ class TransportManager extends Manager
     }
 
     /**
-     * Create an instance of the Mandrill Swift Transport driver.
+     * Create an instance of the Postmark Swift Transport driver.
      *
-     * @return \Illuminate\Mail\Transport\MandrillTransport
+     * @return \Swift_Transport
      */
-    protected function createMandrillDriver()
+    protected function createPostmarkDriver()
     {
-        $config = $this->app['config']->get('services.mandrill', []);
-
-        return new MandrillTransport(
-            $this->guzzle($config), $config['secret']
-        );
-    }
-
-    /**
-     * Create an instance of the SparkPost Swift Transport driver.
-     *
-     * @return \Illuminate\Mail\Transport\SparkPostTransport
-     */
-    protected function createSparkPostDriver()
-    {
-        $config = $this->app['config']->get('services.sparkpost', []);
-
-        return new SparkPostTransport(
-            $this->guzzle($config), $config['secret'], $config['options'] ?? []
+        return new PostmarkTransport(
+            $this->app['config']->get('services.postmark.token')
         );
     }
 
@@ -159,7 +160,13 @@ class TransportManager extends Manager
      */
     protected function createLogDriver()
     {
-        return new LogTransport($this->app->make(LoggerInterface::class));
+        $logger = $this->app->make(LoggerInterface::class);
+
+        if ($logger instanceof LogManager) {
+            $logger = $logger->channel($this->app['config']['mail.log_channel']);
+        }
+
+        return new LogTransport($logger);
     }
 
     /**

@@ -9,7 +9,7 @@ use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEventTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -24,7 +24,7 @@ class BroadcastEventTest extends TestCase
 
         $event = new TestBroadcastEvent;
 
-        (new \Illuminate\Broadcasting\BroadcastEvent($event))->handle($broadcaster);
+        (new BroadcastEvent($event))->handle($broadcaster);
     }
 
     public function testManualParameterSpecification()

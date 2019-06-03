@@ -30,7 +30,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->setRootControllerNamespace();
 
-        if ($this->app->routesAreCached()) {
+        if ($this->routesAreCached()) {
             $this->loadCachedRoutes();
         } else {
             $this->loadRoutes();
@@ -55,6 +55,16 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
+     * Determine if the application routes are cached.
+     *
+     * @return bool
+     */
+    protected function routesAreCached()
+    {
+        return $this->app->routesAreCached();
+    }
+
+    /**
      * Load the cached routes for the application.
      *
      * @return void
@@ -76,16 +86,6 @@ class RouteServiceProvider extends ServiceProvider
         if (method_exists($this, 'map')) {
             $this->app->call([$this, 'map']);
         }
-    }
-
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
     }
 
     /**

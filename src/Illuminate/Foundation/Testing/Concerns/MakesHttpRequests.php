@@ -144,13 +144,15 @@ trait MakesHttpRequests
     }
 
     /**
-     * Set the referer header to simulate a previous request.
+     * Set the referer header and previous URL session value in order to simulate a previous request.
      *
      * @param  string  $url
      * @return $this
      */
     public function from(string $url)
     {
+        $this->app['session']->setPreviousUrl($url);
+
         return $this->withHeader('referer', $url);
     }
 
@@ -434,7 +436,7 @@ trait MakesHttpRequests
      * Follow a redirect chain until a non-redirect is received.
      *
      * @param  \Illuminate\Http\Response  $response
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Foundation\Testing\TestResponse
      */
     protected function followRedirects($response)
     {

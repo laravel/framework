@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
@@ -10,16 +10,16 @@ use Illuminate\Notifications\Messages\DatabaseMessage;
 
 class NotificationDatabaseChannelTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
-        Mockery::close();
+        m::close();
     }
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationDatabaseChannelTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = m::mock();
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
             'id' => 1,
@@ -36,7 +36,7 @@ class NotificationDatabaseChannelTest extends TestCase
     {
         $notification = new NotificationDatabaseChannelTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = m::mock();
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
             'id' => 1,

@@ -3,11 +3,13 @@
 namespace Illuminate\Tests\Auth;
 
 use stdClass;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class AuthAccessGateTest extends TestCase
 {
@@ -26,10 +28,39 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function test_before_can_take_an_array_callback_as_object()
+    {
+        $gate = new Gate(new Container, function () {
+        });
+
+        $gate->before([new AccessGateTestBeforeCallback, 'allowEverything']);
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
+    public function test_before_can_take_an_array_callback_as_object_static()
+    {
+        $gate = new Gate(new Container, function () {
+        });
+
+        $gate->before([new AccessGateTestBeforeCallback, 'allowEverythingStatically']);
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
+    public function test_before_can_take_an_array_callback_with_static_method()
+    {
+        $gate = new Gate(new Container, function () {
+        });
+
+        $gate->before([AccessGateTestBeforeCallback::class, 'allowEverythingStatically']);
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
     public function test_before_can_allow_guests()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->before(function (?StdClass $user) {
@@ -42,7 +73,6 @@ class AuthAccessGateTest extends TestCase
     public function test_after_can_allow_guests()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->after(function (?StdClass $user) {
@@ -55,7 +85,6 @@ class AuthAccessGateTest extends TestCase
     public function test_closures_can_allow_guest_users()
     {
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->define('foo', function (?StdClass $user) {
@@ -75,7 +104,6 @@ class AuthAccessGateTest extends TestCase
         unset($_SERVER['__laravel.testBefore']);
 
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyThatAllowsGuests::class);
@@ -99,7 +127,6 @@ class AuthAccessGateTest extends TestCase
         $_SERVER['__laravel.testBefore'] = false;
 
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNonGuestBefore::class);
@@ -119,7 +146,6 @@ class AuthAccessGateTest extends TestCase
         $_SERVER['__laravel.gateAfter2'] = false;
 
         $gate = new Gate(new Container, function () {
-            return null;
         });
 
         $gate->before(function (?StdClass $user) {
@@ -208,6 +234,7 @@ class AuthAccessGateTest extends TestCase
             return true;
         });
         $gate->before(function () {
+            //
         });
 
         $this->assertTrue($gate->check('foo'));
@@ -276,7 +303,7 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         $gate->after(function ($user, $ability, $result) {
-            return $ability == 'allow' ? true : false;
+            return $ability == 'allow';
         });
 
         $gate->after(function ($user, $ability, $result) {
@@ -306,10 +333,20 @@ class AuthAccessGateTest extends TestCase
 
         $dummy = new AccessGateTestDummy;
 
+        $gate->before(function ($user, $ability, array $arguments) use ($dummy) {
+            $this->assertCount(1, $arguments);
+            $this->assertSame($dummy, $arguments[0]);
+        });
+
         $gate->define('foo', function ($user, $x) use ($dummy) {
-            $this->assertEquals($dummy, $x);
+            $this->assertSame($dummy, $x);
 
             return true;
+        });
+
+        $gate->after(function ($user, $ability, $result, array $arguments) use ($dummy) {
+            $this->assertCount(1, $arguments);
+            $this->assertSame($dummy, $arguments[0]);
         });
 
         $this->assertTrue($gate->check('foo', $dummy));
@@ -322,11 +359,21 @@ class AuthAccessGateTest extends TestCase
         $dummy1 = new AccessGateTestDummy;
         $dummy2 = new AccessGateTestDummy;
 
+        $gate->before(function ($user, $ability, array $arguments) use ($dummy1, $dummy2) {
+            $this->assertCount(2, $arguments);
+            $this->assertSame([$dummy1, $dummy2], $arguments);
+        });
+
         $gate->define('foo', function ($user, $x, $y) use ($dummy1, $dummy2) {
-            $this->assertEquals($dummy1, $x);
-            $this->assertEquals($dummy2, $y);
+            $this->assertSame($dummy1, $x);
+            $this->assertSame($dummy2, $y);
 
             return true;
+        });
+
+        $gate->after(function ($user, $ability, $result, array $arguments) use ($dummy1, $dummy2) {
+            $this->assertCount(2, $arguments);
+            $this->assertSame([$dummy1, $dummy2], $arguments);
         });
 
         $this->assertTrue($gate->check('foo', [$dummy1, $dummy2]));
@@ -336,7 +383,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestClass@foo');
+        $gate->define('foo', AccessGateTestClass::class.'@foo');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -345,7 +392,25 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestInvokableClass');
+        $gate->define('foo', AccessGateTestInvokableClass::class);
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_gates_can_be_defined_using_an_array_callback()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', [new AccessGateTestStaticClass, 'foo']);
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_gates_can_be_defined_using_an_array_callback_with_static_method()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', [AccessGateTestStaticClass::class, 'foo']);
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -453,12 +518,62 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
     }
 
+    public function test_for_user_method_attaches_a_new_user_to_a_new_gate_instance_with_guess_callback()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', function () {
+            return true;
+        });
+
+        $counter = 0;
+        $guesserCallback = function () use (&$counter) {
+            $counter++;
+        };
+        $gate->guessPolicyNamesUsing($guesserCallback);
+        $gate->getPolicyFor('fooClass');
+        $this->assertEquals(1, $counter);
+
+        // now the guesser callback should be present on the new gate as well
+        $newGate = $gate->forUser((object) ['id' => 1]);
+
+        $newGate->getPolicyFor('fooClass');
+        $this->assertEquals(2, $counter);
+
+        $newGate->getPolicyFor('fooClass');
+        $this->assertEquals(3, $counter);
+    }
+
     /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage You are not an admin.
+     * @dataProvider notCallableDataProvider
      */
+    public function test_define_second_parameter_should_be_string_or_callable($callback)
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', $callback);
+    }
+
+    /**
+     * @return array
+     */
+    public function notCallableDataProvider()
+    {
+        return [
+            [1],
+            [new stdClass],
+            [[]],
+            [1.1],
+        ];
+    }
+
     public function test_authorize_throws_unauthorized_exception()
     {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('You are not an admin.');
+
         $gate = $this->getBasicGate();
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
@@ -526,6 +641,15 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->any(['edit', 'update'], new AccessGateTestDummy));
     }
 
+    public function test_none_ability_check_passes_if_all_fail()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
+
+        $this->assertTrue($gate->none(['edit', 'update'], new AccessGateTestDummy));
+    }
+
     public function test_every_ability_check_passes_if_all_pass()
     {
         $gate = $this->getBasicGate();
@@ -589,20 +713,115 @@ class AuthAccessGateTest extends TestCase
             [$noAbilities, [], true],
         ];
     }
+
+    public function test_classes_can_be_defined_as_callbacks_using_at_notation_for_guests()
+    {
+        $gate = new Gate(new Container, function () {
+        });
+
+        $gate->define('foo', AccessGateTestClassForGuest::class.'@foo');
+        $gate->define('obj_foo', [new AccessGateTestClassForGuest, 'foo']);
+        $gate->define('static_foo', [AccessGateTestClassForGuest::class, 'staticFoo']);
+        $gate->define('static_@foo', AccessGateTestClassForGuest::class.'@staticFoo');
+        $gate->define('bar', AccessGateTestClassForGuest::class.'@bar');
+        $gate->define('invokable', AccessGateTestGuestInvokableClass::class);
+        $gate->define('nullable_invokable', AccessGateTestGuestNullableInvokable::class);
+        $gate->define('absent_invokable', 'someAbsentClass');
+
+        AccessGateTestClassForGuest::$calledMethod = '';
+
+        $this->assertTrue($gate->check('foo'));
+        $this->assertEquals('foo was called', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('static_foo'));
+        $this->assertEquals('static foo was invoked', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('bar'));
+        $this->assertEquals('bar got invoked', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('static_@foo'));
+        $this->assertEquals('static foo was invoked', AccessGateTestClassForGuest::$calledMethod);
+
+        $this->assertTrue($gate->check('invokable'));
+        $this->assertEquals('__invoke was called', AccessGateTestGuestInvokableClass::$calledMethod);
+
+        $this->assertTrue($gate->check('nullable_invokable'));
+        $this->assertEquals('Nullable __invoke was called', AccessGateTestGuestNullableInvokable::$calledMethod);
+
+        $this->assertFalse($gate->check('absent_invokable'));
+    }
+}
+
+class AccessGateTestClassForGuest
+{
+    public static $calledMethod = null;
+
+    public function foo($user = null)
+    {
+        static::$calledMethod = 'foo was called';
+
+        return true;
+    }
+
+    public static function staticFoo($user = null)
+    {
+        static::$calledMethod = 'static foo was invoked';
+
+        return true;
+    }
+
+    public function bar(?stdClass $user)
+    {
+        static::$calledMethod = 'bar got invoked';
+
+        return true;
+    }
+}
+
+class AccessGateTestStaticClass
+{
+    public static function foo($user)
+    {
+        return $user->id === 1;
+    }
 }
 
 class AccessGateTestClass
 {
-    public function foo()
+    public function foo($user)
     {
-        return true;
+        return $user->id === 1;
     }
 }
 
 class AccessGateTestInvokableClass
 {
-    public function __invoke()
+    public function __invoke($user)
     {
+        return $user->id === 1;
+    }
+}
+
+class AccessGateTestGuestInvokableClass
+{
+    public static $calledMethod = null;
+
+    public function __invoke($user = null)
+    {
+        static::$calledMethod = '__invoke was called';
+
+        return true;
+    }
+}
+
+class AccessGateTestGuestNullableInvokable
+{
+    public static $calledMethod = null;
+
+    public function __invoke(?StdClass $user)
+    {
+        static::$calledMethod = 'Nullable __invoke was called';
+
         return true;
     }
 }
@@ -771,6 +990,19 @@ class AccessGateTestPolicyWithNonGuestBefore
     }
 
     public function update($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+}
+
+class AccessGateTestBeforeCallback
+{
+    public function allowEverything($user = null)
+    {
+        return true;
+    }
+
+    public static function allowEverythingStatically($user = null)
     {
         return true;
     }

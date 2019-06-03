@@ -72,7 +72,12 @@ class Authorize
      */
     protected function getModel($request, $model)
     {
-        return $this->isClassName($model) ? $model : $request->route($model);
+        if ($this->isClassName($model)) {
+            return trim($model);
+        } else {
+            return $request->route($model, null) ?:
+                ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches)) ? $matches[1] : null);
+        }
     }
 
     /**

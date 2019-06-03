@@ -2,23 +2,26 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery;
 use stdClass;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use Illuminate\Notifications\RoutesNotifications;
 use Illuminate\Contracts\Notifications\Dispatcher;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
-        Mockery::close();
+        m::close();
+
+        Container::setInstance(null);
     }
 
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
+        $factory = m::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
@@ -31,7 +34,7 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationCanBeSentNow()
     {
         $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
+        $factory = m::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
@@ -52,7 +55,7 @@ class NotificationRoutesNotificationsTest extends TestCase
 
 class RoutesNotificationsTestInstance
 {
-    use \Illuminate\Notifications\RoutesNotifications;
+    use RoutesNotifications;
 
     protected $email = 'taylor@laravel.com';
     protected $phone_number = '5555555555';

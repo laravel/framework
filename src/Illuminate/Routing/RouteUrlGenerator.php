@@ -257,7 +257,7 @@ class RouteUrlGenerator
         // First we will get all of the string parameters that are remaining after we
         // have replaced the route wildcards. We'll then build a query string from
         // these string parameters then use it as a starting point for the rest.
-        if (count($parameters) == 0) {
+        if (count($parameters) === 0) {
             return '';
         }
 

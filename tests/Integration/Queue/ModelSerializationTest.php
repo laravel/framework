@@ -3,8 +3,13 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Schema;
+use LogicException;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @group integration
@@ -30,39 +35,45 @@ class ModelSerializationTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
 
-        Schema::connection('custom')->create('users', function ($table) {
+        Schema::connection('custom')->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
 
-        Schema::create('orders', function ($table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('lines', function ($table) {
+        Schema::create('lines', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('order_id');
             $table->unsignedInteger('product_id');
         });
 
-        Schema::create('products', function ($table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
+        });
+
+        Schema::create('roles', function (Blueprint $table) {
+            $table->increments('id');
+        });
+
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('role_id');
         });
     }
 
-    /**
-     * @test
-     */
-    public function it_serialize_user_on_default_connection()
+    public function test_it_serialize_user_on_default_connection()
     {
         $user = ModelSerializationTestUser::create([
             'email' => 'mohamed@laravel.com',
@@ -89,16 +100,13 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals('taylor@laravel.com', $unSerialized->user[1]->email);
     }
 
-    /**
-     * @test
-     */
-    public function it_serialize_user_on_different_connection()
+    public function test_it_serialize_user_on_different_connection()
     {
         $user = ModelSerializationTestUser::on('custom')->create([
             'email' => 'mohamed@laravel.com',
         ]);
 
-        $user2 = ModelSerializationTestUser::on('custom')->create([
+        ModelSerializationTestUser::on('custom')->create([
             'email' => 'taylor@laravel.com',
         ]);
 
@@ -119,13 +127,11 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals('taylor@laravel.com', $unSerialized->user[1]->email);
     }
 
-    /**
-     * @test
-     * @expectedException \LogicException
-     * @expectedExceptionMessage  Queueing collections with multiple model connections is not supported.
-     */
-    public function it_fails_if_models_on_multi_connections()
+    public function test_it_fails_if_models_on_multi_connections()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Queueing collections with multiple model connections is not supported.');
+
         $user = ModelSerializationTestUser::on('custom')->create([
             'email' => 'mohamed@laravel.com',
         ]);
@@ -135,16 +141,13 @@ class ModelSerializationTest extends TestCase
         ]);
 
         $serialized = serialize(new ModelSerializationTestClass(
-            new \Illuminate\Database\Eloquent\Collection([$user, $user2])
+            new Collection([$user, $user2])
         ));
 
         unserialize($serialized);
     }
 
-    /**
-     * @test
-     */
-    public function it_reloads_relationships()
+    public function test_it_reloads_relationships()
     {
         $order = tap(Order::create(), function (Order $order) {
             $order->wasRecentlyCreated = false;
@@ -164,10 +167,7 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
     }
 
-    /**
-     * @test
-     */
-    public function it_reloads_nested_relationships()
+    public function test_it_reloads_nested_relationships()
     {
         $order = tap(Order::create(), function (Order $order) {
             $order->wasRecentlyCreated = false;
@@ -187,11 +187,35 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
     }
 
-    /** @test */
-    public function it_serializes_an_empty_collection()
+    /**
+     * Regression test for https://github.com/laravel/framework/issues/23068.
+     */
+    public function test_it_can_unserialize_nested_relationships_without_pivot()
+    {
+        $user = tap(User::create([
+            'email' => 'taylor@laravel.com',
+        ]), function (User $user) {
+            $user->wasRecentlyCreated = false;
+        });
+
+        $role1 = Role::create();
+        $role2 = Role::create();
+
+        RoleUser::create(['user_id' => $user->id, 'role_id' => $role1->id]);
+        RoleUser::create(['user_id' => $user->id, 'role_id' => $role2->id]);
+
+        $user->roles->each(function ($role) {
+            $role->pivot->load('user', 'role');
+        });
+
+        $serialized = serialize(new ModelSerializationTestClass($user));
+        unserialize($serialized);
+    }
+
+    public function test_it_serializes_an_empty_collection()
     {
         $serialized = serialize(new ModelSerializationTestClass(
-            new \Illuminate\Database\Eloquent\Collection([])
+            new Collection([])
         ));
 
         unserialize($serialized);
@@ -243,9 +267,49 @@ class Product extends Model
     public $timestamps = false;
 }
 
+class User extends Model
+{
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class)
+            ->using(RoleUser::class);
+    }
+}
+
+class Role extends Model
+{
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->using(RoleUser::class);
+    }
+}
+
+class RoleUser extends Pivot
+{
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+}
+
 class ModelSerializationTestClass
 {
-    use \Illuminate\Queue\SerializesModels;
+    use SerializesModels;
 
     public $user;
 
@@ -257,7 +321,7 @@ class ModelSerializationTestClass
 
 class ModelRelationSerializationTestClass
 {
-    use \Illuminate\Queue\SerializesModels;
+    use SerializesModels;
 
     public $order;
 

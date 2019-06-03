@@ -31,10 +31,10 @@ class React extends Preset
     protected static function updatePackageArray(array $packages)
     {
         return [
-            'babel-preset-react' => '^6.23.0',
+            '@babel/preset-react' => '^7.0.0',
             'react' => '^16.2.0',
             'react-dom' => '^16.2.0',
-        ] + Arr::except($packages, ['vue']);
+        ] + Arr::except($packages, ['vue', 'vue-template-compiler']);
     }
 
     /**

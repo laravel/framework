@@ -14,7 +14,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -58,7 +58,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         foreach (['default'] as $connection) {
             $this->schema($connection)->drop('posts');
@@ -104,6 +104,26 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         $this->assertEquals($post->id, $tag->posts->first()->id);
     }
 
+    public function testChunkById()
+    {
+        $post = EloquentManyToManyPolymorphicTestPost::create();
+        $tag1 = EloquentManyToManyPolymorphicTestTag::create();
+        $tag2 = EloquentManyToManyPolymorphicTestTag::create();
+        $tag3 = EloquentManyToManyPolymorphicTestTag::create();
+        $post->tags()->attach([$tag1->id, $tag2->id, $tag3->id]);
+
+        $count = 0;
+        $iterations = 0;
+        $post->tags()->chunkById(2, function ($tags) use (&$iterations, &$count) {
+            $this->assertInstanceOf(EloquentManyToManyPolymorphicTestTag::class, $tags->first());
+            $count += $tags->count();
+            $iterations++;
+        });
+
+        $this->assertEquals(2, $iterations);
+        $this->assertEquals(3, $count);
+    }
+
     /**
      * Helpers...
      */
@@ -139,7 +159,7 @@ class EloquentManyToManyPolymorphicTestPost extends Eloquent
 
     public function tags()
     {
-        return $this->morphToMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestTag', 'taggable');
+        return $this->morphToMany(EloquentManyToManyPolymorphicTestTag::class, 'taggable');
     }
 }
 
@@ -150,7 +170,7 @@ class EloquentManyToManyPolymorphicTestImage extends Eloquent
 
     public function tags()
     {
-        return $this->morphToMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestTag', 'taggable');
+        return $this->morphToMany(EloquentManyToManyPolymorphicTestTag::class, 'taggable');
     }
 }
 
@@ -161,11 +181,11 @@ class EloquentManyToManyPolymorphicTestTag extends Eloquent
 
     public function posts()
     {
-        return $this->morphedByMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestPost', 'taggable');
+        return $this->morphedByMany(EloquentManyToManyPolymorphicTestPost::class, 'taggable');
     }
 
     public function images()
     {
-        return $this->morphedByMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestImage', 'taggable');
+        return $this->morphedByMany(EloquentManyToManyPolymorphicTestImage::class, 'taggable');
     }
 }

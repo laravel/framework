@@ -48,7 +48,7 @@ class KeyGenerateCommand extends Command
 
         $this->laravel['config']['app.key'] = $key;
 
-        $this->info("Application key [$key] set successfully.");
+        $this->info('Application key set successfully.');
     }
 
     /**

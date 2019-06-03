@@ -39,7 +39,8 @@ class ThrottleRequests
      * @param  \Closure  $next
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
@@ -52,7 +53,7 @@ class ThrottleRequests
             throw $this->buildException($key, $maxAttempts);
         }
 
-        $this->limiter->hit($key, $decayMinutes);
+        $this->limiter->hit($key, $decayMinutes * 60);
 
         $response = $next($request);
 
@@ -87,6 +88,7 @@ class ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
+     *
      * @throws \RuntimeException
      */
     protected function resolveRequestSignature($request)

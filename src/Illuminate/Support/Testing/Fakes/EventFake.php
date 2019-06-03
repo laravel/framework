@@ -191,19 +191,6 @@ class EventFake implements Dispatcher
      * @param  bool  $halt
      * @return array|null
      */
-    public function fire($event, $payload = [], $halt = false)
-    {
-        return $this->dispatch($event, $payload, $halt);
-    }
-
-    /**
-     * Fire an event and call the listeners.
-     *
-     * @param  string|object  $event
-     * @param  mixed  $payload
-     * @param  bool  $halt
-     * @return array|null
-     */
     public function dispatch($event, $payload = [], $halt = false)
     {
         $name = is_object($event) ? get_class($event) : (string) $event;
@@ -211,7 +198,7 @@ class EventFake implements Dispatcher
         if ($this->shouldFakeEvent($name, $payload)) {
             $this->events[$name][] = func_get_args();
         } else {
-            $this->dispatcher->dispatch($event, $payload, $halt);
+            return $this->dispatcher->dispatch($event, $payload, $halt);
         }
     }
 

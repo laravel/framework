@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Illuminate\Contracts\Events\Dispatcher;
 
 trait HasEvents
@@ -30,6 +31,8 @@ trait HasEvents
      *
      * @param  object|array|string  $classes
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public static function observe($classes)
     {
@@ -45,10 +48,12 @@ trait HasEvents
      *
      * @param  object|string $class
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function registerObserver($class)
     {
-        $className = is_string($class) ? $class : get_class($class);
+        $className = $this->resolveObserverClassName($class);
 
         // When registering a model observer, we will spin through the possible events
         // and determine if this observer has that method. If it does, we will hook
@@ -61,6 +66,27 @@ trait HasEvents
     }
 
     /**
+     * Resolve the observer's class name from an object or string.
+     *
+     * @param  object|string $class
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function resolveObserverClassName($class)
+    {
+        if (is_object($class)) {
+            return get_class($class);
+        }
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
+        throw new InvalidArgumentException('Unable to find observer: '.$class);
+    }
+
+    /**
      * Get the observable event names.
      *
      * @return array
@@ -70,7 +96,7 @@ trait HasEvents
         return array_merge(
             [
                 'retrieved', 'creating', 'created', 'updating', 'updated',
-                'saving', 'saved', 'restoring', 'restored',
+                'saving', 'saved', 'restoring', 'restored', 'replicating',
                 'deleting', 'deleted', 'forceDeleted',
             ],
             $this->observables
@@ -278,6 +304,17 @@ trait HasEvents
     }
 
     /**
+     * Register a replicating model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function replicating($callback)
+    {
+        static::registerModelEvent('replicating', $callback);
+    }
+
+    /**
      * Register a deleting model event with the dispatcher.
      *
      * @param  \Closure|string  $callback
@@ -350,5 +387,26 @@ trait HasEvents
     public static function unsetEventDispatcher()
     {
         static::$dispatcher = null;
+    }
+
+    /**
+     * Execute a callback without firing any model events for any model type.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function withoutEvents(callable $callback)
+    {
+        $dispatcher = static::getEventDispatcher();
+
+        static::unsetEventDispatcher();
+
+        try {
+            return $callback();
+        } finally {
+            if ($dispatcher) {
+                static::setEventDispatcher($dispatcher);
+            }
+        }
     }
 }

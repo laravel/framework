@@ -21,10 +21,30 @@ LUA;
     }
 
     /**
+     * Get the Lua script for pushing jobs onto the queue.
+     *
+     * KEYS[1] - The queue to push the job onto, for example: queues:foo
+     * KEYS[2] - The notification list fot the queue we are pushing jobs onto, for example: queues:foo:notify
+     * ARGV[1] - The job payload
+     *
+     * @return string
+     */
+    public static function push()
+    {
+        return <<<'LUA'
+-- Push the job onto the queue...
+redis.call('rpush', KEYS[1], ARGV[1])
+-- Push a notification onto the "notify" queue...
+redis.call('rpush', KEYS[2], 1)
+LUA;
+    }
+
+    /**
      * Get the Lua script for popping the next job off of the queue.
      *
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo
      * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
+     * KEYS[3] - The notify queue
      * ARGV[1] - The time at which the reserved job will expire
      *
      * @return string
@@ -42,6 +62,7 @@ if(job ~= false) then
     reserved['attempts'] = reserved['attempts'] + 1
     reserved = cjson.encode(reserved)
     redis.call('zadd', KEYS[2], ARGV[1], reserved)
+    redis.call('lpop', KEYS[3])
 end
 
 return {job, reserved}
@@ -76,6 +97,7 @@ LUA;
      *
      * KEYS[1] - The queue we are removing jobs from, for example: queues:foo:reserved
      * KEYS[2] - The queue we are moving jobs to, for example: queues:foo
+     * KEYS[3] - The notification list for the queue we are moving jobs to, for example queues:foo:notify
      * ARGV[1] - The current UNIX timestamp
      *
      * @return string
@@ -94,6 +116,10 @@ if(next(val) ~= nil) then
 
     for i = 1, #val, 100 do
         redis.call('rpush', KEYS[2], unpack(val, i, math.min(i+99, #val)))
+        -- Push a notification for every job that was migrated...
+        for j = i, math.min(i+99, #val) do
+            redis.call('rpush', KEYS[3], 1)
+        end
     end
 end
 

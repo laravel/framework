@@ -22,6 +22,13 @@ class Blueprint
     protected $table;
 
     /**
+     * The prefix of the table.
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
      * The columns that should be added to the table.
      *
      * @var \Illuminate\Database\Schema\ColumnDefinition[]
@@ -64,11 +71,13 @@ class Blueprint
      *
      * @param  string  $table
      * @param  \Closure|null  $callback
+     * @param  string  $prefix
      * @return void
      */
-    public function __construct($table, Closure $callback = null)
+    public function __construct($table, Closure $callback = null, $prefix = '')
     {
         $this->table = $table;
+        $this->prefix = $prefix;
 
         if (! is_null($callback)) {
             $callback($this);
@@ -125,6 +134,8 @@ class Blueprint
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return void
+     *
+     * @throws \BadMethodCallException
      */
     protected function ensureCommandsAreValid(Connection $connection)
     {
@@ -240,7 +251,7 @@ class Blueprint
     protected function creating()
     {
         return collect($this->commands)->contains(function ($command) {
-            return $command->name == 'create';
+            return $command->name === 'create';
         });
     }
 
@@ -509,7 +520,7 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string  $name
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function foreign($columns, $name = null)
     {
@@ -523,6 +534,17 @@ class Blueprint
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function increments($column)
+    {
+        return $this->unsignedInteger($column, true);
+    }
+
+    /**
+     * Create a new auto-incrementing integer (4-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function integerIncrements($column)
     {
         return $this->unsignedInteger($column, true);
     }
@@ -832,6 +854,18 @@ class Blueprint
     public function enum($column, array $allowed)
     {
         return $this->addColumn('enum', $column, compact('allowed'));
+    }
+
+    /**
+     * Create a new set column on the table.
+     *
+     * @param  string  $column
+     * @param  array  $allowed
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function set($column, array $allowed)
+    {
+        return $this->addColumn('set', $column, compact('allowed'));
     }
 
     /**
@@ -1147,6 +1181,18 @@ class Blueprint
     }
 
     /**
+     * Create a new generated, computed column on the table.
+     *
+     * @param  string  $column
+     * @param  string  $expression
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function computed($column, $expression)
+    {
+        return $this->addColumn('computed', $column, compact('expression'));
+    }
+
+    /**
      * Add the proper columns for a polymorphic table.
      *
      * @param  string  $name
@@ -1242,7 +1288,7 @@ class Blueprint
      */
     protected function createIndexName($type, array $columns)
     {
-        $index = strtolower($this->table.'_'.implode('_', $columns).'_'.$type);
+        $index = strtolower($this->prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
 
         return str_replace(['-', '.'], '_', $index);
     }
@@ -1273,7 +1319,7 @@ class Blueprint
     public function removeColumn($name)
     {
         $this->columns = array_values(array_filter($this->columns, function ($c) use ($name) {
-            return $c['attributes']['name'] != $name;
+            return $c['name'] != $name;
         }));
 
         return $this;

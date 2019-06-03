@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Support\Str;
+use Opis\Closure\SerializableClosure;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\NullConnector;
@@ -10,18 +12,12 @@ use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 
-class QueueServiceProvider extends ServiceProvider
+class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     /**
      * Register the service provider.
      *
@@ -30,14 +26,11 @@ class QueueServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerManager();
-
         $this->registerConnection();
-
         $this->registerWorker();
-
         $this->registerListener();
-
         $this->registerFailedJobServices();
+        $this->registerOpisSecurityKey();
     }
 
     /**
@@ -213,6 +206,20 @@ class QueueServiceProvider extends ServiceProvider
         return new DatabaseFailedJobProvider(
             $this->app['db'], $config['database'], $config['table']
         );
+    }
+
+    /**
+     * Configure Opis Closure signing for security.
+     *
+     * @return void
+     */
+    protected function registerOpisSecurityKey()
+    {
+        if (Str::startsWith($key = $this->app['config']->get('app.key'), 'base64:')) {
+            $key = base64_decode(substr($key, 7));
+        }
+
+        SerializableClosure::setSecretKey($key);
     }
 
     /**

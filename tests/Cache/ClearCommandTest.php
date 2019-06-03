@@ -3,12 +3,15 @@
 namespace Illuminate\Tests\Cache;
 
 use Mockery as m;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
 use Illuminate\Contracts\Cache\Repository;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class ClearCommandTest extends TestCase
 {
@@ -35,13 +38,13 @@ class ClearCommandTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->cacheManager = m::mock('Illuminate\Cache\CacheManager');
-        $this->files = m::mock('Illuminate\Filesystem\Filesystem');
-        $this->cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->cacheManager = m::mock(CacheManager::class);
+        $this->files = m::mock(Filesystem::class);
+        $this->cacheRepository = m::mock(Repository::class);
         $this->command = new ClearCommandTestStub($this->cacheManager, $this->files);
 
         $app = new Application;
@@ -49,7 +52,7 @@ class ClearCommandTest extends TestCase
         $this->command->setLaravel($app);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -76,14 +79,13 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command, ['store' => 'foo']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testClearWithInvalidStoreArgument()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->files->shouldReceive('files')->andReturn([]);
 
-        $this->cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('InvalidArgumentException');
+        $this->cacheManager->shouldReceive('store')->once()->with('bar')->andThrow(InvalidArgumentException::class);
         $this->cacheRepository->shouldReceive('flush')->never();
 
         $this->runCommand($this->command, ['store' => 'bar']);
@@ -140,7 +142,7 @@ class ClearCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new ArrayInput($input), new NullOutput);
     }
 }
 

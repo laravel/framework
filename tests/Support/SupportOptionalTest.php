@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use stdClass;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Optional;
 
@@ -11,7 +12,7 @@ class SupportOptionalTest extends TestCase
     {
         $expected = 'test';
 
-        $targetObj = new \stdClass;
+        $targetObj = new stdClass;
         $targetObj->item = $expected;
 
         $optional = new Optional($targetObj);
@@ -21,7 +22,7 @@ class SupportOptionalTest extends TestCase
 
     public function testGetNotExistItemOnObject()
     {
-        $targetObj = new \stdClass;
+        $targetObj = new stdClass;
 
         $optional = new Optional($targetObj);
 
@@ -30,7 +31,7 @@ class SupportOptionalTest extends TestCase
 
     public function testIssetExistItemOnObject()
     {
-        $targetObj = new \stdClass;
+        $targetObj = new stdClass;
         $targetObj->item = '';
 
         $optional = new Optional($targetObj);
@@ -40,7 +41,7 @@ class SupportOptionalTest extends TestCase
 
     public function testIssetNotExistItemOnObject()
     {
-        $targetObj = new \stdClass;
+        $targetObj = new stdClass;
 
         $optional = new Optional($targetObj);
 
@@ -78,6 +79,7 @@ class SupportOptionalTest extends TestCase
         $optional = new Optional($targetArr);
 
         $this->assertTrue(isset($optional['item']));
+        $this->assertTrue(isset($optional->item));
     }
 
     public function testIssetNotExistItemOnArray()
@@ -87,5 +89,15 @@ class SupportOptionalTest extends TestCase
         $optional = new Optional($targetArr);
 
         $this->assertFalse(isset($optional['item']));
+        $this->assertFalse(isset($optional->item));
+    }
+
+    public function testIssetExistItemOnNull()
+    {
+        $targetNull = null;
+
+        $optional = new Optional($targetNull);
+
+        $this->assertFalse(isset($optional->item));
     }
 }

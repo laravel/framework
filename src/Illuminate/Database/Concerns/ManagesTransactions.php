@@ -85,6 +85,7 @@ trait ManagesTransactions
      * Start a new database transaction.
      *
      * @return void
+     *
      * @throws \Exception
      */
     public function beginTransaction()

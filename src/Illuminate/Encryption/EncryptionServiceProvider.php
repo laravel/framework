@@ -34,6 +34,8 @@ class EncryptionServiceProvider extends ServiceProvider
      *
      * @param  array  $config
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function key(array $config)
     {

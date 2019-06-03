@@ -13,7 +13,7 @@ class EventFakeTest extends TestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application   $app
+     * @param  \Illuminate\Contracts\Foundation\Application   $app
      *
      * @return void
      */
@@ -25,11 +25,8 @@ class EventFakeTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'mysql',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'username' => 'root',
-            'password' => '',
-            'database' => 'forge',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
             'prefix' => '',
         ]);
     }
@@ -39,7 +36,7 @@ class EventFakeTest extends TestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +53,7 @@ class EventFakeTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Schema::dropIfExists('posts');
 
@@ -68,11 +65,65 @@ class EventFakeTest extends TestCase
         Event::fake(NonImportantEvent::class);
         Post::observe([PostObserver::class]);
 
-        $post = new Post();
+        $post = new Post;
         $post->title = 'xyz';
         $post->save();
 
         $this->assertSame('xyz-Test', $post->slug);
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testNonFakedEventGetsProperlyDispatchedAndReturnsResponses()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return 'two';
+        });
+        Event::listen('test', function () {
+            //
+        });
+
+        $this->assertEquals([null, 'two', null], Event::dispatch('test'));
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testNonFakedEventGetsProperlyDispatchedAndCancelsFutureListeners()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return false;
+        });
+        Event::listen('test', function () {
+            $this->fail('should not be called');
+        });
+
+        $this->assertEquals([null], Event::dispatch('test'));
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testNonFakedHaltedEventGetsProperlyDispatchedAndReturnsResponse()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return 'two';
+        });
+        Event::listen('test', function () {
+            $this->fail('should not be called');
+        });
+
+        $this->assertEquals('two', Event::until('test'));
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
@@ -85,6 +136,7 @@ class Post extends Model
 
 class NonImportantEvent
 {
+    //
 }
 
 class PostObserver

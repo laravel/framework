@@ -4,7 +4,6 @@ namespace Illuminate\Http\Resources\Json;
 
 use ArrayAccess;
 use JsonSerializable;
-use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -60,7 +59,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Create a new resource instance.
      *
-     * @param  mixed  $parameters
+     * @param  mixed  ...$parameters
      * @return static
      */
     public static function make(...$parameters)
@@ -76,7 +75,11 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public static function collection($resource)
     {
-        return new AnonymousResourceCollection($resource, get_called_class());
+        return tap(new AnonymousResourceCollection($resource, static::class), function ($collection) {
+            if (property_exists(static::class, 'preserveKeys')) {
+                $collection->preserveKeys = (new static([]))->preserveKeys === true;
+            }
+        });
     }
 
     /**
@@ -91,9 +94,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
             $request = $request ?: Container::getInstance()->make('request')
         );
 
-        if (is_array($data)) {
-            $data = $data;
-        } elseif ($data instanceof Arrayable || $data instanceof Collection) {
+        if ($data instanceof Arrayable) {
             $data = $data->toArray();
         } elseif ($data instanceof JsonSerializable) {
             $data = $data->jsonSerialize();
@@ -110,6 +111,10 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toArray($request)
     {
+        if (is_null($this->resource)) {
+            return [];
+        }
+
         return is_array($this->resource)
             ? $this->resource
             : $this->resource->toArray();

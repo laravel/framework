@@ -52,7 +52,7 @@ class StatusCommand extends BaseCommand
         $this->migrator->setConnection($this->option('database'));
 
         if (! $this->migrator->repositoryExists()) {
-            return $this->error('No migrations found.');
+            return $this->error('Migration table not found.');
         }
 
         $ran = $this->migrator->getRepository()->getRan();
@@ -105,7 +105,7 @@ class StatusCommand extends BaseCommand
         return [
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
 
-            ['path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations files to use'],
+            ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to use'],
 
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
         ];

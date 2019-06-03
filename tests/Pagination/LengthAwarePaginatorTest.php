@@ -7,12 +7,23 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class LengthAwarePaginatorTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var \Illuminate\Pagination\LengthAwarePaginator
+     */
+    private $p;
+
+    /**
+     * @var array
+     */
+    private $options;
+
+    protected function setUp(): void
     {
-        $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+        $this->options = ['onEachSide' => 5];
+        $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, $this->options);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->p);
     }
@@ -91,5 +102,10 @@ class LengthAwarePaginatorTest extends TestCase
 
         $this->assertEquals('http://website.com?key=value%20with%20spaces&foo=2',
                             $this->p->url($this->p->currentPage()));
+    }
+
+    public function testItRetrievesThePaginatorOptions()
+    {
+        $this->assertSame($this->options, $this->p->getOptions());
     }
 }

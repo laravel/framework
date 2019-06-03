@@ -113,7 +113,7 @@ class ResourceRegistrar
      */
     protected function prefixedResource($name, $controller, array $options)
     {
-        list($name, $prefix) = $this->getResourcePrefix($name);
+        [$name, $prefix] = $this->getResourcePrefix($name);
 
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
@@ -152,13 +152,17 @@ class ResourceRegistrar
      */
     protected function getResourceMethods($defaults, $options)
     {
+        $methods = $defaults;
+
         if (isset($options['only'])) {
-            return array_intersect($defaults, (array) $options['only']);
-        } elseif (isset($options['except'])) {
-            return array_diff($defaults, (array) $options['except']);
+            $methods = array_intersect($methods, (array) $options['only']);
         }
 
-        return $defaults;
+        if (isset($options['except'])) {
+            $methods = array_diff($methods, (array) $options['except']);
+        }
+
+        return $methods;
     }
 
     /**

@@ -16,7 +16,7 @@ class MigrateCommand extends BaseCommand
      */
     protected $signature = 'migrate {--database= : The database connection to use}
                 {--force : Force the operation to run when in production}
-                {--path= : The path to the migrations files to be executed}
+                {--path=* : The path(s) to the migrations files to be executed}
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
@@ -74,7 +74,7 @@ class MigrateCommand extends BaseCommand
         // Finally, if the "seed" option has been given, we will re-run the database
         // seed task to re-populate the database, which is convenient when adding
         // a migration and a seed at the same time, as it is only this command.
-        if ($this->option('seed')) {
+        if ($this->option('seed') && ! $this->option('pretend')) {
             $this->call('db:seed', ['--force' => true]);
         }
     }
@@ -89,9 +89,9 @@ class MigrateCommand extends BaseCommand
         $this->migrator->setConnection($this->option('database'));
 
         if (! $this->migrator->repositoryExists()) {
-            $this->call(
-                'migrate:install', ['--database' => $this->option('database')]
-            );
+            $this->call('migrate:install', array_filter([
+                '--database' => $this->option('database'),
+            ]));
         }
     }
 }

@@ -48,6 +48,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
@@ -83,7 +84,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
         );
 
         return tap(! $limiter->acquire(), function () use ($limiter) {
-            list($this->decaysAt, $this->remaining) = [
+            [$this->decaysAt, $this->remaining] = [
                 $limiter->decaysAt, $limiter->remaining,
             ];
         });
