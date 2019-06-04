@@ -1,12 +1,19 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.19...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.20...5.8)
+
+
+## [v5.8.20 (2019-06-04)](https://github.com/laravel/framework/compare/v5.8.19...v5.8.20)
 
 ### Added
 - Added `viewAny()` to dummy policy class ([#28654](https://github.com/laravel/framework/pull/28654), [#28671](https://github.com/laravel/framework/pull/28671))
+- Added `fullpath` option to `make:migration` command ([#28669](https://github.com/laravel/framework/pull/28669))
 
 ### Performance improvement
 - Improve performance for `Arr::collapse()` ([#28662](https://github.com/laravel/framework/pull/28662), [#28676](https://github.com/laravel/framework/pull/28676))
+
+### Fixed
+- Fixed `artisan cache:clear` command with a redis cluster using the Predis library ([#28706](https://github.com/laravel/framework/pull/28706))
 
 
 ## [v5.8.19 (2019-05-28)](https://github.com/laravel/framework/compare/v5.8.18...v5.8.19)
