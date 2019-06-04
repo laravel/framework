@@ -23,8 +23,8 @@
         "illuminate/filesystem": "5.9.*",
         "illuminate/support": "5.9.*",
         "opis/closure": "^3.1",
-        "symfony/debug": "^4.2",
-        "symfony/process": "^4.2"
+        "symfony/debug": "^4.3",
+        "symfony/process": "^4.3"
     },
     "autoload": {
         "psr-4": {
