@@ -539,7 +539,7 @@ class Migrator
      * Resolve the database connection instance.
      *
      * @param  string  $connection
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \Illuminate\Database\Connection
      */
     public function resolveConnection($connection)
     {
