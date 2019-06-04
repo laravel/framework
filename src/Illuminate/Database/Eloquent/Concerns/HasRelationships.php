@@ -47,14 +47,14 @@ trait HasRelationships
     /**
      * Define a one-to-one relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
-        $instance = $this->newRelatedInstance($related);
+        $instance = $this->relatedInstance($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
@@ -80,7 +80,7 @@ trait HasRelationships
     /**
      * Define a has-one-through relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $through
      * @param  string|null  $firstKey
      * @param  string|null  $secondKey
@@ -97,7 +97,7 @@ trait HasRelationships
         $secondKey = $secondKey ?: $through->getForeignKey();
 
         return $this->newHasOneThrough(
-            $this->newRelatedInstance($related)->newQuery(), $this, $through,
+            $this->relatedInstance($related)->newQuery(), $this, $through,
             $firstKey, $secondKey, $localKey ?: $this->getKeyName(),
             $secondLocalKey ?: $through->getKeyName()
         );
@@ -123,7 +123,7 @@ trait HasRelationships
     /**
      * Define a polymorphic one-to-one relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
@@ -132,7 +132,7 @@ trait HasRelationships
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
-        $instance = $this->newRelatedInstance($related);
+        $instance = $this->relatedInstance($related);
 
         [$type, $id] = $this->getMorphs($name, $type, $id);
 
@@ -161,7 +161,7 @@ trait HasRelationships
     /**
      * Define an inverse one-to-one or many relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relation
@@ -176,7 +176,7 @@ trait HasRelationships
             $relation = $this->guessBelongsToRelation();
         }
 
-        $instance = $this->newRelatedInstance($related);
+        $instance = $this->relatedInstance($related);
 
         // If no foreign key was supplied, we can use a backtrace to guess the proper
         // foreign key name by using the name of the relationship function, which
@@ -266,7 +266,7 @@ trait HasRelationships
      */
     protected function morphInstanceTo($target, $name, $type, $id, $ownerKey)
     {
-        $instance = $this->newRelatedInstance(
+        $instance = $this->relatedInstance(
             static::getActualClassNameForMorph($target)
         );
 
@@ -317,14 +317,14 @@ trait HasRelationships
     /**
      * Define a one-to-many relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $foreignKey
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
-        $instance = $this->newRelatedInstance($related);
+        $instance = $this->relatedInstance($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
@@ -352,7 +352,7 @@ trait HasRelationships
     /**
      * Define a has-many-through relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $through
      * @param  string|null  $firstKey
      * @param  string|null  $secondKey
@@ -369,7 +369,7 @@ trait HasRelationships
         $secondKey = $secondKey ?: $through->getForeignKey();
 
         return $this->newHasManyThrough(
-            $this->newRelatedInstance($related)->newQuery(), $this, $through,
+            $this->relatedInstance($related)->newQuery(), $this, $through,
             $firstKey, $secondKey, $localKey ?: $this->getKeyName(),
             $secondLocalKey ?: $through->getKeyName()
         );
@@ -395,7 +395,7 @@ trait HasRelationships
     /**
      * Define a polymorphic one-to-many relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
@@ -404,7 +404,7 @@ trait HasRelationships
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
-        $instance = $this->newRelatedInstance($related);
+        $instance = $this->relatedInstance($related);
 
         // Here we will gather up the morph type and ID for the relationship so that we
         // can properly query the intermediate table of a relation. Finally, we will
@@ -436,7 +436,7 @@ trait HasRelationships
     /**
      * Define a many-to-many relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
@@ -458,7 +458,7 @@ trait HasRelationships
         // First, we'll need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we'll make the query
         // instances as well as the relationship instances we need for this.
-        $instance = $this->newRelatedInstance($related);
+        $instance = $this->relatedInstance($related);
 
         $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
 
@@ -500,7 +500,7 @@ trait HasRelationships
     /**
      * Define a polymorphic many-to-many relationship.
      *
-     * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|string  $related
      * @param  string  $name
      * @param  string  $table
      * @param  string  $foreignPivotKey
@@ -519,7 +519,7 @@ trait HasRelationships
         // First, we will need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we will make the query
         // instances, as well as the relationship instances we need for these.
-        $instance = $this->newRelatedInstance($related);
+        $instance = $this->relatedInstance($related);
 
         $foreignPivotKey = $foreignPivotKey ?: $name.'_id';
 
@@ -710,14 +710,14 @@ trait HasRelationships
     }
 
     /**
-     * Create a new model instance for a related model.
+     * Returns a model instance for a related model.
      *
-     * @param  string  $class
+     * @param  \Illuminate\Database\Eloquent\Model|string  $class
      * @return mixed
      */
-    protected function newRelatedInstance($class)
+    protected function relatedInstance($class)
     {
-        return tap(new $class, function ($instance) {
+        return tap(is_string($class) ? new $class : $class, function ($instance) {
             if (! $instance->getConnectionName()) {
                 $instance->setConnection($this->connection);
             }

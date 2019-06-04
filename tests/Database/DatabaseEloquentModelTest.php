@@ -1039,6 +1039,12 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('save_stub.foo', $relation->getQualifiedForeignKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
+
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->hasOne(new EloquentModelSaveStub, 'foo');
+        $this->assertSame($model, $relation->getParent());
+        $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
     }
 
     public function testMorphOneCreatesProperRelation()
@@ -1048,6 +1054,11 @@ class DatabaseEloquentModelTest extends TestCase
         $relation = $model->morphOne(EloquentModelSaveStub::class, 'morph');
         $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
         $this->assertEquals('save_stub.morph_type', $relation->getQualifiedMorphType());
+        $this->assertEquals(EloquentModelStub::class, $relation->getMorphClass());
+
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->morphOne(new EloquentModelSaveStub, 'morph');
         $this->assertEquals(EloquentModelStub::class, $relation->getMorphClass());
     }
 
@@ -1077,6 +1088,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('save_stub.foo', $relation->getQualifiedForeignKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
+
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->hasMany(new EloquentModelSaveStub, 'foo');
+        $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
     }
 
     public function testMorphManyCreatesProperRelation()
@@ -1095,6 +1111,12 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
         $relation = $model->belongsToStub();
         $this->assertEquals('belongs_to_stub_id', $relation->getForeignKeyName());
+        $this->assertSame($model, $relation->getParent());
+        $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
+
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->belongsTo(new EloquentModelSaveStub);
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
 
@@ -1155,6 +1177,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('table.other', $relation->getQualifiedRelatedPivotKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
+
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->belongsToMany(new EloquentModelSaveStub);
+        $this->assertSame($model, $relation->getParent());
+        $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
+        $this->assertEquals(__FUNCTION__, $relation->getRelationName());
     }
 
     public function testRelationsWithVariedConnections()
