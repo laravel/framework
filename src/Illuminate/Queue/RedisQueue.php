@@ -49,7 +49,7 @@ class RedisQueue extends Queue implements QueueContract
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @param  int  $retryAfter
      * @param  int|null  $blockFor
      * @return void
@@ -66,7 +66,7 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Get the size of the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return int
      */
     public function size($queue = null)
@@ -83,7 +83,7 @@ class RedisQueue extends Queue implements QueueContract
      *
      * @param  object|string  $job
      * @param  mixed   $data
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -95,7 +95,7 @@ class RedisQueue extends Queue implements QueueContract
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @param  array   $options
      * @return mixed
      */
@@ -115,7 +115,7 @@ class RedisQueue extends Queue implements QueueContract
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  object|string  $job
      * @param  mixed   $data
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -128,7 +128,7 @@ class RedisQueue extends Queue implements QueueContract
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $payload
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     protected function laterRaw($delay, $payload, $queue = null)
@@ -159,7 +159,7 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)

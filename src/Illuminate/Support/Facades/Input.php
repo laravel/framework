@@ -51,7 +51,7 @@ class Input extends Facade
      *
      * This method is used for all request verbs (GET, POST, PUT, and DELETE)
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed   $default
      * @return mixed
      */

@@ -489,7 +489,7 @@ class Route
      * Set a regular expression requirement on the route.
      *
      * @param  array|string  $name
-     * @param  string  $expression
+     * @param  string|null  $expression
      * @return $this
      */
     public function where($name, $expression = null)
