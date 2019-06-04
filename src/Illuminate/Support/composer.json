@@ -41,8 +41,8 @@
         "illuminate/filesystem": "Required to use the composer class (5.9.*).",
         "moontoast/math": "Required to use ordered UUIDs (^1.1).",
         "ramsey/uuid": "Required to use Str::uuid() (^3.7).",
-        "symfony/process": "Required to use the composer class (^4.2).",
-        "symfony/var-dumper": "Required to use the dd function (^4.2).",
+        "symfony/process": "Required to use the composer class (^4.3).",
+        "symfony/var-dumper": "Required to use the dd function (^4.3).",
         "vlucas/phpdotenv": "Required to use the env helper (^3.3)."
     },
     "config": {

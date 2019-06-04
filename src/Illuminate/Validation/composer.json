@@ -21,7 +21,7 @@
         "illuminate/contracts": "5.9.*",
         "illuminate/support": "5.9.*",
         "illuminate/translation": "5.9.*",
-        "symfony/http-foundation": "^4.2"
+        "symfony/http-foundation": "^4.3"
     },
     "autoload": {
         "psr-4": {
