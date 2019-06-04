@@ -192,7 +192,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Resolve the database connection instance.
      *
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \Illuminate\Database\Connection
      */
     public function getConnection()
     {

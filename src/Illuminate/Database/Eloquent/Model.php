@@ -1208,7 +1208,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get the database connection for the model.
      *
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \Illuminate\Database\Connection
      */
     public function getConnection()
     {
@@ -1242,7 +1242,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Resolve a connection instance.
      *
      * @param  string|null  $connection
-     * @return \Illuminate\Database\ConnectionInterface
+     * @return \Illuminate\Database\Connection
      */
     public static function resolveConnection($connection = null)
     {
