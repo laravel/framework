@@ -159,7 +159,9 @@ abstract class GeneratorCommand extends Command
     {
         $stub = $this->files->get($this->getStub());
 
-        return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+        $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+
+        return $stub;
     }
 
     /**
@@ -196,13 +198,15 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $stub
      * @param  string  $name
-     * @return string
+     * @return $this
      */
-    protected function replaceClass($stub, $name)
+    protected function replaceClass(&$stub, $name)
     {
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
 
-        return str_replace('DummyClass', $class, $stub);
+        $stub = str_replace('DummyClass', $class, $stub);
+
+        return $this;
     }
 
     /**
