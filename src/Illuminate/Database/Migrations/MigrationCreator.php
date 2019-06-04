@@ -88,6 +88,8 @@ class MigrationCreator
      * @param  string  $table
      * @param  bool    $create
      * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function getStub($table, $create)
     {
