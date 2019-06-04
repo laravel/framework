@@ -139,7 +139,7 @@ class TestResponse
     /**
      * Assert whether the response is redirecting to a given URI.
      *
-     * @param  string  $uri
+     * @param  string|null  $uri
      * @return $this
      */
     public function assertRedirect($uri = null)
@@ -663,7 +663,7 @@ class TestResponse
     /**
      * Assert that the response has no JSON validation errors for the given keys.
      *
-     * @param  string|array  $keys
+     * @param  string|array|null  $keys
      * @return $this
      */
     public function assertJsonMissingValidationErrors($keys = null)
@@ -906,7 +906,7 @@ class TestResponse
      * Assert that the session is missing the given errors.
      *
      * @param  string|array  $keys
-     * @param  string  $format
+     * @param  string|null  $format
      * @param  string  $errorBag
      * @return $this
      */
