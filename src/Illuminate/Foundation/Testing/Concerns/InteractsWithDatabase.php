@@ -15,7 +15,7 @@ trait InteractsWithDatabase
      *
      * @param  string  $table
      * @param  array  $data
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
@@ -32,7 +32,7 @@ trait InteractsWithDatabase
      *
      * @param  string  $table
      * @param  array  $data
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseMissing($table, array $data, $connection = null)
@@ -51,7 +51,7 @@ trait InteractsWithDatabase
      *
      * @param  string|\Illuminate\Database\Eloquent\Model  $table
      * @param  array  $data
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return $this
      */
     protected function assertSoftDeleted($table, array $data = [], $connection = null)

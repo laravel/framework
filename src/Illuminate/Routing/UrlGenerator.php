@@ -113,7 +113,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  \Illuminate\Routing\RouteCollection  $routes
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $assetRoot
+     * @param  string|null  $assetRoot
      * @return void
      */
     public function __construct(RouteCollection $routes, Request $request, $assetRoot = null)
@@ -311,7 +311,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $name
      * @param  array  $parameters
-     * @param  \DateTimeInterface|\DateInterval|int  $expiration
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  bool  $absolute
      * @return string
      */
@@ -484,7 +484,7 @@ class UrlGenerator implements UrlGeneratorContract
      * Get the base URL for the request.
      *
      * @param  string  $scheme
-     * @param  string  $root
+     * @param  string|null  $root
      * @return string
      */
     public function formatRoot($scheme, $root = null)

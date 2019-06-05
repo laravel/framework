@@ -7,7 +7,7 @@ trait InteractsWithFlashData
     /**
      * Retrieve an old input item.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
      * @return string|array
      */

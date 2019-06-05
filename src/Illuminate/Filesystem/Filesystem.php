@@ -178,7 +178,7 @@ class Filesystem
      * Get or set UNIX mode of a file or directory.
      *
      * @param  string  $path
-     * @param  int  $mode
+     * @param  int|null  $mode
      * @return mixed
      */
     public function chmod($path, $mode = null)
@@ -488,7 +488,7 @@ class Filesystem
      *
      * @param  string  $directory
      * @param  string  $destination
-     * @param  int     $options
+     * @param  int|null  $options
      * @return bool
      */
     public function copyDirectory($directory, $destination, $options = null)
