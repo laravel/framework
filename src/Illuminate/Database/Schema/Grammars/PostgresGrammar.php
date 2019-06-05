@@ -200,7 +200,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all tables.
      *
-     * @param  string  $tables
+     * @param  array  $tables
      * @return string
      */
     public function compileDropAllTables($tables)
@@ -211,7 +211,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all views.
      *
-     * @param  string  $views
+     * @param  array  $views
      * @return string
      */
     public function compileDropAllViews($views)

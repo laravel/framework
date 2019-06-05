@@ -700,15 +700,15 @@ class Connection implements ConnectionInterface
     /**
      * Handle a query exception.
      *
-     * @param  \Exception  $e
+     * @param  \Illuminate\Database\QueryException  $e
      * @param  string  $query
      * @param  array  $bindings
      * @param  \Closure  $callback
      * @return mixed
      *
-     * @throws \Exception
+     * @throws \Illuminate\Database\QueryException
      */
-    protected function handleQueryException($e, $query, $bindings, Closure $callback)
+    protected function handleQueryException(QueryException $e, $query, $bindings, Closure $callback)
     {
         if ($this->transactions >= 1) {
             throw $e;

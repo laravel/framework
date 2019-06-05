@@ -181,7 +181,7 @@ class Factory implements FactoryContract
      *
      * @param  string  $rule
      * @param  \Closure|string  $extension
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     public function extend($rule, $extension, $message = null)
@@ -198,7 +198,7 @@ class Factory implements FactoryContract
      *
      * @param  string  $rule
      * @param  \Closure|string  $extension
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     public function extendImplicit($rule, $extension, $message = null)
@@ -215,7 +215,7 @@ class Factory implements FactoryContract
      *
      * @param  string  $rule
      * @param  \Closure|string  $extension
-     * @param  string  $message
+     * @param  string|null  $message
      * @return void
      */
     public function extendDependent($rule, $extension, $message = null)

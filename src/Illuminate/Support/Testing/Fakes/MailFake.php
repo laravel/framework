@@ -267,7 +267,7 @@ class MailFake implements Mailer, MailQueue
      *
      * @param  string  $text
      * @param  \Closure|string  $callback
-     * @return int
+     * @return void
      */
     public function raw($text, $callback)
     {

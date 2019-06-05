@@ -119,7 +119,7 @@ class Store implements Session
     /**
      * Save the session data to storage.
      *
-     * @return bool
+     * @return void
      */
     public function save()
     {
@@ -211,7 +211,7 @@ class Store implements Session
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
-     * @param  string  $default
+     * @param  string|null  $default
      * @return mixed
      */
     public function pull($key, $default = null)
@@ -222,7 +222,7 @@ class Store implements Session
     /**
      * Determine if the session contains old input.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @return bool
      */
     public function hasOldInput($key = null)
@@ -235,7 +235,7 @@ class Store implements Session
     /**
      * Get the requested item from the flashed input array.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed   $default
      * @return mixed
      */

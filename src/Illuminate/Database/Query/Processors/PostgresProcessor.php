@@ -12,7 +12,7 @@ class PostgresProcessor extends Processor
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $sql
      * @param  array   $values
-     * @param  string  $sequence
+     * @param  string|null  $sequence
      * @return int
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)

@@ -63,7 +63,7 @@ abstract class Queue
      *
      * @param  array   $jobs
      * @param  mixed   $data
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return void
      */
     public function bulk($jobs, $data = '', $queue = null)

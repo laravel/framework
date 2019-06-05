@@ -58,7 +58,7 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Get the size of the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return int
      */
     public function size($queue = null)
@@ -73,7 +73,7 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string  $job
      * @param  mixed   $data
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -87,7 +87,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @param  array   $options
      * @return mixed
      */
@@ -102,7 +102,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return void
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -117,7 +117,7 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  array   $jobs
      * @param  mixed   $data
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function bulk($jobs, $data = '', $queue = null)
@@ -186,7 +186,7 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      *
      * @throws \Exception|\Throwable
