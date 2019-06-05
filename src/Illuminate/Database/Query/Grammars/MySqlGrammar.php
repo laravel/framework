@@ -259,7 +259,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
-     * @param  array  $where
+     * @param  string  $where
      * @return string
      */
     protected function compileDeleteWithoutJoins($query, $table, $where)
@@ -285,7 +285,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
-     * @param  array  $where
+     * @param  string  $where
      * @return string
      */
     protected function compileDeleteWithJoins($query, $table, $where)
