@@ -469,7 +469,7 @@ trait HasAttributes
      */
     protected function castAttribute($key, $value)
     {
-        list($type, $argument) = array_pad(explode(':', $this->getCasts()[$key], 2), 2, '');
+        [$type, $argument] = array_pad(explode(':', $this->getCasts()[$key], 2), 2, '');
 
         if (is_null($value) && $argument !== 'always') {
             return $value;
