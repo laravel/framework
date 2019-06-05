@@ -313,6 +313,22 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the command to drop all foreign keys
+     *
+     * @return string
+     */
+    public function dropAllForeignKeys()
+    {
+        return "DECLARE @sql NVARCHAR(MAX) = N'';
+            SELECT @sql += 'ALTER TABLE ' + QUOTENAME(OBJECT_SCHEMA_NAME(parent_object_id))
+                + '.' + QUOTENAME(OBJECT_NAME(parent_object_id)) + 
+                ' DROP CONSTRAINT ' + QUOTENAME(name) + ';'
+            FROM sys.foreign_keys;
+            
+            EXEC sp_executesql @sql;";
+    }
+
+    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column

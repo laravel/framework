@@ -268,6 +268,18 @@ class Builder
     }
 
     /**
+     * Drop all foreign keys from the database.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function dropAllForeignKeys()
+    {
+        throw new LogicException('This database driver does not support dropping all foreign keys.');
+    }
+
+    /**
      * Execute the blueprint to build / modify the table.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
