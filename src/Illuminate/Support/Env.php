@@ -69,7 +69,7 @@ class Env
                 static::$putenv ? [new PutenvAdapter] : []
             );
 
-            static::$factory = (new DotenvFactory($adapters))
+            static::$factory = new DotenvFactory($adapters);
         }
 
         return static::$factory;
