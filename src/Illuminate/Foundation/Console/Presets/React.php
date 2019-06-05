@@ -32,8 +32,8 @@ class React extends Preset
     {
         return [
             '@babel/preset-react' => '^7.0.0',
-            'react' => '^16.2.0',
-            'react-dom' => '^16.2.0',
+            'react' => '^16.8.6',
+            'react-dom' => '^16.8.6',
         ] + Arr::except($packages, ['vue', 'vue-template-compiler']);
     }
 
