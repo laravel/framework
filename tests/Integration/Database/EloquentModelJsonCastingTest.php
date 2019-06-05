@@ -25,6 +25,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
             $table->json('array_as_json_field')->nullable();
             $table->json('object_as_json_field')->nullable();
             $table->json('collection_as_json_field')->nullable();
+            $table->json('collection_always_as_json_field')->nullable();
         });
     }
 
@@ -74,6 +75,17 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $this->assertInstanceOf(Collection::class, $user->collection_as_json_field);
         $this->assertEquals('value1', $user->collection_as_json_field->get('key1'));
     }
+
+    public function test_null_collections_are_castable()
+    {
+        /** @var JsonCast $user */
+        $user = JsonCast::create([
+            'collection_always_as_json_field' => null,
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $user->collection_always_as_json_field);
+        $this->assertCount(0, $user->collection_always_as_json_field);
+    }
 }
 
 /**
@@ -82,6 +94,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
  * @property $array_as_json_field
  * @property $object_as_json_field
  * @property $collection_as_json_field
+ * @property $collection_always_as_json_field
  */
 class JsonCast extends Model
 {
@@ -95,5 +108,6 @@ class JsonCast extends Model
         'array_as_json_field' => 'array',
         'object_as_json_field' => 'object',
         'collection_as_json_field' => 'collection',
+        'collection_always_as_json_field' => 'collection:always',
     ];
 }

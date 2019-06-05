@@ -469,11 +469,13 @@ trait HasAttributes
      */
     protected function castAttribute($key, $value)
     {
-        if (is_null($value)) {
+        list($type, $argument) = array_pad(explode(':', $this->getCasts()[$key], 2), 2, '');
+
+        if (is_null($value) && $argument !== 'always') {
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
+        switch ($type) {
             case 'int':
             case 'integer':
                 return (int) $value;
@@ -482,7 +484,7 @@ trait HasAttributes
             case 'double':
                 return $this->fromFloat($value);
             case 'decimal':
-                return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
+                return $this->asDecimal($value, $argument);
             case 'string':
                 return (string) $value;
             case 'bool':
