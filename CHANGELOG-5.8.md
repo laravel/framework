@@ -1,6 +1,12 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.20...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.21...5.8)
+
+
+## [v5.8.21 (2019-06-05)](https://github.com/laravel/framework/compare/v5.8.20...v5.8.21)
+
+### Fixed
+- Fixed redis cluster connection parsing ([2bcb405](https://github.com/laravel/framework/commit/2bcb405ddc9ed69355513de5f2396dc658fd004d))
 
 
 ## [v5.8.20 (2019-06-04)](https://github.com/laravel/framework/compare/v5.8.19...v5.8.20)
