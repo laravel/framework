@@ -328,11 +328,14 @@ if (! function_exists('csrf_field')) {
     /**
      * Generate a CSRF token form field.
      *
+     * @param  string  $id
+     *
      * @return \Illuminate\Support\HtmlString
      */
-    function csrf_field()
+    function csrf_field($id = null)
     {
-        return new HtmlString('<input type="hidden" name="_token" value="'.csrf_token().'">');
+        $id_attribute = $id ? 'id="'.$id.'"' : '';
+        return new HtmlString('<input type="hidden" name="_token" value="'.csrf_token().'" '.$id_attribute.'>');
     }
 }
 

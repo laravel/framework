@@ -7,11 +7,12 @@ trait CompilesHelpers
     /**
      * Compile the CSRF statements into valid PHP.
      *
+     * @param  string  $arguments
      * @return string
      */
-    protected function compileCsrf()
+    protected function compileCsrf($arguments)
     {
-        return '<?php echo csrf_field(); ?>';
+        return "<?php echo csrf_field{$arguments}; ?>";
     }
 
     /**
