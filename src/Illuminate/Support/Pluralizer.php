@@ -45,6 +45,7 @@ class Pluralizer
         'pokemon',
         'police',
         'rain',
+        'related',
         'rice',
         'series',
         'sheep',
