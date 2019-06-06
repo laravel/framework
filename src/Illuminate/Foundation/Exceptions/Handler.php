@@ -11,8 +11,8 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\ViewErrorBag;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
@@ -21,8 +21,8 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -152,6 +152,7 @@ class Handler implements ExceptionHandlerContract
     {
         try {
             $guard = $this->container->make(Guard::class);
+
             return array_filter([
                 'userId' => $guard->id(),
                 // 'email' => optional(Auth::user())->email,
@@ -417,7 +418,7 @@ class Handler implements ExceptionHandlerContract
         $this->container->make(ViewFactory::class)
             ->replaceNamespace('errors', $paths->map(function ($path) {
                 return "{$path}/errors";
-        })->push(__DIR__.'/views')->all());
+            })->push(__DIR__.'/views')->all());
     }
 
     /**
