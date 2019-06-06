@@ -11,7 +11,7 @@ class SqlServerBuilder extends Builder
      */
     public function dropAllTables()
     {
-        $this->connection->statement($this->grammar->dropAllForeignKeys());
+        $this->connection->statement($this->grammar->compileDropAllForeignKeys());
         $this->connection->statement($this->grammar->compileDropAllTables());
     }
 }

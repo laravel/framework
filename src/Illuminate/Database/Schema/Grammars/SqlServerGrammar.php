@@ -317,7 +317,7 @@ class SqlServerGrammar extends Grammar
      *
      * @return string
      */
-    public function dropAllForeignKeys()
+    public function compileDropAllForeignKeys()
     {
         return "DECLARE @sql NVARCHAR(MAX) = N'';
             SELECT @sql += 'ALTER TABLE ' + QUOTENAME(OBJECT_SCHEMA_NAME(parent_object_id))
