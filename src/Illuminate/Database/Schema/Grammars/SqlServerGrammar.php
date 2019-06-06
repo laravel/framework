@@ -313,7 +313,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile the command to drop all foreign keys
+     * Compile the command to drop all foreign keys.
      *
      * @return string
      */
