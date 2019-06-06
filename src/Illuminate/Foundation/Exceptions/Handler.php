@@ -10,17 +10,19 @@ use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\View;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\ViewErrorBag;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -149,8 +151,9 @@ class Handler implements ExceptionHandlerContract
     protected function context()
     {
         try {
+            $guard = $this->container->make(Guard::class);
             return array_filter([
-                'userId' => Auth::id(),
+                'userId' => $guard->id(),
                 // 'email' => optional(Auth::user())->email,
             ]);
         } catch (Throwable $e) {
@@ -213,12 +216,29 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Auth\AuthenticationException  $exception
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $request->expectsJson()
-                    ? response()->json(['message' => $exception->getMessage()], 401)
-                    : redirect()->guest($exception->redirectTo() ?? route('login'));
+                    ? new JsonResponse(['message' => $exception->getMessage()], 401)
+                    : $this->prepareRedirectResponse($request, $exception);
+    }
+
+    /**
+     * Prepare redirect response for authentication exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function prepareRedirectResponse($request, AuthenticationException $exception)
+    {
+        return $this->container->make(Redirector::class)
+            ->guest(
+                $exception->redirectTo() ?? $this->container->make(UrlGenerator::class)->route('login')
+            );
     }
 
     /**
@@ -244,13 +264,15 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Validation\ValidationException  $exception
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function invalid($request, ValidationException $exception)
     {
-        return redirect($exception->redirectTo ?? url()->previous())
-                    ->withInput(Arr::except($request->input(), $this->dontFlash))
-                    ->withErrors($exception->errors(), $exception->errorBag);
+        return redirect(
+            $exception->redirectTo ?? $this->container->make(UrlGenerator::class)->previous()
+        )->withInput(Arr::except($request->input(), $this->dontFlash))
+            ->withErrors($exception->errors(), $exception->errorBag);
     }
 
     /**
@@ -262,7 +284,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalidJson($request, ValidationException $exception)
     {
-        return response()->json([
+        return new JsonResponse([
             'message' => $exception->getMessage(),
             'errors' => $exception->errors(),
         ], $exception->status);
@@ -372,12 +394,12 @@ class Handler implements ExceptionHandlerContract
     protected function renderHttpException(HttpExceptionInterface $e)
     {
         $this->registerErrorViewPaths();
-
-        if (view()->exists($view = "errors::{$e->getStatusCode()}")) {
-            return response()->view($view, [
+        $viewFactory = $this->container->make(ViewFactory::class);
+        if ($viewFactory->exists($view = "errors::{$e->getStatusCode()}")) {
+            return new Response($viewFactory->make($view, [
                 'errors' => new ViewErrorBag,
                 'exception' => $e,
-            ], $e->getStatusCode(), $e->getHeaders());
+            ]), $e->getStatusCode(), $e->getHeaders());
         }
 
         return $this->convertExceptionToResponse($e);
@@ -392,8 +414,9 @@ class Handler implements ExceptionHandlerContract
     {
         $paths = collect(config('view.paths'));
 
-        View::replaceNamespace('errors', $paths->map(function ($path) {
-            return "{$path}/errors";
+        $this->container->make(ViewFactory::class)
+            ->replaceNamespace('errors', $paths->map(function ($path) {
+                return "{$path}/errors";
         })->push(__DIR__.'/views')->all());
     }
 
