@@ -199,14 +199,14 @@ class Factory implements FactoryContract
         $path = Str::finish($path, '/');
         $mask = $data['mask'] ?? '*';
 
-        $resource = resource_path('views/' . str_replace('.', '/', $this->normalizeName($path)));
+        $resource = resource_path('views/'.str_replace('.', '/', $this->normalizeName($path)));
         $resource = Str::finish($resource, '/');
 
         $data = array_merge($mergeData, Arr::except($this->parseData($data), ['mask']));
 
-        foreach (glob($resource . $mask) as $view) {
+        foreach (glob($resource.$mask) as $view) {
             $filename = Arr::first(explode('.', pathinfo($view, PATHINFO_FILENAME)));
-            $view = $path . $filename;
+            $view = $path.$filename;
 
             $result .= $this->make($view, $data, $mergeData)->render();
         }
