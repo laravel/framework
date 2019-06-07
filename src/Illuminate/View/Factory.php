@@ -203,7 +203,7 @@ class Factory implements FactoryContract
         $data = array_merge($mergeData, $this->parseData($data));
 
         foreach ($items as $item) {
-            if (!$item->isDir()) {
+            if (! $item->isDir()) {
                 $filename = Arr::first(explode('.', $item->getFilename()));
                 $view = $path.'.'.$filename;
 
