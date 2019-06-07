@@ -858,25 +858,16 @@ class Builder
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if (! $this->model->usesTimestamps() ||
-            is_null($this->model->getUpdatedAtColumn())) {
-            return $values;
+        if ($this->model->usesTimestamps() &&
+            ($column = $this->model->getUpdatedAtColumn()) !== null) {
+            $segments = preg_split('/\s+as\s+/i', $this->query->from);
+
+            $qualifiedColumn = end($segments).'.'.$column;
+
+            $values[$qualifiedColumn] = $values[$column] ?? $this->model->freshTimestampString();
+
+            unset($values[$column]);
         }
-
-        $column = $this->model->getUpdatedAtColumn();
-
-        $values = array_merge(
-            [$column => $this->model->freshTimestampString()],
-            $values
-        );
-
-        $segments = preg_split('/\s+as\s+/i', $this->query->from);
-
-        $qualifiedColumn = end($segments).'.'.$column;
-
-        $values[$qualifiedColumn] = $values[$column];
-
-        unset($values[$column]);
 
         return $values;
     }
