@@ -2,6 +2,7 @@
 
 namespace Illuminate\View;
 
+use FilesystemIterator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -180,6 +181,37 @@ class Factory implements FactoryContract
         }
 
         return $this->make($view, $this->parseData($data), $mergeData)->render();
+    }
+
+    /**
+     * Get the rendered content of the view based on a given condition from all files
+     * in the specified folder.
+     *
+     * @param string $path
+     * @param array $data
+     * @param array $mergeData
+     *
+     * @return string
+     */
+    public function renderAll($path, $data = [], $mergeData = [])
+    {
+        $result = '';
+
+        $dir = resource_path('views/'.str_replace('.', '/', $this->normalizeName($path)));
+        $items = new FilesystemIterator($dir);
+
+        $data = array_merge($mergeData, $this->parseData($data));
+
+        foreach ($items as $item) {
+            if (!$item->isDir()) {
+                $filename = Arr::first(explode('.', $item->getFilename()));
+                $view = $path.'.'.$filename;
+
+                $result .= $this->make($view, $data, $mergeData)->render();
+            }
+        }
+
+        return $result;
     }
 
     /**
