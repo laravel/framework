@@ -183,6 +183,38 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Get the rendered content of the view based on a given condition from all files
+     * in the specified folder.
+     *
+     * @param string $path
+     * @param array $data
+     * @param array $mergeData
+     *
+     * @return string
+     */
+    public function renderAll($path, $data = [], $mergeData = [])
+    {
+        $result = '';
+
+        $path = Str::finish($path, '/');
+        $mask = $data['mask'] ?? '*';
+
+        $resource = resource_path('views/' . str_replace('.', '/', $this->normalizeName($path)));
+        $resource = Str::finish($resource, '/');
+
+        $data = array_merge($mergeData, Arr::except($this->parseData($data), ['mask']));
+
+        foreach (glob($resource . $mask) as $view) {
+            $filename = Arr::first(explode('.', pathinfo($view, PATHINFO_FILENAME)));
+            $view = $path . $filename;
+
+            $result .= $this->make($view, $data, $mergeData)->render();
+        }
+
+        return $result;
+    }
+
+    /**
      * Get the rendered contents of a partial from a loop.
      *
      * @param  string  $view

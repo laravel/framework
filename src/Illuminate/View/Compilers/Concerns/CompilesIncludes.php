@@ -29,6 +29,19 @@ trait CompilesIncludes
     }
 
     /**
+     * Compile the include statements into valid PHP for all views from the specified folder.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIncludeAll($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return "<?php echo \$__env->renderAll($expression, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path'])); ?>";
+    }
+
+    /**
      * Compile the include-if statements into valid PHP.
      *
      * @param  string  $expression
