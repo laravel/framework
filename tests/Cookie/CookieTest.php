@@ -6,7 +6,6 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
 
 class CookieTest extends TestCase
 {
