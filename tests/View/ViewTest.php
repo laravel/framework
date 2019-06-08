@@ -69,7 +69,7 @@ class ViewTest extends TestCase
             return '';
         }));
 
-        $this->assertEquals('contents', $view->render(function () {
+        $this->assertEquals('contents'.PHP_EOL, $view->render(function () {
             //
         }));
     }
@@ -99,8 +99,8 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('decrementRender')->twice();
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->twice();
 
-        $this->assertEquals('contents', $view->render());
-        $this->assertEquals('contents', (string) $view);
+        $this->assertEquals('contents'.PHP_EOL, $view->render());
+        $this->assertEquals('contents'.PHP_EOL, (string) $view);
     }
 
     public function testViewNestBindsASubView()
@@ -192,7 +192,7 @@ class ViewTest extends TestCase
 
         $view->renderable = m::mock(Renderable::class);
         $view->renderable->shouldReceive('render')->once()->andReturn('text');
-        $this->assertEquals('contents', $view->render());
+        $this->assertEquals('contents'.PHP_EOL, $view->render());
     }
 
     public function testViewRenderSections()

@@ -341,7 +341,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileStatements($value)
     {
         return preg_replace_callback(
-            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function ($match) {
+            '/\B([\h]*)@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?4) )* \))?/x', function ($match) {
                 return $this->compileStatement($match);
             }, $value
         );
@@ -355,15 +355,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileStatement($match)
     {
-        if (Str::contains($match[1], '@')) {
-            $match[0] = isset($match[3]) ? $match[1].$match[3] : $match[1];
-        } elseif (isset($this->customDirectives[$match[1]])) {
-            $match[0] = $this->callCustomDirective($match[1], Arr::get($match, 3));
-        } elseif (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
-            $match[0] = $this->$method(Arr::get($match, 3));
+        if (Str::contains($match[2], '@')) {
+            $match[0] = isset($match[4]) ? $match[1].$match[2].$match[4] : $match[1].$match[2];
+        } elseif (isset($this->customDirectives[$match[2]])) {
+            $match[0] = $match[1].$this->callCustomDirective($match[2], Arr::get($match, 4));
+        } elseif (method_exists($this, $method = 'compile'.ucfirst($match[2]))) {
+            $match[0] = $match[1].$this->$method(Arr::get($match, 4), $match[1]);
         }
 
-        return isset($match[3]) ? $match[0] : $match[0].$match[2];
+        return isset($match[4]) ? $match[0] : $match[0].$match[3];
     }
 
     /**

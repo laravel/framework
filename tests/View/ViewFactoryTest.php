@@ -346,7 +346,7 @@ class ViewFactoryTest extends TestCase
         $factory->endSlot();
         echo 'component';
         $contents = $factory->renderComponent();
-        $this->assertEquals('title<hr> component Taylor laravel.com', $contents);
+        $this->assertEquals('title<hr> component Taylor laravel.com'.PHP_EOL, $contents);
     }
 
     public function testTranslation()

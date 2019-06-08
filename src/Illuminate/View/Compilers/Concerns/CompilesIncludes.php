@@ -18,52 +18,56 @@ trait CompilesIncludes
     /**
      * Compile the include statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     * @param string $indenting
      * @return string
      */
-    protected function compileInclude($expression)
+    protected function compileInclude($expression, $indenting = '')
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php echo \$__env->make({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
+        return "<?php echo \$__env->make({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']) + ['indenting' => '" . $indenting . "'])->render(); ?>";
     }
 
     /**
      * Compile the include-if statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     * @param string $indenting
      * @return string
      */
-    protected function compileIncludeIf($expression)
+    protected function compileIncludeIf($expression, $indenting = '')
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php if (\$__env->exists({$expression})) echo \$__env->make({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
+        return "<?php if (\$__env->exists({$expression})) echo \$__env->make({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']) + ['indenting' => '" . $indenting . "'])->render(); ?>";
     }
 
     /**
      * Compile the include-when statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     * @param string $indenting
      * @return string
      */
-    protected function compileIncludeWhen($expression)
+    protected function compileIncludeWhen($expression, $indenting = '')
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php echo \$__env->renderWhen($expression, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path'])); ?>";
+        return "<?php echo \$__env->renderWhen($expression, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']) + ['indenting' => '" . $indenting . "']); ?>";
     }
 
     /**
      * Compile the include-first statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     * @param string $indenting
      * @return string
      */
-    protected function compileIncludeFirst($expression)
+    protected function compileIncludeFirst($expression, $indenting = '')
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php echo \$__env->first({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
+        return "<?php echo \$__env->first({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']) + ['indenting' => '" . $indenting . "'])->render(); ?>";
     }
 }
