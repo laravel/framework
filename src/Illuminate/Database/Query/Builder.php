@@ -78,7 +78,9 @@ class Builder
     /**
      * Indicates if the query returns distinct results.
      *
-     * @var array|bool
+     * Occasionally contains the columns that should be distinct.
+     *
+     * @var bool|array
      */
     public $distinct = false;
 
