@@ -6,7 +6,6 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
 
 class CookieTest extends TestCase
 {
@@ -99,11 +98,6 @@ class CookieTest extends TestCase
 
     public function getCreator()
     {
-        return new CookieJar(Request::create('/foo', 'GET'), [
-            'path'     => '/path',
-            'domain'   => '/domain',
-            'secure'   => true,
-            'httpOnly' => false,
-        ]);
+        return new CookieJar;
     }
 }
