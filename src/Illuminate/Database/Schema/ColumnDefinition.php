@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Schema;
 
-use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Query\Expression;
 
 /**
  * @method ColumnDefinition after(string $column) Place the column "after" another column (MySQL)
