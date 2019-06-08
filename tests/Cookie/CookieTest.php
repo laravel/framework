@@ -99,11 +99,6 @@ class CookieTest extends TestCase
 
     public function getCreator()
     {
-        return new CookieJar(Request::create('/foo', 'GET'), [
-            'path'     => '/path',
-            'domain'   => '/domain',
-            'secure'   => true,
-            'httpOnly' => false,
-        ]);
+        return new CookieJar;
     }
 }
