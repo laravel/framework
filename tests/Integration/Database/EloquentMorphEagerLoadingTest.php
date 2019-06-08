@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentMorphToLazyEagerLoadingTest;
+namespace Illuminate\Tests\Integration\Database\EloquentMorphEagerLoadingTest;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -50,7 +50,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         $comments = Comment::query()
             ->with(['commentable' => function (MorphTo $morphTo) {
-                $morphTo->withMorph([Post::class => ['user']]);
+                $morphTo->morphWith([Post::class => ['user']]);
             }])
             ->get();
 
@@ -63,7 +63,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         $comments = Comment::query()
             ->with(['commentable' => function (MorphTo $morphTo) {
-                $morphTo->withMorph([Post::class => 'user']);
+                $morphTo->morphWith([Post::class => 'user']);
             }])
             ->get();
 

@@ -42,7 +42,7 @@ class MorphTo extends BelongsTo
      *
      * @var array
      */
-    protected $typedEagerLoads = [];
+    protected $morphableEagerLoads = [];
 
     /**
      * Create a new morph to relationship instance.
@@ -120,7 +120,7 @@ class MorphTo extends BelongsTo
                             ->mergeConstraintsFrom($this->getQuery())
                             ->with(array_merge(
                                 $this->getQuery()->getEagerLoads(),
-                                (array) ($this->typedEagerLoads[get_class($instance)] ?? [])
+                                (array) ($this->morphableEagerLoads[get_class($instance)] ?? [])
                             ));
 
         return $query->whereIn(
@@ -269,11 +269,10 @@ class MorphTo extends BelongsTo
      * @param  array  $with
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function withMorph(array $with)
+    public function morphWith(array $with)
     {
-        $this->typedEagerLoads = array_merge(
-            $this->typedEagerLoads,
-            $with
+        $this->morphableEagerLoads = array_merge(
+            $this->morphableEagerLoads, $with
         );
 
         return $this;
