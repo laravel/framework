@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Exception;
 use Illuminate\Console\Command;
 
 class UpCommand extends Command
@@ -27,8 +28,19 @@ class UpCommand extends Command
      */
     public function handle()
     {
-        @unlink(storage_path('framework/down'));
+        try {
+            if (! file_exists(storage_path('framework/down'))) {
+                $this->comment('Application is already up.');
 
-        $this->info('Application is now live.');
+                return true;
+            }
+            unlink(storage_path('framework/down'));
+            $this->info('Application is now live.');
+        } catch (Exception $e) {
+            $this->error('Application is failed to up.');
+            $this->error($e->getMessage());
+
+            return false;
+        }
     }
 }
