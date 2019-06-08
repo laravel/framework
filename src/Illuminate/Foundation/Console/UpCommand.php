@@ -24,7 +24,7 @@ class UpCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
@@ -34,13 +34,16 @@ class UpCommand extends Command
 
                 return true;
             }
+
             unlink(storage_path('framework/down'));
+
             $this->info('Application is now live.');
         } catch (Exception $e) {
-            $this->error('Application is failed to up.');
+            $this->error('Failed to disable maintenance mode.');
+
             $this->error($e->getMessage());
 
-            return false;
+            return 1;
         }
     }
 }

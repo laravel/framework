@@ -29,7 +29,7 @@ class DownCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
@@ -37,12 +37,14 @@ class DownCommand extends Command
             file_put_contents(storage_path('framework/down'),
                               json_encode($this->getDownFilePayload(),
                               JSON_PRETTY_PRINT));
+
             $this->comment('Application is now in maintenance mode.');
         } catch (Exception $e) {
-            $this->error('Application is failed to enter maintenance mode.');
+            $this->error('Failed to enter maintenance mode.');
+
             $this->error($e->getMessage());
 
-            return false;
+            return 1;
         }
     }
 
