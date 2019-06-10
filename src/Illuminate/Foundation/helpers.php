@@ -860,6 +860,19 @@ if (! function_exists('today')) {
     }
 }
 
+if (! function_exists('tomorrow')) {
+    /**
+     *  Create a new Carbon instance for tomorrow.
+     *
+     * @param  \DateTimeZone|string|null $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function tomorrow($tz = null)
+    {
+        return Date::tomorrow($tz);
+    }
+}
+
 if (! function_exists('trans')) {
     /**
      * Translate the given message.
