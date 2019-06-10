@@ -4103,27 +4103,26 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [
             'testvalid' => 'filled',
             'testinvalid' => '',
-            'records' =>
-            [
+            'records' => [
                 'ABC123',
                 'ABC122',
                 'ABB132',
-                'ADCD23'
-            ]
-        ],[
+                'ADCD23',
+            ],
+        ], [
             'testvalid' => 'filled',
             'testinvalid' => 'filled',
             'records.*' => [
                 'required',
-                'regex:/[A-F]{3}[0-9]{3}/'
-            ]
+                'regex:/[A-F]{3}[0-9]{3}/',
+            ],
         ]);
 
         $this->assertEquals($v->invalid(), [
             'testinvalid' => '',
             'records' => [
-                3 => 'ADCD23'
-            ]
+                3 => 'ADCD23',
+            ],
         ]);
     }
 
