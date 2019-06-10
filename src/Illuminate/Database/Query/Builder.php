@@ -345,6 +345,21 @@ class Builder
     }
 
     /**
+     * Remove select columns to the query.
+     *
+     * @param  array|mixed  $column
+     * @return $this
+     */
+    public function removeSelect($column)
+    {
+        $column = is_array($column) ? $column : func_get_args();
+
+        $this->columns = array_diff((array) $this->columns, $column);
+
+        return $this;
+    }
+
+    /**
      * Force the query to only return distinct results.
      *
      * @return $this
