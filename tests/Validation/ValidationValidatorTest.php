@@ -4101,28 +4101,28 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, [
-            "testvalid" => "filled",
-            "testinvalid" => "",
-            "records" =>
+            'testvalid' => 'filled',
+            'testinvalid' => '',
+            'records' =>
             [
-                "ABC123",
-                "ABC122",
-                "ABB132",
-                "ADCD23"
+                'ABC123',
+                'ABC122',
+                'ABB132',
+                'ADCD23'
             ]
         ],[
-            "testvalid" => "filled",
-            "testinvalid" => "filled",
-            "records.*" => [
-                "required",
-                "regex:/[A-F]{3}[0-9]{3}/"
+            'testvalid' => 'filled',
+            'testinvalid' => 'filled',
+            'records.*' => [
+                'required',
+                'regex:/[A-F]{3}[0-9]{3}/'
             ]
         ]);
 
         $this->assertEquals($v->invalid(), [
             'testinvalid' => '',
             'records' => [
-                3 => "ADCD23"
+                3 => 'ADCD23'
             ]
         ]);
     }

@@ -661,7 +661,7 @@ class Validator implements ValidatorContract
 
         $result = [];
         $failed = array_only(array_dot($invalid), array_keys($this->failed()));
-        foreach($failed as $key => $failure){
+        foreach ($failed as $key => $failure){
             array_set($result, $key, $failure);
         }
 
