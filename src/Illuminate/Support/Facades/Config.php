@@ -3,12 +3,17 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static bool has($key)
- * @method static mixed get($key, $default = null)
+ * @method static bool has(string $key)
+ * @method static mixed get(array|string $key, mixed $default = null)
+ * @method static array getMany(array $keys)
+ * @method static void set(array|string $key, mixed $value = null)
+ * @method static void prepend(string $key, mixed $value)
+ * @method static void push(string $key, mixed $value)
  * @method static array all()
- * @method static void set($key, $value = null)
- * @method static void prepend($key, $value)
- * @method static void push($key, $value)
+ * @method static bool offsetExists(string $key)
+ * @method static mixed offsetGet(string $key)
+ * @method static void offsetSet(string $key, mixed $value)
+ * @method static void offsetUnset(string $key)
  *
  * @see \Illuminate\Config\Repository
  */
