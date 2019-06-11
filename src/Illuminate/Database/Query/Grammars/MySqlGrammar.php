@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
 
@@ -65,7 +64,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonContains($column, $value)
     {
-        return 'json_contains('.$this->wrap($column).', '.$value.')';
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+
+        return 'json_contains('.$field.', '.$value.$path.')';
     }
 
     /**
@@ -316,16 +317,8 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $delimiter = Str::contains($value, '->>')
-            ? '->>'
-            : '->';
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
-        $path = explode($delimiter, $value);
-
-        $field = $this->wrapSegments(explode('.', array_shift($path)));
-
-        return sprintf('%s'.$delimiter.'\'$.%s\'', $field, collect($path)->map(function ($part) {
-            return '"'.$part.'"';
-        })->implode('.'));
+        return 'json_unquote(json_extract('.$field.$path.'))';
     }
 }

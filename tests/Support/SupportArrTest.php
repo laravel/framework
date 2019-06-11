@@ -321,6 +321,12 @@ class SupportArrTest extends TestCase
 
         $this->assertFalse(Arr::has([], [null]));
         $this->assertFalse(Arr::has(null, [null]));
+
+        $this->assertTrue(Arr::has(['' => 'some'], ''));
+        $this->assertTrue(Arr::has(['' => 'some'], ['']));
+        $this->assertFalse(Arr::has([''], ''));
+        $this->assertFalse(Arr::has([], ''));
+        $this->assertFalse(Arr::has([], ['']));
     }
 
     public function testIsAssoc()

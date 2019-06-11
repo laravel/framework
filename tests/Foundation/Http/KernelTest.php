@@ -18,7 +18,7 @@ class KernelTest extends TestCase
     }
 
     /**
-     * @return \Illuminate\Foundation\Application
+     * @return \Illuminate\Contracts\Foundation\Application
      */
     protected function getApplication()
     {

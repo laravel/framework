@@ -22,7 +22,7 @@ class PendingCommand
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -58,7 +58,7 @@ class PendingCommand
      * Create a new pending console command run.
      *
      * @param  \PHPUnit\Framework\TestCase  $test
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  string  $command
      * @param  array  $parameters
      * @return void

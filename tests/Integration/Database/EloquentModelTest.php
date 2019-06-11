@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -45,7 +46,7 @@ class EloquentModelTest extends DatabaseTestCase
     public function test_attribute_changes()
     {
         $user = TestModel2::create([
-            'name' => str_random(), 'title' => str_random(),
+            'name' => Str::random(), 'title' => Str::random(),
         ]);
 
         $this->assertEmpty($user->getDirty());
@@ -53,7 +54,7 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertFalse($user->isDirty());
         $this->assertFalse($user->wasChanged());
 
-        $user->name = $name = str_random();
+        $user->name = $name = Str::random();
 
         $this->assertEquals(['name' => $name], $user->getDirty());
         $this->assertEmpty($user->getChanges());

@@ -26,7 +26,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen('foo', function ($foo) {
             $_SERVER['__event.test'] = $foo;
         });
-        $d->fire('foo', ['bar']);
+        $d->dispatch('foo', ['bar']);
         $this->assertEquals('bar', $_SERVER['__event.test']);
     }
 
@@ -51,7 +51,7 @@ class EventsDispatcherTest extends TestCase
         $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(stdClass::class));
         $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler@onFooEvent');
-        $d->fire('foo', ['foo', 'bar']);
+        $d->dispatch('foo', ['foo', 'bar']);
     }
 
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
@@ -60,7 +60,7 @@ class EventsDispatcherTest extends TestCase
         $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(stdClass::class));
         $handler->shouldReceive('handle')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler');
-        $d->fire('foo', ['foo', 'bar']);
+        $d->dispatch('foo', ['foo', 'bar']);
     }
 
     public function testQueuedEventsAreFired()
@@ -104,7 +104,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen('bar.*', function () {
             $_SERVER['__event.test'] = 'nope';
         });
-        $d->fire('foo.bar');
+        $d->dispatch('foo.bar');
 
         $this->assertEquals('wildcard', $_SERVER['__event.test']);
     }
@@ -116,13 +116,13 @@ class EventsDispatcherTest extends TestCase
         $d->listen('foo.*', function () {
             $_SERVER['__event.test'] = 'cached_wildcard';
         });
-        $d->fire('foo.bar');
+        $d->dispatch('foo.bar');
         $this->assertEquals('cached_wildcard', $_SERVER['__event.test']);
 
         $d->listen('foo.*', function () {
             $_SERVER['__event.test'] = 'new_wildcard';
         });
-        $d->fire('foo.bar');
+        $d->dispatch('foo.bar');
         $this->assertEquals('new_wildcard', $_SERVER['__event.test']);
     }
 
@@ -134,7 +134,7 @@ class EventsDispatcherTest extends TestCase
             $_SERVER['__event.test'] = 'foo';
         });
         $d->forget('foo');
-        $d->fire('foo');
+        $d->dispatch('foo');
 
         $this->assertFalse(isset($_SERVER['__event.test']));
     }
@@ -147,7 +147,7 @@ class EventsDispatcherTest extends TestCase
             $_SERVER['__event.test'] = 'foo';
         });
         $d->forget('foo.*');
-        $d->fire('foo.bar');
+        $d->dispatch('foo.bar');
 
         $this->assertFalse(isset($_SERVER['__event.test']));
     }
@@ -181,14 +181,14 @@ class EventsDispatcherTest extends TestCase
             $this->assertEquals('foo.bar', $event);
             $this->assertEquals(['first', 'second'], $data);
         });
-        $d->fire('foo.bar', ['first', 'second']);
+        $d->dispatch('foo.bar', ['first', 'second']);
 
         $d = new Dispatcher;
         $d->listen('foo.bar', function ($first, $second) {
             $this->assertEquals('first', $first);
             $this->assertEquals('second', $second);
         });
-        $d->fire('foo.bar', ['first', 'second']);
+        $d->dispatch('foo.bar', ['first', 'second']);
     }
 
     public function testQueuedEventHandlersAreQueued()
@@ -205,7 +205,7 @@ class EventsDispatcherTest extends TestCase
         });
 
         $d->listen('some.event', TestDispatcherQueuedHandler::class.'@someMethod');
-        $d->fire('some.event', ['foo', 'bar']);
+        $d->dispatch('some.event', ['foo', 'bar']);
     }
 
     public function testClassesWork()
@@ -215,7 +215,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen(ExampleEvent::class, function () {
             $_SERVER['__event.test'] = 'baz';
         });
-        $d->fire(new ExampleEvent);
+        $d->dispatch(new ExampleEvent);
 
         $this->assertSame('baz', $_SERVER['__event.test']);
     }
@@ -227,7 +227,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen(SomeEventInterface::class, function () {
             $_SERVER['__event.test'] = 'bar';
         });
-        $d->fire(new AnotherEvent);
+        $d->dispatch(new AnotherEvent);
 
         $this->assertSame('bar', $_SERVER['__event.test']);
     }
@@ -242,7 +242,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen(SomeEventInterface::class, function () {
             $_SERVER['__event.test2'] = 'baar';
         });
-        $d->fire(new AnotherEvent);
+        $d->dispatch(new AnotherEvent);
 
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);

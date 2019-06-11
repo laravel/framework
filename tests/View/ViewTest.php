@@ -125,7 +125,7 @@ class ViewTest extends TestCase
     public function testViewGettersSetters()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $this->assertEquals($view->getName(), 'view');
+        $this->assertEquals($view->name(), 'view');
         $this->assertEquals($view->getPath(), 'path');
         $data = $view->getData();
         $this->assertEquals($data['foo'], 'bar');

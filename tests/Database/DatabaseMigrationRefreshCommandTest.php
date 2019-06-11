@@ -99,7 +99,7 @@ class ApplicationDatabaseRefreshStub extends Application
         }
     }
 
-    public function environment()
+    public function environment(...$environments)
     {
         return 'development';
     }

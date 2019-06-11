@@ -71,6 +71,19 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
     }
 
+    public function testExecCreatesNewCommandWithTimezone()
+    {
+        $schedule = new Schedule('UTC');
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals('UTC', $events[0]->timezone);
+
+        $schedule = new Schedule('Asia/Tokyo');
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals('Asia/Tokyo', $events[0]->timezone);
+    }
+
     public function testCommandCreatesNewArtisanCommand()
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';

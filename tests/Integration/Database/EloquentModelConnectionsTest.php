@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -59,14 +60,14 @@ class EloquentModelConnectionsTest extends TestCase
 
     public function test_child_obeys_parent_connection()
     {
-        $parent1 = ParentModel::create(['name' => str_random()]);
+        $parent1 = ParentModel::create(['name' => Str::random()]);
         $parent1->children()->create(['name' => 'childOnConn1']);
         $parents1 = ParentModel::with('children')->get();
         $this->assertEquals('childOnConn1', ChildModel::on('conn1')->first()->name);
         $this->assertEquals('childOnConn1', $parent1->children()->first()->name);
         $this->assertEquals('childOnConn1', $parents1[0]->children[0]->name);
 
-        $parent2 = ParentModel::on('conn2')->create(['name' => str_random()]);
+        $parent2 = ParentModel::on('conn2')->create(['name' => Str::random()]);
         $parent2->children()->create(['name' => 'childOnConn2']);
         $parents2 = ParentModel::on('conn2')->with('children')->get();
         $this->assertEquals('childOnConn2', ChildModel::on('conn2')->first()->name);
@@ -76,7 +77,7 @@ class EloquentModelConnectionsTest extends TestCase
 
     public function test_child_uses_its_own_connection_if_set()
     {
-        $parent1 = ParentModel::create(['name' => str_random()]);
+        $parent1 = ParentModel::create(['name' => Str::random()]);
         $parent1->childrenDefaultConn2()->create(['name' => 'childAlwaysOnConn2']);
         $parents1 = ParentModel::with('childrenDefaultConn2')->get();
         $this->assertEquals('childAlwaysOnConn2', ChildModelDefaultConn2::first()->name);
@@ -87,7 +88,7 @@ class EloquentModelConnectionsTest extends TestCase
 
     public function test_child_uses_its_own_connection_if_set_even_if_parent_explicit_connection()
     {
-        $parent1 = ParentModel::on('conn1')->create(['name' => str_random()]);
+        $parent1 = ParentModel::on('conn1')->create(['name' => Str::random()]);
         $parent1->childrenDefaultConn2()->create(['name' => 'childAlwaysOnConn2']);
         $parents1 = ParentModel::on('conn1')->with('childrenDefaultConn2')->get();
         $this->assertEquals('childAlwaysOnConn2', ChildModelDefaultConn2::first()->name);

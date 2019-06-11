@@ -6,6 +6,14 @@ use Orchestra\Testbench\TestCase;
 
 class MakesHttpRequestsTest extends TestCase
 {
+    public function testFromSetsHeaderAndSession()
+    {
+        $this->from('previous/url');
+
+        $this->assertSame('previous/url', $this->defaultHeaders['referer']);
+        $this->assertSame('previous/url', $this->app['session']->previousUrl());
+    }
+
     public function testWithoutAndWithMiddleware()
     {
         $this->assertFalse($this->app->has('middleware.disable'));

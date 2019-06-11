@@ -171,38 +171,11 @@ class SQLiteGrammar extends Grammar
      */
     public function compileInsert(Builder $query, array $values)
     {
-        // Essentially we will force every insert to be treated as a batch insert which
-        // simply makes creating the SQL easier for us since we can utilize the same
-        // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
-        if (! is_array(reset($values))) {
-            $values = [$values];
-        }
-
-        // If there is only one record being inserted, we will just use the usual query
-        // grammar insert builder because no special syntax is needed for the single
-        // row inserts in SQLite. However, if there are multiples, we'll continue.
-        if (count($values) === 1) {
-            return empty(reset($values))
-                    ? "insert into $table default values"
-                    : parent::compileInsert($query, reset($values));
-        }
-
-        $names = $this->columnize(array_keys(reset($values)));
-
-        $columns = [];
-
-        // SQLite requires us to build the multi-row insert as a listing of select with
-        // unions joining them together. So we'll build out this list of columns and
-        // then join them all together with select unions to complete the queries.
-        foreach (array_keys(reset($values)) as $column) {
-            $columns[] = '? as '.$this->wrap($column);
-        }
-
-        $columns = array_fill(0, count($values), implode(', ', $columns));
-
-        return "insert into $table ($names) select ".implode(' union all select ', $columns);
+        return empty($values)
+                ? "insert into {$table} DEFAULT VALUES"
+                : parent::compileInsert($query, $values);
     }
 
     /**
@@ -301,11 +274,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $parts = explode('->', $value, 2);
-
-        $field = $this->wrap($parts[0]);
-
-        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_extract('.$field.$path.')';
     }

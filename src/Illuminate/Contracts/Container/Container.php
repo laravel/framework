@@ -3,9 +3,10 @@
 namespace Illuminate\Contracts\Container;
 
 use Closure;
+use ArrayAccess;
 use Psr\Container\ContainerInterface;
 
-interface Container extends ContainerInterface
+interface Container extends ArrayAccess, ContainerInterface
 {
     /**
      * Determine if the given abstract type has been bound.
@@ -91,6 +92,16 @@ interface Container extends ContainerInterface
     public function instance($abstract, $instance);
 
     /**
+     * Add a contextual binding to the container.
+     *
+     * @param  string  $concrete
+     * @param  string  $abstract
+     * @param  \Closure|string  $implementation
+     * @return void
+     */
+    public function addContextualBinding($concrete, $abstract, $implementation);
+
+    /**
      * Define a contextual binding.
      *
      * @param  string|array  $concrete
@@ -105,6 +116,13 @@ interface Container extends ContainerInterface
      * @return \Closure
      */
     public function factory($abstract);
+
+    /**
+     * Flush the container of all bindings and resolved instances.
+     *
+     * @return void
+     */
+    public function flush();
 
     /**
      * Resolve the given type from the container.

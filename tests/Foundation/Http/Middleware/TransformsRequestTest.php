@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
@@ -45,6 +46,28 @@ class TransformsRequestTest extends TestCase
         });
     }
 
+    public function testTransformOncePerArrayKeysWhenMethodIsPost()
+    {
+        $middleware = new ManipulateArrayInput;
+        $symfonyRequest = new SymfonyRequest(
+            [
+                'name' => 'Damian',
+                'beers' => [4, 8, 12],
+            ],
+            [
+                'age' => [28, 56, 84],
+            ]
+        );
+        $symfonyRequest->server->set('REQUEST_METHOD', 'POST');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertEquals('Damian', $request->get('name'));
+            $this->assertEquals([27, 55, 83], $request->get('age'));
+            $this->assertEquals([5, 9, 13], $request->get('beers'));
+        });
+    }
+
     public function testTransformOncePerKeyWhenContentTypeIsJson()
     {
         $middleware = new ManipulateInput;
@@ -78,7 +101,24 @@ class ManipulateInput extends TransformsRequest
         if ($key === 'beers') {
             $value++;
         }
+
         if ($key === 'age') {
+            $value--;
+        }
+
+        return $value;
+    }
+}
+
+class ManipulateArrayInput extends TransformsRequest
+{
+    protected function transform($key, $value)
+    {
+        if (Str::contains($key, 'beers')) {
+            $value++;
+        }
+
+        if (Str::contains($key, 'age')) {
             $value--;
         }
 

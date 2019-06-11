@@ -194,21 +194,27 @@ class Repository implements CacheContract, ArrayAccess
      * @param  string  $key
      * @param  mixed   $value
      * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes = null)
     {
         if (is_array($key)) {
-            $this->putMany($key, $value);
+            $result = $this->putMany($key, $value);
 
-            return;
+            return $result;
         }
 
         if (! is_null($minutes = $this->getMinutes($minutes))) {
-            $this->store->put($this->itemKey($key), $value, $minutes);
+            $result = $this->store->put($this->itemKey($key), $value, $minutes);
 
-            $this->event(new KeyWritten($key, $value, $minutes));
+            if ($result) {
+                $this->event(new KeyWritten($key, $value, $minutes));
+            }
+
+            return $result;
         }
+
+        return false;
     }
 
     /**
@@ -216,7 +222,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function set($key, $value, $ttl = null)
     {
-        $this->put($key, $value, $ttl);
+        return $this->put($key, $value, $ttl);
     }
 
     /**
@@ -224,17 +230,23 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  array  $values
      * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function putMany(array $values, $minutes)
     {
         if (! is_null($minutes = $this->getMinutes($minutes))) {
-            $this->store->putMany($values, $minutes);
+            $result = $this->store->putMany($values, $minutes);
 
-            foreach ($values as $key => $value) {
-                $this->event(new KeyWritten($key, $value, $minutes));
+            if ($result) {
+                foreach ($values as $key => $value) {
+                    $this->event(new KeyWritten($key, $value, $minutes));
+                }
             }
+
+            return $result;
         }
+
+        return false;
     }
 
     /**
@@ -242,7 +254,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function setMultiple($values, $ttl = null)
     {
-        $this->putMany($values, $ttl);
+        return $this->putMany($values, $ttl);
     }
 
     /**
@@ -309,13 +321,17 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->store->forever($this->itemKey($key), $value);
+        $result = $this->store->forever($this->itemKey($key), $value);
 
-        $this->event(new KeyWritten($key, $value, 0));
+        if ($result) {
+            $this->event(new KeyWritten($key, $value, 0));
+        }
+
+        return $result;
     }
 
     /**

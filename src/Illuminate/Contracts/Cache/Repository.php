@@ -39,7 +39,7 @@ interface Repository extends CacheInterface
      * @param  string  $key
      * @param  mixed   $value
      * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes);
 
@@ -76,7 +76,7 @@ interface Repository extends CacheInterface
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value);
 

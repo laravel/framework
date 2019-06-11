@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
+use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Login;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Auth\Events\Failed;
@@ -209,7 +210,7 @@ class AuthenticationTest extends TestCase
             'username' => 'username2',
             'email' => 'email2',
             'password' => bcrypt('password'),
-            'remember_token' => $token = str_random(),
+            'remember_token' => $token = Str::random(),
             'is_active' => false,
         ]);
 

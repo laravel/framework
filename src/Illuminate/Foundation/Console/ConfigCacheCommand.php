@@ -83,6 +83,8 @@ class ConfigCacheCommand extends Command
     {
         $app = require $this->laravel->bootstrapPath().'/app.php';
 
+        $app->useStoragePath($this->laravel->storagePath());
+
         $app->make(ConsoleKernelContract::class)->bootstrap();
 
         return $app['config']->all();

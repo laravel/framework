@@ -62,9 +62,11 @@ abstract class Lock implements LockContract
         $result = $this->acquire();
 
         if ($result && is_callable($callback)) {
-            return tap($callback(), function () {
+            try {
+                return $callback();
+            } finally {
                 $this->release();
-            });
+            }
         }
 
         return $result;

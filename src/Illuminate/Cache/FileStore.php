@@ -55,15 +55,17 @@ class FileStore implements Store
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
         $this->ensureCacheDirectoryExists($path = $this->path($key));
 
-        $this->files->put(
+        $result = $this->files->put(
             $path, $this->expiration($minutes).serialize($value), true
         );
+
+        return $result !== false && $result > 0;
     }
 
     /**
@@ -112,11 +114,11 @@ class FileStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        return $this->put($key, $value, 0);
     }
 
     /**

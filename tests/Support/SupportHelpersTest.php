@@ -270,9 +270,9 @@ class SupportHelpersTest extends TestCase
 
     public function testStrAfter()
     {
-        $this->assertEquals('nah', str_after('hannah', 'han'));
-        $this->assertEquals('nah', str_after('hannah', 'n'));
-        $this->assertEquals('hannah', str_after('hannah', 'xxxx'));
+        $this->assertEquals('nah', Str::after('hannah', 'han'));
+        $this->assertEquals('nah', Str::after('hannah', 'n'));
+        $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
     }
 
     public function testStrContains()
@@ -866,6 +866,25 @@ class SupportHelpersTest extends TestCase
                 };
             }
         })->present()->something());
+    }
+
+    public function testRetry()
+    {
+        $startTime = microtime(true);
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, 100);
+
+        // Make sure we made two attempts
+        $this->assertEquals(2, $attempts);
+
+        // Make sure we waited 100ms for the first attempt
+        $this->assertTrue(microtime(true) - $startTime >= 0.1);
     }
 
     public function testTransform()

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 
-class RedisStore extends TaggableStore implements Store
+class RedisStore extends TaggableStore implements LockProvider
 {
     /**
      * The Redis factory implementation.
@@ -85,13 +85,15 @@ class RedisStore extends TaggableStore implements Store
      * @param  string  $key
      * @param  mixed   $value
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function put($key, $value, $minutes)
     {
-        $this->connection()->setex(
+        $result = $this->connection()->setex(
             $this->prefix.$key, (int) max(1, $minutes * 60), $this->serialize($value)
         );
+
+        return $result ? true : false;
     }
 
     /**
@@ -99,17 +101,23 @@ class RedisStore extends TaggableStore implements Store
      *
      * @param  array  $values
      * @param  float|int  $minutes
-     * @return void
+     * @return bool
      */
     public function putMany(array $values, $minutes)
     {
         $this->connection()->multi();
 
+        $manyResult = null;
+
         foreach ($values as $key => $value) {
-            $this->put($key, $value, $minutes);
+            $result = $this->put($key, $value, $minutes);
+
+            $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
         }
 
         $this->connection()->exec();
+
+        return $manyResult ?: false;
     }
 
     /**
@@ -158,11 +166,13 @@ class RedisStore extends TaggableStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->connection()->set($this->prefix.$key, $this->serialize($value));
+        $result = $this->connection()->set($this->prefix.$key, $this->serialize($value));
+
+        return $result ? true : false;
     }
 
     /**

@@ -539,6 +539,17 @@ class Blueprint
     }
 
     /**
+     * Create a new auto-incrementing integer (4-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function integerIncrements($column)
+    {
+        return $this->unsignedInteger($column, true);
+    }
+
+    /**
      * Create a new auto-incrementing tiny integer (1-byte) column on the table.
      *
      * @param  string  $column
