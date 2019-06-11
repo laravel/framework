@@ -114,7 +114,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Create a new collection by invoking the callback a given amount of times.
      *
-     * @param  int  $number
+     * @param  int       $number
      * @param  callable  $callback
      *
      * @return static
@@ -365,7 +365,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the items in the collection that are not present in the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed     $items
      * @param  callable  $callback
      *
      * @return static
@@ -390,7 +390,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the items in the collection whose keys and values are not present in the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed     $items
      * @param  callable  $callback
      *
      * @return static
@@ -415,7 +415,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the items in the collection whose keys are not present in the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed     $items
      * @param  callable  $callback
      *
      * @return static
@@ -463,8 +463,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Determine if all items in the collection pass the given test.
      *
      * @param  string|callable  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed            $operator
+     * @param  mixed            $value
      *
      * @return bool
      */
@@ -521,7 +521,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback if the value is truthy.
      *
-     * @param  bool  $value
+     * @param  bool      $value
      * @param  callable  $callback
      * @param  callable  $default
      *
@@ -567,7 +567,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback if the value is falsy.
      *
-     * @param  bool  $value
+     * @param  bool      $value
      * @param  callable  $callback
      * @param  callable  $default
      *
@@ -608,8 +608,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair.
      *
      * @param  string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed   $operator
+     * @param  mixed   $value
      *
      * @return static
      */
@@ -623,7 +623,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  string  $key
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  mixed   $value
      *
      * @return \Closure
      */
@@ -680,7 +680,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
-     * @param  mixed  $value
+     * @param  mixed   $value
      *
      * @return static
      */
@@ -693,8 +693,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair.
      *
      * @param  string  $key
-     * @param  mixed  $values
-     * @param  bool  $strict
+     * @param  mixed   $values
+     * @param  bool    $strict
      *
      * @return static
      */
@@ -711,7 +711,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
-     * @param  mixed  $values
+     * @param  mixed   $values
      *
      * @return static
      */
@@ -724,7 +724,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items where the given key between values.
      *
      * @param  string  $key
-     * @param  array  $values
+     * @param  array   $values
      *
      * @return static
      */
@@ -737,8 +737,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair.
      *
      * @param  string  $key
-     * @param  mixed  $values
-     * @param  bool  $strict
+     * @param  mixed   $values
+     * @param  bool    $strict
      *
      * @return static
      */
@@ -755,7 +755,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
-     * @param  mixed  $values
+     * @param  mixed   $values
      *
      * @return static
      */
@@ -782,7 +782,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the first item from the collection.
      *
      * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param  mixed          $default
      *
      * @return mixed
      */
@@ -811,8 +811,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the first item by the given key value pair.
      *
      * @param  string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed   $operator
+     * @param  mixed   $value
      *
      * @return mixed
      */
@@ -878,7 +878,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Group an associative array by a field or using a callback.
      *
      * @param  array|callable|string  $groupBy
-     * @param  bool  $preserveKeys
+     * @param  bool                   $preserveKeys
      * @return static
      */
     public function groupBy($groupBy, $preserveKeys = false)
@@ -1057,7 +1057,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the last item from the collection.
      *
      * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param  mixed          $default
      *
      * @return mixed
      */
@@ -1070,7 +1070,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the values of a given key.
      *
      * @param  string|array  $value
-     * @param  string|null  $key
+     * @param  string|null   $key
      *
      * @return static
      */
@@ -1349,8 +1349,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Partition the collection into two arrays using the given callback or key.
      *
      * @param  callable|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed            $operator
+     * @param  mixed            $value
      *
      * @return static
      */
@@ -1487,7 +1487,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback
-     * @param  mixed  $initial
+     * @param  mixed     $initial
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null)
@@ -1528,7 +1528,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Search the collection for a given value and return the corresponding key if successful.
      *
      * @param  mixed  $value
-     * @param  bool  $strict
+     * @param  bool   $strict
      * @return mixed
      */
     public function search($value, $strict = false)
@@ -1662,8 +1662,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Sort the collection using the given callback.
      *
      * @param  callable|string  $callback
-     * @param  int  $options
-     * @param  bool  $descending
+     * @param  int              $options
+     * @param  bool             $descending
      *
      * @return static
      */
@@ -1697,7 +1697,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Sort the collection in descending order using the given callback.
      *
      * @param  callable|string  $callback
-     * @param  int  $options
+     * @param  int              $options
      *
      * @return static
      */
@@ -1709,7 +1709,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Sort the collection keys.
      *
-     * @param  int  $options
+     * @param  int   $options
      * @param  bool  $descending
      *
      * @return static
@@ -1738,9 +1738,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Splice a portion of the underlying collection array.
      *
-     * @param  int  $offset
+     * @param  int       $offset
      * @param  int|null  $length
-     * @param  mixed  $replacement
+     * @param  mixed     $replacement
      *
      * @return static
      */
@@ -1821,7 +1821,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key
-     * @param  bool  $strict
+     * @param  bool                  $strict
      *
      * @return static
      */
@@ -1908,7 +1908,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Pad collection to the specified length with a value.
      *
-     * @param  int  $size
+     * @param  int    $size
      * @param  mixed  $value
      *
      * @return static
