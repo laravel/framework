@@ -2,15 +2,21 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.21...5.8)
 
+### Added
+- Added `@componentFirst` directive ([#28783](https://github.com/laravel/framework/pull/28783))
+- Added support for typed eager loads ([#28647](https://github.com/laravel/framework/pull/28647), [d72e3cd](https://github.com/laravel/framework/commit/d72e3cd5be14dba654837466564018403839a5e9))
+- Added `Related` and `Recommended` to Pluralizer ([#28749](https://github.com/laravel/framework/pull/28749))
+
+### Fixed
+- Fixed database rules with where clauses ([#28748](https://github.com/laravel/framework/pull/28748))
+
 ### TODO
-- Add support for typed eager loads ([#28647](https://github.com/laravel/framework/pull/28647), [d72e3cd](https://github.com/laravel/framework/commit/d72e3cd5be14dba654837466564018403839a5e9))
 - fix MorphTo Relation ignores parent $timestamp when touching ([#28670](https://github.com/laravel/framework/pull/28670))
 - Check presence of force flag in command signature ([#28742](https://github.com/laravel/framework/pull/28742))
-- Sql Server issue with dropAllTables when foreign key constraints exist ([#28750](https://github.com/laravel/framework/pull/28750))
-- Fix database rules with WHERE clauses ([#28748](https://github.com/laravel/framework/pull/28748))
-- Added "Related" and "Recommended" to Pluralizer ([#28749](https://github.com/laravel/framework/pull/28749))
+- Sql Server issue with dropAllTables when foreign key constraints exist ([#28750](https://github.com/laravel/framework/pull/28750), [#28770](https://github.com/laravel/framework/pull/28770))
 - Suggest resolution when no relationship value is returned ([#28762](https://github.com/laravel/framework/pull/28762))
 - Error handling for maintenance mode commands ([#28765](https://github.com/laravel/framework/pull/28765), [9e20849](https://github.com/laravel/framework/commit/9e20849e5cca7b98ebf0eee2b563b532ff6fe704))
+- Add message value assertion to assertJsonValidationErrors ([#28787](https://github.com/laravel/framework/pull/28787))
 
 
 ## [v5.8.21 (2019-06-05)](https://github.com/laravel/framework/compare/v5.8.20...v5.8.21)
