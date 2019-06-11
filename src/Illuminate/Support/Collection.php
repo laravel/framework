@@ -1356,7 +1356,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function partition($key, $operator = null, $value = null)
     {
-        $partitions = [new static, new static];
+        $partitions = [new static(), new static()];
 
         $callback = func_num_args() === 1
             ? $this->valueRetriever($key)
@@ -1899,7 +1899,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $params = array_merge([
             function () {
                 return new static(func_get_args());
-            }, $this->items
+            }, $this->items,
         ], $arrayableItems);
 
         return new static(call_user_func_array('array_map', $params));
