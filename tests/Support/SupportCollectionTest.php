@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\ItemNotFoundException;
 use stdClass;
 use Exception;
 use ArrayAccess;
@@ -67,6 +68,16 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['foo', 'bar']);
         $this->assertEquals('bar', $c->last());
+    }
+
+    public function testFirstOrFail()
+    {
+        $this->expectException(ItemNotFoundException::class);
+        $c = new Collection([
+            ['material' => 'paper', 'type' => 'book'],
+            ['material' => 'rubber', 'type' => 'gasket'],
+        ]);
+        $c->where('material', 'paper')->firstOrFail();
     }
 
     public function testLastWithCallback()

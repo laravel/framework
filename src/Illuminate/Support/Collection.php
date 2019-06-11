@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Container\EntryNotFoundException;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
 use stdClass;
 use Countable;
 use Exception;
@@ -742,6 +744,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function first(callable $callback = null, $default = null)
     {
         return Arr::first($this->items, $callback, $default);
+    }
+
+    /**
+     * Get the first item from the collection or throw an exception.
+     * @param callable|null $callback
+     * @return mixed
+     * @throws ItemNotFoundException
+     */
+    public function firstOrFail(callable $callback = null)
+    {
+        if (($item = $this->first($callback)) !== null) {
+            return $item;
+        }
+
+        throw new ItemNotFoundException;
     }
 
     /**
