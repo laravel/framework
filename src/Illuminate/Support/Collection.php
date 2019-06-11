@@ -507,6 +507,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Run a filter over each of the items.
      *
      * @param callable|null $callback
+     *
      * @return static
      */
     public function filter(callable $callback = null)
@@ -793,7 +794,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Get the first item from the collection or throw an exception.
+     *
      * @param callable|null $callback
+     *
      * @return mixed
      * @throws ItemNotFoundException
      *
@@ -847,6 +850,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Remove an item from the collection by key.
      *
      * @param string|array $keys
+     *
      * @return $this
      */
     public function forget($keys)
@@ -863,6 +867,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param mixed $key
      * @param mixed $default
+     *
      * @return mixed
      */
     public function get($key, $default = null)
@@ -879,6 +884,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param array|callable|string $groupBy
      * @param bool                  $preserveKeys
+     *
      * @return static
      */
     public function groupBy($groupBy, $preserveKeys = false)
@@ -1470,6 +1476,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get one or a specified number of items randomly from the collection.
      *
      * @param int|null $number
+     *
      * @return static|mixed
      * @throws \InvalidArgumentException
      *
@@ -1488,6 +1495,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param callable $callback
      * @param mixed    $initial
+     *
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null)
@@ -1499,6 +1507,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Create a collection of all elements that do not pass a given truth test.
      *
      * @param callable|mixed $callback
+     *
      * @return static
      */
     public function reject($callback)
@@ -1529,6 +1538,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param mixed $value
      * @param bool  $strict
+     *
      * @return mixed
      */
     public function search($value, $strict = false)
@@ -1560,6 +1570,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Shuffle the items in the collection.
      *
      * @param int $seed
+     *
      * @return static
      */
     public function shuffle($seed = null)
@@ -2109,6 +2120,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Dynamically access collection proxies.
      *
      * @param string $key
+     *
      * @return mixed
      * @throws \Exception
      *
