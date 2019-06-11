@@ -269,7 +269,6 @@ trait InteractsWithInput
      *
      * @param  string|null  $key
      * @param  string|array|null  $default
-     *
      * @return string|array|null
      */
     public function post($key = null, $default = null)
