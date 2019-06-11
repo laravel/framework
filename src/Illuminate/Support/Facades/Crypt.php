@@ -7,7 +7,7 @@ namespace Illuminate\Support\Facades;
  * @method static string generateKey(string $cipher)
  * @method static string encrypt(mixed $value, bool $serialize = true)
  * @method static string encryptString(string $value)
- * @method static mixed decrypt(mixed $payload, bool $unserialize = true)
+ * @method static mixed decrypt(string $payload, bool $unserialize = true)
  * @method static string decryptString(string $payload)
  * @method static string getKey()
  *
