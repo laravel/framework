@@ -77,7 +77,7 @@ class SupportCollectionTest extends TestCase
             ['material' => 'paper', 'type' => 'book'],
             ['material' => 'rubber', 'type' => 'gasket'],
         ]);
-        $c->where('material', 'paper')->firstOrFail();
+        $c->where('material', 'wood')->firstOrFail();
     }
 
     public function testLastWithCallback()
