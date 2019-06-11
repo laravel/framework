@@ -184,6 +184,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $models = EloquentTestUser::where('id', 1)->cursor();
         foreach ($models as $model) {
             $this->assertEquals(1, $model->id);
+            $this->assertEquals('default', $model->getConnectionName());
         }
 
         $records = DB::table('users')->where('id', 1)->cursor();

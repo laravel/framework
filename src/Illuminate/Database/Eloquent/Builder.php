@@ -643,7 +643,7 @@ class Builder
     public function cursor()
     {
         foreach ($this->applyScopes()->query->cursor() as $record) {
-            yield $this->model->newFromBuilder($record);
+            yield $this->newModelInstance()->newFromBuilder($record);
         }
     }
 
