@@ -745,6 +745,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the first item from the collection or throw an exception.
+     * @param callable|null $callback
+     * @return mixed
+     * @throws ItemNotFoundException
+     */
+    public function firstOrFail(callable $callback = null)
+    {
+        if (($item = $this->first($callback)) !== null) {
+            return $item;
+        }
+
+        throw new ItemNotFoundException();
+    }
+
+    /**
      * Get the first item by the given key value pair.
      *
      * @param  string  $key
