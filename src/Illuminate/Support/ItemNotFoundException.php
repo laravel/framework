@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Illuminate\Support;
-
 
 use RuntimeException;
 
