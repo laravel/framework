@@ -369,8 +369,7 @@ class SupportCollectionTest extends TestCase
     public function testHigherOrderFilter()
     {
         $c = new Collection([
-            new class()
-            {
+            new class() {
                 public $name = 'Alex';
 
                 public function active()
@@ -378,8 +377,7 @@ class SupportCollectionTest extends TestCase
                     return true;
                 }
             },
-            new class()
-            {
+            new class() {
                 public $name = 'John';
 
                 public function active()
@@ -849,26 +847,26 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection([
             [
-                'id' => '0',
+                'id'   => '0',
                 'name' => 'zero',
             ],
             [
-                'id' => '00',
+                'id'   => '00',
                 'name' => 'double zero',
             ],
             [
-                'id' => '0',
+                'id'   => '0',
                 'name' => 'again zero',
             ],
         ]);
 
         $this->assertEquals([
             [
-                'id' => '0',
+                'id'   => '0',
                 'name' => 'zero',
             ],
             [
-                'id' => '00',
+                'id'   => '00',
                 'name' => 'double zero',
             ],
         ], $c->uniqueStrict('id')->all());
@@ -1570,11 +1568,11 @@ class SupportCollectionTest extends TestCase
         });
         $this->assertSame(
             [
-                1 => 'A',
+                1   => 'A',
                 'A' => 1,
-                2 => 'B',
+                2   => 'B',
                 'B' => 2,
-                3 => 'C',
+                3   => 'C',
                 'C' => 3,
             ],
             $data->all()
@@ -1854,7 +1852,7 @@ class SupportCollectionTest extends TestCase
         });
         $this->assertEquals([
             '0-taylorotwell' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
-            '1-lucasmichot' => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
+            '1-lucasmichot'  => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ], $result->all());
     }
 
@@ -2289,16 +2287,16 @@ class SupportCollectionTest extends TestCase
     public function testConcatWithArray()
     {
         $expected = [
-            0 => 4,
-            1 => 5,
-            2 => 6,
-            3 => 'a',
-            4 => 'b',
-            5 => 'c',
-            6 => 'Jonny',
-            7 => 'from',
-            8 => 'Laroe',
-            9 => 'Jonny',
+            0  => 4,
+            1  => 5,
+            2  => 6,
+            3  => 'a',
+            4  => 'b',
+            5  => 'c',
+            6  => 'Jonny',
+            7  => 'from',
+            8  => 'Laroe',
+            9  => 'Jonny',
             10 => 'from',
             11 => 'Laroe',
         ];
@@ -2314,16 +2312,16 @@ class SupportCollectionTest extends TestCase
     public function testConcatWithCollection()
     {
         $expected = [
-            0 => 4,
-            1 => 5,
-            2 => 6,
-            3 => 'a',
-            4 => 'b',
-            5 => 'c',
-            6 => 'Jonny',
-            7 => 'from',
-            8 => 'Laroe',
-            9 => 'Jonny',
+            0  => 4,
+            1  => 5,
+            2  => 6,
+            3  => 'a',
+            4  => 'b',
+            5  => 'c',
+            6  => 'Jonny',
+            7  => 'from',
+            8  => 'Laroe',
+            9  => 'Jonny',
             10 => 'from',
             11 => 'Laroe',
         ];
@@ -2599,12 +2597,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([
             'taylor' => [$collection[0]],
             'TAYLOR' => [$collection[1]],
-            'foo' => [$collection[2]],
+            'foo'    => [$collection[2]],
         ], $collection->groupBy->name->toArray());
 
         $this->assertEquals([
             'TAYLOR' => [$collection[0], $collection[1]],
-            'FOO' => [$collection[2]],
+            'FOO'    => [$collection[2]],
         ], $collection->groupBy->uppercase()->toArray());
     }
 

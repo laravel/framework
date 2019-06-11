@@ -796,9 +796,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the first item from the collection or throw an exception.
      *
      * @param callable|null $callback
+     * @throws ItemNotFoundException
      *
      * @return mixed
-     * @throws ItemNotFoundException
      *
      */
     public function firstOrFail(callable $callback = null)
@@ -1476,9 +1476,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get one or a specified number of items randomly from the collection.
      *
      * @param int|null $number
+     * @throws \InvalidArgumentException
      *
      * @return static|mixed
-     * @throws \InvalidArgumentException
      *
      */
     public function random($number = null)
@@ -2120,10 +2120,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Dynamically access collection proxies.
      *
      * @param string $key
-     *
-     * @return mixed
      * @throws \Exception
      *
+     * @return mixed
      */
     public function __get($key)
     {
