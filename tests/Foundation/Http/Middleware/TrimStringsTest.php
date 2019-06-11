@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TrimStringsTest extends TestCase
