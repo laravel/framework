@@ -2120,6 +2120,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Dynamically access collection proxies.
      *
      * @param string $key
+     *
      * @throws \Exception
      *
      * @return mixed
