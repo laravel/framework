@@ -116,12 +116,12 @@ class Str
      * Determine if a given string contains all array values.
      *
      * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param  array  $needles
      * @return bool
      */
-    public static function containsAll($haystack, $needles)
+    public static function containsAll($haystack, array $needles)
     {
-        foreach ((array) $needles as $needle) {
+        foreach ($needles as $needle) {
             if (! static::contains($haystack, $needle)) {
                 return false;
             }
