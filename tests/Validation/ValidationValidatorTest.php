@@ -4441,6 +4441,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testRequiredWithWildcard()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator(
+            $trans,
+            [
+                'names' => [['first' => 'Taylor']],
+                'foo' => 'bar'
+            ],
+            ['foo' => 'required_with:names.*.first']
+        );
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $trans,
+            [
+                'names' => [['first' => 'Taylor']]
+            ],
+            ['foo' => 'required_with:names.*.first']
+        );
+        $this->assertFalse($v->passes());
+    }
+
     public function validUuidList()
     {
         return [
