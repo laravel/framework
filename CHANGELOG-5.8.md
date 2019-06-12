@@ -1,22 +1,29 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.21...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.22...5.8)
+
+
+
+## [v5.8.22 (2019-06-12)](https://github.com/laravel/framework/compare/v5.8.21...v5.8.22)
 
 ### Added
 - Added `@componentFirst` directive ([#28783](https://github.com/laravel/framework/pull/28783))
 - Added support for typed eager loads ([#28647](https://github.com/laravel/framework/pull/28647), [d72e3cd](https://github.com/laravel/framework/commit/d72e3cd5be14dba654837466564018403839a5e9))
 - Added `Related` and `Recommended` to Pluralizer ([#28749](https://github.com/laravel/framework/pull/28749))
+- Added `Str::containsAll()` method ([#28806](https://github.com/laravel/framework/pull/28806))
+- Added: error handling for maintenance mode commands ([#28765](https://github.com/laravel/framework/pull/28765), [9e20849](https://github.com/laravel/framework/commit/9e20849e5cca7b98ebf0eee2b563b532ff6fe704))
+- Added message value assertion to `TestResponse::assertJsonValidationErrors()` ([#28787](https://github.com/laravel/framework/pull/28787))
+- Added: Automatically bind the viewAny method to the index controller action ([#28820](https://github.com/laravel/framework/pull/28820))
 
 ### Fixed
 - Fixed database rules with where clauses ([#28748](https://github.com/laravel/framework/pull/28748))
+- Fixed: MorphTo Relation ignores parent $timestamp when touching ([#28670](https://github.com/laravel/framework/pull/28670))
+- Fixed: Sql Server issue during `dropAllTables` when foreign key constraints exist ([#28750](https://github.com/laravel/framework/pull/28750), [#28770](https://github.com/laravel/framework/pull/28770))
+- Fixed `Model::getConnectionName()` when `Model::cursor()` used ([#28804](https://github.com/laravel/framework/pull/28804))
 
-### TODO
-- fix MorphTo Relation ignores parent $timestamp when touching ([#28670](https://github.com/laravel/framework/pull/28670))
-- Check presence of force flag in command signature ([#28742](https://github.com/laravel/framework/pull/28742))
-- Sql Server issue with dropAllTables when foreign key constraints exist ([#28750](https://github.com/laravel/framework/pull/28750), [#28770](https://github.com/laravel/framework/pull/28770))
-- Suggest resolution when no relationship value is returned ([#28762](https://github.com/laravel/framework/pull/28762))
-- Error handling for maintenance mode commands ([#28765](https://github.com/laravel/framework/pull/28765), [9e20849](https://github.com/laravel/framework/commit/9e20849e5cca7b98ebf0eee2b563b532ff6fe704))
-- Add message value assertion to assertJsonValidationErrors ([#28787](https://github.com/laravel/framework/pull/28787))
+### Changed
+- Made `force` an optional feature when using `ConfirmableTrait`. ([#28742](https://github.com/laravel/framework/pull/28742))
+- Suggest resolution when no relationship value is returned in the `Model::getRelationshipFromMethod()` ([#28762](https://github.com/laravel/framework/pull/28762))
 
 
 ## [v5.8.21 (2019-06-05)](https://github.com/laravel/framework/compare/v5.8.20...v5.8.21)
