@@ -40,5 +40,6 @@ class Bootstrap extends Preset
     {
         copy(__DIR__.'/bootstrap-stubs/_variables.scss', resource_path('sass/_variables.scss'));
         copy(__DIR__.'/bootstrap-stubs/app.scss', resource_path('sass/app.scss'));
+        copy(__DIR__.'/bootstrap-stubs/bootstrap.js', resource_path('js/bootstrap.js'));
     }
 }
