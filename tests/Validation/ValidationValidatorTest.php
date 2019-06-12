@@ -4448,7 +4448,7 @@ class ValidationValidatorTest extends TestCase
             $trans,
             [
                 'names' => [['first' => 'Taylor']],
-                'foo' => 'bar'
+                'foo' => 'bar',
             ],
             ['foo' => 'required_with:names.*.first']
         );
@@ -4457,7 +4457,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $trans,
             [
-                'names' => [['first' => 'Taylor']]
+                'names' => [['first' => 'Taylor']],
             ],
             ['foo' => 'required_with:names.*.first']
         );
