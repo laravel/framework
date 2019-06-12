@@ -657,9 +657,13 @@ class TestResponse
             );
 
             if (! is_int($key)) {
-                PHPUnit::assertStringContainsString(
-                    $value,
-                    $jsonErrors[$key],
+                foreach (Arr::wrap($jsonErrors[$key]) as $jsonErrorMessage) {
+                    if (Str::contains($jsonErrorMessage, $value)) {
+                        return $this;
+                    }
+                }
+
+                PHPUnit::fail(
                     "Failed to find a validation error in the response for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
                 );
             }
