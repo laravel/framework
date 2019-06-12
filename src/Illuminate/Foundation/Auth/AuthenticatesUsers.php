@@ -5,6 +5,9 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Foundation\Auth\Session;
 
 trait AuthenticatesUsers
 {
@@ -16,7 +19,7 @@ trait AuthenticatesUsers
      * @return \Illuminate\Http\Response
      */
     public function showLoginForm()
-    {
+    {        
         return view('auth.login');
     }
 
@@ -25,24 +28,24 @@ trait AuthenticatesUsers
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
-    {
+    {               
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
-        if (method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)) {
+        if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
             return $this->sendLockoutResponse($request);
         }
-
-        if ($this->attemptLogin($request)) {
+             
+        if ($this->attemptLogin($request)) {            
+            //$request->session()->put('admin_login', '1');  
+            session_start();
+            $_SESSION['admin_login'] = '1';                  
             return $this->sendLoginResponse($request);
         }
 
@@ -59,12 +62,10 @@ trait AuthenticatesUsers
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     protected function validateLogin(Request $request)
     {
-        $request->validate([
+        $this->validate($request, [
             $this->username() => 'required|string',
             'password' => 'required|string',
         ]);
@@ -77,7 +78,7 @@ trait AuthenticatesUsers
      * @return bool
      */
     protected function attemptLogin(Request $request)
-    {
+    {       
         return $this->guard()->attempt(
             $this->credentials($request), $request->filled('remember')
         );
@@ -107,7 +108,10 @@ trait AuthenticatesUsers
         $this->clearLoginAttempts($request);
 
         return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
+                ? redirect('admin/listing') : redirect()->intended($this->redirectPath());
+
+        // return $this->authenticated($request, $this->guard()->user())
+        //         ? redirect('admin/listing') : redirect('admin/dashboard');                
     }
 
     /**
@@ -118,8 +122,8 @@ trait AuthenticatesUsers
      * @return mixed
      */
     protected function authenticated(Request $request, $user)
-    {
-        //
+    {        
+        return redirect('admin/listing');               
     }
 
     /**
@@ -128,7 +132,7 @@ trait AuthenticatesUsers
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     protected function sendFailedLoginResponse(Request $request)
     {
@@ -156,21 +160,11 @@ trait AuthenticatesUsers
     public function logout(Request $request)
     {
         $this->guard()->logout();
-
+        session_start();
+        unset($_SESSION['admin_login']);        
         $request->session()->invalidate();
-
-        return $this->loggedOut($request) ?: redirect('/');
-    }
-
-    /**
-     * The user has logged out of the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
-    protected function loggedOut(Request $request)
-    {
-        //
+        
+        return redirect('/admin');
     }
 
     /**
@@ -182,4 +176,6 @@ trait AuthenticatesUsers
     {
         return Auth::guard();
     }
+    
 }
+
