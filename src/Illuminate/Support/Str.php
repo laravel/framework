@@ -99,35 +99,22 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|array  $needles
+     * @param  bool  $strict
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains($haystack, $needles, $strict = false)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
+            if (! $strict && $needle !== '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
             }
-        }
 
-        return false;
-    }
-
-    /**
-     * Determine if a given string contains all array values.
-     *
-     * @param  string  $haystack
-     * @param  array  $needles
-     * @return bool
-     */
-    public static function containsAll($haystack, array $needles)
-    {
-        foreach ($needles as $needle) {
-            if (! static::contains($haystack, $needle)) {
+            if ($strict && ! static::contains($haystack, $needle)) {
                 return false;
             }
         }
 
-        return true;
+        return $strict;
     }
 
     /**

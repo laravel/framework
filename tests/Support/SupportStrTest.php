@@ -127,15 +127,11 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::contains('taylor', 'xxx'));
         $this->assertFalse(Str::contains('taylor', ['xxx']));
         $this->assertFalse(Str::contains('taylor', ''));
-    }
-
-    public function testStrContainsAll()
-    {
-        $this->assertTrue(Str::containsAll('taylor otwell', ['taylor', 'otwell']));
-        $this->assertTrue(Str::containsAll('taylor otwell', 'taylor'));
-        $this->assertTrue(Str::containsAll('taylor otwell', ['taylor']));
-        $this->assertFalse(Str::containsAll('taylor otwell', 'xxx'));
-        $this->assertFalse(Str::containsAll('taylor otwell', ['taylor', 'xxx']));
+        $this->assertTrue(Str::contains('taylor otwell', ['taylor', 'otwell'], true));
+        $this->assertTrue(Str::contains('taylor otwell', 'taylor', true));
+        $this->assertTrue(Str::contains('taylor otwell', ['taylor'], true));
+        $this->assertFalse(Str::contains('taylor otwell', 'xxx', true));
+        $this->assertFalse(Str::contains('taylor otwell', ['taylor', 'xxx'], true));
     }
 
     public function testParseCallback()
