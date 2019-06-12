@@ -110,6 +110,12 @@ trait HasAttributes
         foreach ($this->getArrayableAppends() as $key) {
             $attributes[$key] = $this->mutateAttributeForArray($key, null);
         }
+        
+        foreach ($attributes as $key => $value) {
+            if ($value instanceof Arrayable) {
+                $attributes[$key] = $value->toArray();
+            }
+        }
 
         return $attributes;
     }
