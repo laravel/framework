@@ -377,7 +377,7 @@ trait HasAttributes
         if (Str::contains($key, '->')) {
             [$key, $path] = explode('->', $key, 2);
 
-            return Arr::get($this->getArrayAttributeByKey($key), str_replace('->', '.', $key));
+            return Arr::get($this->getArrayAttributeByKey($key), str_replace('->', '.', $path));
         }
     }
 
