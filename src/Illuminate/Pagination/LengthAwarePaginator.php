@@ -46,7 +46,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
             $this->{$key} = $value;
         }
 
-        if (!is_int($perPage)) {
+        if (! is_int($perPage)) {
             $perPage = $total;
         }
 
