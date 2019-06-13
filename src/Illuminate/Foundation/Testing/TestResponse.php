@@ -631,31 +631,43 @@ class TestResponse
     }
 
     /**
-     * Assert that the response has the given JSON validation errors for the given keys.
+     * Assert that the response has the given JSON validation errors.
      *
-     * @param  string|array  $keys
+     * @param  string|array  $errors
      * @param  string  $responseKey
      * @return $this
      */
-    public function assertJsonValidationErrors($keys, $responseKey = 'errors')
+    public function assertJsonValidationErrors($errors, $responseKey = 'errors')
     {
-        $keys = Arr::wrap($keys);
+        $errors = Arr::wrap($errors);
 
-        PHPUnit::assertNotEmpty($keys, 'No keys were provided.');
+        PHPUnit::assertNotEmpty($errors, 'No validation errors were provided.');
 
-        $errors = $this->json()[$responseKey] ?? [];
+        $jsonErrors = $this->json()[$responseKey] ?? [];
 
-        $errorMessage = $errors
+        $errorMessage = $jsonErrors
                 ? 'Response has the following JSON validation errors:'.
-                        PHP_EOL.PHP_EOL.json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
+                        PHP_EOL.PHP_EOL.json_encode($jsonErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
                 : 'Response does not have JSON validation errors.';
 
-        foreach ($keys as $key) {
+        foreach ($errors as $key => $value) {
             PHPUnit::assertArrayHasKey(
-                $key,
-                $errors,
-                "Failed to find a validation error in the response for key: '{$key}'".PHP_EOL.PHP_EOL.$errorMessage
+                (is_int($key)) ? $value : $key,
+                $jsonErrors,
+                "Failed to find a validation error in the response for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
             );
+
+            if (! is_int($key)) {
+                foreach (Arr::wrap($jsonErrors[$key]) as $jsonErrorMessage) {
+                    if (Str::contains($jsonErrorMessage, $value)) {
+                        return $this;
+                    }
+                }
+
+                PHPUnit::fail(
+                    "Failed to find a validation error in the response for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
+                );
+            }
         }
 
         return $this;

@@ -1896,6 +1896,27 @@ class DatabaseEloquentModelTest extends TestCase
             return new BaseBuilder($connection, $grammar, $processor);
         });
     }
+
+    public function testTouchingModelWithTimestamps()
+    {
+        $this->assertFalse(
+            Model::isIgnoringTouch(Model::class)
+        );
+    }
+
+    public function testNotTouchingModelWithUpdatedAtNull()
+    {
+        $this->assertTrue(
+            Model::isIgnoringTouch(EloquentModelWithUpdatedAtNull::class)
+        );
+    }
+
+    public function testNotTouchingModelWithoutTimestamps()
+    {
+        $this->assertTrue(
+            Model::isIgnoringTouch(EloquentModelWithoutTimestamps::class)
+        );
+    }
 }
 
 class EloquentTestObserverStub
@@ -2302,4 +2323,16 @@ class EloquentModelEventObjectStub extends Model
     protected $dispatchesEvents = [
         'saving' => EloquentModelSavingEventStub::class,
     ];
+}
+
+class EloquentModelWithoutTimestamps extends Model
+{
+    protected $table = 'stub';
+    public $timestamps = false;
+}
+
+class EloquentModelWithUpdatedAtNull extends Model
+{
+    protected $table = 'stub';
+    const UPDATED_AT = null;
 }
