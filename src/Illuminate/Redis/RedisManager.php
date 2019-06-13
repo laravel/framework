@@ -170,7 +170,7 @@ class RedisManager implements Factory
         $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
 
         return array_filter($parsed, function ($key) {
-            return ! in_array($key, ['driver', 'username']);
+            return ! in_array($key, ['driver', 'username'], true);
         }, ARRAY_FILTER_USE_KEY);
     }
 
