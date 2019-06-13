@@ -33,7 +33,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  mixed  $items
      * @param  int  $total
-     * @param  int  $perPage
+     * @param  int|string  $perPage
      * @param  int|null  $currentPage
      * @param  array  $options (path, query, fragment, pageName)
      * @return void
@@ -44,6 +44,10 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
 
         foreach ($options as $key => $value) {
             $this->{$key} = $value;
+        }
+
+        if (!is_int($perPage)) {
+            $perPage = $total;
         }
 
         $this->total = $total;
