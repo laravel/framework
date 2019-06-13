@@ -314,8 +314,7 @@ trait HasAttributes
         // If the attribute exists in the attribute array or has a "get" mutator we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
-            $this->hasGetMutator($key)) {
+        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key) || Str::contains($key, '->')) {
             return $this->getAttributeValue($key);
         }
 
@@ -356,8 +355,7 @@ trait HasAttributes
         // If the attribute is listed as a date, we will convert it to a DateTime
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
-        if (in_array($key, $this->getDates()) &&
-            ! is_null($value)) {
+        if (in_array($key, $this->getDates()) && ! is_null($value)) {
             return $this->asDateTime($value);
         }
 
@@ -374,6 +372,12 @@ trait HasAttributes
     {
         if (isset($this->attributes[$key])) {
             return $this->attributes[$key];
+        }
+
+        if (Str::contains($key, '->')) {
+            [$key, $path] = explode('->', $key, 2);
+
+            return Arr::get($this->getArrayAttributeByKey($key), str_replace('->', '.', $key));
         }
     }
 
