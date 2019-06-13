@@ -861,6 +861,8 @@ class TestResponse
                 $this->session()->has($key),
                 "Session is missing expected key [{$key}]."
             );
+        } elseif ($value instanceof Closure) {
+            PHPUnit::assertTrue($value($this->session()->get($key)));
         } else {
             PHPUnit::assertEquals($value, $this->session()->get($key));
         }
