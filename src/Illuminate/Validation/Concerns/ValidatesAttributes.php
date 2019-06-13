@@ -1391,7 +1391,7 @@ trait ValidatesAttributes
      */
     public function validateRequiredWith($attribute, $value, $parameters)
     {
-        if (strpos($parameters[0], '*') || ! $this->allFailingRequired($parameters)) {
+        if (strpos($parameters[0], '*') !== false || ! $this->allFailingRequired($parameters)) {
             return $this->validateRequired($attribute, $value);
         }
 
