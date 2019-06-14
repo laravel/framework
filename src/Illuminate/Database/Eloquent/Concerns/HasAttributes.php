@@ -197,9 +197,8 @@ trait HasAttributes
             }
 
             if ($attributes[$key] instanceof Arrayable) {
-                $attributes[$key] = $attributes[$key]->toArray(); 
+                $attributes[$key] = $attributes[$key]->toArray();
             }
-
         }
 
         return $attributes;
