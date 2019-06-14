@@ -2403,6 +2403,25 @@ class SupportCollectionTest extends TestCase
         ], $c->jsonSerialize());
     }
 
+    public function testDelimitedJson()
+    {
+        $c = new Collection([
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+            ['foo' => 'bar'],
+        ]);
+
+        $this->assertEquals(
+            $c->toDelimitedJson(),
+            "{\"foo\":\"bar\"}\n{\"foo\":\"bar\"}\n{\"foo\":\"bar\"}\n"
+        );
+
+        $this->assertEquals(
+            $c->toDelimitedJson(':'),
+            "{\"foo\":\"bar\"}:{\"foo\":\"bar\"}:{\"foo\":\"bar\"}:"
+        );
+    }
+
     public function testCombineWithArray()
     {
         $expected = [

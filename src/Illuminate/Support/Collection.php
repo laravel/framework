@@ -1946,6 +1946,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Convert each item into separate JSONs using a separator.
+     *
+     * @param string $separator
+     * @return string
+     */
+    public function toDelimitedJson($separator = "\n")
+    {
+        return $this->reduce(function ($string, $value) use ($separator) {
+            $jsonValue = (new static($value))->toJson();
+
+            return $string.$jsonValue.$separator;
+        }, '');
+    }
+
+    /**
      * Get an iterator for the items.
      *
      * @return \ArrayIterator
