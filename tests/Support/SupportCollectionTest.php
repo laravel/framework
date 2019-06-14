@@ -2418,7 +2418,7 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals(
             $c->toDelimitedJson(':'),
-            "{\"foo\":\"bar\"}:{\"foo\":\"bar\"}:{\"foo\":\"bar\"}:"
+            '{"foo":"bar"}:{"foo":"bar"}:{"foo":"bar"}:'
         );
     }
 
