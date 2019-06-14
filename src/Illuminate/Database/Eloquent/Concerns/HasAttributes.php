@@ -250,6 +250,13 @@ trait HasAttributes
                 $relation = $value;
             }
 
+            // If the value is is set, we'll still go ahead and set it in this list
+            // of attributes. Values that does not Arrayable or null represents the relationships
+            // are updated.
+            elseif (isset($value)) {
+                $relation = $value;
+            }
+
             // If the relationships snake-casing is enabled, we will snake case this
             // key so that the relation attribute is snake cased in this returned
             // array to the developers, making this consistent with attributes.

@@ -1757,6 +1757,35 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue(isset($model->some_relation));
     }
 
+    public function testRelationsToArrayShowIssetValues()
+    {
+        $model = new EloquentModelStub();
+
+        $relationKey = 'foo';
+        $relationValue = 'bar';
+
+        $model->setRelation($relationKey, $relationValue);
+
+        $relationsToArray = $model->relationsToArray();
+
+        $this->assertArrayHasKey($relationKey, $relationsToArray);
+        $this->assertEquals($relationsToArray[$relationKey], $relationValue);
+    }
+
+    public function testChangeRelationWhenSetAttributeIsARelationAlreadyLoaded()
+    {
+        $model = new EloquentModelStub();
+        $relationKey = 'foo';
+        $relationValue = 'bar';
+        $model->setRelation($relationKey, $relationValue);
+
+        $newRelationValue = 'some_new_bar_value';
+        $model->$relationKey = $newRelationValue;
+
+        $this->assertEquals($model->$relationKey, $newRelationValue);
+        $this->assertEquals($model->getRelation($relationKey), $newRelationValue);
+    }
+
     public function testNonExistingAttributeWithInternalMethodNameDoesntCallMethod()
     {
         $model = m::mock(EloquentModelStub::class.'[delete,getRelationValue]');

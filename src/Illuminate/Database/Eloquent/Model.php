@@ -1532,6 +1532,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __set($key, $value)
     {
+        if ($this->relationLoaded($key)) {
+            $this->setRelation($key, $value);
+
+            return;
+        }
+
         $this->setAttribute($key, $value);
     }
 
