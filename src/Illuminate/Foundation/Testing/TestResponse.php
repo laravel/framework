@@ -117,7 +117,7 @@ class TestResponse
 
         return $this;
     }
-    
+
     /**
      * Assert that the response has an unauthorized status code.
      *
@@ -126,7 +126,7 @@ class TestResponse
     public function assertUnauthorized()
     {
         $actual = $this->getStatusCode();
-        
+
         PHPUnit::assertTrue(
             401 === $actual,
             'Response status code ['.$actual.'] is not an unauthorized status code.'
