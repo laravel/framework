@@ -17,7 +17,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  mixed  $key
      * @param  mixed  $default
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model|static|null
      */
     public function find($key, $default = null)
     {

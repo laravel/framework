@@ -1,7 +1,19 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.22...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.23...5.8)
 
+### Added
+- Added possibility to assert that the session contains a given piece of data using a closure in `TestResponse::assertSessionHas()` ([#28837](https://github.com/laravel/framework/pull/28837))
+- Added `TestResponse::assertUnauthorized()` ([#28851](https://github.com/laravel/framework/pull/28851))
+
+
+## [v5.8.23 (2019-06-14)](https://github.com/laravel/framework/compare/v5.8.21...v5.8.23)
+
+### Fixed
+- Fixed strict comparison in redis configuration Parsing. ([#28830](https://github.com/laravel/framework/pull/28830))
+
+### Changed
+- Improved support for arrays on `TestResponse::assertJsonValidationErrors()` ([2970dab](https://github.com/laravel/framework/commit/2970dab3944e3b37578fa193503aae4217c62e59))
 
 
 ## [v5.8.22 (2019-06-12)](https://github.com/laravel/framework/compare/v5.8.21...v5.8.22)

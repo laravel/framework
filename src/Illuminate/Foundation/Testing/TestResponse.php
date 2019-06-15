@@ -119,6 +119,23 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has an unauthorized status code.
+     *
+     * @return $this
+     */
+    public function assertUnauthorized()
+    {
+        $actual = $this->getStatusCode();
+
+        PHPUnit::assertTrue(
+            401 === $actual,
+            'Response status code ['.$actual.'] is not an unauthorized status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
@@ -863,6 +880,8 @@ class TestResponse
                 $this->session()->has($key),
                 "Session is missing expected key [{$key}]."
             );
+        } elseif ($value instanceof Closure) {
+            PHPUnit::assertTrue($value($this->session()->get($key)));
         } else {
             PHPUnit::assertEquals($value, $this->session()->get($key));
         }
