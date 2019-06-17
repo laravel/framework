@@ -1609,27 +1609,6 @@ class RoutingRouteTest extends TestCase
 
         return $router;
     }
-
-    public function testSuspiciousOperation()
-    {
-        $router = $this->getRouter();
-        $router->get('hello', function () {
-            return 'world';
-        });
-        $this->assertEquals('world', $router->dispatch(
-            Request::create('/hello', 'POST', [], [], [], [
-                'HTTP_X_HTTP_METHOD_OVERRIDE' => 'GET',
-            ])
-        )->getContent());
-
-        $this->expectException(NotFoundHttpException::class);
-
-        $this->assertEquals('world', $router->dispatch(
-            Request::create('/hello', 'POST', [], [], [], [
-                'HTTP_X_HTTP_METHOD_OVERRIDE' => '__CONSTRUCT',
-            ])
-        )->getContent());
-    }
 }
 
 class RouteTestControllerStub extends Controller
