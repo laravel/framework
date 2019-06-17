@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
+use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
@@ -189,6 +190,23 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->render($request, $validationException);
 
         $this->assertEquals($argumentExpected, $argumentActual);
+    }
+
+    public function testSuspiciousOperationReturns404WithoutReporting()
+    {
+        $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
+        $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
+
+        $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertStringContainsString('"message": "Invalid method override \"__CONSTRUCT\""', $response->getContent());
+
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $this->handler->report(new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
     }
 }
 
