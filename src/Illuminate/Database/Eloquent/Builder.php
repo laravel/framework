@@ -913,7 +913,7 @@ class Builder
                 continue;
             }
 
-            $builder->callScope(function (Builder $builder) use ($scope) {
+            $builder->callScope(function (self $builder) use ($scope) {
                 // If the scope is a Closure we will just go ahead and call the scope with the
                 // builder instance. The "callScope" method will properly group the clauses
                 // that are added to this query so "where" clauses maintain proper logic.
