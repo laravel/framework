@@ -131,6 +131,21 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
     }
 
+    public function testAssertEmpty()
+    {
+        $statusCode = 200;
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a empty response status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertEmpty();
+    }
+
     public function testAssertHeader()
     {
         $this->expectException(AssertionFailedError::class);

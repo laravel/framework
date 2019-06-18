@@ -173,6 +173,21 @@ class TestResponse
     }
 
     /**
+     * Assert that the response is empty.
+     *
+     * @return $this
+     */
+    public function assertEmpty()
+    {
+        PHPUnit::assertTrue(
+            $this->isEmpty(),
+            'Response status code ['.$this->getStatusCode().'] is not a empty response status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Asserts that the response contains the given header and equals the optional value.
      *
      * @param  string  $headerName
