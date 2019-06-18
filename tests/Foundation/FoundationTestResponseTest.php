@@ -134,6 +134,7 @@ class FoundationTestResponseTest extends TestCase
     public function testAssertEmpty()
     {
         $statusCode = 200;
+
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a empty response status code.');
 
@@ -142,8 +143,22 @@ class FoundationTestResponseTest extends TestCase
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
-
         $response->assertEmpty();
+    }
+
+    public function testAssertNotFound()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a not found status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertNotFound();
     }
 
     public function testAssertHeader()
