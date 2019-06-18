@@ -4444,6 +4444,17 @@ class ValidationValidatorTest extends TestCase
     public function testRequiredWithWildcard()
     {
         $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator(
+            $trans,
+            [
+                'names' => [['second' => 'Otwell']],
+                'foo' => '',
+            ],
+            ['foo' => 'required_with:names.*.first']
+        );
+        $this->assertTrue($v->passes());
+
         $v = new Validator(
             $trans,
             [
