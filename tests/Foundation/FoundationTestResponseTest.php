@@ -131,6 +131,21 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
     }
 
+    public function testAssertOk()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] does not match expected 200 status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertOk();
+    }
+
     public function testAssertHeader()
     {
         $this->expectException(AssertionFailedError::class);
