@@ -22,6 +22,19 @@ class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends T
 
         $listener->handle(new Registered($user));
     }
+    
+    /**
+     * @return void
+     */
+    public function testUserIsInstanceOfMustVerifyEmail()
+    {
+        $user = $this->getMockBuilder(User::class)->getMock();
+        $user->expects($this->once())->method('sendEmailVerificationNotification');
+
+        $listener = new SendEmailVerificationNotification;
+        
+        $listener->handle(new Registered($user));
+    }
 
     /**
      * @return void
