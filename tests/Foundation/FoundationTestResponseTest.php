@@ -131,6 +131,21 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
     }
 
+    public function testAssertNotFound()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a not found status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertNotFound();
+    }
+
     public function testAssertHeader()
     {
         $this->expectException(AssertionFailedError::class);
