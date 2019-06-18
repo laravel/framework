@@ -200,7 +200,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
 
         $this->assertEquals(404, $response->getStatusCode());
-        $this->assertStringContainsString('"message": "Invalid method override \"__CONSTRUCT\""', $response->getContent());
+        $this->assertStringContainsString('"message": ""', $response->getContent());
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);

@@ -198,12 +198,14 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareException(Exception $e)
     {
-        if ($e instanceof ModelNotFoundException || $e instanceof SuspiciousOperationException) {
+        if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);
         } elseif ($e instanceof TokenMismatchException) {
             $e = new HttpException(419, $e->getMessage(), $e);
+        } elseif ($e instanceof SuspiciousOperationException) {
+            $e = new NotFoundHttpException(null, $e);
         }
 
         return $e;
