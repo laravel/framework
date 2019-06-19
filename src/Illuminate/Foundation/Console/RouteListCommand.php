@@ -153,6 +153,12 @@ class RouteListCommand extends Command
      */
     protected function displayRoutes(array $routes)
     {
+        if ($this->option('json')) {
+            $this->line(json_encode(array_values($routes)));
+
+            return;
+        }
+
         $this->table($this->getHeaders(), $routes);
     }
 
@@ -252,6 +258,7 @@ class RouteListCommand extends Command
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
+            ['json', null, InputOption::VALUE_NONE, 'Output the route list as JSON'],
         ];
     }
 }
