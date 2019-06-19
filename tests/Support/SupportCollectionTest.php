@@ -1927,7 +1927,17 @@ class SupportCollectionTest extends TestCase
         });
         $this->assertEquals([
             '[0,"Taylor","Otwell"]' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
-            '[1,"Lucas","Michot"]' => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
+            '[1,"Lucas","Michot"]'  => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
+        ], $result->all());
+    }
+
+    public function testKeyByValue()
+    {
+        $data = new Collection(['Otwell', 'Michot']);
+        $result = $data->keyByValue();
+        $this->assertEquals([
+            'Otwell' => 'Otwell',
+            'Michot' => 'Michot',
         ], $result->all());
     }
 
