@@ -569,6 +569,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('(select * from `users` where `id` = ?) union (select * from `users` where `id` = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1);
+        $builder->union($this->getPostgresBuilder()->select('*')->from('users')->where('id', '=', 2));
+        $this->assertEquals('select * from `users` where `id` = ? union (select * from `users` where `id` = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
         $builder = $this->getMysqlBuilder();
         $expectedSql = '(select `a` from `t1` where `a` = ? and `b` = ?) union (select `a` from `t2` where `a` = ? and `b` = ?) order by `a` asc limit 10';
         $union = $this->getMysqlBuilder()->select('a')->from('t2')->where('a', 11)->where('b', 2);

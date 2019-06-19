@@ -144,7 +144,6 @@ class PostgresGrammar extends Grammar
         return $conjunction.'('.$union['query']->toSql().')';
     }
 
-
     /**
      * Compile the columns for the update statement.
      *
