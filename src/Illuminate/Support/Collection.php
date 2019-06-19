@@ -952,7 +952,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Key an associative array by a it's values.
+     * Key an associative array by it's values.
      *
      * @return static
      */
