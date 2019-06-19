@@ -921,12 +921,13 @@ class Builder
     /**
      * Call the given local model scopes.
      *
-     * @param  array  $scopes
+     * @param  array|string  $scopes
      * @return static|mixed
      */
-    public function scopes(array $scopes)
+    public function scopes($scopes)
     {
         $builder = $this;
+        $scopes = is_array($scopes) ? $scopes : [$scopes];
 
         foreach ($scopes as $scope => $parameters) {
             // If the scope key is an integer, then the scope was passed as the value and
