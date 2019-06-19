@@ -132,6 +132,20 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a single union statement.
+     *
+     * @param  array  $union
+     * @return string
+     */
+    protected function compileUnion(array $union)
+    {
+        $conjunction = $union['all'] ? ' union all ' : ' union ';
+
+        return $conjunction.'('.$union['query']->toSql().')';
+    }
+
+
+    /**
      * Compile the columns for the update statement.
      *
      * @param  array   $values
