@@ -29,10 +29,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $events = array_merge_recursive(
-            $this->discoveredEvents(),
-            $this->listens()
-        );
+        $events = $this->getEvents();
 
         foreach ($events as $event => $listeners) {
             foreach (array_unique($listeners) as $listener) {
@@ -60,12 +57,27 @@ class EventServiceProvider extends ServiceProvider
      *
      * @return array
      */
-    protected function discoveredEvents()
+    public function getEvents()
     {
         if ($this->app->eventsAreCached()) {
-            return require $this->app->getCachedEventsPath();
-        }
+            $cache = require $this->app->getCachedEventsPath();
 
+            return $cache[get_class($this)] ?? [];
+        } else {
+            return array_merge_recursive(
+                $this->discoveredEvents(),
+                $this->listens()
+            );
+        }
+    }
+
+    /**
+     * Get the discovered events for the application.
+     *
+     * @return array
+     */
+    protected function discoveredEvents()
+    {
         return $this->shouldDiscoverEvents()
                     ? $this->discoverEvents()
                     : [];
