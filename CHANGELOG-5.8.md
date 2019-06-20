@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.24...5.8)
 
 
-## [v5.8.23 (2019-06-19)](https://github.com/laravel/framework/compare/v5.8.23...v5.8.24)
+## [v5.8.24 (2019-06-19)](https://github.com/laravel/framework/compare/v5.8.23...v5.8.24)
 
 ### Added
 - Added possibility to assert that the session contains a given piece of data using a closure in `TestResponse::assertSessionHas()` ([#28837](https://github.com/laravel/framework/pull/28837))
