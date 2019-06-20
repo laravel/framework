@@ -1814,8 +1814,16 @@ class DatabaseEloquentModelTest extends TestCase
         ];
 
         $this->assertInstanceOf(Builder::class, $model->scopes($scopes));
-
         $this->assertSame($scopes, $model->scopesCalled);
+    }
+
+    public function testScopesMethodWithString()
+    {
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+
+        $this->assertInstanceOf(Builder::class, $model->scopes('published'));
+        $this->assertSame(['published'], $model->scopesCalled);
     }
 
     public function testIsWithNull()
