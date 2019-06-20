@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Migrations;
 
 use Closure;
+use RuntimeException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
@@ -48,6 +49,7 @@ class MigrationCreator
     public function create($name, $path, $table = null, $create = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
+        $this->ensureMigrationPathExist($path);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
@@ -79,6 +81,25 @@ class MigrationCreator
     {
         if (class_exists($className = $this->getClassName($name))) {
             throw new InvalidArgumentException("A {$className} class already exists.");
+        }
+    }
+
+    /**
+     * Ensure that migration directory exist or create if not.
+     *
+     * @param  string  $path
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function ensureMigrationPathExist(string $path): void
+    {
+        if (is_dir($path)) {
+            return;
+        }
+
+        if (! mkdir($path) && ! is_dir($path)) {
+            throw new RuntimeException("Directory {$path} was not created");
         }
     }
 
