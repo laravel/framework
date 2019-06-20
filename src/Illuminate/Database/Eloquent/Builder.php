@@ -875,14 +875,14 @@ class Builder
     /**
      * Call the given local model scopes.
      *
-     * @param  array  $scopes
+     * @param  array|string  $scopes
      * @return static|mixed
      */
-    public function scopes(array $scopes)
+    public function scopes($scopes)
     {
         $builder = $this;
 
-        foreach ($scopes as $scope => $parameters) {
+        foreach (Arr::wrap($scopes) as $scope => $parameters) {
             // If the scope key is an integer, then the scope was passed as the value and
             // the parameter list is empty, so we will format the scope name and these
             // parameters here. Then, we'll be ready to call the scope on the model.
