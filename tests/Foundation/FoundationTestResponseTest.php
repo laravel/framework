@@ -31,7 +31,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $response = $this->makeMockResponse([
             'render' => 'hello world',
-            'getData' => ['foo' => 'bar'],
+            'gatherData' => ['foo' => 'bar'],
         ]);
 
         $response->assertViewHas('foo');
@@ -48,7 +48,7 @@ class FoundationTestResponseTest extends TestCase
 
         $response = $this->makeMockResponse([
             'render' => 'hello world',
-            'getData' => ['foo' => $model],
+            'gatherData' => ['foo' => $model],
         ]);
 
         $response->original->foo = $model;
