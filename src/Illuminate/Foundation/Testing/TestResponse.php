@@ -697,6 +697,12 @@ class TestResponse
      */
     public function assertJsonMissingValidationErrors($keys = null)
     {
+        if (empty($this->getContent()) && $this->getStatusCode() == 204) {
+            PHPUnit::assertTrue(true);
+
+            return $this;
+        }
+
         $json = $this->json();
 
         if (! array_key_exists('errors', $json)) {
