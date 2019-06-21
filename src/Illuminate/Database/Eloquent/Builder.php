@@ -1228,7 +1228,7 @@ class Builder
      */
     protected function shouldNestWheresForScope(QueryBuilder $query, $originalWhereCount)
     {
-        return count($query->wheres) > $originalWhereCount;
+        return count((array) $query->wheres) > $originalWhereCount;
     }
 
     /**
