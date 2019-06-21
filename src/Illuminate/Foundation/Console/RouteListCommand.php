@@ -153,6 +153,12 @@ class RouteListCommand extends Command
      */
     protected function displayRoutes(array $routes)
     {
+        if ($this->option('json')) {
+            $this->line(json_encode(array_values($routes)));
+
+            return;
+        }
+
         $this->table($this->getHeaders(), $routes);
     }
 
@@ -247,6 +253,7 @@ class RouteListCommand extends Command
         return [
             ['columns', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Columns to include in the route table'],
             ['compact', 'c', InputOption::VALUE_NONE, 'Only show method, URI and action columns'],
+            ['json', null, InputOption::VALUE_NONE, 'Output the route list as JSON'],
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],

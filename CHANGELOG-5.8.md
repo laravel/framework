@@ -1,13 +1,29 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.23...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.24...5.8)
+
+
+## [v5.8.24 (2019-06-19)](https://github.com/laravel/framework/compare/v5.8.23...v5.8.24)
 
 ### Added
 - Added possibility to assert that the session contains a given piece of data using a closure in `TestResponse::assertSessionHas()` ([#28837](https://github.com/laravel/framework/pull/28837))
 - Added `TestResponse::assertUnauthorized()` ([#28851](https://github.com/laravel/framework/pull/28851))
+- Allowed to define port in `ServeCommand` via `SERVER_PORT` env variable ([#28849](https://github.com/laravel/framework/pull/28849), [6a18e73](https://github.com/laravel/framework/commit/6a18e73f63f46b6aa5ab6faceb9eb5060c64fc15))
+- Allowed console environment argument to be separated with a space ([#28869](https://github.com/laravel/framework/pull/28869))
+- Added `@endcomponentFirst` directive ([#28884](https://github.com/laravel/framework/pull/28884))
+- Added optional parameter `$when` to `retry` helper ([85c0801](https://github.com/laravel/framework/commit/85c08016c424f6c8e45f08282523f8785eda9673))
+
+### Fixed
+- Fixed `Builder::dump()` and `Builder::dd()` with global scopes ([#28858](https://github.com/laravel/framework/pull/28858))
+
+### Reverted
+- Reverted: [Automatically bind the viewAny method to the index controller action](https://github.com/laravel/framework/pull/28820) ([#28865](https://github.com/laravel/framework/pull/28865))
+
+### Changed
+- Handle `SuspiciousOperationException` in router as `NotFoundHttpException` ([#28866](https://github.com/laravel/framework/pull/28866))
 
 
-## [v5.8.23 (2019-06-14)](https://github.com/laravel/framework/compare/v5.8.21...v5.8.23)
+## [v5.8.23 (2019-06-14)](https://github.com/laravel/framework/compare/v5.8.22...v5.8.23)
 
 ### Fixed
 - Fixed strict comparison in redis configuration Parsing. ([#28830](https://github.com/laravel/framework/pull/28830))
