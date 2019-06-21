@@ -28,6 +28,11 @@ class RequestMakeCommand extends GeneratorCommand
     protected $type = 'Request';
 
     /**
+     * @var string
+     */
+    protected $defaultParent = \Illuminate\Foundation\Http\FormRequest::class;
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
