@@ -581,18 +581,23 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertJsonMissingValidationErrorsOnAnEmptyResponse()
     {
-        $emptyTestResponse204 = TestResponse::fromBaseResponse(
+        $emptyResponse = TestResponse::fromBaseResponse(
             (new Response)->setContent('')
         );
-        $emptyTestResponse204->setStatusCode(204);
-        $emptyTestResponse204->assertJsonMissingValidationErrors();
 
+        $emptyResponse->assertJsonMissingValidationErrors();
+    }
+
+    public function testAssertJsonMissingValidationErrorsOnInvalidJson()
+    {
         $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Invalid JSON was returned from the route.');
 
-        $emptyTestResponseNot204 = TestResponse::fromBaseResponse(
-            (new Response)->setContent('')
+        $invalidJsonResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent('~invalid json')
         );
-        $emptyTestResponseNot204->assertJsonMissingValidationErrors();
+
+        $invalidJsonResponse->assertJsonMissingValidationErrors();
     }
 
     public function testMacroable()
