@@ -12,14 +12,24 @@ class HasInCollection extends Constraint
      */
     private $collection;
 
-    public function __construct(Collection $collection)
+    /**
+     * @var bool
+     */
+    private $strict;
+
+    public function __construct(Collection $collection, bool $strict=false)
     {
         $this->collection = $collection;
+        $this->strict = $strict;
     }
 
     protected function matches($item): bool
     {
-        return $this->collection->contains($item);
+        return (
+            $this->strict
+                ? $this->collection->containsStrict($item)
+                : $this->collection->contains($item)
+        );
     }
 
     /**

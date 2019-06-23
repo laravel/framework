@@ -41,4 +41,38 @@ trait InteractsWithCollections
 
         return $this;
     }
+
+    /**
+     * Assert that a given item exists in the collection (using strict comparison).
+     *
+     * @param  Collection  $collection
+     * @param  mixed  $item
+     * @return $this
+     */
+    public function assertCollectionHasStrict(Collection $collection, $item)
+    {
+        $this->assertThat(
+            $item, new HasInCollection($collection, true)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given item does not exist in the collection (using strict comparison).
+     *
+     * @param  Collection  $collection
+     * @param  mixed  $item
+     * @return $this
+     */
+    public function assertCollectionMissingStrict(Collection $collection, $item)
+    {
+        $constraint = new ReverseConstraint(
+            new HasInCollection($collection, true)
+        );
+
+        $this->assertThat($item, $constraint);
+
+        return $this;
+    }
 }
