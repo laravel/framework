@@ -15,6 +15,7 @@ abstract class TestCase extends BaseTestCase
     use Concerns\InteractsWithContainer,
         Concerns\MakesHttpRequests,
         Concerns\InteractsWithAuthentication,
+        Concerns\InteractsWithCollections,
         Concerns\InteractsWithConsole,
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithExceptionHandling,
