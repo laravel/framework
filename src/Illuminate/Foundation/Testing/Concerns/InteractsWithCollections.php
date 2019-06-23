@@ -15,7 +15,7 @@ trait InteractsWithCollections
      * @param  mixed  $item
      * @return $this
      */
-    public function assertCollectionHas(Collection $collection, $item)
+    protected function assertCollectionHas(Collection $collection, $item)
     {
         $this->assertThat(
             $item, new HasInCollection($collection)
@@ -31,7 +31,7 @@ trait InteractsWithCollections
      * @param  mixed  $item
      * @return $this
      */
-    public function assertCollectionMissing(Collection $collection, $item)
+    protected function assertCollectionMissing(Collection $collection, $item)
     {
         $constraint = new ReverseConstraint(
             new HasInCollection($collection)
@@ -49,7 +49,7 @@ trait InteractsWithCollections
      * @param  mixed  $item
      * @return $this
      */
-    public function assertCollectionHasStrict(Collection $collection, $item)
+    protected function assertCollectionHasStrict(Collection $collection, $item)
     {
         $this->assertThat(
             $item, new HasInCollection($collection, true)
@@ -65,7 +65,7 @@ trait InteractsWithCollections
      * @param  mixed  $item
      * @return $this
      */
-    public function assertCollectionMissingStrict(Collection $collection, $item)
+    protected function assertCollectionMissingStrict(Collection $collection, $item)
     {
         $constraint = new ReverseConstraint(
             new HasInCollection($collection, true)
