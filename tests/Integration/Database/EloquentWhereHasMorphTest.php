@@ -192,6 +192,15 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         $this->assertEquals([1, 2, 3], $comments->pluck('id')->all());
     }
+
+    public function testModelScopesAreAccessible()
+    {
+        $comments = Comment::whereHasMorph('commentable', [Post::class, Video::class], function (Builder $query) {
+            $query->someSharedModelScope();
+        })->get();
+
+        $this->assertEquals([1, 4], $comments->pluck('id')->all());
+    }
 }
 
 class Comment extends Model
@@ -225,6 +234,11 @@ class Post extends Model
     public $timestamps = false;
 
     protected $guarded = ['id'];
+
+    public function scopeSomeSharedModelScope($query)
+    {
+        $query->where('title', '=', 'foo');
+    }
 }
 
 class Video extends Model
@@ -232,4 +246,9 @@ class Video extends Model
     public $timestamps = false;
 
     protected $guarded = ['id'];
+
+    public function scopeSomeSharedModelScope($query)
+    {
+        $query->where('title', '=', 'foo');
+    }
 }
