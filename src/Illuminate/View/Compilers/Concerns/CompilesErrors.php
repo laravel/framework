@@ -2,6 +2,8 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
+use Illuminate\Support\Arr;
+
 trait CompilesErrors
 {
     /**
@@ -13,8 +15,8 @@ trait CompilesErrors
     protected function compileError($expression)
     {
         $expression = explode(',', $this->stripParentheses($expression));
-        $bag = Arr::get($expression, 0, 'default');
-        $attribute = trim(Arr::get($expression, 1, $expression));
+        $attribute = trim(Arr::get($expression, 0));
+        $bag = trim(Arr::get($expression, 1, '\'default\''));
 
         return '<?php if ($errors->getBag('.$bag.')->has('.$attribute.')) :
 if (isset($message)) { $messageCache = $message; }
