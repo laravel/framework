@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\ExpectationFailedException;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithCollections;
 
