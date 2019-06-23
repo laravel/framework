@@ -11,14 +11,32 @@ class BladeErrorTest extends AbstractBladeTestCase
     <span>{{ $message }}</span>
 @enderror';
         $expected = '
-<?php if ($errors->has(\'email\')) :
+<?php if ($errors->getBag(\'default\')->has(\'email\')) :
 if (isset($message)) { $messageCache = $message; }
-$message = $errors->first(\'email\'); ?>
+$message = $errors->getBag(\'default\')->first(\'email\'); ?>
     <span><?php echo e($message); ?></span>
 <?php unset($message);
 if (isset($messageCache)) { $message = $messageCache; }
 endif; ?>';
 
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+    
+    public function testErrorsWithCustomBagAreCompiled()
+    {
+        $string = '
+@error(\'email\', \'login\')
+    <span>{{ $message }}</span>
+@enderror';
+        $expected = '
+<?php if ($errors->getBag(\'login\')->has(\'email\')) :
+if (isset($message)) { $messageCache = $message; }
+$message = $errors->getBag(\'login\')->first(\'email\'); ?>
+    <span><?php echo e($message); ?></span>
+<?php unset($message);
+if (isset($messageCache)) { $message = $messageCache; }
+endif; ?>';
+        
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }
