@@ -210,8 +210,6 @@ trait QueriesRelationships
                 $query->orWhere(function ($query) use ($relation, $callback, $operator, $count, $type) {
                     $belongsTo = $this->getBelongsToRelation($relation, $type);
 
-                    $belongsTo->getQuery()->mergeConstraintsFrom($relation->getQuery());
-
                     if ($callback) {
                         $callback = function ($query) use ($callback, $type) {
                             return $callback($query, $type);
@@ -234,13 +232,17 @@ trait QueriesRelationships
      */
     protected function getBelongsToRelation(MorphTo $relation, $type)
     {
-        return Relation::noConstraints(function () use ($relation, $type) {
+        $belongsTo = Relation::noConstraints(function () use ($relation, $type) {
             return $this->model->belongsTo(
                 Relation::getMorphedModel($type) ?? $type,
                 $relation->getForeignKeyName(),
                 $relation->getOwnerKeyName()
             );
         });
+
+        $belongsTo->getQuery()->mergeConstraintsFrom($relation->getQuery());
+
+        return $belongsTo;
     }
 
     /**
