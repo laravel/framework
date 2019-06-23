@@ -17,7 +17,7 @@ class HasInCollection extends Constraint
      */
     private $strict;
 
-    public function __construct(Collection $collection, bool $strict=false)
+    public function __construct(Collection $collection, bool $strict = false)
     {
         $this->collection = $collection;
         $this->strict = $strict;
@@ -25,11 +25,10 @@ class HasInCollection extends Constraint
 
     protected function matches($item): bool
     {
-        return (
+        return
             $this->strict
                 ? $this->collection->containsStrict($item)
-                : $this->collection->contains($item)
-        );
+                : $this->collection->contains($item);
     }
 
     /**
