@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Foundation\Testing\Constraints\HasInCollection;
 use Illuminate\Support\Collection;
+use Illuminate\Foundation\Testing\Constraints\HasInCollection;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
 trait InteractsWithCollections

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Foundation\Testing\Concerns\InteractsWithCollections;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\ExpectationFailedException;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithCollections;
 
 class FoundationInteractsWithCollectionsTest extends TestCase
 {
