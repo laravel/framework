@@ -21,7 +21,7 @@ endif; ?>';
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-    
+
     public function testErrorsWithCustomBagAreCompiled()
     {
         $string = '
@@ -36,7 +36,7 @@ $message = $errors->getBag(\'login\')->first(\'email\'); ?>
 <?php unset($message);
 if (isset($messageCache)) { $message = $messageCache; }
 endif; ?>';
-        
+
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }
