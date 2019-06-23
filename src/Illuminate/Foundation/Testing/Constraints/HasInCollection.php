@@ -8,7 +8,7 @@ use PHPUnit\Framework\Constraint\Constraint;
 class HasInCollection extends Constraint
 {
     /**
-     * @var Collection
+     * @var \Illuminate\Support\Collection
      */
     private $collection;
 

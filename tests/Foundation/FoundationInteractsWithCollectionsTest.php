@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
 use PHPUnit\Framework\ExpectationFailedException;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithCollections;
 
@@ -12,7 +11,7 @@ class FoundationInteractsWithCollectionsTest extends TestCase
     use InteractsWithCollections;
 
     /**
-     * @var Collection
+     * @var \Illuminate\Support\Collection
      */
     protected $collection;
 

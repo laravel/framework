@@ -11,7 +11,7 @@ trait InteractsWithCollections
     /**
      * Assert that a given item exists in the collection.
      *
-     * @param  Collection  $collection
+     * @param  \Illuminate\Support\Collection  $collection
      * @param  mixed  $item
      * @return $this
      */
@@ -27,7 +27,7 @@ trait InteractsWithCollections
     /**
      * Assert that a given item does not exist in the collection.
      *
-     * @param  Collection  $collection
+     * @param  \Illuminate\Support\Collection  $collection
      * @param  mixed  $item
      * @return $this
      */
@@ -45,7 +45,7 @@ trait InteractsWithCollections
     /**
      * Assert that a given item exists in the collection (using strict comparison).
      *
-     * @param  Collection  $collection
+     * @param  \Illuminate\Support\Collection  $collection
      * @param  mixed  $item
      * @return $this
      */
@@ -61,7 +61,7 @@ trait InteractsWithCollections
     /**
      * Assert that a given item does not exist in the collection (using strict comparison).
      *
-     * @param  Collection  $collection
+     * @param  \Illuminate\Support\Collection  $collection
      * @param  mixed  $item
      * @return $this
      */
