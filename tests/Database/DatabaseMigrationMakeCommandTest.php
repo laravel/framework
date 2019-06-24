@@ -18,6 +18,20 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         m::close();
     }
 
+    public function testBasicCreateWithInvalidCharsThrowsException()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            $composer = m::mock(Composer::class)
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->runCommand($command, ['name' => 'invalid,classname!']);
+    }
+
     public function testBasicCreateDumpsAutoload()
     {
         $command = new MigrateMakeCommand(

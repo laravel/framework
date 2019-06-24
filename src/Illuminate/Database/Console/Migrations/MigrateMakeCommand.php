@@ -68,6 +68,13 @@ class MigrateMakeCommand extends BaseCommand
         // to be freshly created so we can create the appropriate migrations.
         $name = Str::snake(trim($this->input->getArgument('name')));
 
+        // Later on we're going to convert $name into a classname for the
+        // migration.  As such, we need to confirm that there are no characters
+        // that are not allowed in a classname
+        if (!(bool)preg_match("%^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$%", $name)) {
+            throw new \InvalidArgumentException("Invalid characters present in proposed classname {$name}");
+        }
+
         $table = $this->input->getOption('table');
 
         $create = $this->input->getOption('create') ?: false;
