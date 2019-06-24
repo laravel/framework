@@ -174,7 +174,7 @@ abstract class AbstractPaginator implements Htmlable
             $parameters = array_merge($this->query, $parameters);
         }
 
-        $separator = !empty($parameters)
+        $separator = ! empty($parameters)
             ? (Str::contains($this->path, '?') ? '&' : '?')
             : '';
 
