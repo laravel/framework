@@ -3,9 +3,9 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Support\Composer;
 use Illuminate\Database\Migrations\MigrationCreator;
-use InvalidArgumentException;
 
 class MigrateMakeCommand extends BaseCommand
 {
