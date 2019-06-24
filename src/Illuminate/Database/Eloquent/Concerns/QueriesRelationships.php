@@ -216,7 +216,7 @@ trait QueriesRelationships
                         };
                     }
 
-                    $query->where($relation->getMorphType(), '=', $type)
+                    $query->where($relation->getMorphType(), '=', (new $type)->getMorphClass())
                         ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
@@ -234,7 +234,7 @@ trait QueriesRelationships
     {
         $belongsTo = Relation::noConstraints(function () use ($relation, $type) {
             return $this->model->belongsTo(
-                Relation::getMorphedModel($type) ?? $type,
+                $type,
                 $relation->getForeignKeyName(),
                 $relation->getOwnerKeyName()
             );
