@@ -660,7 +660,9 @@ class Validator implements ValidatorContract
         );
 
         $result = [];
+
         $failed = Arr::only(Arr::dot($invalid), array_keys($this->failed()));
+
         foreach ($failed as $key => $failure) {
             Arr::set($result, $key, $failure);
         }
