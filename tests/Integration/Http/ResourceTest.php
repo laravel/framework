@@ -448,8 +448,11 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $paginator = new LengthAwarePaginator(
-                collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
-                10, 15, 1
+                collect([
+                    new Post(['id' => 5, 'title' => 'Test Title']),
+                    new Post(['id' => 6, 'title' => 'Test Title 2']),
+                ]),
+                10, 1, 1
             );
 
             return new PostCollectionResource($paginator);
@@ -467,20 +470,24 @@ class ResourceTest extends TestCase
                     'id' => 5,
                     'title' => 'Test Title',
                 ],
+                [
+                    'id' => 6,
+                    'title' => 'Test Title 2',
+                ],
             ],
             'links' => [
-                'first' => '/?page=1',
-                'last' => '/?page=1',
+                'first' => '/',
+                'last' => '/?page=10',
                 'prev' => null,
-                'next' => null,
+                'next' => '/?page=2',
             ],
             'meta' => [
                 'current_page' => 1,
                 'from' => 1,
-                'last_page' => 1,
+                'last_page' => 10,
                 'path' => '/',
-                'per_page' => 15,
-                'to' => 1,
+                'per_page' => 1,
+                'to' => 2,
                 'total' => 10,
             ],
         ]);
@@ -510,8 +517,8 @@ class ResourceTest extends TestCase
                 ],
             ],
             'links' => [
-                'first' => '/?page=1',
-                'last' => '/?page=1',
+                'first' => '/',
+                'last' => '/',
                 'prev' => null,
                 'next' => null,
             ],
