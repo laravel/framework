@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Composer;
 use Illuminate\Foundation\Application;
@@ -27,7 +28,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->runCommand($command, ['name' => 'invalid,classname!']);
     }

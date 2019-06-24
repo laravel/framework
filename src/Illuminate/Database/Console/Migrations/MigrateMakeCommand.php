@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console\Migrations;
 use Illuminate\Support\Str;
 use Illuminate\Support\Composer;
 use Illuminate\Database\Migrations\MigrationCreator;
+use InvalidArgumentException;
 
 class MigrateMakeCommand extends BaseCommand
 {
@@ -69,10 +70,10 @@ class MigrateMakeCommand extends BaseCommand
         $name = Str::snake(trim($this->input->getArgument('name')));
 
         // Later on we're going to convert $name into a classname for the
-        // migration.  As such, we need to confirm that there are no characters
+        // migration. As such, we need to confirm that there are no characters
         // that are not allowed in a classname
         if (! (bool) preg_match("%^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$%", $name)) {
-            throw new \InvalidArgumentException("Invalid characters present in proposed classname {$name}");
+            throw new InvalidArgumentException("Invalid characters present in proposed classname {$name}");
         }
 
         $table = $this->input->getOption('table');
