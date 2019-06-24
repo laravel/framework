@@ -71,7 +71,7 @@ class MigrateMakeCommand extends BaseCommand
         // Later on we're going to convert $name into a classname for the
         // migration.  As such, we need to confirm that there are no characters
         // that are not allowed in a classname
-        if (!(bool)preg_match("%^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$%", $name)) {
+        if (! (bool) preg_match("%^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$%", $name)) {
             throw new \InvalidArgumentException("Invalid characters present in proposed classname {$name}");
         }
 
