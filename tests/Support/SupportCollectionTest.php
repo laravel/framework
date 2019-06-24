@@ -1082,7 +1082,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['a' => 'taylor', 'b' => 'dayle']);
 
-        $this->assertEquals(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeys()->all());
+        $this->assertSame(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeysDesc()->all());
     }
 
     public function testReverse()
