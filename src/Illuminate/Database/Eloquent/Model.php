@@ -698,6 +698,38 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Save the given attributes of the model to the database.
+     *
+     * @param string[]|string $attributes
+     * @param array $options
+     *
+     * @return bool
+     */
+    public function saveAttributes($attributes, array $options = [])
+    {
+        $attributes = (array) $attributes;
+
+        $dirty = Arr::only($this->getDirty(), $attributes);
+
+        if (count($dirty) > 0) {
+            $clone = (clone $this)->setRawAttributes($dirty + $this->getOriginal());
+
+            if (! $clone->save($options)) {
+                return false;
+            }
+
+            $changed = array_diff($clone->getAttributes(), $this->getOriginal());
+
+            $this->setRawAttributes($changed + $this->getAttributes());
+            $this->syncOriginalAttributes(array_keys($changed));
+            $this->exists = $clone->exists;
+            $this->wasRecentlyCreated = $clone->wasRecentlyCreated;
+        }
+
+        return true;
+    }
+
+    /**
      * Perform any actions that are necessary after the model is saved.
      *
      * @param  array  $options

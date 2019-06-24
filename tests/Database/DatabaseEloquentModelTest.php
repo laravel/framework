@@ -295,6 +295,53 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->save());
     }
 
+    public function testSaveAttributesWhenUpdating()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery', 'updateTimestamps'])->getMock();
+        $queries = [m::mock(Builder::class), m::mock(Builder::class)];
+        $queries[0]->shouldReceive('where')->once()->with('id', '=', 1);
+        $queries[0]->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
+        $queries[1]->shouldReceive('where')->once()->with('id', '=', 1);
+        $queries[1]->shouldReceive('update')->once()->with(['foo' => 'bar'])->andReturn(1);
+        $model->expects($this->exactly(2))->method('newModelQuery')->will($this->onConsecutiveCalls(...$queries));
+        $model->expects($this->exactly(2))->method('updateTimestamps');
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until');
+        $events->shouldReceive('dispatch');
+
+        $model->id = 1;
+        $model->foo = 'foo';
+        $model->syncOriginal();
+        $model->foo = 'bar';
+        $model->name = 'taylor';
+        $model->exists = true;
+        $this->assertTrue($model->saveAttributes(['name']));
+        $this->assertTrue($model->save());
+    }
+
+    public function testSaveAttributesWhenInserting()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $queries = [m::mock(Builder::class), m::mock(Builder::class)];
+        $queries[0]->shouldReceive('insertGetId')->once()->with(['name' => 'taylor'], 'id')->andReturn(1);
+        $queries[0]->shouldReceive('getConnection')->once();
+        $queries[1]->shouldReceive('where')->once()->with('id', '=', 1);
+        $queries[1]->shouldReceive('update')->once()->with(['foo' => 'bar'])->andReturn(1);
+        $model->expects($this->exactly(2))->method('newModelQuery')->will($this->onConsecutiveCalls(...$queries));
+        $model->expects($this->exactly(2))->method('updateTimestamps');
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until');
+        $events->shouldReceive('dispatch');
+
+        $model->foo = 'bar';
+        $model->name = 'taylor';
+        $model->exists = false;
+        $this->assertTrue($model->saveAttributes(['name']));
+        $this->assertEquals(1, $model->id);
+        $this->assertTrue($model->exists);
+        $this->assertTrue($model->save());
+    }
+
     public function testSaveIsCancelledIfSavingEventReturnsFalse()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery'])->getMock();
