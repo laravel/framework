@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class DownCommand extends Command
 {
@@ -29,14 +30,13 @@ class DownCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param CacheContract $cache
      * @return int
      */
-    public function handle()
+    public function handle(CacheContract $cache)
     {
         try {
-            file_put_contents(storage_path('framework/down'),
-                              json_encode($this->getDownFilePayload(),
-                              JSON_PRETTY_PRINT));
+            $cache->forever('framework_down', $this->getDownFilePayload());
 
             $this->comment('Application is now in maintenance mode.');
         } catch (Exception $e) {

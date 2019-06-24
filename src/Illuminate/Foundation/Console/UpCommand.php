@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class UpCommand extends Command
 {
@@ -24,18 +25,19 @@ class UpCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param CacheContract $cache
      * @return int
      */
-    public function handle()
+    public function handle(CacheContract $cache)
     {
         try {
-            if (! file_exists(storage_path('framework/down'))) {
+            if (! $cache->has('framework_down')) {
                 $this->comment('Application is already up.');
 
                 return true;
             }
 
-            unlink(storage_path('framework/down'));
+            $cache->forget('framework_down');
 
             $this->info('Application is now live.');
         } catch (Exception $e) {
