@@ -2591,9 +2591,7 @@ class Builder
     {
         $original = $this->columns;
 
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
+        $this->columns = $columns;
 
         $result = $callback();
 
