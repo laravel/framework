@@ -74,23 +74,6 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
 
-    public function testWhereHasMorphWithMorphMap()
-    {
-        Relation::morphMap(['posts' => Post::class]);
-
-        Comment::where('commentable_type', Post::class)->update(['commentable_type' => 'posts']);
-
-        try {
-            $comments = Comment::whereHasMorph('commentable', ['posts', Video::class], function (Builder $query) {
-                $query->where('title', 'foo');
-            })->get();
-
-            $this->assertEquals([1, 4], $comments->pluck('id')->all());
-        } finally {
-            Relation::morphMap([], false);
-        }
-    }
-
     public function testWhereHasMorphWithRelationConstraint()
     {
         $comments = Comment::whereHasMorph('commentableWithConstraint', Video::class, function (Builder $query) {
