@@ -61,6 +61,23 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
 
+    public function testWhereHasMorphWithMorphMap()
+    {
+        Relation::morphMap(['posts' => Post::class]);
+
+        Comment::where('commentable_type', Post::class)->update(['commentable_type' => 'posts']);
+
+        try {
+            $comments = Comment::whereHasMorph('commentable', [Post::class, Video::class], function (Builder $query) {
+                $query->where('title', 'foo');
+            })->get();
+
+            $this->assertEquals([1, 4], $comments->pluck('id')->all());
+        } finally {
+            Relation::morphMap([], false);
+        }
+    }
+
     public function testWhereHasMorphWithWildcard()
     {
         // Test newModelQuery() without global scopes.
@@ -72,6 +89,23 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             })->get();
 
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
+    }
+
+    public function testWhereHasMorphWithWildcardAndMorphMap()
+    {
+        Relation::morphMap(['posts' => Post::class]);
+
+        Comment::where('commentable_type', Post::class)->update(['commentable_type' => 'posts']);
+
+        try {
+            $comments = Comment::whereHasMorph('commentable', '*', function (Builder $query) {
+                $query->where('title', 'foo');
+            })->get();
+
+            $this->assertEquals([4, 1], $comments->pluck('id')->all());
+        } finally {
+            Relation::morphMap([], false);
+        }
     }
 
     public function testWhereHasMorphWithRelationConstraint()
