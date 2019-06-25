@@ -63,6 +63,6 @@ class Mix
             }
         }
 
-        return new HtmlString($manifestDirectory.$manifest[$path]);
+        return new HtmlString(env('MIX_ASSET_URL').$manifestDirectory.$manifest[$path]);
     }
 }
