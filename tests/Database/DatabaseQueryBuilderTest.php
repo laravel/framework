@@ -2837,7 +2837,7 @@ SQL;
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
-        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
@@ -2864,7 +2864,7 @@ SQL;
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
-        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
@@ -2895,7 +2895,7 @@ SQL;
 
         $results = [];
 
-        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(0);
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(0);
         $builder->shouldNotReceive('forPage');
         $builder->shouldNotReceive('get');
 
@@ -2910,6 +2910,33 @@ SQL;
         $result = $builder->paginate();
 
         $this->assertEquals(new LengthAwarePaginator($results, 0, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
+    public function testPaginateWithSpecificColumns()
+    {
+        $perPage = 16;
+        $columns = ['id', 'name'];
+        $pageName = 'page-name';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
+
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate($perPage, $columns, $pageName, $page);
+
+        $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
             'path' => $path,
             'pageName' => $pageName,
         ]), $result);

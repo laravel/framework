@@ -139,7 +139,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         $filename = $name ?? basename($path);
 
         $disposition = $response->headers->makeDisposition(
-            $disposition, $filename, Str::ascii($filename)
+            $disposition, $filename, $this->fallbackName($filename)
         );
 
         $response->headers->replace($headers + [
@@ -168,6 +168,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function download($path, $name = null, array $headers = [])
     {
         return $this->response($path, $name, $headers, 'attachment');
+    }
+
+    /**
+     * Convert the string to ASCII characters that are equivalent to the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function fallbackName($name)
+    {
+        return str_replace('%', '', Str::ascii($name));
     }
 
     /**

@@ -2,6 +2,16 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.24...5.8)
 
+### Added
+- Added `json` option to `route:list` command ([#28894](https://github.com/laravel/framework/pull/28894))
+
+### TODO
+- allow view assertions to see all data ([#28893](https://github.com/laravel/framework/pull/28893))
+- Let mix helper use assets url ([#28905](https://github.com/laravel/framework/pull/28905))
+- Prevent event cache from firing multiple times the same event(s) ([#28904](https://github.com/laravel/framework/pull/28904))
+- Fix assertJsonMissingValidationErrors() on empty response ([#28595](https://github.com/laravel/framework/pull/28595))
+- Don't check for status code in assertJsonMissingValidationErrors() ([#28913](https://github.com/laravel/framework/pull/28913))
+
 
 ## [v5.8.24 (2019-06-19)](https://github.com/laravel/framework/compare/v5.8.23...v5.8.24)
 

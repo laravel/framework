@@ -67,7 +67,7 @@ trait Macroable
      * Dynamically handle calls to the class.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      *
      * @throws \BadMethodCallException
@@ -91,7 +91,7 @@ trait Macroable
      * Dynamically handle calls to the class.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      *
      * @throws \BadMethodCallException
