@@ -26,7 +26,7 @@ class DummyClass implements ShouldQueue
      * @param  DummyEvent  $event
      * @return void
      */
-    public function handle(DummyEvent $event)
+    public function handle(DummyEvent $event): void
     {
         //
     }

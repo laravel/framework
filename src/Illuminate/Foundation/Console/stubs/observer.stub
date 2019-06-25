@@ -12,7 +12,7 @@ class DummyClass
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
      */
-    public function created(DummyModel $dummyModel)
+    public function created(DummyModel $dummyModel): void
     {
         //
     }
@@ -23,7 +23,7 @@ class DummyClass
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
      */
-    public function updated(DummyModel $dummyModel)
+    public function updated(DummyModel $dummyModel): void
     {
         //
     }
@@ -34,7 +34,7 @@ class DummyClass
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
      */
-    public function deleted(DummyModel $dummyModel)
+    public function deleted(DummyModel $dummyModel): void
     {
         //
     }
@@ -45,7 +45,7 @@ class DummyClass
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
      */
-    public function restored(DummyModel $dummyModel)
+    public function restored(DummyModel $dummyModel): void
     {
         //
     }
@@ -56,7 +56,7 @@ class DummyClass
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
      */
-    public function forceDeleted(DummyModel $dummyModel)
+    public function forceDeleted(DummyModel $dummyModel): void
     {
         //
     }
