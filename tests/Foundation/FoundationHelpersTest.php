@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 use Illuminate\Foundation\Mix;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
-use Illuminate\Contracts\Config\Repository;
 
 class FoundationHelpersTest extends TestCase
 {
@@ -68,10 +67,6 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixDoesNotIncludeHost()
     {
-        $app = new Application;
-        $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('app.asset_url');
-
         $manifest = $this->makeManifest();
 
         $result = mix('/unversioned.css');
@@ -83,10 +78,6 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixCachesManifestForSubsequentCalls()
     {
-        $app = new Application;
-        $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('app.asset_url');
-
         $manifest = $this->makeManifest();
         mix('unversioned.css');
         unlink($manifest);
@@ -98,10 +89,6 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixAssetMissingStartingSlashHaveItAdded()
     {
-        $app = new Application;
-        $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('app.asset_url');
-
         $manifest = $this->makeManifest();
 
         $result = mix('unversioned.css');
@@ -121,10 +108,6 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixWithManifestDirectory()
     {
-        $app = new Application;
-        $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('app.asset_url');
-
         mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('mix');
 
