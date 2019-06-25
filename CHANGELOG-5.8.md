@@ -1,16 +1,34 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.24...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.26...5.8)
+
+### Added
+- Let `mix` helper use `app.mix_url` config ([#28952](https://github.com/laravel/framework/pull/28952))
+
+### Changed
+- Prevented `TestResponse::dump()` and `TestResponse::dumpHeaders()` dump methods from ending execution of the script ([#28960](https://github.com/laravel/framework/pull/28960))
+
+
+## [v5.8.26 (2019-06-25)](https://github.com/laravel/framework/compare/v5.8.25...v5.8.26)
+
+### Reverted
+- Reverted: [Let `mix` helper use `app.asset_url`](https://github.com/laravel/framework/pull/28905) ([#28950](https://github.com/laravel/framework/pull/28950))
+
+
+## [v5.8.25 (2019-06-25)](https://github.com/laravel/framework/compare/v5.8.24...v5.8.25)
 
 ### Added
 - Added `json` option to `route:list` command ([#28894](https://github.com/laravel/framework/pull/28894))
 
-### TODO
-- allow view assertions to see all data ([#28893](https://github.com/laravel/framework/pull/28893))
-- Let mix helper use assets url ([#28905](https://github.com/laravel/framework/pull/28905))
+### Fixed
+- Fixed columns parameter on paginate method ([#28937](https://github.com/laravel/framework/pull/28937))
 - Prevent event cache from firing multiple times the same event(s) ([#28904](https://github.com/laravel/framework/pull/28904))
-- Fix assertJsonMissingValidationErrors() on empty response ([#28595](https://github.com/laravel/framework/pull/28595))
-- Don't check for status code in assertJsonMissingValidationErrors() ([#28913](https://github.com/laravel/framework/pull/28913))
+- Fixed `TestResponse::assertJsonMissingValidationErrors()` on empty response ([#28595](https://github.com/laravel/framework/pull/28595), [#28913](https://github.com/laravel/framework/pull/28913))
+- Fixed percentage sign in filename fallback in the `FilesystemAdapter::response()` ([#28947](https://github.com/laravel/framework/pull/28947))
+
+### Changed
+- Allow `TestResponse::assertViewHas()` to see all data ([#28893](https://github.com/laravel/framework/pull/28893))
+- Let `mix` helper use `app.asset_url` ([#28905](https://github.com/laravel/framework/pull/28905))
 
 
 ## [v5.8.24 (2019-06-19)](https://github.com/laravel/framework/compare/v5.8.23...v5.8.24)
