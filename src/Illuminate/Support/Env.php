@@ -11,7 +11,7 @@ use Dotenv\Environment\Adapter\ServerConstAdapter;
 class Env
 {
     /**
-     * If the putenv adapter is enabled.
+     * Indicates if the putenv adapter is enabled.
      *
      * @var bool
      */
