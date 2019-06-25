@@ -171,7 +171,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         return $this->response($path, $name, $headers, 'attachment');
     }
-    
+
     /**
      * Convert the string to ASCII characters that are equivalent to the given name.
      *
