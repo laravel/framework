@@ -99,22 +99,22 @@ class ConsoleScheduledEventTest extends TestCase
 
         Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->between('8:00', '10:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->between('9:00', '9:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->between('23:00', '10:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->between('8:00', '6:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->between('10:00', '11:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->between('10:00', '8:00')->filtersPass($app));
     }
 
@@ -126,22 +126,22 @@ class ConsoleScheduledEventTest extends TestCase
 
         Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->unlessBetween('9:00', '9:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->unlessBetween('23:00', '10:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->unlessBetween('8:00', '6:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->unlessBetween('10:00', '11:00')->filtersPass($app));
 
-        $event = (new Event(m::mock(EventMutex::class), 'php foo'))->timezone('UTC');
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->unlessBetween('10:00', '8:00')->filtersPass($app));
     }
 }
