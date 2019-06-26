@@ -34,7 +34,7 @@ class Filesystem
     public function exists($path)
     {
         $requestedPath = $this->normalize($path);
-        $realPath      = $this->normalize(realpath($path));
+        $realPath = $this->normalize(realpath($path));
         return file_exists($requestedPath) && $requestedPath === $realPath;
     }
 
