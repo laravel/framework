@@ -14,8 +14,8 @@ class Filesystem
 
 
     /**
-     * Converts Windows \ as well as multiple / in any direction to /
-     * Removes trailing slash
+     * Converts Windows `\` as well as multiple `/` in any direction to `/`,
+     * also removes trailing slash.
      *
      * @param $path
      * @return mixed
