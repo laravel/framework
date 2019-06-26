@@ -40,7 +40,8 @@
         "symfony/routing": "^4.3",
         "symfony/var-dumper": "^4.3",
         "tijsverkoyen/css-to-inline-styles": "^2.2.1",
-        "vlucas/phpdotenv": "^3.3"
+        "vlucas/phpdotenv": "^3.3",
+        "webmozart/path-util": "^2.3"
     },
     "replace": {
         "illuminate/auth": "self.version",
