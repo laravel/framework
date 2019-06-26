@@ -12,7 +12,6 @@ class Filesystem
 {
     use Macroable;
 
-
     /**
      * Converts Windows `\` as well as multiple `/` in any direction to `/`,
      * also removes trailing slash.
