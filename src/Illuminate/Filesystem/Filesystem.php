@@ -12,6 +12,19 @@ class Filesystem
 {
     use Macroable;
 
+
+    /**
+     * Converts Windows \ as well as multiple / in any direction to /
+     * Removes trailing slash
+     *
+     * @param $path
+     * @return mixed
+     */
+    public function normalize($path)
+    {
+        return rtrim(preg_replace('~(\\\\|/)+~', '/', $path), '/');
+    }
+
     /**
      * Determine if a file or directory exists.
      *
@@ -20,7 +33,9 @@ class Filesystem
      */
     public function exists($path)
     {
-        return file_exists($path);
+        $requestedPath = $this->normalize($path);
+        $realPath      = $this->normalize(realpath($path));
+        return file_exists($requestedPath) && $requestedPath === $realPath;
     }
 
     /**
