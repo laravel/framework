@@ -368,7 +368,7 @@ class Filesystem
      */
     public function isDirectory($directory)
     {
-        return is_dir($directory);
+        return $this->exists($directory) && is_dir($directory);
     }
 
     /**
@@ -379,7 +379,7 @@ class Filesystem
      */
     public function isReadable($path)
     {
-        return is_readable($path);
+        return $this->exists($path) && is_readable($path);
     }
 
     /**
@@ -390,7 +390,7 @@ class Filesystem
      */
     public function isWritable($path)
     {
-        return is_writable($path);
+        return $this->exists($path) && is_writable($path);
     }
 
     /**
@@ -401,7 +401,7 @@ class Filesystem
      */
     public function isFile($file)
     {
-        return is_file($file);
+        return $this->exists($file) && is_file($file);
     }
 
     /**
