@@ -897,11 +897,15 @@ class Connection implements ConnectionInterface
         if (is_null($this->doctrineConnection)) {
             $driver = $this->getDoctrineDriver();
 
-            $this->doctrineConnection = new DoctrineConnection([
+            $this->doctrineConnection = new DoctrineConnection(array_filter([
                 'pdo' => $this->getPdo(),
                 'dbname' => $this->getConfig('database'),
                 'driver' => $driver->getName(),
-            ], $driver);
+                // One can manually pass the serverVersion config to the database connection
+                // options. This is used by Doctrine instead of going through the regular
+                // regular platform version detection. This config was not being used.
+                'serverVersion' => $this->getConfig('serverVersion'),
+            ]), $driver);
         }
 
         return $this->doctrineConnection;
