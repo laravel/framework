@@ -591,6 +591,24 @@ class Str
     }
 
     /**
+     * Check if $className is a valid PHP classname
+     *
+     * @see https://www.php.net/manual/en/language.oop5.basic.php
+     *
+     * @param string $className
+     * @return bool
+     */
+    public static function validClassName($className)
+    {
+        return (bool) preg_match("%
+        ^                       #A valid class name starts with
+        [a-z_\x80-\xff]         # a letter or underscore,
+        [a-z0-9_\x80-\xff]*     # followed by any number of letters, numbers, or underscores
+        $                       # and nothing else
+        %xi", $className);
+    }
+
+    /**
      * Returns the replacements for the ascii method.
      *
      * Note: Adapted from Stringy\Stringy.

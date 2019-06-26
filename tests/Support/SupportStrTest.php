@@ -356,6 +356,14 @@ class SupportStrTest extends TestCase
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
     }
+
+    public function testValidClassName()
+    {
+        $this->assertTrue(Str::validClassName("totally_valid_class_name"));
+        $this->assertTrue(Str::validClassName("€totally_valid_utf8_class_name©"));
+        $this->assertFalse(Str::validClassName("not.a.valid.classname"));
+        $this->assertFalse(Str::validClassName("0_classes_valid"));
+    }
 }
 
 class StringableObjectStub
