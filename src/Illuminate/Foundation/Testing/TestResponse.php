@@ -1054,7 +1054,7 @@ class TestResponse
             $content = $json;
         }
 
-        dd($content);
+        dump($content);
     }
 
     /**
@@ -1064,7 +1064,7 @@ class TestResponse
      */
     public function dumpHeaders()
     {
-        dd($this->headers->all());
+        dump($this->headers->all());
     }
 
     /**
