@@ -117,13 +117,7 @@ trait BuildsQueries
      */
     public function unless($value, $callback, $default = null)
     {
-        if (! $value) {
-            return $callback($this, $value) ?: $this;
-        } elseif ($default) {
-            return $default($this, $value) ?: $this;
-        }
-
-        return $this;
+        return $this->when(! $value, $callback, $default);
     }
 
     /**
