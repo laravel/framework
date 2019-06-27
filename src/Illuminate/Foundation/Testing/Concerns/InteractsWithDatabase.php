@@ -13,7 +13,7 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition exists in the database.
      *
-     * @param  string|Model $table
+     * @param  string|\Illuminate\Database\Eloquent\Model $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
@@ -30,7 +30,7 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition does not exist in the database.
      *
-     * @param  string|Model  $table
+     * @param  string|\Illuminate\Database\Eloquent\Model  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
@@ -49,7 +49,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has been deleted.
      *
-     * @param  string|Model $table
+     * @param  string|\Illuminate\Database\Eloquent\Model $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
@@ -68,7 +68,7 @@ trait InteractsWithDatabase
     }
 
     /**
-     * @param string|Model $table
+     * @param string|\Illuminate\Database\Eloquent\Model $table
      * @return string
      */
     protected function resolveTableName($table)
