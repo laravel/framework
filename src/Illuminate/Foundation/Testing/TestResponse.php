@@ -1042,7 +1042,7 @@ class TestResponse
     /**
      * Dump the content from the response.
      *
-     * @return void
+     * @return $this
      */
     public function dump()
     {
@@ -1055,16 +1055,20 @@ class TestResponse
         }
 
         dump($content);
+
+        return $this;
     }
 
     /**
      * Dump the headers from the response.
      *
-     * @return void
+     * @return $this
      */
     public function dumpHeaders()
     {
         dump($this->headers->all());
+
+        return $this;
     }
 
     /**
