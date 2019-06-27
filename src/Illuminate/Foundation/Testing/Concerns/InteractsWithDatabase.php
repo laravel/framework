@@ -71,14 +71,15 @@ trait InteractsWithDatabase
      * @param string|Model $table
      * @return string
      */
-    protected function resolveTableName($table){
+    protected function resolveTableName($table)
+    {
         if (is_subclass_of($table, Model::class)) {
             $table = $table instanceof Model ? $table->getTable() : (new $table())->getTable();
         }
-        
+
         return $table;
     }
-    
+
     /**
      * Get the database connection.
      *

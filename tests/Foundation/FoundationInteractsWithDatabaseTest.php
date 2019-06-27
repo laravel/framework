@@ -132,20 +132,20 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $this->assertSoftDeleted(new ProductStub($this->data));
     }
-    
+
     public function testAssertDatabaseHasUsingModelInstanceOrString()
     {
         $this->mockCountBuilder(1);
-        
+
         $this->assertDatabaseHas(new ProductStub, $this->data);
         $this->assertDatabaseHas(ProductStub::class, $this->data);
         $this->assertDatabaseHas($this->table, $this->data);
     }
-    
+
     public function testAssertDatabaseHasMissingUsingModelInstanceOrString()
     {
         $this->mockCountBuilder(0);
-        
+
         $this->assertDatabaseMissing(new ProductStub, $this->data);
         $this->assertDatabaseMissing(ProductStub::class, $this->data);
         $this->assertDatabaseMissing($this->table, $this->data);
