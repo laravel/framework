@@ -605,7 +605,7 @@ class Str
 
         foreach ($parts as $part) {
             if (!(bool) preg_match("%
-            ^                       #A valid class name starts with
+            ^                       # A valid class name starts with
             [a-z_\x80-\xff]         # a letter or underscore,
             [a-z0-9_\x80-\xff]*     # followed by any number of letters, numbers, or underscores
             $                       # and nothing else
