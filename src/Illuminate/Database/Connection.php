@@ -897,11 +897,12 @@ class Connection implements ConnectionInterface
         if (is_null($this->doctrineConnection)) {
             $driver = $this->getDoctrineDriver();
 
-            $this->doctrineConnection = new DoctrineConnection([
+            $this->doctrineConnection = new DoctrineConnection(array_filter([
                 'pdo' => $this->getPdo(),
                 'dbname' => $this->getConfig('database'),
                 'driver' => $driver->getName(),
-            ], $driver);
+                'serverVersion' => $this->getConfig('server_version'),
+            ]), $driver);
         }
 
         return $this->doctrineConnection;
