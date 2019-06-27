@@ -13,7 +13,7 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition exists in the database.
      *
-     * @param  string  $table
+     * @param  string|Model $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
@@ -21,7 +21,7 @@ trait InteractsWithDatabase
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
         $this->assertThat(
-            $table, new HasInDatabase($this->getConnection($connection), $data)
+            $this->resolveTableName($table), new HasInDatabase($this->getConnection($connection), $data)
         );
 
         return $this;
@@ -30,7 +30,7 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition does not exist in the database.
      *
-     * @param  string  $table
+     * @param  string|Model  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
@@ -41,7 +41,7 @@ trait InteractsWithDatabase
             new HasInDatabase($this->getConnection($connection), $data)
         );
 
-        $this->assertThat($table, $constraint);
+        $this->assertThat($this->resolveTableName($table), $constraint);
 
         return $this;
     }
@@ -49,7 +49,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has been deleted.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Model  $table
+     * @param  string|Model $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
@@ -61,12 +61,24 @@ trait InteractsWithDatabase
         }
 
         $this->assertThat(
-            $table, new SoftDeletedInDatabase($this->getConnection($connection), $data)
+            $this->resolveTableName($table), new SoftDeletedInDatabase($this->getConnection($connection), $data)
         );
 
         return $this;
     }
 
+    /**
+     * @param string|Model $table
+     * @return string
+     */
+    protected function resolveTableName($table){
+        if (is_subclass_of($table, Model::class)) {
+            $table = $table instanceof Model ? $table->getTable() : (new $table())->getTable();
+        }
+        
+        return $table;
+    }
+    
     /**
      * Get the database connection.
      *
