@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Command;
 use Webmozart\PathUtil\Path;
+use Illuminate\Console\Command;
 
 class StorageLinkCommand extends Command
 {
@@ -38,7 +38,7 @@ class StorageLinkCommand extends Command
                 return $this->error('The "public/storage" directory already exists.');
             }
 
-            if (!unlink($publicPath)) {
+            if (! unlink($publicPath)) {
                 return $this->error('Failed to remove existing "public/storage" directory.');
             }
 
