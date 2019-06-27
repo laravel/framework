@@ -4,6 +4,7 @@ namespace Illuminate\Filesystem;
 
 use ErrorException;
 use FilesystemIterator;
+use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -606,4 +607,35 @@ class Filesystem
     {
         return $this->deleteDirectory($directory, true);
     }
+
+    /**
+     * Compute the relative path to a target from a given base path.
+     *
+     * @param  string  $target
+     * @param  string  $basePath
+     * @return string
+     */
+    public function relativePath($target, $basePath)
+    {
+        throw_unless($basePath[0] == '/' && $target[0] == '/',
+            InvalidArgumentException::class, 'Both target and base path must be absolute');
+
+        // Find length of common prefix
+        $i = 0;
+        $limit = min(strlen($target), strlen($basePath));
+        while ($i < $limit && $basePath[$i] === $target[$i]) {
+            $i++;
+        }
+
+        $path = ltrim(substr($target, $i), '/');
+        $tail = substr($basePath, $i);
+
+        if (strlen($tail)) {
+            $levelsUp = substr_count($tail, '/') + 1;
+            return str_repeat('../', $levelsUp) . $path;
+        }
+
+        return $path;
+    }
+
 }

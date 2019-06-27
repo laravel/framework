@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Webmozart\PathUtil\Path;
 use Illuminate\Console\Command;
 
 class StorageLinkCommand extends Command
@@ -31,6 +30,7 @@ class StorageLinkCommand extends Command
     public function handle()
     {
         $publicPath = public_path('storage');
+        $targetPath = storage_path('app/public');
 
         // For broken symlinks, `file_exists()` returns `false`, but `is_link()` returns `true`
         if (is_link($publicPath) || file_exists($publicPath)) {
@@ -45,13 +45,13 @@ class StorageLinkCommand extends Command
             $this->warn('Removed existing "public/storage" directory.');
         }
 
-        $targetPath = storage_path('app/public');
+        $files = $this->laravel->make('files');
 
         if (! $this->option('absolute')) {
-            $targetPath = Path::makeRelative($targetPath, dirname($publicPath));
+            $targetPath = $files->relativePath($targetPath, public_path());
         }
 
-        $this->laravel->make('files')->link($targetPath, $publicPath);
+        $files->link($targetPath, $publicPath);
 
         $this->info('The [public/storage] directory has been linked.');
     }

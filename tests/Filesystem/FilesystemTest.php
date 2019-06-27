@@ -513,6 +513,23 @@ class FilesystemTest extends TestCase
         $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->allFiles($this->tempDir));
     }
 
+    public function testRelativePath()
+    {
+        $files = new Filesystem;
+
+        $this->assertEquals('storage',
+            $files->relativePath('/srv/site.net/storage', '/srv/site.net'));
+        $this->assertEquals('../storage/app/public',
+            $files->relativePath('/srv/site.net/storage/app/public', '/srv/site.net/public'));
+        $this->assertEquals('../storage/app/alternative/location/foo',
+            $files->relativePath('/srv/site.net/storage/app/alternative/location/foo', '/srv/site.net/public'));
+        $this->assertEquals('../../../foo/bar/xyz',
+            $files->relativePath('/foo/bar/xyz', '/srv/site.net/public'));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $files->relativePath('not/absolute', '/srv/site.net/public');
+    }
+
     public function testCreateFtpDriver()
     {
         $filesystem = new FilesystemManager(new Application);
