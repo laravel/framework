@@ -19,12 +19,13 @@ trait HandlesAuthorization
      * Throws an unauthorized exception.
      *
      * @param  string  $message
+     * @param  mixed|null  $code
      * @return void
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    protected function deny($message = 'This action is unauthorized.')
+    protected function deny($message = 'This action is unauthorized.', $code = null)
     {
-        throw new AuthorizationException($message);
+        throw new AuthorizationException($message, $code);
     }
 }
