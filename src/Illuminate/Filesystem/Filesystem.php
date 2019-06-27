@@ -632,10 +632,10 @@ class Filesystem
 
         if (strlen($tail)) {
             $levelsUp = substr_count($tail, '/') + 1;
+
             return str_repeat('../', $levelsUp).$path;
         }
 
         return $path;
     }
-
 }
