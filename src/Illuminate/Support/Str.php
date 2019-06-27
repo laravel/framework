@@ -600,12 +600,20 @@ class Str
      */
     public static function validClassName($className)
     {
-        return (bool) preg_match("%
-        ^                       #A valid class name starts with
-        [a-z_\x80-\xff]         # a letter or underscore,
-        [a-z0-9_\x80-\xff]*     # followed by any number of letters, numbers, or underscores
-        $                       # and nothing else
-        %xi", $className);
+        // This may be a FQCN, so we split it into parts to check each
+        $parts = explode('\\', ltrim($className, '\\'));
+
+        foreach ($parts as $part) {
+            if (!(bool) preg_match("%
+            ^                       #A valid class name starts with
+            [a-z_\x80-\xff]         # a letter or underscore,
+            [a-z0-9_\x80-\xff]*     # followed by any number of letters, numbers, or underscores
+            $                       # and nothing else
+            %xi", $part)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

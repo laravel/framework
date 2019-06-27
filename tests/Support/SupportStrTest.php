@@ -361,8 +361,11 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(Str::validClassName("totally_valid_class_name"));
         $this->assertTrue(Str::validClassName("€totally_valid_utf8_class_name©"));
+        $this->assertTrue(Str::validClassName(Str::class));
+        $this->assertTrue(Str::validClassName("\\Valid\\_0Class\\Name"));
         $this->assertFalse(Str::validClassName("not.a.valid.classname"));
         $this->assertFalse(Str::validClassName("0_classes_valid"));
+        $this->assertFalse(Str::validClassName("\\Invalid\\0Class\\Name"));
     }
 }
 
