@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
-use Illuminate\Auth\Console\AuthMakeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
@@ -131,7 +130,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @var array
      */
     protected $devCommands = [
-        'AuthMake' => 'command.auth.make',
         'CacheTable' => 'command.cache.table',
         'ChannelMake' => 'command.channel.make',
         'ConsoleMake' => 'command.console.make',
@@ -188,18 +186,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         }
 
         $this->commands(array_values($commands));
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerAuthMakeCommand()
-    {
-        $this->app->singleton('command.auth.make', function () {
-            return new AuthMakeCommand;
-        });
     }
 
     /**
