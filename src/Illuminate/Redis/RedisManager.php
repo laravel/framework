@@ -205,7 +205,7 @@ class RedisManager implements Factory
     }
 
     /**
-     * Change the default driver.
+     * Set the default driver.
      *
      * @param  string  $driver
      * @return void
