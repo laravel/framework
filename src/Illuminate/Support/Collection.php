@@ -1910,11 +1910,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function toArray()
     {
         return array_map(function ($value) {
-            if ($value instanceof \stdClass) {
+            if ($value instanceof Arrayable){
+                return $value->toArray();
+            } elseif ($value instanceof \stdClass) {
                 return (array) $value;
             }
             
-            return $value instanceof Arrayable ? $value->toArray() : $value;
+            return $value;
         }, $this->items);
     }
 
