@@ -81,6 +81,17 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Get a filesystem instance.
+     *
+     * @param  string|null  $name
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function on($name = null)
+    {
+        return $this->disk($name);
+    }
+
+    /**
      * Get a default cloud filesystem instance.
      *
      * @return \Illuminate\Contracts\Filesystem\Filesystem
