@@ -26,7 +26,7 @@ class LoadEnvironmentVariables
     /**
      * Bootstrap the given application.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function bootstrap(Application $app)
@@ -47,7 +47,7 @@ class LoadEnvironmentVariables
     /**
      * Detect if a custom environment file matching the APP_ENV exists.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     protected function checkForSpecificEnvironmentFile($app)
