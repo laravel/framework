@@ -2098,6 +2098,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateEmailWithEmptyDomainPart()
+    {
+        $validator = new Validator($this->getIlluminateArrayTranslator(), ['email' => 'foo@'], ['email' => 'email']);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator($this->getIlluminateArrayTranslator(), ['email' => 'foo@ '], ['email' => 'email']);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator($this->getIlluminateArrayTranslator(), ['email' => 'foo@'], ['email' => 'email']);
+        $this->assertFalse($validator->passes());
+    }
+
     /**
      * @dataProvider validUrls
      */
