@@ -203,7 +203,7 @@ class RedisManager implements Factory
     {
         $this->events = false;
     }
-    
+
     /**
      * Change the default driver.
      *
