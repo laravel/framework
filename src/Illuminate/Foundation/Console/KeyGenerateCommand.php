@@ -77,6 +77,12 @@ class KeyGenerateCommand extends Command
             return false;
         }
 
+        if (! preg_match($this->keyReplacementPattern(), file_get_contents($this->laravel->environmentFilePath()))) {
+            $this->warn('Failed to set application key! Make sure your .env file has APP_KEY variable.');
+
+            return false;
+        }
+
         $this->writeNewEnvironmentFileWith($key);
 
         return true;
