@@ -93,7 +93,7 @@ interface Paginator
     public function hasMorePages();
 
     /**
-     * Get the base path
+     * Get the base path.
      *
      * @return string|null
      */
