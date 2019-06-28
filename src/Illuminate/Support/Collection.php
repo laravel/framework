@@ -1913,6 +1913,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             if ($value instanceof \stdClass) {
                 return (array) $value;
             }
+            
             return $value instanceof Arrayable ? $value->toArray() : $value;
         }, $this->items);
     }
