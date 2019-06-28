@@ -12,9 +12,21 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class LoadEnvironmentVariables
 {
     /**
+     * The console input object.
+     *
+     * @var ArgvInput
+     */
+    private $input;
+
+    public function __construct(ArgvInput $input)
+    {
+        $this->input = $input;
+    }
+
+    /**
      * Bootstrap the given application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
      * @return void
      */
     public function bootstrap(Application $app)
@@ -35,17 +47,13 @@ class LoadEnvironmentVariables
     /**
      * Detect if a custom environment file matching the APP_ENV exists.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
      * @return void
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if ($app->runningInConsole() && ($input = new ArgvInput)->hasParameterOption('--env')) {
-            if ($this->setEnvironmentFilePath(
-                $app, $app->environmentFile().'.'.$input->getParameterOption('--env')
-            )) {
-                return;
-            }
+        if ($app->runningInConsole() && $this->setFileFromCliParameter($app)) {
+            return;
         }
 
         if (! env('APP_ENV')) {
@@ -55,6 +63,23 @@ class LoadEnvironmentVariables
         $this->setEnvironmentFilePath(
             $app, $app->environmentFile().'.'.env('APP_ENV')
         );
+    }
+
+    /**
+     * Attempt to set the environment file from CLI parameters.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return  bool
+     */
+    protected function setFileFromCliParameter($app)
+    {
+        if ($this->input->hasParameterOption('--env-file')) {
+            $filename = $this->input->getParameterOption('--env-file');
+        } elseif ($this->input->hasParameterOption('--env')) {
+            $filename = $app->environmentFile().'.'.$this->input->getParameterOption('--env');
+        }
+
+        return isset($filename) && $this->setEnvironmentFilePath($app, $filename);
     }
 
     /**
