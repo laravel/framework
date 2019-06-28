@@ -2063,6 +2063,19 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testValidateDomain()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'd&f.com'], ['x' => 'Domain']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'test.com'], ['x' => 'Domain']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '测试假域名.com'], ['x' => 'Domain']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateEmail()
     {
         $trans = $this->getIlluminateArrayTranslator();

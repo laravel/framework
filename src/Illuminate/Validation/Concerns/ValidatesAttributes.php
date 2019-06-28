@@ -872,6 +872,22 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the given attribute is missing if it is present.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    public function validateMissing($attribute, $value)
+    {
+        if (Arr::has($this->data, $attribute)) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute is greater than another attribute.
      *
      * @param  string  $attribute
@@ -1083,6 +1099,18 @@ trait ValidatesAttributes
     public function validateIpv6($attribute, $value)
     {
         return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+    }
+
+    /**
+     * Validate that an attribute is a valid domain.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    public function validateDomain($attribute, $value)
+    {
+        return filter_var($value, FILTER_VALIDATE_DOMAIN) !== false;
     }
 
     /**
