@@ -14,7 +14,7 @@ class LoadEnvironmentVariables
     /**
      * The console input object.
      *
-     * @var ArgvInput
+     * @var  \Symfony\Component\Console\Input\ArgvInput
      */
     private $input;
 
