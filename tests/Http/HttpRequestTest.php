@@ -549,6 +549,17 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Dayle', $request->input('buddy'));
     }
 
+    public function testMergeFilesMethod()
+    {
+        $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
+        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $merge = ['photo' => $file];
+        $request->mergeFiles($merge);
+        $this->assertTrue($request->hasFile('photo'));
+        $this->assertEquals('Taylor', $request->input('name'));
+        $this->assertEquals($file, $request->file('photo'));
+    }
+
     public function testReplaceMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);

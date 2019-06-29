@@ -310,6 +310,20 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Merge new files into the current request's files array.
+     *
+     * @param array $files
+     * @return $this
+     */
+    public function mergeFiles(array $files)
+    {
+        $this->files->add($files);
+        $this->convertedFiles = null;
+
+        return $this;
+    }
+
+    /**
      * Replace the input for the current request.
      *
      * @param  array  $input
