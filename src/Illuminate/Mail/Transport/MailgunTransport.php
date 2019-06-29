@@ -64,10 +64,14 @@ class MailgunTransport extends Transport
 
         $message->setBcc([]);
 
-        $this->client->request(
+        $response = $this->client->request(
             'POST',
             "https://{$this->endpoint}/v3/{$this->domain}/messages.mime",
             $this->payload($message, $to)
+        );
+
+        $message->getHeaders()->addTextHeader(
+            'X-Mailgun-Message-ID', $this->getMessageId($response)
         );
 
         $this->sendPerformed($message);
@@ -126,6 +130,19 @@ class MailgunTransport extends Transport
     {
         return array_merge(
             (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
+        );
+    }
+
+    /**
+     * Get the message ID from the response.
+     *
+     * @param  \Psr\Http\Message\ResponseInterface  $response
+     * @return string
+     */
+    protected function getMessageId($response)
+    {
+        return object_get(
+            json_decode($response->getBody()->getContents()), 'id'
         );
     }
 
