@@ -52,6 +52,11 @@ abstract class GeneratorCommand extends Command
     {
         $name = $this->qualifyClass($this->getNameInput());
 
+        // Check to see if $name is a valid classname
+        if (!Str::validClassName($name)) {
+            throw new \InvalidArgumentException($name . ' is not a valid classname!');
+        }
+
         $path = $this->getPath($name);
 
         // First we will check to see if the class already exists. If it does, we don't want

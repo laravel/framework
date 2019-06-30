@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Composer;
@@ -31,6 +32,21 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $composer->shouldReceive('dumpAutoloads')->once();
 
         $this->runCommand($command, ['name' => 'create_foo']);
+    }
+
+
+    public function testBasicBadNameThrowsException()
+    {
+        $command = new MigrateMakeCommand(
+            m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->runCommand($command, ['name' => 'bad_migration,name!']);
     }
 
     public function testBasicCreateGivesCreatorProperArguments()

@@ -68,6 +68,11 @@ class MigrateMakeCommand extends BaseCommand
         // to be freshly created so we can create the appropriate migrations.
         $name = Str::snake(trim($this->input->getArgument('name')));
 
+        // Check to see if $name is a valid classname
+        if (!Str::validClassName($name)) {
+            throw new \InvalidArgumentException($name . ' is not a valid classname!');
+        }
+
         $table = $this->input->getOption('table');
 
         $create = $this->input->getOption('create') ?: false;
