@@ -19,7 +19,7 @@ class LoadEnvironmentVariablesTest extends TestCase
         $app = m::mock(Application::class);
 
         $app->shouldReceive('configurationIsCached')
-            ->once()->with()->andReturn(false);
+            ->once()->with(null)->andReturn(false);
         $app->shouldReceive('runningInConsole')
             ->once()->with()->andReturn(false);
         $app->shouldReceive('environmentPath')
