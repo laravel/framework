@@ -591,7 +591,7 @@ class Str
     }
 
     /**
-     * Check if $className is a valid PHP classname
+     * Check if $className is a valid PHP classname.
      *
      * @see https://www.php.net/manual/en/language.oop5.basic.php
      *
@@ -604,7 +604,7 @@ class Str
         $parts = explode('\\', ltrim($className, '\\'));
 
         foreach ($parts as $part) {
-            if (!(bool) preg_match("%
+            if (! (bool) preg_match("%
             ^                       # A valid class name starts with
             [a-z_\x80-\xff]         # a letter or underscore,
             [a-z0-9_\x80-\xff]*     # followed by any number of letters, numbers, or underscores
@@ -613,6 +613,7 @@ class Str
                 return false;
             }
         }
+
         return true;
     }
 

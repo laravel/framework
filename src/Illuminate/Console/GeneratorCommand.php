@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -53,8 +54,8 @@ abstract class GeneratorCommand extends Command
         $name = $this->qualifyClass($this->getNameInput());
 
         // Check to see if $name is a valid classname
-        if (!Str::validClassName($name)) {
-            throw new \InvalidArgumentException($name . ' is not a valid classname!');
+        if (! Str::validClassName($name)) {
+            throw new InvalidArgumentException($name.' is not a valid classname!');
         }
 
         $path = $this->getPath($name);

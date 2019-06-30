@@ -1,16 +1,15 @@
 <?php
 
-
 namespace Illuminate\Tests\Notifications;
 
+use Mockery as m;
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
-use Mockery as m;
-use Illuminate\Foundation\Console\ChannelMakeCommand;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Illuminate\Foundation\Console\ChannelMakeCommand;
 
 class NotificationChannelMakeCommandTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use InvalidArgumentException;
 use Mockery as m;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Composer;
 use Illuminate\Foundation\Application;
@@ -33,7 +33,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
         $this->runCommand($command, ['name' => 'create_foo']);
     }
-
 
     public function testBasicBadNameThrowsException()
     {

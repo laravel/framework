@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Support\Composer;
 use Illuminate\Database\Migrations\MigrationCreator;
 
@@ -69,8 +70,8 @@ class MigrateMakeCommand extends BaseCommand
         $name = Str::snake(trim($this->input->getArgument('name')));
 
         // Check to see if $name is a valid classname
-        if (!Str::validClassName($name)) {
-            throw new \InvalidArgumentException($name . ' is not a valid classname!');
+        if (! Str::validClassName($name)) {
+            throw new InvalidArgumentException($name.' is not a valid classname!');
         }
 
         $table = $this->input->getOption('table');
