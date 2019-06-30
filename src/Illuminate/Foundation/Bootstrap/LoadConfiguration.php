@@ -6,6 +6,7 @@ use Exception;
 use SplFileInfo;
 use Illuminate\Config\Repository;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 
@@ -20,11 +21,12 @@ class LoadConfiguration
     public function bootstrap(Application $app)
     {
         $items = [];
+        $env = $app->runningInConsole() ? (new ArgvInput)->getParameterOption('--env', env('APP_ENV')) : null;
 
         // First we will see if we have a cache configuration file. If we do, we'll load
         // the configuration items from that file so that it is very quick. Otherwise
         // we will need to spin through every configuration file and load them all.
-        if (file_exists($cached = $app->getCachedConfigPath())) {
+        if (file_exists($cached = $app->getCachedConfigPath($env))) {
             $items = require $cached;
 
             $loadedFromCache = true;

@@ -5,8 +5,8 @@ namespace Illuminate\Foundation\Bootstrap;
 use Dotenv\Dotenv;
 use Illuminate\Support\Env;
 use Dotenv\Exception\InvalidFileException;
-use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 class LoadEnvironmentVariables
@@ -19,11 +19,13 @@ class LoadEnvironmentVariables
      */
     public function bootstrap(Application $app)
     {
-        if ($app->configurationIsCached()) {
+        $env = $app->runningInConsole() ? (new ArgvInput)->getParameterOption('--env', env('APP_ENV')) : null;
+
+        if ($app->configurationIsCached($env)) {
             return;
         }
 
-        $this->checkForSpecificEnvironmentFile($app);
+        $this->checkForSpecificEnvironmentFile($app, $env);
 
         try {
             $this->createDotenv($app)->safeLoad();
@@ -36,24 +38,25 @@ class LoadEnvironmentVariables
      * Detect if a custom environment file matching the APP_ENV exists.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  string|null  $env
      * @return void
      */
-    protected function checkForSpecificEnvironmentFile($app)
+    protected function checkForSpecificEnvironmentFile($app, $env)
     {
-        if ($app->runningInConsole() && ($input = new ArgvInput)->hasParameterOption('--env')) {
+        if ($env === null) {
+            return;
+        }
+
+        if ($app->runningInConsole()) {
             if ($this->setEnvironmentFilePath(
-                $app, $app->environmentFile().'.'.$input->getParameterOption('--env')
+                $app, $app->environmentFile().'.'.$env
             )) {
                 return;
             }
         }
 
-        if (! env('APP_ENV')) {
-            return;
-        }
-
         $this->setEnvironmentFilePath(
-            $app, $app->environmentFile().'.'.env('APP_ENV')
+            $app, $app->environmentFile().'.'.$env
         );
     }
 

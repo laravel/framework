@@ -6,6 +6,7 @@ use Throwable;
 use LogicException;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 
 class ConfigCacheCommand extends Command
@@ -57,7 +58,9 @@ class ConfigCacheCommand extends Command
 
         $config = $this->getFreshConfiguration();
 
-        $configPath = $this->laravel->getCachedConfigPath();
+        $configPath = $this->laravel->getCachedConfigPath(
+            (new ArgvInput)->getParameterOption('--env', env('APP_ENV'))
+        );
 
         $this->files->put(
             $configPath, '<?php return '.var_export($config, true).';'.PHP_EOL

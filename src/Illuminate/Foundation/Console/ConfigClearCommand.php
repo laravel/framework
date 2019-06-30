@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\ArgvInput;
 
 class ConfigClearCommand extends Command
 {
@@ -48,7 +49,11 @@ class ConfigClearCommand extends Command
      */
     public function handle()
     {
-        $this->files->delete($this->laravel->getCachedConfigPath());
+        $path = $this->laravel->getCachedConfigPath(
+            (new ArgvInput)->getParameterOption('--env', env('APP_ENV'))
+        );
+
+        $this->files->delete($path);
 
         $this->info('Configuration cache cleared!');
     }
