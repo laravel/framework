@@ -31,6 +31,14 @@ class FoundationApplicationTest extends TestCase
         $app->setLocale('foo');
     }
 
+    public function testCachedConfigPath()
+    {
+        $app = new Application;
+
+        $this->assertSame('/bootstrap/cache/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/bootstrap/cache/config.testing.php', $app->getCachedConfigPath('testing'));
+    }
+
     public function testServiceProvidersAreCorrectlyRegistered()
     {
         $provider = m::mock(ApplicationBasicServiceProviderStub::class);
