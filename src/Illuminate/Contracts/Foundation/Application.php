@@ -164,9 +164,10 @@ interface Application extends Container
     /**
      * Determine if the application configuration is cached.
      *
+     * @param  string|null  $env
      * @return bool
      */
-    public function configurationIsCached();
+    public function configurationIsCached($env = null);
 
     /**
      * Detect the application's current environment.
@@ -193,9 +194,10 @@ interface Application extends Container
     /**
      * Get the path to the configuration cache file.
      *
+     * @param  string|null  $env
      * @return string
      */
-    public function getCachedConfigPath();
+    public function getCachedConfigPath($env = null);
 
     /**
      * Get the path to the cached services.php file.

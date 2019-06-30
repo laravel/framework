@@ -909,21 +909,25 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Determine if the application configuration is cached.
      *
+     * @param  string|null  $env
      * @return bool
      */
-    public function configurationIsCached()
+    public function configurationIsCached($env = null)
     {
-        return file_exists($this->getCachedConfigPath());
+        return file_exists($this->getCachedConfigPath($env));
     }
 
     /**
      * Get the path to the configuration cache file.
      *
+     * @param  string|null  $env
      * @return string
      */
-    public function getCachedConfigPath()
+    public function getCachedConfigPath($env = null)
     {
-        return $_ENV['APP_CONFIG_CACHE'] ?? $this->bootstrapPath().'/cache/config.php';
+        $path = $env === null ? '/cache/config.php' : "/cache/config.{$env}.php";
+
+        return $_ENV['APP_CONFIG_CACHE'] ?? $this->bootstrapPath().$path;
     }
 
     /**
