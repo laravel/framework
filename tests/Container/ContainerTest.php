@@ -60,7 +60,7 @@ class ContainerTest extends TestCase
         $this->assertEquals('Dayle', $container->make('name'));
     }
 
-    public function testSingletonIfDoesntRegisterIfServiceAlreadyRegistered()
+    public function testSingletonIfDoesntRegisterIfBindingAlreadyRegistered()
     {
         $container = new Container;
         $class = new stdClass;
@@ -75,7 +75,7 @@ class ContainerTest extends TestCase
         $this->assertSame($class, $container->make('class'));
     }
 
-    public function testSingletonIfDoesRegisterIfServiceNotRegisteredYet()
+    public function testSingletonIfDoesRegisterIfBindingNotRegisteredYet()
     {
         $container = new Container;
         $class = new stdClass;
