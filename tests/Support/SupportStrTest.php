@@ -159,6 +159,23 @@ class SupportStrTest extends TestCase
         $this->assertEquals('/test/string', Str::start('//test/string', '/'));
     }
 
+    public function testExtractPattern()
+    {
+        $this->assertEquals('10011', Str::extractPattern('10011 Foo', '/^(?<number>\d+)\s+(?<word>[\w]+)$/', 'number'));
+
+        $parts = Str::extractPattern('10011 Foo', '/^(?<number>\d+)\s+(?<word>[\w]+)$/', ['number', 'word']);
+        $this->assertEquals('10011', $parts['number']);
+        $this->assertEquals('Foo', $parts['word']);
+
+        $this->assertEquals('bar', Str::extractPattern('10011 Foo', '/^(?<number>\d+)\s+(?<word>[\w]+)$/', 'missing', 'bar'));
+
+        $parts = Str::extractPattern('10011 Foo', '/^(?<number>\d+)\s+(?<word>[\w]+)$/', ['missing', 'indexes'], ['missing' => 'bar', 'indexes' => 'baz']);
+        $this->assertEquals('bar', $parts['missing']);
+        $this->assertEquals('baz', $parts['indexes']);
+
+        $this->assertEquals('bar', Str::extractPattern('No match.', '/^(?<number>\d+)\s+(?<word>[\w]+)$/', 'missing', 'bar'));
+    }
+
     public function testFinish()
     {
         $this->assertEquals('abbc', Str::finish('ab', 'bc'));

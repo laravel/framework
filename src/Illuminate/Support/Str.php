@@ -149,6 +149,38 @@ class Str
     }
 
     /**
+     * Extract a pattern from the given string.
+     *
+     * @param  string $haystack
+     * @param  string $pattern
+     * @param  string|int|array $index Index(es) to return
+     * @param  string|array|null $default Default value or keyed values to return if missing a match.
+     * @return mixed
+     */
+    public static function extractPattern(string $haystack, string $pattern, $index, $default = null)
+    {
+        $matches = [];
+
+        preg_match($pattern, $haystack, $matches, PREG_UNMATCHED_AS_NULL);
+
+        if (! is_array($index)) {
+            return $matches[$index] ?? $default;
+        }
+
+        $values = [];
+
+        foreach ($index as $key) {
+            if (is_array($default)) {
+                $values[$key] = $matches[$key] ?? $default[$key] ?? null;
+            } else {
+                $values[$key] = $matches[$key] ?? $default;
+            }
+        }
+
+        return $values;
+    }
+
+    /**
      * Cap a string with a single instance of a given value.
      *
      * @param  string  $value
