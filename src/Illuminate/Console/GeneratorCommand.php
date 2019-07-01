@@ -219,11 +219,11 @@ abstract class GeneratorCommand extends Command
         $replace = [];
 
         if ($this->getNamespace($parent) === $this->getNamespace($name) || $parent === '') {
-            $replace['use NamespacedDummyParent;' . PHP_EOL] = '';
+            $replace['use NamespacedDummyParent;'.PHP_EOL] = '';
         }
 
         $replace['NamespacedDummyParent'] = $parent;
-        $replace[' extends DummyParent'] = ' extends ' . class_basename($parent);
+        $replace[' extends DummyParent'] = ' extends '.class_basename($parent);
 
         if ($parent === '') {
             $replace[' extends DummyParent'] = '';
@@ -237,7 +237,7 @@ abstract class GeneratorCommand extends Command
     }
 
     /**
-     * Get the parent class for the current command
+     * Get the parent class for the current command.
      *
      * @return string|null
      */
@@ -248,7 +248,7 @@ abstract class GeneratorCommand extends Command
     }
 
     /**
-     * Parse the name from the command's signature
+     * Parse the name from the command's signature.
      *
      * @return string
      */
