@@ -205,7 +205,7 @@ class Handler implements ExceptionHandlerContract
         } elseif ($e instanceof TokenMismatchException) {
             $e = new HttpException(419, $e->getMessage(), $e);
         } elseif ($e instanceof SuspiciousOperationException) {
-            $e = new NotFoundHttpException(null, $e);
+            $e = new NotFoundHttpException('Bad hostname provided.', $e);
         }
 
         return $e;
@@ -335,7 +335,7 @@ class Handler implements ExceptionHandlerContract
     protected function renderExceptionWithWhoops(Exception $e)
     {
         return tap(new Whoops, function ($whoops) {
-            $whoops->pushHandler($this->whoopsHandler());
+            $whoops->appendHandler($this->whoopsHandler());
 
             $whoops->writeToOutput(false);
 
