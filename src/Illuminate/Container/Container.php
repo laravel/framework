@@ -359,6 +359,20 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Register a shared binding if it hasn't already been registered.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function singletonIf($abstract, $concrete = null)
+    {
+        if (! $this->bound($abstract)) {
+            $this->singleton($abstract, $concrete);
+        }
+    }
+
+    /**
      * "Extend" an abstract type in the container.
      *
      * @param  string    $abstract

@@ -65,6 +65,36 @@ class ContainerTest extends TestCase
         $this->assertEquals('Dayle', $container->make('name'));
     }
 
+    public function testSingletonIfDoesntRegisterIfBindingAlreadyRegistered()
+    {
+        $container = new Container;
+        $class = new stdClass;
+        $container->singleton('class', function () use ($class) {
+            return $class;
+        });
+        $otherClass = new stdClass;
+        $container->singletonIf('class', function () use ($otherClass) {
+            return $otherClass;
+        });
+
+        $this->assertSame($class, $container->make('class'));
+    }
+
+    public function testSingletonIfDoesRegisterIfBindingNotRegisteredYet()
+    {
+        $container = new Container;
+        $class = new stdClass;
+        $container->singleton('class', function () use ($class) {
+            return $class;
+        });
+        $otherClass = new stdClass;
+        $container->singletonIf('otherClass', function () use ($otherClass) {
+            return $otherClass;
+        });
+
+        $this->assertSame($otherClass, $container->make('otherClass'));
+    }
+
     public function testSharedClosureResolution()
     {
         $container = new Container;
