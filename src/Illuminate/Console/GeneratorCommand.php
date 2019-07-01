@@ -244,6 +244,7 @@ abstract class GeneratorCommand extends Command
     protected function getParent()
     {
         $name = substr($this->name ?? $this->parseNameFromSignature(), 5);
+
         return config("console.generator.parents.{$name}");
     }
 
