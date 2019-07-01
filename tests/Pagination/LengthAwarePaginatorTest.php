@@ -61,6 +61,9 @@ class LengthAwarePaginatorTest extends TestCase
         $this->p->setPath('http://website.com');
         $this->p->setPageName('foo');
 
+        $this->assertEquals('http://website.com',
+                            $this->p->path());
+
         $this->assertEquals('http://website.com?foo=2',
                             $this->p->url($this->p->currentPage()));
 
