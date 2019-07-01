@@ -388,16 +388,6 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Get the base path.
-     *
-     * @return string|null
-     */
-    public function path()
-    {
-        return $this->path;
-    }
-
-    /**
      * Set the number of links to display on each side of current page link.
      *
      * @param  int  $count
@@ -408,6 +398,16 @@ abstract class AbstractPaginator implements Htmlable
         $this->onEachSide = $count;
 
         return $this;
+    }
+
+    /**
+     * Get the base path for paginator generated URLs.
+     *
+     * @return string|null
+     */
+    public function path()
+    {
+        return $this->path;
     }
 
     /**
