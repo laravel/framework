@@ -39,7 +39,7 @@ interface Translator
      * @return void
      */
     public function setLocale($locale);
-    
+
     /**
      * Get the translation for a given key from the JSON translation files.
      *
