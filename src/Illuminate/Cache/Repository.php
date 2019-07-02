@@ -127,6 +127,10 @@ class Repository implements CacheContract, ArrayAccess
             return $this->many($keys);
         }
 
+        if (! is_array($default)) {
+            $default = get_object_vars($default);
+        }
+
         foreach ($keys as $key) {
             if (! isset($default[$key])) {
                 $default[$key] = null;
