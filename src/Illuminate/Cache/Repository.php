@@ -123,17 +123,13 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function getMultiple($keys, $default = null)
     {
-        if (is_null($default)) {
-            return $this->many($keys);
-        }
+        $defaults = [];
 
         foreach ($keys as $key) {
-            if (! isset($default[$key])) {
-                $default[$key] = null;
-            }
+            $defaults[$key] = $default;
         }
 
-        return $this->many($default);
+        return $this->many($defaults);
     }
 
     /**
