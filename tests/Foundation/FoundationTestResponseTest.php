@@ -703,6 +703,17 @@ class FoundationTestResponseTest extends TestCase
         );
     }
 
+    public function testItCanBeTapped()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setContent('')->setStatusCode(418)
+        );
+
+        $response->tap(function ($response) {
+            $this->assertInstanceOf(TestResponse::class, $response);
+        })->assertStatus(418);
+    }
+
     private function makeMockResponse($content)
     {
         $baseResponse = tap(new Response, function ($response) use ($content) {
