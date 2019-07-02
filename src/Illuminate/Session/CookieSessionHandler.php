@@ -85,7 +85,7 @@ class CookieSessionHandler implements SessionHandlerInterface
         $this->cookie->queue($sessionId, json_encode([
             'data' => $data,
             'expires' => $this->availableAt($this->minutes * 60),
-        ]), $this->minutes);
+        ]), $this->minutes * 60);
 
         return true;
     }

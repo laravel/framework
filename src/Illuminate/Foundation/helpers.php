@@ -303,7 +303,7 @@ if (! function_exists('cookie')) {
      *
      * @param  string|null  $name
      * @param  string|null  $value
-     * @param  int  $minutes
+     * @param  int  $seconds
      * @param  string|null  $path
      * @param  string|null  $domain
      * @param  bool  $secure
@@ -312,7 +312,7 @@ if (! function_exists('cookie')) {
      * @param  string|null  $sameSite
      * @return \Illuminate\Cookie\CookieJar|\Symfony\Component\HttpFoundation\Cookie
      */
-    function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true, $raw = false, $sameSite = null)
+    function cookie($name = null, $value = null, $seconds = 0, $path = null, $domain = null, $secure = false, $httpOnly = true, $raw = false, $sameSite = null)
     {
         $cookie = app(CookieFactory::class);
 
@@ -320,7 +320,7 @@ if (! function_exists('cookie')) {
             return $cookie;
         }
 
-        return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+        return $cookie->make($name, $value, $seconds, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
 }
 

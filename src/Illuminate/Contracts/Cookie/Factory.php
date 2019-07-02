@@ -9,7 +9,7 @@ interface Factory
      *
      * @param  string  $name
      * @param  string  $value
-     * @param  int     $minutes
+     * @param  int     $seconds
      * @param  string|null  $path
      * @param  string|null  $domain
      * @param  bool|null    $secure
@@ -18,7 +18,7 @@ interface Factory
      * @param  string|null  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null);
+    public function make($name, $value, $seconds = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null);
 
     /**
      * Create a cookie that lasts "forever" (five years).

@@ -52,7 +52,7 @@ class CookieJar implements JarContract
      *
      * @param  string       $name
      * @param  string       $value
-     * @param  int          $minutes
+     * @param  int          $seconds
      * @param  string|null  $path
      * @param  string|null  $domain
      * @param  bool|null    $secure
@@ -61,11 +61,11 @@ class CookieJar implements JarContract
      * @param  string|null  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
+    public function make($name, $value, $seconds = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
     {
         [$path, $domain, $secure, $sameSite] = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
 
-        $time = ($minutes == 0) ? 0 : $this->availableAt($minutes * 60);
+        $time = ($seconds === 0) ? 0 : $this->availableAt($seconds);
 
         return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
@@ -85,7 +85,7 @@ class CookieJar implements JarContract
      */
     public function forever($name, $value, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
     {
-        return $this->make($name, $value, 2628000, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+        return $this->make($name, $value, 157680000, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
 
     /**
@@ -98,7 +98,7 @@ class CookieJar implements JarContract
      */
     public function forget($name, $path = null, $domain = null)
     {
-        return $this->make($name, null, -2628000, $path, $domain);
+        return $this->make($name, null, -157680000, $path, $domain);
     }
 
     /**
