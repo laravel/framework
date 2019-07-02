@@ -39,4 +39,14 @@ interface Translator
      * @return void
      */
     public function setLocale($locale);
+
+    /**
+     * Get the translation for a given key from the JSON translation files.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string  $locale
+     * @return string|array
+     */
+    public function getFromJson($key, array $replace = [], $locale = null);
 }
