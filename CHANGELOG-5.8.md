@@ -1,22 +1,29 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.26...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.27...5.8)
+
+
+## [v5.8.27 (2019-07-02)](https://github.com/laravel/framework/compare/v5.8.26...v5.8.27)
 
 ### Added
 - Let `mix` helper use `app.mix_url` config ([#28952](https://github.com/laravel/framework/pull/28952))
 - Added `RedisManager::setDriver()` method ([#28985](https://github.com/laravel/framework/pull/28985))
+- Added `whereHasMorph()` and corresponding methods to work with `MorphTo` relations ([#28928](https://github.com/laravel/framework/pull/28928))
+
+### Fixed
+- Fixed: Changing a database field to binary include `collation` ([#28975](https://github.com/laravel/framework/pull/28975))
+- Fixed [app.stub for jquery components loading](https://github.com/laravel/framework/issues/28984) ([#29001](https://github.com/laravel/framework/pull/29001))
+- Fixed equivalent for greek letter theta in `Str::ascii()` ([#28999](https://github.com/laravel/framework/pull/28999))
 
 ### Changed
 - Prevented `TestResponse::dump()` and `TestResponse::dumpHeaders()` methods from ending execution of the script ([#28960](https://github.com/laravel/framework/pull/28960))
 - Allowed `TestResponse::dump()` and `TestResponse::dumpHeaders()` methods chaining ([#28967](https://github.com/laravel/framework/pull/28967))
-
-### TODO
-- Notification fake accepts custom channels ([#28969](https://github.com/laravel/framework/pull/28969))
+- Allowed to `NotificationFake` accept custom channels ([#28969](https://github.com/laravel/framework/pull/28969))
 - Replace contents of service manifest atomically ([#28973](https://github.com/laravel/framework/pull/28973))
-- Pass down the serverVersion database connection option to Doctrine DBAL connection ([#28964](https://github.com/laravel/framework/pull/28964), [1b55b28](https://github.com/laravel/framework/commit/1b55b289788d5c49187481e421d949fe409a27c1))
-- Add whereHasMorph() ([#28928](https://github.com/laravel/framework/pull/28928))
-- Replace self:: with static:: ([#28974](https://github.com/laravel/framework/pull/28974))
-- Make sure changing a database field to binary does not include collation ([#28975](https://github.com/laravel/framework/pull/28975))
+- Pass down the `serverVersion` database connection option to Doctrine DBAL connection ([#28964](https://github.com/laravel/framework/pull/28964), [1b55b28](https://github.com/laravel/framework/commit/1b55b289788d5c49187481e421d949fe409a27c1))
+- Replace `self::` with `static::` in the `Relation::getMorphedModel()` ([#28974](https://github.com/laravel/framework/pull/28974))
+- Set a message for `SuspiciousOperationException` ([#29000](https://github.com/laravel/framework/pull/29000))
+- Storing Mailgun Message-ID in the headers after sending ([#28994](https://github.com/laravel/framework/pull/28994))
 
 
 ## [v5.8.26 (2019-06-25)](https://github.com/laravel/framework/compare/v5.8.25...v5.8.26)
