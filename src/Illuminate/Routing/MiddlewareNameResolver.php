@@ -9,7 +9,7 @@ class MiddlewareNameResolver
     /**
      * Resolve the middleware name to a class name(s) preserving passed parameters.
      *
-     * @param  string  $name
+     * @param  \Closure|string  $name
      * @param  array  $map
      * @param  array  $middlewareGroups
      * @return \Closure|string|array

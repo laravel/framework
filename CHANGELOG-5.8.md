@@ -4,9 +4,19 @@
 
 ### Added
 - Let `mix` helper use `app.mix_url` config ([#28952](https://github.com/laravel/framework/pull/28952))
+- Added `RedisManager::setDriver()` method ([#28985](https://github.com/laravel/framework/pull/28985))
 
 ### Changed
-- Prevented `TestResponse::dump()` and `TestResponse::dumpHeaders()` dump methods from ending execution of the script ([#28960](https://github.com/laravel/framework/pull/28960))
+- Prevented `TestResponse::dump()` and `TestResponse::dumpHeaders()` methods from ending execution of the script ([#28960](https://github.com/laravel/framework/pull/28960))
+- Allowed `TestResponse::dump()` and `TestResponse::dumpHeaders()` methods chaining ([#28967](https://github.com/laravel/framework/pull/28967))
+
+### TODO
+- Notification fake accepts custom channels ([#28969](https://github.com/laravel/framework/pull/28969))
+- Replace contents of service manifest atomically ([#28973](https://github.com/laravel/framework/pull/28973))
+- Pass down the serverVersion database connection option to Doctrine DBAL connection ([#28964](https://github.com/laravel/framework/pull/28964), [1b55b28](https://github.com/laravel/framework/commit/1b55b289788d5c49187481e421d949fe409a27c1))
+- Add whereHasMorph() ([#28928](https://github.com/laravel/framework/pull/28928))
+- Replace self:: with static:: ([#28974](https://github.com/laravel/framework/pull/28974))
+- Make sure changing a database field to binary does not include collation ([#28975](https://github.com/laravel/framework/pull/28975))
 
 
 ## [v5.8.26 (2019-06-25)](https://github.com/laravel/framework/compare/v5.8.25...v5.8.26)

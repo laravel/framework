@@ -205,6 +205,17 @@ class RedisManager implements Factory
     }
 
     /**
+     * Set the default driver.
+     *
+     * @param  string  $driver
+     * @return void
+     */
+    public function setDriver($driver)
+    {
+        $this->driver = $driver;
+    }
+
+    /**
      * Pass methods onto the default Redis connection.
      *
      * @param  string  $method
