@@ -26,6 +26,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
+        Concerns\HasExtendedResourceAuthorization,
         ForwardsCalls;
 
     /**
