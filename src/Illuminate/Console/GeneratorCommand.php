@@ -159,7 +159,7 @@ abstract class GeneratorCommand extends Command
     {
         $stub = $this->files->get($this->getStub());
 
-        return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+        return $this->replaceNamespace($stub, $name)->replaceParent($stub, $name)->replaceClass($stub, $name);
     }
 
     /**
@@ -203,6 +203,59 @@ abstract class GeneratorCommand extends Command
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
 
         return str_replace('DummyClass', $class, $stub);
+    }
+
+    /**
+     * Replace the parent class for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $name
+     * @return $this
+     */
+    protected function replaceParent(&$stub, $name)
+    {
+        $parent = $this->getParent() ?? $this->defaultParent ?? '';
+
+        $replace = [];
+
+        if ($this->getNamespace($parent) === $this->getNamespace($name) || $parent === '') {
+            $replace['use NamespacedDummyParent;'.PHP_EOL] = '';
+        }
+
+        $replace['NamespacedDummyParent'] = $parent;
+        $replace[' extends DummyParent'] = ' extends '.class_basename($parent);
+
+        if ($parent === '') {
+            $replace[' extends DummyParent'] = '';
+        }
+
+        $stub = str_replace(
+            array_keys($replace), array_values($replace), $stub
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get the parent class for the current command.
+     *
+     * @return string|null
+     */
+    protected function getParent()
+    {
+        $name = substr($this->name ?? $this->parseNameFromSignature(), 5);
+
+        return config("console.generator.parents.{$name}");
+    }
+
+    /**
+     * Parse the name from the command's signature.
+     *
+     * @return string
+     */
+    protected function parseNameFromSignature()
+    {
+        return explode(' ', $this->signature, 2)[0];
     }
 
     /**
