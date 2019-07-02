@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Cache;
 
-use stdClass;
 use DateTime;
+use stdClass;
 use DateInterval;
 use Mockery as m;
 use DateTimeImmutable;
