@@ -172,8 +172,8 @@ abstract class AbstractPaginator implements Htmlable
             $parameters = array_merge($this->query, $parameters);
         }
 
-        return $this->path
-                        .(Str::contains($this->path, '?') ? '&' : '?')
+        return $this->path()
+                        .(Str::contains($this->path(), '?') ? '&' : '?')
                         .Arr::query($parameters)
                         .$this->buildFragment();
     }
@@ -398,6 +398,16 @@ abstract class AbstractPaginator implements Htmlable
         $this->onEachSide = $count;
 
         return $this;
+    }
+
+    /**
+     * Get the base path for paginator generated URLs.
+     *
+     * @return string|null
+     */
+    public function path()
+    {
+        return $this->path;
     }
 
     /**

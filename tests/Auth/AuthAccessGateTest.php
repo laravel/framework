@@ -573,12 +573,26 @@ class AuthAccessGateTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('You are not an admin.');
+        $this->expectExceptionCode(null);
 
         $gate = $this->getBasicGate();
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $gate->authorize('create', new AccessGateTestDummy);
+    }
+
+    public function test_authorize_throws_unauthorized_exception_with_custom_status_code()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Not allowed to view as it is not published.');
+        $this->expectExceptionCode('unpublished');
+
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithDenyExceptionCode::class);
+
+        $gate->authorize('view', new AccessGateTestDummy);
     }
 
     public function test_authorize_returns_allowed_response()
@@ -1005,5 +1019,15 @@ class AccessGateTestBeforeCallback
     public static function allowEverythingStatically($user = null)
     {
         return true;
+    }
+}
+
+class AccessGateTestPolicyWithDenyExceptionCode
+{
+    use HandlesAuthorization;
+
+    public function view()
+    {
+        return $this->deny('Not allowed to view as it is not published.', 'unpublished');
     }
 }

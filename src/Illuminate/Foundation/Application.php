@@ -5,6 +5,7 @@ namespace Illuminate\Foundation;
 use Closure;
 use RuntimeException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -549,8 +550,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        if (isset($_ENV['APP_RUNNING_IN_CONSOLE'])) {
-            return $_ENV['APP_RUNNING_IN_CONSOLE'] === 'true';
+        if (Env::get('APP_RUNNING_IN_CONSOLE') !== null) {
+            return Env::get('APP_RUNNING_IN_CONSOLE') === true;
         }
 
         return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
@@ -893,7 +894,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedServicesPath()
     {
-        return $_ENV['APP_SERVICES_CACHE'] ?? $this->bootstrapPath().'/cache/services.php';
+        return Env::get('APP_SERVICES_CACHE', $this->bootstrapPath().'/cache/services.php');
     }
 
     /**
@@ -903,7 +904,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedPackagesPath()
     {
-        return $_ENV['APP_PACKAGES_CACHE'] ?? $this->bootstrapPath().'/cache/packages.php';
+        return Env::get('APP_PACKAGES_CACHE', $this->bootstrapPath().'/cache/packages.php');
     }
 
     /**
@@ -923,7 +924,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedConfigPath()
     {
-        return $_ENV['APP_CONFIG_CACHE'] ?? $this->bootstrapPath().'/cache/config.php';
+        return Env::get('APP_CONFIG_CACHE', $this->bootstrapPath().'/cache/config.php');
     }
 
     /**
@@ -943,7 +944,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedRoutesPath()
     {
-        return $_ENV['APP_ROUTES_CACHE'] ?? $this->bootstrapPath().'/cache/routes.php';
+        return Env::get('APP_ROUTES_CACHE', $this->bootstrapPath().'/cache/routes.php');
     }
 
     /**
@@ -963,7 +964,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedEventsPath()
     {
-        return $_ENV['APP_EVENTS_CACHE'] ?? $this->bootstrapPath().'/cache/events.php';
+        return Env::get('APP_EVENTS_CACHE', $this->bootstrapPath().'/cache/events.php');
     }
 
     /**
