@@ -61,7 +61,7 @@ abstract class Lock implements LockContract
     /**
      * Release the lock.
      *
-     * @return void
+     * @return bool
      */
     abstract public function release();
 
