@@ -1341,6 +1341,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $keys = is_array($keys) ? $keys : func_get_args();
 
+        $isMultidimensionalArray = $this->every(function ($item) {
+            return is_array($item);
+        });
+
+        if ($isMultidimensionalArray) {
+            return new static(array_map(function ($items) use ($keys) {
+                return Arr::only($items, $keys);
+            }, $this->items));
+        }
+
         return new static(Arr::only($this->items, $keys));
     }
 

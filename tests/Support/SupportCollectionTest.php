@@ -2359,6 +2359,50 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(collect(['first', 'email']))->all());
     }
 
+    public function testOnlyOnMultidimensionalArrays()
+    {
+        $people = new Collection([
+            [
+                'first' => 'John',
+                'last' => 'Doe',
+                'name' => 'John Doe',
+                'email' => 'john.doe@gmail.com',
+            ],
+            [
+                'first' => 'Jane',
+                'last' => 'Doe',
+                'name' => 'Jane Doe',
+                'email' => 'jane.doe@gmail.com',
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'first' => 'John',
+                'name' => 'John Doe',
+                'email' => 'john.doe@gmail.com',
+            ],
+            [
+                'first' => 'Jane',
+                'name' => 'Jane Doe',
+                'email' => 'jane.doe@gmail.com',
+            ],
+        ], $people->only(['first', 'name', 'email'])->all());
+
+        $this->assertEquals([
+            [
+                'name' => 'John Doe',
+                'email' => 'john.doe@gmail.com',
+            ],
+            [
+                'name' => 'Jane Doe',
+                'email' => 'jane.doe@gmail.com',
+            ],
+        ], $people->only(['missing-key', 'name', 'email'])->all());
+
+        $this->assertEquals($people->all(), $people->only(null)->all());
+    }
+
     public function testGettingAvgItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
