@@ -37,7 +37,7 @@ class MiddlewareNameResolver
         // Finally, when the middleware is simply a string mapped to a class name the
         // middleware name will get parsed into the full class name and parameters
         // which may be run using the Pipeline which accepts this string format.
-        list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
+        [$name, $parameters] = array_pad(explode(':', $name, 2), 2, null);
 
         return ($map[$name] ?? $name).(! is_null($parameters) ? ':'.$parameters : '');
     }
@@ -66,7 +66,7 @@ class MiddlewareNameResolver
                 continue;
             }
 
-            list($middleware, $parameters) = array_pad(
+            [$middleware, $parameters] = array_pad(
                 explode(':', $middleware, 2), 2, null
             );
 

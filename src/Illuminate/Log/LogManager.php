@@ -134,7 +134,7 @@ class LogManager implements LoggerInterface
     protected function tap($name, Logger $logger)
     {
         foreach ($this->configurationFor($name)['tap'] ?? [] as $tap) {
-            list($class, $arguments) = $this->parseTap($tap);
+            [$class, $arguments] = $this->parseTap($tap);
 
             $this->app->make($class)->__invoke($logger, ...explode(',', $arguments));
         }
