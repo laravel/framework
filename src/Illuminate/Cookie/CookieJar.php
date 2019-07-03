@@ -62,7 +62,7 @@ class CookieJar implements JarContract
      */
     public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null)
     {
-        list($path, $domain, $secure, $sameSite) = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
+        [$path, $domain, $secure, $sameSite] = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
 
         $time = ($minutes == 0) ? 0 : $this->availableAt($minutes * 60);
 
@@ -176,7 +176,7 @@ class CookieJar implements JarContract
      */
     public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite = null)
     {
-        list($this->path, $this->domain, $this->secure, $this->sameSite) = [$path, $domain, $secure, $sameSite];
+        [$this->path, $this->domain, $this->secure, $this->sameSite] = [$path, $domain, $secure, $sameSite];
 
         return $this;
     }
