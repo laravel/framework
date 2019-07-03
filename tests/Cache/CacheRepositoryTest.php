@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use DateTime;
 use DateInterval;
 use Mockery as m;
+use ArrayIterator;
 use DateTimeImmutable;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -130,12 +131,19 @@ class CacheRepositoryTest extends TestCase
         $repo->put(['foo' => 'bar', 'bar' => 'baz'], 1);
     }
 
-    public function testSettingMultipleItemsInCache()
+    public function testSettingMultipleItemsInCacheArray()
     {
-        // Alias of PuttingMultiple
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1)->andReturn(true);
         $result = $repo->setMultiple(['foo' => 'bar', 'bar' => 'baz'], 1);
+        $this->assertTrue($result);
+    }
+
+    public function testSettingMultipleItemsInCacheIterator()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1)->andReturn(true);
+        $result = $repo->setMultiple(new ArrayIterator(['foo' => 'bar', 'bar' => 'baz']), 1);
         $this->assertTrue($result);
     }
 

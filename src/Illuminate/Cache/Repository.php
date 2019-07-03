@@ -283,7 +283,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function setMultiple($values, $ttl = null)
     {
-        return $this->putMany($values, $ttl);
+        return $this->putMany(is_array($values) ? $values : iterator_to_array($values), $ttl);
     }
 
     /**
