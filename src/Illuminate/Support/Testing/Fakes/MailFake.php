@@ -311,6 +311,6 @@ class MailFake implements Mailer
      */
     public function failures()
     {
-        //
+        return [];
     }
 }
