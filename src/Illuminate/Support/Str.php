@@ -589,7 +589,18 @@ class Str
 
         return $factory->uuid4();
     }
-
+    
+    /**
+     * Fastest way to check a string is JSON in PHP
+     *
+     * @return bool
+     */
+    public static function isJson($str_json)
+    {
+        json_decode($str_json);
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
+    
     /**
      * Returns the replacements for the ascii method.
      *
