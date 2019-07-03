@@ -7,6 +7,7 @@ about: 'Report a general framework issue. Please ensure your Laravel version is 
 - Laravel Version: #.#.#
 - PHP Version: #.#.#
 - Database Driver & Version:
+- Are you using `PDO::ATTR_EMULATE_PREPARES => true`: y/n
 
 ### Description:
 
