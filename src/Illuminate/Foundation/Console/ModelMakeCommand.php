@@ -122,6 +122,10 @@ class ModelMakeCommand extends GeneratorCommand
             return __DIR__.'/stubs/pivot.model.stub';
         }
 
+        if ($this->option('unguarded')) {
+            return __DIR__.'/stubs/unguarded.model.stub';
+        }
+
         return __DIR__.'/stubs/model.stub';
     }
 
@@ -144,6 +148,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
 
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
+
+            ['unguarded', 'u', InputOption::VALUE_NONE, 'Indicates if the generated model should be unguarded for mass assignment'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
         ];
