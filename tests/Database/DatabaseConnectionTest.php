@@ -251,7 +251,8 @@ class DatabaseConnectionTest extends TestCase
         $pdo->expects($this->exactly(3))->method('beginTransaction');
         $pdo->expects($this->never())->method('rollBack');
         $pdo->expects($this->exactly(3))->method('commit');
-        $mock->transaction(function () {}, 3);
+        $mock->transaction(function () {
+        }, 3);
     }
 
     public function testTransactionMethodRetriesOnDeadlock()

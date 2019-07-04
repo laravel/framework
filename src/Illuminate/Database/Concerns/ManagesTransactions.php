@@ -47,8 +47,7 @@ trait ManagesTransactions
             // back the transaction, resulting in an error if we attempt to manually roll back.
             try {
                 $this->commit();
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
                 );
