@@ -102,8 +102,6 @@ trait ManagesTransactions
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
      * @return void
-     *
-     * @throws \Exception
      */
     protected function handleCommitTransactionException($e, $currentAttempt, $maxAttempts)
     {
