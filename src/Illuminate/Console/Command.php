@@ -378,7 +378,9 @@ class Command extends SymfonyCommand
     {
         $question = new Question($question, $default);
 
-        is_callable($choices) ? $question->setAutocompleterCallback($choices) : $question->setAutocompleterValues($choices);
+        is_callable($choices)
+            ? $question->setAutocompleterCallback($choices)
+            : $question->setAutocompleterValues($choices);
 
         return $this->output->askQuestion($question);
     }
