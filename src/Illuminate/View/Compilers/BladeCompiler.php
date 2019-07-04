@@ -375,9 +375,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function callCustomDirective($name, $value)
     {
-        if (Str::startsWith($value, '(') && Str::endsWith($value, ')')) {
-            $value = Str::substr($value, 1, -1);
-        }
+        $value = $this->stripParentheses($value);
 
         return call_user_func($this->customDirectives[$name], trim($value));
     }
@@ -390,7 +388,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function stripParentheses($expression)
     {
-        if (Str::startsWith($expression, '(')) {
+        if (Str::startsWith($expression, '(') && Str::endsWith($expression, ')')) {
             $expression = substr($expression, 1, -1);
         }
 
