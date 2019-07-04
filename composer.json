@@ -102,8 +102,7 @@
     },
     "autoload-dev": {
         "files": [
-            "tests/Database/stubs/MigrationCreatorFakeMigration.php",
-            "tests/Database/stubs/PDOExceptionStub.php"
+            "tests/Database/stubs/MigrationCreatorFakeMigration.php"
         ],
         "psr-4": {
             "Illuminate\\Tests\\": "tests/"

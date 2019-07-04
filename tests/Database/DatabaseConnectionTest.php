@@ -247,7 +247,7 @@ class DatabaseConnectionTest extends TestCase
 
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->setMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
-        $pdo->method('commit')->will($this->throwException(new \PDOExceptionStub('Serialization failure', '40001')));
+        $pdo->method('commit')->will($this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')));
         $pdo->expects($this->exactly(3))->method('beginTransaction');
         $pdo->expects($this->never())->method('rollBack');
         $pdo->expects($this->exactly(3))->method('commit');
@@ -424,5 +424,22 @@ class DatabaseConnectionTestMockPDO extends PDO
     public function __construct()
     {
         //
+    }
+}
+
+class DatabaseConnectionTestMockPDOException extends PDOException
+{
+    /**
+     * Overrides Exception::__construct, which casts $code to integer, so that we can create
+     * an exception with a string $code consistent with the real PDOException behavior.
+     *
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return void
+     */
+    public function __construct($message = null, $code = null)
+    {
+        $this->message = $message;
+        $this->code = $code;
     }
 }
