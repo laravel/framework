@@ -26,9 +26,7 @@ trait ManagesTransactions
             // catch any exception we can rollback this transaction so that none of this
             // gets actually persisted to a database or stored in a permanent fashion.
             try {
-                return tap($callback($this), function () {
-                    $this->commit();
-                });
+                $callbackReturn = $callback($this);
             }
 
             // If we catch an exception we'll rollback this transaction and try again if we
@@ -38,11 +36,26 @@ trait ManagesTransactions
                 $this->handleTransactionException(
                     $e, $currentAttempt, $attempts
                 );
+                continue;
             } catch (Throwable $e) {
                 $this->rollBack();
 
                 throw $e;
             }
+
+            // Exceptions on commit need to be handled separately as they automatically roll
+            // back the transaction, resulting in an error if we attempt to manually roll back.
+            try {
+                $this->commit();
+            }
+            catch (Exception $e) {
+                $this->handleCommitTransactionException(
+                    $e, $currentAttempt, $attempts
+                );
+                continue;
+            }
+
+            return $callbackReturn;
         }
     }
 
@@ -76,6 +89,35 @@ trait ManagesTransactions
         if ($this->causedByDeadlock($e) &&
             $currentAttempt < $maxAttempts) {
             return;
+        }
+
+        throw $e;
+    }
+
+    /**
+     * Handle an exception encountered when committing a transaction.
+     *
+     * @param  \Exception  $e
+     * @param  int  $currentAttempt
+     * @param  int  $maxAttempts
+     * @return void
+     *
+     * @throws \Exception
+     */
+    protected function handleCommitTransactionException($e, $currentAttempt, $maxAttempts)
+    {
+        // If the COMMIT fails, the transaction is automatically rolled back.
+        $this->transactions--;
+
+        // If we encountered a serialization failure, try again if we are not out of attempts.
+        // SQLSTATE 40001 is designated as a serialization failure.
+        if ($e->getCode() === '40001' &&
+            $currentAttempt < $maxAttempts) {
+            return;
+        }
+
+        if ($this->causedByLostConnection($e)) {
+            $this->transactions = 0;
         }
 
         throw $e;
