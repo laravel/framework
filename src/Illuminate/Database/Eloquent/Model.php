@@ -1615,6 +1615,19 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
+        if (Str::startsWith($method, "get") || Str::startsWith($method, "set")) {
+            $attribute = substr($method, 3);
+            $attribute = Str::snake($attribute);
+            if (Str::startsWith($method, "get")) {
+                if (array_key_exists($attribute, $this->attributes)) {
+                    return $this->{$attribute};
+                }
+            } else {
+                $this->{$attribute} = $parameters[0];
+                return true;
+            }
+        }
+
         return $this->forwardCallTo($this->newQuery(), $method, $parameters);
     }
 
