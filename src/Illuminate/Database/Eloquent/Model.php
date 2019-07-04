@@ -215,7 +215,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         foreach (class_uses_recursive($class) as $trait) {
             $method = 'boot'.class_basename($trait);
 
-            if (method_exists($class, $method) && ! isset($method[$booted])) {
+            if (method_exists($class, $method) && ! isset($booted[$method])) {
                 forward_static_call([$class, $method]);
 
                 $booted[$method] = true;
