@@ -36,6 +36,7 @@ trait ManagesTransactions
                 $this->handleTransactionException(
                     $e, $currentAttempt, $attempts
                 );
+                
                 continue;
             } catch (Throwable $e) {
                 $this->rollBack();
@@ -51,6 +52,7 @@ trait ManagesTransactions
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
                 );
+
                 continue;
             }
 
