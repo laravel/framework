@@ -1624,6 +1624,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 }
             } else {
                 $this->{$attribute} = $parameters[0];
+
                 return true;
             }
         }
