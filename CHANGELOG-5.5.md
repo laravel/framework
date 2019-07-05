@@ -1,5 +1,26 @@
 # Release Notes for 5.5.x
 
+## v5.5.46 (Upcoming)
+
+### Changed
+- Show the artisan down error message by default ([#27945](https://github.com/laravel/framework/pull/27945))
+
+### Fixed
+- Fixed various phpdoc ([#27379](https://github.com/laravel/framework/pull/27379), [#27663](https://github.com/laravel/framework/pull/27663), [#29063](https://github.com/laravel/framework/pull/29063))
+- Fix database cache on PostgreSQL ([#28903](https://github.com/laravel/framework/pull/28903))
+- Fixed cache repository setMultiple with an iterator ([#29038](https://github.com/laravel/framework/pull/29038))
+- Fixed cache repository getMultiple implementation ([#29046](https://github.com/laravel/framework/pull/29046))
+
+## v5.5.45 (2019-01-28)
+
+### Changed
+- Added serialization parameters to helper functions decrypt and encrypt ([#26283](https://github.com/laravel/framework/pull/26283))
+- Allow setting the full Mailgun API URL ([#26592](https://github.com/laravel/framework/pull/26592))
+
+### Fixed
+- Fixed cache repository for PHP from 7.2.12 ([#26497](https://github.com/laravel/framework/pull/26497))
+- Prevent double escape of notification URL ([#26538](https://github.com/laravel/framework/pull/26538))
+
 ## v5.5.44 (2018-10-04)
 
 ### Changed
@@ -8,7 +29,6 @@
 ### Fixed
 - Fix pivot timestamp columns without parent ([#25746](https://github.com/laravel/framework/pull/25746))
 - Fix "sometimes" validation ([#25852](https://github.com/laravel/framework/pull/25852))
-
 
 ## v5.5.43 (2018-09-02)
 
