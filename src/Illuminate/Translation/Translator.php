@@ -136,7 +136,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 if (! is_null($line = $this->getLine(
                     $namespace, $group, $locale, $item, $replace
                 ))) {
-                    break;
+                    return $line ?? $key;
                 }
             }
         }
