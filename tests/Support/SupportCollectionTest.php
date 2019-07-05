@@ -702,7 +702,10 @@ class SupportCollectionTest extends TestCase
     public function testReplaceCollection()
     {
         $c = new Collection(['a', 'b', 'c']);
-        $this->assertEquals(['a', 'd', 'e'], $c->replace(new Collection([1 => 'd', 2 => 'e']))->all());
+        $this->assertEquals(
+            ['a', 'd', 'e'],
+            $c->replace(new Collection([1 => 'd', 2 => 'e']))->all()
+        );
     }
 
     public function testReplaceRecursiveNull()
