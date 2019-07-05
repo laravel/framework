@@ -1259,6 +1259,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Recursively merge the collection with the given items.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function mergeRecursive($items)
+    {
+        return new static(array_merge_recursive($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @param  mixed  $values
