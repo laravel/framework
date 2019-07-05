@@ -104,6 +104,10 @@ class RouteCacheCommand extends Command
     {
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-        return str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
+        return str_replace(
+            '{{routes}}',
+            str_replace(['\\', '\'', ], ['\\\\','\\\''], serialize($routes)),
+            $stub
+        );
     }
 }
