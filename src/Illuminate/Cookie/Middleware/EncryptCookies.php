@@ -3,18 +3,18 @@
 namespace Illuminate\Cookie\Middleware;
 
 use Closure;
+use Illuminate\Encryption\EncryptionManager;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class EncryptCookies
 {
     /**
      * The encrypter instance.
      *
-     * @var \Illuminate\Contracts\Encryption\Encrypter
+     * @var \Illuminate\Encryption\EncryptionManager
      */
     protected $encrypter;
 
@@ -35,10 +35,10 @@ class EncryptCookies
     /**
      * Create a new CookieGuard instance.
      *
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
+     * @param  \Illuminate\Encryption\EncryptionManager  $encrypter
      * @return void
      */
-    public function __construct(EncrypterContract $encrypter)
+    public function __construct(EncryptionManager $encrypter)
     {
         $this->encrypter = $encrypter;
     }

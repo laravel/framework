@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
+use Illuminate\Encryption\EncryptionManager;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
@@ -14,7 +15,7 @@ use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Mockery as m;
 
 class EncryptCookiesTest extends TestCase
 {
@@ -31,8 +32,12 @@ class EncryptCookiesTest extends TestCase
         parent::setUp();
 
         $container = new Container;
-        $container->singleton(EncrypterContract::class, function () {
-            return new Encrypter(str_repeat('a', 16));
+        $container->singleton(EncryptionManager::class, function () {
+            return tap(m::mock(EncryptionManager::class), function ($m) {
+                $m->shouldReceive('encrypt')->andReturnUsing(function ($arg) {
+                    return (new Encrypter(str_repeat('a', 16)))->encrypt($arg);
+                });
+            });
         });
 
         $this->router = new Router(new Dispatcher, $container);
