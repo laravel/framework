@@ -357,11 +357,11 @@ class Command extends SymfonyCommand
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  array   $choices
+     * @param  array|callable  $choices
      * @param  string|null  $default
      * @return mixed
      */
-    public function anticipate($question, array $choices, $default = null)
+    public function anticipate($question, $choices, $default = null)
     {
         return $this->askWithCompletion($question, $choices, $default);
     }
@@ -370,15 +370,17 @@ class Command extends SymfonyCommand
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  array   $choices
+     * @param  array|callable $choices
      * @param  string|null  $default
      * @return mixed
      */
-    public function askWithCompletion($question, array $choices, $default = null)
+    public function askWithCompletion($question, $choices, $default = null)
     {
         $question = new Question($question, $default);
 
-        $question->setAutocompleterValues($choices);
+        is_callable($choices)
+            ? $question->setAutocompleterCallback($choices)
+            : $question->setAutocompleterValues($choices);
 
         return $this->output->askQuestion($question);
     }
