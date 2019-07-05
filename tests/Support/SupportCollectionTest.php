@@ -680,10 +680,10 @@ class SupportCollectionTest extends TestCase
 
     public function testMergeRecursiveCollection()
     {
-        $c = new Collection(['name' => 'Hello', 'id' => 1]);
+        $c = new Collection(['name' => 'Hello', 'id' => 1, 'meta' => ['tags' => ['a', 'b'], 'roles' => 'admin']]);
         $this->assertEquals(
-            ['name' => ['Hello', 'World'], 'id' => [1, 2]],
-            $c->mergeRecursive(new Collection(['name' => 'World', 'id' => 2]))->all()
+            ['name' => 'Hello', 'id' => 1, 'meta' => ['tags' => ['a', 'b', 'c'], 'roles' => ['admin', 'editor']]],
+            $c->mergeRecursive(new Collection(['meta' => ['tags' => ['c'], 'roles' => 'editor']]))->all()
         );
     }
 
