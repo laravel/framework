@@ -666,6 +666,27 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testMergeRecursiveNull()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello'], $c->mergeRecursive(null)->all());
+    }
+
+    public function testMergeRecursiveArray()
+    {
+        $c = new Collection(['name' => 'Hello', 'id' => 1]);
+        $this->assertEquals(['name' => 'Hello', 'id' => [1, 2]], $c->mergeRecursive(['id' => 2])->all());
+    }
+
+    public function testMergeRecursiveCollection()
+    {
+        $c = new Collection(['name' => 'Hello', 'id' => 1]);
+        $this->assertEquals(
+            ['name' => ['Hello', 'World'], 'id' => [1, 2]],
+            $c->mergeRecursive(new Collection(['name' => 'World', 'id' => 2]))->all()
+        );
+    }
+
     public function testUnionNull()
     {
         $c = new Collection(['name' => 'Hello']);
