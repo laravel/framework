@@ -16,8 +16,7 @@ trait DetectsConcurrencyErrors
     protected function causedByConcurrencyError(Exception $e)
     {
         // First check SQLSTATE code. This covers serialization failures and some deadlocks.
-        if( $e instanceof \PDOException && $e->getCode() === '40001' )
-        {
+        if( $e instanceof \PDOException && $e->getCode() === '40001' ) {
             return true;
         }
 
