@@ -353,7 +353,7 @@ class ViewFactoryTest extends TestCase
     {
         $container = new Container;
         $container->instance('translator', $translator = m::mock(stdClass::class));
-        $translator->shouldReceive('getFromJson')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
+        $translator->shouldReceive('get')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
         $factory = $this->getFactory();
         $factory->setContainer($container);
         $factory->startTranslation(['name' => 'taylor']);

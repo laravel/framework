@@ -112,38 +112,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
-        [$namespace, $group, $item] = $this->parseKey($key);
-
-        // Here we will get the locale that should be used for the language line. If one
-        // was not passed, we will use the default locales which was given to us when
-        // the translator was instantiated. Then, we can load the lines and return.
-        $locales = $fallback ? $this->localeArray($locale)
-                             : [$locale ?: $this->locale];
-
-        foreach ($locales as $locale) {
-            if (! is_null($line = $this->getLine(
-                $namespace, $group, $locale, $item, $replace
-            ))) {
-                break;
-            }
-        }
-
-        // If the line doesn't exist, we will return back the key which was requested as
-        // that will be quick to spot in the UI if language keys are wrong or missing
-        // from the application's language files. Otherwise we can return the line.
-        return $line ?? $key;
-    }
-
-    /**
-     * Get the translation for a given key from the JSON translation files.
-     *
-     * @param  string  $key
-     * @param  array  $replace
-     * @param  string|null  $locale
-     * @return string|array
-     */
-    public function getFromJson($key, array $replace = [], $locale = null)
-    {
         $locale = $locale ?: $this->locale;
 
         // For JSON translations, there is only one file per locale, so we will simply load
@@ -157,13 +125,25 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // using the typical translation file. This way developers can always just use a
         // helper such as __ instead of having to pick between trans or __ with views.
         if (! isset($line)) {
-            $fallback = $this->get($key, $replace, $locale);
+            [$namespace, $group, $item] = $this->parseKey($key);
 
-            if ($fallback !== $key) {
-                return $fallback;
+            // Here we will get the locale that should be used for the language line. If one
+            // was not passed, we will use the default locales which was given to us when
+            // the translator was instantiated. Then, we can load the lines and return.
+            $locales = $fallback ? $this->localeArray($locale) : [$locale];
+
+            foreach ($locales as $locale) {
+                if (! is_null($line = $this->getLine(
+                    $namespace, $group, $locale, $item, $replace
+                ))) {
+                    return $line ?? $key;
+                }
             }
         }
 
+        // If the line doesn't exist, we will return back the key which was requested as
+        // that will be quick to spot in the UI if language keys are wrong or missing
+        // from the application's language files. Otherwise we can return the line.
         return $this->makeReplacements($line ?: $key, $replace);
     }
 
