@@ -108,8 +108,7 @@ trait ManagesTransactions
         // If the COMMIT fails, the transaction is automatically rolled back.
         $this->transactions--;
 
-        // If we encountered a serialization failure, try again if we are not out of attempts.
-        // SQLSTATE 40001 is designated as a serialization failure.
+        // If we encountered a concurrency error, try again if we are not out of attempts.
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
             return;
