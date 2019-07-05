@@ -13,6 +13,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Database\Eloquent\PropertyNotFoundException;
 
 trait HasAttributes
 {
@@ -29,6 +30,13 @@ trait HasAttributes
      * @var array
      */
     protected $original = [];
+
+    /**
+     * Indicates whether to throw an exception when accessing undefined properties.
+     *
+     * @var bool
+     */
+    protected $strictProperties = false;
 
     /**
      * The changed model attributes.
@@ -326,7 +334,13 @@ trait HasAttributes
             return;
         }
 
-        return $this->getRelationValue($key);
+        if ($this->relationLoaded($key) || method_exists($this, $key)) {
+            return $this->getRelationValue($key);
+        }
+
+        if ($this->strictProperties) {
+            throw PropertyNotFoundException::make($this, $key);
+        }
     }
 
     /**

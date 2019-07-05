@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
+use Illuminate\Database\Eloquent\PropertyNotFoundException;
 
 class DatabaseEloquentModelTest extends TestCase
 {
@@ -163,6 +164,24 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['project' => 'laravel'], $model->only('project'));
         $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->only('first_name', 'last_name'));
         $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->only(['first_name', 'last_name']));
+    }
+
+    public function testAccessingAnUndefinedPropertyThrowsExceptionWhenStrictPropertyGetterIsEnabled()
+    {
+        $this->expectException(PropertyNotFoundException::class);
+        $model = new EloquentModelWithStrictPropertyGetter;
+        $class = get_class($model);
+        $this->expectExceptionMessage("Call to undefined property [some_undefined_property] on model [{$class}]");
+        $model->some_undefined_property;
+    }
+
+    public function testIssetAndOffsetExistsReturnsFalseWhenStrictPropertyEnabled()
+    {
+        $model = new EloquentModelWithStrictPropertyGetter;
+
+        $this->assertFalse($model->offsetExists('some_undefined_property'));
+        $this->assertFalse(isset($model->some_undefined_property));
+        $this->assertTrue($model->some_undefined_property ?? true);
     }
 
     public function testNewInstanceReturnsNewInstanceWithAttributesSet()
@@ -2343,4 +2362,9 @@ class EloquentModelWithUpdatedAtNull extends Model
 {
     protected $table = 'stub';
     const UPDATED_AT = null;
+}
+
+class EloquentModelWithStrictPropertyGetter extends Model
+{
+    protected $strictProperties = true;
 }

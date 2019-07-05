@@ -1543,7 +1543,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetExists($offset)
     {
-        return ! is_null($this->getAttribute($offset));
+        try {
+            return ! is_null($this->getAttribute($offset));
+        } catch (PropertyNotFoundException $e) {
+            return false;
+        }
     }
 
     /**
