@@ -2,6 +2,18 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.27...5.8)
 
+### Added
+- Make TestResponse tappable ([#29033](https://github.com/laravel/framework/pull/29033))
+- Added `Support\Collection::mergeRecursive()` method ([#29084](https://github.com/laravel/framework/pull/29084))
+- Added `Support\Collection::replace()` and `Support\Collection::replaceRecursive()` methods ([#29088](https://github.com/laravel/framework/pull/29088))
+
+### Fixed
+- Fixed cache repository setMultiple with an iterator ([#29039](https://github.com/laravel/framework/pull/29039))
+- Fixed cache repository getMultiple implementation ([#29047](https://github.com/laravel/framework/pull/29047))
+
+### TODO
+- Fail job immediately after it timeouts if it wont be retried ([#29024](https://github.com/laravel/framework/pull/29024))
+
 
 ## [v5.8.27 (2019-07-02)](https://github.com/laravel/framework/compare/v5.8.26...v5.8.27)
 
