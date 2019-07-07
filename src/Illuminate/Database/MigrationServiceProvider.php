@@ -7,9 +7,33 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Database\Console\Migrations\FreshCommand;
+use Illuminate\Database\Console\Migrations\InstallCommand;
+use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Database\Console\Migrations\RefreshCommand;
+use Illuminate\Database\Console\Migrations\ResetCommand;
+use Illuminate\Database\Console\Migrations\RollbackCommand;
+use Illuminate\Database\Console\Migrations\StatusCommand;
 
 class MigrationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
+    /**
+     * The commands to be registered.
+     *
+     * @var array
+     */
+    protected $commands = [
+        'command.migrate',
+        'command.migrate.fresh',
+        'command.migrate.install',
+        'command.migrate.refresh',
+        'command.migrate.reset',
+        'command.migrate.rollback',
+        'command.migrate.status',
+        'command.migrate.make',
+    ];
+
     /**
      * Register the service provider.
      *
@@ -22,6 +46,8 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         $this->registerMigrator();
 
         $this->registerCreator();
+
+        $this->registerCommands($this->commands);
     }
 
     /**
@@ -68,14 +94,73 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     }
 
     /**
+     * Register the given commands.
+     *
+     * @param  array  $commands
+     * @return void
+     */
+    protected function registerCommands(array $commands)
+    {
+        $factories = $this->getFactories();
+
+        foreach ($commands as $commandName) {
+            $this->app->singleton($commandName, $factories[$commandName]);
+        }
+
+        $this->commands($commands);
+    }
+
+    /**
+     * Get class factories.
+     *
+     * @return array
+     */
+    protected function getFactories(): array
+    {
+        return [
+            'command.migrate'          => static function ($app) {
+                return new MigrateCommand($app['migrator']);
+            },
+            'command.migrate.fresh'    => static function () {
+                return new FreshCommand;
+            },
+            'command.migrate.install'  => static function ($app) {
+                return new InstallCommand($app['migration.repository']);
+            },
+            'command.migrate.refresh'  => static function () {
+                return new RefreshCommand;
+            },
+            'command.migrate.reset'    => static function ($app) {
+                return new ResetCommand($app['migrator']);
+            },
+            'command.migrate.rollback' => static function ($app) {
+                return new RollbackCommand($app['migrator']);
+            },
+            'command.migrate.status'   => static function ($app) {
+                return new StatusCommand($app['migrator']);
+            },
+            'command.migrate.make'     => static function ($app) {
+                // Once we have the migration creator registered, we will create the command
+                // and inject the creator. The creator is responsible for the actual file
+                // creation of the migrations, and may be extended by these developers.
+                $creator = $app['migration.creator'];
+
+                $composer = $app['composer'];
+
+                return new MigrateMakeCommand($creator, $composer);
+            },
+        ];
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array
      */
     public function provides()
     {
-        return [
+        return array_merge([
             'migrator', 'migration.repository', 'migration.creator',
-        ];
+        ], $this->commands);
     }
 }
