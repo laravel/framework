@@ -2,8 +2,8 @@
 
 namespace Illuminate\Session;
 
-use Illuminate\Encryption\EncryptionManager;
 use SessionHandlerInterface;
+use Illuminate\Encryption\EncryptionManager;
 use Illuminate\Contracts\Encryption\DecryptException;
 
 class EncryptedStore extends Store

@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Encryption\EncryptionManager;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Encryption\EncryptionManager;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Contracts\Foundation\Application;

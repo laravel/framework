@@ -2,9 +2,9 @@
 
 namespace Illuminate\Encryption;
 
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Str;
 use RuntimeException;
+use Illuminate\Support\Str;
+use Illuminate\Foundation\Application;
 
 class EncryptionManager
 {
@@ -49,6 +49,7 @@ class EncryptionManager
     protected function makeEncrypter($name)
     {
         $config = $this->resolveConfiguration($name);
+
         return new Encrypter($this->getKey($config), $config['cipher'] ?? 'AES-128-CBC');
     }
 

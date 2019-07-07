@@ -99,7 +99,7 @@ class KeyGenerateCommand extends Command
         // the new one, otherwise append the new key to the end of the file
         $newContents = preg_match($this->keyReplacementPattern(), $contents)
             ? preg_replace($this->keyReplacementPattern(), $line, $contents)
-            : $contents . PHP_EOL . $line;
+            : $contents.PHP_EOL.$line;
 
         file_put_contents($this->laravel->environmentFilePath(), $newContents);
     }
@@ -112,7 +112,8 @@ class KeyGenerateCommand extends Command
     protected function keyReplacementPattern()
     {
         $escaped = preg_quote('='.$this->getCurrentKey(), '/');
-        return "/^".$this->keyName()."{$escaped}/m";
+
+        return '/^'.$this->keyName()."{$escaped}/m";
     }
 
     /**
@@ -121,6 +122,7 @@ class KeyGenerateCommand extends Command
     protected function getCurrentKey()
     {
         $config = $this->getEncrypterConfig();
+
         return $config['key'] ?? null;
     }
 

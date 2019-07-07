@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
-use Illuminate\Encryption\EncryptionManager;
+use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
@@ -12,10 +12,10 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Routing\Controller;
 use Illuminate\Container\Container;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\EncryptionManager;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Mockery as m;
 
 class EncryptCookiesTest extends TestCase
 {

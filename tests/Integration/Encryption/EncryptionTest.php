@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Encryption;
 
-use Illuminate\Encryption\EncryptionManager;
 use RuntimeException;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\EncryptionManager;
 use Illuminate\Encryption\EncryptionServiceProvider;
 
 class EncryptionTest extends TestCase
