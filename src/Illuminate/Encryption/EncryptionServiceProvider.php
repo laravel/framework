@@ -18,8 +18,5 @@ class EncryptionServiceProvider extends ServiceProvider
         $this->app->singleton('encrypter', function ($app) {
             return new EncryptionManager($app);
         });
-//        $this->app->singleton('encrypter.default', function ($app) {
-//            return $app['encrypter']->encrypter();
-//        });
     }
 }
