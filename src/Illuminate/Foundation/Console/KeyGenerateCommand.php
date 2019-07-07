@@ -17,6 +17,8 @@ class KeyGenerateCommand extends Command
      */
     protected $signature = 'key:generate
                     {--show : Display the key instead of modifying files}
+                    {--encrypter= : The name of the encrypter this key will belong to (Defaults to "default")}
+                    {--key= : The name of the key being set (Defaults to "APP_KEY")}
                     {--force : Force the operation to run when in production}';
 
     /**
@@ -46,7 +48,7 @@ class KeyGenerateCommand extends Command
             return;
         }
 
-        $this->laravel['config']['app.key'] = $key;
+        $this->getEncrypterConfig()['key'] = $key;
 
         $this->info('Application key set successfully.');
     }
@@ -59,7 +61,7 @@ class KeyGenerateCommand extends Command
     protected function generateRandomKey()
     {
         return 'base64:'.base64_encode(
-            Encrypter::generateKey($this->laravel['config']['app.cipher'])
+            Encrypter::generateKey($this->getEncrypterConfig()['cipher'])
         );
     }
 
@@ -71,7 +73,7 @@ class KeyGenerateCommand extends Command
      */
     protected function setKeyInEnvironmentFile($key)
     {
-        $currentKey = $this->laravel['config']['app.key'];
+        $currentKey = $this->getCurrentKey();
 
         if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
             return false;
@@ -90,22 +92,58 @@ class KeyGenerateCommand extends Command
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
-            $this->keyReplacementPattern(),
-            'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
-        ));
+        $line = $this->keyName().'='.$key;
+        $contents = file_get_contents($this->laravel->environmentFilePath());
+
+        // If a key is already present in the environment file replace it with
+        // the new one, otherwise append the new key to the end of the file
+        $newContents = preg_match($this->keyReplacementPattern(), $contents)
+            ? preg_replace($this->keyReplacementPattern(), $line, $contents)
+            : $contents . PHP_EOL . $line;
+
+        file_put_contents($this->laravel->environmentFilePath(), $newContents);
     }
 
     /**
-     * Get a regex pattern that will match env APP_KEY with any random key.
+     * Get a regex pattern that will match the given key name with any random key.
      *
      * @return string
      */
     protected function keyReplacementPattern()
     {
-        $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
+        $escaped = preg_quote('='.$this->getCurrentKey(), '/');
+        return "/^".$this->keyName()."{$escaped}/m";
+    }
 
-        return "/^APP_KEY{$escaped}/m";
+    /**
+     * @return string|null
+     */
+    protected function getCurrentKey()
+    {
+        $config = $this->getEncrypterConfig();
+        return $config['key'] ?? null;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getEncrypterConfig()
+    {
+        $name = $this->option('encrypter') ?? 'default';
+        $config = $this->laravel['config']['encryption.encrypters'];
+
+        if (! isset($config[$name]) || ! is_array($config[$name])) {
+            throw new \InvalidArgumentException("Encrypter [{$name}] not configured.");
+        }
+
+        return $config[$name];
+    }
+
+    /**
+     * @return string
+     */
+    protected function keyName()
+    {
+        return $this->option('key') ?? 'APP_KEY';
     }
 }
