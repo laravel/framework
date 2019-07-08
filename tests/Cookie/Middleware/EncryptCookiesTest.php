@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
-use Illuminate\Contracts\Encryption\Factory;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

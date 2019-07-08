@@ -6,9 +6,9 @@ use Closure;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\TokenMismatchException;
-use Illuminate\Contracts\Encryption\Factory as Encryption;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Contracts\Encryption\Factory as Encryption;
 
 class VerifyCsrfToken
 {

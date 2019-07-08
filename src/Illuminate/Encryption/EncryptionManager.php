@@ -2,10 +2,10 @@
 
 namespace Illuminate\Encryption;
 
-use InvalidArgumentException;
 use RuntimeException;
-use Illuminate\Contracts\Encryption\Factory as FactoryContract;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
+use Illuminate\Contracts\Encryption\Factory as FactoryContract;
 
 class EncryptionManager implements FactoryContract
 {

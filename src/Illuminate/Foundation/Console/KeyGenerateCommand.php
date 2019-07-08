@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
+use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Console\ConfirmableTrait;
-use InvalidArgumentException;
 
 class KeyGenerateCommand extends Command
 {
