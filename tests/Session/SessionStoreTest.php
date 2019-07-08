@@ -211,6 +211,15 @@ class SessionStoreTest extends TestCase
         $this->assertFalse(array_search('foo', $session->get('_flash.old')));
     }
 
+    public function testOnly()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $session->put('qu', 'ux');
+        $this->assertEquals(['foo' => 'bar', 'qu' => 'ux'], $session->all());
+        $this->assertEquals(['qu' => 'ux'], $session->only(['qu']));
+    }
+
     public function testReplace()
     {
         $session = $this->getSession();
