@@ -173,7 +173,7 @@ class Store implements Session
      * @param  array  $keys
      * @return array
      */
-    public function only($keys)
+    public function only(array $keys)
     {
         return Arr::only($this->attributes, $keys);
     }
