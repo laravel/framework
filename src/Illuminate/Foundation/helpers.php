@@ -879,6 +879,31 @@ if (! function_exists('trans')) {
     }
 }
 
+if (! function_exists('trans_if')) {
+    /**
+     * Translate the given message based on the condition.
+     *
+     * @param bool $condition
+     * @param string $keyTrue
+     * @param string $keyFalse
+     * @param array $replaceTrue
+     * @param array $replaceFalse
+     * @param null $locale
+     * @return \Illuminate\Contracts\Translation\Translator|string|array|null
+     */
+    function trans_if(bool $condition, string $keyTrue, string $keyFalse, array $replaceTrue = [], array $replaceFalse = [], $locale = null)
+    {
+        if (is_null($keyTrue) && is_null($keyFalse)) {
+            return app('translator');
+        }
+
+        $key = ($condition === true) ? $keyTrue : $keyFalse;
+        $replace = ($condition === true) ? $replaceTrue : $replaceFalse;
+
+        return app('translator')->trans($key, $replace, $locale);
+    }
+}
+
 if (! function_exists('trans_choice')) {
     /**
      * Translates the given message based on a count.
