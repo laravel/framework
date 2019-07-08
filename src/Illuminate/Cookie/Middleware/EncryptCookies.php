@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Contracts\Encryption\Factory as Encryption;
 
 class EncryptCookies
 {
@@ -35,10 +36,10 @@ class EncryptCookies
     /**
      * Create a new CookieGuard instance.
      *
-     * @param  \Illuminate\Encryption\EncryptionManager  $encrypter
+     * @param \Illuminate\Contracts\Encryption\Factory $encrypter
      * @return void
      */
-    public function __construct(EncryptionManager $encrypter)
+    public function __construct(Encryption $encrypter)
     {
         $this->encrypter = $encrypter;
     }

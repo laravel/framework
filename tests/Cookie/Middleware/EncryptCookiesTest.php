@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
+use Illuminate\Contracts\Encryption\Factory as Encryption;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -32,7 +33,7 @@ class EncryptCookiesTest extends TestCase
         parent::setUp();
 
         $container = new Container;
-        $container->singleton(EncryptionManager::class, function () {
+        $container->singleton(Encryption::class, function () {
             return tap(m::mock(EncryptionManager::class), function ($m) {
                 $m->shouldReceive('encrypt')->andReturnUsing(function ($arg) {
                     return (new Encrypter(str_repeat('a', 16)))->encrypt($arg);
