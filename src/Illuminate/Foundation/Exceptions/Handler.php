@@ -267,7 +267,7 @@ class Handler implements ExceptionHandlerContract
     protected function invalidJson($request, ValidationException $exception)
     {
         return response()->json([
-            'message' => $exception->getMessage(),
+            'message' => __($exception->getMessage()),
             'errors' => $exception->errors(),
         ], $exception->status);
     }
