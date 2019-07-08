@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
-use Illuminate\Encryption\EncryptionManager;
-use Illuminate\Http\Request;
 use Mockery as m;
+use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\EncryptionManager;
 
 class VerifyCsrfTokenExceptTest extends TestCase
 {

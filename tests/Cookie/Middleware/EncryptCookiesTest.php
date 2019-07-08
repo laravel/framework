@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
-use Illuminate\Contracts\Encryption\Factory as Encryption;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,6 +15,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Encryption\EncryptionManager;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Contracts\Encryption\Factory as Encryption;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class EncryptCookiesTest extends TestCase

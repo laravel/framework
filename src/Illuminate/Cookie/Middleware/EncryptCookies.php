@@ -3,7 +3,6 @@
 namespace Illuminate\Cookie\Middleware;
 
 use Closure;
-use Illuminate\Encryption\EncryptionManager;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
