@@ -17,4 +17,16 @@ class EncryptionServiceProvider extends ServiceProvider
             return new EncryptionManager($app);
         });
     }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [
+            'encrypter',
+        ];
+    }
 }

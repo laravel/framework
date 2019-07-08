@@ -4,9 +4,9 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Encryption\EncryptionManager;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Contracts\Encryption\Factory as Encryption;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 
@@ -24,7 +24,7 @@ class VerifyCsrfToken
     /**
      * The encrypter implementation.
      *
-     * @var \Illuminate\Encryption\EncryptionManager
+     * @var \Illuminate\Contracts\Encryption\Factory
      */
     protected $encrypter;
 
@@ -46,10 +46,10 @@ class VerifyCsrfToken
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Encryption\EncryptionManager  $encrypter
+     * @param  \Illuminate\Contracts\Encryption\Factory  $encrypter
      * @return void
      */
-    public function __construct(Application $app, EncryptionManager $encrypter)
+    public function __construct(Application $app, Encryption $encrypter)
     {
         $this->app = $app;
         $this->encrypter = $encrypter;

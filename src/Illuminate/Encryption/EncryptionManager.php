@@ -2,34 +2,39 @@
 
 namespace Illuminate\Encryption;
 
+use InvalidArgumentException;
 use RuntimeException;
+use Illuminate\Contracts\Encryption\Factory as FactoryContract;
 use Illuminate\Support\Str;
-use Illuminate\Foundation\Application;
 
-class EncryptionManager
+class EncryptionManager implements FactoryContract
 {
     /**
-     * @var Application
+     * The application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
     /**
-     * @var Encrypter[]
+     * @var \Illuminate\Contracts\Encryption\Encrypter[]
      */
     protected $encrypters = [];
 
     /**
-     * EncryptionManager constructor.
-     * @param Application $app
+     * Create a new Encryption manager instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return void
      */
-    public function __construct(Application $app)
+    public function __construct($app)
     {
         $this->app = $app;
     }
 
     /**
-     * @param null $name
-     * @return Encrypter
+     * @param string|null $name
+     * @return \Illuminate\Contracts\Encryption\Encrypter
      */
     public function encrypter($name = null)
     {
@@ -43,8 +48,8 @@ class EncryptionManager
     }
 
     /**
-     * @param $name
-     * @return Encrypter
+     * @param string $name
+     * @return \Illuminate\Encryption\Encrypter
      */
     protected function makeEncrypter($name)
     {
@@ -54,8 +59,8 @@ class EncryptionManager
     }
 
     /**
-     * @param $config
-     * @return bool|mixed|string
+     * @param array $config
+     * @return string
      */
     protected function getKey($config)
     {
@@ -78,7 +83,7 @@ class EncryptionManager
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return array
      */
     protected function resolveConfiguration($name)
@@ -86,7 +91,7 @@ class EncryptionManager
         $config = $this->app['config']['encryption.encrypters'];
 
         if (! isset($config[$name])) {
-            throw new \InvalidArgumentException("Encrypter [{$name}] not configured.");
+            throw new InvalidArgumentException("Encrypter [{$name}] not configured.");
         }
 
         return $config[$name];

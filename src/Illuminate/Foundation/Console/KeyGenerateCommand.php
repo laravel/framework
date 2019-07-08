@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Console\ConfirmableTrait;
+use InvalidArgumentException;
 
 class KeyGenerateCommand extends Command
 {
@@ -135,7 +136,7 @@ class KeyGenerateCommand extends Command
         $config = $this->laravel['config']['encryption.encrypters'];
 
         if (! isset($config[$name]) || ! is_array($config[$name])) {
-            throw new \InvalidArgumentException("Encrypter [{$name}] not configured.");
+            throw new InvalidArgumentException("Encrypter [{$name}] not configured.");
         }
 
         return $config[$name];

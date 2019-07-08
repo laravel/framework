@@ -12,9 +12,9 @@ use Illuminate\Contracts\Encryption\DecryptException;
 class EncryptCookies
 {
     /**
-     * The encrypter instance.
+     * The encryption manager instance.
      *
-     * @var \Illuminate\Encryption\EncryptionManager
+     * @var \Illuminate\Contracts\Encryption\Factory
      */
     protected $encrypter;
 
