@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Session;
 
+use Illuminate\Encryption\EncryptionManager;
 use Mockery as m;
 use ReflectionClass;
 use SessionHandlerInterface;
@@ -56,7 +57,7 @@ class EncryptedSessionStoreTest extends TestCase
         return [
             $this->getSessionName(),
             m::mock(SessionHandlerInterface::class),
-            m::mock(Encrypter::class),
+            m::mock(EncryptionManager::class),
             $this->getSessionId(),
         ];
     }

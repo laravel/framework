@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
+use Illuminate\Encryption\EncryptionManager;
 use Illuminate\Http\Request;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Encryption\Encrypter;
 
@@ -15,7 +17,12 @@ class VerifyCsrfTokenExceptTest extends TestCase
     {
         parent::setUp();
 
-        $this->stub = new VerifyCsrfTokenExceptStub(app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
+        $encryption = tap(m::mock(EncryptionManager::class), function ($m) {
+            $m->shouldReceive('encrypt')->andReturnUsing(function ($arg) {
+                return (new Encrypter(str_repeat('a', 16)))->encrypt($arg);
+            });
+        });
+        $this->stub = new VerifyCsrfTokenExceptStub(app(), $encryption);
         $this->request = Request::create('http://example.com/foo/bar', 'POST');
     }
 
