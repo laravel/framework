@@ -627,7 +627,7 @@ class Container implements ArrayAccess, ContainerContract
                 throw $e;
             }
 
-            throw new EntryNotFoundException;
+            throw new EntryNotFoundException($id);
         }
     }
 
