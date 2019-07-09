@@ -25,4 +25,14 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $this->assertEquals('<?php $__env->endSlot(); ?>', $this->compiler->compileString('@endslot'));
     }
+
+    public function testScopedSlotsAreCompiled()
+    {
+        $this->assertEquals('<?php $__env->scopedSlot(\'foo\', function ($bar) { ?>', $this->compiler->compileString('@scopedslot(\'foo\', function ($bar))'));
+    }
+
+    public function testEndScopedSlotsAreCompiled()
+    {
+        $this->assertEquals('<?php }); ?>', $this->compiler->compileString('@endscopedslot'));
+    }
 }

@@ -47,6 +47,29 @@ trait CompilesComponents
     }
 
     /**
+     * Compile the scoped-slot statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileScopedSlot($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return "<?php \$__env->scopedSlot({$expression} { ?>";
+    }
+
+    /**
+     * Compile the end-scoped-slot statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndScopedSlot()
+    {
+        return '<?php }); ?>';
+    }
+
+    /**
      * Compile the component-first statements into valid PHP.
      *
      * @param  string  $expression

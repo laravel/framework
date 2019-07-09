@@ -134,6 +134,18 @@ trait ManagesComponents
     }
 
     /**
+     * Start the scoped slot rendering process.
+     *
+     * @param  string  $name
+     * @param  callable  $renderFunction
+     * @return void
+     */
+    public function scopedSlot($name, $renderFunction)
+    {
+        $this->slots[$this->currentComponent()][$name] = $renderFunction;
+    }
+
+    /**
      * Get the index for the current component.
      *
      * @return int
