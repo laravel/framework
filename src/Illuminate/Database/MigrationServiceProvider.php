@@ -220,6 +220,6 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     {
         return array_merge([
             'migrator', 'migration.repository', 'migration.creator',
-        ], $this->commands);
+        ], array_values($this->commands));
     }
 }
