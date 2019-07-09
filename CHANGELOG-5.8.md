@@ -1,17 +1,25 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.27...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.28...5.8)
+
+
+
+## [v5.8.28 (2019-07-09)](https://github.com/laravel/framework/compare/v5.8.27...v5.8.28)
 
 ### Added
 - Make TestResponse tappable ([#29033](https://github.com/laravel/framework/pull/29033))
 - Added `Support\Collection::mergeRecursive()` method ([#29084](https://github.com/laravel/framework/pull/29084))
 - Added `Support\Collection::replace()` and `Support\Collection::replaceRecursive()` methods ([#29088](https://github.com/laravel/framework/pull/29088))
+- Added `Session\Store::only()` method ([#29107](https://github.com/laravel/framework/pull/29107))
 
 ### Fixed
 - Fixed cache repository setMultiple with an iterator ([#29039](https://github.com/laravel/framework/pull/29039))
 - Fixed cache repository getMultiple implementation ([#29047](https://github.com/laravel/framework/pull/29047))
 
-### TODO
+### Reverted
+- Reverted [Fixed: app.stub for jquery components loading](https://github.com/laravel/framework/pull/29001) ([#29109](https://github.com/laravel/framework/pull/29109))
+
+### Changed
 - Fail job immediately after it timeouts if it wont be retried ([#29024](https://github.com/laravel/framework/pull/29024))
 
 
