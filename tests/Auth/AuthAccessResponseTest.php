@@ -30,13 +30,15 @@ class AuthAccessResponseTest extends TestCase
 
     public function test_authorize_method_throws_authorization_exception_when_response_denied()
     {
-        $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('Some message.');
-        $this->expectExceptionCode('some_code');
-
         $response = Response::deny('Some message.', 'some_code');
 
-        $response->authorize();
+        try {
+            $response->authorize();
+        } catch (AuthorizationException $e) {
+            $this->assertEquals('Some message.', $e->getMessage());
+            $this->assertEquals('some_code', $e->getCode());
+            $this->assertEquals($response, $e->getResponse());
+        }
     }
 
     public function test_throw_if_needed_doesnt_throw_authorization_exception_when_response_allowed()

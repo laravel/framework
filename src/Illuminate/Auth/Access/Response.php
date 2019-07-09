@@ -116,7 +116,8 @@ class Response implements Arrayable
     public function authorize()
     {
         if ($this->denied()) {
-            throw new AuthorizationException($this->message(), $this->code());
+            throw (new AuthorizationException($this->message(), $this->code()))
+                ->setResponse($this);
         }
 
         return $this;

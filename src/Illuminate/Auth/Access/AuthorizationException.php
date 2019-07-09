@@ -7,6 +7,13 @@ use Exception;
 class AuthorizationException extends Exception
 {
     /**
+     * The response from the gate.
+     *
+     * @var \Illuminate\Auth\Access\Response
+     */
+    protected $response;
+
+    /**
      * Create a new authorization exception instance.
      *
      * @param  string|null  $message
@@ -19,6 +26,29 @@ class AuthorizationException extends Exception
         parent::__construct($message, 0, $previous);
 
         $this->code = $code;
+    }
+
+    /**
+     * Set the response from the gate.
+     *
+     * @param \Illuminate\Auth\Access\Response $response
+     * @return $this
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * Get the response from the gate.
+     *
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 
     /**

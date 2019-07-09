@@ -608,6 +608,20 @@ class AuthAccessGateTest extends TestCase
         $gate->authorize('create', new AccessGateTestDummy);
     }
 
+    public function test_policy_that_throws_authorization_exception_is_caught_in_inspect()
+    {
+        $gate = $this->getBasicGate();
+        
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyThrowingAuthorizationException::class);
+
+        $response = $gate->inspect('create', new AccessGateTestDummy);
+
+        $this->assertTrue($response->denied());
+        $this->assertFalse($response->allowed());
+        $this->assertEquals('Not allowed.', $response->message());
+        $this->assertEquals('some_code', $response->code());
+    }
+
     public function test_authorize_returns_allowed_response()
     {
         $gate = $this->getBasicGate(true);
@@ -1086,3 +1100,12 @@ class AccessGateTestPolicyWithDeniedResponseObject
         return Response::deny('Not allowed.', 'some_code');
     }
 }
+
+class AccessGateTestPolicyThrowingAuthorizationException
+{
+    public function create()
+    {
+        throw new AuthorizationException('Not allowed.', 'some_code');
+    }
+}
+
