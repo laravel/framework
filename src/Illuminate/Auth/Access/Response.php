@@ -2,7 +2,9 @@
 
 namespace Illuminate\Auth\Access;
 
-class Response
+use Illuminate\Contracts\Support\Arrayable;
+
+class Response implements Arrayable
 {
     /**
      * The response message.
@@ -12,14 +14,32 @@ class Response
     protected $message;
 
     /**
+     * Indicates whether the response was allowed.
+     *
+     * @var bool
+     */
+    protected $allowed;
+
+    /**
+     * The response code.
+     *
+     * @var mixed
+     */
+    protected $code;
+
+    /**
      * Create a new response.
      *
-     * @param  string|null  $message
+     * @param  string   $message
+     * @param  bool     $allowed
+     * @param  mixed    $code
      * @return void
      */
-    public function __construct($message = null)
+    public function __construct($message, bool $allowed, $code = null)
     {
         $this->message = $message;
+        $this->allowed = $allowed;
+        $this->code = $code;
     }
 
     /**
@@ -33,6 +53,36 @@ class Response
     }
 
     /**
+     * Determine if the response was allowed.
+     *
+     * @return bool
+     */
+    public function allowed()
+    {
+        return $this->allowed;
+    }
+
+    /**
+     * Determine if the response was denied.
+     *
+     * @return bool
+     */
+    public function denied()
+    {
+        return ! $this->allowed();
+    }
+
+    /**
+     * Get the response code/reason.
+     *
+     * @return mixed
+     */
+    public function code()
+    {
+        return $this->code;
+    }
+
+    /**
      * Get the string representation of the message.
      *
      * @return string
@@ -40,5 +90,59 @@ class Response
     public function __toString()
     {
         return (string) $this->message();
+    }
+
+    /**
+     * Throw authorization exception if response was denied.
+     *
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws AuthorizationException
+     */
+    public function authorize()
+    {
+        if ($this->denied()) {
+            throw new AuthorizationException($this->message(), $this->code());
+        }
+
+        return $this;
+    }
+
+    /**
+     * Convert the response to an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'allowed' => $this->allowed(),
+            'message' => $this->message(),
+            'code' => $this->code(),
+        ];
+    }
+
+    /**
+     * Create a new "allow" Response.
+     *
+     * @param string|null $message
+     * @param mixed $code
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public static function allow($message = null, $code = null)
+    {
+        return new static($message, true, $code);
+    }
+
+    /**
+     * Create a new "deny" Response.
+     *
+     * @param string|null $message
+     * @param mixed $code
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public static function deny($message = 'This action is unauthorized.', $code = null)
+    {
+        return new static($message, false, $code);
     }
 }

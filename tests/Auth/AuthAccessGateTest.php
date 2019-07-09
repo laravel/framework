@@ -590,9 +590,22 @@ class AuthAccessGateTest extends TestCase
 
         $gate = $this->getBasicGate();
 
-        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithDenyExceptionCode::class);
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithCode::class);
 
         $gate->authorize('view', new AccessGateTestDummy);
+    }
+
+    public function test_authorize_with_policy_that_returns_denied_response_object_throws_exception()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Not allowed.');
+        $this->expectExceptionCode('some_code');
+
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithDeniedResponseObject::class);
+
+        $gate->authorize('create', new AccessGateTestDummy);
     }
 
     public function test_authorize_returns_allowed_response()
@@ -607,6 +620,36 @@ class AuthAccessGateTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->assertNull($response->message());
         $this->assertTrue($check);
+    }
+
+    public function test_response_returns_response_when_ability_granted()
+    {
+        $gate = $this->getBasicGate(true);
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithCode::class);
+
+        $response = $gate->access('view', new AccessGateTestDummy);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertNull($response->message());
+        $this->assertTrue($response->allowed());
+        $this->assertFalse($response->denied());
+        $this->assertNull($response->code());
+    }
+
+    public function test_response_returns_response_when_ability_denied()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithCode::class);
+
+        $response = $gate->access('view', new AccessGateTestDummy);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('Not allowed to view as it is not published.', $response->message());
+        $this->assertFalse($response->allowed());
+        $this->assertTrue($response->denied());
+        $this->assertEquals($response->code(), 'unpublished');
     }
 
     public function test_authorize_returns_an_allowed_response_for_a_truthy_return()
@@ -1022,12 +1065,24 @@ class AccessGateTestBeforeCallback
     }
 }
 
-class AccessGateTestPolicyWithDenyExceptionCode
+class AccessGateTestPolicyWithCode
 {
     use HandlesAuthorization;
 
-    public function view()
+    public function view($user)
     {
-        return $this->deny('Not allowed to view as it is not published.', 'unpublished');
+        if (! $user->isAdmin) {
+            return $this->deny('Not allowed to view as it is not published.', 'unpublished');
+        }
+
+        return true;
+    }
+}
+
+class AccessGateTestPolicyWithDeniedResponseObject
+{
+    public function create()
+    {
+        return Response::deny('Not allowed.', 'some_code');
     }
 }

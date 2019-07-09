@@ -20,4 +20,14 @@ class AuthorizationException extends Exception
 
         $this->code = $code;
     }
+
+    /**
+     * Create a deny response object from this exception.
+     *
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public function toResponse()
+    {
+        return Response::deny($this->message, $this->code);
+    }
 }
