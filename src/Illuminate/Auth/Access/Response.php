@@ -7,18 +7,18 @@ use Illuminate\Contracts\Support\Arrayable;
 class Response implements Arrayable
 {
     /**
-     * The response message.
-     *
-     * @var string|null
-     */
-    protected $message;
-
-    /**
      * Indicates whether the response was allowed.
      *
      * @var bool
      */
     protected $allowed;
+
+    /**
+     * The response message.
+     *
+     * @var string|null
+     */
+    protected $message;
 
     /**
      * The response code.
@@ -30,26 +30,40 @@ class Response implements Arrayable
     /**
      * Create a new response.
      *
-     * @param  string   $message
-     * @param  bool     $allowed
-     * @param  mixed    $code
+     * @param  bool  $allowed
+     * @param  string  $message
+     * @param  mixed  $code
      * @return void
      */
-    public function __construct($message, bool $allowed, $code = null)
+    public function __construct(bool $allowed, $message = '', $code = null)
     {
-        $this->message = $message;
-        $this->allowed = $allowed;
         $this->code = $code;
+        $this->allowed = $allowed;
+        $this->message = $message;
     }
 
     /**
-     * Get the response message.
+     * Create a new "allow" Response.
      *
-     * @return string|null
+     * @param string|null $message
+     * @param mixed $code
+     * @return \Illuminate\Auth\Access\Response
      */
-    public function message()
+    public static function allow($message = null, $code = null)
     {
-        return $this->message;
+        return new static(true, $message, $code);
+    }
+
+    /**
+     * Create a new "deny" Response.
+     *
+     * @param string|null $message
+     * @param mixed $code
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public static function deny($message = 'This action is unauthorized.', $code = null)
+    {
+        return new static(false, $message, $code);
     }
 
     /**
@@ -73,23 +87,23 @@ class Response implements Arrayable
     }
 
     /**
-     * Get the response code/reason.
+     * Get the response message.
+     *
+     * @return string|null
+     */
+    public function message()
+    {
+        return $this->message;
+    }
+
+    /**
+     * Get the response code / reason.
      *
      * @return mixed
      */
     public function code()
     {
         return $this->code;
-    }
-
-    /**
-     * Get the string representation of the message.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->message();
     }
 
     /**
@@ -123,26 +137,12 @@ class Response implements Arrayable
     }
 
     /**
-     * Create a new "allow" Response.
+     * Get the string representation of the message.
      *
-     * @param string|null $message
-     * @param mixed $code
-     * @return \Illuminate\Auth\Access\Response
+     * @return string
      */
-    public static function allow($message = null, $code = null)
+    public function __toString()
     {
-        return new static($message, true, $code);
-    }
-
-    /**
-     * Create a new "deny" Response.
-     *
-     * @param string|null $message
-     * @param mixed $code
-     * @return \Illuminate\Auth\Access\Response
-     */
-    public static function deny($message = 'This action is unauthorized.', $code = null)
-    {
-        return new static($message, false, $code);
+        return (string) $this->message();
     }
 }

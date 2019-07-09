@@ -274,7 +274,7 @@ class Gate implements GateContract
     public function check($abilities, $arguments = [])
     {
         return collect($abilities)->every(function ($ability) use ($arguments) {
-            return $this->access($ability, $arguments)->allowed();
+            return $this->inspect($ability, $arguments)->allowed();
         });
     }
 
@@ -315,17 +315,17 @@ class Gate implements GateContract
      */
     public function authorize($ability, $arguments = [])
     {
-        return $this->access($ability, $arguments)->authorize();
+        return $this->inspect($ability, $arguments)->authorize();
     }
 
     /**
-     * Get the access response for the given ability.
+     * Inspect the user for the given ability.
      *
      * @param  string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
-    public function access($ability, $arguments = [])
+    public function inspect($ability, $arguments = [])
     {
         try {
             $result = $this->raw($ability, $arguments);

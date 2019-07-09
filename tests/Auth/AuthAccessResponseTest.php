@@ -48,16 +48,16 @@ class AuthAccessResponseTest extends TestCase
 
     public function test_casting_to_string_returns_message()
     {
-        $response = new Response('some data', true);
+        $response = new Response(true, 'some data');
         $this->assertSame('some data', (string) $response);
 
-        $response = new Response(null, false);
+        $response = new Response(false, null);
         $this->assertSame('', (string) $response);
     }
 
     public function test_response_to_array_method()
     {
-        $response = new Response('Not allowed.', false, 'some_code');
+        $response = new Response(false, 'Not allowed.', 'some_code');
 
         $this->assertEquals([
             'allowed' => false,

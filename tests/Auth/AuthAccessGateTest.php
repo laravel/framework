@@ -628,7 +628,7 @@ class AuthAccessGateTest extends TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithCode::class);
 
-        $response = $gate->access('view', new AccessGateTestDummy);
+        $response = $gate->inspect('view', new AccessGateTestDummy);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertNull($response->message());
@@ -643,7 +643,7 @@ class AuthAccessGateTest extends TestCase
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithCode::class);
 
-        $response = $gate->access('view', new AccessGateTestDummy);
+        $response = $gate->inspect('view', new AccessGateTestDummy);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals('Not allowed to view as it is not published.', $response->message());
