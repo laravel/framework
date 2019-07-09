@@ -117,7 +117,7 @@ class Response implements Arrayable
     {
         if ($this->denied()) {
             throw (new AuthorizationException($this->message(), $this->code()))
-                ->setResponse($this);
+                        ->setResponse($this);
         }
 
         return $this;

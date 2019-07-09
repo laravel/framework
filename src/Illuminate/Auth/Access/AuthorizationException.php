@@ -29,6 +29,16 @@ class AuthorizationException extends Exception
     }
 
     /**
+     * Get the response from the gate.
+     *
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public function response()
+    {
+        return $this->response;
+    }
+
+    /**
      * Set the response from the gate.
      *
      * @param  \Illuminate\Auth\Access\Response  $response
@@ -39,16 +49,6 @@ class AuthorizationException extends Exception
         $this->response = $response;
 
         return $this;
-    }
-
-    /**
-     * Get the response from the gate.
-     *
-     * @return \Illuminate\Auth\Access\Response
-     */
-    public function getResponse()
-    {
-        return $this->response;
     }
 
     /**

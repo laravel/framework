@@ -37,7 +37,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertEquals('Some message.', $e->getMessage());
             $this->assertEquals('some_code', $e->getCode());
-            $this->assertEquals($response, $e->getResponse());
+            $this->assertEquals($response, $e->response());
         }
     }
 
