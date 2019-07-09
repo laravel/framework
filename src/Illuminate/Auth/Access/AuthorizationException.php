@@ -31,7 +31,7 @@ class AuthorizationException extends Exception
     /**
      * Set the response from the gate.
      *
-     * @param \Illuminate\Auth\Access\Response $response
+     * @param  \Illuminate\Auth\Access\Response  $response
      * @return $this
      */
     public function setResponse($response)
