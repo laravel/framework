@@ -611,7 +611,7 @@ class AuthAccessGateTest extends TestCase
     public function test_policy_that_throws_authorization_exception_is_caught_in_inspect()
     {
         $gate = $this->getBasicGate();
-        
+
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyThrowingAuthorizationException::class);
 
         $response = $gate->inspect('create', new AccessGateTestDummy);
@@ -1108,4 +1108,3 @@ class AccessGateTestPolicyThrowingAuthorizationException
         throw new AuthorizationException('Not allowed.', 'some_code');
     }
 }
-
