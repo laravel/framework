@@ -31,6 +31,7 @@ class StorageLinkCommand extends Command
         parent::setLaravel($laravel);
 
         $filesystem = $laravel->make('files');
+
         $this->setDescription(sprintf(
             $this->description,
             $filesystem->basename(public_path()),
