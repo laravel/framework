@@ -35,7 +35,7 @@ class Response implements Arrayable
      * @param  mixed  $code
      * @return void
      */
-    public function __construct(bool $allowed, $message = '', $code = null)
+    public function __construct($allowed, $message = '', $code = null)
     {
         $this->code = $code;
         $this->allowed = $allowed;
