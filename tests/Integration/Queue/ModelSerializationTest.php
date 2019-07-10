@@ -220,6 +220,21 @@ class ModelSerializationTest extends TestCase
 
         unserialize($serialized);
     }
+
+    public function test_it_serializes_a_collection_in_correct_order()
+    {
+        ModelSerializationTestUser::create([ 'email' => 'mohamed@laravel.com' ]);
+        ModelSerializationTestUser::create([ 'email' => 'taylor@laravel.com' ]);
+
+        $serialized = serialize(new CollectionSerializationTestClass(
+            ModelSerializationTestUser::orderByDesc('email')->get()
+        ));
+
+        $unserialized = unserialize($serialized);
+
+        $this->assertEquals($unserialized->users->first()->email, 'taylor@laravel.com');
+        $this->assertEquals($unserialized->users->last()->email, 'mohamed@laravel.com');
+    }
 }
 
 class ModelSerializationTestUser extends Model
@@ -328,5 +343,17 @@ class ModelRelationSerializationTestClass
     public function __construct($order)
     {
         $this->order = $order;
+    }
+}
+
+class CollectionSerializationTestClass
+{
+    use SerializesModels;
+
+    public $users;
+
+    public function __construct($users)
+    {
+        $this->users = $users;
     }
 }

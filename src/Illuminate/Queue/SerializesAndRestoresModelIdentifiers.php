@@ -67,9 +67,13 @@ trait SerializesAndRestoresModelIdentifiers
             return new EloquentCollection;
         }
 
-        return $this->getQueryForModelRestoration(
+        $collection = $this->getQueryForModelRestoration(
             (new $value->class)->setConnection($value->connection), $value->id
-        )->useWritePdo()->get();
+        )->useWritePdo()->get()->keyBy->getKey();
+
+        return new EloquentCollection(
+            collect($value->id)->map(function ($id) use ($collection) { return $collection[$id]; })
+        );
     }
 
     /**
