@@ -74,6 +74,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
+        $this->markdown->shouldReceive('theme')->once()->andReturnSelf();
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
@@ -118,6 +119,7 @@ class SendingMailNotificationsTest extends TestCase
             'name' => 'Taylor Otwell',
         ]);
 
+        $this->markdown->shouldReceive('theme')->once()->andReturnSelf();
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
@@ -161,6 +163,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
+        $this->markdown->shouldReceive('theme')->once()->andReturnSelf();
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
@@ -194,6 +197,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
+        $this->markdown->shouldReceive('theme')->once()->andReturnSelf();
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
