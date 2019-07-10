@@ -186,7 +186,13 @@ class FileStore implements Store
             return $this->emptyPayload();
         }
 
-        $data = unserialize(substr($contents, 10));
+        try {
+            $data = unserialize(substr($contents, 10));
+        } catch (Exception $e) {
+            $this->forget($key);
+
+            return $this->emptyPayload();
+        }
 
         // Next, we'll extract the number of seconds that are remaining for a cache
         // so that we can properly retain the time for things like the increment

@@ -86,7 +86,9 @@ class ServeCommand extends Command
      */
     protected function port()
     {
-        return $this->input->getOption('port') + $this->portOffset;
+        $port = $this->input->getOption('port') ?: 8000;
+
+        return $port + $this->portOffset;
     }
 
     /**
@@ -96,7 +98,8 @@ class ServeCommand extends Command
      */
     protected function canTryAnotherPort()
     {
-        return $this->input->getOption('tries') > $this->portOffset;
+        return is_null($this->input->getOption('port')) &&
+               ($this->input->getOption('tries') > $this->portOffset);
     }
 
     /**
@@ -109,7 +112,7 @@ class ServeCommand extends Command
         return [
             ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', '127.0.0.1'],
 
-            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', 8000],
+            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', $_ENV['SERVER_PORT'] ?? null],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
         ];

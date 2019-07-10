@@ -31,7 +31,7 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
             $table->unsignedInteger('base_model_id');
         });
 
-        Schema::create('deleted_relateds', function (Blueprint $table) {
+        Schema::create('deleted_related', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('base_model_id');
             $table->softDeletes();

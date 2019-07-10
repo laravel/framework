@@ -134,7 +134,7 @@ class AuthorizeMiddlewareTest extends TestCase
             return $post;
         });
 
-        $this->gate()->define('view-comments', function ($user, $model = null) use ($post) {
+        $this->gate()->define('view-comments', function ($user, $model = null) {
             return true;
         });
 

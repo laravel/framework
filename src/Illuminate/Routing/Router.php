@@ -1011,7 +1011,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Get a route parameter for the current route.
      *
      * @param  string  $key
-     * @param  string  $default
+     * @param  string|null  $default
      * @return mixed
      */
     public function input($key, $default = null)

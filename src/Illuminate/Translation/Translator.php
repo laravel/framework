@@ -93,7 +93,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @param  string  $key
      * @param  array   $replace
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return string|array
      */
     public function trans($key, array $replace = [], $locale = null)
@@ -131,11 +131,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
-        if (isset($line)) {
-            return $line;
-        }
-
-        return $key;
+        return $line ?? $key;
     }
 
     /**
@@ -143,7 +139,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @param  string  $key
      * @param  array  $replace
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return string|array
      */
     public function getFromJson($key, array $replace = [], $locale = null)
@@ -177,7 +173,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  int|array|\Countable  $number
      * @param  array   $replace
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return string
      */
     public function transChoice($key, $number, array $replace = [], $locale = null)
@@ -191,7 +187,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  int|array|\Countable  $number
      * @param  array   $replace
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return string
      */
     public function choice($key, $number, array $replace = [], $locale = null)

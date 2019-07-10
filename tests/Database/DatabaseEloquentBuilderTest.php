@@ -39,6 +39,40 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('baz', $result);
     }
 
+    public function testFindManyMethod()
+    {
+        // ids are not empty
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', ['one', 'two']);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(['baz']);
+
+        $result = $builder->findMany(['one', 'two'], ['column']);
+        $this->assertEquals(['baz'], $result);
+
+        // ids are empty array
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('newCollection')->once()->withNoArgs()->andReturn('emptycollection');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldNotReceive('whereIn');
+        $builder->shouldNotReceive('get');
+
+        $result = $builder->findMany([], ['column']);
+        $this->assertEquals('emptycollection', $result);
+
+        // ids are empty collection
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('newCollection')->once()->withNoArgs()->andReturn('emptycollection');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldNotReceive('whereIn');
+        $builder->shouldNotReceive('get');
+
+        $result = $builder->findMany(collect(), ['column']);
+        $this->assertEquals('emptycollection', $result);
+    }
+
     public function testFindOrNewMethodModelFound()
     {
         $model = $this->getMockModel();
@@ -117,7 +151,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $ids = collect([1, 2]);
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', $ids);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
 
@@ -1131,6 +1165,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpdateWithAlias()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', $now])->andReturn(1);
+
+        $result = $builder->from('table as alias')->update(['foo' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        Carbon::setTestNow(null);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -1286,27 +1338,27 @@ class EloquentBuilderTestModelSelfRelatedStub extends Model
 
     public function parentFoo()
     {
-        return $this->belongsTo(EloquentBuilderTestModelSelfRelatedStub::class, 'parent_id', 'id', 'parent');
+        return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
     }
 
     public function childFoo()
     {
-        return $this->hasOne(EloquentBuilderTestModelSelfRelatedStub::class, 'parent_id', 'id');
+        return $this->hasOne(self::class, 'parent_id', 'id');
     }
 
     public function childFoos()
     {
-        return $this->hasMany(EloquentBuilderTestModelSelfRelatedStub::class, 'parent_id', 'id', 'children');
+        return $this->hasMany(self::class, 'parent_id', 'id', 'children');
     }
 
     public function parentBars()
     {
-        return $this->belongsToMany(EloquentBuilderTestModelSelfRelatedStub::class, 'self_pivot', 'child_id', 'parent_id', 'parent_bars');
+        return $this->belongsToMany(self::class, 'self_pivot', 'child_id', 'parent_id', 'parent_bars');
     }
 
     public function childBars()
     {
-        return $this->belongsToMany(EloquentBuilderTestModelSelfRelatedStub::class, 'self_pivot', 'parent_id', 'child_id', 'child_bars');
+        return $this->belongsToMany(self::class, 'self_pivot', 'parent_id', 'child_id', 'child_bars');
     }
 
     public function bazes()

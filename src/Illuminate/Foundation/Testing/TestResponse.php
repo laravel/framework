@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Tappable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Foundation\Testing\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -18,7 +19,7 @@ use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
  */
 class TestResponse
 {
-    use Macroable {
+    use Tappable, Macroable {
         __call as macroCall;
     }
 
@@ -119,6 +120,23 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has an unauthorized status code.
+     *
+     * @return $this
+     */
+    public function assertUnauthorized()
+    {
+        $actual = $this->getStatusCode();
+
+        PHPUnit::assertTrue(
+            401 === $actual,
+            'Response status code ['.$actual.'] is not an unauthorized status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
@@ -139,7 +157,7 @@ class TestResponse
     /**
      * Assert whether the response is redirecting to a given URI.
      *
-     * @param  string  $uri
+     * @param  string|null  $uri
      * @return $this
      */
     public function assertRedirect($uri = null)
@@ -631,30 +649,42 @@ class TestResponse
     }
 
     /**
-     * Assert that the response has the given JSON validation errors for the given keys.
+     * Assert that the response has the given JSON validation errors.
      *
-     * @param  string|array  $keys
+     * @param  string|array  $errors
      * @return $this
      */
-    public function assertJsonValidationErrors($keys)
+    public function assertJsonValidationErrors($errors)
     {
-        $keys = Arr::wrap($keys);
+        $errors = Arr::wrap($errors);
 
-        PHPUnit::assertNotEmpty($keys, 'No keys were provided.');
+        PHPUnit::assertNotEmpty($errors, 'No validation errors were provided.');
 
-        $errors = $this->json()['errors'] ?? [];
+        $jsonErrors = $this->json()['errors'] ?? [];
 
-        $errorMessage = $errors
+        $errorMessage = $jsonErrors
                 ? 'Response has the following JSON validation errors:'.
-                        PHP_EOL.PHP_EOL.json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
+                        PHP_EOL.PHP_EOL.json_encode($jsonErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
                 : 'Response does not have JSON validation errors.';
 
-        foreach ($keys as $key) {
+        foreach ($errors as $key => $value) {
             PHPUnit::assertArrayHasKey(
-                $key,
-                $errors,
-                "Failed to find a validation error in the response for key: '{$key}'".PHP_EOL.PHP_EOL.$errorMessage
+                (is_int($key)) ? $value : $key,
+                $jsonErrors,
+                "Failed to find a validation error in the response for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
             );
+
+            if (! is_int($key)) {
+                foreach (Arr::wrap($jsonErrors[$key]) as $jsonErrorMessage) {
+                    if (Str::contains($jsonErrorMessage, $value)) {
+                        return $this;
+                    }
+                }
+
+                PHPUnit::fail(
+                    "Failed to find a validation error in the response for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
+                );
+            }
         }
 
         return $this;
@@ -663,11 +693,17 @@ class TestResponse
     /**
      * Assert that the response has no JSON validation errors for the given keys.
      *
-     * @param  string|array  $keys
+     * @param  string|array|null  $keys
      * @return $this
      */
     public function assertJsonMissingValidationErrors($keys = null)
     {
+        if ($this->getContent() === '') {
+            PHPUnit::assertTrue(true);
+
+            return $this;
+        }
+
         $json = $this->json();
 
         if (! array_key_exists('errors', $json)) {
@@ -758,13 +794,13 @@ class TestResponse
         $this->ensureResponseHasView();
 
         if (is_null($value)) {
-            PHPUnit::assertArrayHasKey($key, $this->original->getData());
+            PHPUnit::assertArrayHasKey($key, $this->original->gatherData());
         } elseif ($value instanceof Closure) {
-            PHPUnit::assertTrue($value($this->original->getData()[$key]));
+            PHPUnit::assertTrue($value($this->original->gatherData()[$key]));
         } elseif ($value instanceof Model) {
-            PHPUnit::assertTrue($value->is($this->original->getData()[$key]));
+            PHPUnit::assertTrue($value->is($this->original->gatherData()[$key]));
         } else {
-            PHPUnit::assertEquals($value, $this->original->getData()[$key]);
+            PHPUnit::assertEquals($value, $this->original->gatherData()[$key]);
         }
 
         return $this;
@@ -799,7 +835,7 @@ class TestResponse
     {
         $this->ensureResponseHasView();
 
-        return $this->original->getData()[$key];
+        return $this->original->gatherData()[$key];
     }
 
     /**
@@ -812,7 +848,7 @@ class TestResponse
     {
         $this->ensureResponseHasView();
 
-        PHPUnit::assertArrayNotHasKey($key, $this->original->getData());
+        PHPUnit::assertArrayNotHasKey($key, $this->original->gatherData());
 
         return $this;
     }
@@ -849,6 +885,8 @@ class TestResponse
                 $this->session()->has($key),
                 "Session is missing expected key [{$key}]."
             );
+        } elseif ($value instanceof Closure) {
+            PHPUnit::assertTrue($value($this->session()->get($key)));
         } else {
             PHPUnit::assertEquals($value, $this->session()->get($key));
         }
@@ -906,7 +944,7 @@ class TestResponse
      * Assert that the session is missing the given errors.
      *
      * @param  string|array  $keys
-     * @param  string  $format
+     * @param  string|null  $format
      * @param  string  $errorBag
      * @return $this
      */
@@ -915,7 +953,7 @@ class TestResponse
         $keys = (array) $keys;
 
         if (empty($keys)) {
-            return $this->assertSessionMissing('errors');
+            return $this->assertSessionHasNoErrors();
         }
 
         if (is_null($this->session()->get('errors'))) {
@@ -1005,7 +1043,7 @@ class TestResponse
     /**
      * Dump the content from the response.
      *
-     * @return void
+     * @return $this
      */
     public function dump()
     {
@@ -1017,7 +1055,21 @@ class TestResponse
             $content = $json;
         }
 
-        dd($content);
+        dump($content);
+
+        return $this;
+    }
+
+    /**
+     * Dump the headers from the response.
+     *
+     * @return $this
+     */
+    public function dumpHeaders()
+    {
+        dump($this->headers->all());
+
+        return $this;
     }
 
     /**

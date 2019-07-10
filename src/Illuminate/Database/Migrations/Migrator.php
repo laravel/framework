@@ -7,10 +7,22 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Events\MigrationEnded;
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Events\MigrationStarted;
+use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
 {
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
+
     /**
      * The migration repository implementation.
      *
@@ -59,13 +71,16 @@ class Migrator
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
     public function __construct(MigrationRepositoryInterface $repository,
                                 Resolver $resolver,
-                                Filesystem $files)
+                                Filesystem $files,
+                                Dispatcher $dispatcher = null)
     {
         $this->files = $files;
+        $this->events = $dispatcher;
         $this->resolver = $resolver;
         $this->repository = $repository;
     }
@@ -79,8 +94,6 @@ class Migrator
      */
     public function run($paths = [], array $options = [])
     {
-        $this->notes = [];
-
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
@@ -140,6 +153,8 @@ class Migrator
 
         $step = $options['step'] ?? false;
 
+        $this->fireMigrationEvent(new MigrationsStarted);
+
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
@@ -150,6 +165,8 @@ class Migrator
                 $batch++;
             }
         }
+
+        $this->fireMigrationEvent(new MigrationsEnded);
     }
 
     /**
@@ -194,8 +211,6 @@ class Migrator
      */
     public function rollback($paths = [], array $options = [])
     {
-        $this->notes = [];
-
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
@@ -239,6 +254,8 @@ class Migrator
 
         $this->requireFiles($files = $this->getMigrationFiles($paths));
 
+        $this->fireMigrationEvent(new MigrationsStarted);
+
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order. This getLast method on the
         // repository already returns these migration's names in reverse order.
@@ -259,6 +276,8 @@ class Migrator
             );
         }
 
+        $this->fireMigrationEvent(new MigrationsEnded);
+
         return $rolledBack;
     }
 
@@ -271,8 +290,6 @@ class Migrator
      */
     public function reset($paths = [], $pretend = false)
     {
-        $this->notes = [];
-
         // Next, we will reverse the migration list so we can run them back in the
         // correct order for resetting this database. This will allow us to get
         // the database back into its "empty" state ready for the migrations.
@@ -357,7 +374,11 @@ class Migrator
 
         $callback = function () use ($migration, $method) {
             if (method_exists($migration, $method)) {
+                $this->fireMigrationEvent(new MigrationStarted($migration, $method));
+
                 $migration->{$method}();
+
+                $this->fireMigrationEvent(new MigrationEnded($migration, $method));
             }
         };
 
@@ -580,7 +601,7 @@ class Migrator
     }
 
     /**
-     * Write a note to the conosle's output.
+     * Write a note to the console's output.
      *
      * @param  string  $message
      * @return void
@@ -589,6 +610,19 @@ class Migrator
     {
         if ($this->output) {
             $this->output->writeln($message);
+        }
+    }
+
+    /**
+     * Fire the given event for the migration.
+     *
+     * @param  \Illuminate\Contracts\Database\Events\MigrationEvent $event
+     * @return void
+     */
+    public function fireMigrationEvent($event)
+    {
+        if ($this->events) {
+            $this->events->dispatch($event);
         }
     }
 }

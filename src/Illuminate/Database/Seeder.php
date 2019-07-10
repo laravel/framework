@@ -108,7 +108,7 @@ abstract class Seeder
     /**
      * Run the database seeds.
      *
-     * @return dynamic
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */

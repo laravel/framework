@@ -76,7 +76,7 @@ abstract class Lock implements LockContract
      * Attempt to acquire the lock.
      *
      * @param  callable|null  $callback
-     * @return bool
+     * @return mixed
      */
     public function get($callback = null)
     {

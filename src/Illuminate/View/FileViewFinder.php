@@ -40,7 +40,7 @@ class FileViewFinder implements ViewFinderInterface
      *
      * @var array
      */
-    protected $extensions = ['blade.php', 'php', 'css'];
+    protected $extensions = ['blade.php', 'php', 'css', 'html'];
 
     /**
      * Create a new file view loader instance.
@@ -298,6 +298,16 @@ class FileViewFinder implements ViewFinderInterface
     public function getPaths()
     {
         return $this->paths;
+    }
+
+    /**
+     * Get the views that have been located.
+     *
+     * @return array
+     */
+    public function getViews()
+    {
+        return $this->views;
     }
 
     /**

@@ -19,17 +19,11 @@ class DiscoverEvents
      */
     public static function within($listenerPath, $basePath)
     {
-        $listenerEvents = collect(static::getListenerEvents((new Finder)
-                    ->files()
-                    ->in($listenerPath), $basePath));
-
-        return $listenerEvents->values()
-                ->zip($listenerEvents->keys()->all())
-                ->reduce(function ($carry, $listenerEventPair) {
-                    $carry[$listenerEventPair[0]][] = $listenerEventPair[1];
-
-                    return $carry;
-                }, []);
+        return collect(static::getListenerEvents(
+            (new Finder)->files()->in($listenerPath), $basePath
+        ))->mapToDictionary(function ($event, $listener) {
+            return [$event => $listener];
+        })->all();
     }
 
     /**
@@ -71,8 +65,12 @@ class DiscoverEvents
      */
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
-        $class = trim(str_replace($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 
-        return str_replace(DIRECTORY_SEPARATOR, '\\', ucfirst(Str::replaceLast('.php', '', $class)));
+        return str_replace(
+            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
+            ['\\', app()->getNamespace()],
+            ucfirst(Str::replaceLast('.php', '', $class))
+        );
     }
 }

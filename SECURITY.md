@@ -1,14 +1,26 @@
----
-name: "🔒 Security Vulnerabilities"
-about: 'For reporting security-related issues, see: https://github.com/laravel/laravel#security-vulnerabilities'
+# Security Policy
 
----
+**PLEASE DON'T DISCLOSE SECURITY-RELATED ISSUES PUBLICLY, [SEE BELOW](#reporting-a-vulnerability).**
 
-PLEASE DON'T DISCLOSE SECURITY-RELATED ISSUES PUBLICLY, SEE BELOW.
+## Supported Versions
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+Version | Security Fixes Until
+--- | ---
+5.8	| February 26th, 2020
+5.7	| September 4th, 2019
+5.6	| February 7th, 2019
+5.5 (LTS) | August 30th, 2020
+5.4	| January 24th, 2018
+5.3	| August 23rd, 2017
+5.2	| December 21st, 2016
+5.1 (LTS) | June 9th, 2018
+5.0	| February 4th, 2016
 
-Public PGP Key:
+## Reporting a Vulnerability
+
+If you discover a security vulnerability within Laravel, please send an email to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+
+### Public PGP Key
 
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----

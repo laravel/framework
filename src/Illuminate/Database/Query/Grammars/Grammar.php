@@ -733,9 +733,7 @@ class Grammar extends BaseGrammar
     protected function compileOrdersToArray(Builder $query, $orders)
     {
         return array_map(function ($order) {
-            return ! isset($order['sql'])
-                        ? $this->wrap($order['column']).' '.$order['direction']
-                        : $order['sql'];
+            return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'];
         }, $orders);
     }
 
@@ -1119,6 +1117,8 @@ class Grammar extends BaseGrammar
      */
     protected function wrapJsonPath($value, $delimiter = '->')
     {
+        $value = preg_replace("/([\\\\]+)?\\'/", "\\'", $value);
+
         return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
     }
 

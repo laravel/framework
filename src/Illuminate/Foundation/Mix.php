@@ -63,6 +63,6 @@ class Mix
             }
         }
 
-        return new HtmlString($manifestDirectory.$manifest[$path]);
+        return new HtmlString(app('config')->get('app.mix_url').$manifestDirectory.$manifest[$path]);
     }
 }

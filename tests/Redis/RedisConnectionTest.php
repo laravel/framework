@@ -558,8 +558,9 @@ class RedisConnectionTest extends TestCase
             $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
                 'cluster' => false,
                 'default' => [
-                    'host' => $host,
-                    'port' => $port,
+                    'url' => "redis://user@$host:$port",
+                    'host' => 'overwrittenByUrl',
+                    'port' => 'overwrittenByUrl',
                     'database' => 5,
                     'options' => ['prefix' => 'laravel:'],
                     'timeout' => 0.5,

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use DateTime;
 use DateInterval;
 use Mockery as m;
+use ArrayIterator;
 use DateTimeImmutable;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -130,12 +131,19 @@ class CacheRepositoryTest extends TestCase
         $repo->put(['foo' => 'bar', 'bar' => 'baz'], 1);
     }
 
-    public function testSettingMultipleItemsInCache()
+    public function testSettingMultipleItemsInCacheArray()
     {
-        // Alias of PuttingMultiple
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1)->andReturn(true);
         $result = $repo->setMultiple(['foo' => 'bar', 'bar' => 'baz'], 1);
+        $this->assertTrue($result);
+    }
+
+    public function testSettingMultipleItemsInCacheIterator()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1)->andReturn(true);
+        $result = $repo->setMultiple(new ArrayIterator(['foo' => 'bar', 'bar' => 'baz']), 1);
         $this->assertTrue($result);
     }
 
@@ -268,11 +276,11 @@ class CacheRepositoryTest extends TestCase
     public function testGettingMultipleValuesFromCache()
     {
         $keys = ['key1', 'key2', 'key3'];
-        $default = ['key2' => 5];
+        $default = 5;
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('many')->once()->with(['key2', 'key1', 'key3'])->andReturn(['key1' => 1, 'key2' => null, 'key3' => null]);
-        $this->assertEquals(['key1' => 1, 'key2' => 5, 'key3' => null], $repo->getMultiple($keys, $default));
+        $repo->getStore()->shouldReceive('many')->once()->with(['key1', 'key2', 'key3'])->andReturn(['key1' => 1, 'key2' => null, 'key3' => null]);
+        $this->assertEquals(['key1' => 1, 'key2' => 5, 'key3' => 5], $repo->getMultiple($keys, $default));
     }
 
     public function testRemovingMultipleKeys()

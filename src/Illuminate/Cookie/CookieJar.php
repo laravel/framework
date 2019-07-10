@@ -53,8 +53,8 @@ class CookieJar implements JarContract
      * @param  string       $name
      * @param  string       $value
      * @param  int          $minutes
-     * @param  string       $path
-     * @param  string       $domain
+     * @param  string|null  $path
+     * @param  string|null  $domain
      * @param  bool|null    $secure
      * @param  bool         $httpOnly
      * @param  bool         $raw
@@ -75,8 +75,8 @@ class CookieJar implements JarContract
      *
      * @param  string       $name
      * @param  string       $value
-     * @param  string       $path
-     * @param  string       $domain
+     * @param  string|null  $path
+     * @param  string|null  $domain
      * @param  bool|null    $secure
      * @param  bool         $httpOnly
      * @param  bool         $raw
@@ -92,8 +92,8 @@ class CookieJar implements JarContract
      * Expire the given cookie.
      *
      * @param  string  $name
-     * @param  string  $path
-     * @param  string  $domain
+     * @param  string|null  $path
+     * @param  string|null  $domain
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forget($name, $path = null, $domain = null)
@@ -158,7 +158,7 @@ class CookieJar implements JarContract
      * @param  string    $path
      * @param  string    $domain
      * @param  bool|null $secure
-     * @param  string    $sameSite
+     * @param  string|null  $sameSite
      * @return array
      */
     protected function getPathAndDomain($path, $domain, $secure = null, $sameSite = null)
@@ -172,7 +172,7 @@ class CookieJar implements JarContract
      * @param  string  $path
      * @param  string  $domain
      * @param  bool    $secure
-     * @param  string  $sameSite
+     * @param  string|null  $sameSite
      * @return $this
      */
     public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite = null)

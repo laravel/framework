@@ -323,7 +323,7 @@ class Blueprint
     /**
      * Indicate that the given primary key should be dropped.
      *
-     * @param  string|array  $index
+     * @param  string|array|null  $index
      * @return \Illuminate\Support\Fluent
      */
     public function dropPrimary($index = null)
@@ -468,7 +468,7 @@ class Blueprint
      * Specify the primary key(s) for the table.
      *
      * @param  string|array  $columns
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  string|null  $algorithm
      * @return \Illuminate\Support\Fluent
      */
@@ -481,7 +481,7 @@ class Blueprint
      * Specify a unique index for the table.
      *
      * @param  string|array  $columns
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  string|null  $algorithm
      * @return \Illuminate\Support\Fluent
      */
@@ -494,7 +494,7 @@ class Blueprint
      * Specify an index for the table.
      *
      * @param  string|array  $columns
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  string|null  $algorithm
      * @return \Illuminate\Support\Fluent
      */
@@ -507,7 +507,7 @@ class Blueprint
      * Specify a spatial index for the table.
      *
      * @param  string|array  $columns
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Support\Fluent
      */
     public function spatialIndex($columns, $name = null)
@@ -519,8 +519,8 @@ class Blueprint
      * Specify a foreign key for the table.
      *
      * @param  string|array  $columns
-     * @param  string  $name
-     * @return \Illuminate\Support\Fluent
+     * @param  string|null  $name
+     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function foreign($columns, $name = null)
     {
@@ -597,7 +597,7 @@ class Blueprint
      * Create a new char column on the table.
      *
      * @param  string  $column
-     * @param  int  $length
+     * @param  int|null  $length
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function char($column, $length = null)
@@ -611,7 +611,7 @@ class Blueprint
      * Create a new string column on the table.
      *
      * @param  string  $column
-     * @param  int  $length
+     * @param  int|null  $length
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function string($column, $length = null)
@@ -854,6 +854,18 @@ class Blueprint
     public function enum($column, array $allowed)
     {
         return $this->addColumn('enum', $column, compact('allowed'));
+    }
+
+    /**
+     * Create a new set column on the table.
+     *
+     * @param  string  $column
+     * @param  array  $allowed
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function set($column, array $allowed)
+    {
+        return $this->addColumn('set', $column, compact('allowed'));
     }
 
     /**

@@ -666,6 +666,69 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testMergeRecursiveNull()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello'], $c->mergeRecursive(null)->all());
+    }
+
+    public function testMergeRecursiveArray()
+    {
+        $c = new Collection(['name' => 'Hello', 'id' => 1]);
+        $this->assertEquals(['name' => 'Hello', 'id' => [1, 2]], $c->mergeRecursive(['id' => 2])->all());
+    }
+
+    public function testMergeRecursiveCollection()
+    {
+        $c = new Collection(['name' => 'Hello', 'id' => 1, 'meta' => ['tags' => ['a', 'b'], 'roles' => 'admin']]);
+        $this->assertEquals(
+            ['name' => 'Hello', 'id' => 1, 'meta' => ['tags' => ['a', 'b', 'c'], 'roles' => ['admin', 'editor']]],
+            $c->mergeRecursive(new Collection(['meta' => ['tags' => ['c'], 'roles' => 'editor']]))->all()
+        );
+    }
+
+    public function testReplaceNull()
+    {
+        $c = new Collection(['a', 'b', 'c']);
+        $this->assertEquals(['a', 'b', 'c'], $c->replace(null)->all());
+    }
+
+    public function testReplaceArray()
+    {
+        $c = new Collection(['a', 'b', 'c']);
+        $this->assertEquals(['a', 'd', 'e'], $c->replace([1 => 'd', 2 => 'e'])->all());
+    }
+
+    public function testReplaceCollection()
+    {
+        $c = new Collection(['a', 'b', 'c']);
+        $this->assertEquals(
+            ['a', 'd', 'e'],
+            $c->replace(new Collection([1 => 'd', 2 => 'e']))->all()
+        );
+    }
+
+    public function testReplaceRecursiveNull()
+    {
+        $c = new Collection(['a', 'b', ['c', 'd']]);
+        $this->assertEquals(['a', 'b', ['c', 'd']], $c->replaceRecursive(null)->all());
+    }
+
+    public function testReplaceRecursiveArray()
+    {
+        $c = new Collection(['a', 'b', ['c', 'd']]);
+        $this->assertEquals(['z', 'b', ['c', 'e']], $c->replaceRecursive(['z', 2 => [1 => 'e']])->all());
+    }
+
+    public function testReplaceRecursiveCollection()
+    {
+        $c = new Collection(['a', 'b', ['c', 'd']]);
+        $this->assertEquals(
+            ['z', 'b', ['c', 'e']],
+            $c->replaceRecursive(new Collection(['z', 2 => [1 => 'e']]))->all()
+        );
+    }
+
     public function testUnionNull()
     {
         $c = new Collection(['name' => 'Hello']);
@@ -743,6 +806,60 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssoc($c2)->all());
         // allow for case insensitive difference
         $this->assertEquals(['b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssocUsing($c2, 'strcasecmp')->all());
+    }
+
+    public function testDuplicates()
+    {
+        $duplicates = Collection::make([1, 2, 1, 'laravel', null, 'laravel', 'php', null])->duplicates()->all();
+        $this->assertSame([2 => 1, 5 => 'laravel', 7 => null], $duplicates);
+
+        // does loose comparison
+        $duplicates = Collection::make([2, '2', [], null])->duplicates()->all();
+        $this->assertSame([1 => '2', 3 => null], $duplicates);
+
+        // works with mix of primitives
+        $duplicates = Collection::make([1, '2', ['laravel'], ['laravel'], null, '2'])->duplicates()->all();
+        $this->assertSame([3 => ['laravel'], 5 => '2'], $duplicates);
+
+        // works with mix of objects and primitives **excepts numbers**.
+        $expected = new Collection(['laravel']);
+        $duplicates = Collection::make([new Collection(['laravel']), $expected, $expected, [], '2', '2'])->duplicates()->all();
+        $this->assertSame([1 => $expected, 2 => $expected, 5 => '2'], $duplicates);
+    }
+
+    public function testDuplicatesWithKey()
+    {
+        $items = [['framework' => 'vue'], ['framework' => 'laravel'], ['framework' => 'laravel']];
+        $duplicates = Collection::make($items)->duplicates('framework')->all();
+        $this->assertSame([2 => 'laravel'], $duplicates);
+    }
+
+    public function testDuplicatesWithCallback()
+    {
+        $items = [['framework' => 'vue'], ['framework' => 'laravel'], ['framework' => 'laravel']];
+        $duplicates = Collection::make($items)->duplicates(function ($item) {
+            return $item['framework'];
+        })->all();
+        $this->assertSame([2 => 'laravel'], $duplicates);
+    }
+
+    public function testDuplicatesWithStrict()
+    {
+        $duplicates = Collection::make([1, 2, 1, 'laravel', null, 'laravel', 'php', null])->duplicatesStrict()->all();
+        $this->assertSame([2 => 1, 5 => 'laravel', 7 => null], $duplicates);
+
+        // does strict comparison
+        $duplicates = Collection::make([2, '2', [], null])->duplicatesStrict()->all();
+        $this->assertSame([], $duplicates);
+
+        // works with mix of primitives
+        $duplicates = Collection::make([1, '2', ['laravel'], ['laravel'], null, '2'])->duplicatesStrict()->all();
+        $this->assertSame([3 => ['laravel'], 5 => '2'], $duplicates);
+
+        // works with mix of primitives, objects, and numbers
+        $expected = new Collection(['laravel']);
+        $duplicates = Collection::make([new Collection(['laravel']), $expected, $expected, [], '2', '2'])->duplicatesStrict()->all();
+        $this->assertSame([2 => $expected, 5 => '2'], $duplicates);
     }
 
     public function testEach()
@@ -1021,14 +1138,14 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['b' => 'dayle', 'a' => 'taylor']);
 
-        $this->assertEquals(['a' => 'taylor', 'b' => 'dayle'], $data->sortKeys()->all());
+        $this->assertSame(['a' => 'taylor', 'b' => 'dayle'], $data->sortKeys()->all());
     }
 
     public function testSortKeysDesc()
     {
         $data = new Collection(['a' => 'taylor', 'b' => 'dayle']);
 
-        $this->assertEquals(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeys()->all());
+        $this->assertSame(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeysDesc()->all());
     }
 
     public function testReverse()

@@ -13,7 +13,7 @@ trait InteractsWithInput
     /**
      * Retrieve a server variable from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -36,7 +36,7 @@ trait InteractsWithInput
     /**
      * Retrieve a header from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -176,7 +176,7 @@ trait InteractsWithInput
     /**
      * Get all of the input and files for the request.
      *
-     * @param  array|mixed  $keys
+     * @param  array|mixed|null  $keys
      * @return array
      */
     public function all($keys = null)
@@ -255,7 +255,7 @@ trait InteractsWithInput
     /**
      * Retrieve a query string item from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -267,9 +267,8 @@ trait InteractsWithInput
     /**
      * Retrieve a request payload item from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
-     *
      * @return string|array|null
      */
     public function post($key = null, $default = null)
@@ -291,7 +290,7 @@ trait InteractsWithInput
     /**
      * Retrieve a cookie from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -366,7 +365,7 @@ trait InteractsWithInput
     /**
      * Retrieve a file from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $default
      * @return \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|array|null
      */

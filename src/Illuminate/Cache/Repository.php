@@ -85,7 +85,7 @@ class Repository implements CacheContract, ArrayAccess
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -134,17 +134,13 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function getMultiple($keys, $default = null)
     {
-        if (is_null($default)) {
-            return $this->many($keys);
-        }
+        $defaults = [];
 
         foreach ($keys as $key) {
-            if (! isset($default[$key])) {
-                $default[$key] = null;
-            }
+            $defaults[$key] = $default;
         }
 
-        return $this->many($default);
+        return $this->many($defaults);
     }
 
     /**
@@ -178,7 +174,7 @@ class Repository implements CacheContract, ArrayAccess
      * Retrieve an item from the cache and delete it.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function pull($key, $default = null)
@@ -192,7 +188,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
@@ -283,14 +279,14 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function setMultiple($values, $ttl = null)
     {
-        return $this->putMany($values, $ttl);
+        return $this->putMany(is_array($values) ? $values : iterator_to_array($values), $ttl);
     }
 
     /**
      * Store an item in the cache if the key does not exist.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
@@ -628,7 +624,7 @@ class Repository implements CacheContract, ArrayAccess
      * Handle dynamic calls into macros or pass missing methods to the store.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

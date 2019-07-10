@@ -34,7 +34,7 @@ class React extends Preset
             '@babel/preset-react' => '^7.0.0',
             'react' => '^16.2.0',
             'react-dom' => '^16.2.0',
-        ] + Arr::except($packages, ['vue']);
+        ] + Arr::except($packages, ['vue', 'vue-template-compiler']);
     }
 
     /**

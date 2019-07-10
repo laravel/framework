@@ -4,9 +4,12 @@ namespace Illuminate\Tests\Integration\Auth;
 
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Events\Dispatcher;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Support\Facades\Schema;
@@ -14,6 +17,7 @@ use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Auth\Events\OtherDeviceLogout;
+use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 
 /**
@@ -245,4 +249,77 @@ class AuthenticationTest extends TestCase
 
         $this->assertNull($provider->retrieveByToken($user->id, $token));
     }
+
+    public function test_dispatcher_changes_if_there_is_one_on_the_auth_guard()
+    {
+        $this->assertInstanceOf(SessionGuard::class, $this->app['auth']->guard());
+        $this->assertInstanceOf(Dispatcher::class, $this->app['auth']->guard()->getDispatcher());
+
+        Event::fake();
+
+        $this->assertInstanceOf(SessionGuard::class, $this->app['auth']->guard());
+        $this->assertInstanceOf(EventFake::class, $this->app['auth']->guard()->getDispatcher());
+    }
+
+    public function test_dispatcher_changes_if_there_is_one_on_the_custom_auth_guard()
+    {
+        $this->app['config']['auth.guards.myGuard'] = [
+            'driver' => 'myCustomDriver',
+            'provider' => 'user',
+        ];
+
+        Auth::extend('myCustomDriver', function () {
+            return new MyCustomGuardStub();
+        });
+
+        $this->assertInstanceOf(MyCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
+        $this->assertInstanceOf(Dispatcher::class, $this->app['auth']->guard()->getDispatcher());
+
+        Event::fake();
+
+        $this->assertInstanceOf(MyCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
+        $this->assertInstanceOf(EventFake::class, $this->app['auth']->guard()->getDispatcher());
+    }
+
+    public function test_has_no_problem_if_there_is_no_dispatching_the_auth_custom_guard()
+    {
+        $this->app['config']['auth.guards.myGuard'] = [
+            'driver' => 'myCustomDriver',
+            'provider' => 'user',
+        ];
+
+        Auth::extend('myCustomDriver', function () {
+            return new MyDispatcherLessCustomGuardStub();
+        });
+
+        $this->assertInstanceOf(MyDispatcherLessCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
+
+        Event::fake();
+
+        $this->assertInstanceOf(MyDispatcherLessCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
+    }
+}
+
+class MyCustomGuardStub
+{
+    protected $events;
+
+    public function __construct()
+    {
+        $this->setDispatcher(new Dispatcher());
+    }
+
+    public function setDispatcher(Dispatcher $events)
+    {
+        $this->events = $events;
+    }
+
+    public function getDispatcher()
+    {
+        return $this->events;
+    }
+}
+
+class MyDispatcherLessCustomGuardStub
+{
 }

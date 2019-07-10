@@ -1572,6 +1572,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo', 1, 'bar'], $builder->getRawBindings()['join']);
     }
 
+    public function testJoinSubWithPrefix()
+    {
+        $builder = $this->getBuilder();
+        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder->from('users')->joinSub('select * from "contacts"', 'sub', 'users.id', '=', 'sub.id');
+        $this->assertEquals('select * from "prefix_users" inner join (select * from "contacts") as "prefix_sub" on "prefix_users"."id" = "prefix_sub"."id"', $builder->toSql());
+    }
+
     public function testLeftJoinSub()
     {
         $builder = $this->getBuilder();
@@ -2252,6 +2260,29 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where json_extract(`items`, \'$."available"\') = true and json_extract(`items`, \'$."active"\') = false and json_unquote(json_extract(`items`, \'$."number_available"\')) = ?', $builder->toSql());
     }
 
+    public function testJsonPathEscaping()
+    {
+        $expectedWithJsonEscaped = <<<SQL
+select json_unquote(json_extract(`json`, '$."\'))#"'))
+SQL;
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select("json->\\\'))#");
+        $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
+    }
+
     public function testMySqlWrappingJson()
     {
         $builder = $this->getMySqlBuilder();
@@ -2795,7 +2826,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
-        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
@@ -2822,7 +2853,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
-        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(2);
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
@@ -2853,7 +2884,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $results = [];
 
-        $builder->shouldReceive('getCountForPagination')->once()->with($columns)->andReturn(0);
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(0);
         $builder->shouldNotReceive('forPage');
         $builder->shouldNotReceive('get');
 
@@ -2868,6 +2899,33 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->paginate();
 
         $this->assertEquals(new LengthAwarePaginator($results, 0, $perPage, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
+    public function testPaginateWithSpecificColumns()
+    {
+        $perPage = 16;
+        $columns = ['id', 'name'];
+        $pageName = 'page-name';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
+
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate($perPage, $columns, $pageName, $page);
+
+        $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
             'path' => $path,
             'pageName' => $pageName,
         ]), $result);
@@ -3106,6 +3164,17 @@ class DatabaseQueryBuilderTest extends TestCase
             $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions')->where('foo', '=', '1');
         }, 'sessions')->where('bar', '<', '10');
         $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "user_sessions" where "foo" = ?) as "sessions" where "bar" < ?', $builder->toSql());
+        $this->assertEquals(['1', '10'], $builder->getBindings());
+    }
+
+    public function testFromSubWithPrefix()
+    {
+        $builder = $this->getBuilder();
+        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder->fromSub(function ($query) {
+            $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions')->where('foo', '=', '1');
+        }, 'sessions')->where('bar', '<', '10');
+        $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "prefix_user_sessions" where "foo" = ?) as "prefix_sessions" where "bar" < ?', $builder->toSql());
         $this->assertEquals(['1', '10'], $builder->getBindings());
     }
 

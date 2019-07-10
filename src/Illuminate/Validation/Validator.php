@@ -265,7 +265,7 @@ class Validator implements ValidatorContract
     {
         $this->messages = new MessageBag;
 
-        $this->distinctValues = [];
+        [$this->distinctValues, $this->failedRules] = [[], []];
 
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of

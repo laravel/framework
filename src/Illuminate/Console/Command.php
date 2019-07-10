@@ -451,7 +451,7 @@ class Command extends SymfonyCommand
      * Write a string as standard output.
      *
      * @param  string  $string
-     * @param  string  $style
+     * @param  string|null  $style
      * @param  int|string|null  $verbosity
      * @return void
      */

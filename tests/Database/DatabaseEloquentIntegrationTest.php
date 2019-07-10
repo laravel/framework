@@ -184,6 +184,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $models = EloquentTestUser::where('id', 1)->cursor();
         foreach ($models as $model) {
             $this->assertEquals(1, $model->id);
+            $this->assertEquals('default', $model->getConnectionName());
         }
 
         $records = DB::table('users')->where('id', 1)->cursor();
@@ -1600,17 +1601,17 @@ class EloquentTestUser extends Eloquent
 
     public function friends()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id');
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id');
     }
 
     public function friendsOne()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 1);
     }
 
     public function friendsTwo()
     {
-        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
     }
 
     public function posts()
@@ -1718,12 +1719,12 @@ class EloquentTestPost extends Eloquent
 
     public function childPosts()
     {
-        return $this->hasMany(EloquentTestPost::class, 'parent_id');
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function parentPost()
     {
-        return $this->belongsTo(EloquentTestPost::class, 'parent_id');
+        return $this->belongsTo(self::class, 'parent_id');
     }
 }
 

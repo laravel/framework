@@ -31,7 +31,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $response = $this->makeMockResponse([
             'render' => 'hello world',
-            'getData' => ['foo' => 'bar'],
+            'gatherData' => ['foo' => 'bar'],
         ]);
 
         $response->assertViewHas('foo');
@@ -48,7 +48,7 @@ class FoundationTestResponseTest extends TestCase
 
         $response = $this->makeMockResponse([
             'render' => 'hello world',
-            'getData' => ['foo' => $model],
+            'gatherData' => ['foo' => $model],
         ]);
 
         $response->original->foo = $model;
@@ -129,6 +129,86 @@ class FoundationTestResponseTest extends TestCase
         ]);
 
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
+    }
+
+    public function testAssertOk()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] does not match expected 200 status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertOk();
+    }
+
+    public function testAssertNotFound()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a not found status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertNotFound();
+    }
+
+    public function testAssertForbidden()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a forbidden status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertForbidden();
+    }
+
+    public function testAssertUnauthorized()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not an unauthorized status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertUnauthorized();
+    }
+
+    public function testAssertStatus()
+    {
+        $statusCode = 500;
+        $expectedStatusCode = 401;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage("Expected status code {$expectedStatusCode} but received {$statusCode}");
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertStatus($expectedStatusCode);
     }
 
     public function testAssertHeader()
@@ -355,6 +435,124 @@ class FoundationTestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors([]);
     }
 
+    public function testAssertJsonValidationErrorsWithArray()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['foo' => 'one', 'bar' => 'two'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['foo', 'bar']);
+    }
+
+    public function testAssertJsonValidationErrorMessages()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['key' => 'foo'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['key' => 'foo']);
+    }
+
+    public function testAssertJsonValidationErrorContainsMessages()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['key' => 'foo bar'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['key' => 'foo']);
+    }
+
+    public function testAssertJsonValidationErrorMessagesCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = [
+            'status' => 'ok',
+            'errors' => ['key' => 'foo'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['key' => 'bar']);
+    }
+
+    public function testAssertJsonValidationErrorMessageKeyCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = [
+            'status' => 'ok',
+            'errors' => ['foo' => 'value'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['bar' => 'value']);
+    }
+
+    public function testAssertJsonValidationErrorMessagesMultipleMessages()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['one' => 'foo', 'two' => 'bar'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => 'foo', 'two' => 'bar']);
+    }
+
+    public function testAssertJsonValidationErrorMessagesMixed()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['one' => 'foo', 'two' => 'bar'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => 'foo', 'two']);
+    }
+
+    public function testAssertJsonValidationErrorMessagesMixedCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = [
+            'status' => 'ok',
+            'errors' => ['one' => 'foo', 'two' => 'bar'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => 'taylor', 'otwell']);
+    }
+
     public function testAssertJsonMissingValidationErrors()
     {
         $baseResponse = tap(new Response, function ($response) {
@@ -446,6 +644,27 @@ class FoundationTestResponseTest extends TestCase
         $testResponse->assertJsonMissingValidationErrors();
     }
 
+    public function testAssertJsonMissingValidationErrorsOnAnEmptyResponse()
+    {
+        $emptyResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent('')
+        );
+
+        $emptyResponse->assertJsonMissingValidationErrors();
+    }
+
+    public function testAssertJsonMissingValidationErrorsOnInvalidJson()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Invalid JSON was returned from the route.');
+
+        $invalidJsonResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent('~invalid json')
+        );
+
+        $invalidJsonResponse->assertJsonMissingValidationErrors();
+    }
+
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {
@@ -482,6 +701,17 @@ class FoundationTestResponseTest extends TestCase
             json_decode($response->getContent(), true),
             $response->json()
         );
+    }
+
+    public function testItCanBeTapped()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setContent('')->setStatusCode(418)
+        );
+
+        $response->tap(function ($response) {
+            $this->assertInstanceOf(TestResponse::class, $response);
+        })->assertStatus(418);
     }
 
     private function makeMockResponse($content)

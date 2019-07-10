@@ -24,7 +24,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
-            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
+            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
             $this->assertIsInt($array['available_at']);
@@ -44,7 +44,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
-            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
+            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
             $this->assertIsInt($array['available_at']);
@@ -96,14 +96,14 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[
                 'queue' => 'queue',
-                'payload' => json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
+                'payload' => json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
                 'created_at' => 'created',
             ], [
                 'queue' => 'queue',
-                'payload' => json_encode(['displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
+                'payload' => json_encode(['displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
