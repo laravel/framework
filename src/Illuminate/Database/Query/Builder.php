@@ -1161,7 +1161,9 @@ class Builder
             $value = $value->format('d');
         }
 
-        $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+        if (! $value instanceof Expression) {
+            $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+        }
 
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
     }
@@ -1202,7 +1204,9 @@ class Builder
             $value = $value->format('m');
         }
 
-        $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+        if (! $value instanceof Expression) {
+            $value = str_pad($value, 2, '0', STR_PAD_LEFT);
+        }
 
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
     }
