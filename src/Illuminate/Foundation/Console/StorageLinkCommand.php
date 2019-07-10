@@ -18,7 +18,25 @@ class StorageLinkCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Create a symbolic link from "public/storage" to "storage/app/public"';
+    protected $description = 'Create a symbolic link from "%s/storage" to "%s/app/public"';
+
+    /**
+     * Set the Laravel application instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $laravel
+     * @return void
+     */
+    public function setLaravel($laravel)
+    {
+        parent::setLaravel($laravel);
+
+        $filesystem = $laravel->make('files');
+        $this->setDescription(sprintf(
+            $this->description,
+            $filesystem->basename(public_path()),
+            $filesystem->basename(storage_path())
+        ));
+    }
 
     /**
      * Execute the console command.
@@ -27,14 +45,23 @@ class StorageLinkCommand extends Command
      */
     public function handle()
     {
-        if (file_exists(public_path('storage'))) {
-            return $this->error('The "public/storage" directory already exists.');
+        $filesystem = $this->laravel->make('files');
+
+        if ($filesystem->exists(public_path('storage'))) {
+            return $this->error(sprintf(
+                'The "%s/storage" directory already exists.',
+                $filesystem->basename(public_path())
+            ));
         }
 
-        $this->laravel->make('files')->link(
-            storage_path('app/public'), public_path('storage')
+        $filesystem->link(
+            storage_path('app/public'),
+            public_path('storage')
         );
 
-        $this->info('The [public/storage] directory has been linked.');
+        $this->info(sprintf(
+            'The [%s/storage] directory has been linked.',
+            $filesystem->basename(storage_path())
+        ));
     }
 }
