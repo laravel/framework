@@ -1933,6 +1933,26 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function pad($size, $value)
     {
         return new static(array_pad($this->items, $size, $value));
+    } 
+
+    /**
+     * Transform plain arrays to collection.
+     *
+     * @param  int $depth
+     * @return static
+     */
+    public function refresh($depth = INF)
+    {
+        return $this->map(function($item) use ($depth) {  
+
+            if($depth > 0 && (is_array($item) || $item instanceof self)) {
+                $collection = new static($this->getArrayableItems($item));
+
+                return $collection->refresh($depth - 1);
+            }
+
+            return $item;
+        }); 
     }
 
     /**

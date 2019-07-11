@@ -3190,6 +3190,94 @@ class SupportCollectionTest extends TestCase
         $collection = new Collection([1, 2, 3]);
         $this->assertNull($collection->get(null));
     }
+    
+    public function testRefresh()
+    {
+        $data = new Collection([
+            'firstname' => 'esmaiel', 
+            'lastname'  => 'zare',
+            'fullnames' => ['esmaiel', 'zare'],
+            'meta'  => [
+                'mail' => 'zarehesmaiel@gmail.com',
+                'numbers' => [
+                    'phone' => '00000000',
+                    'mobile'=> '00000000',
+                ]
+            ]
+        ]);
+
+        $data = $data->refresh();
+
+        $wanted = [
+            'firstname' => 'esmaiel', 
+            'lastname'  => 'zare',
+            'fullnames' => new Collection(['esmaiel', 'zare']),
+            'meta'  => new Collection([
+                'mail' => 'zarehesmaiel@gmail.com',
+                'numbers' => new Collection([
+                    'phone' => '00000000',
+                    'mobile'=> '00000000',
+                ])
+            ])
+        ];
+
+        $this->assertEquals($wanted, $data->all());
+    }
+
+    public function testRefreshWithDepth()
+    {
+        $data = new Collection([
+            'firstname' => 'esmaiel', 
+            'lastname'  => 'zare',
+            'fullnames' => ['esmaiel', 'zare'],
+            'meta'  => [
+                'mail' => 'zarehesmaiel@gmail.com',
+                'numbers' => [
+                    'phone' => '00000000',
+                    'mobile'=> '00000000',
+                ]
+            ],
+            'history' => new Collection([
+                'history1', 'history2'
+            ])
+        ]); 
+
+        $oneDepth = [
+            'firstname' => 'esmaiel', 
+            'lastname'  => 'zare',
+            'fullnames' => new Collection(['esmaiel', 'zare']),
+            'meta'  => new Collection([
+                'mail' => 'zarehesmaiel@gmail.com',
+                'numbers' => [
+                    'phone' => '00000000',
+                    'mobile'=> '00000000',
+                ]
+            ]),
+            'history' => new Collection([
+                'history1', 'history2'
+            ])
+        ]; 
+
+        $twoDepth = [
+            'firstname' => 'esmaiel', 
+            'lastname'  => 'zare',
+            'fullnames' => new Collection(['esmaiel', 'zare']),
+            'meta'  => new Collection([
+                'mail' => 'zarehesmaiel@gmail.com',
+                'numbers' => new Collection([
+                    'phone' => '00000000',
+                    'mobile'=> '00000000',
+                ])
+            ]),
+            'history' => new Collection([
+                'history1', 'history2'
+            ])
+        ];
+
+        $this->assertEquals($oneDepth, $data->refresh(1)->all()); 
+        $this->assertEquals($twoDepth, $data->refresh(2)->all());
+        $this->assertEquals($twoDepth, $data->refresh(1)->refresh(2)->all());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
