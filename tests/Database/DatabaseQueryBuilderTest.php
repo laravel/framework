@@ -327,7 +327,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where `id` = ? or month(`created_at`) = ?', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->where('id', 1)->orWhereyear('created_at', 1);
+        $builder->select('*')->from('users')->where('id', 1)->orWhereYear('created_at', 1);
         $this->assertEquals('select * from `users` where `id` = ? or year(`created_at`) = ?', $builder->toSql());
     }
 
@@ -336,6 +336,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'))->where('admin', true);
         $this->assertEquals([true], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDay('created_at', new Raw('NOW()'));
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonth('created_at', new Raw('NOW()'));
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereYear('created_at', new Raw('NOW()'));
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testWhereDateMySql()
