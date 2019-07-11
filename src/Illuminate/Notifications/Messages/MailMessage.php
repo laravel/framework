@@ -142,7 +142,7 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
-     * Set the theme to use with the markdown template.
+     * Set the theme to use with the Markdown template.
      *
      * @param  string  $theme
      * @return $this
