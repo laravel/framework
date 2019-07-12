@@ -2,19 +2,19 @@
 
 namespace Illuminate\Support;
 
-use stdClass;
-use Countable;
-use Exception;
 use ArrayAccess;
-use Traversable;
 use ArrayIterator;
 use CachingIterator;
-use JsonSerializable;
-use IteratorAggregate;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Jsonable;
-use Symfony\Component\VarDumper\VarDumper;
+use Countable;
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\Macroable;
+use IteratorAggregate;
+use JsonSerializable;
+use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
+use Traversable;
 
 /**
  * @property-read HigherOrderCollectionProxy $average
@@ -148,7 +148,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $items = $this->map(function ($value) use ($callback) {
             return $callback($value);
         })->filter(function ($value) {
-            return ! is_null($value);
+            return !is_null($value);
         });
 
         if ($count = $items->count()) {
@@ -177,7 +177,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $values = (isset($key) ? $this->pluck($key) : $this)
             ->filter(function ($item) {
-                return ! is_null($item);
+                return !is_null($item);
             })->sort()->values();
 
         $count = $values->count();
@@ -288,7 +288,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         if ($this->useAsCallable($key)) {
-            return ! is_null($this->first($key));
+            return !is_null($this->first($key));
         }
 
         return in_array($key, $this->items, true);
@@ -303,7 +303,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function crossJoin(...$lists)
     {
         return new static(Arr::crossJoin(
-            $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
+            $this->items,
+            ...array_map([$this, 'getArrayableItems'], $lists)
         ));
     }
 
@@ -509,7 +510,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $callback = $this->valueRetriever($key);
 
             foreach ($this->items as $k => $v) {
-                if (! $callback($v, $k)) {
+                if (!$callback($v, $k)) {
                     return false;
                 }
             }
@@ -530,7 +531,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($keys instanceof self) {
             $keys = $keys->all();
-        } elseif (! is_array($keys)) {
+        } elseif (!is_array($keys)) {
             $keys = func_get_args();
         }
 
@@ -605,7 +606,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function unless($value, callable $callback, callable $default = null)
     {
-        return $this->when(! $value, $callback, $default);
+        return $this->when(!$value, $callback, $default);
     }
 
     /**
@@ -902,14 +903,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         foreach ($this->items as $key => $value) {
             $groupKeys = $groupBy($value, $key);
 
-            if (! is_array($groupKeys)) {
+            if (!is_array($groupKeys)) {
                 $groupKeys = [$groupKeys];
             }
 
             foreach ($groupKeys as $groupKey) {
                 $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
 
-                if (! array_key_exists($groupKey, $results)) {
+                if (!array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = new static;
                 }
 
@@ -919,7 +920,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $result = new static($results);
 
-        if (! empty($nextGroups)) {
+        if (!empty($nextGroups)) {
             return $result->map->groupBy($nextGroups, $preserveKeys);
         }
 
@@ -962,7 +963,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if (! $this->offsetExists($value)) {
+            if (!$this->offsetExists($value)) {
                 return false;
             }
         }
@@ -1008,7 +1009,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function intersectByKeys($items)
     {
         return new static(array_intersect_key(
-            $this->items, $this->getArrayableItems($items)
+            $this->items,
+            $this->getArrayableItems($items)
         ));
     }
 
@@ -1029,7 +1031,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function isNotEmpty()
     {
-        return ! $this->isEmpty();
+        return !$this->isEmpty();
     }
 
     /**
@@ -1040,7 +1042,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function useAsCallable($value)
     {
-        return ! is_string($value) && is_callable($value);
+        return !is_string($value) && is_callable($value);
     }
 
     /**
@@ -1070,7 +1072,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $finalItem = $collection->pop();
 
-        return $collection->implode($glue).$finalGlue.$finalItem;
+        return $collection->implode($glue) . $finalGlue . $finalItem;
     }
 
     /**
@@ -1156,7 +1158,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
             $value = reset($pair);
 
-            if (! isset($dictionary[$key])) {
+            if (!isset($dictionary[$key])) {
                 $dictionary[$key] = [];
             }
 
@@ -1239,7 +1241,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $callback = $this->valueRetriever($callback);
 
         return $this->filter(function ($value) {
-            return ! is_null($value);
+            return !is_null($value);
         })->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
@@ -1304,7 +1306,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return $this->map(function ($value) use ($callback) {
             return $callback($value);
         })->filter(function ($value) {
-            return ! is_null($value);
+            return !is_null($value);
         })->reduce(function ($result, $value) {
             return is_null($result) || $value < $result ? $value : $result;
         });
@@ -1386,7 +1388,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 : $this->operatorForWhere(...func_get_args());
 
         foreach ($this->items as $key => $item) {
-            $partitions[(int) ! $callback($item, $key)][$key] = $item;
+            $partitions[(int) !$callback($item, $key)][$key] = $item;
         }
 
         return new static($partitions);
@@ -1524,7 +1526,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return $this->filter(function ($value, $key) use ($callback, $useAsCallable) {
             return $useAsCallable
-                ? ! $callback($value, $key)
+                ? !$callback($value, $key)
                 : $value != $callback;
         });
     }
@@ -1570,7 +1572,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function search($value, $strict = false)
     {
-        if (! $this->useAsCallable($value)) {
+        if (!$this->useAsCallable($value)) {
             return array_search($value, $this->items, $strict);
         }
 
@@ -2156,10 +2158,26 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function __get($key)
     {
-        if (! in_array($key, static::$proxies)) {
+        if (!in_array($key, static::$proxies)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
         }
 
         return new HigherOrderCollectionProxy($this, $key);
+    }
+
+    /**
+     * Transforms the collection to its accumulated values.
+     *
+     * @return static
+     */
+    public function cumulative()
+    {
+        $cumulative = [];
+
+        $this->reduce(function ($carry, $item) use (&$cumulative) {
+            return $cumulative[] = $carry + $item;
+        }, 0);
+
+        return new static($cumulative);
     }
 }
