@@ -2193,7 +2193,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_merge(?, "[]")) where `active` = ?',
+                        'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_extract(?, "$")) where `active` = ?',
                         [['white', 'black', 'yellow'], 1]
                     );
 
@@ -2210,7 +2210,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_merge(?, "[]")) where `active` = ?',
+                        'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_extract(?, "$")) where `active` = ?',
                         [['color' => 'white', 'size' => 'large'], 1]
                     );
 
