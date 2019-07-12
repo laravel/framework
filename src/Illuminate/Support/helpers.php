@@ -1262,4 +1262,29 @@ if (! function_exists('with')) {
     {
         return is_null($callback) ? $value : $callback($value);
     }
+    
+            if(! function_exists('print_whole_word')){
+        /**
+        * Get string and return text with whole word
+        *
+        *@param integer $amount
+        *@param string $string
+        *@return string
+        */
+          function print_whole_word($amount, $string)
+    {
+        $words = ' ';
+        $string = strip_tags($string);
+        $countChar = 0;
+        $string_array = explode(' ', $string);
+        foreach ($string_array as $str) {
+            $words.=$str.' ';
+            $countChar += mb_strlen($str,'UTF-8');
+            if($countChar>= $amount){
+                break;
+            }
+        }
+        return rtrim($words);
+    }
+    }
 }
