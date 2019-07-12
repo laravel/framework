@@ -327,6 +327,7 @@ class Worker
 
             if ($job->isDeleted()) {
                 $this->raiseDeletedJobEvent($connectionName, $job);
+
                 return;
             }
 
