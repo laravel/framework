@@ -1165,7 +1165,7 @@ class Builder
     protected function createSelectWithConstraint($name)
     {
         return [explode(':', $name)[0], function ($query) use ($name) {
-            $query->select(explode(',', explode(':', $name)[1]));
+            $query->select(array_map('trim', explode(',', explode(':', $name)[1])));
         }];
     }
 
