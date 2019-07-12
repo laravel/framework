@@ -192,14 +192,18 @@ class Migrator
 
         $this->note("<comment>Migrating:</comment> {$name}");
 
+        $startTime = microtime(true);
+
         $this->runMigration($migration, 'up');
+
+        $runTime = round(microtime(true) - $startTime, 2);
 
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
         // in the application. A migration repository keeps the migrate order.
         $this->repository->log($name, $batch);
 
-        $this->note("<info>Migrated:</info>  {$name}");
+        $this->note("<info>Migrated:</info>  {$name} ({$runTime} seconds)");
     }
 
     /**
@@ -349,14 +353,18 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
+        $startTime = microtime(true);
+
         $this->runMigration($instance, 'down');
+
+        $runTime = round(microtime(true) - $startTime, 2);
 
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
         // by the application then will be able to fire by any later operation.
         $this->repository->delete($migration);
 
-        $this->note("<info>Rolled back:</info>  {$name}");
+        $this->note("<info>Rolled back:</info>  {$name} ({$runTime} seconds)");
     }
 
     /**
