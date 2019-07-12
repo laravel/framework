@@ -996,7 +996,7 @@ class Builder
     /**
      * Add a "where null" clause to the query.
      *
-     * @param  string|array  $column
+     * @param  string|array  $columns
      * @param  string  $boolean
      * @param  bool    $not
      * @return $this
