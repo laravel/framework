@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
+use Illuminate\Queue\Events\JobDeleted;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -256,6 +257,20 @@ class QueueWorkerTest extends TestCase
         $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 3]));
 
         $this->assertEquals(10, $job->releaseAfter);
+    }
+
+    public function test_job_does_not_fire_if_deleted()
+    {
+        $job = new WorkerFakeJob(function () {
+            return true;
+        });
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $job->delete();
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 10]));
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobDeleted::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
     /**

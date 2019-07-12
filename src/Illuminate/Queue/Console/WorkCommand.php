@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobDeleted;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 
@@ -133,6 +134,10 @@ class WorkCommand extends Command
             $this->writeOutput($event->job, 'success');
         });
 
+        $this->laravel['events']->listen(JobDeleted::class, function ($event) {
+            $this->writeOutput($event->job, 'deleted');
+        });
+
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
             $this->writeOutput($event->job, 'failed');
 
@@ -154,6 +159,8 @@ class WorkCommand extends Command
                 return $this->writeStatus($job, 'Processing', 'comment');
             case 'success':
                 return $this->writeStatus($job, 'Processed', 'info');
+            case 'deleted':
+                return $this->writeStatus($job, 'Deleted', 'info');
             case 'failed':
                 return $this->writeStatus($job, 'Failed', 'error');
         }

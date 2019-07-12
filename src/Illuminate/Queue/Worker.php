@@ -325,6 +325,11 @@ class Worker
                 $connectionName, $job, (int) $options->maxTries
             );
 
+            if ($job->isDeleted()) {
+                $this->raiseDeletedJobEvent($connectionName, $job);
+                return;
+            }
+
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
@@ -469,6 +474,20 @@ class Worker
     protected function raiseAfterJobEvent($connectionName, $job)
     {
         $this->events->dispatch(new Events\JobProcessed(
+            $connectionName, $job
+        ));
+    }
+
+    /**
+     * Raise the deleted queue job event.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function raiseDeletedJobEvent($connectionName, $job)
+    {
+        $this->events->dispatch(new Events\JobDeleted(
             $connectionName, $job
         ));
     }
