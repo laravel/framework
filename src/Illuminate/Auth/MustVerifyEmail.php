@@ -35,4 +35,15 @@ trait MustVerifyEmail
     {
         $this->notify(new Notifications\VerifyEmail);
     }
+
+    /**
+     * Get the email address to verify
+     *
+     * @return string
+     */
+    public function getEmailForVerification()
+    {
+        return $this->email;
+    }
+
 }
