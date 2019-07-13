@@ -104,24 +104,33 @@ class CookieJar implements JarContract
     /**
      * Determine if a cookie has been queued.
      *
-     * @param  string  $key
+     * @param string      $key
+     * @param string|null $path
+     *
      * @return bool
      */
-    public function hasQueued($key)
+    public function hasQueued($key, $path = null)
     {
-        return ! is_null($this->queued($key));
+        return ! is_null($this->queued($key, null, $path));
     }
 
     /**
      * Get a queued cookie instance.
      *
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param string      $key
+     * @param mixed       $default
+     * @param string|null $path
+     *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function queued($key, $default = null)
+    public function queued($key, $default = null, $path = null)
     {
-        return Arr::get($this->queued, $key, $default);
+        $queued = Arr::get($this->queued, $key, $default);
+        if ($path === null) {
+            return Arr::last($queued, null, $default);
+        }
+
+        return Arr::get($queued, $path, $default);
     }
 
     /**
@@ -138,18 +147,28 @@ class CookieJar implements JarContract
             $cookie = call_user_func_array([$this, 'make'], $parameters);
         }
 
-        $this->queued[$cookie->getName()] = $cookie;
+        if (!isset($this->queued[$cookie->getName()])) {
+            $this->queued[$cookie->getName()] = [];
+        }
+
+        $this->queued[$cookie->getName()][$cookie->getPath()] = $cookie;
     }
 
     /**
      * Remove a cookie from the queue.
      *
-     * @param  string  $name
+     * @param string      $name
+     * @param string|null $path
+     *
      * @return void
      */
-    public function unqueue($name)
+    public function unqueue($name, $path = null)
     {
-        unset($this->queued[$name]);
+        if ($path === null) {
+            unset($this->queued[$name]);
+        } else {
+            unset($this->queued[$name][$path]);
+        }
     }
 
     /**
@@ -189,6 +208,6 @@ class CookieJar implements JarContract
      */
     public function getQueuedCookies()
     {
-        return $this->queued;
+        return Arr::flatten($this->queued);
     }
 }

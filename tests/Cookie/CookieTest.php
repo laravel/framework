@@ -69,22 +69,71 @@ class CookieTest extends TestCase
         $this->assertEmpty($cookie->getQueuedCookies());
         $this->assertFalse($cookie->hasQueued('foo'));
         $cookie->queue($cookie->make('foo', 'bar'));
-        $this->assertArrayHasKey('foo', $cookie->getQueuedCookies());
         $this->assertTrue($cookie->hasQueued('foo'));
         $this->assertInstanceOf(Cookie::class, $cookie->queued('foo'));
         $cookie->queue('qu', 'ux');
-        $this->assertArrayHasKey('qu', $cookie->getQueuedCookies());
         $this->assertTrue($cookie->hasQueued('qu'));
         $this->assertInstanceOf(Cookie::class, $cookie->queued('qu'));
+    }
+
+    public function testQueuedWithPath(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieOne = $cookieJar->make('foo', 'bar', 0, '/path');
+        $cookieTwo = $cookieJar->make('foo', 'rab', 0, '/');
+        $cookieJar->queue($cookieOne);
+        $cookieJar->queue($cookieTwo);
+        $this->assertEquals($cookieOne, $cookieJar->queued('foo', null, '/path'));
+        $this->assertEquals($cookieTwo, $cookieJar->queued('foo', null, '/'));
+    }
+
+    public function testQueuedWithoutPath(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieOne = $cookieJar->make('foo', 'bar', 0, '/path');
+        $cookieTwo = $cookieJar->make('foo', 'rab', 0, '/');
+        $cookieJar->queue($cookieOne);
+        $cookieJar->queue($cookieTwo);
+        $this->assertEquals($cookieTwo, $cookieJar->queued('foo'));
+    }
+
+    public function testHasQueued(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookie = $cookieJar->make('foo', 'bar');
+        $cookieJar->queue($cookie);
+        $this->assertTrue($cookieJar->hasQueued('foo'));
+    }
+
+    public function testHasQueuedWithPath(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieOne = $cookieJar->make('foo', 'bar', 0, '/path');
+        $cookieTwo = $cookieJar->make('foo', 'rab', 0, '/');
+        $cookieJar->queue($cookieOne);
+        $cookieJar->queue($cookieTwo);
+        $this->assertTrue($cookieJar->hasQueued('foo', '/path'));
+        $this->assertTrue($cookieJar->hasQueued('foo', '/'));
+        $this->assertFalse($cookieJar->hasQueued('foo', '/wrongPath'));
     }
 
     public function testUnqueue()
     {
         $cookie = $this->getCreator();
         $cookie->queue($cookie->make('foo', 'bar'));
-        $this->assertArrayHasKey('foo', $cookie->getQueuedCookies());
         $cookie->unqueue('foo');
         $this->assertEmpty($cookie->getQueuedCookies());
+    }
+
+    public function testUnqueueWithPath(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieOne = $cookieJar->make('foo', 'bar', 0, '/path');
+        $cookieTwo = $cookieJar->make('foo', 'rab', 0, '/');
+        $cookieJar->queue($cookieOne);
+        $cookieJar->queue($cookieTwo);
+        $cookieJar->unqueue('foo', '/path');
+        $this->assertEquals(['foo' => ['/' => $cookieTwo]], $this->getProtectedPropertyValue($cookieJar, 'queued'));
     }
 
     public function testCookieJarIsMacroable()
@@ -96,8 +145,48 @@ class CookieTest extends TestCase
         $this->assertEquals('bar', $cookie->foo());
     }
 
+    public function testQueueCookie(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookie = $cookieJar->make('foo', 'bar', 0, '/path');
+        $cookieJar->queue($cookie);
+        $this->assertEquals(['foo' => ['/path' => $cookie]], $this->getProtectedPropertyValue($cookieJar, 'queued'));
+    }
+
+    public function testQueueWithCreatingNewCookie(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieJar->queue('foo', 'bar', 0, '/path');
+        $this->assertEquals(
+            ['foo' => ['/path' => new Cookie('foo', 'bar', 0, '/path')]],
+            $this->getProtectedPropertyValue($cookieJar, 'queued')
+        );
+    }
+
+    public function testGetQueuedCookies(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieOne = $cookieJar->make('foo', 'bar', 0, '/path');
+        $cookieTwo = $cookieJar->make('foo', 'rab', 0, '/');
+        $cookieThree = $cookieJar->make('oof', 'bar', 0, '/path');
+        $cookieJar->queue($cookieOne);
+        $cookieJar->queue($cookieTwo);
+        $cookieJar->queue($cookieThree);
+        $this->assertEquals(
+            [$cookieOne, $cookieTwo, $cookieThree],
+            $cookieJar->getQueuedCookies()
+        );
+    }
+
     public function getCreator()
     {
         return new CookieJar;
+    }
+
+    private function getProtectedPropertyValue(CookieJar $cookieJar, string $propertyName)
+    {
+        $property = (new \ReflectionObject($cookieJar))->getProperty($propertyName);
+        $property->setAccessible(true);
+        return $property->getValue($cookieJar);
     }
 }
