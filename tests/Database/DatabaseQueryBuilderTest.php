@@ -2184,7 +2184,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
     }
 
-    public function testMySqlUpdateWrappingJsonArray()
+    public function testMySqlUpdateWrappingJsonArrayAndObject()
     {
         $grammar = new MySqlGrammar;
         $processor = m::mock(Processor::class);
@@ -2193,29 +2193,20 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_extract(?, "$")) where `active` = ?',
-                        [['white', 'black', 'yellow'], 1]
+                        'update `users` set `options` = ?, `meta` = json_set(`meta`, \'$."tags"\', cast(? as json)), `group_id` = 45 where `active` = ?',
+                        [
+                            json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
+                            json_encode(['white', 'large']),
+                            1,
+                        ]
                     );
 
         $builder = new Builder($connection, $grammar, $processor);
-        $builder->from('users')->where('active', '=', 1)->update(['meta->tags' => ['white', 'black', 'yellow']]);
-    }
-
-    public function testMySqlUpdateWrappingJsonObject()
-    {
-        $grammar = new MySqlGrammar;
-        $processor = m::mock(Processor::class);
-
-        $connection = $this->createMock(ConnectionInterface::class);
-        $connection->expects($this->once())
-                    ->method('update')
-                    ->with(
-                        'update `users` set `meta` = json_set(`meta`, \'$."tags"\', json_extract(?, "$")) where `active` = ?',
-                        [['color' => 'white', 'size' => 'large'], 1]
-                    );
-
-        $builder = new Builder($connection, $grammar, $processor);
-        $builder->from('users')->where('active', 1)->update(['meta->tags' => ['color' => 'white', 'size' => 'large']]);
+        $builder->from('users')->where('active', 1)->update([
+            'options' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
+            'meta->tags' => ['white', 'large'],
+            'group_id' => new Raw('45'),
+        ]);
     }
 
     public function testMySqlUpdateWithJsonPreparesBindingsCorrectly()
