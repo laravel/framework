@@ -133,7 +133,16 @@ class CookieTest extends TestCase
         $cookieJar->queue($cookieOne);
         $cookieJar->queue($cookieTwo);
         $cookieJar->unqueue('foo', '/path');
-        $this->assertEquals(['foo' => ['/' => $cookieTwo]], $this->getProtectedPropertyValue($cookieJar, 'queued'));
+        $this->assertEquals(['foo' => ['/' => $cookieTwo]], $this->getQueuedPropertyValue($cookieJar));
+    }
+
+    public function testUnqueueOnlyCookieForName(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookie = $cookieJar->make('foo', 'bar', 0, '/path');
+        $cookieJar->queue($cookie);
+        $cookieJar->unqueue('foo', '/path');
+        $this->assertEmpty($this->getQueuedPropertyValue($cookieJar));
     }
 
     public function testCookieJarIsMacroable()
@@ -150,7 +159,7 @@ class CookieTest extends TestCase
         $cookieJar = $this->getCreator();
         $cookie = $cookieJar->make('foo', 'bar', 0, '/path');
         $cookieJar->queue($cookie);
-        $this->assertEquals(['foo' => ['/path' => $cookie]], $this->getProtectedPropertyValue($cookieJar, 'queued'));
+        $this->assertEquals(['foo' => ['/path' => $cookie]], $this->getQueuedPropertyValue($cookieJar));
     }
 
     public function testQueueWithCreatingNewCookie(): void
@@ -159,7 +168,7 @@ class CookieTest extends TestCase
         $cookieJar->queue('foo', 'bar', 0, '/path');
         $this->assertEquals(
             ['foo' => ['/path' => new Cookie('foo', 'bar', 0, '/path')]],
-            $this->getProtectedPropertyValue($cookieJar, 'queued')
+            $this->getQueuedPropertyValue($cookieJar)
         );
     }
 
@@ -183,9 +192,9 @@ class CookieTest extends TestCase
         return new CookieJar;
     }
 
-    private function getProtectedPropertyValue(CookieJar $cookieJar, string $propertyName)
+    private function getQueuedPropertyValue(CookieJar $cookieJar)
     {
-        $property = (new \ReflectionObject($cookieJar))->getProperty($propertyName);
+        $property = (new \ReflectionObject($cookieJar))->getProperty('queued');
         $property->setAccessible(true);
         return $property->getValue($cookieJar);
     }

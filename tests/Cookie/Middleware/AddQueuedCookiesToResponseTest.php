@@ -12,9 +12,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class AddQueuedCookiesToResponseTest extends TestCase
 {
 
-    /**
-     * @return void
-     */
     public function testHandle(): void
     {
         $cookieJar = new CookieJar();
