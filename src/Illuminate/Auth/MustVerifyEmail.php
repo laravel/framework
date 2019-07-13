@@ -45,5 +45,4 @@ trait MustVerifyEmail
     {
         return $this->email;
     }
-
 }
