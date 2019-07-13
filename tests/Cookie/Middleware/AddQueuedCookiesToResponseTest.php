@@ -11,7 +11,6 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class AddQueuedCookiesToResponseTest extends TestCase
 {
-
     public function testHandle(): void
     {
         $cookieJar = new CookieJar();

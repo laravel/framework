@@ -166,7 +166,6 @@ class CookieJar implements JarContract
     {
         if ($path === null) {
             unset($this->queued[$name]);
-            return;
         } else {
             unset($this->queued[$name][$path]);
 
