@@ -70,7 +70,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Set the constraints for the allowed types of the relation
+     * Set the constraints for the allowed types of the relation.
      *
      * @param  array  $types
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
