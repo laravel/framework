@@ -104,7 +104,7 @@ class MorphTo extends BelongsTo
         foreach ($models as $model) {
             $type = $model->{$this->morphType};
             if ($type && ($this->types == ['*'] || in_array($type, $this->types))) {
-                $this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
+                $this->dictionary[$type][$model->{$this->foreignKey}][] = $model;
             }
         }
     }
