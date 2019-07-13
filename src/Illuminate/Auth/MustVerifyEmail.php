@@ -37,7 +37,7 @@ trait MustVerifyEmail
     }
 
     /**
-     * Get the email address to verify
+     * Get the email address to verify.
      *
      * @return string
      */
