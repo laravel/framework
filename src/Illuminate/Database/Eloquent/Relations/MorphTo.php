@@ -17,6 +17,13 @@ class MorphTo extends BelongsTo
     protected $morphType;
 
     /**
+     * Allowed type values for the relation.
+     *
+     * @var array
+     */
+    protected $types = ['*'];
+
+    /**
      * The models whose relations are being eager loaded.
      *
      * @var \Illuminate\Database\Eloquent\Collection
@@ -63,6 +70,19 @@ class MorphTo extends BelongsTo
     }
 
     /**
+     * Set the constraints for the allowed types of the relation
+     *
+     * @param  array  $types
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function addTypeConstraints(array $types)
+    {
+        $this->types = $types;
+
+        return $this;
+    }
+
+    /**
      * Set the constraints for an eager load of the relation.
      *
      * @param  array  $models
@@ -82,7 +102,8 @@ class MorphTo extends BelongsTo
     protected function buildDictionary(Collection $models)
     {
         foreach ($models as $model) {
-            if ($model->{$this->morphType}) {
+            $type = $model->{$this->morphType};
+            if ($type && ($this->types == ['*'] || in_array($type, $this->types))) {
                 $this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
             }
         }
