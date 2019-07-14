@@ -2246,7 +2246,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')
-            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"name","first_name"}\', ?)', ['John']);
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"name","first_name"}\', ?)', ['"John"']);
         $builder->from('users')->update(['users.options->name->first_name' => 'John']);
 
         $builder = $this->getPostgresBuilder();
