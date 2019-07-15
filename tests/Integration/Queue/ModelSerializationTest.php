@@ -223,8 +223,8 @@ class ModelSerializationTest extends TestCase
 
     public function test_it_serializes_a_collection_in_correct_order()
     {
-        ModelSerializationTestUser::create([ 'email' => 'mohamed@laravel.com' ]);
-        ModelSerializationTestUser::create([ 'email' => 'taylor@laravel.com' ]);
+        ModelSerializationTestUser::create(['email' => 'mohamed@laravel.com']);
+        ModelSerializationTestUser::create(['email' => 'taylor@laravel.com']);
 
         $serialized = serialize(new CollectionSerializationTestClass(
             ModelSerializationTestUser::orderByDesc('email')->get()

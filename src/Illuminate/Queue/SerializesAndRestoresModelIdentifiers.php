@@ -3,11 +3,11 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Contracts\Queue\QueueableCollection;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 trait SerializesAndRestoresModelIdentifiers
 {
@@ -80,7 +80,9 @@ trait SerializesAndRestoresModelIdentifiers
         $collection = $collection->keyBy->getKey();
 
         return new EloquentCollection(
-            collect($value->id)->map(function ($id) use ($collection) { return $collection[$id]; })
+            collect($value->id)->map(function ($id) use ($collection) {
+                return $collection[$id];
+            })
         );
     }
 
