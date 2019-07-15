@@ -2261,7 +2261,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('update')
             ->with('update "users" set "options" = ?, "meta" = jsonb_set("meta"::jsonb, \'{"tags"}\', ?), "group_id" = 45', [
                 json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
-                json_encode(['white', 'large'])
+                json_encode(['white', 'large']),
             ]);
 
         $builder->from('users')->update([
