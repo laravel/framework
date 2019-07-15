@@ -970,7 +970,9 @@ class Grammar extends BaseGrammar
      */
     public function prepareBindingsForDelete(array $bindings)
     {
-        return Arr::flatten($bindings);
+        return Arr::flatten(
+            Arr::except($bindings, 'select')
+        );
     }
 
     /**

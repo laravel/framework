@@ -2076,6 +2076,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->delete(1);
         $this->assertEquals(1, $result);
 
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "users"."id" = ?', [1])->andReturn(1);
+        $result = $builder->from('users')->selectRaw('?', ['ignore'])->delete(1);
+        $this->assertEquals(1, $result);
+
         $builder = $this->getSqliteBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" where "email" = ? order by "id" asc limit 1)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
