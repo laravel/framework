@@ -61,7 +61,7 @@ class Response implements Arrayable
      * @param mixed $code
      * @return \Illuminate\Auth\Access\Response
      */
-    public static function deny($message = 'This action is unauthorized.', $code = null)
+    public static function deny($message = null, $code = null)
     {
         return new static(false, $message, $code);
     }
