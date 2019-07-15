@@ -131,6 +131,7 @@ trait ManagesFrequencies
     public function hourlyAt($offset)
     {
         $offset = is_array($offset) ? implode(',', $offset) : $offset;
+
         return $this->spliceIntoPosition(1, $offset);
     }
 
