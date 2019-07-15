@@ -209,6 +209,29 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
     }
+
+
+    public function testContextualBindingWorksForNestedPrimitiveResolvingForMultipleClassesInjection()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectTwoInstances::class)->needs(ContainerTestContextPrimitiveTwo::class)->give(function() {
+            return new ContainerTestContextPrimitiveTwo('test');
+        });
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectTwoInstances::class);
+        $this->assertInstanceOf(
+            ContainerTestContextWithNestedOptionalDependencyStubWithPrimitive::class,
+            $resolvedInstance->implOne
+        );
+        $this->assertNull($resolvedInstance->implOne->inner);
+
+        $this->assertInstanceOf(
+            ContainerTestContextPrimitiveTwo::class,
+            $resolvedInstance->implTwo
+        );
+        $this->assertEquals($resolvedInstance->implTwo->primitive, 'test');
+    }
 }
 
 interface IContainerContextContractStub
@@ -263,5 +286,47 @@ class ContainerTestContextInjectThree
     public function __construct(IContainerContextContractStub $impl)
     {
         $this->impl = $impl;
+    }
+}
+
+class ContainerTestContextInjectTwoInstances
+{
+    public $implOne;
+    public $implTwo;
+
+    public function __construct(ContainerTestContextWithNestedOptionalDependencyStubWithPrimitive $implOne, ContainerTestContextPrimitiveTwo $implTwo)
+    {
+        $this->implOne = $implOne;
+        $this->implTwo = $implTwo;
+    }
+}
+
+class ContainerTestContextWithNestedOptionalDependencyStubWithPrimitive
+{
+    public $inner;
+
+    public function __construct(ContainerTestContextPrimitiveOne $inner = null)
+    {
+        $this->inner = $inner;
+    }
+}
+
+class ContainerTestContextPrimitiveOne
+{
+    public $primitive;
+
+    public function __construct(string $primitive)
+    {
+        $this->primitive = $primitive;
+    }
+}
+
+class ContainerTestContextPrimitiveTwo
+{
+    public $primitive;
+
+    public function __construct(string $primitive)
+    {
+        $this->primitive = $primitive;
     }
 }
