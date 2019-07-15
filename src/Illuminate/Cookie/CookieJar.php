@@ -104,9 +104,8 @@ class CookieJar implements JarContract
     /**
      * Determine if a cookie has been queued.
      *
-     * @param string      $key
-     * @param string|null $path
-     *
+     * @param  string       $key
+     * @param  string|null  $path
      * @return bool
      */
     public function hasQueued($key, $path = null)
@@ -117,15 +116,15 @@ class CookieJar implements JarContract
     /**
      * Get a queued cookie instance.
      *
-     * @param string      $key
-     * @param mixed       $default
-     * @param string|null $path
-     *
+     * @param  string       $key
+     * @param  mixed        $default
+     * @param  string|null  $path
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function queued($key, $default = null, $path = null)
     {
         $queued = Arr::get($this->queued, $key, $default);
+
         if ($path === null) {
             return Arr::last($queued, null, $default);
         }
@@ -157,9 +156,8 @@ class CookieJar implements JarContract
     /**
      * Remove a cookie from the queue.
      *
-     * @param string      $name
-     * @param string|null $path
-     *
+     * @param  string       $name
+     * @param  string|null  $path
      * @return void
      */
     public function unqueue($name, $path = null)
