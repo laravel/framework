@@ -47,6 +47,7 @@ class FrequencyTest extends TestCase
     {
         $this->assertEquals('0 * * * *', $this->event->everyFiveMinutes()->hourly()->getExpression());
         $this->assertEquals('37 * * * *', $this->event->hourlyAt(37)->getExpression());
+        $this->assertEquals('15,30,45 * * * *', $this->event->hourlyAt([15,30,45])->getExpression());
     }
 
     public function testMonthlyOn()
