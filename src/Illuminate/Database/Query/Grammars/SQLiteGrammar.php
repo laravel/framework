@@ -227,14 +227,29 @@ class SQLiteGrammar extends Grammar
     public function compileDelete(Builder $query)
     {
         if (isset($query->joins) || isset($query->limit)) {
-            $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
-
-            return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
+            return $this->compileDeleteWithJoinsOrLimit($query);
         }
 
         $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
         return trim("delete from {$this->wrapTable($query->from)} $wheres");
+    }
+
+    /**
+     * Compile a delete statement with joins or limit into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileDeleteWithJoinsOrLimit(Builder $query)
+    {
+        $segments = preg_split('/\s+as\s+/i', $query->from);
+
+        $alias = $segments[1] ?? $segments[0];
+
+        $selectSql = parent::compileSelect($query->select($alias.'.rowid'));
+
+        return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**
