@@ -4,6 +4,7 @@ namespace Illuminate\Redis\Connections;
 
 use Redis;
 use Closure;
+use RedisCluster;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 
 /**
@@ -292,7 +293,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Execute commands in a pipeline.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return \Redis|array
      */
     public function pipeline(callable $callback = null)
@@ -307,7 +308,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Execute commands in a transaction.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return \Redis|array
      */
     public function transaction(callable $callback = null)
@@ -386,6 +387,22 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function createSubscription($channels, Closure $callback, $method = 'subscribe')
     {
         //
+    }
+
+    /**
+     * Flush the selected Redis database.
+     *
+     * @return void
+     */
+    public function flushdb()
+    {
+        if (! $this->client instanceof RedisCluster) {
+            return $this->command('flushdb');
+        }
+
+        foreach ($this->client->_masters() as [$host, $port]) {
+            tap(new Redis)->connect($host, $port)->flushDb();
+        }
     }
 
     /**

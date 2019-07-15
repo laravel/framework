@@ -494,6 +494,42 @@ class SupportHelpersTest extends TestCase
         $this->assertTrue(microtime(true) - $startTime >= 0.1);
     }
 
+    public function testRetryWithPassingWhenCallback()
+    {
+        $startTime = microtime(true);
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, 100, function ($ex) {
+            return true;
+        });
+
+        // Make sure we made two attempts
+        $this->assertEquals(2, $attempts);
+
+        // Make sure we waited 100ms for the first attempt
+        $this->assertTrue(microtime(true) - $startTime >= 0.1);
+    }
+
+    public function testRetryWithFailingWhenCallback()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, 100, function ($ex) {
+            return false;
+        });
+    }
+
     public function testTransform()
     {
         $this->assertEquals(10, transform(5, function ($value) {
@@ -570,6 +606,21 @@ class SupportHelpersTest extends TestCase
 
         $_SERVER['foo'] = '(null)';
         $this->assertNull(env('foo'));
+    }
+
+    public function testEnvDefault()
+    {
+        $_SERVER['foo'] = 'bar';
+        $this->assertEquals('bar', env('foo', 'default'));
+
+        $_SERVER['foo'] = '';
+        $this->assertEquals('', env('foo', 'default'));
+
+        unset($_SERVER['foo']);
+        $this->assertEquals('default', env('foo', 'default'));
+
+        $_SERVER['foo'] = null;
+        $this->assertEquals('default', env('foo', 'default'));
     }
 
     public function testEnvEscapedString()

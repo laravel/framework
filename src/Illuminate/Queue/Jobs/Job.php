@@ -48,6 +48,8 @@ abstract class Job
 
     /**
      * The name of the connection the job belongs to.
+     *
+     * @var string
      */
     protected $connectionName;
 
@@ -231,6 +233,16 @@ abstract class Job
     public function maxTries()
     {
         return $this->payload()['maxTries'] ?? null;
+    }
+
+    /**
+     * Get the number of seconds to delay a failed job before retrying it.
+     *
+     * @return int|null
+     */
+    public function delaySeconds()
+    {
+        return $this->payload()['delay'] ?? null;
     }
 
     /**

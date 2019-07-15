@@ -129,6 +129,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::contains('taylor', ''));
     }
 
+    public function testStrContainsAll()
+    {
+        $this->assertTrue(Str::containsAll('taylor otwell', ['taylor', 'otwell']));
+        $this->assertTrue(Str::containsAll('taylor otwell', ['taylor']));
+        $this->assertFalse(Str::containsAll('taylor otwell', ['taylor', 'xxx']));
+    }
+
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
@@ -191,6 +198,9 @@ class SupportStrTest extends TestCase
 
         $this->assertTrue(Str::is('foo/bar/baz', $valueObject));
         $this->assertTrue(Str::is($patternObject, $valueObject));
+
+        //empty patterns
+        $this->assertFalse(Str::is([], 'test'));
     }
 
     public function testKebab()
@@ -228,6 +238,7 @@ class SupportStrTest extends TestCase
     public function testLength()
     {
         $this->assertEquals(11, Str::length('foo bar baz'));
+        $this->assertEquals(11, Str::length('foo bar baz', 'UTF-8'));
     }
 
     public function testRandom()
@@ -244,6 +255,11 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo/bar/baz/?', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?/?'));
         $this->assertEquals('foo/bar', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?'));
         $this->assertEquals('?/?/?', Str::replaceArray('x', ['foo', 'bar', 'baz'], '?/?/?'));
+        // Ensure recursive replacements are avoided
+        $this->assertEquals('foo?/bar/baz', Str::replaceArray('?', ['foo?', 'bar', 'baz'], '?/?/?'));
+        // Test for associative array support
+        $this->assertEquals('foo/bar', Str::replaceArray('?', [1 => 'foo', 2 => 'bar'], '?/?'));
+        $this->assertEquals('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
     }
 
     public function testReplaceFirst()

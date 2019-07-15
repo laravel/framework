@@ -243,6 +243,21 @@ class QueueWorkerTest extends TestCase
         $this->assertNull($job->failedWith);
     }
 
+    public function test_job_based_failed_delay()
+    {
+        $job = new WorkerFakeJob(function ($job) {
+            throw new \Exception('Something went wrong.');
+        });
+
+        $job->attempts = 1;
+        $job->delaySeconds = 10;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 3]));
+
+        $this->assertEquals(10, $job->releaseAfter);
+    }
+
     /**
      * Helpers...
      */
@@ -353,6 +368,7 @@ class WorkerFakeJob implements QueueJobContract
     public $releaseAfter;
     public $released = false;
     public $maxTries;
+    public $delaySeconds;
     public $timeoutAt;
     public $attempts = 0;
     public $failedWith;
@@ -387,6 +403,11 @@ class WorkerFakeJob implements QueueJobContract
     public function maxTries()
     {
         return $this->maxTries;
+    }
+
+    public function delaySeconds()
+    {
+        return $this->delaySeconds;
     }
 
     public function timeoutAt()

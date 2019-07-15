@@ -80,7 +80,7 @@ class View implements ArrayAccess, ViewContract
      * Get the string contents of the view.
      *
      * @param  callable|null  $callback
-     * @return string
+     * @return array|string
      *
      * @throws \Throwable
      */
@@ -147,7 +147,7 @@ class View implements ArrayAccess, ViewContract
      *
      * @return array
      */
-    protected function gatherData()
+    public function gatherData()
     {
         $data = array_merge($this->factory->getShared(), $this->data);
 
@@ -163,7 +163,7 @@ class View implements ArrayAccess, ViewContract
     /**
      * Get the sections of the rendered view.
      *
-     * @return string
+     * @return array
      *
      * @throws \Throwable
      */

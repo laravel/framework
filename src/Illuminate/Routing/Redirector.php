@@ -77,7 +77,7 @@ class Redirector
      * @param  string  $path
      * @param  int     $status
      * @param  array   $headers
-     * @param  bool    $secure
+     * @param  bool|null    $secure
      * @return \Illuminate\Http\RedirectResponse
      */
     public function guest($path, $status = 302, $headers = [], $secure = null)
@@ -101,7 +101,7 @@ class Redirector
      * @param  string  $default
      * @param  int     $status
      * @param  array   $headers
-     * @param  bool    $secure
+     * @param  bool|null    $secure
      * @return \Illuminate\Http\RedirectResponse
      */
     public function intended($default = '/', $status = 302, $headers = [], $secure = null)
@@ -128,7 +128,7 @@ class Redirector
      * @param  string  $path
      * @param  int     $status
      * @param  array   $headers
-     * @param  bool    $secure
+     * @param  bool|null    $secure
      * @return \Illuminate\Http\RedirectResponse
      */
     public function to($path, $status = 302, $headers = [], $secure = null)

@@ -40,14 +40,14 @@ class FileViewFinder implements ViewFinderInterface
      *
      * @var array
      */
-    protected $extensions = ['blade.php', 'php', 'css'];
+    protected $extensions = ['blade.php', 'php', 'css', 'html'];
 
     /**
      * Create a new file view loader instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  array  $paths
-     * @param  array  $extensions
+     * @param  array|null  $extensions
      * @return void
      */
     public function __construct(Filesystem $files, array $paths, array $extensions = null)
@@ -298,6 +298,16 @@ class FileViewFinder implements ViewFinderInterface
     public function getPaths()
     {
         return $this->paths;
+    }
+
+    /**
+     * Get the views that have been located.
+     *
+     * @return array
+     */
+    public function getViews()
+    {
+        return $this->views;
     }
 
     /**

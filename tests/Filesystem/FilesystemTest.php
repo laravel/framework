@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Filesystem;
 use SplFileInfo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use League\Flysystem\Adapter\Ftp;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Filesystem\FilesystemManager;

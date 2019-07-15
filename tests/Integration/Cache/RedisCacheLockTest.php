@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Exception;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
@@ -70,6 +71,27 @@ class RedisCacheLockTest extends TestCase
         $firstLock->release();
 
         $this->assertFalse(Cache::store('redis')->lock('foo')->get());
+    }
+
+    public function test_redis_locks_with_failed_block_callback_are_released()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('redis')->lock('foo', 10);
+
+        try {
+            $firstLock->block(1, function () {
+                throw new Exception('failed');
+            });
+        } catch (Exception $e) {
+            // Not testing the exception, just testing the lock
+            // is released regardless of the how the exception
+            // thrown by the callback was handled.
+        }
+
+        $secondLock = Cache::store('redis')->lock('foo', 1);
+
+        $this->assertTrue($secondLock->get());
     }
 
     public function test_redis_locks_can_be_released_using_owner_token()

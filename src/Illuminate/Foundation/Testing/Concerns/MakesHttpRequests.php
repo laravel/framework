@@ -87,7 +87,7 @@ trait MakesHttpRequests
     /**
      * Disable middleware for the test.
      *
-     * @param  string|array  $middleware
+     * @param  string|array|null  $middleware
      * @return $this
      */
     public function withoutMiddleware($middleware = null)
@@ -113,7 +113,7 @@ trait MakesHttpRequests
     /**
      * Enable the given middleware for the test.
      *
-     * @param  string|array  $middleware
+     * @param  string|array|null  $middleware
      * @return $this
      */
     public function withMiddleware($middleware = null)
@@ -329,7 +329,7 @@ trait MakesHttpRequests
      * @param  array  $cookies
      * @param  array  $files
      * @param  array  $server
-     * @param  string  $content
+     * @param  string|null  $content
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)

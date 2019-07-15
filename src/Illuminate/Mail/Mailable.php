@@ -756,7 +756,7 @@ class Mailable implements MailableContract, Renderable
      * Attach a file to the message from storage.
      *
      * @param  string  $path
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  array  $options
      * @return $this
      */
@@ -770,7 +770,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $disk
      * @param  string  $path
-     * @param  string  $name
+     * @param  string|null  $name
      * @param  array  $options
      * @return $this
      */

@@ -229,6 +229,7 @@ class CacheManager implements FactoryContract
         $dynamoConfig = [
             'region' => $config['region'],
             'version' => 'latest',
+            'endpoint' => $config['endpoint'] ?? null,
         ];
 
         if ($config['key'] && $config['secret']) {

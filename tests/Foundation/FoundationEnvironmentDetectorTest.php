@@ -32,4 +32,24 @@ class FoundationEnvironmentDetectorTest extends TestCase
         }, ['--env=local']);
         $this->assertEquals('local', $result);
     }
+
+    public function testConsoleEnvironmentDetectionSeparatedWithSpace()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--env', 'local']);
+        $this->assertEquals('local', $result);
+    }
+
+    public function testConsoleEnvironmentDetectionWithNoValue()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--env']);
+        $this->assertEquals('foobar', $result);
+    }
 }

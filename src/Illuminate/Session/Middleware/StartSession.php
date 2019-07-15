@@ -53,11 +53,11 @@ class StartSession
 
         $this->collectGarbage($session);
 
+        $response = $next($request);
+
         $this->storeCurrentUrl($request, $session);
 
-        $this->addCookieToResponse(
-            $response = $next($request), $session
-        );
+        $this->addCookieToResponse($response, $session);
 
         // Again, if the session has been configured we will need to close out the session
         // so that the attributes may be persisted to some storage medium. We will also
