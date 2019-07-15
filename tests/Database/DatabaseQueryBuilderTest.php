@@ -2255,6 +2255,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->update(['options->language' => new Raw("'null'")]);
     }
 
+    public function testPostgresUpdateWrappingJsonArrayAndObject()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = ?, "meta" = jsonb_set("meta"::jsonb, \'{"tags"}\', ?), "group_id" = 45', [
+                json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
+                json_encode(['white', 'large'])
+            ]);
+
+        $builder->from('users')->update([
+            'options' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
+            'meta->tags' => ['white', 'large'],
+            'group_id' => new Raw('45'),
+        ]);
+    }
+
     public function testMySqlWrappingJsonWithString()
     {
         $builder = $this->getMySqlBuilder();
