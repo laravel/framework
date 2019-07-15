@@ -971,3 +971,18 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+
+if(! function_exists('is_404')){
+    /**
+     * Returns True or false to check page is 404
+     *
+     * @return bool
+     */
+    function is_404(){
+        if(\Request::route() == null) {
+            http_response_code(404);
+            return true;
+        }
+    }
+}
