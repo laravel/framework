@@ -2,6 +2,17 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.28...5.8)
 
+### Added
+- Added possibility for `WithFaker::makeFaker()` use local `app.faker_locale` config ([#29123](https://github.com/laravel/framework/pull/29123))
+- Added ability to set theme for mail notifications ([#29132](https://github.com/laravel/framework/pull/29132))
+- Added runtime for each migration to output ([#29149](https://github.com/laravel/framework/pull/29149))
+- Added possibility for `whereNull` and `whereNotNull` to accept array columns argument ([#29154](https://github.com/laravel/framework/pull/29154))
+
+### Performance
+- Improved eager loading performance for MorphTo relation ([#29129](https://github.com/laravel/framework/pull/29129))
+
+### Fixed
+- Fixed `Builder::whereDay()` and `Builder::whereMonth()` with raw expressions
 
 
 ## [v5.8.28 (2019-07-09)](https://github.com/laravel/framework/compare/v5.8.27...v5.8.28)

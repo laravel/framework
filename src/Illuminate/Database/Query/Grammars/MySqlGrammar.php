@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
 
@@ -237,21 +236,6 @@ class MySqlGrammar extends Grammar
         return isset($query->joins)
                     ? $this->compileDeleteWithJoins($query, $table, $where)
                     : $this->compileDeleteWithoutJoins($query, $table, $where);
-    }
-
-    /**
-     * Prepare the bindings for a delete statement.
-     *
-     * @param  array  $bindings
-     * @return array
-     */
-    public function prepareBindingsForDelete(array $bindings)
-    {
-        $cleanBindings = Arr::except($bindings, ['join', 'select']);
-
-        return array_values(
-            array_merge($bindings['join'], Arr::flatten($cleanBindings))
-        );
     }
 
     /**
