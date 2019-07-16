@@ -1197,13 +1197,14 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string  $keyType
      * @return void
      */
-    public function morphs($name, $indexName = null)
+    public function morphs($name, $indexName = null, $keyType = 'unsignedBigInteger')
     {
         $this->string("{$name}_type");
 
-        $this->unsignedBigInteger("{$name}_id");
+        $this->{$keyType}("{$name}_id");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1213,13 +1214,14 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string  $keyType
      * @return void
      */
-    public function nullableMorphs($name, $indexName = null)
+    public function nullableMorphs($name, $indexName = null, $keyType = 'unsignedBigInteger')
     {
         $this->string("{$name}_type")->nullable();
 
-        $this->unsignedBigInteger("{$name}_id")->nullable();
+        $this->{$keyType}("{$name}_id")->nullable();
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
