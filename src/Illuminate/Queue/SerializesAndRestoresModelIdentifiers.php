@@ -79,8 +79,9 @@ trait SerializesAndRestoresModelIdentifiers
         }
 
         $collection = $collection->keyBy->getKey();
+        $collectionClass = get_class($collection);
 
-        return new EloquentCollection(
+        return new $collectionClass(
             collect($value->id)->map(function ($id) use ($collection) {
                 return $collection[$id];
             })
