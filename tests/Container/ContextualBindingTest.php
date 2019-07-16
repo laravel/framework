@@ -210,7 +210,6 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
     }
 
-
     public function testContextualBindingWorksForNestedPrimitiveResolvingForMultipleClassesInjection()
     {
         $container = new Container;

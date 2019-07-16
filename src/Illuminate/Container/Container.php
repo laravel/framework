@@ -816,8 +816,7 @@ class Container implements ArrayAccess, ContainerContract
         // new instance of this class, injecting the created dependencies in.
         try {
             $instances = $this->resolveDependencies($dependencies);
-        }
-        catch (BindingResolutionException $e) {
+        } catch (BindingResolutionException $e) {
             array_pop($this->buildStack);
             throw $e;
         }
