@@ -2781,6 +2781,20 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['TAYLOR', 'TAYLOR'], $collection->each->uppercase()->map->name->toArray());
     }
 
+    public function testHigherOrderCollectionFunctionsOnNonObjects()
+    {
+        $collection = collect([null, 'bad@email', 'taylorotwell@gmail.com', 123]);
+
+        $this->assertEquals(
+            [2 => 'taylorotwell@gmail.com'],
+            $collection->filter->filter_var(FILTER_VALIDATE_EMAIL)->toArray()
+        );
+
+        $collection = collect([['a' => 'b', 'c' => 'd'], ['e' => 'f']]);
+
+        $this->assertEquals([['b', 'd'], ['f']], $collection->map->array_values()->toArray());
+    }
+
     public function testPartition()
     {
         $collection = new Collection(range(1, 10));
