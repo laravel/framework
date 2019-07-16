@@ -3,8 +3,10 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 trait SerializesAndRestoresModelIdentifiers
@@ -67,9 +69,21 @@ trait SerializesAndRestoresModelIdentifiers
             return new EloquentCollection;
         }
 
-        return $this->getQueryForModelRestoration(
+        $collection = $this->getQueryForModelRestoration(
             (new $value->class)->setConnection($value->connection), $value->id
         )->useWritePdo()->get();
+
+        if (is_a($value->class, Pivot::class, true) || in_array(AsPivot::class, class_uses($value->class))) {
+            return $collection;
+        }
+
+        $collection = $collection->keyBy->getKey();
+
+        return new EloquentCollection(
+            collect($value->id)->map(function ($id) use ($collection) {
+                return $collection[$id];
+            })
+        );
     }
 
     /**
