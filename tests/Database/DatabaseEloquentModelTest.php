@@ -1589,6 +1589,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
+        $model->collectionAttribute = new BaseCollection;
 
         $this->assertIsInt($model->intAttribute);
         $this->assertIsFloat($model->floatAttribute);
@@ -1606,6 +1607,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('{"foo":"bar"}', $model->jsonAttributeValue());
         $this->assertInstanceOf(Carbon::class, $model->dateAttribute);
         $this->assertInstanceOf(Carbon::class, $model->datetimeAttribute);
+        $this->assertInstanceOf(BaseCollection::class, $model->collectionAttribute);
         $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
@@ -1620,6 +1622,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertIsObject($arr['objectAttribute']);
         $this->assertIsArray($arr['arrayAttribute']);
         $this->assertIsArray($arr['jsonAttribute']);
+        $this->assertIsArray($arr['collectionAttribute']);
         $this->assertTrue($arr['boolAttribute']);
         $this->assertFalse($arr['booleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
@@ -1656,6 +1659,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->dateAttribute = null;
         $model->datetimeAttribute = null;
         $model->timestampAttribute = null;
+        $model->collectionAttribute = null;
 
         $attributes = $model->getAttributes();
 
@@ -1670,6 +1674,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($attributes['dateAttribute']);
         $this->assertNull($attributes['datetimeAttribute']);
         $this->assertNull($attributes['timestampAttribute']);
+        $this->assertNull($attributes['collectionAttribute']);
 
         $this->assertNull($model->intAttribute);
         $this->assertNull($model->floatAttribute);
@@ -1682,6 +1687,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->dateAttribute);
         $this->assertNull($model->datetimeAttribute);
         $this->assertNull($model->timestampAttribute);
+        $this->assertNull($model->collectionAttribute);
 
         $array = $model->toArray();
 
@@ -1696,6 +1702,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($array['dateAttribute']);
         $this->assertNull($array['datetimeAttribute']);
         $this->assertNull($array['timestampAttribute']);
+        $this->assertNull($attributes['collectionAttribute']);
     }
 
     public function testModelAttributeCastingFailsOnUnencodableData()
@@ -2271,6 +2278,7 @@ class EloquentModelCastingStub extends Model
         'objectAttribute' => 'object',
         'arrayAttribute' => 'array',
         'jsonAttribute' => 'json',
+        'collectionAttribute' => 'collection',
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
