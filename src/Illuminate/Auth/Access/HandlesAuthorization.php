@@ -23,7 +23,7 @@ trait HandlesAuthorization
      * @param  mixed|null  $code
      * @return \Illuminate\Auth\Access\Response
      */
-    protected function deny($message = 'This action is unauthorized.', $code = null)
+    protected function deny($message = null, $code = null)
     {
         return Response::deny($message, $code);
     }

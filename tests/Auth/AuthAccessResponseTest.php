@@ -28,6 +28,13 @@ class AuthAccessResponseTest extends TestCase
         $this->assertEquals('some_code', $response->code());
     }
 
+    public function test_deny_method_with_no_message_returns_null()
+    {
+        $response = Response::deny();
+
+        $this->assertNull($response->message());
+    }
+
     public function test_authorize_method_throws_authorization_exception_when_response_denied()
     {
         $response = Response::deny('Some message.', 'some_code');
@@ -38,6 +45,17 @@ class AuthAccessResponseTest extends TestCase
             $this->assertEquals('Some message.', $e->getMessage());
             $this->assertEquals('some_code', $e->getCode());
             $this->assertEquals($response, $e->response());
+        }
+    }
+
+    public function test_authorize_method_throws_authorization_exception_with_default_message()
+    {
+        $response = Response::deny();
+
+        try {
+            $response->authorize();
+        } catch (AuthorizationException $e) {
+            $this->assertEquals('This action is unauthorized.', $e->getMessage());
         }
     }
 
