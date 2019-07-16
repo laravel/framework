@@ -136,7 +136,7 @@ abstract class Seeder
         }
 
         return isset($this->container)
-            ? $this->container->call([$this, 'run'])
-            : $this->run();
+                    ? $this->container->call([$this, 'run'])
+                    : $this->run();
     }
 }
