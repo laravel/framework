@@ -235,6 +235,20 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($unserialized->users->first()->email, 'taylor@laravel.com');
         $this->assertEquals($unserialized->users->last()->email, 'mohamed@laravel.com');
     }
+
+    public function test_it_can_unserialize_custom_collection()
+    {
+        ModelSerializationTestCustomUser::create(['email' => 'mohamed@laravel.com']);
+        ModelSerializationTestCustomUser::create(['email' => 'taylor@laravel.com']);
+
+        $serialized = serialize(new CollectionSerializationTestClass(
+            ModelSerializationTestCustomUser::all()
+        ));
+
+        $unserialized = unserialize($serialized);
+
+        $this->assertInstanceOf(ModelSerializationTestCustomUserCollection::class, $unserialized->users);
+    }
 }
 
 class ModelSerializationTestUser extends Model
@@ -242,6 +256,22 @@ class ModelSerializationTestUser extends Model
     public $table = 'users';
     public $guarded = ['id'];
     public $timestamps = false;
+}
+
+class ModelSerializationTestCustomUserCollection extends Collection
+{
+}
+
+class ModelSerializationTestCustomUser extends Model
+{
+    public $table = 'users';
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function newCollection(array $models = [])
+    {
+        return new ModelSerializationTestCustomUserCollection($models);
+    }
 }
 
 class Order extends Model
