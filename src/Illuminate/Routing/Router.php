@@ -1192,7 +1192,7 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         $this->get('email/verify', 'Auth\VerificationController@show')->name('verification.notice');
         $this->get('email/verify/{id}', 'Auth\VerificationController@verify')->name('verification.verify');
-        $this->get('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
+        $this->post('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
     }
 
     /**
