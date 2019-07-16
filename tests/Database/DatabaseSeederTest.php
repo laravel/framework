@@ -38,9 +38,9 @@ class DatabaseSeederTest extends TestCase
         $seeder = new TestSeeder;
         $seeder->setContainer($container = m::mock(Container::class));
         $output = m::mock(OutputInterface::class);
-        $output->shouldReceive('writeln')->once()->andReturn('foo');
+        $output->shouldReceive('writeln')->times(2)->andReturn('foo');
         $command = m::mock(Command::class);
-        $command->shouldReceive('getOutput')->once()->andReturn($output);
+        $command->shouldReceive('getOutput')->times(2)->andReturn($output);
         $seeder->setCommand($command);
         $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
