@@ -36,10 +36,16 @@ abstract class Seeder
 
         foreach ($classes as $class) {
             if ($silent === false && isset($this->command)) {
-                $this->command->getOutput()->writeln("<info>Seeding:</info> $class");
+                $this->note("<comment>Seeding:</comment> $class");
             }
 
+            $startTime = microtime(true);
+
             $this->resolve($class)->__invoke();
+
+            $runTime = round(microtime(true) - $startTime, 2);
+
+            $this->note("<info>Seeded:</info> $class ({$runTime} seconds)");
         }
 
         return $this;
@@ -106,6 +112,17 @@ abstract class Seeder
     }
 
     /**
+     * Write a note to the console's output.
+     *
+     * @param  string  $message
+     * @return void
+     */
+    protected function note($message)
+    {
+        $this->command->getOutput()->writeln($message);
+    }
+
+    /**
      * Run the database seeds.
      *
      * @return mixed
@@ -119,7 +136,7 @@ abstract class Seeder
         }
 
         return isset($this->container)
-                    ? $this->container->call([$this, 'run'])
-                    : $this->run();
+            ? $this->container->call([$this, 'run'])
+            : $this->run();
     }
 }
