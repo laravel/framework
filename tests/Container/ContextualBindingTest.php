@@ -213,8 +213,6 @@ class ContextualBindingTest extends TestCase
     public function testContextualBindingWorksForNestedPrimitiveResolvingForMultipleClassesInjection()
     {
         $container = new Container;
-
-
         $container->when(ContainerTestContextInjectTwoInstances::class)->needs(ContainerTestContextInjectTwo::class)->give(function() {
             return new ContainerTestContextInjectTwo(new ContainerContextImplementationStubTwo);
         });
