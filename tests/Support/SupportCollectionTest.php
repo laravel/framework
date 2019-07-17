@@ -178,6 +178,10 @@ class SupportCollectionTest extends TestCase
         $array = $method->invokeArgs($collection, [$items]);
         $this->assertSame(['foo' => 'bar'], $array);
 
+        $items = new TestJsonSerializeWithScalarValueObject;
+        $array = $method->invokeArgs($collection, [$items]);
+        $this->assertSame(['foo'], $array);
+
         $items = new Collection(['foo' => 'bar']);
         $array = $method->invokeArgs($collection, [$items]);
         $this->assertSame(['foo' => 'bar'], $array);
@@ -3294,6 +3298,14 @@ class TestJsonSerializeObject implements JsonSerializable
     public function jsonSerialize()
     {
         return ['foo' => 'bar'];
+    }
+}
+
+class TestJsonSerializeWithScalarValueObject implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return 'foo';
     }
 }
 
