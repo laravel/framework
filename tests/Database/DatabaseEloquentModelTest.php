@@ -92,6 +92,11 @@ class DatabaseEloquentModelTest extends TestCase
         $model->bar = '2017-03-18';
         $model->dateAttribute = '2017-03-18';
         $model->datetimeAttribute = '2017-03-23 22:17:00';
+        $model->jsonAttribute = [
+            'foo' => 1,
+            'bar' => 2,
+            'baz' => 3,
+        ];
         $model->syncOriginal();
 
         $model->boolAttribute = true;
@@ -99,6 +104,11 @@ class DatabaseEloquentModelTest extends TestCase
         $model->bar = '2017-03-18 00:00:00';
         $model->dateAttribute = '2017-03-18 00:00:00';
         $model->datetimeAttribute = null;
+        $model->jsonAttribute = [
+            'baz' => 3,
+            'foo' => 1,
+            'bar' => 2,
+        ];
 
         $this->assertTrue($model->isDirty());
         $this->assertTrue($model->isDirty('foo'));
@@ -106,6 +116,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty('boolAttribute'));
         $this->assertFalse($model->isDirty('dateAttribute'));
         $this->assertTrue($model->isDirty('datetimeAttribute'));
+        $this->assertFalse($model->isDirty('jsonAttribute'));
     }
 
     public function testCleanAttributes()
