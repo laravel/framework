@@ -124,6 +124,10 @@ class Kernel implements KernelContract
             $response = $this->renderException($request, $e);
         }
 
+        if (isset($e) && method_exists($response, 'withException')) {
+            $response->withException($e);
+        }
+
         $this->app['events']->dispatch(
             new Events\RequestHandled($request, $response)
         );
