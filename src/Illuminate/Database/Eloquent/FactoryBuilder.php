@@ -5,8 +5,9 @@ namespace Illuminate\Database\Eloquent;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Database\Eloquent\FactoryBuilder as FactoryBuilderContract;
 
-class FactoryBuilder
+class FactoryBuilder implements FactoryBuilderContract
 {
     use Macroable;
 

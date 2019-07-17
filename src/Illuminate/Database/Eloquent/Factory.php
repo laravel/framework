@@ -2,11 +2,11 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use ArrayAccess;
 use Faker\Generator as Faker;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Contracts\Database\Eloquent\Factory as FactoryContract;
 
-class Factory implements ArrayAccess
+class Factory implements FactoryContract
 {
     /**
      * The model definitions in the container.

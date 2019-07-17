@@ -19,9 +19,9 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
+use Illuminate\Contracts\Database\Eloquent\Factory as EloquentFactory;
 
 if (! function_exists('abort')) {
     /**

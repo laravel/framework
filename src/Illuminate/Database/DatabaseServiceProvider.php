@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\EntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Contracts\Database\Eloquent\Factory as EloquentFactoryContract;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
@@ -83,6 +84,8 @@ class DatabaseServiceProvider extends ServiceProvider
                 $app->make(FakerGenerator::class), $this->app->databasePath('factories')
             );
         });
+
+        $this->app->alias(EloquentFactory::class, EloquentFactoryContract::class);
     }
 
     /**
