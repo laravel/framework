@@ -79,6 +79,7 @@ trait SerializesAndRestoresModelIdentifiers
         }
 
         $collection = $collection->keyBy->getKey();
+
         $collectionClass = get_class($collection);
 
         return new $collectionClass(
