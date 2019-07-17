@@ -757,6 +757,12 @@ class ValidationValidatorTest extends TestCase
         $foo = new File('', false);
         $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'required_with:file']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['names' => [['foo' => 'Taylor']]], ['foo' => 'required_with:names.*.first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['names' => [['first' => 'Taylor']]], ['foo' => 'required_with:names.*.first']);
+        $this->assertFalse($v->passes());
     }
 
     public function testRequiredWithAll()
@@ -766,6 +772,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['first' => 'foo'], ['last' => 'required_with_all:first']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['names' => [['first' => 'Taylor', 'foo' => 'Otwell']]], ['foo' => 'required_with_all:names.*.first,names.*.last']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['names' => [['first' => 'Taylor', 'last' => 'Otwell']]], ['foo' => 'required_with_all:names.*.first,names.*.last']);
         $this->assertFalse($v->passes());
     }
 
@@ -820,6 +832,12 @@ class ValidationValidatorTest extends TestCase
         $file = new File('', false);
         $foo = new File('', false);
         $v = new Validator($trans, ['file' => $file, 'foo' => $foo], ['foo' => 'required_without:file']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['names' => [['first' => 'Taylor']]], ['foo' => 'required_without:names.*.first']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['names' => [['foo' => 'Taylor']]], ['foo' => 'required_without:names.*.first']);
         $this->assertFalse($v->passes());
     }
 
@@ -891,6 +909,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['f1' => 'foo', 'f2' => 'bar', 'f3' => 'baz'], $rules);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['names' => [['first' => 'Taylor']]], ['foo' => 'required_without_all:names.*.first,names.*.last']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['names' => [['foo' => 'Taylor']]], ['foo' => 'required_without_all:names.*.first,names.*.last']);
+        $this->assertFalse($v->passes());
     }
 
     public function testRequiredIf()

@@ -1458,7 +1458,15 @@ trait ValidatesAttributes
     protected function anyFailingRequired(array $attributes)
     {
         foreach ($attributes as $key) {
-            if (! $this->validateRequired($key, $this->getValue($key))) {
+            if (Str::contains($key, '*')) {
+                $data = ValidationData::initializeAndGatherData($key, $this->data);
+
+                foreach ($data as $attribute => $item) {
+                    if (Str::is($key, $attribute) && ! $this->validateRequired($attribute, $item)) {
+                        return true;
+                    }
+                }
+            } elseif (! $this->validateRequired($key, $this->getValue($key))) {
                 return true;
             }
         }
@@ -1475,7 +1483,15 @@ trait ValidatesAttributes
     protected function allFailingRequired(array $attributes)
     {
         foreach ($attributes as $key) {
-            if ($this->validateRequired($key, $this->getValue($key))) {
+            if (Str::contains($key, '*')) {
+                $data = ValidationData::initializeAndGatherData($key, $this->data);
+
+                foreach ($data as $attribute => $item) {
+                    if (Str::is($key, $attribute) && $this->validateRequired($attribute, $item)) {
+                        return false;
+                    }
+                }
+            } elseif ($this->validateRequired($key, $this->getValue($key))) {
                 return false;
             }
         }
