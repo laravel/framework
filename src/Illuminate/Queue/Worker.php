@@ -325,6 +325,12 @@ class Worker
                 $connectionName, $job, (int) $options->maxTries
             );
 
+            if ($job->isDeleted()) {
+                $this->raiseAfterJobEvent($connectionName, $job);
+
+                return;
+            }
+
             // Here we will fire off the job and let it process. We will catch any exceptions so
             // they can be reported to the developers logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has finished.
