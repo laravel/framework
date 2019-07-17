@@ -121,7 +121,7 @@ class PendingMail
     public function send(MailableContract $mailable)
     {
         return $mailable instanceof ShouldQueue ? 
-            $this->queue($mailable) : $this->sendNow($mailable)
+            $this->queue($mailable) : $this->sendNow($mailable);
     }
 
     /**
