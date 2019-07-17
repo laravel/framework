@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Http;
 use Exception;
 use Throwable;
 use Illuminate\Routing\Router;
-use Illuminate\Routing\Pipeline;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
