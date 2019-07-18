@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -18,7 +19,7 @@ class Worker
     /**
      * The queue manager instance.
      *
-     * @var \Illuminate\Queue\QueueManager
+     * @var \Illuminate\Contracts\Queue\Factory
      */
     protected $manager;
 
@@ -44,6 +45,13 @@ class Worker
     protected $exceptions;
 
     /**
+     * The maintenance mode check callable.
+     *
+     * @var \callable
+     */
+    protected $isDownForMaintenance;
+
+    /**
      * Indicates if the worker should exit.
      *
      * @var bool
@@ -60,18 +68,21 @@ class Worker
     /**
      * Create a new queue worker.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param  \Illuminate\Contracts\Queue\Factory $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
+     * @param  \callable $isDownForMaintenance
      * @return void
      */
     public function __construct(QueueManager $manager,
                                 Dispatcher $events,
-                                ExceptionHandler $exceptions)
+                                ExceptionHandler $exceptions,
+                                callable $isDownForMaintenance)
     {
         $this->events = $events;
         $this->manager = $manager;
         $this->exceptions = $exceptions;
+        $this->isDownForMaintenance = $isDownForMaintenance;
     }
 
     /**
@@ -174,7 +185,7 @@ class Worker
      */
     protected function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
     {
-        return ! (($this->manager->isDownForMaintenance() && ! $options->force) ||
+        return ! ((($this->isDownForMaintenance)() && ! $options->force) ||
             $this->paused ||
             $this->events->until(new Events\Looping($connectionName, $queue)) === false);
     }
@@ -636,7 +647,7 @@ class Worker
     /**
      * Set the queue manager instance.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param  \Illuminate\Contracts\Queue\Factory $manager
      * @return void
      */
     public function setManager(QueueManager $manager)

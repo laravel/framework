@@ -97,7 +97,10 @@ class QueueWorkerTest extends TestCase
         $worker = new InsomniacWorker(
             new WorkerFakeManager('default', new BrokenQueueConnection($e = new RuntimeException)),
             $this->events,
-            $this->exceptionHandler
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
         );
 
         $worker->runNextJob('default', 'queue', $this->workerOptions());
@@ -258,22 +261,56 @@ class QueueWorkerTest extends TestCase
         $this->assertEquals(10, $job->releaseAfter);
     }
 
+    public function test_job_runs_if_app_is_not_in_maintenance_mode()
+    {
+        $firstJob = new WorkerFakeJob(function ($job) {
+            $job->attempts++;
+        });
+
+        $secondJob = new WorkerFakeJob(function ($job) {
+            $job->attempts++;
+        });
+
+        $this->maintenanceFlags = [false, true];
+
+        $maintenanceModeChecker = function () {
+            if ($this->maintenanceFlags) {
+                return array_pop($this->maintenanceFlags);
+            }
+
+            throw new LoopBreakerException;
+        };
+
+        $this->expectException(LoopBreakerException::class);
+
+        $worker = $this->getWorker('default', ['queue' => [$firstJob, $secondJob]], $maintenanceModeChecker);
+
+        $worker->daemon('default', 'queue', $this->workerOptions());
+
+        $this->assertEquals($firstJob->attempts, 1);
+
+        $this->assertEquals($firstJob->attempts, 0);
+    }
+
     /**
      * Helpers...
      */
-    private function getWorker($connectionName = 'default', $jobs = [])
+    private function getWorker($connectionName = 'default', $jobs = [], ?callable $isInMaintenanceMode = null)
     {
         return new InsomniacWorker(
-            ...$this->workerDependencies($connectionName, $jobs)
+            ...$this->workerDependencies($connectionName, $jobs, $isInMaintenanceMode)
         );
     }
 
-    private function workerDependencies($connectionName = 'default', $jobs = [])
+    private function workerDependencies($connectionName = 'default', $jobs = [], ?callable $isInMaintenanceMode = null)
     {
         return [
             new WorkerFakeManager($connectionName, new WorkerFakeConnection($jobs)),
             $this->events,
             $this->exceptionHandler,
+            $isInMaintenanceMode ?? function () {
+                return false;
+            },
         ];
     }
 
@@ -310,7 +347,7 @@ class InsomniacWorker extends Worker
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
     {
-        return true;
+        return ! ($this->isDownForMaintenance)();
     }
 }
 
