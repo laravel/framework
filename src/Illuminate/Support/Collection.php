@@ -2002,11 +2002,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Count the number of items in the collection.
      *
+     * @param callable|null $callback
+     *
      * @return int
      */
-    public function count()
+    public function count($callback = null)
     {
-        return count($this->items);
+        if (is_null($callback)) {
+            return count($this->items);
+        }
+
+        return $this->reduce(function ($count, $value) use ($callback) {
+            return $count + $callback($value);
+        }, 0);
     }
 
     /**
