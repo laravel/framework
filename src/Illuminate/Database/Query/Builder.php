@@ -82,7 +82,7 @@ class Builder {
 	 *
 	 * @var array
 	 */
-	public $wheres;
+	public $wheres = array();
 
 	/**
 	 * The groupings for the query.
