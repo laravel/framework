@@ -1461,10 +1461,12 @@ trait ValidatesAttributes
             if (Str::contains($key, '*')) {
                 $data = ValidationData::initializeAndGatherData($key, $this->data);
 
-                foreach ($data as $attribute => $item) {
-                    if (Str::is($key, $attribute) && ! $this->validateRequired($attribute, $item)) {
-                        return true;
-                    }
+                $data = array_filter($data, function ($item, $attribute) use ($key) {
+                    return Str::is($key, $attribute) && $this->validateRequired($attribute, $item);
+                }, ARRAY_FILTER_USE_BOTH);
+
+                if (empty($data)) {
+                    return true;
                 }
             } elseif (! $this->validateRequired($key, $this->getValue($key))) {
                 return true;
