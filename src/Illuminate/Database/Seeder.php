@@ -39,11 +39,9 @@ abstract class Seeder
                 $this->note("<comment>Seeding:</comment> $class");
             }
 
-            $startTime = microtime(true);
-
-            $this->resolve($class)->__invoke();
-
-            $runTime = round(microtime(true) - $startTime, 2);
+            $runTime = duration(function () use ($class) {
+                $this->resolve($class)->__invoke();
+            });
 
             $this->note("<info>Seeded:</info> $class ({$runTime} seconds)");
         }

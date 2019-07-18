@@ -59,13 +59,11 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        $startTime = microtime(true);
-
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
+        $runTime = duration(function () {
+            Model::unguarded(function () {
+                $this->getSeeder()->__invoke();
+            });
         });
-
-        $runTime = round(microtime(true) - $startTime, 2);
 
         $this->info("Database seeding completed successfully in {$runTime} seconds.");
     }

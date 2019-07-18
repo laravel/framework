@@ -596,6 +596,24 @@ if (! function_exists('data_set')) {
     }
 }
 
+if (! function_exists('duration')) {
+    /**
+     * Count callabck runtime.
+     *
+     * @param  callable $callback
+     * @param  int $precision
+     * @return float
+     */
+    function duration(callable $callback, int $precision = 2)
+    {
+        $startTime = microtime(true);
+
+        $callback();
+
+        return round(microtime(true) - $startTime, $precision);
+    }
+}
+
 if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
