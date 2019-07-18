@@ -26,7 +26,7 @@ interface MustVerifyEmail
     public function sendEmailVerificationNotification();
 
     /**
-     * Get the email address to verify.
+     * Get the email address that should be used for verification.
      *
      * @return string
      */
