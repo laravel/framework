@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -18,7 +19,7 @@ class Worker
     /**
      * The queue manager instance.
      *
-     * @var \Illuminate\Queue\QueueManager
+     * @var \Illuminate\Contracts\Queue\Factory
      */
     protected $manager;
 
@@ -60,7 +61,7 @@ class Worker
     /**
      * Create a new queue worker.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param  \Illuminate\Contracts\Queue\Factory $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
      * @return void
@@ -636,7 +637,7 @@ class Worker
     /**
      * Set the queue manager instance.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param  \Illuminate\Contracts\Queue\Factory $manager
      * @return void
      */
     public function setManager(QueueManager $manager)
