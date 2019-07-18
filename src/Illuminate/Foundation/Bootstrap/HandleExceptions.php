@@ -12,7 +12,7 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class HandleExceptions
 {
-    static $reservedMemory;
+    public static $reservedMemory;
 
     /**
      * The application instance.
