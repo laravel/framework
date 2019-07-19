@@ -45,6 +45,7 @@ class ServeCommand extends Command
         if (is_resource($connection)) {
             fclose($connection);
             $this->portOffset += 1;
+
             return $this->handle();
         } else {
             $this->line("<info>Laravel development server started:</info> <http://{$this->host()}:{$this->port()}>");
