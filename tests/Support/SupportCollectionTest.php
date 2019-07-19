@@ -2161,6 +2161,9 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['primary' => 'foo', 'secondary' => 'bar'], $c->reject(function ($item, $key) {
             return $key == 'id';
         })->all());
+
+        $c = new Collection(['foo', '', null, 'bar']);
+        $this->assertEquals(['foo', 'bar'], $c->reject('blank')->values()->all());
     }
 
     public function testRejectWithoutAnArgumentRemovesTruthyValues()

@@ -1509,12 +1509,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function reject($callback = true)
     {
-        $useAsCallable = $this->useAsCallable($callback);
+        $isCallable = is_callable($callback);
 
-        return $this->filter(function ($value, $key) use ($callback, $useAsCallable) {
-            return $useAsCallable
-                ? ! $callback($value, $key)
-                : $value != $callback;
+        return $this->filter(function ($value, $key) use ($callback, $isCallable) {
+            return $isCallable ? ! $callback($value, $key) : $value != $callback;
         });
     }
 
