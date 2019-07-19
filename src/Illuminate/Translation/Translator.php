@@ -101,7 +101,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         return $this->get($key, $replace, $locale);
     }
 
-
     /**
      * set the translation for the given key.
      *
@@ -121,7 +120,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         Arr::set($this->loaded[$namespace][$group][$locale], $item, $value);
     }
-
 
     /**
      * Get the translation for the given key.
