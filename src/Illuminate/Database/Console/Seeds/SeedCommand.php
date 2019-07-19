@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Stopwatch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,16 +35,24 @@ class SeedCommand extends Command
     protected $resolver;
 
     /**
+     * Timer instance.
+     *
+     * @var \Illuminate\Support\Stopwatch
+     */
+    protected $watch;
+
+    /**
      * Create a new database seed command instance.
      *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-     * @return void
+     * @param \Illuminate\Database\ConnectionResolverInterface $resolver
+     * @param \Illuminate\Support\Stopwatch $watch
      */
-    public function __construct(Resolver $resolver)
+    public function __construct(Resolver $resolver, Stopwatch $watch)
     {
         parent::__construct();
 
         $this->resolver = $resolver;
+        $this->watch = $watch;
     }
 
     /**
@@ -59,13 +68,13 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        $runTime = duration(function () {
-            Model::unguarded(function () {
-                $this->getSeeder()->__invoke();
-            });
+        $this->watch->start('seeder');
+
+        Model::unguarded(function () {
+            $this->getSeeder()->__invoke();
         });
 
-        $this->info("Database seeding completed successfully in {$runTime} seconds.");
+        $this->info("Database seeding completed successfully in {$this->watch->check('seeder')} seconds.");
     }
 
     /**
@@ -77,7 +86,7 @@ class SeedCommand extends Command
     {
         $class = $this->laravel->make($this->input->getOption('class'));
 
-        return $class->setContainer($this->laravel)->setCommand($this);
+        return $class->setContainer($this->laravel)->setCommand($this)->setWatch($this->watch);
     }
 
     /**
@@ -90,6 +99,11 @@ class SeedCommand extends Command
         $database = $this->input->getOption('database');
 
         return $database ?: $this->laravel['config']['database.default'];
+    }
+
+    public function getWatch()
+    {
+        return $this->watch;
     }
 
     /**

@@ -641,15 +641,6 @@ class SupportHelpersTest extends TestCase
         $_SERVER['foo'] = 'From $_SERVER';
         $this->assertSame('From $_ENV', env('foo'));
     }
-
-    public function testDuration()
-    {
-        $sleep = function () {
-            sleep(0);
-        };
-
-        $this->assertIsFloat(duration($sleep));
-    }
 }
 
 trait SupportTestTraitOne

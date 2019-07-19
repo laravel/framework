@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Support\Stopwatch;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Auth\Console\AuthMakeCommand;
@@ -951,7 +952,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerSeedCommand()
     {
         $this->app->singleton('command.seed', function ($app) {
-            return new SeedCommand($app['db']);
+            return new SeedCommand($app['db'], $app->make(Stopwatch::class));
         });
     }
 

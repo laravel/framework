@@ -7,6 +7,7 @@ use Mockery\Mock;
 use Illuminate\Console\Command;
 use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Stopwatch;
 use Illuminate\Container\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -37,14 +38,20 @@ class DatabaseSeederTest extends TestCase
     {
         $seeder = new TestSeeder;
         $seeder->setContainer($container = m::mock(Container::class));
+        $seeder->setWatch($watch = m::mock(Stopwatch::class));
+
         $output = m::mock(OutputInterface::class);
-        $output->shouldReceive('writeln')->times(2)->andReturn('foo');
+
         $command = m::mock(Command::class);
-        $command->shouldReceive('getOutput')->times(2)->andReturn($output);
+        $command->shouldReceive('line')->times(2)->andReturn($output);
+        $watch->shouldReceive('start')->once()->with('ClassName');
         $seeder->setCommand($command);
+        $watch->shouldReceive('check')->once()->with('ClassName');
+
         $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
         $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
+        $child->shouldReceive('setWatch')->once()->with($watch)->andReturn($child);
         $child->shouldReceive('__invoke')->once();
 
         $seeder->call('ClassName');

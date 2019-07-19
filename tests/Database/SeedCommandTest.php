@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Mockery as m;
 use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Stopwatch;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Container\Container;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -22,10 +23,14 @@ class SeedCommandTest extends TestCase
         $seeder = m::mock(Seeder::class);
         $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
         $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->shouldReceive('setWatch')->once()->andReturnSelf();
         $seeder->shouldReceive('__invoke')->once();
 
         $resolver = m::mock(ConnectionResolverInterface::class);
         $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $watch = m::mock(Stopwatch::class);
+        $watch->shouldReceive('start')->once()->with('seeder');
 
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
@@ -35,7 +40,9 @@ class SeedCommandTest extends TestCase
             new OutputStyle($input, $output)
         );
 
-        $command = new SeedCommand($resolver);
+        $watch->shouldReceive('check')->once()->with('seeder');
+
+        $command = new SeedCommand($resolver, $watch);
         $command->setLaravel($container);
 
         // call run to set up IO, then fire manually.
