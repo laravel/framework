@@ -101,6 +101,28 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         return $this->get($key, $replace, $locale);
     }
 
+
+    /**
+     * set the translation for the given key.
+     *
+     * @param string $key
+     * @param string $value
+     * @param string|null $locale
+     * @return void
+     */
+    public function set($key, $value, $locale = null)
+    {
+        [$namespace, $group, $item] = $this->parseKey($key);
+
+        $this->loaded = $this->loaded ?? [];
+        $this->loaded[$namespace] = $this->loaded[$namespace] ?? [];
+        $this->loaded[$namespace][$group] = $this->loaded[$namespace][$group] ?? [];
+        $this->loaded[$namespace][$group] = $this->loaded[$namespace][$group] ?? [];
+
+        Arr::set($this->loaded[$namespace][$group][$locale], $item, $value);
+    }
+
+
     /**
      * Get the translation for the given key.
      *

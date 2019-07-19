@@ -179,6 +179,13 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
     }
 
+    public function testSetTranslation()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->set('test.test', 'this is test', 'en');
+        $this->assertEquals('this is test', $t->get('test.test'));
+    }
+
     protected function getLoader()
     {
         return m::mock(Loader::class);
