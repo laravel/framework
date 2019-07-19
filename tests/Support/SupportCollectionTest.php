@@ -357,12 +357,12 @@ class SupportCollectionTest extends TestCase
     public function testCountWithCallable()
     {
         $c = new Collection(['alice', 'aaron', 'bob', 'carla']);
-        $this->assertEquals(1, $c->count(function($value){
+        $this->assertEquals(1, $c->count(function ($value) {
             return $value === 'alice';
         }));
 
         $c = new Collection([]);
-        $this->assertEquals(0, $c->count(function($value){
+        $this->assertEquals(0, $c->count(function ($value) {
             return $value === 'alice';
         }));
     }
