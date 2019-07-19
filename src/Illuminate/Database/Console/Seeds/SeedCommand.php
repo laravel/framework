@@ -39,20 +39,20 @@ class SeedCommand extends Command
      *
      * @var \Illuminate\Support\Stopwatch
      */
-    protected $watch;
+    public $watch;
 
     /**
      * Create a new database seed command instance.
      *
-     * @param \Illuminate\Database\ConnectionResolverInterface $resolver
-     * @param \Illuminate\Support\Stopwatch $watch
+     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+     * @return void
      */
-    public function __construct(Resolver $resolver, Stopwatch $watch)
+    public function __construct(Resolver $resolver)
     {
         parent::__construct();
 
         $this->resolver = $resolver;
-        $this->watch = $watch;
+        $this->watch = new Stopwatch();
     }
 
     /**
@@ -86,7 +86,7 @@ class SeedCommand extends Command
     {
         $class = $this->laravel->make($this->input->getOption('class'));
 
-        return $class->setContainer($this->laravel)->setCommand($this)->setWatch($this->watch);
+        return $class->setContainer($this->laravel)->setCommand($this);
     }
 
     /**
@@ -99,11 +99,6 @@ class SeedCommand extends Command
         $database = $this->input->getOption('database');
 
         return $database ?: $this->laravel['config']['database.default'];
-    }
-
-    public function getWatch()
-    {
-        return $this->watch;
     }
 
     /**

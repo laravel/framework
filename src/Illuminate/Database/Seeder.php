@@ -5,7 +5,6 @@ namespace Illuminate\Database;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Console\Command;
-use Illuminate\Support\Stopwatch;
 use Illuminate\Container\Container;
 
 abstract class Seeder
@@ -25,13 +24,6 @@ abstract class Seeder
     protected $command;
 
     /**
-     * Timer instance.
-     *
-     * @var \Illuminate\Support\Stopwatch
-     */
-    protected $watch;
-
-    /**
      * Seed the given connection from the given path.
      *
      * @param  array|string  $class
@@ -43,13 +35,16 @@ abstract class Seeder
         $classes = Arr::wrap($class);
 
         foreach ($classes as $class) {
-            $this->note("<comment>Seeding:</comment> $class", $silent);
-
-            $this->watch->start($class);
+            if ($silent === false && isset($this->command)) {
+                $this->command->line("<comment>Seeding:</comment> $class");
+                $this->command->watch->start($class);
+            }
 
             $this->resolve($class)->__invoke();
 
-            $this->note("<info>Seeded:</info> $class ({$this->watch->check($class)} seconds)", $silent);
+            if ($silent === false && isset($this->command)) {
+                $this->command->line("<info>Seeded:</info> $class ({$this->command->watch->check($class)} seconds)");
+            }
         }
 
         return $this;
@@ -86,10 +81,6 @@ abstract class Seeder
             $instance->setCommand($this->command);
         }
 
-        if (isset($this->watch)) {
-            $instance->setWatch($this->watch);
-        }
-
         return $instance;
     }
 
@@ -117,27 +108,6 @@ abstract class Seeder
         $this->command = $command;
 
         return $this;
-    }
-
-    public function setWatch(Stopwatch $watch)
-    {
-        $this->watch = $watch;
-
-        return $this;
-    }
-
-    /**
-     * Write a note to the console's output.
-     *
-     * @param  string  $message
-     * @param  bool  $silent
-     * @return void
-     */
-    protected function note($message, $silent = false)
-    {
-        if ($silent === false && isset($this->command)) {
-            $this->command->line($message);
-        }
     }
 
     /**

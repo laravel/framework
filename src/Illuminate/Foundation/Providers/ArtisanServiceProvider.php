@@ -952,7 +952,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerSeedCommand()
     {
         $this->app->singleton('command.seed', function ($app) {
-            return new SeedCommand($app['db'], $app->make(Stopwatch::class));
+            return new SeedCommand($app['db']);
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Console\Seeds\SeedCommand;
 use Mockery as m;
 use Mockery\Mock;
 use Illuminate\Console\Command;
@@ -38,11 +39,13 @@ class DatabaseSeederTest extends TestCase
     {
         $seeder = new TestSeeder;
         $seeder->setContainer($container = m::mock(Container::class));
-        $seeder->setWatch($watch = m::mock(Stopwatch::class));
+
+        $command = m::mock(SeedCommand::class);
+
+        $watch = m::mock(Stopwatch::class);
+        $command->watch = $watch;
 
         $output = m::mock(OutputInterface::class);
-
-        $command = m::mock(Command::class);
         $command->shouldReceive('line')->times(2)->andReturn($output);
         $watch->shouldReceive('start')->once()->with('ClassName');
         $seeder->setCommand($command);
@@ -51,7 +54,6 @@ class DatabaseSeederTest extends TestCase
         $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
         $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
-        $child->shouldReceive('setWatch')->once()->with($watch)->andReturn($child);
         $child->shouldReceive('__invoke')->once();
 
         $seeder->call('ClassName');
