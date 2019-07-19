@@ -40,15 +40,16 @@ class ServeCommand extends Command
     public function handle()
     {
         chdir(public_path());
+        
+        $connection = @fsockopen($this->host(), $this->port());
 
-        $this->line("<info>Laravel development server started:</info> <http://{$this->host()}:{$this->port()}>");
-
-        passthru($this->serverCommand(), $status);
-
-        if ($status && $this->canTryAnotherPort()) {
+        if (is_resource($connection)) {
+            fclose($connection);
             $this->portOffset += 1;
-
             return $this->handle();
+        } else {
+            $this->line("<info>Laravel development server started:</info> <http://{$this->host()}:{$this->port()}>");
+            passthru($this->serverCommand(), $status);
         }
 
         return $status;
