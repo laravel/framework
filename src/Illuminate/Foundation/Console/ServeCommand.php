@@ -40,7 +40,6 @@ class ServeCommand extends Command
     public function handle()
     {
         chdir(public_path());
-        
         $connection = @fsockopen($this->host(), $this->port());
 
         if (is_resource($connection)) {
