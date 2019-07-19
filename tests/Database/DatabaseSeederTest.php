@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Console\Seeds\SeedCommand;
 use Mockery as m;
 use Mockery\Mock;
 use Illuminate\Console\Command;
@@ -10,6 +9,7 @@ use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Stopwatch;
 use Illuminate\Container\Container;
+use Illuminate\Database\Console\Seeds\SeedCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TestSeeder extends Seeder
