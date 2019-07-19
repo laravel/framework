@@ -1970,7 +1970,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Count the number of items in the collection.
      *
      * @param callable|null $callback
-     *
      * @return int
      */
     public function count($callback = null)
