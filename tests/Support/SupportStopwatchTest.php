@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Support\Stopwatch;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Stopwatch;
 
 class SupportStopwatchTest extends TestCase
 {
