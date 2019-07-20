@@ -594,6 +594,71 @@ class Blueprint
     }
 
     /**
+     * Create a new non-incrementing column on the table with the "increments" data type.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     *
+     * @see increments()
+     */
+    public function identity($column)
+    {
+        return $this->unsignedInteger($column);
+    }
+
+    /**
+     * Create a new non-incrementing column on the table with the "tinyIncrements" data type.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     *
+     * @see tinyIncrements()
+     */
+    public function tinyIdentity($column)
+    {
+        return $this->unsignedTinyInteger($column);
+    }
+
+    /**
+     * Create a new non-incrementing column on the table with the "smallIncrements" data type.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     *
+     * @see smallIncrements()
+     */
+    public function smallIdentity($column)
+    {
+        return $this->unsignedSmallInteger($column);
+    }
+
+    /**
+     * Create a new non-incrementing column on the table with the "mediumIncrements" data type.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     *
+     * @see mediumIncrements()
+     */
+    public function mediumIdentity($column)
+    {
+        return $this->unsignedMediumInteger($column);
+    }
+
+    /**
+     * Create a new non-incrementing column on the table with the "bigIncrements" data type.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     *
+     * @see bigIncrements()
+     */
+    public function bigIdentity($column)
+    {
+        return $this->unsignedBigInteger($column);
+    }
+
+    /**
      * Create a new char column on the table.
      *
      * @param  string  $column
