@@ -142,52 +142,52 @@ abstract class TestCase extends BaseTestCase
      */
     protected function tearDown(): void
     {
-        if ($this->app) {
-            foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
-                call_user_func($callback);
+        try {
+            if ($this->app) {
+                foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
+                    call_user_func($callback);
+                }
+
+                $this->app->flush();
+                $this->app = null;
+
+                foreach ($this->afterApplicationDestroyedCallbacks as $callback) {
+                    call_user_func($callback);
+                }
+            }
+        } finally {
+            $this->setUpHasRun = false;
+
+            if (property_exists($this, 'serverVariables')) {
+                $this->serverVariables = [];
             }
 
-            $this->app->flush();
-
-            $this->app = null;
-        }
-
-        $this->setUpHasRun = false;
-
-        if (property_exists($this, 'serverVariables')) {
-            $this->serverVariables = [];
-        }
-
-        if (property_exists($this, 'defaultHeaders')) {
-            $this->defaultHeaders = [];
-        }
-
-        if (class_exists('Mockery')) {
-            if ($container = Mockery::getContainer()) {
-                $this->addToAssertionCount($container->mockery_getExpectationCount());
+            if (property_exists($this, 'defaultHeaders')) {
+                $this->defaultHeaders = [];
             }
 
-            Mockery::close();
+            if (class_exists('Mockery')) {
+                if ($container = Mockery::getContainer()) {
+                    $this->addToAssertionCount($container->mockery_getExpectationCount());
+                }
+
+                Mockery::close();
+            }
+
+            if (class_exists(Carbon::class)) {
+                Carbon::setTestNow();
+            }
+
+            if (class_exists(CarbonImmutable::class)) {
+                CarbonImmutable::setTestNow();
+            }
+
+            $this->afterApplicationCreatedCallbacks = [];
+            $this->beforeApplicationDestroyedCallbacks = [];
+            $this->afterApplicationDestroyedCallbacks = [];
+
+            Artisan::forgetBootstrappers();
         }
-
-        if (class_exists(Carbon::class)) {
-            Carbon::setTestNow();
-        }
-
-        if (class_exists(CarbonImmutable::class)) {
-            CarbonImmutable::setTestNow();
-        }
-
-        $this->afterApplicationCreatedCallbacks = [];
-        $this->beforeApplicationDestroyedCallbacks = [];
-
-        Artisan::forgetBootstrappers();
-
-        foreach ($this->afterApplicationDestroyedCallbacks as $callback) {
-            call_user_func($callback);
-        }
-
-        $this->afterApplicationDestroyedCallbacks = [];
     }
 
     /**
