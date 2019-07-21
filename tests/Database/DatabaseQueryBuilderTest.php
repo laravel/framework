@@ -338,7 +338,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where `id` = ? or month(`created_at`) = ?', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->where('id', 1)->orWhereyear('created_at', 1);
+        $builder->select('*')->from('users')->where('id', 1)->orWhereYear('created_at', 1);
         $this->assertEquals('select * from `users` where `id` = ? or year(`created_at`) = ?', $builder->toSql());
     }
 
@@ -347,6 +347,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'))->where('admin', true);
         $this->assertEquals([true], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDay('created_at', new Raw('NOW()'));
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonth('created_at', new Raw('NOW()'));
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereYear('created_at', new Raw('NOW()'));
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testWhereDateMySql()
@@ -969,6 +981,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testArrayWhereNulls()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNull(['id', 'expires_at']);
+        $this->assertEquals('select * from "users" where "id" is null and "expires_at" is null', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNull(['id', 'expires_at']);
+        $this->assertEquals('select * from "users" where "id" = ? or "id" is null or "expires_at" is null', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testBasicWhereNotNulls()
     {
         $builder = $this->getBuilder();
@@ -979,6 +1004,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', '>', 1)->orWhereNotNull('id');
         $this->assertEquals('select * from "users" where "id" > ? or "id" is not null', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    public function testArrayWhereNotNulls()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotNull(['id', 'expires_at']);
+        $this->assertEquals('select * from "users" where "id" is not null and "expires_at" is not null', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '>', 1)->orWhereNotNull(['id', 'expires_at']);
+        $this->assertEquals('select * from "users" where "id" > ? or "id" is not null or "expires_at" is not null', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
@@ -2068,6 +2106,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->delete(1);
         $this->assertEquals(1, $result);
 
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "users"."id" = ?', [1])->andReturn(1);
+        $result = $builder->from('users')->selectRaw('?', ['ignore'])->delete(1);
+        $this->assertEquals(1, $result);
+
         $builder = $this->getSqliteBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" where "email" = ? order by "id" asc limit 1)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
@@ -2089,6 +2132,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSqliteBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" inner join "contacts" on "users"."id" = "contacts"."id" where "users"."email" = ? order by "users"."id" asc limit 1)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('users.email', '=', 'foo')->orderBy('users.id')->limit(1)->delete();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqliteBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" as "u" where "rowid" in (select "u"."rowid" from "users" as "u" inner join "contacts" as "c" on "u"."id" = "c"."id")', [])->andReturn(1);
+        $result = $builder->from('users as u')->join('contacts as c', 'u.id', '=', 'c.id')->delete();
         $this->assertEquals(1, $result);
 
         $builder = $this->getMySqlBuilder();

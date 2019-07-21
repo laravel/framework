@@ -168,6 +168,17 @@ class Store implements Session
     }
 
     /**
+     * Get a subset of the session data.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function only(array $keys)
+    {
+        return Arr::only($this->attributes, $keys);
+    }
+
+    /**
      * Checks if a key exists.
      *
      * @param  string|array  $key
