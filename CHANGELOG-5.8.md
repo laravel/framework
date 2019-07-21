@@ -2,6 +2,18 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.29...5.8)
 
+### Fixed
+- Fixed collections with JsonSerializable items and mixed values ([#29205](https://github.com/laravel/framework/pull/29205))
+
+### Reverted
+- Reverted: [Added possibility for `WithFaker::makeFaker()` use local `app.faker_locale` config](https://github.com/laravel/framework/pull/29123) ([#29250](https://github.com/laravel/framework/pull/29250))
+
+### TODO
+- tagged today breaks queue deserializing with Model::newCollection() ([#29196](https://github.com/laravel/framework/pull/29196))
+- Prevent a job from firing if it's been marked as deleted ([#29204](https://github.com/laravel/framework/pull/29204), [1003c27](https://github.com/laravel/framework/commit/1003c27b73f11472c1ebdb9238b839aefddfb048))
+- Add Postgres support for collation() on columns ([#29213](https://github.com/laravel/framework/pull/29213))
+- Allocate memory for error handling to allow handling memory exhaustion limits ([#29226](https://github.com/laravel/framework/pull/29226))
+
 
 ## [v5.8.29 (2019-07-16)](https://github.com/laravel/framework/compare/v5.8.28...v5.8.29)
 
