@@ -43,7 +43,7 @@ trait InteractsWithConsole
             return $this->app[Kernel::class]->call($command, $parameters);
         }
 
-        $this->beforeApplicationDestroyed(function () {
+        $this->afterApplicationDestroyed(function () {
             if (count($this->expectedQuestions)) {
                 $this->fail('Question "'.Arr::first($this->expectedQuestions)[0].'" was not asked.');
             }
