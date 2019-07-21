@@ -125,6 +125,22 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an insert statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileInsert(Builder $query, array $values)
+    {
+        if (empty($values)) {
+            $values = [[]];
+        }
+
+        return parent::compileInsert($query, $values);
+    }
+
+    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

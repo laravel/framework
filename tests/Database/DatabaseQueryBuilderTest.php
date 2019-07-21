@@ -1856,6 +1856,25 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testInsertGetIdWithEmptyValues()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into `users` () values ()', [], null);
+        $builder->from('users')->insertGetId([]);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" default values returning "id"', [], null);
+        $builder->from('users')->insertGetId([]);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" default values', [], null);
+        $builder->from('users')->insertGetId([]);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into [users] default values', [], null);
+        $builder->from('users')->insertGetId([]);
+    }
+
     public function testInsertMethodRespectsRawBindings()
     {
         $builder = $this->getBuilder();
