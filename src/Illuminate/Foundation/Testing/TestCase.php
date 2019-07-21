@@ -144,15 +144,17 @@ abstract class TestCase extends BaseTestCase
     {
         try {
             if ($this->app) {
-                foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
-                    call_user_func($callback);
-                }
+                try {
+                    foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
+                        call_user_func($callback);
+                    }
+                } finally {
+                    $this->app->flush();
+                    $this->app = null;
 
-                $this->app->flush();
-                $this->app = null;
-
-                foreach ($this->afterApplicationDestroyedCallbacks as $callback) {
-                    call_user_func($callback);
+                    foreach ($this->afterApplicationDestroyedCallbacks as $callback) {
+                        call_user_func($callback);
+                    }
                 }
             }
         } finally {
@@ -166,7 +168,7 @@ abstract class TestCase extends BaseTestCase
                 $this->defaultHeaders = [];
             }
 
-            if (class_exists('Mockery')) {
+            if (class_exists(Mockery::class)) {
                 if ($container = Mockery::getContainer()) {
                     $this->addToAssertionCount($container->mockery_getExpectationCount());
                 }
