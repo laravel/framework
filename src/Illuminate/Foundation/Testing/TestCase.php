@@ -183,7 +183,7 @@ abstract class TestCase extends BaseTestCase
 
         Artisan::forgetBootstrappers();
 
-        foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
+        foreach ($this->afterApplicationDestroyedCallbacks as $callback) {
             call_user_func($callback);
         }
 
