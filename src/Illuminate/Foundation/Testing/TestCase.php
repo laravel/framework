@@ -43,6 +43,13 @@ abstract class TestCase extends BaseTestCase
     protected $beforeApplicationDestroyedCallbacks = [];
 
     /**
+     * The callbacks that should be run after the application is destroyed.
+     *
+     * @var array
+     */
+    protected $afterApplicationDestroyedCallbacks = [];
+
+    /**
      * Indicates if we have made it through the base setUp function.
      *
      * @var bool
@@ -175,6 +182,12 @@ abstract class TestCase extends BaseTestCase
         $this->beforeApplicationDestroyedCallbacks = [];
 
         Artisan::forgetBootstrappers();
+
+        foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
+            call_user_func($callback);
+        }
+
+        $this->afterApplicationDestroyedCallbacks = [];
     }
 
     /**
@@ -201,5 +214,16 @@ abstract class TestCase extends BaseTestCase
     protected function beforeApplicationDestroyed(callable $callback)
     {
         $this->beforeApplicationDestroyedCallbacks[] = $callback;
+    }
+
+    /**
+     * Register a callback to be run after the application is destroyed.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    protected function afterApplicationDestroyed(callable $callback)
+    {
+        $this->afterApplicationDestroyedCallbacks[] = $callback;
     }
 }
