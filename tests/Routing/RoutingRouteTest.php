@@ -1093,19 +1093,18 @@ class RoutingRouteTest extends TestCase
 
     public function testRoutePreservingOriginalParametersState()
     {
-        $phpunit = $this;
         $router = $this->getRouter();
         $router->bind('bar', function ($value) {
             return strlen($value);
         });
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function ($bar) use ($router, $phpunit) {
+            'uses' => function ($bar) use ($router) {
                 $route = $router->getCurrentRoute();
 
-                $phpunit->assertEquals('taylor', $route->originalParameter('bar'));
-                $phpunit->assertEquals('default', $route->originalParameter('unexisting', 'default'));
-                $phpunit->assertEquals(['bar' => 'taylor'], $route->originalParameters());
+                $this->assertEquals('taylor', $route->originalParameter('bar'));
+                $this->assertEquals('default', $route->originalParameter('unexisting', 'default'));
+                $this->assertEquals(['bar' => 'taylor'], $route->originalParameters());
 
                 return $bar;
             },
@@ -1445,12 +1444,11 @@ class RoutingRouteTest extends TestCase
 
     public function testImplicitBindings()
     {
-        $phpunit = $this;
         $router = $this->getRouter();
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
-                $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+            'uses' => function (RoutingTestUserModel $bar) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
                 return $bar->value;
             },
@@ -1460,12 +1458,11 @@ class RoutingRouteTest extends TestCase
 
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
     {
-        $phpunit = $this;
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar = null) use ($phpunit) {
-                $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
+            'uses' => function (RoutingTestUserModel $bar = null) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
                 return $bar->value;
             },
@@ -1475,12 +1472,11 @@ class RoutingRouteTest extends TestCase
 
     public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
     {
-        $phpunit = $this;
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar = null) use ($phpunit) {
-                $phpunit->assertNull($bar);
+            'uses' => function (RoutingTestUserModel $bar = null) {
+                $this->assertNull($bar);
             },
         ]);
         $router->dispatch(Request::create('foo', 'GET'))->getContent();
@@ -1490,12 +1486,11 @@ class RoutingRouteTest extends TestCase
     {
         $this->expectException(ModelNotFoundException::class);
 
-        $phpunit = $this;
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestNonExistingUserModel $bar = null) use ($phpunit) {
-                $phpunit->fail('ModelNotFoundException was expected.');
+            'uses' => function (RoutingTestNonExistingUserModel $bar = null) {
+                $this->fail('ModelNotFoundException was expected.');
             },
         ]);
         $router->dispatch(Request::create('foo/nonexisting', 'GET'))->getContent();
@@ -1503,7 +1498,6 @@ class RoutingRouteTest extends TestCase
 
     public function testImplicitBindingThroughIOC()
     {
-        $phpunit = $this;
         $container = new Container;
         $router = new Router(new Dispatcher, $container);
         $container->singleton(Registrar::class, function () use ($router) {
@@ -1513,8 +1507,8 @@ class RoutingRouteTest extends TestCase
         $container->bind(RoutingTestUserModel::class, RoutingTestExtendedUserModel::class);
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
-                $phpunit->assertInstanceOf(RoutingTestExtendedUserModel::class, $bar);
+            'uses' => function (RoutingTestUserModel $bar) {
+                $this->assertInstanceOf(RoutingTestExtendedUserModel::class, $bar);
             },
         ]);
         $router->dispatch(Request::create('foo/baz', 'GET'))->getContent();
