@@ -18,6 +18,13 @@ trait CompilesInjections
 
         $service = trim($segments[1]);
 
+        if (strpos($service, '@')) {
+
+            list($service, $method) = explode('@', $service);
+
+            return "<?php \${$variable} = (app('{$service}'))->{$method}(); ?>";
+        }
+
         return "<?php \${$variable} = app('{$service}'); ?>";
     }
 }
