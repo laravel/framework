@@ -144,17 +144,15 @@ abstract class TestCase extends BaseTestCase
     {
         try {
             if ($this->app) {
-                try {
-                    foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
-                        call_user_func($callback);
-                    }
-                } finally {
-                    $this->app->flush();
-                    $this->app = null;
+                foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
+                    \rescue($callback, null, false);
+                }
 
-                    foreach ($this->afterApplicationDestroyedCallbacks as $callback) {
-                        call_user_func($callback);
-                    }
+                $this->app->flush();
+                $this->app = null;
+
+                foreach ($this->afterApplicationDestroyedCallbacks as $callback) {
+                    call_user_func($callback);
                 }
             }
         } finally {
