@@ -43,6 +43,7 @@ class Response extends BaseResponse
         }
 
         parent::setContent($content);
+        $this->header('Content-Length', strlen($content));
 
         return $this;
     }
