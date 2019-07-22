@@ -20,7 +20,7 @@ trait CompilesInjections
 
         if (strpos($service, '@')) {
 
-            list($service, $method) = explode('@', $service);
+            [$service, $method] = explode('@', $service);
 
             return "<?php \${$variable} = (app('{$service}'))->{$method}(); ?>";
         }
