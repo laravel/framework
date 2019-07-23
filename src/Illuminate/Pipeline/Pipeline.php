@@ -4,9 +4,7 @@ namespace Illuminate\Pipeline;
 
 use Closure;
 use RuntimeException;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
 class Pipeline implements PipelineContract

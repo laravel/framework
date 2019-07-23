@@ -4,9 +4,9 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Exception;
-use Illuminate\Contracts\Support\Responsable;
 use Throwable;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
