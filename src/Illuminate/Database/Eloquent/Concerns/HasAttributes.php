@@ -698,7 +698,7 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given array into ArrayObject
+     * Decode the given array into ArrayObject.
      *
      * @param array $value
      *
