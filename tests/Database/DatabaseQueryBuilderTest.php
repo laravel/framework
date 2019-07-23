@@ -1979,6 +1979,11 @@ class DatabaseQueryBuilderTest extends TestCase
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" as "u" set "email" = ?, "name" = ? where "rowid" in (select "u"."rowid" from "users" as "u" inner join "orders" as "o" on "u"."id" = "o"."user_id")', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users as u')->join('orders as o', 'u.id', '=', 'o.user_id')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     public function testUpdateMethodWithJoinsAndAliasesOnSqlServer()
