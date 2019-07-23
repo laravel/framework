@@ -12,10 +12,6 @@ class FoundationAliasLoaderTest extends TestCase
         $loader = AliasLoader::getInstance(['foo' => 'bar']);
 
         $this->assertSame(array_intersect(['foo' => 'bar'], $loader->getAliases()), ['foo' => 'bar']);
-        $this->assertFalse($loader->isRegistered());
-        $loader->register();
-
-        $this->assertTrue($loader->isRegistered());
     }
 
     public function testGetInstanceCreatesOneInstance()
