@@ -163,6 +163,8 @@ class PendingCommand
             (new ArrayInput($this->parameters)), $this->createABufferedOutputMock(),
         ]);
 
+        $mock->_mockery_ignoreVerification = true;
+
         foreach ($this->test->expectedQuestions as $i => $question) {
             $mock->shouldReceive('askQuestion')
                 ->once()
@@ -192,6 +194,8 @@ class PendingCommand
         $mock = Mockery::mock(BufferedOutput::class.'[doWrite]')
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldIgnoreMissing();
+
+        $mock->_mockery_ignoreVerification = true;
 
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')
