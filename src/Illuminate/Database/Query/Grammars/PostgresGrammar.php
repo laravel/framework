@@ -368,7 +368,7 @@ class PostgresGrammar extends Grammar
         // Update statements with "joins" in Postgres use an interesting syntax. We need to
         // take all of the bindings and put them on the end of this array since they are
         // added to the end of the "where" clause statements as typical where clauses.
-        $bindingsWithoutJoin = Arr::except($bindings, 'join');
+        $bindingsWithoutJoin = Arr::except($bindings, ['select', 'join']);
 
         return array_values(
             array_merge($values, $bindings['join'], Arr::flatten($bindingsWithoutJoin))
