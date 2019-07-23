@@ -6,9 +6,7 @@ use Closure;
 use Exception;
 use Throwable;
 use RuntimeException;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Support\Responsable;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
@@ -169,13 +167,9 @@ class Pipeline implements PipelineContract
                         $parameters = [$passable, $stack];
                     }
 
-                    $response = method_exists($pipe, $this->method)
+                    return method_exists($pipe, $this->method)
                                     ? $pipe->{$this->method}(...$parameters)
                                     : $pipe(...$parameters);
-
-                    return $response instanceof Responsable
-                                ? $response->toResponse($this->getContainer()->make(Request::class))
-                                : $response;
                 } catch (Exception $e) {
                     return $this->handleException($passable, $e);
                 } catch (Throwable $e) {
@@ -229,6 +223,6 @@ class Pipeline implements PipelineContract
      */
     protected function handleException($passable, Exception $e)
     {
-        throw $e; // actually handled in the Routing Pipeline
+        throw $e;
     }
 }
