@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use ArrayObject;
 use LogicException;
 use DateTimeInterface;
 use Carbon\CarbonInterface;
@@ -499,6 +500,8 @@ trait HasAttributes
             case 'array':
             case 'json':
                 return $this->fromJson($value);
+            case 'array_object':
+                return $this->asArrayObject($this->fromJson($value));
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
             case 'date':
@@ -692,6 +695,18 @@ trait HasAttributes
         }
 
         return $value;
+    }
+
+    /**
+     * Decode the given array into ArrayObject
+     *
+     * @param array $value
+     *
+     * @return ArrayObject|null
+     */
+    protected function asArrayObject($value)
+    {
+        return new ArrayObject($value, ArrayObject::ARRAY_AS_PROPS | ArrayObject::STD_PROP_LIST);
     }
 
     /**
