@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -218,6 +219,25 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch(Request::create('foo/bar', 'GET'))->getContent();
         $this->assertEquals('hello caught', $response);
     }
+
+
+    public function testReturnsResponseWhenMiddlewareReturnsResponsable()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', [
+            'uses' => RouteTestClosureMiddlewareController::class.'@index',
+            'middleware' => 'foo',
+        ]);
+        $router->aliasMiddleware('foo', function ($request, $next) {
+            return new ResponsableResponse;
+        });
+
+        $this->assertEquals(
+            'bar',
+            $router->dispatch(Request::create('foo/bar', 'GET'))->getContent()
+        );
+    }
+
 
     public function testDefinedClosureMiddleware()
     {
@@ -1910,5 +1930,13 @@ class ActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+}
+
+class ResponsableResponse implements Responsable
+{
+    public function toResponse($request)
+    {
+        return new Response('bar');
     }
 }

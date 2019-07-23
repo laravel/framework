@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Exception;
+use Illuminate\Contracts\Support\Responsable;
 use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -50,7 +51,11 @@ class Pipeline extends BasePipeline
 
                     $callable = $slice($stack, $pipe);
 
-                    return $callable($passable);
+                    $response = $callable($passable);
+
+                    return $response instanceof Responsable
+                        ? $response->toResponse($this->getContainer()->make(Request::class))
+                        : $response;
                 } catch (Exception $e) {
                     return $this->handleException($passable, $e);
                 } catch (Throwable $e) {
