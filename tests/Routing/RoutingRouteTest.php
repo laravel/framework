@@ -22,8 +22,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -220,7 +220,6 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('hello caught', $response);
     }
 
-
     public function testReturnsResponseWhenMiddlewareReturnsResponsable()
     {
         $router = $this->getRouter();
@@ -237,7 +236,6 @@ class RoutingRouteTest extends TestCase
             $router->dispatch(Request::create('foo/bar', 'GET'))->getContent()
         );
     }
-
 
     public function testDefinedClosureMiddleware()
     {

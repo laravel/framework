@@ -6,7 +6,6 @@ use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Support\Responsable;
 
 class PipelineTest extends TestCase
 {
