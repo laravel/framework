@@ -65,17 +65,6 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertSame('taylor', $newModel->username);
     }
 
-    public function testUpdateMethodRetrievesModelAndUpdates()
-    {
-        $relation = $this->getRelation();
-        $mock = m::mock(Model::class);
-        $mock->shouldReceive('fill')->once()->with(['attributes'])->andReturn($mock);
-        $mock->shouldReceive('save')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('first')->once()->andReturn($mock);
-
-        $this->assertTrue($relation->update(['attributes']));
-    }
-
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
