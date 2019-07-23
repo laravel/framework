@@ -11,7 +11,11 @@ class FoundationAliasLoaderTest extends TestCase
     {
         $loader = AliasLoader::getInstance(['foo' => 'bar']);
 
-        $this->assertSame(array_intersect(['foo' => 'bar'], $loader->getAliases()), ['foo' => 'bar']);
+        $this->assertEquals(['foo' => 'bar'], $loader->getAliases());
+        $this->assertFalse($loader->isRegistered());
+        $loader->register();
+
+        $this->assertTrue($loader->isRegistered());
     }
 
     public function testGetInstanceCreatesOneInstance()
@@ -23,15 +27,14 @@ class FoundationAliasLoaderTest extends TestCase
     public function testLoaderCanBeCreatedAndRegisteredMergingAliases()
     {
         $loader = AliasLoader::getInstance(['foo' => 'bar']);
-
-        $this->assertSame(array_intersect(['foo' => 'bar'], $loader->getAliases()), ['foo' => 'bar']);
+        $this->assertEquals(['foo' => 'bar'], $loader->getAliases());
 
         $loader = AliasLoader::getInstance(['foo2' => 'bar2']);
-        $this->assertSame(array_intersect(['foo2' => 'bar2', 'foo' => 'bar'], $loader->getAliases()), ['foo2' => 'bar2', 'foo' => 'bar']);
+        $this->assertEquals(['foo2' => 'bar2', 'foo' => 'bar'], $loader->getAliases());
 
         // override keys
         $loader = AliasLoader::getInstance(['foo' => 'baz']);
-        $this->assertSame(array_intersect(['foo2' => 'bar2', 'foo' => 'baz'], $loader->getAliases()), ['foo2' => 'bar2', 'foo' => 'baz']);
+        $this->assertEquals(['foo2' => 'bar2', 'foo' => 'baz'], $loader->getAliases());
     }
 
     public function testLoaderCanAliasAndLoadClasses()
