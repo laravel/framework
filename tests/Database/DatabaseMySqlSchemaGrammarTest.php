@@ -434,6 +434,18 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5), add `discounted_stored` int as (price - 5) stored', $statements[0]);
     }
 
+    public function testAddingGeneratedColumnWithCharset()
+    {
+        $blueprint = new Blueprint('links');
+        $blueprint->string('url', 2083)->charset('ascii');
+        $blueprint->string('url_hash_virtual', 64)->virtualAs('sha2(url, 256)')->charset('ascii');
+        $blueprint->string('url_hash_stored', 64)->storedAs('sha2(url, 256)')->charset('ascii');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `links` add `url` varchar(2083) character set ascii not null, add `url_hash_virtual` varchar(64) character set ascii as (sha2(url, 256)), add `url_hash_stored` varchar(64) character set ascii as (sha2(url, 256)) stored', $statements[0]);
+    }
+
     public function testAddingString()
     {
         $blueprint = new Blueprint('users');
