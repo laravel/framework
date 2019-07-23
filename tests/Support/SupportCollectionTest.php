@@ -372,7 +372,7 @@ class SupportCollectionTest extends TestCase
         $request = new Request();
         $response = new Response();
         $c = new Collection([$request, $response]);
-        $this->assertEquals([$response], $c->filterByClass(Request::class)->all());
+        $this->assertEquals([$request], $c->filterByClass(Request::class)->all());
     }
 
     public function testHigherOrderKeyBy()
