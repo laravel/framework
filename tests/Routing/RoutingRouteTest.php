@@ -1937,5 +1937,4 @@ class ResponsableResponse implements Responsable
     {
         return new Response('bar');
     }
-
 }
