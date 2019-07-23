@@ -2,10 +2,10 @@
 
 namespace Illuminate\Redis\Connectors;
 
-use Illuminate\Contracts\Redis\Connector;
 use Redis;
 use RedisCluster;
 use Illuminate\Support\Arr;
+use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 
