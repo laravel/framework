@@ -9,7 +9,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 /**
  * @group integration
  */
-class EloquentModelDateCastingTest extends DatabaseTestCase
+class EloquentModelArrayObjectCastingTest extends DatabaseTestCase
 {
     public function setUp()
     {
