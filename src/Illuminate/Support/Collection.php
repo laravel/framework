@@ -553,7 +553,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Run a filter over each of the items for a specified class
+     * Run a filter over each of the items for a specified class.
      *
      * @param  string|null  $class
      * @return static

@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use stdClass;
 use Exception;
 use ArrayAccess;
@@ -13,6 +11,8 @@ use ArrayIterator;
 use CachingIterator;
 use ReflectionClass;
 use JsonSerializable;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
