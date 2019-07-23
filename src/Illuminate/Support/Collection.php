@@ -553,6 +553,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Run a filter over each of the items for a specified class
+     *
+     * @param  string|null  $class
+     * @return static
+     */
+    public function filterByClass(string $class = null)
+    {
+        if ($class) {
+            return (new static($this->items))
+                ->filter(function ($item) use ($class) {
+                    return $item instanceof $class;
+                });
+        }
+    }
+
+    /**
      * Apply the callback if the value is truthy.
      *
      * @param  bool  $value

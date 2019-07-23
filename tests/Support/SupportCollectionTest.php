@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use stdClass;
 use Exception;
 use ArrayAccess;
@@ -363,6 +365,14 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Hello', 'second' => 'World'], $c->filter(function ($item, $key) {
             return $key != 'id';
         })->all());
+    }
+
+    public function testFilterByClass()
+    {
+        $request = new Request();
+        $response = new Response();
+        $c = new Collection([$request, $response]);
+        $this->assertEquals([$response], $c->filterByClass(Request::class)->all());
     }
 
     public function testHigherOrderKeyBy()
