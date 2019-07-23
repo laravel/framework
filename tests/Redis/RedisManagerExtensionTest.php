@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Redis;
 
-use Illuminate\Contracts\Redis\Connector;
-use Illuminate\Foundation\Application;
-use Illuminate\Redis\RedisManager;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Redis\RedisManager;
+use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Redis\Connector;
 
 class RedisManagerExtensionTest extends TestCase
 {
@@ -34,9 +34,9 @@ class RedisManagerExtensionTest extends TestCase
                         'port' => 'some-port',
                         'database' => 5,
                         'timeout' => 0.5,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
 
         $this->redis->extend('my_custom_driver', function () {
