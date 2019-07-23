@@ -700,9 +700,9 @@ trait HasAttributes
     /**
      * Decode the given array into ArrayObject.
      *
-     * @param array $value
+     * @param array|object $value
      *
-     * @return ArrayObject|null
+     * @return ArrayObject
      */
     protected function asArrayObject($value)
     {
