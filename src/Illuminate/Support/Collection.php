@@ -566,6 +566,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                     return $item instanceof $class;
                 });
         }
+
+        return new static(array_filter($this->items));
     }
 
     /**
