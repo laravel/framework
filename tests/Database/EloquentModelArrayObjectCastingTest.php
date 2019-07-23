@@ -23,7 +23,7 @@ class EloquentModelArrayObjectCastingTest extends DatabaseTestCase
 
     public function test_cast_array_object()
     {
-        $user = TestModel1::create([
+        $user = TestModelCastArrayObject::create([
             'array_object_field' => '{"a":"1", "b":2}',
         ]);
 
@@ -33,7 +33,7 @@ class EloquentModelArrayObjectCastingTest extends DatabaseTestCase
     }
 }
 
-class TestModel1 extends Model
+class TestModelCastArrayObject extends Model
 {
     public $table = 'test_model1';
     public $timestamps = false;
