@@ -38,6 +38,9 @@ class TestModelCastArrayObject extends Model
     public $table = 'test_model1';
     public $timestamps = false;
 
+    protected $guarded = ['id'];
+    protected $fillable = ['array_object_field'];
+
     public $casts = [
         'array_object_field' => 'array_object',
     ];
