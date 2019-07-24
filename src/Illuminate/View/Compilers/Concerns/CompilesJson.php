@@ -19,7 +19,11 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        $parts = explode(',', $this->stripParentheses($expression));
+        if (preg_match("/^\((.*),\s?(JSON_.*)?(,\s?(\d))?\)$/", $expression, $matches)) {
+            $parts = array_merge([$this->stripParentheses($matches[1])], explode(',', $matches[2]));
+        } else {
+            $parts = [$this->stripParentheses($expression)];
+        }
 
         $options = isset($parts[1]) ? trim($parts[1]) : $this->encodingOptions;
 

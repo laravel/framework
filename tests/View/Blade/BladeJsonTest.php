@@ -19,4 +19,12 @@ class BladeJsonTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testValueCanContainCommas()
+    {
+        $string = 'var foo = @json(substring($var, 1, 4), JSON_HEX_TAG);';
+        $expected = 'var foo = <?php echo json_encode(substring($var, 1, 4), JSON_HEX_TAG, 512) ?>;';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
