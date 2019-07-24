@@ -93,6 +93,17 @@ trait InteractsWithExceptionHandling
             }
 
             /**
+             * Determine if the exception should be reported.
+             *
+             * @param  \Exception  $e
+             * @return bool
+             */
+            public function shouldReport(Exception $e)
+            {
+                return false;
+            }
+
+            /**
              * Render the given exception.
              *
              * @param  \Illuminate\Http\Request  $request

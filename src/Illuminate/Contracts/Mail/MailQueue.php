@@ -8,7 +8,7 @@ interface MailQueue
      * Queue a new e-mail message for sending.
      *
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function queue($view, $queue = null);
@@ -18,7 +18,7 @@ interface MailQueue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function later($delay, $view, $queue = null);

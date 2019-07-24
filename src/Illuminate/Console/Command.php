@@ -62,6 +62,13 @@ class Command extends SymfonyCommand
     protected $description;
 
     /**
+     * The console command help text.
+     *
+     * @var string
+     */
+    protected $help;
+
+    /**
      * Indicates whether the command should be shown in the Artisan command list.
      *
      * @var bool
@@ -108,6 +115,8 @@ class Command extends SymfonyCommand
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
         $this->setDescription($this->description);
+
+        $this->setHelp($this->help);
 
         $this->setHidden($this->isHidden());
 
@@ -223,11 +232,29 @@ class Command extends SymfonyCommand
      */
     protected function createInputFromArguments(array $arguments)
     {
-        return tap(new ArrayInput($arguments), function ($input) {
+        return tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
             if ($input->hasParameterOption(['--no-interaction'], true)) {
                 $input->setInteractive(false);
             }
         });
+    }
+
+    /**
+     * Get all of the context passed to the command.
+     *
+     * @return array
+     */
+    protected function context()
+    {
+        return collect($this->option())->only([
+            'ansi',
+            'no-ansi',
+            'no-interaction',
+            'quiet',
+            'verbose',
+        ])->filter()->mapWithKeys(function ($value, $key) {
+            return ["--{$key}" => $value];
+        })->all();
     }
 
     /**
@@ -281,7 +308,7 @@ class Command extends SymfonyCommand
      * Get the value of a command option.
      *
      * @param  string|null  $key
-     * @return string|array|null
+     * @return string|array|bool|null
      */
     public function option($key = null)
     {
@@ -330,11 +357,11 @@ class Command extends SymfonyCommand
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  array   $choices
+     * @param  array|callable  $choices
      * @param  string|null  $default
      * @return mixed
      */
-    public function anticipate($question, array $choices, $default = null)
+    public function anticipate($question, $choices, $default = null)
     {
         return $this->askWithCompletion($question, $choices, $default);
     }
@@ -343,15 +370,17 @@ class Command extends SymfonyCommand
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  array   $choices
+     * @param  array|callable $choices
      * @param  string|null  $default
      * @return mixed
      */
-    public function askWithCompletion($question, array $choices, $default = null)
+    public function askWithCompletion($question, $choices, $default = null)
     {
         $question = new Question($question, $default);
 
-        $question->setAutocompleterValues($choices);
+        is_callable($choices)
+            ? $question->setAutocompleterCallback($choices)
+            : $question->setAutocompleterValues($choices);
 
         return $this->output->askQuestion($question);
     }
@@ -433,7 +462,7 @@ class Command extends SymfonyCommand
      * Write a string as standard output.
      *
      * @param  string  $string
-     * @param  string  $style
+     * @param  string|null  $style
      * @param  int|string|null  $verbosity
      * @return void
      */
@@ -541,6 +570,24 @@ class Command extends SymfonyCommand
         }
 
         return $level;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHidden($hidden)
+    {
+        parent::setHidden($this->hidden = $hidden);
+
+        return $this;
     }
 
     /**

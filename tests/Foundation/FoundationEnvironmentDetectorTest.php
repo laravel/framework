@@ -8,7 +8,7 @@ use Illuminate\Foundation\EnvironmentDetector;
 
 class FoundationEnvironmentDetectorTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -31,5 +31,25 @@ class FoundationEnvironmentDetectorTest extends TestCase
             return 'foobar';
         }, ['--env=local']);
         $this->assertEquals('local', $result);
+    }
+
+    public function testConsoleEnvironmentDetectionSeparatedWithSpace()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--env', 'local']);
+        $this->assertEquals('local', $result);
+    }
+
+    public function testConsoleEnvironmentDetectionWithNoValue()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--env']);
+        $this->assertEquals('foobar', $result);
     }
 }

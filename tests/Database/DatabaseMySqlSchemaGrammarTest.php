@@ -11,7 +11,7 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -618,6 +618,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `role` enum(\'member\', \'admin\') not null', $statements[0]);
+    }
+
+    public function testAddingSet()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->set('role', ['member', 'admin']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `role` set(\'member\', \'admin\') not null', $statements[0]);
     }
 
     public function testAddingJson()

@@ -13,6 +13,13 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 class HandleExceptions
 {
     /**
+     * Reserved memory so that errors can be displayed properly on memory exhaustion.
+     *
+     * @var string
+     */
+    public static $reservedMemory;
+
+    /**
      * The application instance.
      *
      * @var \Illuminate\Contracts\Foundation\Application
@@ -27,6 +34,8 @@ class HandleExceptions
      */
     public function bootstrap(Application $app)
     {
+        self::$reservedMemory = str_repeat('x', 10240);
+
         $this->app = $app;
 
         error_reporting(-1);
@@ -78,6 +87,8 @@ class HandleExceptions
         }
 
         try {
+            self::$reservedMemory = null;
+
             $this->getExceptionHandler()->report($e);
         } catch (Exception $e) {
             //

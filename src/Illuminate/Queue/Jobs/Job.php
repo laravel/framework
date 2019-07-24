@@ -2,7 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\ManuallyFailedException;
 
 abstract class Job
 {
@@ -45,6 +48,8 @@ abstract class Job
 
     /**
      * The name of the connection the job belongs to.
+     *
+     * @var string
      */
     protected $connectionName;
 
@@ -155,15 +160,41 @@ abstract class Job
     }
 
     /**
-     * Process an exception that caused the job to fail.
+     * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable|null $e
      * @return void
      */
-    public function failed($e)
+    public function fail($e = null)
     {
         $this->markAsFailed();
 
+        if ($this->isDeleted()) {
+            return;
+        }
+
+        try {
+            // If the job has failed, we will delete it, call the "failed" method and then call
+            // an event indicating the job has failed so it can be logged if needed. This is
+            // to allow every developer to better keep monitor of their failed queue jobs.
+            $this->delete();
+
+            $this->failed($e);
+        } finally {
+            $this->resolve(Dispatcher::class)->dispatch(new JobFailed(
+                $this->connectionName, $this, $e ?: new ManuallyFailedException
+            ));
+        }
+    }
+
+    /**
+     * Process an exception that caused the job to fail.
+     *
+     * @param  \Throwable|null $e
+     * @return void
+     */
+    protected function failed($e)
+    {
         $payload = $this->payload();
 
         [$class, $method] = JobName::parse($payload['job']);
@@ -202,6 +233,16 @@ abstract class Job
     public function maxTries()
     {
         return $this->payload()['maxTries'] ?? null;
+    }
+
+    /**
+     * Get the number of seconds to delay a failed job before retrying it.
+     *
+     * @return int|null
+     */
+    public function delaySeconds()
+    {
+        return $this->payload()['delay'] ?? null;
     }
 
     /**

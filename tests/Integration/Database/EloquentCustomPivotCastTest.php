@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
@@ -11,21 +12,21 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  */
 class EloquentCustomPivotCastTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
 
-        Schema::create('projects', function ($table) {
+        Schema::create('projects', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        Schema::create('project_users', function ($table) {
+        Schema::create('project_users', function (Blueprint $table) {
             $table->integer('user_id');
             $table->integer('project_id');
             $table->text('permissions');

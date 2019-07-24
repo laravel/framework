@@ -12,18 +12,12 @@ use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 
-class QueueServiceProvider extends ServiceProvider
+class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     /**
      * Register the service provider.
      *

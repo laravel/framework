@@ -13,14 +13,14 @@ use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -41,7 +41,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
 
         $results = $repo->create($user);
 
-        $this->assertInternalType('string', $results);
+        $this->assertIsString($results);
         $this->assertGreaterThan(1, strlen($results));
     }
 

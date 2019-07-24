@@ -416,16 +416,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Determine if the grammar supports savepoints.
-     *
-     * @return bool
-     */
-    public function supportsSavepoints()
-    {
-        return true;
-    }
-
-    /**
      * Compile the SQL statement to define a savepoint.
      *
      * @param  string  $name
@@ -479,6 +469,17 @@ class SqlServerGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_value('.$field.$path.')';
+    }
+
+    /**
+     * Wrap the given JSON boolean value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanValue($value)
+    {
+        return "'".$value."'";
     }
 
     /**

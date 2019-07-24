@@ -24,7 +24,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * The Illuminate application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -63,7 +63,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         if (! $this->app) {
             $this->refreshApplication();
@@ -133,7 +133,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @return void
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->app) {
             foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {

@@ -9,6 +9,25 @@ use Illuminate\Database\Query\Builder;
 class PostgresGrammar extends Grammar
 {
     /**
+     * The components that make up a select clause.
+     *
+     * @var array
+     */
+    protected $selectComponents = [
+        'aggregate',
+        'columns',
+        'from',
+        'joins',
+        'wheres',
+        'groups',
+        'havings',
+        'orders',
+        'limit',
+        'offset',
+        'lock',
+    ];
+
+    /**
      * All of the available clause operators.
      *
      * @var array
@@ -86,6 +105,67 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a select query into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileSelect(Builder $query)
+    {
+        if ($query->unions && $query->aggregate) {
+            return $this->compileUnionAggregate($query);
+        }
+
+        $sql = parent::compileSelect($query);
+
+        if ($query->unions) {
+            $sql = '('.$sql.') '.$this->compileUnions($query);
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Compile the "select *" portion of the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @return string|null
+     */
+    protected function compileColumns(Builder $query, $columns)
+    {
+        // If the query is actually performing an aggregating select, we will let that
+        // compiler handle the building of the select clauses, as it will need some
+        // more syntax that is best handled by that function to keep things neat.
+        if (! is_null($query->aggregate)) {
+            return;
+        }
+
+        if (is_array($query->distinct)) {
+            $select = 'select distinct on ('.$this->columnize($query->distinct).') ';
+        } elseif ($query->distinct) {
+            $select = 'select distinct ';
+        } else {
+            $select = 'select ';
+        }
+
+        return $select.$this->columnize($columns);
+    }
+
+    /**
+     * Compile a single union statement.
+     *
+     * @param  array  $union
+     * @return string
+     */
+    protected function compileUnion(array $union)
+    {
+        $conjunction = $union['all'] ? ' union all ' : ' union ';
+
+        return $conjunction.'('.$union['query']->toSql().')';
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column
@@ -128,18 +208,6 @@ class PostgresGrammar extends Grammar
         }
 
         return $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function compileInsert(Builder $query, array $values)
-    {
-        $table = $this->wrapTable($query->from);
-
-        return empty($values)
-                ? "insert into {$table} DEFAULT VALUES"
-                : parent::compileInsert($query, $values);
     }
 
     /**
@@ -307,7 +375,7 @@ class PostgresGrammar extends Grammar
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = collect($values)->map(function ($value, $column) {
-            return $this->isJsonSelector($column) && ! $this->isExpression($value)
+            return ! $this->isExpression($value) && ($this->isJsonSelector($column) || is_array($value) || is_object($value))
                 ? json_encode($value)
                 : $value;
         })->all();
@@ -363,7 +431,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileTruncate(Builder $query)
     {
-        return ['truncate '.$this->wrapTable($query->from).' restart identity' => []];
+        return ['truncate '.$this->wrapTable($query->from).' restart identity cascade' => []];
     }
 
     /**
@@ -387,6 +455,33 @@ class PostgresGrammar extends Grammar
         }
 
         return $field.'->>'.$attribute;
+    }
+
+    /**
+     *Wrap the given JSON selector for boolean values.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanSelector($value)
+    {
+        $selector = str_replace(
+            '->>', '->',
+            $this->wrapJsonSelector($value)
+        );
+
+        return '('.$selector.')::jsonb';
+    }
+
+    /**
+     * Wrap the given JSON boolean value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanValue($value)
+    {
+        return "'".$value."'::jsonb";
     }
 
     /**

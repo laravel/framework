@@ -34,9 +34,9 @@ class MaintenanceModeException extends ServiceUnavailableHttpException
      * Create a new exception instance.
      *
      * @param  int  $time
-     * @param  int  $retryAfter
-     * @param  string  $message
-     * @param  \Exception  $previous
+     * @param  int|null  $retryAfter
+     * @param  string|null  $message
+     * @param  \Exception|null  $previous
      * @param  int  $code
      * @return void
      */

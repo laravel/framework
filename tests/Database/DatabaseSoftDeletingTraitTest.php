@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -17,9 +17,9 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     public function testDeleteSetsSoftDeletedColumn()
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->shouldDeferMissing();
+        $model->makePartial();
         $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
-        $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
         $query->shouldReceive('update')->once()->with([
             'deleted_at' => 'date-time',
             'updated_at' => 'date-time',
@@ -32,7 +32,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     public function testRestore()
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->shouldDeferMissing();
+        $model->makePartial();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
         $model->shouldReceive('save')->once();
         $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
@@ -45,7 +45,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     public function testRestoreCancel()
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->shouldDeferMissing();
+        $model->makePartial();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
 
@@ -103,5 +103,17 @@ class DatabaseSoftDeletingTraitStub
     public function getUpdatedAtColumn()
     {
         return defined('static::UPDATED_AT') ? static::UPDATED_AT : 'updated_at';
+    }
+
+    public function setKeysForSaveQuery($query)
+    {
+        $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
+
+        return $query;
+    }
+
+    protected function getKeyForSaveQuery()
+    {
+        return 1;
     }
 }

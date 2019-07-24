@@ -2,6 +2,8 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
 class RedirectController extends Controller
@@ -9,13 +11,32 @@ class RedirectController extends Controller
     /**
      * Invoke the controller method.
      *
-     * @param  array  $args
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Routing\UrlGenerator  $url
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function __invoke(...$args)
+    public function __invoke(Request $request, UrlGenerator $url)
     {
-        [$destination, $status] = array_slice($args, -2);
+        $parameters = collect($request->route()->parameters());
 
-        return new RedirectResponse($destination, $status);
+        $status = $parameters->pop();
+
+        $destination = $parameters->pop();
+
+        $route = (new Route('GET', $destination, [
+            'as' => 'laravel_route_redirect_destination',
+        ]))->bind($request);
+
+        $parameters = $parameters->only(
+            $route->getCompiled()->getPathVariables()
+        )->toArray();
+
+        $url = $url->toRoute($route, $parameters, false);
+
+        if (! Str::startsWith($destination, '/') && Str::startsWith($url, '/')) {
+            $url = Str::after($url, '/');
+        }
+
+        return new RedirectResponse($url, $status);
     }
 }

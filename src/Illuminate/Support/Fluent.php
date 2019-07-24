@@ -10,16 +10,16 @@ use Illuminate\Contracts\Support\Arrayable;
 class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
 {
     /**
-     * All of the attributes set on the container.
+     * All of the attributes set on the fluent instance.
      *
      * @var array
      */
     protected $attributes = [];
 
     /**
-     * Create a new fluent container instance.
+     * Create a new fluent instance.
      *
-     * @param  array|object    $attributes
+     * @param  array|object  $attributes
      * @return void
      */
     public function __construct($attributes = [])
@@ -30,7 +30,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get an attribute from the container.
+     * Get an attribute from the fluent instance.
      *
      * @param  string  $key
      * @param  mixed   $default
@@ -46,7 +46,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Get the attributes from the container.
+     * Get the attributes from the fluent instance.
      *
      * @return array
      */
@@ -56,7 +56,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Convert the Fluent instance to an array.
+     * Convert the fluent instance to an array.
      *
      * @return array
      */
@@ -76,7 +76,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Convert the Fluent instance to JSON.
+     * Convert the fluent instance to JSON.
      *
      * @param  int  $options
      * @return string
@@ -132,7 +132,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Handle dynamic calls to the container to set attributes.
+     * Handle dynamic calls to the fluent instance to set attributes.
      *
      * @param  string  $method
      * @param  array   $parameters

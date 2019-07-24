@@ -10,7 +10,7 @@ use Symfony\Component\Process\Process;
 
 class QueueListenerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -44,11 +44,43 @@ class QueueListenerTest extends TestCase
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
+        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
 
         $this->assertInstanceOf(Process::class, $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} queue:work {$escape}connection{$escape} --once --queue={$escape}queue{$escape} --delay=1 --memory=2 --sleep=3 --tries=0", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=0{$escape}", $process->getCommandLine());
+    }
+
+    public function testMakeProcessCorrectlyFormatsCommandLineWithAnEnvironmentSpecified()
+    {
+        $listener = new Listener(__DIR__);
+        $options = new ListenerOptions('test');
+        $options->delay = 1;
+        $options->memory = 2;
+        $options->timeout = 3;
+        $process = $listener->makeProcess('connection', 'queue', $options);
+        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+
+        $this->assertInstanceOf(Process::class, $process);
+        $this->assertEquals(__DIR__, $process->getWorkingDirectory());
+        $this->assertEquals(3, $process->getTimeout());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}connection{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=0{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
+    }
+
+    public function testMakeProcessCorrectlyFormatsCommandLineWhenTheConnectionIsNotSpecified()
+    {
+        $listener = new Listener(__DIR__);
+        $options = new ListenerOptions('test');
+        $options->delay = 1;
+        $options->memory = 2;
+        $options->timeout = 3;
+        $process = $listener->makeProcess(null, 'queue', $options);
+        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+
+        $this->assertInstanceOf(Process::class, $process);
+        $this->assertEquals(__DIR__, $process->getWorkingDirectory());
+        $this->assertEquals(3, $process->getTimeout());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} {$escape}queue:work{$escape} {$escape}--once{$escape} {$escape}--queue=queue{$escape} {$escape}--delay=1{$escape} {$escape}--memory=2{$escape} {$escape}--sleep=3{$escape} {$escape}--tries=0{$escape} {$escape}--env=test{$escape}", $process->getCommandLine());
     }
 }

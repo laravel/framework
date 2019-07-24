@@ -6,10 +6,11 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -62,7 +63,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
@@ -118,24 +119,22 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertCount(1, $country);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].
-     */
     public function testFirstOrFailThrowsAnException()
     {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].');
+
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
 
         HasManyThroughTestCountry::first()->posts()->firstOrFail();
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].
-     */
     public function testFindOrFailThrowsAnException()
     {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1');
+
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
                                  ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
 
@@ -197,6 +196,24 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'updated_at',
                 'laravel_through_key', ], array_keys($post->getAttributes()));
         });
+    }
+
+    public function testChunkById()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $i = 0;
+        $count = 0;
+
+        $country->posts()->chunkById(2, function ($collection) use (&$i, &$count) {
+            $i++;
+            $count += $collection->count();
+        });
+
+        $this->assertEquals(3, $i);
+        $this->assertEquals(6, $count);
     }
 
     public function testCursorReturnsCorrectModels()

@@ -42,7 +42,6 @@ trait HasRelationships
      */
     public static $manyMethods = [
         'belongsToMany', 'morphToMany', 'morphedByMany',
-        'guessBelongsToManyRelation', 'findFirstMethodThatIsntRelation',
     ];
 
     /**
@@ -529,7 +528,13 @@ trait HasRelationships
         // Now we're ready to create a new query builder for this related model and
         // the relationship instances for this relation. This relations will set
         // appropriate query constraints then entirely manages the hydrations.
-        $table = $table ?: Str::plural($name);
+        if (! $table) {
+            $words = preg_split('/(_)/u', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+            $lastWord = array_pop($words);
+
+            $table = implode('', $words).Str::plural($lastWord);
+        }
 
         return $this->newMorphToMany(
             $instance->newQuery(), $this, $name, $table,
@@ -590,14 +595,17 @@ trait HasRelationships
     }
 
     /**
-     * Get the relationship name of the belongs to many.
+     * Get the relationship name of the belongsToMany relationship.
      *
-     * @return string
+     * @return string|null
      */
     protected function guessBelongsToManyRelation()
     {
         $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
-            return ! in_array($trace['function'], Model::$manyMethods);
+            return ! in_array(
+                $trace['function'],
+                array_merge(static::$manyMethods, ['guessBelongsToManyRelation'])
+            );
         });
 
         return ! is_null($caller) ? $caller['function'] : null;

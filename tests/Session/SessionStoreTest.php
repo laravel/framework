@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -209,6 +209,15 @@ class SessionStoreTest extends TestCase
         $session->reflash();
         $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
         $this->assertFalse(array_search('foo', $session->get('_flash.old')));
+    }
+
+    public function testOnly()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $session->put('qu', 'ux');
+        $this->assertEquals(['foo' => 'bar', 'qu' => 'ux'], $session->all());
+        $this->assertEquals(['qu' => 'ux'], $session->only(['qu']));
     }
 
     public function testReplace()

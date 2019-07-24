@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\InteractsWithTime;
 
@@ -28,16 +29,23 @@ class DownCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
-        file_put_contents(
-            storage_path('framework/down'),
-            json_encode($this->getDownFilePayload(), JSON_PRETTY_PRINT)
-        );
+        try {
+            file_put_contents(storage_path('framework/down'),
+                              json_encode($this->getDownFilePayload(),
+                              JSON_PRETTY_PRINT));
 
-        $this->comment('Application is now in maintenance mode.');
+            $this->comment('Application is now in maintenance mode.');
+        } catch (Exception $e) {
+            $this->error('Failed to enter maintenance mode.');
+
+            $this->error($e->getMessage());
+
+            return 1;
+        }
     }
 
     /**

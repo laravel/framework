@@ -26,7 +26,7 @@ trait WithFaker
     /**
      * Get the default Faker instance for a given locale.
      *
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return \Faker\Generator
      */
     protected function faker($locale = null)
@@ -37,11 +37,11 @@ trait WithFaker
     /**
      * Create a Faker instance for the given locale.
      *
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return \Faker\Generator
      */
     protected function makeFaker($locale = null)
     {
-        return Factory::create($locale ?? Factory::DEFAULT_LOCALE);
+        return Factory::create($locale ?? config('app.faker_locale', Factory::DEFAULT_LOCALE));
     }
 }

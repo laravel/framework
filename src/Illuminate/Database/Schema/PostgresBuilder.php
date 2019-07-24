@@ -76,11 +76,33 @@ class PostgresBuilder extends Builder
     }
 
     /**
+     * Drop all types from the database.
+     */
+    public function dropAllTypes()
+    {
+        $types = [];
+
+        foreach ($this->getAllTypes() as $row) {
+            $row = (array) $row;
+
+            $types[] = reset($row);
+        }
+
+        if (empty($types)) {
+            return;
+        }
+
+        $this->connection->statement(
+            $this->grammar->compileDropAllTypes($types)
+        );
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @return array
      */
-    protected function getAllTables()
+    public function getAllTables()
     {
         return $this->connection->select(
             $this->grammar->compileGetAllTables($this->connection->getConfig('schema'))
@@ -96,6 +118,18 @@ class PostgresBuilder extends Builder
     {
         return $this->connection->select(
             $this->grammar->compileGetAllViews($this->connection->getConfig('schema'))
+        );
+    }
+
+    /**
+     * Get all of the type names for the database.
+     *
+     * @return array
+     */
+    protected function getAllTypes()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllTypes()
         );
     }
 

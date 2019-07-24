@@ -121,7 +121,7 @@ class FluentArrayIteratorStub implements IteratorAggregate
 
     public function __construct(array $items = [])
     {
-        $this->items = (array) $items;
+        $this->items = $items;
     }
 
     public function getIterator()

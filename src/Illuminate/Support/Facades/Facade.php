@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Closure;
 use Mockery;
 use RuntimeException;
 use Mockery\MockInterface;
@@ -21,6 +22,19 @@ abstract class Facade
      * @var array
      */
     protected static $resolvedInstance;
+
+    /**
+     * Run a Closure when the facade has been resolved.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function resolved(Closure $callback)
+    {
+        static::$app->afterResolving(static::getFacadeAccessor(), function ($service) use ($callback) {
+            $callback($service);
+        });
+    }
 
     /**
      * Convert the facade into a Mockery spy.
@@ -145,11 +159,15 @@ abstract class Facade
     /**
      * Resolve the facade root instance from the container.
      *
-     * @param  string  $name
+     * @param  object|string  $name
      * @return mixed
      */
     protected static function resolveFacadeInstance($name)
     {
+        if (is_object($name)) {
+            return $name;
+        }
+
         if (isset(static::$resolvedInstance[$name])) {
             return static::$resolvedInstance[$name];
         }

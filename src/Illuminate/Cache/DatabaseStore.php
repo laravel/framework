@@ -84,25 +84,27 @@ class DatabaseStore implements Store
     }
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  float|int  $minutes
-     * @return void
+     * @param  int  $seconds
+     * @return bool
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $seconds)
     {
         $key = $this->prefix.$key;
 
         $value = $this->serialize($value);
 
-        $expiration = $this->getTime() + (int) ($minutes * 60);
+        $expiration = $this->getTime() + $seconds;
 
         try {
-            $this->table()->insert(compact('key', 'value', 'expiration'));
+            return $this->table()->insert(compact('key', 'value', 'expiration'));
         } catch (Exception $e) {
-            $this->table()->where('key', $key)->update(compact('value', 'expiration'));
+            $result = $this->table()->where('key', $key)->update(compact('value', 'expiration'));
+
+            return $result > 0;
         }
     }
 
@@ -196,11 +198,11 @@ class DatabaseStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return void
+     * @return bool
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 5256000);
+        return $this->put($key, $value, 315360000);
     }
 
     /**

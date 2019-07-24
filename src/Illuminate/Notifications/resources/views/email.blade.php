@@ -3,7 +3,7 @@
 @if (! empty($greeting))
 # {{ $greeting }}
 @else
-@if ($level == 'error')
+@if ($level === 'error')
 # @lang('Whoops!')
 @else
 # @lang('Hello!')
@@ -48,7 +48,7 @@
 
 {{-- Subcopy --}}
 @isset($actionText)
-@component('mail::subcopy')
+@slot('subcopy')
 @lang(
     "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
     'into your web browser: [:actionURL](:actionURL)',
@@ -57,6 +57,6 @@
         'actionURL' => $actionUrl,
     ]
 )
-@endcomponent
+@endslot
 @endisset
 @endcomponent

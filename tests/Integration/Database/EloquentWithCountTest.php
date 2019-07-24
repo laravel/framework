@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentWithCountTest;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -11,34 +12,31 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentWithCountTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('one', function ($table) {
+        Schema::create('one', function (Blueprint $table) {
             $table->increments('id');
         });
 
-        Schema::create('two', function ($table) {
+        Schema::create('two', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
         });
 
-        Schema::create('three', function ($table) {
+        Schema::create('three', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('two_id');
         });
 
-        Schema::create('four', function ($table) {
+        Schema::create('four', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
         });
     }
 
-    /**
-     * @test
-     */
-    public function it_basic()
+    public function test_it_basic()
     {
         $one = Model1::create();
         $two = $one->twos()->Create();

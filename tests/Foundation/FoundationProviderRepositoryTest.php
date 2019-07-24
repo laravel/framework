@@ -12,7 +12,7 @@ use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -81,7 +81,7 @@ class FoundationProviderRepositoryTest extends TestCase
     public function testWriteManifestStoresToProperLocation()
     {
         $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files = m::mock(Filesystem::class), __DIR__.'/services.php');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
+        $files->shouldReceive('replace')->once()->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
 
         $result = $repo->writeManifest(['foo']);
 

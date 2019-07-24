@@ -15,7 +15,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class BusDispatcherTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

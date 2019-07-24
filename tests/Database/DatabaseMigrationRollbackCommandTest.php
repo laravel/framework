@@ -12,7 +12,7 @@ use Illuminate\Database\Console\Migrations\RollbackCommand;
 
 class DatabaseMigrationRollbackCommandTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -88,7 +88,7 @@ class ApplicationDatabaseRollbackStub extends Application
         }
     }
 
-    public function environment()
+    public function environment(...$environments)
     {
         return 'development';
     }

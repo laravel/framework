@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -23,7 +24,7 @@ class SendingMailNotificationsTest extends TestCase
     public $mailer;
     public $markdown;
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -54,11 +55,11 @@ class SendingMailNotificationsTest extends TestCase
         });
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('name')->nullable();
@@ -73,6 +74,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
+        $this->markdown->shouldReceive('theme')->once()->andReturnSelf();
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
@@ -117,6 +119,7 @@ class SendingMailNotificationsTest extends TestCase
             'name' => 'Taylor Otwell',
         ]);
 
+        $this->markdown->shouldReceive('theme')->once()->andReturnSelf();
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
@@ -160,6 +163,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
+        $this->markdown->shouldReceive('theme')->once()->andReturnSelf();
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 
@@ -193,6 +197,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
+        $this->markdown->shouldReceive('theme')->once()->andReturnSelf();
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
         $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
 

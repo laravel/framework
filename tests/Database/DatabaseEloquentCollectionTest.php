@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,7 +11,7 @@ use Illuminate\Support\Collection as BaseCollection;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -244,6 +245,28 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(new Collection([$one]), $c1->diff($c2));
     }
 
+    public function testCollectionReturnsDuplicateBasedOnlyOnKeys()
+    {
+        $one = new TestEloquentCollectionModel();
+        $two = new TestEloquentCollectionModel();
+        $three = new TestEloquentCollectionModel();
+        $four = new TestEloquentCollectionModel();
+        $one->id = 1;
+        $one->someAttribute = '1';
+        $two->id = 1;
+        $two->someAttribute = '2';
+        $three->id = 1;
+        $three->someAttribute = '3';
+        $four->id = 2;
+        $four->someAttribute = '4';
+
+        $duplicates = Collection::make([$one, $two, $three, $four])->duplicates()->all();
+        $this->assertSame([1 => $two, 2 => $three], $duplicates);
+
+        $duplicates = Collection::make([$one, $two, $three, $four])->duplicatesStrict()->all();
+        $this->assertSame([1 => $two, 2 => $three], $duplicates);
+    }
+
     public function testCollectionIntersectsWithGivenCollection()
     {
         $one = m::mock(Model::class);
@@ -272,6 +295,28 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection([$one, $two, $two]);
 
         $this->assertEquals(new Collection([$one, $two]), $c->unique());
+    }
+
+    public function testCollectionReturnsUniqueStrictBasedOnKeysOnly()
+    {
+        $one = new TestEloquentCollectionModel();
+        $two = new TestEloquentCollectionModel();
+        $three = new TestEloquentCollectionModel();
+        $four = new TestEloquentCollectionModel();
+        $one->id = 1;
+        $one->someAttribute = '1';
+        $two->id = 1;
+        $two->someAttribute = '2';
+        $three->id = 1;
+        $three->someAttribute = '3';
+        $four->id = 2;
+        $four->someAttribute = '4';
+
+        $uniques = Collection::make([$one, $two, $three, $four])->unique()->all();
+        $this->assertSame([$three, $four], $uniques);
+
+        $uniques = Collection::make([$one, $two, $three, $four])->unique(null, true)->all();
+        $this->assertSame([$three, $four], $uniques);
     }
 
     public function testOnlyReturnsCollectionWithGivenModelKeys()
@@ -352,12 +397,11 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(TestEloquentCollectionModel::class, $c->getQueueableClass());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Queueing collections with multiple model types is not supported.
-     */
     public function testQueueableCollectionImplementationThrowsExceptionOnMultipleModelTypes()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Queueing collections with multiple model types is not supported.');
+
         $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
         $c->getQueueableClass();
     }

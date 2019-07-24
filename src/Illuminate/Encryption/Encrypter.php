@@ -67,7 +67,7 @@ class Encrypter implements EncrypterContract
      */
     public static function generateKey($cipher)
     {
-        return random_bytes($cipher == 'AES-128-CBC' ? 16 : 32);
+        return random_bytes($cipher === 'AES-128-CBC' ? 16 : 32);
     }
 
     /**
@@ -114,6 +114,8 @@ class Encrypter implements EncrypterContract
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
     public function encryptString($value)
     {
@@ -123,7 +125,7 @@ class Encrypter implements EncrypterContract
     /**
      * Decrypt the given value.
      *
-     * @param  mixed  $payload
+     * @param  string  $payload
      * @param  bool  $unserialize
      * @return mixed
      *
@@ -154,6 +156,8 @@ class Encrypter implements EncrypterContract
      *
      * @param  string  $payload
      * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
     public function decryptString($payload)
     {
