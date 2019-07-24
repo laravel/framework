@@ -341,7 +341,7 @@ trait HasAttributes
      */
     public function getAttributeValue($key)
     {
-        $value = $this->getAttributeFromArray($key);
+        $value = $this->getAttributeDefault($key);
 
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
@@ -369,12 +369,12 @@ trait HasAttributes
     }
 
     /**
-     * Get an attribute from the $attributes array.
+     * Get an attribute default value from the $attributes array.
      *
      * @param  string  $key
      * @return mixed
      */
-    protected function getAttributeFromArray($key)
+    public function getAttributeDefault($key)
     {
         if (isset($this->attributes[$key])) {
             return $this->attributes[$key];
