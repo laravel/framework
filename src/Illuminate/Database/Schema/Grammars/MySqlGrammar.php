@@ -576,7 +576,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeBoolean(Fluent $column)
     {
-        return 'bit(1)';
+        return 'tinyint(1)';
     }
 
     /**
