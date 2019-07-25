@@ -1225,7 +1225,7 @@ class Blueprint
     }
 
     /**
-     * Add the proper columns for a polymorphic table (using uuid for the {$name}_id column).
+     * Add the proper columns for a polymorphic table using UUIDs.
      *
      * @param  string  $name
      * @param  string|null  $indexName
@@ -1241,7 +1241,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable columns for a polymorphic table (using uuid for the {$name}_id column).
+     * Add nullable columns for a polymorphic table using UUIDs.
      *
      * @param  string  $name
      * @param  string|null  $indexName
