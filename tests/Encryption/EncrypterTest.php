@@ -112,4 +112,12 @@ class EncrypterTest extends TestCase
         $modified_payload = base64_encode(json_encode($data));
         $e->decrypt($modified_payload);
     }
+
+    public function testGetKey()
+    {
+        $key = str_repeat('a', 16);
+        $e = new Encrypter($key);
+
+        $this->assertEquals($key, $e->getKey());
+    }
 }
