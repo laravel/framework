@@ -1,6 +1,58 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.27...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.29...5.8)
+
+### Fixed
+- Fixed collections with JsonSerializable items and mixed values ([#29205](https://github.com/laravel/framework/pull/29205))
+
+### Reverted
+- Reverted: [Added possibility for `WithFaker::makeFaker()` use local `app.faker_locale` config](https://github.com/laravel/framework/pull/29123) ([#29250](https://github.com/laravel/framework/pull/29250))
+
+### TODO
+- tagged today breaks queue deserializing with Model::newCollection() ([#29196](https://github.com/laravel/framework/pull/29196))
+- Prevent a job from firing if it's been marked as deleted ([#29204](https://github.com/laravel/framework/pull/29204), [1003c27](https://github.com/laravel/framework/commit/1003c27b73f11472c1ebdb9238b839aefddfb048))
+- Add Postgres support for collation() on columns ([#29213](https://github.com/laravel/framework/pull/29213))
+- Allocate memory for error handling to allow handling memory exhaustion limits ([#29226](https://github.com/laravel/framework/pull/29226))
+
+
+## [v5.8.29 (2019-07-16)](https://github.com/laravel/framework/compare/v5.8.28...v5.8.29)
+
+### Added
+- Added possibility for `WithFaker::makeFaker()` use local `app.faker_locale` config ([#29123](https://github.com/laravel/framework/pull/29123))
+- Added ability to set theme for mail notifications ([#29132](https://github.com/laravel/framework/pull/29132))
+- Added runtime for each migration to output ([#29149](https://github.com/laravel/framework/pull/29149))
+- Added possibility for `whereNull` and `whereNotNull` to accept array columns argument ([#29154](https://github.com/laravel/framework/pull/29154))
+- Allowed `Console\Scheduling\ManagesFrequencies::hourlyAt()` to accept array of integers ([#29173](https://github.com/laravel/framework/pull/29173))
+
+### Performance
+- Improved eager loading performance for MorphTo relation ([#29129](https://github.com/laravel/framework/pull/29129))
+
+### Fixed
+- Fixed `Builder::whereDay()` and `Builder::whereMonth()` with raw expressions
+- Fixed DELETE queries with alias on SQLite ([#29164](https://github.com/laravel/framework/pull/29164))
+- Fixed queue jobs using SerializesModels losing order of passed in collections ([#29136](https://github.com/laravel/framework/pull/29136))
+- Fixed conditional binding for nested optional dependencies ([#29180](https://github.com/laravel/framework/pull/29180))
+- Fixed: validator not failing on custom rule when message is null ([#29174](https://github.com/laravel/framework/pull/29174))
+- Fixed DELETE query bindings ([#29165](https://github.com/laravel/framework/pull/29165))
+
+
+## [v5.8.28 (2019-07-09)](https://github.com/laravel/framework/compare/v5.8.27...v5.8.28)
+
+### Added
+- Make TestResponse tappable ([#29033](https://github.com/laravel/framework/pull/29033))
+- Added `Support\Collection::mergeRecursive()` method ([#29084](https://github.com/laravel/framework/pull/29084))
+- Added `Support\Collection::replace()` and `Support\Collection::replaceRecursive()` methods ([#29088](https://github.com/laravel/framework/pull/29088))
+- Added `Session\Store::only()` method ([#29107](https://github.com/laravel/framework/pull/29107))
+
+### Fixed
+- Fixed cache repository setMultiple with an iterator ([#29039](https://github.com/laravel/framework/pull/29039))
+- Fixed cache repository getMultiple implementation ([#29047](https://github.com/laravel/framework/pull/29047))
+
+### Reverted
+- Reverted [Fixed: app.stub for jquery components loading](https://github.com/laravel/framework/pull/29001) ([#29109](https://github.com/laravel/framework/pull/29109))
+
+### Changed
+- Fail job immediately after it timeouts if it wont be retried ([#29024](https://github.com/laravel/framework/pull/29024))
 
 
 ## [v5.8.27 (2019-07-02)](https://github.com/laravel/framework/compare/v5.8.26...v5.8.27)

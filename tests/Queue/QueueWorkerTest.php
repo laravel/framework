@@ -292,6 +292,22 @@ class QueueWorkerTest extends TestCase
         $this->assertEquals($firstJob->attempts, 0);
     }
 
+    public function test_job_does_not_fire_if_deleted()
+    {
+        $job = new WorkerFakeJob(function () {
+            return true;
+        });
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $job->delete();
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->once();
+        $this->assertFalse($job->hasFailed());
+        $this->assertFalse($job->isReleased());
+        $this->assertTrue($job->isDeleted());
+    }
+
     /**
      * Helpers...
      */

@@ -178,6 +178,10 @@ class SupportCollectionTest extends TestCase
         $array = $method->invokeArgs($collection, [$items]);
         $this->assertSame(['foo' => 'bar'], $array);
 
+        $items = new TestJsonSerializeWithScalarValueObject;
+        $array = $method->invokeArgs($collection, [$items]);
+        $this->assertSame(['foo'], $array);
+
         $items = new Collection(['foo' => 'bar']);
         $array = $method->invokeArgs($collection, [$items]);
         $this->assertSame(['foo' => 'bar'], $array);
@@ -664,6 +668,69 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['name' => 'Hello']);
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
+    }
+
+    public function testMergeRecursiveNull()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello'], $c->mergeRecursive(null)->all());
+    }
+
+    public function testMergeRecursiveArray()
+    {
+        $c = new Collection(['name' => 'Hello', 'id' => 1]);
+        $this->assertEquals(['name' => 'Hello', 'id' => [1, 2]], $c->mergeRecursive(['id' => 2])->all());
+    }
+
+    public function testMergeRecursiveCollection()
+    {
+        $c = new Collection(['name' => 'Hello', 'id' => 1, 'meta' => ['tags' => ['a', 'b'], 'roles' => 'admin']]);
+        $this->assertEquals(
+            ['name' => 'Hello', 'id' => 1, 'meta' => ['tags' => ['a', 'b', 'c'], 'roles' => ['admin', 'editor']]],
+            $c->mergeRecursive(new Collection(['meta' => ['tags' => ['c'], 'roles' => 'editor']]))->all()
+        );
+    }
+
+    public function testReplaceNull()
+    {
+        $c = new Collection(['a', 'b', 'c']);
+        $this->assertEquals(['a', 'b', 'c'], $c->replace(null)->all());
+    }
+
+    public function testReplaceArray()
+    {
+        $c = new Collection(['a', 'b', 'c']);
+        $this->assertEquals(['a', 'd', 'e'], $c->replace([1 => 'd', 2 => 'e'])->all());
+    }
+
+    public function testReplaceCollection()
+    {
+        $c = new Collection(['a', 'b', 'c']);
+        $this->assertEquals(
+            ['a', 'd', 'e'],
+            $c->replace(new Collection([1 => 'd', 2 => 'e']))->all()
+        );
+    }
+
+    public function testReplaceRecursiveNull()
+    {
+        $c = new Collection(['a', 'b', ['c', 'd']]);
+        $this->assertEquals(['a', 'b', ['c', 'd']], $c->replaceRecursive(null)->all());
+    }
+
+    public function testReplaceRecursiveArray()
+    {
+        $c = new Collection(['a', 'b', ['c', 'd']]);
+        $this->assertEquals(['z', 'b', ['c', 'e']], $c->replaceRecursive(['z', 2 => [1 => 'e']])->all());
+    }
+
+    public function testReplaceRecursiveCollection()
+    {
+        $c = new Collection(['a', 'b', ['c', 'd']]);
+        $this->assertEquals(
+            ['z', 'b', ['c', 'e']],
+            $c->replaceRecursive(new Collection(['z', 2 => [1 => 'e']]))->all()
+        );
     }
 
     public function testUnionNull()
@@ -3231,6 +3298,14 @@ class TestJsonSerializeObject implements JsonSerializable
     public function jsonSerialize()
     {
         return ['foo' => 'bar'];
+    }
+}
+
+class TestJsonSerializeWithScalarValueObject implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return 'foo';
     }
 }
 
