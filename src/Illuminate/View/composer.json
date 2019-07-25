@@ -16,11 +16,11 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "illuminate/container": "5.9.*",
-        "illuminate/contracts": "5.9.*",
-        "illuminate/events": "5.9.*",
-        "illuminate/filesystem": "5.9.*",
-        "illuminate/support": "5.9.*",
+        "illuminate/container": "^6.0",
+        "illuminate/contracts": "^6.0",
+        "illuminate/events": "^6.0",
+        "illuminate/filesystem": "^6.0",
+        "illuminate/support": "^6.0",
         "symfony/debug": "^4.3"
     },
     "autoload": {
@@ -30,7 +30,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.9-dev"
+            "dev-master": "6.0-dev"
         }
     },
     "config": {
