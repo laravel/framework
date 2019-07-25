@@ -146,7 +146,7 @@ class MailableStub extends Mailable implements MailableContract
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.9';
+    protected $version = '6.0';
 
     /**
      * Build the message.
@@ -164,7 +164,7 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.9';
+    protected $version = '6.0';
 
     /**
      * Build the message.

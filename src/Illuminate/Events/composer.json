@@ -15,9 +15,9 @@
     ],
     "require": {
         "php": "^7.2",
-        "illuminate/container": "5.9.*",
-        "illuminate/contracts": "5.9.*",
-        "illuminate/support": "5.9.*"
+        "illuminate/container": "^6.0",
+        "illuminate/contracts": "^6.0",
+        "illuminate/support": "^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +26,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.9-dev"
+            "dev-master": "6.0-dev"
         }
     },
     "config": {

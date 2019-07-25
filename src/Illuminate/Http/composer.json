@@ -16,8 +16,8 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "illuminate/session": "5.9.*",
-        "illuminate/support": "5.9.*",
+        "illuminate/session": "^6.0",
+        "illuminate/support": "^6.0",
         "symfony/http-foundation": "^4.3",
         "symfony/http-kernel": "^4.3"
     },
@@ -28,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.9-dev"
+            "dev-master": "6.0-dev"
         }
     },
     "config": {
