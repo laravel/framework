@@ -1225,6 +1225,38 @@ class Blueprint
     }
 
     /**
+     * Add the proper columns for a polymorphic table using UUIDs.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function uuidMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type");
+
+        $this->uuid("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add nullable columns for a polymorphic table using UUIDs.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableUuidMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type")->nullable();
+
+        $this->uuid("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
      * Adds the `remember_token` column to the table.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition
