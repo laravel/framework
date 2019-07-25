@@ -9,6 +9,17 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class DummyClass
 {
     use HandlesAuthorization;
+    
+    /**
+     * Determine whether the user can view any DocDummyPluralModel.
+     *
+     * @param  \NamespacedDummyUserModel  $user
+     * @return mixed
+     */
+    public function viewAny(DummyUser $user)
+    {
+        //
+    }
 
     /**
      * Determine whether the user can view the DocDummyModel.
@@ -53,6 +64,30 @@ class DummyClass
      * @return mixed
      */
     public function delete(DummyUser $user, DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can restore the DocDummyModel.
+     *
+     * @param  \NamespacedDummyUserModel  $user
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return mixed
+     */
+    public function restore(DummyUser $user, DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can permanently delete the DocDummyModel.
+     *
+     * @param  \NamespacedDummyUserModel  $user
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return mixed
+     */
+    public function forceDelete(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }

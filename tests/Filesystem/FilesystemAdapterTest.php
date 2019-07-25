@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class FilesystemAdapterTest extends TestCase
@@ -14,13 +16,13 @@ class FilesystemAdapterTest extends TestCase
     private $tempDir;
     private $filesystem;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tempDir = __DIR__.'/tmp';
         $this->filesystem = new Filesystem(new Local($this->tempDir));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
         $filesystem->deleteDir(basename($this->tempDir));
@@ -50,6 +52,33 @@ class FilesystemAdapterTest extends TestCase
         // $this->assertEquals('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
     }
 
+    public function testDownloadNonAsciiFilename()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem);
+        $response = $files->download('file.txt', 'пиздюк.txt');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals("attachment; filename=pizdyuk.txt; filename*=utf-8''%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt", $response->headers->get('content-disposition'));
+    }
+
+    public function testDownloadNonAsciiEmptyFilename()
+    {
+        $this->filesystem->write('пиздюк.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem);
+        $response = $files->download('пиздюк.txt');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=pizdyuk.txt; filename*=utf-8\'\'%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt', $response->headers->get('content-disposition'));
+    }
+
+    public function testDownloadPercentInFilename()
+    {
+        $this->filesystem->write('Hello%World.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem);
+        $response = $files->download('Hello%World.txt', 'Hello%World.txt');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=HelloWorld.txt; filename*=utf-8\'\'Hello%25World.txt', $response->headers->get('content-disposition'));
+    }
+
     public function testExists()
     {
         $this->filesystem->write('file.txt', 'Hello World');
@@ -61,7 +90,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
-        $this->assertEquals($this->tempDir.'/file.txt', $filesystemAdapter->path('file.txt'));
+        $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
     }
 
     public function testGet()
@@ -90,7 +119,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->prepend('file.txt', 'Hello ');
-        $this->assertStringEqualsFile($this->tempDir.'/file.txt', "Hello \nWorld");
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello '.PHP_EOL.'World');
     }
 
     public function testAppend()
@@ -98,7 +127,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello ');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->append('file.txt', 'Moon');
-        $this->assertStringEqualsFile($this->tempDir.'/file.txt', "Hello \nMoon");
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello '.PHP_EOL.'Moon');
     }
 
     public function testDelete()
@@ -106,7 +135,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertTrue($filesystemAdapter->delete('file.txt'));
-        $this->assertFalse(file_exists($this->tempDir.'/file.txt'));
+        $this->assertFileNotExists($this->tempDir.'/file.txt');
     }
 
     public function testDeleteReturnsFalseWhenFileNotFound()
@@ -144,5 +173,49 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
         $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+    }
+
+    public function testStream()
+    {
+        $this->filesystem->write('file.txt', $original_content = 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $readStream = $filesystemAdapter->readStream('file.txt');
+        $filesystemAdapter->writeStream('copy.txt', $readStream);
+        $this->assertEquals($original_content, $filesystemAdapter->get('copy.txt'));
+    }
+
+    public function testStreamBetweenFilesystems()
+    {
+        $secondFilesystem = new Filesystem(new Local($this->tempDir.'/second'));
+        $this->filesystem->write('file.txt', $original_content = 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $secondFilesystemAdapter = new FilesystemAdapter($secondFilesystem);
+        $readStream = $filesystemAdapter->readStream('file.txt');
+        $secondFilesystemAdapter->writeStream('copy.txt', $readStream);
+        $this->assertEquals($original_content, $secondFilesystemAdapter->get('copy.txt'));
+    }
+
+    public function testStreamToExistingFileThrows()
+    {
+        $this->expectException(FileExistsException::class);
+        $this->filesystem->write('file.txt', 'Hello World');
+        $this->filesystem->write('existing.txt', 'Dear Kate');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $readStream = $filesystemAdapter->readStream('file.txt');
+        $filesystemAdapter->writeStream('existing.txt', $readStream);
+    }
+
+    public function testReadStreamNonExistentFileThrows()
+    {
+        $this->expectException(FileNotFoundException::class);
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->readStream('nonexistent.txt');
+    }
+
+    public function testStreamInvalidResourceThrows()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }
 }

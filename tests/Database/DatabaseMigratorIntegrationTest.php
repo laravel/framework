@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
+use Mockery as m;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Console\OutputStyle;
+use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
@@ -12,13 +16,14 @@ use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 class DatabaseMigratorIntegrationTest extends TestCase
 {
     protected $db;
+    protected $migrator;
 
     /**
      * Bootstrap Eloquent.
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->db = $db = new DB;
 
@@ -29,9 +34,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         $db->setAsGlobal();
 
-        $container = new \Illuminate\Container\Container;
+        $container = new Container;
         $container->instance('db', $db->getDatabaseManager());
-        \Illuminate\Support\Facades\Facade::setFacadeApplication($container);
+
+        Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
@@ -39,15 +45,20 @@ class DatabaseMigratorIntegrationTest extends TestCase
             new Filesystem
         );
 
+        $output = m::mock(OutputStyle::class);
+        $output->shouldReceive('writeln');
+
+        $this->migrator->setOutput($output);
+
         if (! $repository->repositoryExists()) {
             $repository->createRepository();
         }
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
-        \Illuminate\Support\Facades\Facade::clearResolvedInstances();
-        \Illuminate\Support\Facades\Facade::setFacadeApplication(null);
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
     }
 
     public function testBasicMigrationOfSingleFolder()

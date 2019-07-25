@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Encryption;
 
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class EncrypterTest extends TestCase
 {
@@ -44,71 +46,64 @@ class EncrypterTest extends TestCase
         $this->assertEquals('foo', $e->decrypt($encrypted));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
-     */
     public function testDoNoAllowLongerKey()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+
         new Encrypter(str_repeat('z', 32));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
-     */
     public function testWithBadKeyLength()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+
         new Encrypter(str_repeat('a', 5));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
-     */
     public function testWithBadKeyLengthAlternativeCipher()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+
         new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
-     */
     public function testWithUnsupportedCipher()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+
         new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Encryption\DecryptException
-     * @expectedExceptionMessage The payload is invalid.
-     */
     public function testExceptionThrownWhenPayloadIsInvalid()
     {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
         $e = new Encrypter(str_repeat('a', 16));
         $payload = $e->encrypt('foo');
         $payload = str_shuffle($payload);
         $e->decrypt($payload);
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Encryption\DecryptException
-     * @expectedExceptionMessage The MAC is invalid.
-     */
     public function testExceptionThrownWithDifferentKey()
     {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The MAC is invalid.');
+
         $a = new Encrypter(str_repeat('a', 16));
         $b = new Encrypter(str_repeat('b', 16));
         $b->decrypt($a->encrypt('baz'));
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Encryption\DecryptException
-     * @expectedExceptionMessage The payload is invalid.
-     */
     public function testExceptionThrownWhenIvIsTooLong()
     {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
         $e = new Encrypter(str_repeat('a', 16));
         $payload = $e->encrypt('foo');
         $data = json_decode(base64_decode($payload), true);

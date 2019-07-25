@@ -3,19 +3,24 @@
 namespace Illuminate\Tests\Log;
 
 use Mockery as m;
+use RuntimeException;
 use Illuminate\Log\Logger;
+use Monolog\Logger as Monolog;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class LogLoggerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
     public function testMethodsPassErrorAdditionsToMonolog()
     {
-        $writer = new Logger($monolog = m::mock('Monolog\Logger'));
+        $writer = new Logger($monolog = m::mock(Monolog::class));
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
         $writer->error('foo');
@@ -23,10 +28,10 @@ class LogLoggerTest extends TestCase
 
     public function testLoggerFiresEventsDispatcher()
     {
-        $writer = new Logger($monolog = m::mock('Monolog\Logger'), $events = new \Illuminate\Events\Dispatcher);
+        $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
-        $events->listen(\Illuminate\Log\Events\MessageLogged::class, function ($event) {
+        $events->listen(MessageLogged::class, function ($event) {
             $_SERVER['__log.level'] = $event->level;
             $_SERVER['__log.message'] = $event->message;
             $_SERVER['__log.context'] = $event->context;
@@ -44,25 +49,25 @@ class LogLoggerTest extends TestCase
         unset($_SERVER['__log.context']);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Events dispatcher has not been set.
-     */
     public function testListenShortcutFailsWithNoDispatcher()
     {
-        $writer = new Logger($monolog = m::mock('Monolog\Logger'));
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Events dispatcher has not been set.');
+
+        $writer = new Logger($monolog = m::mock(Monolog::class));
         $writer->listen(function () {
+            //
         });
     }
 
     public function testListenShortcut()
     {
-        $writer = new Logger($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $writer = new Logger($monolog = m::mock(Monolog::class), $events = m::mock(DispatcherContract::class));
 
         $callback = function () {
             return 'success';
         };
-        $events->shouldReceive('listen')->with(\Illuminate\Log\Events\MessageLogged::class, $callback)->once();
+        $events->shouldReceive('listen')->with(MessageLogged::class, $callback)->once();
 
         $writer->listen($callback);
     }

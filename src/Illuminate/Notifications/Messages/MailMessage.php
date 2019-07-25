@@ -2,7 +2,13 @@
 
 namespace Illuminate\Notifications\Messages;
 
-class MailMessage extends SimpleMessage
+use Traversable;
+use Illuminate\Mail\Markdown;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Renderable;
+
+class MailMessage extends SimpleMessage implements Renderable
 {
     /**
      * The view to be rendered.
@@ -24,6 +30,13 @@ class MailMessage extends SimpleMessage
      * @var string|null
      */
     public $markdown = 'notifications::email';
+
+    /**
+     * The current theme being used when generating emails.
+     *
+     * @var string|null
+     */
+    public $theme = 'default';
 
     /**
      * The "from" information for the message.
@@ -75,6 +88,13 @@ class MailMessage extends SimpleMessage
     public $priority;
 
     /**
+     * The callbacks for the message.
+     *
+     * @var array
+     */
+    public $callbacks = [];
+
+    /**
      * Set the view for the mail message.
      *
      * @param  array|string  $view
@@ -122,6 +142,19 @@ class MailMessage extends SimpleMessage
     }
 
     /**
+     * Set the theme to use with the Markdown template.
+     *
+     * @param  string  $theme
+     * @return $this
+     */
+    public function theme($theme)
+    {
+        $this->theme = $theme;
+
+        return $this;
+    }
+
+    /**
      * Set the from address for the mail message.
      *
      * @param  string  $address
@@ -144,7 +177,11 @@ class MailMessage extends SimpleMessage
      */
     public function replyTo($address, $name = null)
     {
-        $this->replyTo[] = [$address, $name];
+        if ($this->arrayOfAddresses($address)) {
+            $this->replyTo += $this->parseAddresses($address);
+        } else {
+            $this->replyTo[] = [$address, $name];
+        }
 
         return $this;
     }
@@ -152,13 +189,17 @@ class MailMessage extends SimpleMessage
     /**
      * Set the cc address for the mail message.
      *
-     * @param  string  $address
+     * @param  array|string  $address
      * @param  string|null  $name
      * @return $this
      */
     public function cc($address, $name = null)
     {
-        $this->cc[] = [$address, $name];
+        if ($this->arrayOfAddresses($address)) {
+            $this->cc += $this->parseAddresses($address);
+        } else {
+            $this->cc[] = [$address, $name];
+        }
 
         return $this;
     }
@@ -166,13 +207,17 @@ class MailMessage extends SimpleMessage
     /**
      * Set the bcc address for the mail message.
      *
-     * @param  string  $address
+     * @param  array|string  $address
      * @param  string|null  $name
      * @return $this
      */
     public function bcc($address, $name = null)
     {
-        $this->bcc[] = [$address, $name];
+        if ($this->arrayOfAddresses($address)) {
+            $this->bcc += $this->parseAddresses($address);
+        } else {
+            $this->bcc[] = [$address, $name];
+        }
 
         return $this;
     }
@@ -229,5 +274,56 @@ class MailMessage extends SimpleMessage
     public function data()
     {
         return array_merge($this->toArray(), $this->viewData);
+    }
+
+    /**
+     * Parse the multi-address array into the necessary format.
+     *
+     * @param  array  $value
+     * @return array
+     */
+    protected function parseAddresses($value)
+    {
+        return collect($value)->map(function ($address, $name) {
+            return [$address, is_numeric($name) ? null : $name];
+        })->values()->all();
+    }
+
+    /**
+     * Determine if the given "address" is actually an array of addresses.
+     *
+     * @param  mixed  $address
+     * @return bool
+     */
+    protected function arrayOfAddresses($address)
+    {
+        return is_array($address) ||
+               $address instanceof Arrayable ||
+               $address instanceof Traversable;
+    }
+
+    /**
+     * Render the mail notification message into an HTML string.
+     *
+     * @return string
+     */
+    public function render()
+    {
+        return Container::getInstance()
+            ->make(Markdown::class)
+            ->render($this->markdown, $this->data());
+    }
+
+    /**
+     * Register a callback to be called with the Swift message instance.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function withSwiftMessage($callback)
+    {
+        $this->callbacks[] = $callback;
+
+        return $this;
     }
 }

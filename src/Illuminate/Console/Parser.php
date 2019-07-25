@@ -35,13 +35,11 @@ class Parser
      *
      * @param  string  $expression
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected static function name($expression)
     {
-        if (trim($expression) === '') {
-            throw new InvalidArgumentException('Console command definition is empty.');
-        }
-
         if (! preg_match('/[^\s]+/', $expression, $matches)) {
             throw new InvalidArgumentException('Unable to determine command name from signature.');
         }
@@ -80,7 +78,7 @@ class Parser
      */
     protected static function parseArgument($token)
     {
-        list($token, $description) = static::extractDescription($token);
+        [$token, $description] = static::extractDescription($token);
 
         switch (true) {
             case Str::endsWith($token, '?*'):
@@ -106,7 +104,7 @@ class Parser
      */
     protected static function parseOption($token)
     {
-        list($token, $description) = static::extractDescription($token);
+        [$token, $description] = static::extractDescription($token);
 
         $matches = preg_split('/\s*\|\s*/', $token, 2);
 

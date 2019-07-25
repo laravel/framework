@@ -38,10 +38,10 @@ class VendorPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'vendor:publish {--force : Overwrite any existing files.}
-                    {--all : Publish assets for all service providers without prompt.}
-                    {--provider= : The service provider that has assets you want to publish.}
-                    {--tag=* : One or many tags that have assets you want to publish.}';
+    protected $signature = 'vendor:publish {--force : Overwrite any existing files}
+                    {--all : Publish assets for all service providers without prompt}
+                    {--provider= : The service provider that has assets you want to publish}
+                    {--tag=* : One or many tags that have assets you want to publish}';
 
     /**
      * The console command description.
@@ -90,7 +90,7 @@ class VendorPublishCommand extends Command
             return;
         }
 
-        list($this->provider, $this->tags) = [
+        [$this->provider, $this->tags] = [
             $this->option('provider'), (array) $this->option('tag'),
         ];
 
@@ -140,11 +140,11 @@ class VendorPublishCommand extends Command
      */
     protected function parseChoice($choice)
     {
-        list($type, $value) = explode(': ', strip_tags($choice));
+        [$type, $value] = explode(': ', strip_tags($choice));
 
-        if ($type == 'Provider') {
+        if ($type === 'Provider') {
             $this->provider = $value;
-        } elseif ($type == 'Tag') {
+        } elseif ($type === 'Tag') {
             $this->tags = [$value];
         }
     }

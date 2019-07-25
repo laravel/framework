@@ -3,14 +3,18 @@
 namespace Illuminate\Tests\Http;
 
 use Mockery as m;
+use RuntimeException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class HttpRequestTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -79,9 +83,9 @@ class HttpRequestTest extends TestCase
     {
         return [
             ['', 1, 'default'],
-            ['foo/bar//baz', '1', 'foo'],
-            ['foo/bar//baz', '2', 'bar'],
-            ['foo/bar//baz', '3', 'baz'],
+            ['foo/bar//baz', 1, 'foo'],
+            ['foo/bar//baz', 2, 'bar'],
+            ['foo/bar//baz', 3, 'baz'],
         ];
     }
 
@@ -141,6 +145,9 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('http://foo.com/foo/bar/?name=taylor', 'GET');
         $this->assertEquals('http://foo.com/foo/bar?name=graham', $request->fullUrlWithQuery(['name' => 'graham']));
+
+        $request = Request::create('https://foo.com', 'GET');
+        $this->assertEquals('https://foo.com/?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
     }
 
     public function testIsMethod()
@@ -187,6 +194,23 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->routeIs('foo.foo'));
     }
 
+    public function testRouteMethod()
+    {
+        $request = Request::create('/foo/bar', 'GET');
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/{required}/{optional?}', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        $this->assertEquals('bar', $request->route('required'));
+        $this->assertEquals('bar', $request->route('required', 'default'));
+        $this->assertNull($request->route('optional'));
+        $this->assertEquals('default', $request->route('optional', 'default'));
+    }
+
     public function testAjaxMethod()
     {
         $request = Request::create('/', 'GET');
@@ -198,6 +222,28 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->ajax());
         $request->headers->set('X-Requested-With', '');
         $this->assertFalse($request->ajax());
+    }
+
+    public function testPrefetchMethod()
+    {
+        $request = Request::create('/', 'GET');
+        $this->assertFalse($request->prefetch());
+
+        $request->server->set('HTTP_X_MOZ', '');
+        $this->assertFalse($request->prefetch());
+        $request->server->set('HTTP_X_MOZ', 'prefetch');
+        $this->assertTrue($request->prefetch());
+        $request->server->set('HTTP_X_MOZ', 'Prefetch');
+        $this->assertTrue($request->prefetch());
+
+        $request->server->remove('HTTP_X_MOZ');
+
+        $request->headers->set('Purpose', '');
+        $this->assertFalse($request->prefetch());
+        $request->headers->set('Purpose', 'prefetch');
+        $this->assertTrue($request->prefetch());
+        $request->headers->set('Purpose', 'Prefetch');
+        $this->assertTrue($request->prefetch());
     }
 
     public function testPjaxMethod()
@@ -330,8 +376,38 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Taylor', $request['name']);
         $this->assertEquals('Bob', $request->input('foo', 'Bob'));
 
-        $request = Request::create('/', 'GET', [], [], ['file' => new \Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
+        $request = Request::create('/', 'GET', [], [], ['file' => new SymfonyUploadedFile(__FILE__, 'foo.php')]);
+        $this->assertInstanceOf(SymfonyUploadedFile::class, $request['file']);
+    }
+
+    public function testArrayAccess()
+    {
+        $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/bar/{id}/{name}', []);
+            $route->bind($request);
+            $route->setParameter('id', 'foo');
+            $route->setParameter('name', 'Taylor');
+
+            return $route;
+        });
+
+        $this->assertFalse(isset($request['non-existant']));
+        $this->assertNull($request['non-existant']);
+
+        $this->assertTrue(isset($request['name']));
+        $this->assertNull($request['name']);
+
+        $this->assertNotEquals('Taylor', $request['name']);
+
+        $this->assertTrue(isset($request['foo.bar']));
+        $this->assertNull($request['foo.bar']);
+        $this->assertTrue(isset($request['foo.baz']));
+        $this->assertEquals('', $request['foo.baz']);
+
+        $this->assertTrue(isset($request['id']));
+        $this->assertEquals('foo', $request['id']);
     }
 
     public function testAllMethod()
@@ -434,7 +510,7 @@ class HttpRequestTest extends TestCase
             ],
         ];
         $request = Request::create('/', 'GET', [], [], $files);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request->file('foo'));
+        $this->assertInstanceOf(SymfonyUploadedFile::class, $request->file('foo'));
     }
 
     public function testHasFileMethod()
@@ -547,14 +623,14 @@ class HttpRequestTest extends TestCase
 
     public function testAllInputReturnsInputAndFiles()
     {
-        $file = $this->getMockBuilder('Illuminate\Http\UploadedFile')->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => 'bar'], [], ['baz' => $file]);
         $this->assertEquals(['foo' => 'bar', 'baz' => $file, 'boom' => 'breeze'], $request->all());
     }
 
     public function testAllInputReturnsNestedInputAndFiles()
     {
-        $file = $this->getMockBuilder('Illuminate\Http\UploadedFile')->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], ['foo' => ['photo' => $file]]);
         $this->assertEquals(['foo' => ['bar' => 'baz', 'photo' => $file], 'boom' => 'breeze'], $request->all());
     }
@@ -591,7 +667,7 @@ class HttpRequestTest extends TestCase
 
         $baseRequest = SymfonyRequest::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], $invalidFiles);
 
-        $request = Request::createFromBase($baseRequest);
+        Request::createFromBase($baseRequest);
     }
 
     public function testMultipleFileUploadWithEmptyValue()
@@ -616,7 +692,7 @@ class HttpRequestTest extends TestCase
     public function testOldMethodCallsSession()
     {
         $request = Request::create('/', 'GET');
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
         $request->setLaravelSession($session);
         $this->assertEquals('boom', $request->old('foo', 'bar'));
@@ -625,7 +701,7 @@ class HttpRequestTest extends TestCase
     public function testFlushMethodCallsSession()
     {
         $request = Request::create('/', 'GET');
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('flashInput')->once();
         $request->setLaravelSession($session);
         $request->flush();
@@ -769,12 +845,11 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->accepts('text/html'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Session store not set on request.
-     */
     public function testSessionMethod()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Session store not set on request.');
+
         $request = Request::create('/', 'GET');
         $request->session();
     }
@@ -801,12 +876,11 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(40, mb_strlen($request->fingerprint()));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to generate fingerprint. Route unavailable.
-     */
     public function testFingerprintWithoutRoute()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to generate fingerprint. Route unavailable.');
+
         $request = Request::create('/', 'GET', [], [], [], []);
         $request->fingerprint();
     }
@@ -906,7 +980,7 @@ class HttpRequestTest extends TestCase
 
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
     {
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'email' => 'foo']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
@@ -915,7 +989,7 @@ class HttpRequestTest extends TestCase
 
     public function testHttpRequestFlashOnlyCallsFlashWithProperParameters()
     {
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
@@ -924,7 +998,7 @@ class HttpRequestTest extends TestCase
 
     public function testHttpRequestFlashExceptCallsFlashWithProperParameters()
     {
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);

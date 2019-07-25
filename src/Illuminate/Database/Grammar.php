@@ -2,10 +2,13 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Query\Expression;
 
 abstract class Grammar
 {
+    use Macroable;
+
     /**
      * The grammar table prefix.
      *
@@ -55,7 +58,7 @@ abstract class Grammar
         // If the value being wrapped has a column alias we will need to separate out
         // the pieces so we can wrap each of the segments of the expression on its
         // own, and then join these both back together using the "as" connector.
-        if (strpos(strtolower($value), ' as ') !== false) {
+        if (stripos($value, ' as ') !== false) {
             return $this->wrapAliasedValue($value, $prefixAlias);
         }
 

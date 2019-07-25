@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
+use ArrayObject;
 
 class Optional implements ArrayAccess
 {
@@ -44,7 +45,7 @@ class Optional implements ArrayAccess
     /**
      * Dynamically check a property exists on the underlying object.
      *
-     * @param $name
+     * @param  mixed  $name
      * @return bool
      */
     public function __isset($name)
@@ -53,7 +54,7 @@ class Optional implements ArrayAccess
             return isset($this->value->{$name});
         }
 
-        if (is_array($this->value) || $this->value instanceof \ArrayObject) {
+        if (is_array($this->value) || $this->value instanceof ArrayObject) {
             return isset($this->value[$name]);
         }
 

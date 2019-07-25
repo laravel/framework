@@ -21,7 +21,7 @@ trait DatabaseRule
     protected $column;
 
     /**
-     * There extra where clauses for the query.
+     * The extra where clauses for the query.
      *
      * @var array
      */
@@ -166,7 +166,7 @@ trait DatabaseRule
     protected function formatWheres()
     {
         return collect($this->wheres)->map(function ($where) {
-            return $where['column'].','.$where['value'];
+            return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
         })->implode(',');
     }
 }

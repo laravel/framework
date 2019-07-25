@@ -28,7 +28,7 @@ class RouteAction
         // If the action is already a Closure instance, we will just set that instance
         // as the "uses" property, because there is nothing else we need to do when
         // it is available. Otherwise we will need to find it in the action list.
-        if (is_callable($action)) {
+        if (is_callable($action, true)) {
             return ! is_array($action) ? ['uses' => $action] : [
                 'uses' => $action[0].'@'.$action[1],
                 'controller' => $action[0].'@'.$action[1],
@@ -80,6 +80,8 @@ class RouteAction
      *
      * @param  string $action
      * @return string
+     *
+     * @throws \UnexpectedValueException
      */
     protected static function makeInvokable($action)
     {

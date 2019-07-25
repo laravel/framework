@@ -22,13 +22,13 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 
     public function test_mail_is_sent()
     {
-        $notifiable = (new AnonymousNotifiable())
+        $notifiable = (new AnonymousNotifiable)
             ->route('testchannel', 'enzo')
             ->route('anothertestchannel', 'enzo@deepblue.com');
 
         NotificationFacade::send(
             $notifiable,
-            new TestMailNotificationForAnonymousNotifiable()
+            new TestMailNotificationForAnonymousNotifiable
         );
 
         $this->assertEquals([
@@ -42,18 +42,20 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 
         $this->assertInstanceOf(NotificationFake::class, $fake);
 
-        $notifiable = (new AnonymousNotifiable())
+        $notifiable = (new AnonymousNotifiable)
             ->route('testchannel', 'enzo')
             ->route('anothertestchannel', 'enzo@deepblue.com');
 
-        NotificationFacade::send(
+        NotificationFacade::locale('it')->send(
             $notifiable,
-            new TestMailNotificationForAnonymousNotifiable()
+            new TestMailNotificationForAnonymousNotifiable
         );
 
-        NotificationFacade::assertSentTo(new AnonymousNotifiable(), TestMailNotificationForAnonymousNotifiable::class,
-            function ($notification, $channels, $notifiable) {
-                return $notifiable->routes['testchannel'] == 'enzo' && $notifiable->routes['anothertestchannel'] == 'enzo@deepblue.com';
+        NotificationFacade::assertSentTo(new AnonymousNotifiable, TestMailNotificationForAnonymousNotifiable::class,
+            function ($notification, $channels, $notifiable, $locale) {
+                return $notifiable->routes['testchannel'] === 'enzo' &&
+                    $notifiable->routes['anothertestchannel'] === 'enzo@deepblue.com' &&
+                    $locale === 'it';
             }
         );
     }

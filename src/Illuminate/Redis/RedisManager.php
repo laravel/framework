@@ -4,12 +4,21 @@ namespace Illuminate\Redis;
 
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Redis\Connections\Connection;
+use Illuminate\Support\ConfigurationUrlParser;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
  */
 class RedisManager implements Factory
 {
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
     /**
      * The name of the default driver.
      *
@@ -32,14 +41,23 @@ class RedisManager implements Factory
     protected $connections;
 
     /**
+     * Indicates whether event dispatcher is set on connections.
+     *
+     * @var bool
+     */
+    protected $events = false;
+
+    /**
      * Create a new Redis manager instance.
      *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  string  $driver
      * @param  array  $config
      * @return void
      */
-    public function __construct($driver, array $config)
+    public function __construct($app, $driver, array $config)
     {
+        $this->app = $app;
         $this->driver = $driver;
         $this->config = $config;
     }
@@ -58,7 +76,9 @@ class RedisManager implements Factory
             return $this->connections[$name];
         }
 
-        return $this->connections[$name] = $this->resolve($name);
+        return $this->connections[$name] = $this->configure(
+            $this->resolve($name), $name
+        );
     }
 
     /**
@@ -76,7 +96,10 @@ class RedisManager implements Factory
         $options = $this->config['options'] ?? [];
 
         if (isset($this->config[$name])) {
-            return $this->connector()->connect($this->config[$name], $options);
+            return $this->connector()->connect(
+                $this->parseConnectionConfiguration($this->config[$name]),
+                $options
+            );
         }
 
         if (isset($this->config['clusters'][$name])) {
@@ -94,11 +117,31 @@ class RedisManager implements Factory
      */
     protected function resolveCluster($name)
     {
-        $clusterOptions = $this->config['clusters']['options'] ?? [];
-
         return $this->connector()->connectToCluster(
-            $this->config['clusters'][$name], $clusterOptions, $this->config['options'] ?? []
+            array_map(function ($config) {
+                return $this->parseConnectionConfiguration($config);
+            }, $this->config['clusters'][$name]),
+            $this->config['clusters']['options'] ?? [],
+            $this->config['options'] ?? []
         );
+    }
+
+    /**
+     * Configure the given connection to prepare it for commands.
+     *
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @param  string  $name
+     * @return \Illuminate\Redis\Connections\Connection
+     */
+    protected function configure(Connection $connection, $name)
+    {
+        $connection->setName($name);
+
+        if ($this->events && $this->app->bound('events')) {
+            $connection->setEventDispatcher($this->app->make('events'));
+        }
+
+        return $connection;
     }
 
     /**
@@ -117,6 +160,21 @@ class RedisManager implements Factory
     }
 
     /**
+     * Parse the Redis connection configuration.
+     *
+     * @param  mixed  $config
+     * @return array
+     */
+    protected function parseConnectionConfiguration($config)
+    {
+        $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
+
+        return array_filter($parsed, function ($key) {
+            return ! in_array($key, ['driver', 'username'], true);
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
      * Return all of the created connections.
      *
      * @return array
@@ -124,6 +182,37 @@ class RedisManager implements Factory
     public function connections()
     {
         return $this->connections;
+    }
+
+    /**
+     * Enable the firing of Redis command events.
+     *
+     * @return void
+     */
+    public function enableEvents()
+    {
+        $this->events = true;
+    }
+
+    /**
+     * Disable the firing of Redis command events.
+     *
+     * @return void
+     */
+    public function disableEvents()
+    {
+        $this->events = false;
+    }
+
+    /**
+     * Set the default driver.
+     *
+     * @param  string  $driver
+     * @return void
+     */
+    public function setDriver($driver)
+    {
+        $this->driver = $driver;
     }
 
     /**

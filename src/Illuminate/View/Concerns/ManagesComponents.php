@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Concerns;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 
 trait ManagesComponents
@@ -53,6 +54,22 @@ trait ManagesComponents
     }
 
     /**
+     * Get the first view that actually exists from the given list, and start a component.
+     *
+     * @param  array  $names
+     * @param  array  $data
+     * @return void
+     */
+    public function startComponentFirst(array $names, array $data = [])
+    {
+        $name = Arr::first($names, function ($item) {
+            return $this->exists($item);
+        });
+
+        $this->startComponent($name, $data);
+    }
+
+    /**
      * Render the current component.
      *
      * @return string
@@ -88,7 +105,7 @@ trait ManagesComponents
      */
     public function slot($name, $content = null)
     {
-        if (count(func_get_args()) === 2) {
+        if (func_num_args() === 2) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } else {
             if (ob_start()) {

@@ -3,11 +3,12 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 
 class VerifyCsrfToken
 {
@@ -16,7 +17,7 @@ class VerifyCsrfToken
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -35,9 +36,16 @@ class VerifyCsrfToken
     protected $except = [];
 
     /**
+     * Indicates whether the XSRF-TOKEN cookie should be set on the response.
+     *
+     * @var bool
+     */
+    protected $addHttpCookie = true;
+
+    /**
      * Create a new middleware instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      * @return void
      */
@@ -64,10 +72,14 @@ class VerifyCsrfToken
             $this->inExceptArray($request) ||
             $this->tokensMatch($request)
         ) {
-            return $this->addCookieToResponse($request, $next($request));
+            return tap($next($request), function ($response) use ($request) {
+                if ($this->shouldAddXsrfTokenCookie()) {
+                    $this->addCookieToResponse($request, $response);
+                }
+            });
         }
 
-        throw new TokenMismatchException;
+        throw new TokenMismatchException('CSRF token mismatch.');
     }
 
     /**
@@ -138,10 +150,20 @@ class VerifyCsrfToken
         $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
 
         if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
-            $token = $this->encrypter->decrypt($header);
+            $token = $this->encrypter->decrypt($header, static::serialized());
         }
 
         return $token;
+    }
+
+    /**
+     * Determine if the cookie should be added to the response.
+     *
+     * @return bool
+     */
+    public function shouldAddXsrfTokenCookie()
+    {
+        return $this->addHttpCookie;
     }
 
     /**
@@ -163,5 +185,15 @@ class VerifyCsrfToken
         );
 
         return $response;
+    }
+
+    /**
+     * Determine if the cookie contents should be serialized.
+     *
+     * @return bool
+     */
+    public static function serialized()
+    {
+        return EncryptCookies::serialized('XSRF-TOKEN');
     }
 }

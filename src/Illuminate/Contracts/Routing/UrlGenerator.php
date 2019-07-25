@@ -12,11 +12,19 @@ interface UrlGenerator
     public function current();
 
     /**
+     * Get the URL for the previous request.
+     *
+     * @param  mixed  $fallback
+     * @return string
+     */
+    public function previous($fallback = false);
+
+    /**
      * Generate an absolute URL to the given path.
      *
      * @param  string  $path
      * @param  mixed  $extra
-     * @param  bool  $secure
+     * @param  bool|null  $secure
      * @return string
      */
     public function to($path, $extra = [], $secure = null);
@@ -34,7 +42,7 @@ interface UrlGenerator
      * Generate the URL to an application asset.
      *
      * @param  string  $path
-     * @param  bool    $secure
+     * @param  bool|null  $secure
      * @return string
      */
     public function asset($path, $secure = null);
@@ -54,7 +62,7 @@ interface UrlGenerator
     /**
      * Get the URL to a controller action.
      *
-     * @param  string  $action
+     * @param  string|array  $action
      * @param  mixed $parameters
      * @param  bool $absolute
      * @return string

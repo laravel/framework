@@ -7,7 +7,7 @@ use NamespacedDummyModel;
 class DummyClass
 {
     /**
-     * Handle to the DocDummyModel "created" event.
+     * Handle the DocDummyModel "created" event.
      *
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
@@ -35,6 +35,28 @@ class DummyClass
      * @return void
      */
     public function deleted(DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Handle the DocDummyModel "restored" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function restored(DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Handle the DocDummyModel "force deleted" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function forceDeleted(DummyModel $dummyModel)
     {
         //
     }

@@ -80,7 +80,7 @@ class View implements ArrayAccess, ViewContract
      * Get the string contents of the view.
      *
      * @param  callable|null  $callback
-     * @return string
+     * @return array|string
      *
      * @throws \Throwable
      */
@@ -147,7 +147,7 @@ class View implements ArrayAccess, ViewContract
      *
      * @return array
      */
-    protected function gatherData()
+    public function gatherData()
     {
         $data = array_merge($this->factory->getShared(), $this->data);
 
@@ -163,7 +163,9 @@ class View implements ArrayAccess, ViewContract
     /**
      * Get the sections of the rendered view.
      *
-     * @return string
+     * @return array
+     *
+     * @throws \Throwable
      */
     public function renderSections()
     {
@@ -382,7 +384,7 @@ class View implements ArrayAccess, ViewContract
      * Remove a piece of bound data from the view.
      *
      * @param  string  $key
-     * @return bool
+     * @return void
      */
     public function __unset($key)
     {
@@ -417,6 +419,8 @@ class View implements ArrayAccess, ViewContract
      * Get the string contents of the view.
      *
      * @return string
+     *
+     * @throws \Throwable
      */
     public function __toString()
     {

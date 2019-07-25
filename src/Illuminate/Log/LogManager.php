@@ -15,13 +15,16 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
+use Monolog\Handler\WhatFailureGroupHandler;
 
 class LogManager implements LoggerInterface
 {
+    use ParsesLogConfiguration;
+
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -40,25 +43,9 @@ class LogManager implements LoggerInterface
     protected $customCreators = [];
 
     /**
-     * The Log levels.
-     *
-     * @var array
-     */
-    protected $levels = [
-        'debug' => Monolog::DEBUG,
-        'info' => Monolog::INFO,
-        'notice' => Monolog::NOTICE,
-        'warning' => Monolog::WARNING,
-        'error' => Monolog::ERROR,
-        'critical' => Monolog::CRITICAL,
-        'alert' => Monolog::ALERT,
-        'emergency' => Monolog::EMERGENCY,
-    ];
-
-    /**
      * Create a new Log manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -134,7 +121,7 @@ class LogManager implements LoggerInterface
     protected function tap($name, Logger $logger)
     {
         foreach ($this->configurationFor($name)['tap'] ?? [] as $tap) {
-            list($class, $arguments) = $this->parseTap($tap);
+            [$class, $arguments] = $this->parseTap($tap);
 
             $this->app->make($class)->__invoke($logger, ...explode(',', $arguments));
         }
@@ -230,6 +217,10 @@ class LogManager implements LoggerInterface
             return $this->channel($channel)->getHandlers();
         })->all();
 
+        if ($config['ignore_exceptions'] ?? false) {
+            $handlers = [new WhatFailureGroupHandler($handlers)];
+        }
+
         return new Monolog($this->parseChannel($config), $handlers);
     }
 
@@ -246,7 +237,7 @@ class LogManager implements LoggerInterface
                 new StreamHandler(
                     $config['path'], $this->level($config),
                     $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-                )
+                ), $config
             ),
         ]);
     }
@@ -263,7 +254,7 @@ class LogManager implements LoggerInterface
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config),
                 $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-            )),
+            ), $config),
         ]);
     }
 
@@ -284,8 +275,10 @@ class LogManager implements LoggerInterface
                 $config['emoji'] ?? ':boom:',
                 $config['short'] ?? false,
                 $config['context'] ?? true,
-                $this->level($config)
-            )),
+                $this->level($config),
+                $config['bubble'] ?? true,
+                $config['exclude_fields'] ?? []
+            ), $config),
         ]);
     }
 
@@ -299,8 +292,9 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config))
-            ),
+                Str::snake($this->app['config']['app.name'], '-'),
+                $config['facility'] ?? LOG_USER, $this->level($config)
+            ), $config),
         ]);
     }
 
@@ -314,8 +308,8 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new ErrorLogHandler(
-                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config))
-            ),
+                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config)
+            )),
         ]);
     }
 
@@ -336,7 +330,11 @@ class LogManager implements LoggerInterface
             );
         }
 
-        $with = array_merge($config['with'] ?? [], $config['handler_with'] ?? []);
+        $with = array_merge(
+            ['level' => $this->level($config)],
+            $config['with'] ?? [],
+            $config['handler_with'] ?? []
+        );
 
         return new Monolog($this->parseChannel($config), [$this->prepareHandler(
             $this->app->make($config['handler'], $with), $config
@@ -389,37 +387,13 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * Extract the log channel from the given configuration.
+     * Get fallback log channel name.
      *
-     * @param  array  $config
      * @return string
      */
-    protected function parseChannel(array $config)
+    protected function getFallbackChannelName()
     {
-        if (! isset($config['name'])) {
-            return $this->app->bound('env') ? $this->app->environment() : 'production';
-        }
-
-        return $config['name'];
-    }
-
-    /**
-     * Parse the string level into a Monolog constant.
-     *
-     * @param  array  $config
-     * @return int
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function level(array $config)
-    {
-        $level = $config['level'] ?? 'debug';
-
-        if (isset($this->levels[$level])) {
-            return $this->levels[$level];
-        }
-
-        throw new InvalidArgumentException('Invalid log level.');
+        return $this->app->bound('env') ? $this->app->environment() : 'production';
     }
 
     /**
@@ -471,14 +445,14 @@ class LogManager implements LoggerInterface
     /**
      * System is unusable.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function emergency($message, array $context = [])
     {
-        return $this->driver()->emergency($message, $context);
+        $this->driver()->emergency($message, $context);
     }
 
     /**
@@ -487,14 +461,14 @@ class LogManager implements LoggerInterface
      * Example: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function alert($message, array $context = [])
     {
-        return $this->driver()->alert($message, $context);
+        $this->driver()->alert($message, $context);
     }
 
     /**
@@ -502,28 +476,28 @@ class LogManager implements LoggerInterface
      *
      * Example: Application component unavailable, unexpected exception.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function critical($message, array $context = [])
     {
-        return $this->driver()->critical($message, $context);
+        $this->driver()->critical($message, $context);
     }
 
     /**
      * Runtime errors that do not require immediate action but should typically
      * be logged and monitored.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function error($message, array $context = [])
     {
-        return $this->driver()->error($message, $context);
+        $this->driver()->error($message, $context);
     }
 
     /**
@@ -532,27 +506,27 @@ class LogManager implements LoggerInterface
      * Example: Use of deprecated APIs, poor use of an API, undesirable things
      * that are not necessarily wrong.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function warning($message, array $context = [])
     {
-        return $this->driver()->warning($message, $context);
+        $this->driver()->warning($message, $context);
     }
 
     /**
      * Normal but significant events.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function notice($message, array $context = [])
     {
-        return $this->driver()->notice($message, $context);
+        $this->driver()->notice($message, $context);
     }
 
     /**
@@ -560,48 +534,48 @@ class LogManager implements LoggerInterface
      *
      * Example: User logs in, SQL logs.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function info($message, array $context = [])
     {
-        return $this->driver()->info($message, $context);
+        $this->driver()->info($message, $context);
     }
 
     /**
      * Detailed debug information.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function debug($message, array $context = [])
     {
-        return $this->driver()->debug($message, $context);
+        $this->driver()->debug($message, $context);
     }
 
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
+     * @param  mixed  $level
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
     public function log($level, $message, array $context = [])
     {
-        return $this->driver()->log($level, $message, $context);
+        $this->driver()->log($level, $message, $context);
     }
 
     /**
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

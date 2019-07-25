@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Swift_Message;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
@@ -31,19 +32,19 @@ class MailSesTransportTest extends TestCase
         $transport = $manager->driver('ses');
 
         /** @var SesClient $ses */
-        $ses = $this->readAttribute($transport, 'ses');
+        $ses = $transport->ses();
 
         $this->assertEquals('us-east-1', $ses->getRegion());
     }
 
     public function testSend()
     {
-        $message = new \Swift_Message('Foo subject', 'Bar body');
+        $message = new Swift_Message('Foo subject', 'Bar body');
         $message->setSender('myself@example.com');
         $message->setTo('me@example.com');
         $message->setBcc('you@example.com');
 
-        $client = $this->getMockBuilder('Aws\Ses\SesClient')
+        $client = $this->getMockBuilder(SesClient::class)
             ->setMethods(['sendRawEmail'])
             ->disableOriginalConstructor()
             ->getMock();

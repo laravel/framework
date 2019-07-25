@@ -29,7 +29,7 @@ class JobChainingTest extends TestCase
         ]);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         JobChainingTestFirstJob::$ran = false;
         JobChainingTestSecondJob::$ran = false;
@@ -174,8 +174,8 @@ class JobChainingTest extends TestCase
         $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
         $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
 
-        $this->assertEquals(null, JobChainingTestThirdJob::$usedQueue);
-        $this->assertEquals(null, JobChainingTestThirdJob::$usedConnection);
+        $this->assertNull(JobChainingTestThirdJob::$usedQueue);
+        $this->assertNull(JobChainingTestThirdJob::$usedConnection);
     }
 }
 

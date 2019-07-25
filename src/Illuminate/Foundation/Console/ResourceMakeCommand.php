@@ -32,7 +32,7 @@ class ResourceMakeCommand extends GeneratorCommand
     /**
      * Execute the console command.
      *
-     * @return bool|null
+     * @return void
      */
     public function handle()
     {
@@ -85,7 +85,7 @@ class ResourceMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['collection', 'c', InputOption::VALUE_NONE, 'Create a resource collection.'],
+            ['collection', 'c', InputOption::VALUE_NONE, 'Create a resource collection'],
         ];
     }
 }

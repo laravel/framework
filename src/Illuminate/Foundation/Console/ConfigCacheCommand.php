@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Throwable;
+use LogicException;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
@@ -46,6 +48,8 @@ class ConfigCacheCommand extends Command
      * Execute the console command.
      *
      * @return void
+     *
+     * @throws \LogicException
      */
     public function handle()
     {
@@ -53,9 +57,19 @@ class ConfigCacheCommand extends Command
 
         $config = $this->getFreshConfiguration();
 
+        $configPath = $this->laravel->getCachedConfigPath();
+
         $this->files->put(
-            $this->laravel->getCachedConfigPath(), '<?php return '.var_export($config, true).';'.PHP_EOL
+            $configPath, '<?php return '.var_export($config, true).';'.PHP_EOL
         );
+
+        try {
+            require $configPath;
+        } catch (Throwable $e) {
+            $this->files->delete($configPath);
+
+            throw new LogicException('Your configuration files are not serializable.', 0, $e);
+        }
 
         $this->info('Configuration cached successfully!');
     }
@@ -68,6 +82,8 @@ class ConfigCacheCommand extends Command
     protected function getFreshConfiguration()
     {
         $app = require $this->laravel->bootstrapPath().'/app.php';
+
+        $app->useStoragePath($this->laravel->storagePath());
 
         $app->make(ConsoleKernelContract::class)->bootstrap();
 

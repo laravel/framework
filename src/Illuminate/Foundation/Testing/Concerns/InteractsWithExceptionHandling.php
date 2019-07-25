@@ -13,7 +13,7 @@ trait InteractsWithExceptionHandling
     /**
      * The original exception handler.
      *
-     * @var ExceptionHandler|null
+     * @var \Illuminate\Contracts\Debug\ExceptionHandler|null
      */
     protected $originalExceptionHandler;
 
@@ -90,6 +90,17 @@ trait InteractsWithExceptionHandling
             public function report(Exception $e)
             {
                 //
+            }
+
+            /**
+             * Determine if the exception should be reported.
+             *
+             * @param  \Exception  $e
+             * @return bool
+             */
+            public function shouldReport(Exception $e)
+            {
+                return false;
             }
 
             /**

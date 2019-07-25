@@ -8,6 +8,7 @@ use Illuminate\Mail\Markdown;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MailChannel
 {
@@ -60,7 +61,7 @@ class MailChannel
 
         $this->mailer->send(
             $this->buildView($message),
-            $message->data(),
+            array_merge($message->data(), $this->additionalMessageData($notification)),
             $this->messageBuilder($notifiable, $notification, $message)
         );
     }
@@ -92,9 +93,29 @@ class MailChannel
             return $message->view;
         }
 
+        if (property_exists($message, 'theme') && ! is_null($message->theme)) {
+            $this->markdown->theme($message->theme);
+        }
+
         return [
             'html' => $this->markdown->render($message->markdown, $message->data()),
             'text' => $this->markdown->renderText($message->markdown, $message->data()),
+        ];
+    }
+
+    /**
+     * Get additional meta-data to pass along with the view data.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return array
+     */
+    protected function additionalMessageData($notification)
+    {
+        return [
+            '__laravel_notification' => get_class($notification),
+            '__laravel_notification_queued' => in_array(
+                ShouldQueue::class, class_implements($notification)
+            ),
         ];
     }
 
@@ -120,6 +141,8 @@ class MailChannel
         if (! is_null($message->priority)) {
             $mailMessage->setPriority($message->priority);
         }
+
+        $this->runCallbacks($mailMessage, $message);
     }
 
     /**
@@ -184,8 +207,10 @@ class MailChannel
             $recipients = [$recipients];
         }
 
-        return collect($recipients)->map(function ($recipient) {
-            return is_string($recipient) ? $recipient : $recipient->email;
+        return collect($recipients)->mapWithKeys(function ($recipient, $email) {
+            return is_numeric($email)
+                    ? [$email => (is_string($recipient) ? $recipient : $recipient->email)]
+                    : [$email => $recipient];
         })->all();
     }
 
@@ -205,5 +230,21 @@ class MailChannel
         foreach ($message->rawAttachments as $attachment) {
             $mailMessage->attachData($attachment['data'], $attachment['name'], $attachment['options']);
         }
+    }
+
+    /**
+     * Run the callbacks for the message.
+     *
+     * @param  \Illuminate\Mail\Message  $mailMessage
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return $this
+     */
+    protected function runCallbacks($mailMessage, $message)
+    {
+        foreach ($message->callbacks as $callback) {
+            $callback($mailMessage->getSwiftMessage());
+        }
+
+        return $this;
     }
 }

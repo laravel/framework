@@ -50,7 +50,7 @@ interface ViewFinderInterface
      *
      * @param  string  $namespace
      * @param  string|array  $hints
-     * @return $this
+     * @return void
      */
     public function replaceNamespace($namespace, $hints);
 

@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Integration\Database;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Tests\Integration\Database\Fixtures\Post;
 
 /**
  * @group integration
@@ -25,24 +27,24 @@ class EloquentDeleteTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('comments', function ($table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('body')->nullable();
             $table->integer('post_id');
             $table->timestamps();
         });
 
-        Schema::create('roles', function ($table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
             $table->softDeletes();
@@ -58,10 +60,10 @@ class EloquentDeleteTest extends TestCase
         }
 
         Post::latest('id')->limit(1)->delete();
-        $this->assertEquals(9, Post::all()->count());
+        $this->assertCount(9, Post::all());
 
         Post::join('comments', 'comments.post_id', '=', 'posts.id')->where('posts.id', '>', 1)->orderBy('posts.id')->limit(1)->delete();
-        $this->assertEquals(8, Post::all()->count());
+        $this->assertCount(8, Post::all());
     }
 
     public function testForceDeletedEventIsFired()
@@ -77,11 +79,6 @@ class EloquentDeleteTest extends TestCase
 
         $this->assertEquals($role->id, RoleObserver::$model->id);
     }
-}
-
-class Post extends Model
-{
-    public $table = 'posts';
 }
 
 class Comment extends Model

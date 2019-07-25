@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Validation;
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
+use Illuminate\Translation\Translator;
+use Illuminate\Translation\ArrayLoader;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -16,7 +18,7 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -35,11 +37,11 @@ class ValidationExistsRuleTest extends TestCase
     {
         $rule = new Exists('table');
         $rule->where('foo', 'bar');
-        $this->assertEquals('exists:table,NULL,foo,bar', (string) $rule);
+        $this->assertEquals('exists:table,NULL,foo,"bar"', (string) $rule);
 
         $rule = new Exists('table', 'column');
         $rule->where('foo', 'bar');
-        $this->assertEquals('exists:table,column,foo,bar', (string) $rule);
+        $this->assertEquals('exists:table,column,foo,"bar"', (string) $rule);
     }
 
     public function testItChoosesValidRecordsUsingWhereInRule()
@@ -157,15 +159,15 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema('default')->drop('users');
     }
 
     public function getIlluminateArrayTranslator()
     {
-        return new \Illuminate\Translation\Translator(
-            new \Illuminate\Translation\ArrayLoader, 'en'
+        return new Translator(
+            new ArrayLoader, 'en'
         );
     }
 }

@@ -77,6 +77,7 @@ trait ManagesLayouts
      *
      * @param  bool  $overwrite
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
     public function stopSection($overwrite = false)
@@ -100,6 +101,7 @@ trait ManagesLayouts
      * Stop injecting content into a section and append it.
      *
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
     public function appendSection()
@@ -187,7 +189,7 @@ trait ManagesLayouts
      * Get the contents of a section.
      *
      * @param  string  $name
-     * @param  string  $default
+     * @param  string|null  $default
      * @return mixed
      */
     public function getSection($name, $default = null)

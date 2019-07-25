@@ -2,9 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\Lock as LockContract;
-
-class MemcachedLock extends Lock implements LockContract
+class MemcachedLock extends Lock
 {
     /**
      * The Memcached instance.
@@ -19,11 +17,12 @@ class MemcachedLock extends Lock implements LockContract
      * @param  \Memcached  $memcached
      * @param  string  $name
      * @param  int  $seconds
+     * @param  string|null  $owner
      * @return void
      */
-    public function __construct($memcached, $name, $seconds)
+    public function __construct($memcached, $name, $seconds, $owner = null)
     {
-        parent::__construct($name, $seconds);
+        parent::__construct($name, $seconds, $owner);
 
         $this->memcached = $memcached;
     }
@@ -36,17 +35,41 @@ class MemcachedLock extends Lock implements LockContract
     public function acquire()
     {
         return $this->memcached->add(
-            $this->name, 1, $this->seconds
+            $this->name, $this->owner, $this->seconds
         );
     }
 
     /**
      * Release the lock.
      *
-     * @return void
+     * @return bool
      */
     public function release()
     {
+        if ($this->isOwnedByCurrentProcess()) {
+            return $this->memcached->delete($this->name);
+        }
+
+        return false;
+    }
+
+    /**
+     * Releases this lock in disregard of ownership.
+     *
+     * @return void
+     */
+    public function forceRelease()
+    {
         $this->memcached->delete($this->name);
+    }
+
+    /**
+     * Returns the owner value written into the driver for this lock.
+     *
+     * @return mixed
+     */
+    protected function getCurrentOwner()
+    {
+        return $this->memcached->get($this->name);
     }
 }

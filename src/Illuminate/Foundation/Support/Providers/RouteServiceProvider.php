@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Support\Providers;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Contracts\Routing\UrlGenerator;
 
 /**
@@ -11,6 +12,8 @@ use Illuminate\Contracts\Routing\UrlGenerator;
  */
 class RouteServiceProvider extends ServiceProvider
 {
+    use ForwardsCalls;
+
     /**
      * The controller namespace for the application.
      *
@@ -27,7 +30,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->setRootControllerNamespace();
 
-        if ($this->app->routesAreCached()) {
+        if ($this->routesAreCached()) {
             $this->loadCachedRoutes();
         } else {
             $this->loadRoutes();
@@ -49,6 +52,16 @@ class RouteServiceProvider extends ServiceProvider
         if (! is_null($this->namespace)) {
             $this->app[UrlGenerator::class]->setRootControllerNamespace($this->namespace);
         }
+    }
+
+    /**
+     * Determine if the application routes are cached.
+     *
+     * @return bool
+     */
+    protected function routesAreCached()
+    {
+        return $this->app->routesAreCached();
     }
 
     /**
@@ -76,16 +89,6 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
-
-    /**
      * Pass dynamic methods onto the router instance.
      *
      * @param  string  $method
@@ -94,8 +97,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function __call($method, $parameters)
     {
-        return call_user_func_array(
-            [$this->app->make(Router::class), $method], $parameters
+        return $this->forwardCallTo(
+            $this->app->make(Router::class), $method, $parameters
         );
     }
 }

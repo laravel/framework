@@ -5,10 +5,11 @@ namespace Illuminate\Tests\View;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\View\Engines\CompilerEngine;
+use Illuminate\View\Compilers\CompilerInterface;
 
 class ViewCompilerEngineTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -39,6 +40,6 @@ class ViewCompilerEngineTest extends TestCase
 
     protected function getEngine()
     {
-        return new CompilerEngine(m::mock('Illuminate\View\Compilers\CompilerInterface'));
+        return new CompilerEngine(m::mock(CompilerInterface::class));
     }
 }

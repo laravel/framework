@@ -76,9 +76,9 @@ class ExceptionMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['render', null, InputOption::VALUE_NONE, 'Create the exception with an empty render method.'],
+            ['render', null, InputOption::VALUE_NONE, 'Create the exception with an empty render method'],
 
-            ['report', null, InputOption::VALUE_NONE, 'Create the exception with an empty report method.'],
+            ['report', null, InputOption::VALUE_NONE, 'Create the exception with an empty report method'],
         ];
     }
 }

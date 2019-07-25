@@ -190,7 +190,7 @@ class ProviderRepository
             throw new Exception('The bootstrap/cache directory must be present and writable.');
         }
 
-        $this->files->put(
+        $this->files->replace(
             $this->manifestPath, '<?php return '.var_export($manifest, true).';'
         );
 

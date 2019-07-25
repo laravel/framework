@@ -30,6 +30,11 @@ class NotificationMailMessageTest extends TestCase
                 ->cc('test@example.com', 'Test');
 
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->cc);
+
+        $message = new MailMessage;
+        $message->cc(['test@example.com', 'Test' => 'test@example.com']);
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->cc);
     }
 
     public function testBccIsSetCorrectly()
@@ -42,6 +47,11 @@ class NotificationMailMessageTest extends TestCase
         $message = new MailMessage;
         $message->bcc('test@example.com')
                 ->bcc('test@example.com', 'Test');
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->bcc);
+
+        $message = new MailMessage;
+        $message->bcc(['test@example.com', 'Test' => 'test@example.com']);
 
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->bcc);
     }
@@ -58,5 +68,22 @@ class NotificationMailMessageTest extends TestCase
                 ->replyTo('test@example.com', 'Test');
 
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
+
+        $message = new MailMessage;
+        $message->replyTo(['test@example.com', 'Test' => 'test@example.com']);
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
+    }
+
+    public function testCallbackIsSetCorrectly()
+    {
+        $callback = function () {
+            //
+        };
+
+        $message = new MailMessage;
+        $message->withSwiftMessage($callback);
+
+        $this->assertSame([$callback], $message->callbacks);
     }
 }

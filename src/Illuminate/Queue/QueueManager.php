@@ -15,7 +15,7 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -36,7 +36,7 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Create a new queue manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -113,7 +113,7 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Determine if the driver is connected.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return bool
      */
     public function connected($name = null)
@@ -124,7 +124,7 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Resolve a queue connection instance.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($name = null)
@@ -238,7 +238,7 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Get the full name for the given connection.
      *
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return string
      */
     public function getName($connection = null)

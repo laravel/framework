@@ -46,6 +46,8 @@ class ViewClearCommand extends Command
      * Execute the console command.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function handle()
     {

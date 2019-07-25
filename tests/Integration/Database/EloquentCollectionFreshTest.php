@@ -3,18 +3,19 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Tests\Integration\Database\Fixtures\User;
 
 /**
  * @group integration
  */
 class EloquentCollectionFreshTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
         });
@@ -33,9 +34,4 @@ class EloquentCollectionFreshTest extends DatabaseTestCase
 
         $this->assertEmpty($collection->fresh()->filter());
     }
-}
-
-class User extends Model
-{
-    protected $guarded = [];
 }
