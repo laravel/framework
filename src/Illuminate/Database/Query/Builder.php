@@ -768,6 +768,20 @@ class Builder
             return $this->addArrayOfWheres($first, $boolean, 'whereColumn');
         }
 
+        // If the given operator is "between" or "not between"
+        // build the conditional statements
+        if (strtolower($operator) === 'between') {
+            return $this->where(function ($query) use ($first, $second) {
+                $query->whereColumn($first, '>=', array_shift($second))
+                    ->whereColumn($first, '<=', array_shift($second));
+            });
+        } elseif (strtolower($operator) === 'not between') {
+            return $this->where(function ($query) use ($first, $second) {
+                $query->whereColumn($first, '<', array_shift($second))
+                ->orWhereColumn($first, '>', array_shift($second));
+            });
+        }
+        
         // If the given operator is not found in the list of valid operators we will
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.

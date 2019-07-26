@@ -756,6 +756,16 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereColumn('updated_at', '>', 'created_at');
         $this->assertEquals('select * from "users" where "updated_at" > "created_at"', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn('age', 'between', ['min_age', 'max_age']);
+        $this->assertEquals('select * from "users" where ("age" >= "min_age" and "age" <= "max_age")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orWhereColumn('age', 'not between', ['min_age', 'max_age']);
+        $this->assertEquals('select * from "users" where ("age" < "min_age" or "age" > "max_age")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testArrayWhereColumn()
@@ -768,6 +778,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereColumn($conditions);
         $this->assertEquals('select * from "users" where ("first_name" = "last_name" and "updated_at" > "created_at")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $conditions = [
+            ['age', 'between', ['min_age', 'max_age']],
+            ['age', 'not between', ['min_age', 'max_age']],
+        ];
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn($conditions);
+        $expectedSql = 'select * from "users" where (("age" >= "min_age" and "age" <= "max_age") and ("age" < "min_age" or "age" > "max_age"))';
+        $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
     }
 
