@@ -901,13 +901,14 @@ if (! function_exists('str_contains')) {
      *
      * @param  string  $haystack
      * @param  string|array  $needles
+     * @param  bool  $caseSensitive
      * @return bool
      *
      * @deprecated Str::contains() should be used directly instead. Will be removed in Laravel 6.0.
      */
-    function str_contains($haystack, $needles)
+    function str_contains($haystack, $needles, $caseSensitive = true)
     {
-        return Str::contains($haystack, $needles);
+        return Str::contains($haystack, $needles, $caseSensitive);
     }
 }
 
