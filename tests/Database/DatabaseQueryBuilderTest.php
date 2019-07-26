@@ -2021,6 +2021,16 @@ class DatabaseQueryBuilderTest extends TestCase
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "name" = ? and "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 'baz', 1])->andReturn(1);
+        $result = $builder->from('users')
+            ->join('orders', function ($join) {
+                $join->on('users.id', '=', 'orders.user_id')
+                    ->where('users.id', '=', 1);
+            })->where('name', 'baz')
+            ->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     public function testUpdateMethodRespectsRaw()
@@ -2162,6 +2172,16 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" USING "contacts" where "users"."id" = ? and "users"."id" = "contacts"."id"', [1])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->take(1)->delete(1);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" USING "contacts" where "name" = ? and "users"."id" = "contacts"."user_id" and "users"."id" = ?', ['baz', 1])->andReturn(1);
+        $result = $builder->from('users')
+            ->join('contacts', function ($join) {
+                $join->on('users.id', '=', 'contacts.user_id')
+                    ->where('users.id', '=', 1);
+            })->where('name', 'baz')
+            ->delete();
         $this->assertEquals(1, $result);
     }
 
