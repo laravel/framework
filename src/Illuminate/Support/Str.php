@@ -105,7 +105,7 @@ class Str
     public static function contains($haystack, $needles, $caseSensitive = true)
     {
         $func = $caseSensitive
-            ? 'mb_strpos' : 'stripos';
+            ? 'mb_strpos' : 'mb_stripos';
 
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && call_user_func($func, $haystack, $needle) !== false) {
