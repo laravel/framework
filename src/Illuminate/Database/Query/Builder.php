@@ -778,7 +778,7 @@ class Builder
         } elseif (strtolower($operator) === 'not between') {
             return $this->where(function ($query) use ($first, $second) {
                 $query->whereColumn($first, '<', array_shift($second))
-                ->orWhereColumn($first, '>', array_shift($second));
+                    ->orWhereColumn($first, '>', array_shift($second));
             });
         }
 
