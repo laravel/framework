@@ -373,7 +373,7 @@ class BelongsTo extends Relation
      * Get the name of the relationship.
      *
      * @return string
-     * @deprecated The getRelationName() method should be used instead. Will be removed in Laravel 5.9.
+     * @deprecated The getRelationName() method should be used instead. Will be removed in Laravel 6.0.
      */
     public function getRelation()
     {
