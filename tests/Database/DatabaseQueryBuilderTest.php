@@ -2183,6 +2183,11 @@ class DatabaseQueryBuilderTest extends TestCase
             })->where('name', 'baz')
             ->delete();
         $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" USING "contacts" where "users"."id" = "contacts"."id"', [])->andReturn(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete();
+        $this->assertEquals(1, $result);
     }
 
     public function testTruncateMethod()
