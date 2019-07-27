@@ -365,10 +365,10 @@ class PostgresGrammar extends Grammar
                 : $value;
         })->all();
 
-        $cleanBindings = Arr::except($bindings, 'select');
+        $bindingsWithoutWhere = Arr::except($bindings, ['select', 'where']);
 
         return array_values(
-            array_merge($values, Arr::flatten($cleanBindings))
+            array_merge($values, $bindings['where'], Arr::flatten($bindingsWithoutWhere))
         );
     }
 
@@ -403,6 +403,21 @@ class PostgresGrammar extends Grammar
         $where = count($query->wheres) > 0 ? ' '.$this->compileUpdateWheres($query) : '';
 
         return trim("delete from {$table}{$using}{$where}");
+    }
+
+    /**
+     * Prepare the bindings for a delete statement.
+     *
+     * @param  array  $bindings
+     * @return array
+     */
+    public function prepareBindingsForDelete(array $bindings)
+    {
+        $bindingsWithoutWhere = Arr::except($bindings, ['select', 'where']);
+
+        return array_values(
+            array_merge($bindings['where'], Arr::flatten($bindingsWithoutWhere))
+        );
     }
 
     /**
