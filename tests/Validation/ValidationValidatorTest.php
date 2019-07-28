@@ -2436,6 +2436,12 @@ class ValidationValidatorTest extends TestCase
         $file6->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('svg'));
         $v = new Validator($trans, ['x' => $file6], ['x' => 'Image']);
         $this->assertTrue($v->passes());
+
+        $file7 = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file7->expects($this->any())->method('guessExtension')->will($this->returnValue('webp'));
+        $file7->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('webp'));
+        $v = new Validator($trans, ['x' => $file7], ['x' => 'Image']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateImageDoesNotAllowPhpExtensionsOnImageMime()
