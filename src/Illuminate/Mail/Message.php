@@ -2,23 +2,24 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Image;
-use Swift_Attachment;
+use Illuminate\Support\Arr;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\NamedAddress;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
- * @mixin \Swift_Message
+ * @mixin \Symfony\Component\Mime\Email
  */
 class Message
 {
     use ForwardsCalls;
 
     /**
-     * The Swift Message instance.
+     * The Symfony Email instance.
      *
-     * @var \Swift_Message
+     * @var \Symfony\Component\Mime\Email
      */
-    protected $swift;
+    protected $email;
 
     /**
      * CIDs of files embedded in the message.
@@ -30,12 +31,12 @@ class Message
     /**
      * Create a new message instance.
      *
-     * @param  \Swift_Message  $swift
+     * @param  \Symfony\Component\Mime\Email  $email
      * @return void
      */
-    public function __construct($swift)
+    public function __construct($email)
     {
-        $this->swift = $swift;
+        $this->email = $email;
     }
 
     /**
@@ -47,7 +48,7 @@ class Message
      */
     public function from($address, $name = null)
     {
-        $this->swift->setFrom($address, $name);
+        $this->email->from(...$this->createAddress($address, $name));
 
         return $this;
     }
@@ -61,7 +62,7 @@ class Message
      */
     public function sender($address, $name = null)
     {
-        $this->swift->setSender($address, $name);
+        $this->email->sender($address);
 
         return $this;
     }
@@ -74,7 +75,7 @@ class Message
      */
     public function returnPath($address)
     {
-        $this->swift->setReturnPath($address);
+        $this->email->returnPath($address);
 
         return $this;
     }
@@ -90,7 +91,7 @@ class Message
     public function to($address, $name = null, $override = false)
     {
         if ($override) {
-            $this->swift->setTo($address, $name);
+            $this->email->to(...$this->createAddress($address, $name));
 
             return $this;
         }
@@ -109,7 +110,7 @@ class Message
     public function cc($address, $name = null, $override = false)
     {
         if ($override) {
-            $this->swift->setCc($address, $name);
+            $this->email->cc(...$this->createAddress($address, $name));
 
             return $this;
         }
@@ -128,7 +129,7 @@ class Message
     public function bcc($address, $name = null, $override = false)
     {
         if ($override) {
-            $this->swift->setBcc($address, $name);
+            $this->email->bcc(...$this->createAddress($address, $name));
 
             return $this;
         }
@@ -159,9 +160,15 @@ class Message
     protected function addAddresses($address, $name, $type)
     {
         if (is_array($address)) {
-            $this->swift->{"set{$type}"}($address, $name);
+            $type = lcfirst($type);
+
+            $this->email->$type(
+                ...$this->createAddress($address, $name)
+            );
         } else {
-            $this->swift->{"add{$type}"}($address, $name);
+            $this->email->{"add{$type}"}(
+                ...$this->createAddress($address, $name)
+            );
         }
 
         return $this;
@@ -175,7 +182,7 @@ class Message
      */
     public function subject($subject)
     {
-        $this->swift->setSubject($subject);
+        $this->email->subject($subject);
 
         return $this;
     }
@@ -188,7 +195,7 @@ class Message
      */
     public function priority($level)
     {
-        $this->swift->setPriority($level);
+        $this->email->priority($level);
 
         return $this;
     }
@@ -202,20 +209,13 @@ class Message
      */
     public function attach($file, array $options = [])
     {
-        $attachment = $this->createAttachmentFromPath($file);
+        $this->email->attachFromPath(
+            $file,
+            Arr::get($options, 'as'),
+            Arr::get($options, 'mime')
+        );
 
-        return $this->prepAttachment($attachment, $options);
-    }
-
-    /**
-     * Create a Swift Attachment instance.
-     *
-     * @param  string  $file
-     * @return \Swift_Mime_Attachment
-     */
-    protected function createAttachmentFromPath($file)
-    {
-        return Swift_Attachment::fromPath($file);
+        return $this;
     }
 
     /**
@@ -228,21 +228,9 @@ class Message
      */
     public function attachData($data, $name, array $options = [])
     {
-        $attachment = $this->createAttachmentFromData($data, $name);
+        $this->email->attach($data, $name, Arr::get($options, 'mime'));
 
-        return $this->prepAttachment($attachment, $options);
-    }
-
-    /**
-     * Create a Swift Attachment instance from data.
-     *
-     * @param  string  $data
-     * @param  string  $name
-     * @return \Swift_Attachment
-     */
-    protected function createAttachmentFromData($data, $name)
-    {
-        return new Swift_Attachment($data, $name);
+        return $this;
     }
 
     /**
@@ -257,9 +245,7 @@ class Message
             return $this->embeddedFiles[$file];
         }
 
-        return $this->embeddedFiles[$file] = $this->swift->embed(
-            Swift_Image::fromPath($file)
-        );
+        return $this->embeddedFiles[$file] = $this->email->embedFromPath($file);
     }
 
     /**
@@ -272,51 +258,44 @@ class Message
      */
     public function embedData($data, $name, $contentType = null)
     {
-        $image = new Swift_Image($data, $name, $contentType);
-
-        return $this->swift->embed($image);
+        return $this->email->embed($data, $name, $contentType);
     }
 
     /**
-     * Prepare and attach the given attachment.
-     *
-     * @param  \Swift_Attachment  $attachment
-     * @param  array  $options
-     * @return $this
+     * @param  string|array  $address
+     * @param  string|null  $name
+     * @return array
      */
-    protected function prepAttachment($attachment, $options = [])
-    {
-        // First we will check for a MIME type on the message, which instructs the
-        // mail client on what type of attachment the file is so that it may be
-        // downloaded correctly by the user. The MIME option is not required.
-        if (isset($options['mime'])) {
-            $attachment->setContentType($options['mime']);
+    public function createAddress($address, $name = null) {
+        $addrs = [];
+
+        if (is_array($address)) {
+            foreach ($address as $email) {
+                $addrs[] = current($this->createAddress($email));
+            }
+        } else {
+            if ($name) {
+                $addrs[] = new NamedAddress($address, $name);
+            } else {
+                $addrs[] = new Address($address);
+            }
         }
 
-        // If an alternative name was given as an option, we will set that on this
-        // attachment so that it will be downloaded with the desired names from
-        // the developer, otherwise the default file names will get assigned.
-        if (isset($options['as'])) {
-            $attachment->setFilename($options['as']);
-        }
-
-        $this->swift->attach($attachment);
-
-        return $this;
+        return $addrs;
     }
 
     /**
-     * Get the underlying Swift Message instance.
+     * Get the underlying Symfony Email instance.
      *
-     * @return \Swift_Message
+     * @return \Symfony\Component\Mime\Email
      */
-    public function getSwiftMessage()
+    public function getSymfonyEmail()
     {
-        return $this->swift;
+        return $this->email;
     }
 
     /**
-     * Dynamically pass missing methods to the Swift instance.
+     * Dynamically pass missing methods to the Symfony Email instance.
      *
      * @param  string  $method
      * @param  array  $parameters
@@ -324,6 +303,6 @@ class Message
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallTo($this->swift, $method, $parameters);
+        return $this->forwardCallTo($this->email, $method, $parameters);
     }
 }
