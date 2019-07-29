@@ -75,7 +75,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::send($user, new GreetingMailNotification);
 
         $this->assertStringContainsString('hello',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
     }
 
@@ -89,7 +89,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
     }
 
@@ -109,11 +109,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::send($users, (new GreetingMailNotification)->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[1]->getBody()
+            app('symfony.transport')->messages()[1]->getBody()->toString()
         );
     }
 
@@ -127,7 +127,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotificationWithMailable);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
     }
 
@@ -147,11 +147,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $user->notify((new GreetingMailNotification)->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
 
         $this->assertRegExp('/dans (1|un) jour/',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
 
         $this->assertTrue($this->app->isLocale('en'));
@@ -169,7 +169,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $recipient->notify(new GreetingMailNotification);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
     }
 
@@ -194,13 +194,13 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
         $this->assertStringContainsString('hola',
-            app('swift.transport')->messages()[1]->getBody()
+            app('symfony.transport')->messages()[1]->getBody()->toString()
         );
         $this->assertStringContainsString('hi',
-            app('swift.transport')->messages()[2]->getBody()
+            app('symfony.transport')->messages()[2]->getBody()->toString()
         );
     }
 
@@ -216,7 +216,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
     }
 
@@ -232,7 +232,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getBody()->toString()
         );
     }
 }

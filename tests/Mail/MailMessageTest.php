@@ -2,21 +2,22 @@
 
 namespace Illuminate\Tests\Mail;
 
-use stdClass;
 use Mockery as m;
-use Swift_Mime_Message;
 use Illuminate\Mail\Message;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\NamedAddress;
 
 class MailMessageTest extends TestCase
 {
     /**
      * @var \Mockery::mock
      */
-    protected $swift;
+    protected $email;
 
     /**
-     * @var \Illuminate\Mail\Message
+     * @var \Symfony\Component\Mime\Email
      */
     protected $message;
 
@@ -24,8 +25,8 @@ class MailMessageTest extends TestCase
     {
         parent::setUp();
 
-        $this->swift = m::mock(Swift_Mime_Message::class);
-        $this->message = new Message($this->swift);
+        $this->email = m::mock(Email::class);
+        $this->message = new Message($this->email);
     }
 
     protected function tearDown(): void
@@ -35,89 +36,115 @@ class MailMessageTest extends TestCase
 
     public function testFromMethod()
     {
-        $this->swift->shouldReceive('setFrom')->once()->with('foo@bar.baz', 'Foo');
+        $this->email->shouldReceive('from')->once()->andReturnUsing(function ($arg) {
+            $this->assertEquals(new NamedAddress('foo@bar.baz', 'Foo'), $arg);
+        });
+
         $this->assertInstanceOf(Message::class, $this->message->from('foo@bar.baz', 'Foo'));
     }
 
     public function testSenderMethod()
     {
-        $this->swift->shouldReceive('setSender')->once()->with('foo@bar.baz', 'Foo');
-        $this->assertInstanceOf(Message::class, $this->message->sender('foo@bar.baz', 'Foo'));
+        $this->email->shouldReceive('sender')->once()->with('foo@bar.baz');
+        $this->assertInstanceOf(Message::class, $this->message->sender('foo@bar.baz'));
     }
 
     public function testReturnPathMethod()
     {
-        $this->swift->shouldReceive('setReturnPath')->once()->with('foo@bar.baz');
+        $this->email->shouldReceive('returnPath')->once()->with('foo@bar.baz');
         $this->assertInstanceOf(Message::class, $this->message->returnPath('foo@bar.baz'));
     }
 
     public function testToMethod()
     {
-        $this->swift->shouldReceive('addTo')->once()->with('foo@bar.baz', 'Foo');
+        $this->email->shouldReceive('addTo')->once()->andReturnUsing(function ($arg) {
+            $this->assertEquals(new NamedAddress('foo@bar.baz', 'Foo'), $arg);
+        });
         $this->assertInstanceOf(Message::class, $this->message->to('foo@bar.baz', 'Foo', false));
     }
 
     public function testToMethodWithOverride()
     {
-        $this->swift->shouldReceive('setTo')->once()->with('foo@bar.baz', 'Foo');
+        $this->email->shouldReceive('to')->once()->andReturnUsing(function ($arg) {
+            $this->assertEquals(new NamedAddress('foo@bar.baz', 'Foo'), $arg);
+        });
         $this->assertInstanceOf(Message::class, $this->message->to('foo@bar.baz', 'Foo', true));
     }
 
     public function testCcMethod()
     {
-        $this->swift->shouldReceive('addCc')->once()->with('foo@bar.baz', 'Foo');
+        $this->email->shouldReceive('addCc')->once()->andReturnUsing(function ($arg) {
+            $this->assertEquals(new NamedAddress('foo@bar.baz', 'Foo'), $arg);
+        });
         $this->assertInstanceOf(Message::class, $this->message->cc('foo@bar.baz', 'Foo'));
     }
 
     public function testBccMethod()
     {
-        $this->swift->shouldReceive('addBcc')->once()->with('foo@bar.baz', 'Foo');
+        $this->email->shouldReceive('addBcc')->once()->andReturnUsing(function ($arg) {
+            $this->assertEquals(new NamedAddress('foo@bar.baz', 'Foo'), $arg);
+        });
         $this->assertInstanceOf(Message::class, $this->message->bcc('foo@bar.baz', 'Foo'));
     }
 
     public function testReplyToMethod()
     {
-        $this->swift->shouldReceive('addReplyTo')->once()->with('foo@bar.baz', 'Foo');
+        $this->email->shouldReceive('addReplyTo')->once()->andReturnUsing(function ($arg) {
+            $this->assertEquals(new NamedAddress('foo@bar.baz', 'Foo'), $arg);
+        });
         $this->assertInstanceOf(Message::class, $this->message->replyTo('foo@bar.baz', 'Foo'));
     }
 
     public function testSubjectMethod()
     {
-        $this->swift->shouldReceive('setSubject')->once()->with('foo');
+        $this->email->shouldReceive('subject')->once()->with('foo');
         $this->assertInstanceOf(Message::class, $this->message->subject('foo'));
     }
 
     public function testPriorityMethod()
     {
-        $this->swift->shouldReceive('setPriority')->once()->with(1);
+        $this->email->shouldReceive('priority')->once()->with(1);
         $this->assertInstanceOf(Message::class, $this->message->priority(1));
     }
 
-    public function testGetSwiftMessageMethod()
+    public function testGetSymfonyEmailMethod()
     {
-        $this->assertInstanceOf(Swift_Mime_Message::class, $this->message->getSwiftMessage());
+        $this->assertInstanceOf(Email::class, $this->message->getSymfonyEmail());
     }
 
     public function testBasicAttachment()
     {
-        $swift = m::mock(stdClass::class);
-        $message = $this->getMockBuilder(Message::class)->setMethods(['createAttachmentFromPath'])->setConstructorArgs([$swift])->getMock();
-        $attachment = m::mock(stdClass::class);
-        $message->expects($this->once())->method('createAttachmentFromPath')->with($this->equalTo('foo.jpg'))->will($this->returnValue($attachment));
-        $swift->shouldReceive('attach')->once()->with($attachment);
-        $attachment->shouldReceive('setContentType')->once()->with('image/jpeg');
-        $attachment->shouldReceive('setFilename')->once()->with('bar.jpg');
-        $message->attach('foo.jpg', ['mime' => 'image/jpeg', 'as' => 'bar.jpg']);
+        $this->email->shouldReceive('attachFromPath')->once()->with(
+            'foo.jpg',
+            'bar.jpg',
+            'image/jpeg'
+        );
+        $this->assertInstanceOf(Message::class, $this->message->attach('foo.jpg', ['mime' => 'image/jpeg', 'as' => 'bar.jpg']));
     }
 
     public function testDataAttachment()
     {
-        $swift = m::mock(stdClass::class);
-        $message = $this->getMockBuilder(Message::class)->setMethods(['createAttachmentFromData'])->setConstructorArgs([$swift])->getMock();
-        $attachment = m::mock(stdClass::class);
-        $message->expects($this->once())->method('createAttachmentFromData')->with($this->equalTo('foo'), $this->equalTo('name'))->will($this->returnValue($attachment));
-        $swift->shouldReceive('attach')->once()->with($attachment);
-        $attachment->shouldReceive('setContentType')->once()->with('image/jpeg');
-        $message->attachData('foo', 'name', ['mime' => 'image/jpeg']);
+        $this->email->shouldReceive('attach')->with('foo', 'name', 'image/jpeg');
+        $this->assertInstanceOf(Message::class, $this->message->attachData('foo', 'name', ['mime' => 'image/jpeg']));
+    }
+
+    public function testCreateAddress()
+    {
+        // Named addresses
+        $this->assertEquals([
+            new NamedAddress('foo@bar.baz', 'Foo'),
+        ], $this->message->createAddress('foo@bar.baz', 'Foo'));
+
+        // Un-named addresses
+        $this->assertEquals([
+            new Address('foo@bar.baz'),
+            new Address('foo@bar.com'),
+        ], $this->message->createAddress(['foo@bar.baz', 'foo@bar.com']));
+
+        // Un-named named addresses
+        $this->assertEquals([
+            new Address('foo@bar.baz'),
+            new Address('foo@bar.com'),
+        ], $this->message->createAddress(['foo@bar.baz', 'foo@bar.com'], 'Foo'));
     }
 }

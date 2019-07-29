@@ -36,6 +36,7 @@
         "symfony/finder": "^4.3",
         "symfony/http-foundation": "^4.3",
         "symfony/http-kernel": "^4.3",
+        "symfony/mailer": "^4.3",
         "symfony/process": "^4.3",
         "symfony/routing": "^4.3",
         "symfony/var-dumper": "^4.3",

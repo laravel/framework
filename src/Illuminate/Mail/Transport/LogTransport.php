@@ -3,8 +3,10 @@
 namespace Illuminate\Mail\Transport;
 
 use Psr\Log\LoggerInterface;
-use Swift_Mime_SimpleMessage;
 use Swift_Mime_SimpleMimeEntity;
+use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\SmtpEnvelope;
 
 class LogTransport extends Transport
 {
@@ -29,13 +31,9 @@ class LogTransport extends Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
     {
-        $this->beforeSendPerformed($message);
-
         $this->logger->debug($this->getMimeEntityString($message));
-
-        $this->sendPerformed($message);
 
         return $this->numberOfRecipients($message);
     }
