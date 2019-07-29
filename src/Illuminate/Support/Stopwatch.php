@@ -23,7 +23,7 @@ class Stopwatch
     }
 
     /**
-     * Check a given timer and get the elapsed time in milliseconds.
+     * Check a given timer and get the elapsed time in seconds.
      *
      * @param  string  $key
      * @param  int  $precision
