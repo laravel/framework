@@ -16,7 +16,7 @@ class SQLiteGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = ['Nullable', 'Default', 'Increment'];
+    protected $modifiers = ['Nullable', 'Default', 'Increment', 'Unsigned'];
 
     /**
      * The columns available as serials.
@@ -855,6 +855,20 @@ class SQLiteGrammar extends Grammar
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' primary key autoincrement';
+        }
+    }
+
+    /**
+     * Get the SQL for an unsigned column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyUnsigned(Blueprint $blueprint, Fluent $column)
+    {
+        if ($column->unsigned) {
+            return ' CHECK("'.$column->name.'" >= 0)';
         }
     }
 }

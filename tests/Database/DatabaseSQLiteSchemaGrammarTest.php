@@ -27,7 +27,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
+        $this->assertEquals('create table "users" ("id" integer not null primary key autoincrement CHECK("id" >= 0), "email" varchar not null)', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
@@ -36,7 +36,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $expected = [
-            'alter table "users" add column "id" integer not null primary key autoincrement',
+            'alter table "users" add column "id" integer not null primary key autoincrement CHECK("id" >= 0)',
             'alter table "users" add column "email" varchar not null',
         ];
         $this->assertEquals($expected, $statements);
@@ -52,7 +52,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create temporary table "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
+        $this->assertEquals('create temporary table "users" ("id" integer not null primary key autoincrement CHECK("id" >= 0), "email" varchar not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -258,7 +258,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
+        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement CHECK("id" >= 0)', $statements[0]);
     }
 
     public function testAddingSmallIncrementingID()
@@ -268,7 +268,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
+        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement CHECK("id" >= 0)', $statements[0]);
     }
 
     public function testAddingMediumIncrementingID()
@@ -278,7 +278,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
+        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement CHECK("id" >= 0)', $statements[0]);
     }
 
     public function testAddingBigIncrementingID()
@@ -288,7 +288,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
+        $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement CHECK("id" >= 0)', $statements[0]);
     }
 
     public function testAddingString()
