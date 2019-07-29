@@ -102,11 +102,32 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $appPath;
 
     /**
+     * The custom bootstrap path defined by the developer.
+     *
+     * @var string
+     */
+    protected $bootstrapPath;
+
+    /**
+     * The custom config path defined by the developer.
+     *
+     * @var string
+     */
+    protected $configPath;
+
+    /**
      * The custom database path defined by the developer.
      *
      * @var string
      */
     protected $databasePath;
+
+    /**
+     * The custom resources path defined by the developer.
+     *
+     * @var string
+     */
+    protected $resourcesPath;
 
     /**
      * The custom storage path defined by the developer.
@@ -340,7 +361,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function bootstrapPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return ($this->bootstrapPath ?: $this->basePath.DIRECTORY_SEPARATOR.'bootstrap').($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+
+    /**
+     * Set the bootstrap directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useBootstrapPath($path)
+    {
+        $this->bootstrapPath = $path;
+
+        $this->instance('path.bootstrap', $path);
+
+        return $this;
     }
 
     /**
@@ -351,7 +387,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function configPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return ($this->configPath ?: $this->basePath.DIRECTORY_SEPARATOR.'config').($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+
+    /**
+     * Set the config directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useConfigPath($path)
+    {
+        $this->configPath = $path;
+
+        $this->instance('path.config', $path);
+
+        return $this;
     }
 
     /**
@@ -433,7 +484,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function resourcePath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return ($this->resourcesPath ?: $this->basePath.DIRECTORY_SEPARATOR.'resources').($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+
+    /**
+     * Set the resources directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useResourcesPath($path)
+    {
+        $this->resourcesPath = $path;
+
+        $this->instance('path.resources', $path);
+
+        return $this;
     }
 
     /**
