@@ -266,7 +266,8 @@ class Message
      * @param  string|null  $name
      * @return array
      */
-    public function createAddress($address, $name = null) {
+    public function createAddress($address, $name = null)
+    {
         $addrs = [];
 
         if (is_array($address)) {

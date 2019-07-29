@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Mail;
 
-use stdClass;
 use Mockery as m;
 use Illuminate\Mail\Message;
 use PHPUnit\Framework\TestCase;
@@ -133,7 +132,7 @@ class MailMessageTest extends TestCase
     {
         // Named addresses
         $this->assertEquals([
-            new NamedAddress('foo@bar.baz', 'Foo')
+            new NamedAddress('foo@bar.baz', 'Foo'),
         ], $this->message->createAddress('foo@bar.baz', 'Foo'));
 
         // Un-named addresses
