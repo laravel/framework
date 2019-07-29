@@ -45,7 +45,7 @@ class Worker
     protected $exceptions;
 
     /**
-     * The maintenance mode check callable.
+     * The callback used to determine if the application is in maintenance mode.
      *
      * @var \callable
      */
