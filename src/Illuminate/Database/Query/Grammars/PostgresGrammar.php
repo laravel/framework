@@ -400,9 +400,9 @@ class PostgresGrammar extends Grammar
             return $this->wrapTable($join->table);
         })->implode(', ');
 
-        $where = count($query->wheres) > 0 ? ' '.$this->compileUpdateWheres($query) : '';
+        $where = $this->compileUpdateWheres($query);
 
-        return trim("delete from {$table}{$using}{$where}");
+        return trim("delete from {$table}{$using} {$where}");
     }
 
     /**
