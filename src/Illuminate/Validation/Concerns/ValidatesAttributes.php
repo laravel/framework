@@ -988,7 +988,7 @@ trait ValidatesAttributes
      */
     public function validateImage($attribute, $value)
     {
-        return $this->validateMimes($attribute, $value, ['jpeg', 'png', 'gif', 'bmp', 'svg']);
+        return $this->validateMimes($attribute, $value, ['jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']);
     }
 
     /**
