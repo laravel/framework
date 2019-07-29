@@ -189,7 +189,7 @@ class MailgunTransport extends Transport
     }
 
     /**
-     * Get the API end-point being used by the transport.
+     * Get the API endpoint being used by the transport.
      *
      * @return string
      */
@@ -199,7 +199,7 @@ class MailgunTransport extends Transport
     }
 
     /**
-     * Set the API end-point being used by the transport.
+     * Set the API endpoint being used by the transport.
      *
      * @param  string  $endpoint
      * @return string
