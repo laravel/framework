@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Mail;
 
 use Mockery as m;
-use Swift_Mailer;
 use Illuminate\Mail\Mailer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -15,6 +14,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 
 class MailableQueuedTest extends TestCase
@@ -91,7 +91,7 @@ class MailableQueuedTest extends TestCase
 
     protected function getMocks()
     {
-        return [m::mock(Factory::class), m::mock(Swift_Mailer::class)];
+        return [m::mock(Factory::class), m::mock(ArrayTransport::class)];
     }
 }
 

@@ -56,7 +56,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to('test@mail.com')->send(new TestMail);
 
         $this->assertStringContainsString('name',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getHtmlBody()
         );
     }
 
@@ -65,7 +65,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to('test@mail.com')->locale('ar')->send(new TestMail);
 
         $this->assertStringContainsString('esm',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getHtmlBody()
         );
     }
 
@@ -80,7 +80,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to('test@mail.com')->locale('es')->send(new TimestampTestMail);
 
         $this->assertRegExp('/nombre (en|dentro de) (un|1) día/',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getHtmlBody()
         );
 
         $this->assertEquals('en', Carbon::getLocale());
@@ -96,7 +96,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to($recipient)->send(new TestMail);
 
         $this->assertStringContainsString('esm',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getHtmlBody()
         );
     }
 
@@ -110,7 +110,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to($recipient)->locale('ar')->send(new TestMail);
 
         $this->assertStringContainsString('esm',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getHtmlBody()
         );
     }
 
@@ -129,7 +129,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to($toRecipient)->cc($ccRecipient)->send(new TestMail);
 
         $this->assertStringContainsString('esm',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getHtmlBody()
         );
     }
 
@@ -149,7 +149,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to($recipients)->send(new TestMail);
 
         $this->assertStringContainsString('name',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getHtmlBody()
         );
     }
 
@@ -161,11 +161,11 @@ class SendingMailWithLocaleTest extends TestCase
         $this->assertEquals('en', app('translator')->getLocale());
 
         $this->assertStringContainsString('esm',
-            app('swift.transport')->messages()[0]->getBody()
+            app('symfony.transport')->messages()[0]->getHtmlBody()
         );
 
         $this->assertStringContainsString('name',
-            app('swift.transport')->messages()[1]->getBody()
+            app('symfony.transport')->messages()[1]->getHtmlBody()
         );
     }
 }

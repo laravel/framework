@@ -2,10 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Mailer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Swift_DependencyContainer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 
@@ -18,7 +16,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register()
     {
-        $this->registerSwiftMailer();
+        $this->registerSymfonyTransport();
         $this->registerIlluminateMailer();
         $this->registerMarkdownRenderer();
     }
@@ -38,7 +36,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
             // for maximum testability on said classes instead of passing Closures.
             $mailer = new Mailer(
                 $this->app['view'],
-                $this->app['swift.mailer'],
+                $this->app['symfony.transport']->driver(),
                 $this->app['events']
             );
 
@@ -75,36 +73,13 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * Register the Swift Mailer instance.
-     *
-     * @return void
-     */
-    public function registerSwiftMailer()
-    {
-        $this->registerSwiftTransport();
-
-        // Once we have the transporter registered, we will register the actual Swift
-        // mailer instance, passing in the transport instances, which allows us to
-        // override this transporter instances during app start-up if necessary.
-        $this->app->singleton('swift.mailer', function () {
-            if ($domain = $this->app->make('config')->get('mail.domain')) {
-                Swift_DependencyContainer::getInstance()
-                                ->register('mime.idgenerator.idright')
-                                ->asValue($domain);
-            }
-
-            return new Swift_Mailer($this->app['swift.transport']->driver());
-        });
-    }
-
-    /**
      * Register the Swift Transport instance.
      *
      * @return void
      */
-    protected function registerSwiftTransport()
+    protected function registerSymfonyTransport()
     {
-        $this->app->singleton('swift.transport', function () {
+        $this->app->singleton('symfony.transport', function () {
             return new TransportManager($this->app);
         });
     }
@@ -140,7 +115,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
     public function provides()
     {
         return [
-            'mailer', 'swift.mailer', 'swift.transport', Markdown::class,
+            'mailer', 'symfony.transport', Markdown::class,
         ];
     }
 }

@@ -19,7 +19,7 @@ class MailLogTransportTest extends TestCase
             'path' => 'mail.log',
         ]);
 
-        $manager = $this->app['swift.transport'];
+        $manager = $this->app['symfony.transport'];
 
         $transport = $manager->driver('log');
         $this->assertInstanceOf(LogTransport::class, $transport);
@@ -36,7 +36,7 @@ class MailLogTransportTest extends TestCase
     {
         $logger = $this->app->instance('log', new NullLogger());
 
-        $manager = $this->app['swift.transport'];
+        $manager = $this->app['symfony.transport'];
 
         $this->assertEquals($logger, $manager->driver('log')->logger());
     }
