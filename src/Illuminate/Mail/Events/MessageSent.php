@@ -5,9 +5,9 @@ namespace Illuminate\Mail\Events;
 class MessageSent
 {
     /**
-     * The Swift message instance.
+     * The Symfony Email instance.
      *
-     * @var \Swift_Message
+     * @var \Symfony\Component\Mime\Email
      */
     public $message;
 
@@ -21,7 +21,7 @@ class MessageSent
     /**
      * Create a new event instance.
      *
-     * @param  \Swift_Message  $message
+     * @param  \Symfony\Component\Mime\Email  $message
      * @param  array  $data
      * @return void
      */
