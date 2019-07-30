@@ -7,7 +7,6 @@ use Mockery as m;
 use Swift_Mailer;
 use Swift_Transport;
 use Illuminate\Mail\Mailer;
-use Swift_Mime_SimpleMessage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Email;
 use Illuminate\Support\HtmlString;
