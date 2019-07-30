@@ -47,17 +47,16 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock(Swift_Mime_SimpleMessage::class);
+        $message = m::mock(Email::class);
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->never();
         $view->shouldReceive('render')->never();
-        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
-        $message->shouldReceive('addPart')->once()->with('rendered.text', 'text/plain');
-        $message->shouldReceive('setFrom')->never();
-        $this->setSwiftMailer($mailer);
-        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
+        $message->shouldReceive('html')->once()->with('rendered.view');
+        $message->shouldReceive('text')->once()->with('rendered.text');
+        $message->shouldReceive('from')->never();
+        $message->shouldReceive('getSymfonyEmail')->once()->andReturn($message);
+        $mailer->getTransport()->shouldReceive('send')->once()->with($message, []);
         $mailer->send(['html' => new HtmlString('rendered.view'), 'text' => new HtmlString('rendered.text')], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
@@ -68,16 +67,15 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock(Swift_Mime_SimpleMessage::class);
+        $message = m::mock(Email::class);
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->never();
         $view->shouldReceive('render')->never();
-        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
-        $message->shouldReceive('setFrom')->never();
-        $this->setSwiftMailer($mailer);
-        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
+        $message->shouldReceive('html')->once()->with('rendered.view');
+        $message->shouldReceive('from')->never();
+        $message->shouldReceive('getSymfonyEmail')->once()->andReturn($message);
+        $mailer->getTransport()->shouldReceive('send')->once()->with($message, []);
         $mailer->html('rendered.view', function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
@@ -88,18 +86,17 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock(Swift_Mime_SimpleMessage::class);
+        $message = m::mock(Email::class);
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message])->andReturn($view);
         $view->shouldReceive('render')->twice()->andReturn('rendered.view');
-        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
-        $message->shouldReceive('addPart')->once()->with('rendered.view', 'text/plain');
+        $message->shouldReceive('html')->once()->with('rendered.view');
+        $message->shouldReceive('text')->once()->with('rendered.view');
         $message->shouldReceive('setFrom')->never();
-        $this->setSwiftMailer($mailer);
-        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
+        $message->shouldReceive('getSymfonyEmail')->once()->andReturn($message);
+        $mailer->getTransport()->shouldReceive('send')->once()->with($message, []);
         $mailer->send(['foo', 'bar'], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
@@ -110,18 +107,17 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock(Swift_Mime_SimpleMessage::class);
+        $message = m::mock(Email::class);
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message])->andReturn($view);
         $view->shouldReceive('render')->twice()->andReturn('rendered.view');
-        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
-        $message->shouldReceive('addPart')->once()->with('rendered.view', 'text/plain');
+        $message->shouldReceive('html')->once()->with('rendered.view');
+        $message->shouldReceive('text')->once()->with('rendered.view');
         $message->shouldReceive('setFrom')->never();
-        $this->setSwiftMailer($mailer);
-        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
+        $message->shouldReceive('getSymfonyEmail')->once()->andReturn($message);
+        $mailer->getTransport()->shouldReceive('send')->once()->with($message, []);
         $mailer->send(['html' => 'foo', 'text' => 'bar'], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
@@ -135,10 +131,10 @@ class MailMailerTest extends TestCase
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
-        $this->setSwiftMailer($mailer);
+        // $this->setSwiftMailer($mailer);
         $mailer->alwaysFrom('taylorotwell@gmail.com', 'Taylor Otwell');
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
-            $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
+        $mailer->getTransport()->shouldReceive('send')->once()->with(m::type(Email::class), [])->andReturnUsing(function ($message) {
+            $this->assertEquals('Taylor Otwell <taylorotwell@gmail.com>', $message->getFrom()[0]->toString());
         });
         $mailer->send('foo', ['data'], function ($m) {
             //
@@ -196,7 +192,7 @@ class MailMailerTest extends TestCase
 
     protected function getMailer($events = null)
     {
-        return new Mailer(m::mock(Factory::class), m::mock(Swift_Mailer::class), $events);
+        return new Mailer(m::mock(Factory::class), m::mock(ArrayTransport::class), $events);
     }
 
     public function setSwiftMailer($mailer)
