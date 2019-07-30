@@ -2,8 +2,10 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Mime_SimpleMessage;
 use Illuminate\Support\Collection;
+use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\SmtpEnvelope;
 
 class ArrayTransport extends Transport
 {
@@ -27,13 +29,11 @@ class ArrayTransport extends Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
     {
-        $this->beforeSendPerformed($message);
-
         $this->messages[] = $message;
 
-        return $this->numberOfRecipients($message);
+        return null;
     }
 
     /**

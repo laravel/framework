@@ -8,13 +8,13 @@ use Psr\Log\LoggerInterface;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Manager;
 use GuzzleHttp\Client as HttpClient;
-use Swift_SmtpTransport as SmtpTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Postmark\Transport as PostmarkTransport;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
 use Swift_SendmailTransport as SendmailTransport;
+use Symfony\Component\Mailer\Transport\Smtp\ESmtpTransport as SmtpTransport;
 
 class TransportManager extends Manager
 {
@@ -33,7 +33,8 @@ class TransportManager extends Manager
         $transport = new SmtpTransport($config['host'], $config['port']);
 
         if (isset($config['encryption'])) {
-            $transport->setEncryption($config['encryption']);
+            $stream = $transport->getStream();
+            $stream->setEncryption($config['encryption']);
         }
 
         // Once we have the transport we will check for the presence of a username
@@ -58,11 +59,13 @@ class TransportManager extends Manager
     protected function configureSmtpDriver($transport, $config)
     {
         if (isset($config['stream'])) {
-            $transport->setStreamOptions($config['stream']);
+            $stream = $transport->getStream();
+            $stream->setStreamOptions($config['stream']);
         }
 
         if (isset($config['source_ip'])) {
-            $transport->setSourceIp($config['source_ip']);
+            $stream = $transport->getStream();
+            $stream->setSourceIp($config['source_ip']);
         }
 
         if (isset($config['local_domain'])) {

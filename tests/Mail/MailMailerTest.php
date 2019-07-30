@@ -5,16 +5,17 @@ namespace Illuminate\Tests\Mail;
 use stdClass;
 use Mockery as m;
 use Swift_Mailer;
-use Swift_Message;
 use Swift_Transport;
 use Illuminate\Mail\Mailer;
 use Swift_Mime_SimpleMessage;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Email;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Mail\Transport\ArrayTransport;
 
 class MailMailerTest extends TestCase
 {
@@ -27,16 +28,15 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
-        $message = m::mock(Swift_Mime_SimpleMessage::class);
+        $message = m::mock(Email::class);
         $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
-        $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
-        $message->shouldReceive('setFrom')->never();
-        $this->setSwiftMailer($mailer);
-        $message->shouldReceive('getSwiftMessage')->once()->andReturn($message);
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
+        $message->shouldReceive('html')->once()->with('rendered.view');
+        $message->shouldReceive('from')->never();
+        $message->shouldReceive('getSymfonyEmail')->once()->andReturn($message);
+        $mailer->getTransport()->shouldReceive('send')->once()->with($message, []);
         $mailer->send('foo', ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
         });
@@ -212,7 +212,7 @@ class MailMailerTest extends TestCase
 
     protected function getMocks()
     {
-        return [m::mock(Factory::class), m::mock(Swift_Mailer::class)];
+        return [m::mock(Factory::class), m::mock(ArrayTransport::class)];
     }
 }
 
