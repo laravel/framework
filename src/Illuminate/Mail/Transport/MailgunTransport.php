@@ -29,7 +29,7 @@ class MailgunTransport extends Transport
     protected $domain;
 
     /**
-     * The Mailgun API end-point.
+     * The Mailgun API endpoint.
      *
      * @var string
      */
