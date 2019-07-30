@@ -119,7 +119,7 @@ class PhpRedisConnector
     protected function createRedisClusterInstance(array $servers, array $options)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '>=')) {
-            return new RedisCluster(
+            $client = new RedisCluster(
                 null,
                 array_values($servers),
                 $options['timeout'] ?? 0,
@@ -127,14 +127,24 @@ class PhpRedisConnector
                 isset($options['persistent']) && $options['persistent'],
                 $options['password'] ?? null
             );
+        } else {
+            $client = new RedisCluster(
+                null,
+                array_values($servers),
+                $options['timeout'] ?? 0,
+                $options['read_timeout'] ?? 0,
+                isset($options['persistent']) && $options['persistent']
+            );
         }
 
-        return new RedisCluster(
-            null,
-            array_values($servers),
-            $options['timeout'] ?? 0,
-            $options['read_timeout'] ?? 0,
-            isset($options['persistent']) && $options['persistent']
-        );
+        if (! empty($servers['prefix'])) {
+            $client->setOption(Redis::OPT_PREFIX, $servers['prefix']);
+        }
+
+        if (! empty($servers['read_timeout'])) {
+            $client->setOption(Redis::OPT_READ_TIMEOUT, $servers['read_timeout']);
+        }
+
+        return $client;
     }
 }
