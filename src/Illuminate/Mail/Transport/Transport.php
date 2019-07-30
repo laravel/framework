@@ -3,7 +3,6 @@
 namespace Illuminate\Mail\Transport;
 
 use Symfony\Component\Mime\Message;
-use Swift_Events_EventListener;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 abstract class Transport implements TransportInterface

@@ -2,11 +2,8 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Mailer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Swift_DependencyContainer;
-use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 
