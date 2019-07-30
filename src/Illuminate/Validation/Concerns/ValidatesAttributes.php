@@ -246,7 +246,7 @@ trait ValidatesAttributes
                 return Date::parse($value);
             }
 
-            return new DateTime($value);
+            return date_create($value);
         } catch (Exception $e) {
             //
         }
