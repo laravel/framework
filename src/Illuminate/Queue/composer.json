@@ -16,7 +16,7 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "illuminate/console": "^6.0*",
+        "illuminate/console": "^6.0",
         "illuminate/container": "^6.0",
         "illuminate/contracts": "^6.0",
         "illuminate/database": "^6.0",
