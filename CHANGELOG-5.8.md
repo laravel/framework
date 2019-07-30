@@ -4,7 +4,7 @@
 
 
 
-## [v5.8.29 (2019-07-30)](https://github.com/laravel/framework/compare/v5.8.29...v5.8.30)
+## [v5.8.30 (2019-07-30)](https://github.com/laravel/framework/compare/v5.8.29...v5.8.30)
 
 ### Added
 - Added `MakesHttpRequests::option()` and `MakesHttpRequests::optionJson()` methods ([#29258](https://github.com/laravel/framework/pull/29258))
