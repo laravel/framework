@@ -3,8 +3,6 @@
 namespace Illuminate\Mail\Transport;
 
 use Psr\Log\LoggerInterface;
-use Swift_Mime_SimpleMimeEntity;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\SmtpEnvelope;
