@@ -5,7 +5,7 @@ namespace Illuminate\Contracts\Redis;
 interface Connector
 {
     /**
-     * Create a new clustered redis connection.
+     * Create a connection to a Redis cluster.
      *
      * @param  array  $config
      * @param  array  $options
@@ -14,7 +14,7 @@ interface Connector
     public function connect(array $config, array $options);
 
     /**
-     * Create a new clustered redis connection.
+     * Create a connection to a Redis instance.
      *
      * @param  array  $config
      * @param  array  $clusterOptions
