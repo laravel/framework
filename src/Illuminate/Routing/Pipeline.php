@@ -3,7 +3,6 @@
 namespace Illuminate\Routing;
 
 use Exception;
-use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -17,31 +16,16 @@ use Illuminate\Pipeline\Pipeline as BasePipeline;
 class Pipeline extends BasePipeline
 {
     /**
-     * Get a Closure that represents a slice of the application onion.
+     * Handles the value returned from each pipe before passing it to the next
      *
-     * @return \Closure
+     * @param  mixed $carry
+     * @return mixed
      */
-    protected function carry()
+    protected function handleCarry($carry)
     {
-        return function ($stack, $pipe) {
-            return function ($passable) use ($stack, $pipe) {
-                try {
-                    $slice = parent::carry();
-
-                    $callable = $slice($stack, $pipe);
-
-                    $response = $callable($passable);
-
-                    return $response instanceof Responsable
-                        ? $response->toResponse($this->getContainer()->make(Request::class))
-                        : $response;
-                } catch (Exception $e) {
-                    return $this->handleException($passable, $e);
-                } catch (Throwable $e) {
-                    return $this->handleException($passable, new FatalThrowableError($e));
-                }
-            };
-        };
+        return $carry instanceof Responsable
+            ? $carry->toResponse($this->getContainer()->make(Request::class))
+            : $carry;
     }
 
     /**

@@ -167,9 +167,11 @@ class Pipeline implements PipelineContract
                         $parameters = [$passable, $stack];
                     }
 
-                    return method_exists($pipe, $this->method)
+                    $carry = method_exists($pipe, $this->method)
                                     ? $pipe->{$this->method}(...$parameters)
                                     : $pipe(...$parameters);
+
+                    return $this->handleCarry($carry);
                 } catch (Exception $e) {
                     return $this->handleException($passable, $e);
                 } catch (Throwable $e) {
@@ -210,6 +212,17 @@ class Pipeline implements PipelineContract
         }
 
         return $this->container;
+    }
+
+    /**
+     * Handles the value returned from each pipe before passing it to the next
+     *
+     * @param  mixed $carry
+     * @return mixed
+     */
+    protected function handleCarry($carry)
+    {
+        return $carry;
     }
 
     /**
