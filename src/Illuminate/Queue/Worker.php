@@ -152,10 +152,10 @@ class Worker
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             // Check if the job exists in queue.
-            if($job) {
+            if ($job) {
                 // Mark the job as failed.
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int)$options->maxTries, $this->maxAttemptsExceededException($job)
+                    $job->getConnectionName(), $job, (int) $options->maxTries, $this->maxAttemptsExceededException($job)
                 );
             }
             $this->kill(1);
