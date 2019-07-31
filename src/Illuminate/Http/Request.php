@@ -422,8 +422,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $request;
         }
 
-        $content = $request->content;
-
         $newRequest = (new static)->duplicate(
             $request->query->all(), $request->request->all(), $request->attributes->all(),
             $request->cookies->all(), $request->files->all(), $request->server->all()
@@ -431,7 +429,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $newRequest->headers->replace($request->headers->all());
 
-        $newRequest->content = $content;
+        $newRequest->content = $request->content;
 
         $newRequest->request = $newRequest->getInputSource();
 
