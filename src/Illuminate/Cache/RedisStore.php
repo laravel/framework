@@ -214,8 +214,10 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function flush()
     {
-        $this->connection()->flushdb();
-
+        $application_keys=$this->connection()->keys($this->prefix.'*');
+	    foreach ($application_keys as $key) {
+		    $this->connection()->del($key);
+	    }
         return true;
     }
 
