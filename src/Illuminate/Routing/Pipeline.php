@@ -16,7 +16,7 @@ use Illuminate\Pipeline\Pipeline as BasePipeline;
 class Pipeline extends BasePipeline
 {
     /**
-     * Handles the value returned from each pipe before passing it to the next
+     * Handles the value returned from each pipe before passing it to the next.
      *
      * @param  mixed $carry
      * @return mixed

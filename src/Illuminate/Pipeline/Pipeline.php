@@ -215,7 +215,7 @@ class Pipeline implements PipelineContract
     }
 
     /**
-     * Handles the value returned from each pipe before passing it to the next
+     * Handles the value returned from each pipe before passing it to the next.
      *
      * @param  mixed $carry
      * @return mixed
