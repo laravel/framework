@@ -492,7 +492,7 @@ class Migrator
     }
 
     /**
-     * Check if file has to run in current environment
+     * Check if file has to run in current environment.
      *
      * @param $file
      * @return bool
@@ -503,14 +503,14 @@ class Migrator
     }
 
     /**
-     * Get the environment name from file
+     * Get the environment name from file.
      *
      * @param $file
      * @return string
      */
     public function getEnvironmentName($file)
     {
-        if(preg_match('/\.(.*)\.php$/', $file, $matches)) {
+        if (preg_match('/\.(.*)\.php$/', $file, $matches)) {
             $environment = $matches[1];
         }
 
@@ -518,7 +518,7 @@ class Migrator
     }
 
     /**
-     * Remove the environment name from migration path
+     * Remove the environment name from migration path.
      *
      * @param $path
      * @return string
