@@ -206,6 +206,34 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
     }
 
+    public function testCustomPivotClassUpdatesTimestamps()
+    {
+        Carbon::setTestNow('2017-10-10 10:10:10');
+
+        $post = Post::create(['title' => Str::random()]);
+        $tag = TagWithCustomPivot::create(['name' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            [
+                'post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty',
+                'created_at' => '1507630210',
+                'updated_at' => '1507630210',
+            ],
+        ]);
+
+        Carbon::setTestNow('2017-10-10 10:10:20'); // +10 seconds
+
+        $this->assertEquals(
+            1,
+            $post->tagsWithCustomExtraPivot()->updateExistingPivot($tag->id, ['flag' => 'exclude'])
+        );
+        foreach ($post->tagsWithCustomExtraPivot as $tag) {
+            $this->assertSame('exclude', $tag->pivot->flag);
+            $this->assertEquals('1507630210', $tag->pivot->getAttributes()['created_at']);
+            $this->assertEquals('1507630220', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+        }
+    }
+
     public function testAttachMethod()
     {
         $post = Post::create(['title' => Str::random()]);
