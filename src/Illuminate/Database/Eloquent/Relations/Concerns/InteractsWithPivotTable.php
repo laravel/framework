@@ -403,7 +403,7 @@ trait InteractsWithPivotTable
      * @param  string  $column
      * @return bool
      */
-    protected function hasPivotColumn($column)
+    public function hasPivotColumn($column)
     {
         return in_array($column, $this->pivotColumns);
     }
