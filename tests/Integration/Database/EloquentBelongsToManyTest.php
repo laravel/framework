@@ -187,8 +187,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $tag = TagWithCustomPivot::create(['name' => Str::random()]);
 
         DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
+            [
+                'post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty',
+                'created_at' => '1507630210',
+                'updated_at' => '1507630210',
+            ],
         ]);
+
+        Carbon::setTestNow('2017-10-10 10:10:20'); // +10 seconds
 
         // Test on actually existing pivot
         $this->assertEquals(
@@ -197,6 +203,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertEquals('exclude', $tag->pivot->flag);
+            $this->assertEquals('1507630210', $tag->pivot->getAttributes()['created_at']);
+            $this->assertEquals('1507630220', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
         }
 
         // Test on non-existent pivot
