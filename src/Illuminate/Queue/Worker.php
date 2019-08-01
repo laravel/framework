@@ -114,6 +114,7 @@ class Worker
                 if ($this->supportsAsyncSignals()) {
                     $this->registerTimeoutHandler($job, $options);
                 }
+
                 $this->runJob($job, $connectionName, $options);
             } else {
                 $this->sleep($options->sleep);
