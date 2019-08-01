@@ -28,8 +28,10 @@ class Carbon extends BaseCarbon
     {
         static::setTestNow($now);
 
-        $callback($now);
-
-        static::setTestNow();
+        try {
+            $callback($now);
+        } finally {
+            static::setTestNow();
+        }
     }
 }
