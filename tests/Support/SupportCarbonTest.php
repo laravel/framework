@@ -20,7 +20,7 @@ class SupportCarbonTest extends TestCase
     {
         parent::setUp();
 
-        Carbon::setTestNow($this->now = Carbon::create(2017, 6, 27, 13, 14, 15, 'UTC'));
+        $this->now = Carbon::create(2017, 6, 27, 13, 14, 15, 'UTC');
     }
 
     protected function tearDown(): void
@@ -45,7 +45,9 @@ class SupportCarbonTest extends TestCase
             return (int) ($this->diffInYears($dt, $abs) / 10);
         });
 
-        $this->assertSame(2, $this->now->diffInDecades(Carbon::now()->addYears(25)));
+        Carbon::freezeAt($this->now, function () {
+            $this->assertSame(2, $this->now->diffInDecades(Carbon::now()->addYears(25)));
+        });
     }
 
     public function testCarbonIsMacroableWhenCalledStatically()
@@ -54,7 +56,9 @@ class SupportCarbonTest extends TestCase
             return Carbon::now()->subDays(2)->setTime(12, 0, 0);
         });
 
-        $this->assertSame('2017-06-25 12:00:00', Carbon::twoDaysAgoAtNoon()->toDateTimeString());
+        Carbon::freezeAt($this->now, function () {
+            $this->assertSame('2017-06-25 12:00:00', Carbon::twoDaysAgoAtNoon()->toDateTimeString());
+        });
     }
 
     public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
@@ -71,6 +75,13 @@ class SupportCarbonTest extends TestCase
         $this->expectExceptionMessage('nonExistingMacro does not exist.');
 
         Carbon::now()->nonExistingMacro();
+    }
+
+    public function testFreezeKeepsTimeFrozen()
+    {
+        Carbon::freeze(function ($now) {
+            $this->assertEquals(Carbon::now(), $now);
+        });
     }
 
     public function testCarbonAllowsCustomSerializer()
