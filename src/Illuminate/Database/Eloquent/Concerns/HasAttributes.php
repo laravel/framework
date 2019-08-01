@@ -571,6 +571,12 @@ trait HasAttributes
             return $this->setMutatedAttributeValue($key, $value);
         }
 
+        // We can also apply a less greedy mutator which allows the developer
+        // to mutate the data before being handled by the defined castings.
+        elseif ($this->hasSetAndCastMutator($key)) {
+            $value = $this->setAndCastMutatedAttributeValue($key, $value);
+        }
+
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
@@ -615,6 +621,29 @@ trait HasAttributes
     protected function setMutatedAttributeValue($key, $value)
     {
         return $this->{'set'.Str::studly($key).'Attribute'}($value);
+    }
+
+    /**
+     * Determine if a set and cast mutator exists for an attribute.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasSetAndCastMutator($key)
+    {
+        return method_exists($this, 'setAndCast'.Str::studly($key).'Attribute');
+    }
+
+    /**
+     * Set the value of an attribute using its mutator and casting.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function setAndCastMutatedAttributeValue($key, $value)
+    {
+        return $this->{'setAndCast'.Str::studly($key).'Attribute'}($value);
     }
 
     /**
