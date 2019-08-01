@@ -15,7 +15,7 @@ class HttpJsonResponseTest extends TestCase
     /**
      * @dataProvider setAndRetrieveDataProvider
      *
-     * @param  $data
+     * @param  mixed  $data
      */
     public function testSetAndRetrieveData($data): void
     {

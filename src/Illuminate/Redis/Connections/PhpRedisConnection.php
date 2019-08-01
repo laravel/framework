@@ -149,7 +149,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @param  string  $key
      * @param  int  $count
-     * @param  $value  $value
+     * @param  mixed  $value
      * @return int|false
      */
     public function lrem($key, $count, $value)
