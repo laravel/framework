@@ -63,7 +63,7 @@ class AuthAccessGateTest extends TestCase
         $gate = new Gate(new Container, function () {
         });
 
-        $gate->before(function (?StdClass $user) {
+        $gate->before(function (?stdClass $user) {
             return true;
         });
 
@@ -75,7 +75,7 @@ class AuthAccessGateTest extends TestCase
         $gate = new Gate(new Container, function () {
         });
 
-        $gate->after(function (?StdClass $user) {
+        $gate->after(function (?stdClass $user) {
             return true;
         });
 
@@ -87,11 +87,11 @@ class AuthAccessGateTest extends TestCase
         $gate = new Gate(new Container, function () {
         });
 
-        $gate->define('foo', function (?StdClass $user) {
+        $gate->define('foo', function (?stdClass $user) {
             return true;
         });
 
-        $gate->define('bar', function (StdClass $user) {
+        $gate->define('bar', function (stdClass $user) {
             return false;
         });
 
@@ -148,19 +148,19 @@ class AuthAccessGateTest extends TestCase
         $gate = new Gate(new Container, function () {
         });
 
-        $gate->before(function (?StdClass $user) {
+        $gate->before(function (?stdClass $user) {
             $_SERVER['__laravel.gateBefore'] = true;
         });
 
-        $gate->after(function (?StdClass $user) {
+        $gate->after(function (?stdClass $user) {
             $_SERVER['__laravel.gateAfter'] = true;
         });
 
-        $gate->before(function (StdClass $user) {
+        $gate->before(function (stdClass $user) {
             $_SERVER['__laravel.gateBefore2'] = true;
         });
 
-        $gate->after(function (StdClass $user) {
+        $gate->after(function (stdClass $user) {
             $_SERVER['__laravel.gateAfter2'] = true;
         });
 
@@ -818,7 +818,7 @@ class AccessGateTestGuestNullableInvokable
 {
     public static $calledMethod = null;
 
-    public function __invoke(?StdClass $user)
+    public function __invoke(?stdClass $user)
     {
         static::$calledMethod = 'Nullable __invoke was called';
 
@@ -961,12 +961,12 @@ class AccessGateTestPolicyWithAllPermissions
 
 class AccessGateTestPolicyThatAllowsGuests
 {
-    public function before(?StdClass $user)
+    public function before(?stdClass $user)
     {
         $_SERVER['__laravel.testBefore'] = true;
     }
 
-    public function edit(?StdClass $user, AccessGateTestDummy $dummy)
+    public function edit(?stdClass $user, AccessGateTestDummy $dummy)
     {
         return true;
     }
@@ -979,12 +979,12 @@ class AccessGateTestPolicyThatAllowsGuests
 
 class AccessGateTestPolicyWithNonGuestBefore
 {
-    public function before(StdClass $user)
+    public function before(stdClass $user)
     {
         $_SERVER['__laravel.testBefore'] = true;
     }
 
-    public function edit(?StdClass $user, AccessGateTestDummy $dummy)
+    public function edit(?stdClass $user, AccessGateTestDummy $dummy)
     {
         return true;
     }
