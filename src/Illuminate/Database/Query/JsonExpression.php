@@ -43,7 +43,7 @@ class JsonExpression extends Expression
                 return '?';
             case 'object':
             case 'array':
-                return 'cast(? as json)';
+                return '?';
         }
 
         throw new InvalidArgumentException("JSON value is of illegal type: {$type}");

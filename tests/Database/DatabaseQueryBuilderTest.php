@@ -2286,31 +2286,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
     }
 
-    public function testMySqlUpdateWrappingJsonArrayAndObject()
-    {
-        $grammar = new MySqlGrammar;
-        $processor = m::mock(Processor::class);
-
-        $connection = $this->createMock(ConnectionInterface::class);
-        $connection->expects($this->once())
-                    ->method('update')
-                    ->with(
-                        'update `users` set `options` = ?, `meta` = json_set(`meta`, \'$."tags"\', cast(? as json)), `group_id` = 45 where `active` = ?',
-                        [
-                            json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
-                            json_encode(['white', 'large']),
-                            1,
-                        ]
-                    );
-
-        $builder = new Builder($connection, $grammar, $processor);
-        $builder->from('users')->where('active', 1)->update([
-            'options' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
-            'meta->tags' => ['white', 'large'],
-            'group_id' => new Raw('45'),
-        ]);
-    }
-
     public function testMySqlUpdateWithJsonPreparesBindingsCorrectly()
     {
         $grammar = new MySqlGrammar;
@@ -2355,22 +2330,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('update')
             ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"language"}\', \'null\')', []);
         $builder->from('users')->update(['options->language' => new Raw("'null'")]);
-    }
-
-    public function testPostgresUpdateWrappingJsonArrayAndObject()
-    {
-        $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')
-            ->with('update "users" set "options" = ?, "meta" = jsonb_set("meta"::jsonb, \'{"tags"}\', ?), "group_id" = 45', [
-                json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
-                json_encode(['white', 'large']),
-            ]);
-
-        $builder->from('users')->update([
-            'options' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
-            'meta->tags' => ['white', 'large'],
-            'group_id' => new Raw('45'),
-        ]);
     }
 
     public function testMySqlWrappingJsonWithString()
