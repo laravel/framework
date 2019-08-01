@@ -460,6 +460,8 @@ class Migrator
             return Str::endsWith($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php');
         })->filter()->sortBy(function ($file) {
             return $this->getMigrationName($file);
+        })->filter(function ($file) {
+            return $this->checkEnvironment($file);
         })->values()->keyBy(function ($file) {
             return $this->getMigrationName($file);
         })->all();
@@ -486,7 +488,44 @@ class Migrator
      */
     public function getMigrationName($path)
     {
-        return str_replace('.php', '', basename($path));
+        return str_replace('.php', '', $this->removeEnvironmentFromPath(basename($path)));
+    }
+
+    /**
+     * Check if file has to run in current environment
+     *
+     * @param $file
+     * @return bool
+     */
+    public function checkEnvironment($file)
+    {
+        return app()->environment($this->getEnvironmentName($file));
+    }
+
+    /**
+     * Get the environment name from file
+     *
+     * @param $file
+     * @return string
+     */
+    public function getEnvironmentName($file)
+    {
+        if(preg_match('/\.(.*)\.php$/', $file, $matches)) {
+            $environment = $matches[1];
+        }
+
+        return $environment ?? app()->environment();
+    }
+
+    /**
+     * Remove the environment name from migration path
+     *
+     * @param $path
+     * @return string
+     */
+    public function removeEnvironmentFromPath($path)
+    {
+        return preg_replace('/\..*\.php$/', '', $path) ?? $path;
     }
 
     /**
