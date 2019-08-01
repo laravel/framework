@@ -179,6 +179,33 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotEmpty($results['detached']);
     }
 
+    public function test_custom_pivot_class_using_update_existing_pivot()
+    {
+        Carbon::setTestNow('2017-10-10 10:10:10');
+
+        $post = Post::create(['title' => Str::random()]);
+        $tag = TagWithCustomPivot::create(['name' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
+        ]);
+
+        // Test on actually existing pivot
+        $this->assertEquals(
+            1,
+            $post->tagsWithCustomExtraPivot()->updateExistingPivot($tag->id, ['flag' => 'exclude'])
+        );
+        foreach ($post->tagsWithCustomExtraPivot as $tag) {
+            $this->assertEquals('exclude', $tag->pivot->flag);
+        }
+
+        // Test on non-existent pivot
+        $this->assertEquals(
+            0,
+            $post->tagsWithCustomExtraPivot()->updateExistingPivot(0, ['flag' => 'exclude'])
+        );
+    }
+
     public function test_attach_method()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -774,6 +801,14 @@ class Post extends Model
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
             ->using(PostTagPivot::class)
             ->withTimestamps();
+    }
+
+    public function tagsWithCustomExtraPivot()
+    {
+        return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
+            ->using(PostTagPivot::class)
+            ->withTimestamps()
+            ->withPivot('flag');
     }
 
     public function tagsWithCustomPivotClass()
