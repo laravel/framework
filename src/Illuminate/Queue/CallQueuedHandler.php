@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Exception;
 use ReflectionClass;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -45,9 +46,13 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
-        $this->dispatcher->dispatchNow(
-            $command, $this->resolveHandler($job, $command)
-        );
+        (new Pipeline)->send($command)
+                ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
+                ->then(function ($command) use ($job) {
+                    $this->dispatcher->dispatchNow(
+                        $command, $this->resolveHandler($job, $command)
+                    );
+                });
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
