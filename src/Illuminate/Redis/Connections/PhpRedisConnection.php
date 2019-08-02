@@ -100,7 +100,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @param  string  $key
      * @param  dynamic  $dictionary
-     * @return int
+     * @return array
      */
     public function hmget($key, ...$dictionary)
     {
