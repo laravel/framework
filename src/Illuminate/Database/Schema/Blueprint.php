@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Traits\Macroable;
@@ -981,9 +982,11 @@ class Blueprint
      */
     public function timestamps($precision = 0)
     {
-        $this->timestamp('created_at', $precision)->nullable();
+        $this->timestamp('created_at', $precision)->useCurrent();
 
-        $this->timestamp('updated_at', $precision)->nullable();
+        $this->timestamp('updated_at', $precision)->default(
+            new Expression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
+        );
     }
 
     /**
