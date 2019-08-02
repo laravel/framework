@@ -21,6 +21,7 @@
         "illuminate/contracts": "^6.0",
         "illuminate/database": "^6.0",
         "illuminate/filesystem": "^6.0",
+        "illuminate/pipeline": "^6.0",
         "illuminate/support": "^6.0",
         "opis/closure": "^3.1",
         "symfony/debug": "^4.3",
