@@ -68,6 +68,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(json_encode(['name' => 'taylor']), $attributes['list_items']);
     }
 
+    public function testCastAttributeCanBeMutated()
+    {
+        $model = new EloquentModelStub;
+        $model->colors = ['green', ' red', 'blue ', ' orange ', ' p ink '];
+        $this->assertEquals(['green', 'red', 'blue', 'orange', 'p ink'], $model->colors->all());
+    }
+
     public function testDirtyAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
@@ -1952,6 +1959,7 @@ class EloquentModelStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = EloquentModelSaveStub::class;
+    protected $casts = ['colors' => 'collection'];
 
     public function getListItemsAttribute($value)
     {
@@ -1971,6 +1979,11 @@ class EloquentModelStub extends Model
     public function setPasswordAttribute($value)
     {
         $this->attributes['password_hash'] = sha1($value);
+    }
+
+    public function setColorsAttribute($value)
+    {
+        return array_map('trim', $value);
     }
 
     public function publicIncrement($column, $amount = 1, $extra = [])

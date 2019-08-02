@@ -568,7 +568,11 @@ trait HasAttributes
         // which simply lets the developers tweak the attribute as it is set on
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
-            return $this->setMutatedAttributeValue($key, $value);
+            $value = $this->setMutatedAttributeValue($key, $value);
+
+            if (is_null($value)) {
+                return $value;
+            }
         }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime
