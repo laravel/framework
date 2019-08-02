@@ -220,11 +220,26 @@ class AuthenticationTest extends TestCase
         $this->assertTrue($this->app['auth']->check());
         $this->assertNotNull($this->app['auth']->user()->getRememberToken());
 
+        $this->app['auth']->logout();
+
+        $this->assertFalse($this->app['auth']->check());
+    }
+
+    public function test_logging_in_out_all_devices_via_attempt_remembering()
+    {
+        $this->assertTrue(
+            $this->app['auth']->attempt(['email' => 'email', 'password' => 'password'], true)
+        );
+        $this->assertInstanceOf(AuthenticationTestUser::class, $this->app['auth']->user());
+        $this->assertTrue($this->app['auth']->check());
+        $this->assertNotNull($this->app['auth']->user()->getRememberToken());
+
         $oldToken = $this->app['auth']->user()->getRememberToken();
         $user = $this->app['auth']->user();
 
-        $this->app['auth']->logout();
+        $this->app['auth']->logoutAllDevices();
 
+        $this->assertFalse($this->app['auth']->check());
         $this->assertNotNull($user->getRememberToken());
         $this->assertNotEquals($oldToken, $user->getRememberToken());
     }
