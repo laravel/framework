@@ -160,9 +160,10 @@ class CallQueuedHandlerTestJobWithMiddleware
                 public function handle($command, $next)
                 {
                     CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = $command;
+
                     return $next($command);
                 }
-            }
+            },
         ];
     }
 }
@@ -187,6 +188,7 @@ class TestJobMiddleware
     public function handle($command, $next)
     {
         $_SERVER['__test.dispatchMiddleware'] = true;
+
         return $next($command);
     }
 }
