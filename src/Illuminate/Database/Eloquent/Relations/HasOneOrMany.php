@@ -232,11 +232,22 @@ abstract class HasOneOrMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values);
+        $instance = null;
 
-            $instance->save();
-        });
+        // Use the models that have already been loaded by the parent. This will solve
+        // the n + 1 query problem for the developer and also increase performance.
+        if (empty($attributes)) {
+            $relation = $this->related->getTable();
+            $instance = $this->parent->getRelation($relation)->first();
+        }
+
+        $instance = $instance ?? $this->firstOrNew($attributes);
+
+        $instance->fill($values);
+
+        $instance->save();
+
+        return $instance;
     }
 
     /**
