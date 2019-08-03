@@ -21,6 +21,20 @@ class FileFactory
     }
 
     /**
+     * Create a new fake file with content from the $inputFile.
+     *
+     * @param  string  $name
+     * @param  string  $inputFile
+     * @return  \Illuminate\Http\Testing\File
+     */
+    public function createFromFile($name, $inputFile)
+    {
+        return new File($name, tap(tmpfile(), function ($temp) use ($inputFile) {
+            fwrite($temp, file_get_contents($inputFile));
+        }));
+    }
+
+    /**
      * Create a new fake image.
      *
      * @param  string  $name

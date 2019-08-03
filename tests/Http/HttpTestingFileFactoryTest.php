@@ -28,4 +28,13 @@ class HttpTestingFileFactoryTest extends TestCase
         $this->assertSame(15, $info[0]);
         $this->assertSame(20, $info[1]);
     }
+
+    public function testCreateFromFile()
+    {
+        $file = (new FileFactory)->createFromFile('test.txt', __DIR__ . '/fixtures/test.txt');
+
+        $this->assertEquals('This is a story about something that happened long ago when your grandfather was a child.',
+            trim($file->get()));
+        $this->assertSame('test.txt', $file->name);
+    }
 }
