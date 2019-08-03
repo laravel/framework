@@ -2357,7 +2357,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->update(['options->language' => new Raw("'null'")]);
     }
 
-    public function testPostgresUpdateWrappingJsonArrayAndObject()
+    public function testPostgresUpdateWrappingJsonArray()
     {
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')
