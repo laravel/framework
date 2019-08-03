@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToTest;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -24,8 +25,18 @@ class EloquentBelongsToTest extends DatabaseTestCase
             $table->string('parent_slug')->nullable();
         });
 
+        Schema::create('posts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('user_id')->nullable();
+            $table->string('title');
+            $table->timestamps();
+        });
+
         $user = User::create(['slug' => Str::random()]);
         User::create(['parent_id' => $user->id, 'parent_slug' => $user->slug]);
+
+        $post = Post::create(['title' => 'dives']);
+        $user->posts()->save($post);
     }
 
     public function test_has_self()
@@ -74,6 +85,24 @@ class EloquentBelongsToTest extends DatabaseTestCase
         $this->assertEquals($child->id, $child->parent_id);
         $this->assertFalse($child->relationLoaded('parent'));
     }
+
+    public function test_updateOrCreate_method()
+    {
+        $user = User::first();
+
+        $user->posts()->updateOrCreate(['title' => 'dives'], ['title' => 'wavez']);
+        $this->assertEquals('wavez', $user->posts()->first()->fresh()->title);
+
+        $user->posts()->updateOrCreate(['id' => 'asd'], ['title' => 'vapor']);
+        $this->assertNotNull($user->posts()->whereTitle('vapor')->first());
+
+        $user = User::with('posts')->first();
+
+        DB::enableQueryLog();
+        $user->posts()->updateOrCreate([], ['title' => 'nova']);
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertEquals('nova', $user->fresh()->posts()->first()->title);
+    }
 }
 
 class User extends Model
@@ -89,5 +118,23 @@ class User extends Model
     public function parentBySlug()
     {
         return $this->belongsTo(self::class, 'parent_slug', 'slug');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'user_id');
+    }
+}
+
+
+class Post extends Model
+{
+    public $table = 'posts';
+    public $timestamps = true;
+    protected $guarded = ['id'];
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
     }
 }
