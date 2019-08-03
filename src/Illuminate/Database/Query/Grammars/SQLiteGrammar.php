@@ -193,9 +193,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function compileUpdateWithJoinsOrLimit(Builder $query, $columns)
     {
-        $segments = preg_split('/\s+as\s+/i', $query->from);
-
-        $alias = $segments[1] ?? $segments[0];
+        $alias = last(preg_split('/\s+as\s+/i', $query->from));
 
         $selectSql = parent::compileSelect($query->select($alias.'.rowid'));
 
@@ -230,9 +228,7 @@ class SQLiteGrammar extends Grammar
             return $this->compileDeleteWithJoinsOrLimit($query);
         }
 
-        $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return trim("delete from {$this->wrapTable($query->from)} $wheres");
+        return parent::compileDelete($query);
     }
 
     /**
@@ -243,13 +239,13 @@ class SQLiteGrammar extends Grammar
      */
     protected function compileDeleteWithJoinsOrLimit(Builder $query)
     {
-        $segments = preg_split('/\s+as\s+/i', $query->from);
+        $table = $this->wrapTable($query->from);
 
-        $alias = $segments[1] ?? $segments[0];
+        $alias = last(preg_split('/\s+as\s+/i', $query->from));
 
-        $selectSql = parent::compileSelect($query->select($alias.'.rowid'));
+        $selectSql = $this->compileSelect($query->select($alias.'.rowid'));
 
-        return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
+        return "delete from {$table} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**

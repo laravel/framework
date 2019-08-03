@@ -295,41 +295,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a delete statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileDelete(Builder $query)
-    {
-        $table = $this->wrapTable($query->from);
-
-        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return isset($query->joins)
-                    ? $this->compileDeleteWithJoins($query, $table, $where)
-                    : trim("delete from {$table} {$where}");
-    }
-
-    /**
-     * Compile a delete statement with joins into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $table
-     * @param  string  $where
-     * @return string
-     */
-    protected function compileDeleteWithJoins(Builder $query, $table, $where)
-    {
-        $joins = ' '.$this->compileJoins($query, $query->joins);
-
-        $alias = stripos($table, ' as ') !== false
-                ? explode(' as ', $table)[1] : $table;
-
-        return trim("delete {$alias} from {$table}{$joins} {$where}");
-    }
-
-    /**
      * Compile a truncate table statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
