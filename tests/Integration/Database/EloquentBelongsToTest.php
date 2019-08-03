@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToTest;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
