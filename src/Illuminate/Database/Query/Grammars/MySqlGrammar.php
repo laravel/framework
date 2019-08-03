@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\JsonExpression;
 
 class MySqlGrammar extends Grammar
 {
@@ -145,7 +144,7 @@ class MySqlGrammar extends Grammar
     {
         return collect($values)->map(function ($value, $key) {
             if ($this->isJsonSelector($key)) {
-                return $this->compileJsonUpdateColumn($key, new JsonExpression($value));
+                return $this->compileJsonUpdateColumn($key, $value);
             }
 
             return $this->wrap($key).' = '.$this->parameter($value);
@@ -153,17 +152,25 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Prepares a JSON column being updated using the JSON_SET function.
+     * Prepare a JSON column being updated using the JSON_SET function.
      *
      * @param  string  $key
-     * @param  \Illuminate\Database\Query\JsonExpression  $value
+     * @param  mixed  $value
      * @return string
      */
-    protected function compileJsonUpdateColumn($key, JsonExpression $value)
+    protected function compileJsonUpdateColumn($key, $value)
     {
+        if (is_bool($value)) {
+            $value = $value ? 'true' : 'false';
+        } elseif (is_array($value)) {
+            $value = 'cast(? as json)';
+        } else {
+            $value = $this->parameter($value);
+        }
+
         [$field, $path] = $this->wrapJsonFieldAndPath($key);
 
-        return "{$field} = json_set({$field}{$path}, {$value->getValue()})";
+        return "{$field} = json_set({$field}{$path}, {$value})";
     }
 
     /**
