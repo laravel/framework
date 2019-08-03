@@ -57,12 +57,14 @@ class StartSession
 
         $this->storeCurrentUrl($request, $session);
 
-        $this->addCookieToResponse($response, $session);
+        if ($this->manager->driver()->isDirty()) {
+            $this->addCookieToResponse($response, $session);
 
-        // Again, if the session has been configured we will need to close out the session
-        // so that the attributes may be persisted to some storage medium. We will also
-        // add the session identifier cookie to the application response headers now.
-        $this->saveSession($request);
+            // Again, if the session has been configured we will need to close out the session
+            // so that the attributes may be persisted to some storage medium. We will also
+            // add the session identifier cookie to the application response headers now.
+            $this->saveSession($request);
+        }
 
         return $response;
     }

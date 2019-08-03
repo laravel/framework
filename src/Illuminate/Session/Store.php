@@ -33,6 +33,13 @@ class Store implements Session
     protected $attributes = [];
 
     /**
+     * The session attributes when started.
+     *
+     * @var array
+     */
+    protected $originalAttributes = [];
+
+    /**
      * The session handler implementation.
      *
      * @var \SessionHandlerInterface
@@ -84,7 +91,7 @@ class Store implements Session
      */
     protected function loadSession()
     {
-        $this->attributes = array_merge($this->attributes, $this->readFromHandler());
+        $this->originalAttributes = $this->attributes = array_merge($this->attributes, $this->readFromHandler());
     }
 
     /**
@@ -668,5 +675,13 @@ class Store implements Session
         if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDirty()
+    {
+        return $this->originalAttributes !== $this->attributes;
     }
 }
