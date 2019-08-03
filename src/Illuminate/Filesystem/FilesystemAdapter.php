@@ -646,11 +646,16 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Create a directory.
      *
      * @param  string  $path
+     * @param  mixed  $options
      * @return bool
      */
-    public function makeDirectory($path)
+    public function makeDirectory($path, $options = [])
     {
-        return $this->driver->createDir($path);
+        $options = is_string($options)
+                     ? ['visibility' => $options]
+                     : (array) $options;
+
+        return $this->driver->createDir($path, $options);
     }
 
     /**
