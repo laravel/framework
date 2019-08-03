@@ -484,7 +484,15 @@ class BelongsToMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        $instance = null;
+
+        // Use the models that have already been loaded by the parent. This will solve
+        // the n + 1 query problem for the developer and also increase performance.
+        if (empty($attributes)) {
+            $instance = $this->parent->getRelation($this->related->getTable())->first();
+        }
+
+        if (! $instance && is_null($instance = $this->where($attributes)->first())) {
             return $this->create($values, $joining, $touch);
         }
 
