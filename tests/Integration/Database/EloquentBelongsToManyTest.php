@@ -391,6 +391,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tags()->updateOrCreate(['id' => 'asd'], ['name' => 'dives']);
         $this->assertNotNull($post->tags()->whereName('dives')->first());
+
+        $post = Post::with('tags')->first();
+
+        DB::enableQueryLog();
+        $post->tags()->updateOrCreate([], ['name' => 'vapor']);
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertEquals('vapor', $tag->fresh()->name);
     }
 
     public function test_sync_method()
