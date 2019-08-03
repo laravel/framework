@@ -443,7 +443,10 @@ class Validator implements ValidatorContract
     protected function getPrimaryAttribute($attribute)
     {
         foreach ($this->implicitAttributes as $unparsed => $parsed) {
-            if (in_array($attribute, $parsed)) {
+            if (
+                is_numeric($attribute) ?
+                in_array($attribute, $parsed) :
+                in_array($attribute, $parsed, true)) {
                 return $unparsed;
             }
         }
