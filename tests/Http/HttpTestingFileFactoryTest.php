@@ -31,7 +31,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testCreateFromFile()
     {
-        $file = (new FileFactory)->createFromFile('test.txt', __DIR__ . '/fixtures/test.txt');
+        $file = (new FileFactory)->createFromFile('test.txt', __DIR__ .'/fixtures/test.txt');
 
         $this->assertEquals('This is a story about something that happened long ago when your grandfather was a child.',
             trim($file->get()));
