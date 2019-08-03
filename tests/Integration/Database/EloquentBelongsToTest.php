@@ -126,7 +126,6 @@ class User extends Model
     }
 }
 
-
 class Post extends Model
 {
     public $table = 'posts';
