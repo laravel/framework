@@ -33,6 +33,13 @@ class Store implements Session
     protected $attributes = [];
 
     /**
+     * The session attributes when started.
+     *
+     * @var array
+     */
+    protected $originalAttributes = [];
+
+    /**
      * The session handler implementation.
      *
      * @var \SessionHandlerInterface
@@ -84,7 +91,7 @@ class Store implements Session
      */
     protected function loadSession()
     {
-        $this->attributes = array_merge($this->attributes, $this->readFromHandler());
+        $this->originalAttributes = $this->attributes = array_merge($this->attributes, $this->readFromHandler());
     }
 
     /**
@@ -123,11 +130,14 @@ class Store implements Session
      */
     public function save()
     {
+        $isDirty = $this->isDirty();
         $this->ageFlashData();
 
-        $this->handler->write($this->getId(), $this->prepareForStorage(
-            serialize($this->attributes)
-        ));
+        if ($isDirty) {
+            $this->handler->write($this->getId(), $this->prepareForStorage(
+                serialize($this->attributes)
+            ));
+        }
 
         $this->started = false;
     }
@@ -668,5 +678,15 @@ class Store implements Session
         if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
+    }
+
+    /**
+     * Determine if the session data has changed since loaded.
+     *
+     * @return bool
+     */
+    protected function isDirty()
+    {
+        return $this->originalAttributes !== $this->attributes;
     }
 }
