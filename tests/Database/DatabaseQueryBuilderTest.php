@@ -2224,7 +2224,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testTruncateMethod()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('statement')->once()->with('truncate "users"', []);
+        $builder->getConnection()->shouldReceive('statement')->once()->with('truncate table "users"', []);
         $builder->from('users')->truncate();
 
         $sqlite = new SQLiteGrammar;
