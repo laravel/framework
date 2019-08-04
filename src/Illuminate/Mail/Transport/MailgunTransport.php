@@ -29,7 +29,7 @@ class MailgunTransport extends Transport
     protected $domain;
 
     /**
-     * The Mailgun API end-point.
+     * The Mailgun API endpoint.
      *
      * @var string
      */
@@ -186,5 +186,26 @@ class MailgunTransport extends Transport
     public function setDomain($domain)
     {
         return $this->domain = $domain;
+    }
+
+    /**
+     * Get the API endpoint being used by the transport.
+     *
+     * @return string
+     */
+    public function getEndpoint()
+    {
+        return $this->endpoint;
+    }
+
+    /**
+     * Set the API endpoint being used by the transport.
+     *
+     * @param  string  $endpoint
+     * @return string
+     */
+    public function setEndpoint($endpoint)
+    {
+        return $this->endpoint = $endpoint;
     }
 }

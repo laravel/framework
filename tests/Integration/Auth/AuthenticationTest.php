@@ -229,6 +229,24 @@ class AuthenticationTest extends TestCase
         $this->assertNotEquals($oldToken, $user->getRememberToken());
     }
 
+    public function test_logging_in_out_current_device_via_remembering()
+    {
+        $this->assertTrue(
+            $this->app['auth']->attempt(['email' => 'email', 'password' => 'password'], true)
+        );
+        $this->assertInstanceOf(AuthenticationTestUser::class, $this->app['auth']->user());
+        $this->assertTrue($this->app['auth']->check());
+        $this->assertNotNull($this->app['auth']->user()->getRememberToken());
+
+        $oldToken = $this->app['auth']->user()->getRememberToken();
+        $user = $this->app['auth']->user();
+
+        $this->app['auth']->logoutCurrentDevice();
+
+        $this->assertNotNull($user->getRememberToken());
+        $this->assertEquals($oldToken, $user->getRememberToken());
+    }
+
     public function test_auth_via_attempt_remembering()
     {
         $provider = new EloquentUserProvider(app('hash'), AuthenticationTestUser::class);

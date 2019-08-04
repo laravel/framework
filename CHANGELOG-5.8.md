@@ -2,8 +2,17 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.29...5.8)
 
+### Added
+- Added`MakesHttpRequests::option()` and `MakesHttpRequests::optionJson()` methods ([#29258](https://github.com/laravel/framework/pull/29258))
+- Added `Blueprint::uuidMorphs()` and `Blueprint::nullableUuidMorphs()` methods ([#29289](https://github.com/laravel/framework/pull/29289))
+
 ### Fixed
 - Fixed collections with JsonSerializable items and mixed values ([#29205](https://github.com/laravel/framework/pull/29205))
+- Fixed MySQL Schema Grammar `$modifiers` order ([#29265](https://github.com/laravel/framework/pull/29265))
+- Fixed UPDATE query bindings on PostgreSQL ([#29272](https://github.com/laravel/framework/pull/29272))
+- Fixed default theme for Markdown mails ([#29274](https://github.com/laravel/framework/pull/29274))
+- Fixed UPDATE queries with alias on SQLite ([#29276](https://github.com/laravel/framework/pull/29276))
+- Fixed UPDATE and DELETE queries with join bindings on PostgreSQL ([#29306](https://github.com/laravel/framework/pull/29306))
 
 ### Reverted
 - Reverted: [Added possibility for `WithFaker::makeFaker()` use local `app.faker_locale` config](https://github.com/laravel/framework/pull/29123) ([#29250](https://github.com/laravel/framework/pull/29250))
@@ -13,6 +22,7 @@
 - Prevent a job from firing if it's been marked as deleted ([#29204](https://github.com/laravel/framework/pull/29204), [1003c27](https://github.com/laravel/framework/commit/1003c27b73f11472c1ebdb9238b839aefddfb048))
 - Add Postgres support for collation() on columns ([#29213](https://github.com/laravel/framework/pull/29213))
 - Allocate memory for error handling to allow handling memory exhaustion limits ([#29226](https://github.com/laravel/framework/pull/29226))
+- Teardown test suite after using fail() method ([#29267](https://github.com/laravel/framework/pull/29267))
 
 
 ## [v5.8.29 (2019-07-16)](https://github.com/laravel/framework/compare/v5.8.28...v5.8.29)
