@@ -37,7 +37,8 @@ use Illuminate\Contracts\Support\Arrayable;
  * @property-read HigherOrderCollectionProxy $sum
  * @property-read HigherOrderCollectionProxy $unique
  */
-class Collection implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable
+
+class Collection implements ArrayAccess, Enumerable
 {
     use Macroable;
 
