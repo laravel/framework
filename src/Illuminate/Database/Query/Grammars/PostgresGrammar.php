@@ -304,9 +304,7 @@ class PostgresGrammar extends Grammar
     {
         $table = $this->wrapTable($query->from);
 
-        $segments = preg_split('/\s+as\s+/i', $query->from);
-
-        $alias = $segments[1] ?? $segments[0];
+        $alias = last(preg_split('/\s+as\s+/i', $query->from));
 
         $selectSql = $this->compileSelect($query->select($alias.'.ctid'));
 
@@ -360,9 +358,7 @@ class PostgresGrammar extends Grammar
     {
         $table = $this->wrapTable($query->from);
 
-        $segments = preg_split('/\s+as\s+/i', $query->from);
-
-        $alias = $segments[1] ?? $segments[0];
+        $alias = last(preg_split('/\s+as\s+/i', $query->from));
 
         $selectSql = $this->compileSelect($query->select($alias.'.ctid'));
 
