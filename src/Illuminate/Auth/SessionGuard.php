@@ -532,7 +532,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Log this session out for the current user.
+     * Log the user out of the application on their current device only.
      *
      * @return void
      */
