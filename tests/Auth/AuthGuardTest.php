@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Auth\Events\CurrentDeviceLogout;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthGuardTest extends TestCase
@@ -323,6 +324,55 @@ class AuthGuardTest extends TestCase
 
         $mock->setUser($user);
         $mock->logout();
+    }
+
+    public function testLogoutCurrentDeviceRemovesRememberMeCookie()
+    {
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $mock = $this->getMockBuilder(SessionGuard::class)->setMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
+        $mock->setCookieJar($cookies = m::mock(CookieJar::class));
+        $user = m::mock(Authenticatable::class);
+        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+        $mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
+        $mock->expects($this->once())->method('recaller')->will($this->returnValue('non-null-cookie'));
+
+        $cookie = m::mock(Cookie::class);
+        $cookies->shouldReceive('forget')->once()->with('bar')->andReturn($cookie);
+        $cookies->shouldReceive('queue')->once()->with($cookie);
+        $mock->getSession()->shouldReceive('remove')->once()->with('foo');
+        $mock->setUser($user);
+        $mock->logoutCurrentDevice();
+        $this->assertNull($mock->getUser());
+    }
+
+    public function testLogoutCurrentDeviceDoesNotEnqueueRememberMeCookieForDeletionIfCookieDoesntExist()
+    {
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $mock = $this->getMockBuilder(SessionGuard::class)->setMethods(['getName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
+        $mock->setCookieJar($cookies = m::mock(CookieJar::class));
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getRememberToken')->andReturn(null);
+        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+        $mock->expects($this->once())->method('recaller')->will($this->returnValue(null));
+
+        $mock->getSession()->shouldReceive('remove')->once()->with('foo');
+        $mock->setUser($user);
+        $mock->logoutCurrentDevice();
+        $this->assertNull($mock->getUser());
+    }
+
+    public function testLogoutCurrentDeviceFiresLogoutEvent()
+    {
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $mock = $this->getMockBuilder(SessionGuard::class)->setMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
+        $mock->expects($this->once())->method('clearUserDataFromStorage');
+        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getRememberToken')->andReturn(null);
+        $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
+        $mock->setUser($user);
+        $events->shouldReceive('dispatch')->once()->with(m::type(CurrentDeviceLogout::class));
+        $mock->logoutCurrentDevice();
     }
 
     public function testLoginMethodQueuesCookieWhenRemembering()

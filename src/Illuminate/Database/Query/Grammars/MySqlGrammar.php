@@ -232,30 +232,9 @@ class MySqlGrammar extends Grammar
     {
         $values = collect($values)->reject(function ($value, $column) {
             return $this->isJsonSelector($column) && is_bool($value);
-        })->map(function ($value) {
-            return ! $this->isExpression($value) && (is_array($value) || is_object($value))
-                ? json_encode($value)
-                : $value;
         })->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);
-    }
-
-    /**
-     * Compile a delete statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileDelete(Builder $query)
-    {
-        $table = $this->wrapTable($query->from);
-
-        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return isset($query->joins)
-                    ? $this->compileDeleteWithJoins($query, $table, $where)
-                    : $this->compileDeleteWithoutJoins($query, $table, $where);
     }
 
     /**
@@ -266,9 +245,9 @@ class MySqlGrammar extends Grammar
      * @param  string  $where
      * @return string
      */
-    protected function compileDeleteWithoutJoins($query, $table, $where)
+    protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
     {
-        $sql = trim("delete from {$table} {$where}");
+        $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
 
         // When using MySQL, delete statements may contain order by statements and limits
         // so we will compile both of those here. Once we have finished compiling this
@@ -282,24 +261,6 @@ class MySqlGrammar extends Grammar
         }
 
         return $sql;
-    }
-
-    /**
-     * Compile a delete query that uses joins.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $table
-     * @param  string  $where
-     * @return string
-     */
-    protected function compileDeleteWithJoins($query, $table, $where)
-    {
-        $joins = ' '.$this->compileJoins($query, $query->joins);
-
-        $alias = stripos($table, ' as ') !== false
-                ? explode(' as ', $table)[1] : $table;
-
-        return trim("delete {$alias} from {$table}{$joins} {$where}");
     }
 
     /**

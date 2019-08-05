@@ -532,6 +532,32 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Log the user out of the application on their current device only.
+     *
+     * @return void
+     */
+    public function logoutCurrentDevice()
+    {
+        $user = $this->user();
+
+        // If we have an event dispatcher instance, we can fire off the logout event
+        // so any further processing can be done. This allows the developer to be
+        // listening for anytime a user signs out of this application manually.
+        $this->clearUserDataFromStorage();
+
+        if (isset($this->events)) {
+            $this->events->dispatch(new Events\CurrentDeviceLogout($this->name, $user));
+        }
+
+        // Once we have fired the logout event we will clear the users out of memory
+        // so they are no longer available as the user is no longer considered as
+        // being signed into this application and should not be available here.
+        $this->user = null;
+
+        $this->loggedOut = true;
+    }
+
+    /**
      * Invalidate other sessions for the current user.
      *
      * The application must be using the AuthenticateSession middleware.
