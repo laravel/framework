@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -3934,6 +3935,7 @@ class SupportCollectionTest extends TestCase
     {
         return [
             [Collection::class],
+            [LazyCollection::class],
         ];
     }
 }
