@@ -130,13 +130,24 @@ class DatabaseEloquentModelTest extends TestCase
         $attributes = $model->getAttributes();
 
         // ensure password attribute was not set to null
-        $this->assertArrayNotHasKey('password', $attributes);
+        $this->assertNull($attributes['password']);
         $this->assertEquals('******', $model->password);
 
         $hash = 'e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4';
 
         $this->assertEquals($hash, $attributes['password_hash']);
         $this->assertEquals($hash, $model->password_hash);
+    }
+
+    public function testCastedAttributesCanBeMutatedAndAccessed()
+    {
+        $model = new EloquentModelStub;
+        $model->colors = ['red', ' blue', 'green ', ' purple '];
+        $attributes = $model->getAttributes();
+
+        $this->assertEquals(json_encode(['red', 'blue', 'green', 'purple']), $attributes['colors']);
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $model->colors);
+        $this->assertEquals(['RED', 'BLUE', 'GREEN', 'PURPLE'], $model->colors->all());
     }
 
     public function testArrayAccessToAttributes()
@@ -1256,6 +1267,7 @@ class DatabaseEloquentModelTest extends TestCase
         $expectedAttributes = [
             'list_items',
             'password',
+            'colors',
             'appendable',
         ];
 
@@ -1967,6 +1979,7 @@ class EloquentModelStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     protected $morph_to_stub_type = EloquentModelSaveStub::class;
+    protected $casts = ['colors' => 'collection'];
 
     public function getListItemsAttribute($value)
     {
@@ -1975,7 +1988,7 @@ class EloquentModelStub extends Model
 
     public function setListItemsAttribute($value)
     {
-        $this->attributes['list_items'] = json_encode($value);
+        return json_encode($value);
     }
 
     public function getPasswordAttribute()
@@ -1986,6 +1999,20 @@ class EloquentModelStub extends Model
     public function setPasswordAttribute($value)
     {
         $this->attributes['password_hash'] = sha1($value);
+
+        return null;
+    }
+
+    public function getColorsAttribute($value)
+    {
+        return $value->map(function ($item, $key) {
+            return strtoupper($item);
+        });
+    }
+
+    public function setColorsAttribute($value)
+    {
+        return array_map('trim', $value);
     }
 
     public function publicIncrement($column, $amount = 1, $extra = [])
