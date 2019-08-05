@@ -237,15 +237,20 @@ class Message
      * Embed a file in the message and get the CID.
      *
      * @param  string  $file
+     * @param  string|null  $name
+     * @param  string|null  $contentType
      * @return string
      */
-    public function embed($file)
+    public function embed($file, $name = null, $contentType = null)
     {
-        if (isset($this->embeddedFiles[$file])) {
-            return $this->embeddedFiles[$file];
+        $hash = sha1($file.$name.$contentType);
+        if (isset($this->embeddedFiles[$hash])) {
+            return $this->embeddedFiles[$hash];
         }
 
-        return $this->embeddedFiles[$file] = $this->email->embedFromPath($file);
+        $this->email->embedFromPath($file, $name, $contentType);
+
+        return $this->embeddedFiles[$hash] = 'cid:'.head($this->email->getAttachments())->getContentId();
     }
 
     /**
