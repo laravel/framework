@@ -130,7 +130,7 @@ class DatabaseEloquentModelTest extends TestCase
         $attributes = $model->getAttributes();
 
         // ensure password attribute was not set to null
-        $this->assertNull($attributes['password']);
+        $this->assertEquals('', $attributes['password']);
         $this->assertEquals('******', $model->password);
 
         $hash = 'e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4';
@@ -2000,7 +2000,7 @@ class EloquentModelStub extends Model
     {
         $this->attributes['password_hash'] = sha1($value);
 
-        return null;
+        return '';
     }
 
     public function getColorsAttribute($value)
