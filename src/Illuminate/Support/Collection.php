@@ -943,6 +943,17 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Skip the first {$count} items.
+     *
+     * @param  int  $count
+     * @return static
+     */
+    public function skip($count)
+    {
+        return $this->slice($count);
+    }
+
+    /**
      * Slice the underlying collection array.
      *
      * @param  int  $offset

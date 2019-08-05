@@ -208,6 +208,18 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSkipMethod($collection)
+    {
+        $data = new $collection([1, 2, 3, 4, 5, 6]);
+
+        $data = $data->skip(4)->values();
+
+        $this->assertSame([5, 6], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testGetArrayableItems($collection)
     {
         $data = new $collection;

@@ -768,6 +768,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function shuffle($seed = null);
 
     /**
+     * Skip the first {$count} items.
+     *
+     * @param  int  $count
+     * @return static
+     */
+    public function skip($count);
+
+    /**
      * Get a slice of items from the enumerable.
      *
      * @param  int  $offset
