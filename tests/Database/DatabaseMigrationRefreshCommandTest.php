@@ -96,10 +96,7 @@ class ApplicationDatabaseRefreshStub extends Application
         foreach ($data as $abstract => $instance) {
             $this->instance($abstract, $instance);
         }
-    }
 
-    public function environment(...$environments)
-    {
-        return 'development';
+        $this['env'] = 'development';
     }
 }
