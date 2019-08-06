@@ -2987,7 +2987,7 @@ class Builder
     /**
      * Dump the current SQL and bindings.
      *
-     * @return void
+     * @return $this
      */
     public function dump()
     {
