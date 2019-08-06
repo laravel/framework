@@ -87,8 +87,9 @@ class CacheArrayStoreTest extends TestCase
     {
         $store = new ArrayStore;
         $store->put('foo', 'bar', 10);
-        $store->forget('foo');
+        $this->assertTrue($store->forget('foo'));
         $this->assertNull($store->get('foo'));
+        $this->assertFalse($store->forget('foo'));
     }
 
     public function testItemsCanBeFlushed()
