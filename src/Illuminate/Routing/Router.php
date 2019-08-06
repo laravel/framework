@@ -1120,13 +1120,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function uses(...$patterns)
     {
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $this->currentRouteAction())) {
-                return true;
-            }
-        }
-
-        return false;
+        return Str::is($patterns, $this->currentRouteAction());
     }
 
     /**
