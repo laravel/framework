@@ -626,7 +626,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         // If the application has already booted, we will call this boot method on
         // the provider class so it has an opportunity to do its boot logic and
         // will be ready for any usage by this developer's application logic.
-        if ($this->booted) {
+        if ($this->isBooted()) {
             $this->bootProvider($provider);
         }
 
@@ -740,7 +740,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this->register($instance = new $provider($this));
 
-        if (! $this->booted) {
+        if (! $this->isBooted()) {
             $this->booting(function () use ($instance) {
                 $this->bootProvider($instance);
             });
@@ -797,7 +797,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function boot()
     {
-        if ($this->booted) {
+        if ($this->isBooted()) {
             return;
         }
 
