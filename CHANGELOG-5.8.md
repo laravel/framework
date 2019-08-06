@@ -1,16 +1,22 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.30...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.31...5.8)
 
-### TODO:
-- Use date_create to prevent unsuppressible date validator warnings ([#29342](https://github.com/laravel/framework/pull/29342))
-- Make updateExistingPivot() safe on non-existent pivot ([#29362](https://github.com/laravel/framework/pull/29362))
-- Change visibility to public for hasPivotColumn method by pactode ([#29367](https://github.com/laravel/framework/pull/29367))
-- Fix worker timeout handler when there is no job processing ([#29366](https://github.com/laravel/framework/pull/29366))
-- Fix assertJsonValidationErrors with muliple messages ([#29380](https://github.com/laravel/framework/pull/29380))
-- Procedural date creation returned false ([#29389](https://github.com/laravel/framework/pull/29389))
-- Fix UPDATE queries with alias ([#29405](https://github.com/laravel/framework/pull/29405))
-- Add line break for plain text mails ([#29408](https://github.com/laravel/framework/pull/29408))
+
+## [v5.8.31 (2019-08-06)](https://github.com/laravel/framework/compare/v5.8.30...v5.8.31)
+
+### Fixed
+- Fixed FatalThrowableError in `updateExistingPivot()` when pivot is non-existent ([#29362](https://github.com/laravel/framework/pull/29362))
+- Fixed worker timeout handler when there is no job processing ([#29366](https://github.com/laravel/framework/pull/29366))
+- Fixed `assertJsonValidationErrors()` with muliple messages ([#29380](https://github.com/laravel/framework/pull/29380))
+- Fixed UPDATE queries with alias ([#29405](https://github.com/laravel/framework/pull/29405))
+
+### Changed
+- `Illuminate\Cache\ArrayStore::forget()` returns false on missing key ([#29427](https://github.com/laravel/framework/pull/29427))
+- Allow chaining on `QueryBuilder::dump()` method ([#29437](https://github.com/laravel/framework/pull/29437))
+- Change visibility to public for `hasPivotColumn()` method ([#29367](https://github.com/laravel/framework/pull/29367))
+- Added line break for plain text mails ([#29408](https://github.com/laravel/framework/pull/29408))
+- Use `date_create` to prevent date validator warnings ([#29342](https://github.com/laravel/framework/pull/29342), [#29389](https://github.com/laravel/framework/pull/29389))
 
 
 ## [v5.8.30 (2019-07-30)](https://github.com/laravel/framework/compare/v5.8.29...v5.8.30)
