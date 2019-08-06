@@ -156,10 +156,8 @@ abstract class ServiceProvider
 
         static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
 
-        if (! is_null($groups)) {
-            foreach ((array) $groups as $group) {
-                $this->addPublishGroup($group, $paths);
-            }
+        foreach ((array) $groups as $group) {
+            $this->addPublishGroup($group, $paths);
         }
     }
 
