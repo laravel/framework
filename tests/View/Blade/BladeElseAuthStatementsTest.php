@@ -7,12 +7,9 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 
-class BladeElseAuthStatementsTest extends TestCase
+class BladeElseAuthStatementsTest extends AbstractBladeTestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+
 
     public function testElseAuthStatementsAreCompiled()
     {
@@ -46,8 +43,6 @@ wheeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
-    protected function getFiles()
-    {
-        return m::mock(Filesystem::class);
-    }
+
+
 }

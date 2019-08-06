@@ -7,12 +7,10 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 
-class BladeElseGuestStatementsTest extends TestCase
+class BladeElseGuestStatementsTest extends AbstractBladeTestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+
+
 
     public function testIfStatementsAreCompiled()
     {
@@ -30,8 +28,6 @@ wheeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
-    protected function getFiles()
-    {
-        return m::mock(Filesystem::class);
-    }
+
+
 }
