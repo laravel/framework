@@ -2992,7 +2992,7 @@ class Builder
     public function dump()
     {
         dump($this->toSql(), $this->getBindings());
-        
+
         return $this;
     }
 
