@@ -68,7 +68,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param $driver
+     * @param  mixed  $driver
      *
      * @throws \Exception
      */

@@ -1,10 +1,28 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.29...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.30...5.8)
+
+### TODO:
+- Use date_create to prevent unsuppressible date validator warnings ([#29342](https://github.com/laravel/framework/pull/29342))
+- Make updateExistingPivot() safe on non-existent pivot ([#29362](https://github.com/laravel/framework/pull/29362))
+- Change visibility to public for hasPivotColumn method by pactode ([#29367](https://github.com/laravel/framework/pull/29367))
+- Fix worker timeout handler when there is no job processing ([#29366](https://github.com/laravel/framework/pull/29366))
+- Fix assertJsonValidationErrors with muliple messages ([#29380](https://github.com/laravel/framework/pull/29380))
+- Procedural date creation returned false ([#29389](https://github.com/laravel/framework/pull/29389))
+- Fix UPDATE queries with alias ([#29405](https://github.com/laravel/framework/pull/29405))
+- Add line break for plain text mails ([#29408](https://github.com/laravel/framework/pull/29408))
+
+
+## [v5.8.30 (2019-07-30)](https://github.com/laravel/framework/compare/v5.8.29...v5.8.30)
 
 ### Added
-- Added`MakesHttpRequests::option()` and `MakesHttpRequests::optionJson()` methods ([#29258](https://github.com/laravel/framework/pull/29258))
+- Added `MakesHttpRequests::option()` and `MakesHttpRequests::optionJson()` methods ([#29258](https://github.com/laravel/framework/pull/29258))
 - Added `Blueprint::uuidMorphs()` and `Blueprint::nullableUuidMorphs()` methods ([#29289](https://github.com/laravel/framework/pull/29289))
+- Added `MailgunTransport::getEndpoint()` and `MailgunTransport::setEndpoint()` methods ([#29312](https://github.com/laravel/framework/pull/29312))
+- Added `WEBP` to image validation rule ([#29309](https://github.com/laravel/framework/pull/29309))
+- Added `TestResponse::assertSessionHasInput()` method ([#29327](https://github.com/laravel/framework/pull/29327))
+- Added support for custom redis driver ([#29275](https://github.com/laravel/framework/pull/29275))
+- Added Postgres support for `collation()` on columns ([#29213](https://github.com/laravel/framework/pull/29213))
 
 ### Fixed
 - Fixed collections with JsonSerializable items and mixed values ([#29205](https://github.com/laravel/framework/pull/29205))
@@ -13,14 +31,15 @@
 - Fixed default theme for Markdown mails ([#29274](https://github.com/laravel/framework/pull/29274))
 - Fixed UPDATE queries with alias on SQLite ([#29276](https://github.com/laravel/framework/pull/29276))
 - Fixed UPDATE and DELETE queries with join bindings on PostgreSQL ([#29306](https://github.com/laravel/framework/pull/29306))
+- Fixed support of `DateTime` objects and `int` values in `orWhereDay()`, `orWhereMonth()`, `orWhereYear()` methods in the `Builder` ([#29317](https://github.com/laravel/framework/pull/29317))
+- Fixed DELETE queries with joins on PostgreSQL ([#29313](https://github.com/laravel/framework/pull/29313))
+- Prevented a job from firing if job marked as deleted ([#29204](https://github.com/laravel/framework/pull/29204), [1003c27](https://github.com/laravel/framework/commit/1003c27b73f11472c1ebdb9238b839aefddfb048))
+- Fixed model deserializing with custom `Model::newCollection()` ([#29196](https://github.com/laravel/framework/pull/29196))
 
 ### Reverted
 - Reverted: [Added possibility for `WithFaker::makeFaker()` use local `app.faker_locale` config](https://github.com/laravel/framework/pull/29123) ([#29250](https://github.com/laravel/framework/pull/29250))
 
-### TODO
-- tagged today breaks queue deserializing with Model::newCollection() ([#29196](https://github.com/laravel/framework/pull/29196))
-- Prevent a job from firing if it's been marked as deleted ([#29204](https://github.com/laravel/framework/pull/29204), [1003c27](https://github.com/laravel/framework/commit/1003c27b73f11472c1ebdb9238b839aefddfb048))
-- Add Postgres support for collation() on columns ([#29213](https://github.com/laravel/framework/pull/29213))
+### Changed
 - Allocate memory for error handling to allow handling memory exhaustion limits ([#29226](https://github.com/laravel/framework/pull/29226))
 - Teardown test suite after using fail() method ([#29267](https://github.com/laravel/framework/pull/29267))
 
