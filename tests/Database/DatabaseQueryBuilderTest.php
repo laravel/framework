@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use DateTime;
 use stdClass;
 use Mockery as m;
 use RuntimeException;
@@ -2295,10 +2296,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `options` = ?, `meta` = json_set(`meta`, \'$."tags"\', cast(? as json)), `group_id` = 45 where `active` = ?',
+                        'update `users` set `options` = ?, `meta` = json_set(`meta`, \'$."tags"\', cast(? as json)), `group_id` = 45, `created_at` = ? where `active` = ?',
                         [
                             json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
                             json_encode(['white', 'large']),
+                            new DateTime('2019-08-06'),
                             1,
                         ]
                     );
@@ -2308,6 +2310,7 @@ class DatabaseQueryBuilderTest extends TestCase
             'options' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
             'meta->tags' => ['white', 'large'],
             'group_id' => new Raw('45'),
+            'created_at' => new DateTime('2019-08-06'),
         ]);
     }
 
@@ -2361,15 +2364,17 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')
-            ->with('update "users" set "options" = ?, "meta" = jsonb_set("meta"::jsonb, \'{"tags"}\', ?), "group_id" = 45', [
+            ->with('update "users" set "options" = ?, "meta" = jsonb_set("meta"::jsonb, \'{"tags"}\', ?), "group_id" = 45, "created_at" = ?', [
                 json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
                 json_encode(['white', 'large']),
+                new DateTime('2019-08-06'),
             ]);
 
         $builder->from('users')->update([
             'options' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
             'meta->tags' => ['white', 'large'],
             'group_id' => new Raw('45'),
+            'created_at' => new DateTime('2019-08-06'),
         ]);
     }
 
