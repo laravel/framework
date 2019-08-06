@@ -691,13 +691,7 @@ class Route
             return false;
         }
 
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $routeName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return Str::is($patterns, $routeName);
     }
 
     /**
