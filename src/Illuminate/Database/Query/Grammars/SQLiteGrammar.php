@@ -189,7 +189,7 @@ class SQLiteGrammar extends Grammar
     {
         $table = $this->wrapTable($query->from);
 
-        $columns = collect($values)->map(function ($value, $key) use ($query) {
+        $columns = collect($values)->map(function ($value, $key) {
             return $this->wrap(Str::after($key, '.')).' = '.$this->parameter($value);
         })->implode(', ');
 
