@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Illuminate\View\Compilers\BladeCompiler;
-
 class BladeIfAuthStatementsTest extends AbstractBladeTestCase
 {
     public function testIfStatementsAreCompiled()
