@@ -8,7 +8,6 @@ class BladeElseAuthStatementsTest extends AbstractBladeTestCase
 {
     public function testElseAuthStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@auth("api")
 breeze
 @elseauth("standard")
@@ -19,12 +18,11 @@ breeze
 <?php elseif(auth()->guard("standard")->check()): ?>
 wheeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testPlainElseAuthStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@auth("api")
 breeze
 @elseauth
@@ -35,6 +33,6 @@ breeze
 <?php elseif(auth()->guard()->check()): ?>
 wheeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

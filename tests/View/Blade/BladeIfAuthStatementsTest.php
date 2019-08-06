@@ -8,25 +8,23 @@ class BladeIfAuthStatementsTest extends AbstractBladeTestCase
 {
     public function testIfStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@auth("api")
 breeze
 @endauth';
         $expected = '<?php if(auth()->guard("api")->check()): ?>
 breeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testPlainIfStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@auth
 breeze
 @endauth';
         $expected = '<?php if(auth()->guard()->check()): ?>
 breeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }
