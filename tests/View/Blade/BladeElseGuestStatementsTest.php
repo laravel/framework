@@ -2,16 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 
 class BladeElseGuestStatementsTest extends AbstractBladeTestCase
 {
-
-
-
     public function testIfStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -27,7 +21,4 @@ wheeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
-
-
-
 }
