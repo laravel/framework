@@ -47,7 +47,7 @@ class StartSession
 
         $sessionCookiePath = config('session.path', '/');
         $sessionCookiePath = preg_replace('/^\//', '', $sessionCookiePath); //remove the first slash
-        if(!empty($sessionCookiePath) && !Str::startsWith($request->path(), $sessionCookiePath)) {
+        if (! empty($sessionCookiePath) && ! Str::startsWith($request->path(), $sessionCookiePath)) {
             return $next($request); //do not initialize session if path do not match
         }
 
