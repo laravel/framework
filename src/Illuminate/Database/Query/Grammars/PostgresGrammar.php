@@ -248,7 +248,7 @@ class PostgresGrammar extends Grammar
         // columns and convert it to a parameter value. Then we will concatenate a
         // list of the columns that can be added into this update query clauses.
         return collect($values)->map(function ($value, $key) {
-            $column = Str::after($key, '.');
+            $column = Arr::last(explode('.', $key));
 
             if ($this->isJsonSelector($key)) {
                 return $this->compileJsonUpdateColumn($column, $value);
