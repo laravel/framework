@@ -2987,11 +2987,13 @@ class Builder
     /**
      * Dump the current SQL and bindings.
      *
-     * @return void
+     * @return $this
      */
     public function dump()
     {
         dump($this->toSql(), $this->getBindings());
+
+        return $this;
     }
 
     /**
