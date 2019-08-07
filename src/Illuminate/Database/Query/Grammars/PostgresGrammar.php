@@ -9,25 +9,6 @@ use Illuminate\Database\Query\Builder;
 class PostgresGrammar extends Grammar
 {
     /**
-     * The components that make up a select clause.
-     *
-     * @var array
-     */
-    protected $selectComponents = [
-        'aggregate',
-        'columns',
-        'from',
-        'joins',
-        'wheres',
-        'groups',
-        'havings',
-        'orders',
-        'limit',
-        'offset',
-        'lock',
-    ];
-
-    /**
      * All of the available clause operators.
      *
      * @var array
@@ -105,27 +86,6 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a select query into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileSelect(Builder $query)
-    {
-        if ($query->unions && $query->aggregate) {
-            return $this->compileUnionAggregate($query);
-        }
-
-        $sql = parent::compileSelect($query);
-
-        if ($query->unions) {
-            $sql = '('.$sql.') '.$this->compileUnions($query);
-        }
-
-        return $sql;
-    }
-
-    /**
      * Compile the "select *" portion of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -150,19 +110,6 @@ class PostgresGrammar extends Grammar
         }
 
         return $select.$this->columnize($columns);
-    }
-
-    /**
-     * Compile a single union statement.
-     *
-     * @param  array  $union
-     * @return string
-     */
-    protected function compileUnion(array $union)
-    {
-        $conjunction = $union['all'] ? ' union all ' : ' union ';
-
-        return $conjunction.'('.$union['query']->toSql().')';
     }
 
     /**

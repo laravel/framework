@@ -788,7 +788,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1);
         $builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
-        $this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ?', $builder->toSql());
+        $this->assertEquals('(select * from "users" where "id" = ?) union (select * from "users" where "id" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
@@ -817,6 +817,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->union($this->getSQLiteBuilder()->select('name')->from('users')->where('id', '=', 2));
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $expectedSql = 'select * from (select [name] from [users] where [id] = ?) as [temp_table] union select * from (select [name] from [users] where [id] = ?) as [temp_table]';
+        $builder->select('name')->from('users')->where('id', '=', 1);
+        $builder->union($this->getSqlServerBuilder()->select('name')->from('users')->where('id', '=', 2));
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
     public function testUnionAlls()
@@ -824,7 +831,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1);
         $builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
-        $this->assertEquals('select * from "users" where "id" = ? union all select * from "users" where "id" = ?', $builder->toSql());
+        $this->assertEquals('(select * from "users" where "id" = ?) union all (select * from "users" where "id" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $expectedSql = '(select * from "users" where "id" = ?) union all (select * from "users" where "id" = ?)';
@@ -841,7 +848,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1);
         $builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
         $builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 3));
-        $this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ? union select * from "users" where "id" = ?', $builder->toSql());
+        $this->assertEquals('(select * from "users" where "id" = ?) union (select * from "users" where "id" = ?) union (select * from "users" where "id" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
     }
 
@@ -851,7 +858,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1);
         $builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
         $builder->unionAll($this->getBuilder()->select('*')->from('users')->where('id', '=', 3));
-        $this->assertEquals('select * from "users" where "id" = ? union all select * from "users" where "id" = ? union all select * from "users" where "id" = ?', $builder->toSql());
+        $this->assertEquals('(select * from "users" where "id" = ?) union all (select * from "users" where "id" = ?) union all (select * from "users" where "id" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
     }
 
@@ -861,7 +868,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1);
         $builder->union($this->getBuilder()->select('*')->from('users')->where('id', '=', 2));
         $builder->orderBy('id', 'desc');
-        $this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ? order by "id" desc', $builder->toSql());
+        $this->assertEquals('(select * from "users" where "id" = ?) union (select * from "users" where "id" = ?) order by "id" desc', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
@@ -871,7 +878,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users');
         $builder->union($this->getBuilder()->select('*')->from('dogs'));
         $builder->skip(5)->take(10);
-        $this->assertEquals('select * from "users" union select * from "dogs" limit 10 offset 5', $builder->toSql());
+        $this->assertEquals('(select * from "users") union (select * from "dogs") limit 10 offset 5', $builder->toSql());
 
         $expectedSql = '(select * from "users") union (select * from "dogs") limit 10 offset 5';
         $builder = $this->getPostgresBuilder();
@@ -896,7 +903,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $join->on('dogs.breed_id', '=', 'breeds.id')
                 ->where('breeds.is_native', '=', 1);
         }));
-        $this->assertEquals('select * from "users" union select * from "dogs" inner join "breeds" on "dogs"."breed_id" = "breeds"."id" and "breeds"."is_native" = ?', $builder->toSql());
+        $this->assertEquals('(select * from "users") union (select * from "dogs" inner join "breeds" on "dogs"."breed_id" = "breeds"."id" and "breeds"."is_native" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
@@ -945,7 +952,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getSQLiteBuilder()->from('videos'))->count();
 
-        $expected = 'select count(*) as aggregate from (select * from [posts] union select * from [videos]) as [temp_table]';
+        $expected = 'select count(*) as aggregate from (select * from (select * from [posts]) as [temp_table] union select * from (select * from [videos]) as [temp_table]) as [temp_table]';
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
@@ -1232,7 +1239,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'));
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from (select "id" from "posts" union select "id" from "videos") as "temp_table"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
