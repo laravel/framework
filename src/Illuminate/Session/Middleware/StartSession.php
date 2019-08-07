@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -42,6 +43,12 @@ class StartSession
     {
         if (! $this->sessionConfigured()) {
             return $next($request);
+        }
+
+        $sessionCookiePath = config('session.path', '/');
+        $sessionCookiePath = preg_replace('/^\//', '', $sessionCookiePath); //remove the first slash
+        if(!Str::startsWith($request->path(), $sessionCookiePath)) {
+            return $next($request); //do not initialize session if path do not match
         }
 
         // If a session driver has been configured, we will need to start the session here
