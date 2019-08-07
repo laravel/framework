@@ -468,7 +468,7 @@ class Arr
      */
     public static function random($array, $number = null)
     {
-        $requested = is_null($number) ? 1 : $number;
+        $requested = is_null($number) ? 1 : (int) $number;
 
         $count = count($array);
 
@@ -478,23 +478,25 @@ class Arr
             );
         }
 
-        if (is_null($number)) {
-            return $array[array_rand($array)];
-        }
-
-        if ((int) $number === 0) {
+        if ($requested === 0) {
             return [];
         }
 
-        $keys = array_rand($array, $number);
-
         $results = [];
 
-        foreach ((array) $keys as $key) {
-            $results[] = $array[$key];
-        }
+        $array = array_values($array);
 
-        return $results;
+        do {
+            $key = random_int(0, $count - 1);
+
+            if (! array_key_exists($key, $results)) {
+                $results[$key] = $array[$key];
+            }
+        } while (count($results) < $requested);
+
+        $results = array_values($results);
+
+        return is_null($number) ? $results[0] : $results;
     }
 
     /**
