@@ -3,12 +3,12 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Session\Session;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
