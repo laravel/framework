@@ -676,15 +676,21 @@ class TestResponse
             );
 
             if (! is_int($key)) {
+                $hasError = false;
+
                 foreach (Arr::wrap($jsonErrors[$key]) as $jsonErrorMessage) {
                     if (Str::contains($jsonErrorMessage, $value)) {
-                        return $this;
+                        $hasError = true;
+
+                        break;
                     }
                 }
 
-                PHPUnit::fail(
-                    "Failed to find a validation error in the response for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
-                );
+                if (! $hasError) {
+                    PHPUnit::fail(
+                        "Failed to find a validation error in the response for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
+                    );
+                }
             }
         }
 
@@ -910,6 +916,41 @@ class TestResponse
             } else {
                 $this->assertSessionHas($key, $value);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the session has a given value in the flashed input array.
+     *
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function assertSessionHasInput($key, $value = null)
+    {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                if (is_int($k)) {
+                    $this->assertSessionHasInput($v);
+                } else {
+                    $this->assertSessionHasInput($k, $v);
+                }
+            }
+
+            return $this;
+        }
+
+        if (is_null($value)) {
+            PHPUnit::assertTrue(
+                $this->session()->getOldInput($key),
+                "Session is missing expected key [{$key}]."
+            );
+        } elseif ($value instanceof Closure) {
+            PHPUnit::assertTrue($value($this->session()->getOldInput($key)));
+        } else {
+            PHPUnit::assertEquals($value, $this->session()->getOldInput($key));
         }
 
         return $this;

@@ -256,7 +256,7 @@ class QueueWorkerTest extends TestCase
         $job->delaySeconds = 10;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 3]));
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 3, 'maxTries' => 0]));
 
         $this->assertEquals(10, $job->releaseAfter);
     }

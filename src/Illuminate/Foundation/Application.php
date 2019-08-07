@@ -1138,7 +1138,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'config'               => [\Illuminate\Config\Repository::class, \Illuminate\Contracts\Config\Repository::class],
             'cookie'               => [\Illuminate\Cookie\CookieJar::class, \Illuminate\Contracts\Cookie\Factory::class, \Illuminate\Contracts\Cookie\QueueingFactory::class],
             'encrypter'            => [\Illuminate\Encryption\Encrypter::class, \Illuminate\Contracts\Encryption\Encrypter::class],
-            'db'                   => [\Illuminate\Database\DatabaseManager::class],
+            'db'                   => [\Illuminate\Database\DatabaseManager::class, \Illuminate\Database\ConnectionResolverInterface::class],
             'db.connection'        => [\Illuminate\Database\Connection::class, \Illuminate\Database\ConnectionInterface::class],
             'events'               => [\Illuminate\Events\Dispatcher::class, \Illuminate\Contracts\Events\Dispatcher::class],
             'files'                => [\Illuminate\Filesystem\Filesystem::class],
