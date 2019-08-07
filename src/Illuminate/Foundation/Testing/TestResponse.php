@@ -360,6 +360,9 @@ class TestResponse
      */
     public function assertSee($value)
     {
+        if(is_null($value)){
+            PHPUnit::fail("Unable to assert see on a null value in response");
+        }
         PHPUnit::assertStringContainsString((string) $value, $this->getContent());
 
         return $this;
@@ -386,6 +389,9 @@ class TestResponse
      */
     public function assertSeeText($value)
     {
+        if(is_null($value)){
+            PHPUnit::fail("Unable to assert see on a null value in response");
+        }
         PHPUnit::assertStringContainsString((string) $value, strip_tags($this->getContent()));
 
         return $this;

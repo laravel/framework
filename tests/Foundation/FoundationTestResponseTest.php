@@ -98,6 +98,28 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeText('foobar');
     }
 
+    public function testAssertSeeTextWithNullCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>',
+        ]);
+
+        $response->assertSeeText(null);
+    }
+
+    public function testAssertSeeWithNullCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>',
+        ]);
+
+        $response->assertSee(null);
+    }
+
     public function testAssertSeeTextInOrder()
     {
         $response = $this->makeMockResponse([
