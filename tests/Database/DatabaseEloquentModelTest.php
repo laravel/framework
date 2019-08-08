@@ -58,8 +58,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->name = 'foo';
         $this->assertEquals('foo', $model->name);
         $this->assertTrue(isset($model->name));
-        unset($model->name);
-        $this->assertFalse(isset($model->name));
+        $this->expectException(\PHPUnit\Framework\Error\Notice::class);
+        $model->unexisting_field;
 
         // test mutation
         $model->list_items = ['name' => 'taylor'];

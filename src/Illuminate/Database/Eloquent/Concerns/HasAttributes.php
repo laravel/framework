@@ -402,6 +402,10 @@ trait HasAttributes
         if (method_exists($this, $key)) {
             return $this->getRelationshipFromMethod($key);
         }
+
+        // If there is no matches, throws the Exception like a regular PHP class does.
+        $class = get_class($this);
+        trigger_error("Undefined attribute or relation: $class::$key");
     }
 
     /**
