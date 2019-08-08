@@ -3127,6 +3127,25 @@ class SupportCollectionTest extends TestCase
         $collection = new Collection([1, 2, 3]);
         $this->assertNull($collection->get(null));
     }
+
+    public function testGet()
+    {
+        $collection = new Collection(['price' => 100]);
+        $this->assertEquals(100, $collection->get('price'));
+
+        $collection = new Collection(['products.desk' => ['price' => 100]]);
+        $this->assertEquals(['price' => 100], $collection->get('products.desk'));
+
+        $collection = new Collection(['products.desk' => ['price' => 100]]);
+        $this->assertEquals('xo', $collection->get('products', 'xo'));
+
+        $collection = new Collection(['products' => ['desk' => ['price' => 100]]]);
+        $this->assertEquals(['price' => 100], $collection->get('products.desk'));
+
+        $collection = new Collection(['foo' => null, 'bar' => ['baz' => null]]);
+        $this->assertNull($collection->get('foo', 'default'));
+        $this->assertNull($collection->get('bar.baz', 'default'));
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
