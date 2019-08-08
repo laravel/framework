@@ -39,7 +39,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getProcessor()->shouldReceive('processSelect');
         $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
-            $this->assertEquals('select * from "users"', $sql);
+            $this->assertEquals('select "users".* from "users"', $sql);
         });
         $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
             $this->assertEquals('select "foo", "bar" from "users"', $sql);

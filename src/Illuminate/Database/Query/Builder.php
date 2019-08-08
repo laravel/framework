@@ -2009,8 +2009,12 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Support\Collection
      */
-    public function get($columns = ['*'])
+    public function get($columns = null)
     {
+        if (is_null($columns)) {
+            $columns = [$this->from . '.*'];
+        }
+
         return collect($this->onceWithColumns($columns, function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
@@ -2134,7 +2138,7 @@ class Builder
     public function cursor()
     {
         if (is_null($this->columns)) {
-            $this->columns = ['*'];
+            $this->columns = [$this->from . '.*'];
         }
 
         return $this->connection->cursor(
