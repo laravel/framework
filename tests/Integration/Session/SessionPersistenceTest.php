@@ -30,7 +30,7 @@ class SessionPersistenceTest extends TestCase
             throw new TokenMismatchException;
         })->middleware('web');
 
-        $response = $this->get('/');
+        $this->get('/');
         $this->assertTrue($handler->written);
     }
 

@@ -520,7 +520,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        $attempts = retry(2, function ($attempts) {
+        retry(2, function ($attempts) {
             if ($attempts > 1) {
                 return $attempts;
             }

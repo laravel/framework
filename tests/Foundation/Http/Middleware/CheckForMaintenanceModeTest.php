@@ -96,7 +96,7 @@ class CheckForMaintenanceModeTest extends TestCase
 
         $middleware = new CheckForMaintenanceMode($this->createMaintenanceApplication());
 
-        $result = $middleware->handle(Request::create('/'), function ($request) {
+        $middleware->handle(Request::create('/'), function ($request) {
         });
     }
 
@@ -127,7 +127,7 @@ class CheckForMaintenanceModeTest extends TestCase
 
         $middleware = new CheckForMaintenanceMode($this->createMaintenanceApplication());
 
-        $result = $middleware->handle(Request::create('/foo/bar'), function ($request) {
+        $middleware->handle(Request::create('/foo/bar'), function ($request) {
         });
     }
 

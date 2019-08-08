@@ -3004,7 +3004,6 @@ SQL;
     public function testPaginateWithDefaultArguments()
     {
         $perPage = 15;
-        $columns = ['*'];
         $pageName = 'page';
         $page = 1;
         $builder = $this->getMockQueryBuilder();
@@ -3035,7 +3034,6 @@ SQL;
     public function testPaginateWhenNoResults()
     {
         $perPage = 15;
-        $columns = ['*'];
         $pageName = 'page';
         $page = 1;
         $builder = $this->getMockQueryBuilder();
