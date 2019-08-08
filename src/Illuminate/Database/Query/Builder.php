@@ -2115,7 +2115,7 @@ class Builder
     public function get($columns = null)
     {
         if (is_null($columns)) {
-            $columns = [$this->from . '.*'];
+            $columns = [$this->from.'.*'];
         }
 
         return collect($this->onceWithColumns(Arr::wrap($columns), function () {
@@ -2243,7 +2243,7 @@ class Builder
     public function cursor()
     {
         if (is_null($this->columns)) {
-            $this->columns = [$this->from . '.*'];
+            $this->columns = [$this->from.'.*'];
         }
 
         return $this->connection->cursor(
