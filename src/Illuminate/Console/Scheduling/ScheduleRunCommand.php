@@ -31,7 +31,7 @@ class ScheduleRunCommand extends Command
     /**
      * The 24 hour timestamp this scheduler command started running.
      *
-     * @var \Illuminate\Support\Carbon;
+     * @var \Carbon\Carbon;
      */
     protected $startedAt;
 

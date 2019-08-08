@@ -6,7 +6,7 @@ use DateTime;
 use Carbon\Factory;
 use Carbon\CarbonImmutable;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\DateFactory;
 use Illuminate\Support\Facades\Date;

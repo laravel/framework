@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Notifications;
 
 use Illuminate\Mail\Mailable;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Event;

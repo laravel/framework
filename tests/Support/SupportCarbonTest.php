@@ -5,14 +5,14 @@ namespace Illuminate\Tests\Support;
 use DateTime;
 use DateTimeInterface;
 use BadMethodCallException;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Carbon\Carbon as BaseCarbon;
 
 class SupportCarbonTest extends TestCase
 {
     /**
-     * @var \Illuminate\Support\Carbon
+     * @var \Carbon\Carbon
      */
     protected $now;
 

@@ -1,1 +1,1 @@
-{{__('nom')}} {{ Illuminate\Support\Carbon::tomorrow()->diffForHumans() }}
+{{__('nom')}} {{ Carbon\Carbon::tomorrow()->diffForHumans() }}

@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\SoftDeletes;
 

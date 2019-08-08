@@ -77,7 +77,7 @@ trait HasTimestamps
     /**
      * Get a fresh timestamp for the model.
      *
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     public function freshTimestamp()
     {

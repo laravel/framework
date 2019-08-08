@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Http\Exceptions;
 
 use Exception;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Date;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
@@ -12,7 +12,7 @@ class MaintenanceModeException extends ServiceUnavailableHttpException
     /**
      * When the application was put in maintenance mode.
      *
-     * @var \Illuminate\Support\Carbon
+     * @var \Carbon\Carbon
      */
     public $wentDownAt;
 
@@ -26,7 +26,7 @@ class MaintenanceModeException extends ServiceUnavailableHttpException
     /**
      * When the application should next be available.
      *
-     * @var \Illuminate\Support\Carbon
+     * @var \Carbon\Carbon
      */
     public $willBeAvailableAt;
 

@@ -7,7 +7,7 @@ use DateTimeInterface;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -757,7 +757,7 @@ trait HasAttributes
      * Return a timestamp as DateTime object with time set to 00:00:00.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     protected function asDate($value)
     {
@@ -768,7 +768,7 @@ trait HasAttributes
      * Return a timestamp as DateTime object.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     protected function asDateTime($value)
     {

@@ -4,7 +4,7 @@ namespace Illuminate\Cache;
 
 use RuntimeException;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\InteractsWithTime;

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 

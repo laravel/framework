@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
 use Illuminate\Queue\Queue;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\RedisQueue;

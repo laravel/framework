@@ -5,7 +5,7 @@ namespace Illuminate\Console\Scheduling;
 use Closure;
 use Cron\CronExpression;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Contracts\Mail\Mailer;
@@ -779,7 +779,7 @@ class Event
      * @param  \DateTimeInterface|string  $currentTime
      * @param  int  $nth
      * @param  bool  $allowCurrentDate
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {

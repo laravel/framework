@@ -7,7 +7,7 @@ use Mockery as m;
 use DateTimeImmutable;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Validation\Validator;

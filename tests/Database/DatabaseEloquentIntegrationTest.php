@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use RuntimeException;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;

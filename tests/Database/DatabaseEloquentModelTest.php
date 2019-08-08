@@ -11,7 +11,7 @@ use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -496,7 +496,7 @@ class DatabaseEloquentModelTest extends TestCase
             'created_at' => '2012-12-04 22:59.32130',
         ]);
 
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $model->created_at);
         $this->assertEquals('22:30:59.321000', $model->created_at->format('H:i:s.u'));
     }
 

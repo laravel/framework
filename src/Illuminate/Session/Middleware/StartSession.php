@@ -4,7 +4,7 @@ namespace Illuminate\Session\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Session\Session;

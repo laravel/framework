@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Console\Scheduling;
 
 use Mockery as m;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Console\Scheduling\Event;

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Auth;
 
 use stdClass;
 use Mockery as m;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Contracts\Hashing\Hasher;

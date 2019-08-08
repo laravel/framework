@@ -6,7 +6,7 @@ use stdClass;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 

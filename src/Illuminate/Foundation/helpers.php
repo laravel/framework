@@ -585,7 +585,7 @@ if (! function_exists('now')) {
      * Create a new Carbon instance for the current time.
      *
      * @param  \DateTimeZone|string|null $tz
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     function now($tz = null)
     {
@@ -852,7 +852,7 @@ if (! function_exists('today')) {
      * Create a new Carbon instance for the current date.
      *
      * @param  \DateTimeZone|string|null $tz
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     function today($tz = null)
     {

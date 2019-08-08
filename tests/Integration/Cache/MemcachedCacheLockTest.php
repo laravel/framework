@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 

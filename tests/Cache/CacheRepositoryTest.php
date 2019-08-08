@@ -7,7 +7,7 @@ use DateInterval;
 use Mockery as m;
 use ArrayIterator;
 use DateTimeImmutable;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RedisStore;

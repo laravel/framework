@@ -6,7 +6,7 @@ use Closure;
 use ArrayAccess;
 use DateTimeInterface;
 use BadMethodCallException;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Cache\Events\KeyWritten;
