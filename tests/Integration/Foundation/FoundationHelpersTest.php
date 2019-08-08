@@ -77,7 +77,7 @@ class FoundationHelpersTest extends TestCase
 
         try {
             mix('missing.js');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         } finally { // make sure we can cleanup the file
             unlink($manifest);

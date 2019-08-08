@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use DateTime;
 use Carbon\Factory;
+use CustomDateClass;
 use Carbon\CarbonImmutable;
 use InvalidArgumentException;
 use Illuminate\Support\Carbon;
@@ -76,8 +77,8 @@ class DateFacadeTest extends TestCase
         DateFactory::use(Carbon::class);
         $this->assertSame('en', Date::now()->locale);
         include_once __DIR__.'/fixtures/CustomDateClass.php';
-        DateFactory::use(\CustomDateClass::class);
-        $this->assertInstanceOf(\CustomDateClass::class, Date::now());
+        DateFactory::use(CustomDateClass::class);
+        $this->assertInstanceOf(CustomDateClass::class, Date::now());
         $this->assertInstanceOf(Carbon::class, Date::now()->getOriginal());
         DateFactory::use(Carbon::class);
     }
