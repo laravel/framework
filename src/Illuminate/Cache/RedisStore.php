@@ -292,7 +292,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function serialize($value)
     {
-        return is_numeric($value) ? $value : serialize($value);
+        return is_numeric($value) || is_string($value) ? $value : serialize($value);
     }
 
     /**
@@ -303,6 +303,6 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function unserialize($value)
     {
-        return is_numeric($value) ? $value : unserialize($value);
+        return is_numeric($value) || (@unserialize($value) === false) ? $value : unserialize($value);
     }
 }
