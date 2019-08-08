@@ -363,6 +363,7 @@ class TestResponse
         if (is_null($value)) {
             PHPUnit::fail('Unable to assert see on a null value in response');
         }
+
         PHPUnit::assertStringContainsString((string) $value, $this->getContent());
 
         return $this;
