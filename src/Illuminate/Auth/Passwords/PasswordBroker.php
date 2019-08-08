@@ -172,7 +172,7 @@ class PasswordBroker implements PasswordBrokerContract
             $credentials['password_confirmation'],
         ];
 
-        return $password === $confirm && mb_strlen($password) >= 8;
+        return $password === $confirm && mb_strlen($password) > 0;
     }
 
     /**

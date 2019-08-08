@@ -94,17 +94,6 @@ class AuthPasswordBrokerTest extends TestCase
         }));
     }
 
-    public function testRedirectReturnedByRemindWhenPasswordsLessThanEightCharacters()
-    {
-        $creds = ['password' => 'abcdefg', 'password_confirmation' => 'abcdefg'];
-        $broker = $this->getBroker($mocks = $this->getMocks());
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
-
-        $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
-            //
-        }));
-    }
-
     public function testRedirectReturnedByRemindWhenPasswordDoesntPassValidator()
     {
         $creds = ['password' => 'abcdef', 'password_confirmation' => 'abcdef'];
