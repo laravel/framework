@@ -23,7 +23,7 @@ class ConfigurationUrlParserTest extends TestCase
             'postgres' => 'pgsql',
             'postgresql' => 'pgsql',
             'sqlite3' => 'sqlite',
-        ], \Illuminate\Support\ConfigurationUrlParser::getDriverAliases());
+        ], ConfigurationUrlParser::getDriverAliases());
 
         ConfigurationUrlParser::addDriverAlias('some-particular-alias', 'mysql');
 

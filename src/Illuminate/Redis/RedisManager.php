@@ -2,6 +2,7 @@
 
 namespace Illuminate\Redis;
 
+use Closure;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
@@ -235,7 +236,7 @@ class RedisManager implements Factory
      * @param  \Closure  $callback
      * @return $this
      */
-    public function extend($driver, \Closure $callback)
+    public function extend($driver, Closure $callback)
     {
         $this->customCreators[$driver] = $callback->bindTo($this, $this);
 

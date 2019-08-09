@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Mockery as m;
+use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -143,7 +144,7 @@ class RedisBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithUserForChannel($channel)
     {
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->channel_name = $channel;
 
         $user = m::mock('User');
@@ -162,7 +163,7 @@ class RedisBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithoutUserForChannel($channel)
     {
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->channel_name = $channel;
 
         $request->shouldReceive('user')

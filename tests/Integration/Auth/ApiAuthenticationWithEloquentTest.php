@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Auth\User as FoundationUser;
 
 class ApiAuthenticationWithEloquentTest extends TestCase
 {
@@ -52,7 +53,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
     }
 }
 
-class User extends \Illuminate\Foundation\Auth\User
+class User extends FoundationUser
 {
     //
 }

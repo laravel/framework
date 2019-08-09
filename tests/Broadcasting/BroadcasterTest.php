@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Broadcasting;
 
 use Exception;
 use Mockery as m;
+use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
@@ -176,7 +177,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
         });
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->withNoArgs()
@@ -193,7 +194,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard')
@@ -212,7 +213,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('someotherchannel', function () {
         }, ['guards' => ['myguard2', 'myguard1']]);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard1')
@@ -239,7 +240,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard')
@@ -255,7 +256,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
         }, ['guards' => ['myguard1', 'myguard2']]);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard1')

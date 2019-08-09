@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Mockery as m;
+use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -150,7 +151,7 @@ class PusherBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithUserForChannel($channel)
     {
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->channel_name = $channel;
         $request->socket_id = 'abcd.1234';
 
@@ -174,7 +175,7 @@ class PusherBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithoutUserForChannel($channel)
     {
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->channel_name = $channel;
 
         $request->shouldReceive('user')

@@ -496,7 +496,7 @@ class DatabaseEloquentModelTest extends TestCase
             'created_at' => '2012-12-04 22:59.32130',
         ]);
 
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
+        $this->assertInstanceOf(Carbon::class, $model->created_at);
         $this->assertEquals('22:30:59.321000', $model->created_at->format('H:i:s.u'));
     }
 
