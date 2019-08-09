@@ -1877,7 +1877,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testWithoutTouchingCallback()
     {
-        $model = new EloquentModelStub(['id' => 1]);
+        new EloquentModelStub(['id' => 1]);
 
         $called = false;
 
@@ -1890,7 +1890,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testWithoutTouchingOnCallback()
     {
-        $model = new EloquentModelStub(['id' => 1]);
+        new EloquentModelStub(['id' => 1]);
 
         $called = false;
 
