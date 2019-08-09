@@ -29,7 +29,7 @@ class SeedCommandTest extends TestCase
 
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
-        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('isProduction')->once()->andReturn(false);
         $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
         $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
             new OutputStyle($input, $output)
