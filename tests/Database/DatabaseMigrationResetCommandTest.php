@@ -61,7 +61,7 @@ class ApplicationDatabaseResetStub extends Application
             $this->instance($abstract, $instance);
         }
 
-        $this->detectEnvironment(function() {
+        $this->detectEnvironment(function () {
             return 'development';
         });
     }
