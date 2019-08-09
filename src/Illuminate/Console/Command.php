@@ -239,9 +239,9 @@ class Command extends SymfonyCommand
     {
         $options = array_only($this->option(), ['no-interaction', 'ansi', 'no-ansi', 'quiet', 'verbose']);
 
-        collect($options)->mapWithKeys(function ($value, $key) {
+        return collect($options)->mapWithKeys(function ($value, $key) {
             return ["--{$key}" => $value];
-        })->all();
+        })->filter()->all();
     }
 
     /**
