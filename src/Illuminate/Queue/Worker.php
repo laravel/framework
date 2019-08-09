@@ -5,10 +5,10 @@ namespace Illuminate\Queue;
 use Exception;
 use Throwable;
 use Illuminate\Support\Carbon;
+use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
@@ -17,11 +17,11 @@ class Worker
     use DetectsLostConnections;
 
     /**
-     * The queue manager instance.
+     * The queue factory instance.
      *
      * @var \Illuminate\Contracts\Queue\Factory
      */
-    protected $manager;
+    protected $factory;
 
     /**
      * The event dispatcher instance.
@@ -68,19 +68,19 @@ class Worker
     /**
      * Create a new queue worker.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory $manager
+     * @param  \Illuminate\Contracts\Queue\Factory $factory
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
      * @param  \callable $isDownForMaintenance
      * @return void
      */
-    public function __construct(QueueManager $manager,
+    public function __construct(Factory $factory,
                                 Dispatcher $events,
                                 ExceptionHandler $exceptions,
                                 callable $isDownForMaintenance)
     {
         $this->events = $events;
-        $this->manager = $manager;
+        $this->factory = $factory;
         $this->exceptions = $exceptions;
         $this->isDownForMaintenance = $isDownForMaintenance;
     }
@@ -115,7 +115,7 @@ class Worker
             // register the timeout handler and reset the alarm for this job so it is
             // not stuck in a frozen state forever. Then, we can fire off this job.
             $job = $this->getNextJob(
-                $this->manager->connection($connectionName), $queue
+                $this->factory->connection($connectionName), $queue
             );
 
             if ($this->supportsAsyncSignals()) {
@@ -237,7 +237,7 @@ class Worker
     public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
         $job = $this->getNextJob(
-            $this->manager->connection($connectionName), $queue
+            $this->factory->connection($connectionName), $queue
         );
 
         // If we're able to pull a job off of the stack, we will process it and then return
@@ -641,23 +641,23 @@ class Worker
     }
 
     /**
-     * Get the queue manager instance.
+     * Get the queue factory instance.
      *
-     * @return \Illuminate\Queue\QueueManager
+     * @return \Illuminate\Contracts\Queue\Factory
      */
-    public function getManager()
+    public function getFactory()
     {
-        return $this->manager;
+        return $this->factory;
     }
 
     /**
-     * Set the queue manager instance.
+     * Set the queue factory instance.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory $manager
+     * @param  \Illuminate\Contracts\Queue\Factory $factory
      * @return void
      */
-    public function setManager(QueueManager $manager)
+    public function setFactory(Factory $factory)
     {
-        $this->manager = $manager;
+        $this->factory = $factory;
     }
 }
