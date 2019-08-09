@@ -27,7 +27,7 @@ class MigratorTest extends TestCase
 
         $migrator->run([__DIR__.'/fixtures']);
 
-        $this->assertTrue($this->tableExists('members'));
+        $this->assertTrue($this->tableExists('people'));
     }
 
     private function tableExists($table): bool
