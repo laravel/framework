@@ -286,6 +286,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         return tap(parent::getDefaultInputDefinition(), function ($definition) {
             $definition->addOption($this->getEnvironmentOption());
+            $definition->addOption($this->getDryRunOption());
         });
     }
 
@@ -299,6 +300,18 @@ class Application extends SymfonyApplication implements ApplicationContract
         $message = 'The environment the command should run under';
 
         return new InputOption('--env', null, InputOption::VALUE_OPTIONAL, $message);
+    }
+
+    /**
+     * Get the global dry run option for the definition.
+     *
+     * @return \Symfony\Component\Console\Input\InputOption
+     */
+    protected function getDryRunOption()
+    {
+        $message = 'Hook to allow for conditionally previewing results of running the command.';
+
+        return new InputOption('--dry-run', null, InputOption::VALUE_NONE, $message);
     }
 
     /**
