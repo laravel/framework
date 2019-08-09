@@ -393,7 +393,7 @@ class LogManager implements LoggerInterface
      */
     protected function getFallbackChannelName()
     {
-        return $this->app->environment();
+        return $this->app->bound('env') ? $this->app->environment() : 'production';
     }
 
     /**
