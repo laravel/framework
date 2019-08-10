@@ -306,6 +306,8 @@ class FactoryBuilder
      * @param  array  $definition
      * @param  array  $attributes
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function applyStates(array $definition, array $attributes = [])
     {

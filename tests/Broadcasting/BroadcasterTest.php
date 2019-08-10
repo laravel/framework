@@ -2,12 +2,15 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Exception;
 use Mockery as m;
+use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BroadcasterTest extends TestCase
 {
@@ -16,16 +19,18 @@ class BroadcasterTest extends TestCase
      */
     public $broadcaster;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->broadcaster = new FakeBroadcaster;
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
+
+        Container::setInstance(null);
     }
 
     public function testExtractingParametersWhileCheckingForUserAccess()
@@ -78,11 +83,10 @@ class BroadcasterTest extends TestCase
         $this->assertEquals(['model.1.instance', 'something'], $parameters);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testUnknownChannelAuthHandlerTypeThrowsException()
     {
+        $this->expectException(Exception::class);
+
         $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', 123);
     }
 
@@ -95,11 +99,10 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
-     */
     public function testNotFoundThrowsHttpException()
     {
+        $this->expectException(HttpException::class);
+
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
             //
         };
@@ -174,7 +177,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
         });
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->withNoArgs()
@@ -191,7 +194,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard')
@@ -210,7 +213,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('someotherchannel', function () {
         }, ['guards' => ['myguard2', 'myguard1']]);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard1')
@@ -237,7 +240,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard')
@@ -253,7 +256,7 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
         }, ['guards' => ['myguard1', 'myguard2']]);
 
-        $request = m::mock(\Illuminate\Http\Request::class);
+        $request = m::mock(Request::class);
         $request->shouldReceive('user')
                 ->once()
                 ->with('myguard1')

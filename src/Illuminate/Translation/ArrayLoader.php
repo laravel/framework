@@ -18,18 +18,14 @@ class ArrayLoader implements Loader
      *
      * @param  string  $locale
      * @param  string  $group
-     * @param  string  $namespace
+     * @param  string|null  $namespace
      * @return array
      */
     public function load($locale, $group, $namespace = null)
     {
         $namespace = $namespace ?: '*';
 
-        if (isset($this->messages[$namespace][$locale][$group])) {
-            return $this->messages[$namespace][$locale][$group];
-        }
-
-        return [];
+        return $this->messages[$namespace][$locale][$group] ?? [];
     }
 
     /**

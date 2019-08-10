@@ -14,17 +14,18 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
-        "illuminate/container": "5.8.*",
-        "illuminate/contracts": "5.8.*",
-        "illuminate/http": "5.8.*",
-        "illuminate/pipeline": "5.8.*",
-        "illuminate/session": "5.8.*",
-        "illuminate/support": "5.8.*",
-        "symfony/debug": "^4.1",
-        "symfony/http-foundation": "^4.1",
-        "symfony/http-kernel": "^4.1",
-        "symfony/routing": "^4.1"
+        "php": "^7.2",
+        "ext-json": "*",
+        "illuminate/container": "^6.0",
+        "illuminate/contracts": "^6.0",
+        "illuminate/http": "^6.0",
+        "illuminate/pipeline": "^6.0",
+        "illuminate/session": "^6.0",
+        "illuminate/support": "^6.0",
+        "symfony/debug": "^4.3",
+        "symfony/http-foundation": "^4.3",
+        "symfony/http-kernel": "^4.3",
+        "symfony/routing": "^4.3"
     },
     "autoload": {
         "psr-4": {
@@ -33,12 +34,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.8-dev"
+            "dev-master": "6.0-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the make commands (5.8.*).",
-        "symfony/psr-http-message-bridge": "Required to psr7 bridging features (^1.0)."
+        "illuminate/console": "Required to use the make commands (^6.0).",
+        "symfony/psr-http-message-bridge": "Required to psr7 bridging features (^1.1)."
     },
     "config": {
         "sort-packages": true

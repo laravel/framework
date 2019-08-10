@@ -23,7 +23,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->db = $db = new DB;
 
@@ -36,10 +36,6 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         $container = new Container;
         $container->instance('db', $db->getDatabaseManager());
-
-        $container->bind('db.schema', function ($c) {
-            return $c['db']->connection()->getSchemaBuilder();
-        });
 
         Facade::setFacadeApplication($container);
 
@@ -59,7 +55,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         }
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);

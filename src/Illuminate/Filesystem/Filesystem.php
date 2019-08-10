@@ -2,7 +2,6 @@
 
 namespace Illuminate\Filesystem;
 
-use Exception;
 use ErrorException;
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
@@ -116,7 +115,7 @@ class Filesystem
      * @param  string  $path
      * @param  string  $contents
      * @param  bool  $lock
-     * @return int
+     * @return int|bool
      */
     public function put($path, $contents, $lock = false)
     {
@@ -126,32 +125,21 @@ class Filesystem
     /**
      * Write the contents of a file, replacing it atomically if it already exists.
      *
-     * This will also replace the target file permissions.
-     *
      * @param  string  $path
      * @param  string  $content
      * @return void
-     *
-     * @throws \Exception
      */
     public function replace($path, $content)
     {
-        // If the path already exists and is a symlink, make sure we get the real path...
+        // If the path already exists and is a symlink, get the real path...
         clearstatcache(true, $path);
 
-        $realPath = realpath($path);
+        $path = realpath($path) ?: $path;
 
-        if ($realPath) {
-            $path = $realPath;
-        }
+        $tempPath = tempnam(dirname($path), basename($path));
 
-        $dirName = dirname($path);
-
-        if (! is_writable($dirName)) {
-            throw new Exception("Replacing [{$path}] requires that its parent directory is writable.");
-        }
-
-        $tempPath = tempnam($dirName, basename($path));
+        // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
+        chmod($tempPath, 0777 - umask());
 
         file_put_contents($tempPath, $content);
 
@@ -190,7 +178,7 @@ class Filesystem
      * Get or set UNIX mode of a file or directory.
      *
      * @param  string  $path
-     * @param  int  $mode
+     * @param  int|null  $mode
      * @return mixed
      */
     public function chmod($path, $mode = null)
@@ -266,7 +254,7 @@ class Filesystem
 
         $mode = $this->isDirectory($target) ? 'J' : 'H';
 
-        exec("mklink /{$mode} \"{$link}\" \"{$target}\"");
+        exec("mklink /{$mode} ".escapeshellarg($link).' '.escapeshellarg($target));
     }
 
     /**
@@ -500,7 +488,7 @@ class Filesystem
      *
      * @param  string  $directory
      * @param  string  $destination
-     * @param  int     $options
+     * @param  int|null  $options
      * @return bool
      */
     public function copyDirectory($directory, $destination, $options = null)

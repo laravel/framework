@@ -13,7 +13,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentModelLoadMissingTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -54,7 +54,7 @@ class Comment extends Model
 
     public function parent()
     {
-        return $this->belongsTo(Comment::class);
+        return $this->belongsTo(self::class);
     }
 }
 

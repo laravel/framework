@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Http;
 
 use Mockery as m;
+use RuntimeException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
@@ -13,7 +14,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class HttpRequestTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -221,6 +222,28 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->ajax());
         $request->headers->set('X-Requested-With', '');
         $this->assertFalse($request->ajax());
+    }
+
+    public function testPrefetchMethod()
+    {
+        $request = Request::create('/', 'GET');
+        $this->assertFalse($request->prefetch());
+
+        $request->server->set('HTTP_X_MOZ', '');
+        $this->assertFalse($request->prefetch());
+        $request->server->set('HTTP_X_MOZ', 'prefetch');
+        $this->assertTrue($request->prefetch());
+        $request->server->set('HTTP_X_MOZ', 'Prefetch');
+        $this->assertTrue($request->prefetch());
+
+        $request->server->remove('HTTP_X_MOZ');
+
+        $request->headers->set('Purpose', '');
+        $this->assertFalse($request->prefetch());
+        $request->headers->set('Purpose', 'prefetch');
+        $this->assertTrue($request->prefetch());
+        $request->headers->set('Purpose', 'Prefetch');
+        $this->assertTrue($request->prefetch());
     }
 
     public function testPjaxMethod()
@@ -822,12 +845,11 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->accepts('text/html'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Session store not set on request.
-     */
     public function testSessionMethod()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Session store not set on request.');
+
         $request = Request::create('/', 'GET');
         $request->session();
     }
@@ -854,12 +876,11 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(40, mb_strlen($request->fingerprint()));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to generate fingerprint. Route unavailable.
-     */
     public function testFingerprintWithoutRoute()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to generate fingerprint. Route unavailable.');
+
         $request = Request::create('/', 'GET', [], [], [], []);
         $request->fingerprint();
     }

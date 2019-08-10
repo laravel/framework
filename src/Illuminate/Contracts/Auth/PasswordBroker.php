@@ -28,13 +28,6 @@ interface PasswordBroker
     const INVALID_USER = 'passwords.user';
 
     /**
-     * Constant representing an invalid password.
-     *
-     * @var string
-     */
-    const INVALID_PASSWORD = 'passwords.password';
-
-    /**
      * Constant representing an invalid token.
      *
      * @var string
@@ -57,20 +50,4 @@ interface PasswordBroker
      * @return mixed
      */
     public function reset(array $credentials, Closure $callback);
-
-    /**
-     * Set a custom password validator.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function validator(Closure $callback);
-
-    /**
-     * Determine if the passwords match for the request.
-     *
-     * @param  array  $credentials
-     * @return bool
-     */
-    public function validateNewPassword(array $credentials);
 }

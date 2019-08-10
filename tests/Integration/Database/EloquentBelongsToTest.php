@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToTest;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -11,18 +13,18 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentBelongsToTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('slug')->nullable();
             $table->unsignedInteger('parent_id')->nullable();
             $table->string('parent_slug')->nullable();
         });
 
-        $user = User::create(['slug' => str_random()]);
+        $user = User::create(['slug' => Str::random()]);
         User::create(['parent_id' => $user->id, 'parent_slug' => $user->slug]);
     }
 
@@ -38,6 +40,39 @@ class EloquentBelongsToTest extends DatabaseTestCase
         $users = User::has('parentBySlug')->get();
 
         $this->assertEquals(1, $users->count());
+    }
+
+    public function test_associate_with_model()
+    {
+        $parent = User::doesntHave('parent')->first();
+        $child = User::has('parent')->first();
+
+        $parent->parent()->associate($child);
+
+        $this->assertEquals($child->id, $parent->parent_id);
+        $this->assertEquals($child->id, $parent->parent->id);
+    }
+
+    public function test_associate_with_id()
+    {
+        $parent = User::doesntHave('parent')->first();
+        $child = User::has('parent')->first();
+
+        $parent->parent()->associate($child->id);
+
+        $this->assertEquals($child->id, $parent->parent_id);
+        $this->assertEquals($child->id, $parent->parent->id);
+    }
+
+    public function test_associate_with_id_unsets_loaded_relation()
+    {
+        $child = User::has('parent')->with('parent')->first();
+
+        // Overwrite the (loaded) parent relation
+        $child->parent()->associate($child->id);
+
+        $this->assertEquals($child->id, $child->parent_id);
+        $this->assertFalse($child->relationLoaded('parent'));
     }
 }
 

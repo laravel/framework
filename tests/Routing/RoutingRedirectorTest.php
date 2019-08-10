@@ -19,7 +19,7 @@ class RoutingRedirectorTest extends TestCase
     protected $session;
     protected $redirect;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->headers = m::mock(HeaderBag::class);
 
@@ -45,7 +45,7 @@ class RoutingRedirectorTest extends TestCase
         $this->redirect->setSession($this->session);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -159,5 +159,13 @@ class RoutingRedirectorTest extends TestCase
 
         $response = $this->redirect->home();
         $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
+    }
+
+    public function testItSetsValidIntendedUrl()
+    {
+        $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+
+        $result = $this->redirect->setIntendedUrl('http://foo.com/bar');
+        $this->assertNull($result);
     }
 }

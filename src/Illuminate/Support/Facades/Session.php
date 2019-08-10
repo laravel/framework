@@ -12,6 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool exists(string|array $key)
  * @method static bool has(string|array $key)
  * @method static mixed get(string $key, $default = null)
+ * @method static mixed pull(string $key, $default = null)
  * @method static void put(string|array $key, $value = null)
  * @method static string token()
  * @method static mixed remove(string $key)

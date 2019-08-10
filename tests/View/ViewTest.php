@@ -6,6 +6,7 @@ use Closure;
 use ArrayAccess;
 use Mockery as m;
 use Illuminate\View\View;
+use BadMethodCallException;
 use Illuminate\View\Factory;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
@@ -15,7 +16,7 @@ use Illuminate\Contracts\Support\Renderable;
 
 class ViewTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -125,7 +126,7 @@ class ViewTest extends TestCase
     public function testViewGettersSetters()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $this->assertEquals($view->getName(), 'view');
+        $this->assertEquals($view->name(), 'view');
         $this->assertEquals($view->getPath(), 'path');
         $data = $view->getData();
         $this->assertEquals($data['foo'], 'bar');
@@ -170,12 +171,11 @@ class ViewTest extends TestCase
         $this->assertFalse($view->offsetExists('foo'));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method Illuminate\View\View::badMethodCall does not exist.
-     */
     public function testViewBadMethod()
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Illuminate\View\View::badMethodCall does not exist.');
+
         $view = $this->getView();
         $view->badMethodCall();
     }

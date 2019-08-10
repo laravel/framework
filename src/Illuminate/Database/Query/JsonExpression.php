@@ -24,6 +24,8 @@ class JsonExpression extends Expression
      *
      * @param  mixed  $value
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getJsonBindingParameter($value)
     {
@@ -38,10 +40,10 @@ class JsonExpression extends Expression
             case 'integer':
             case 'double':
             case 'string':
-                return '?';
             case 'object':
-            case 'array':
                 return '?';
+            case 'array':
+                return 'cast(? as json)';
         }
 
         throw new InvalidArgumentException("JSON value is of illegal type: {$type}");

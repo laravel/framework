@@ -8,6 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
 class SupportTestingMailFakeTest extends TestCase
 {
@@ -21,7 +23,7 @@ class SupportTestingMailFakeTest extends TestCase
      */
     private $mailable;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new MailFake;
@@ -40,6 +42,17 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
         $this->fake->assertSent(MailableStub::class);
+    }
+
+    public function testAssertSentWhenRecipientHasPreferredLocale()
+    {
+        $user = new LocalizedRecipientStub;
+
+        $this->fake->to($user)->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function ($mail) use ($user) {
+            return $mail->hasTo($user) && $mail->locale === 'au';
+        });
     }
 
     public function testAssertNotSent()
@@ -129,11 +142,11 @@ class SupportTestingMailFakeTest extends TestCase
     }
 }
 
-class MailableStub extends Mailable
+class MailableStub extends Mailable implements MailableContract
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.8';
+    protected $version = '6.0';
 
     /**
      * Build the message.
@@ -151,7 +164,7 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.8';
+    protected $version = '6.0';
 
     /**
      * Build the message.
@@ -162,5 +175,15 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
     {
         $this->with('first_name', 'Taylor')
              ->withLastName('Otwell');
+    }
+}
+
+class LocalizedRecipientStub implements HasLocalePreference
+{
+    public $email = 'taylor@laravel.com';
+
+    public function preferredLocale()
+    {
+        return 'au';
     }
 }

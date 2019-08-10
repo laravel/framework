@@ -13,7 +13,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentMorphToTouchesTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -59,7 +59,7 @@ class Comment extends Model
 
     public function commentable()
     {
-        return $this->morphTo();
+        return $this->morphTo(null, null, null, 'id');
     }
 }
 

@@ -37,7 +37,7 @@ class ModelMakeCommand extends GeneratorCommand
     public function handle()
     {
         if (parent::handle() === false && ! $this->option('force')) {
-            return;
+            return false;
         }
 
         if ($this->option('all')) {
@@ -71,7 +71,7 @@ class ModelMakeCommand extends GeneratorCommand
 
         $this->call('make:factory', [
             'name' => "{$factory}Factory",
-            '--model' => $this->argument('name'),
+            '--model' => $this->qualifyClass($this->getNameInput()),
         ]);
     }
 
@@ -82,7 +82,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
+        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
 
         if ($this->option('pivot')) {
             $table = Str::singular($table);

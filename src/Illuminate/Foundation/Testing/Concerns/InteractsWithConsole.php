@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\PendingCommand;
@@ -44,11 +45,11 @@ trait InteractsWithConsole
 
         $this->beforeApplicationDestroyed(function () {
             if (count($this->expectedQuestions)) {
-                $this->fail('Question "'.array_first($this->expectedQuestions)[0].'" was not asked.');
+                $this->fail('Question "'.Arr::first($this->expectedQuestions)[0].'" was not asked.');
             }
 
             if (count($this->expectedOutput)) {
-                $this->fail('Output "'.array_first($this->expectedOutput).'" was not printed.');
+                $this->fail('Output "'.Arr::first($this->expectedOutput).'" was not printed.');
             }
         });
 

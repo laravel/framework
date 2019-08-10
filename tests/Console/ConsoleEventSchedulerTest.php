@@ -19,7 +19,7 @@ class ConsoleEventSchedulerTest extends TestCase
      */
     private $schedule;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $container->instance(Schedule::class, $this->schedule = new Schedule(m::mock(EventMutex::class)));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -69,6 +69,19 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals("path/to/command --title={$escape}A {$escapeReal}real{$escapeReal} test{$escape}", $events[5]->command);
         $this->assertEquals("path/to/command {$escape}one{$escape} {$escape}two{$escape}", $events[6]->command);
         $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
+    }
+
+    public function testExecCreatesNewCommandWithTimezone()
+    {
+        $schedule = new Schedule('UTC');
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals('UTC', $events[0]->timezone);
+
+        $schedule = new Schedule('Asia/Tokyo');
+        $schedule->exec('path/to/command');
+        $events = $schedule->events();
+        $this->assertEquals('Asia/Tokyo', $events[0]->timezone);
     }
 
     public function testCommandCreatesNewArtisanCommand()

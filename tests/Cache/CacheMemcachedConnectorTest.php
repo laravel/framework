@@ -9,7 +9,7 @@ use Illuminate\Cache\MemcachedConnector;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

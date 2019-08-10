@@ -46,6 +46,10 @@ class SQLiteGrammar extends Grammar
      */
     public function compileSelect(Builder $query)
     {
+        if ($query->unions && $query->aggregate) {
+            return $this->compileUnionAggregate($query);
+        }
+
         $sql = parent::compileSelect($query);
 
         if ($query->unions) {
@@ -159,18 +163,6 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function compileInsert(Builder $query, array $values)
-    {
-        $table = $this->wrapTable($query->from);
-
-        return empty($values)
-                ? "insert into {$table} DEFAULT VALUES"
-                : parent::compileInsert($query, $values);
-    }
-
-    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -182,16 +174,30 @@ class SQLiteGrammar extends Grammar
         $table = $this->wrapTable($query->from);
 
         $columns = collect($values)->map(function ($value, $key) use ($query) {
-            return $this->wrap(Str::after($key, $query->from.'.')).' = '.$this->parameter($value);
+            return $this->wrap(Str::after($key, '.')).' = '.$this->parameter($value);
         })->implode(', ');
 
         if (isset($query->joins) || isset($query->limit)) {
-            $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
-
-            return "update {$table} set $columns where {$this->wrap('rowid')} in ({$selectSql})";
+            return $this->compileUpdateWithJoinsOrLimit($query, $columns);
         }
 
         return trim("update {$table} set {$columns} {$this->compileWheres($query)}");
+    }
+
+    /**
+     * Compile an update statement with joins or limit into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $columns
+     * @return string
+     */
+    protected function compileUpdateWithJoinsOrLimit(Builder $query, $columns)
+    {
+        $alias = last(preg_split('/\s+as\s+/i', $query->from));
+
+        $selectSql = parent::compileSelect($query->select($alias.'.rowid'));
+
+        return "update {$this->wrapTable($query->from)} set {$columns} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**
@@ -203,10 +209,10 @@ class SQLiteGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $cleanBindings = Arr::except($bindings, ['select', 'join']);
+        $cleanBindings = Arr::except($bindings, 'select');
 
         return array_values(
-            array_merge($values, $bindings['join'], Arr::flatten($cleanBindings))
+            array_merge($values, Arr::flatten($cleanBindings))
         );
     }
 
@@ -219,29 +225,27 @@ class SQLiteGrammar extends Grammar
     public function compileDelete(Builder $query)
     {
         if (isset($query->joins) || isset($query->limit)) {
-            $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
-
-            return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
+            return $this->compileDeleteWithJoinsOrLimit($query);
         }
 
-        $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return trim("delete from {$this->wrapTable($query->from)} $wheres");
+        return parent::compileDelete($query);
     }
 
     /**
-     * Prepare the bindings for a delete statement.
+     * Compile a delete statement with joins or limit into SQL.
      *
-     * @param  array  $bindings
-     * @return array
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
      */
-    public function prepareBindingsForDelete(array $bindings)
+    protected function compileDeleteWithJoinsOrLimit(Builder $query)
     {
-        $cleanBindings = Arr::except($bindings, ['select', 'join']);
+        $table = $this->wrapTable($query->from);
 
-        return array_values(
-            array_merge($bindings['join'], Arr::flatten($cleanBindings))
-        );
+        $alias = last(preg_split('/\s+as\s+/i', $query->from));
+
+        $selectSql = $this->compileSelect($query->select($alias.'.rowid'));
+
+        return "delete from {$table} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**
@@ -268,8 +272,6 @@ class SQLiteGrammar extends Grammar
     {
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
-        $selector = 'json_extract('.$field.$path.')';
-
-        return $selector;
+        return 'json_extract('.$field.$path.')';
     }
 }

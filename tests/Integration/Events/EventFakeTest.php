@@ -13,7 +13,7 @@ class EventFakeTest extends TestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application   $app
+     * @param  \Illuminate\Contracts\Foundation\Application   $app
      *
      * @return void
      */
@@ -36,7 +36,7 @@ class EventFakeTest extends TestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,7 +53,7 @@ class EventFakeTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Schema::dropIfExists('posts');
 
@@ -70,6 +70,60 @@ class EventFakeTest extends TestCase
         $post->save();
 
         $this->assertSame('xyz-Test', $post->slug);
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testNonFakedEventGetsProperlyDispatchedAndReturnsResponses()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return 'two';
+        });
+        Event::listen('test', function () {
+            //
+        });
+
+        $this->assertEquals([null, 'two', null], Event::dispatch('test'));
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testNonFakedEventGetsProperlyDispatchedAndCancelsFutureListeners()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return false;
+        });
+        Event::listen('test', function () {
+            $this->fail('should not be called');
+        });
+
+        $this->assertEquals([null], Event::dispatch('test'));
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testNonFakedHaltedEventGetsProperlyDispatchedAndReturnsResponse()
+    {
+        Event::fake(NonImportantEvent::class);
+        Event::listen('test', function () {
+            // one
+        });
+        Event::listen('test', function () {
+            return 'two';
+        });
+        Event::listen('test', function () {
+            $this->fail('should not be called');
+        });
+
+        $this->assertEquals('two', Event::until('test'));
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }

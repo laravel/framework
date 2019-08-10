@@ -22,7 +22,7 @@ class PendingCommand
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -58,7 +58,7 @@ class PendingCommand
      * Create a new pending console command run.
      *
      * @param  \PHPUnit\Framework\TestCase  $test
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  string  $command
      * @param  array  $parameters
      * @return void
@@ -135,9 +135,11 @@ class PendingCommand
         try {
             $exitCode = $this->app[Kernel::class]->call($this->command, $this->parameters);
         } catch (NoMatchingExpectationException $e) {
-            if ($e->getMethodName() == 'askQuestion') {
+            if ($e->getMethodName() === 'askQuestion') {
                 $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
             }
+
+            throw $e;
         }
 
         if ($this->expectedExitCode !== null) {
@@ -163,7 +165,6 @@ class PendingCommand
 
         foreach ($this->test->expectedQuestions as $i => $question) {
             $mock->shouldReceive('askQuestion')
-                ->once()
                 ->ordered()
                 ->with(Mockery::on(function ($argument) use ($question) {
                     return $argument->getQuestion() == $question[0];
@@ -193,7 +194,6 @@ class PendingCommand
 
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')
-                ->once()
                 ->ordered()
                 ->with($output, Mockery::any())
                 ->andReturnUsing(function () use ($i) {

@@ -4,6 +4,7 @@ namespace Illuminate\Redis\Connections;
 
 use Redis;
 use Closure;
+use RedisCluster;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 
 /**
@@ -45,7 +46,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         return array_map(function ($value) {
             return $value !== false ? $value : null;
-        }, $this->command('mget', $keys));
+        }, $this->command('mget', [$keys]));
     }
 
     /**
@@ -99,11 +100,11 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @param  string  $key
      * @param  dynamic  $dictionary
-     * @return int
+     * @return array
      */
     public function hmget($key, ...$dictionary)
     {
-        if (count($dictionary) == 1) {
+        if (count($dictionary) === 1) {
             $dictionary = $dictionary[0];
         }
 
@@ -119,7 +120,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function hmset($key, ...$dictionary)
     {
-        if (count($dictionary) == 1) {
+        if (count($dictionary) === 1) {
             $dictionary = $dictionary[0];
         } else {
             $input = collect($dictionary);
@@ -148,7 +149,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @param  string  $key
      * @param  int  $count
-     * @param  $value  $value
+     * @param  mixed  $value
      * @return int|false
      */
     public function lrem($key, $count, $value)
@@ -292,7 +293,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Execute commands in a pipeline.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return \Redis|array
      */
     public function pipeline(callable $callback = null)
@@ -307,7 +308,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Execute commands in a transaction.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return \Redis|array
      */
     public function transaction(callable $callback = null)
@@ -386,6 +387,22 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function createSubscription($channels, Closure $callback, $method = 'subscribe')
     {
         //
+    }
+
+    /**
+     * Flush the selected Redis database.
+     *
+     * @return void
+     */
+    public function flushdb()
+    {
+        if (! $this->client instanceof RedisCluster) {
+            return $this->command('flushdb');
+        }
+
+        foreach ($this->client->_masters() as [$host, $port]) {
+            tap(new Redis)->connect($host, $port)->flushDb();
+        }
     }
 
     /**

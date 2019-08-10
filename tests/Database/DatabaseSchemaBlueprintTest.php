@@ -13,7 +13,7 @@ use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -102,6 +102,27 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals('prefix_geo_coordinates_spatialindex', $commands[0]->index);
     }
 
+    public function testDefaultCurrentDateTime()
+    {
+        $base = new Blueprint('users', function ($table) {
+            $table->dateTime('created')->useCurrent();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` add `created` datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
     public function testDefaultCurrentTimestamp()
     {
         $base = new Blueprint('users', function ($table) {
@@ -133,5 +154,20 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testRemoveColumn()
+    {
+        $base = new Blueprint('users', function ($table) {
+            $table->string('foo');
+            $table->string('remove_this');
+            $table->removeColumn('remove_this');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
 }

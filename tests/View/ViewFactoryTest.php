@@ -5,6 +5,7 @@ namespace Illuminate\Tests\View;
 use Closure;
 use stdClass;
 use Mockery as m;
+use ErrorException;
 use ReflectionFunction;
 use Illuminate\View\View;
 use Illuminate\View\Factory;
@@ -22,7 +23,7 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class ViewFactoryTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -80,11 +81,10 @@ class ViewFactoryTest extends TestCase
         unset($_SERVER['__test.view']);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testFirstThrowsInvalidArgumentExceptionIfNoneFound()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andThrow(InvalidArgumentException::class);
         $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andThrow(InvalidArgumentException::class);
@@ -353,7 +353,7 @@ class ViewFactoryTest extends TestCase
     {
         $container = new Container;
         $container->instance('translator', $translator = m::mock(stdClass::class));
-        $translator->shouldReceive('getFromJson')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
+        $translator->shouldReceive('get')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
         $factory = $this->getFactory();
         $factory->setContainer($container);
         $factory->startTranslation(['name' => 'taylor']);
@@ -474,22 +474,20 @@ class ViewFactoryTest extends TestCase
         $factory->make('vendor/package::foo.bar');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionIsThrownForUnknownExtension()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('view.foo');
         $factory->make('view');
     }
 
-    /**
-     * @expectedException \ErrorException
-     * @expectedExceptionMessage section exception message
-     */
     public function testExceptionsInSectionsAreThrown()
     {
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessage('section exception message');
+
         $engine = new CompilerEngine(m::mock(CompilerInterface::class));
         $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
             return $path;
@@ -504,12 +502,11 @@ class ViewFactoryTest extends TestCase
         $factory->make('view')->render();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot end a section without first starting one.
-     */
     public function testExtraStopSectionCallThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot end a section without first starting one.');
+
         $factory = $this->getFactory();
         $factory->startSection('foo');
         $factory->stopSection();
@@ -517,12 +514,11 @@ class ViewFactoryTest extends TestCase
         $factory->stopSection();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot end a section without first starting one.
-     */
     public function testExtraAppendSectionCallThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot end a section without first starting one.');
+
         $factory = $this->getFactory();
         $factory->startSection('foo');
         $factory->stopSection();
@@ -543,6 +539,8 @@ class ViewFactoryTest extends TestCase
             'count' => 3,
             'first' => true,
             'last' => false,
+            'odd' => false,
+            'even' => true,
             'depth' => 1,
             'parent' => null,
         ];
@@ -558,6 +556,8 @@ class ViewFactoryTest extends TestCase
             'count' => 4,
             'first' => true,
             'last' => false,
+            'odd' => false,
+            'even' => true,
             'depth' => 2,
             'parent' => (object) $expectedLoop,
         ];
@@ -601,6 +601,8 @@ class ViewFactoryTest extends TestCase
             'count' => null,
             'first' => true,
             'last' => null,
+            'odd' => false,
+            'even' => true,
             'depth' => 1,
             'parent' => null,
         ];
@@ -616,11 +618,19 @@ class ViewFactoryTest extends TestCase
 
         $factory->incrementLoopIndices();
 
+        $this->assertEquals(1, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(0, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(3, $factory->getLoopStack()[0]['remaining']);
+        $this->assertTrue($factory->getLoopStack()[0]['odd']);
+        $this->assertFalse($factory->getLoopStack()[0]['even']);
+
         $factory->incrementLoopIndices();
 
         $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
         $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
         $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
+        $this->assertFalse($factory->getLoopStack()[0]['odd']);
+        $this->assertTrue($factory->getLoopStack()[0]['even']);
     }
 
     public function testReachingEndOfLoop()
@@ -651,6 +661,15 @@ class ViewFactoryTest extends TestCase
         $this->assertFalse($factory->getLoopStack()[0]['first']);
         $this->assertNull($factory->getLoopStack()[0]['remaining']);
         $this->assertNull($factory->getLoopStack()[0]['last']);
+    }
+
+    public function testMacro()
+    {
+        $factory = $this->getFactory();
+        $factory->macro('getFoo', function () {
+            return 'Hello World';
+        });
+        $this->assertEquals('Hello World', $factory->getFoo());
     }
 
     protected function getFactory()

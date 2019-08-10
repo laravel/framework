@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use BadMethodCallException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Pagination\Paginator;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -84,7 +85,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         Carbon::setTestNow(null);
 
@@ -526,6 +527,14 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, $users);
     }
 
+    public function testWhereDoesntHaveWithNestedDeletedRelationship()
+    {
+        $this->createUsers();
+
+        $users = SoftDeletesTestUser::doesntHave('posts.comments')->get();
+        $this->assertCount(1, $users);
+    }
+
     public function testWhereHasWithNestedDeletedRelationshipAndWithTrashedCondition()
     {
         $this->createUsers();
@@ -613,11 +622,10 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals($abigail->email, $comment->owner->email);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testMorphToWithBadMethodCall()
     {
+        $this->expectException(BadMethodCallException::class);
+
         $this->createUsers();
 
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
@@ -748,7 +756,6 @@ class SoftDeletesTestUser extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'users';
     protected $guarded = [];
 
@@ -772,7 +779,6 @@ class SoftDeletesTestUserWithTrashedPosts extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'users';
     protected $guarded = [];
 
@@ -789,7 +795,6 @@ class SoftDeletesTestPost extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'posts';
     protected $guarded = [];
 
@@ -820,7 +825,6 @@ class SoftDeletesTestComment extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'comments';
     protected $guarded = [];
 
@@ -834,7 +838,6 @@ class SoftDeletesTestCommentWithTrashed extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'comments';
     protected $guarded = [];
 
@@ -851,7 +854,6 @@ class SoftDeletesTestAddress extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'addresses';
     protected $guarded = [];
 }
@@ -863,7 +865,6 @@ class SoftDeletesTestGroup extends Eloquent
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
     protected $table = 'groups';
     protected $guarded = [];
 

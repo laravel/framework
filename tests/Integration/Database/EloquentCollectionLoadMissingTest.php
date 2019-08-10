@@ -13,7 +13,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,6 +43,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
         Comment::create(['parent_id' => null, 'post_id' => 1]);
         Comment::create(['parent_id' => 1, 'post_id' => 1]);
+        Comment::create(['parent_id' => 2, 'post_id' => 1]);
 
         Revision::create(['comment_id' => 1]);
     }
@@ -75,6 +76,19 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
         $this->assertArrayNotHasKey('post_id', $posts[0]->comments[1]->parent->getAttributes());
     }
+
+    public function testLoadMissingWithDuplicateRelationName()
+    {
+        $posts = Post::with('comments')->get();
+
+        DB::enableQueryLog();
+
+        $posts->loadMissing('comments.parent.parent');
+
+        $this->assertCount(2, DB::getQueryLog());
+        $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
+        $this->assertTrue($posts[0]->comments[1]->parent->relationLoaded('parent'));
+    }
 }
 
 class Comment extends Model
@@ -85,7 +99,7 @@ class Comment extends Model
 
     public function parent()
     {
-        return $this->belongsTo(Comment::class);
+        return $this->belongsTo(self::class);
     }
 
     public function revisions()

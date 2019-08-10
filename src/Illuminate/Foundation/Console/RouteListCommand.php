@@ -34,13 +34,6 @@ class RouteListCommand extends Command
     protected $router;
 
     /**
-     * An array of all the registered routes.
-     *
-     * @var \Illuminate\Routing\RouteCollection
-     */
-    protected $routes;
-
-    /**
      * The table headers for the command.
      *
      * @var array
@@ -65,7 +58,6 @@ class RouteListCommand extends Command
         parent::__construct();
 
         $this->router = $router;
-        $this->routes = $router->getRoutes();
     }
 
     /**
@@ -75,11 +67,15 @@ class RouteListCommand extends Command
      */
     public function handle()
     {
-        if (count($this->routes) === 0) {
+        if (empty($this->router->getRoutes())) {
             return $this->error("Your application doesn't have any routes.");
         }
 
-        $this->displayRoutes($this->getRoutes());
+        if (empty($routes = $this->getRoutes())) {
+            return $this->error("Your application doesn't have any routes matching the given criteria.");
+        }
+
+        $this->displayRoutes($routes);
     }
 
     /**
@@ -89,9 +85,9 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $routes = collect($this->routes)->map(function ($route) {
+        $routes = collect($this->router->getRoutes())->map(function ($route) {
             return $this->getRouteInformation($route);
-        })->all();
+        })->filter()->all();
 
         if ($sort = $this->option('sort')) {
             $routes = $this->sortRoutes($sort, $routes);
@@ -101,9 +97,7 @@ class RouteListCommand extends Command
             $routes = array_reverse($routes);
         }
 
-        $routes = $this->pluckColumns($routes);
-
-        return array_filter($routes);
+        return $this->pluckColumns($routes);
     }
 
     /**
@@ -131,7 +125,7 @@ class RouteListCommand extends Command
      * @param  array  $routes
      * @return array
      */
-    protected function sortRoutes($sort, $routes)
+    protected function sortRoutes($sort, array $routes)
     {
         return Arr::sort($routes, function ($route) use ($sort) {
             return $route[$sort];
@@ -144,7 +138,7 @@ class RouteListCommand extends Command
      * @param  array  $routes
      * @return array
      */
-    protected function pluckColumns($routes)
+    protected function pluckColumns(array $routes)
     {
         return array_map(function ($route) {
             return Arr::only($route, $this->getColumns());
@@ -159,6 +153,12 @@ class RouteListCommand extends Command
      */
     protected function displayRoutes(array $routes)
     {
+        if ($this->option('json')) {
+            $this->line(json_encode(array_values($routes)));
+
+            return;
+        }
+
         $this->table($this->getHeaders(), $routes);
     }
 
@@ -216,10 +216,31 @@ class RouteListCommand extends Command
         }
 
         if ($columns = $this->option('columns')) {
-            return array_intersect($availableColumns, $columns);
+            return array_intersect($availableColumns, $this->parseColumns($columns));
         }
 
         return $availableColumns;
+    }
+
+    /**
+     * Parse the column list.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function parseColumns(array $columns)
+    {
+        $results = [];
+
+        foreach ($columns as $i => $column) {
+            if (Str::contains($column, ',')) {
+                $results = array_merge($results, explode(',', $column));
+            } else {
+                $results[] = $column;
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -231,17 +252,12 @@ class RouteListCommand extends Command
     {
         return [
             ['columns', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Columns to include in the route table'],
-
             ['compact', 'c', InputOption::VALUE_NONE, 'Only show method, URI and action columns'],
-
+            ['json', null, InputOption::VALUE_NONE, 'Output the route list as JSON'],
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
-
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
-
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
-
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
-
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
     }

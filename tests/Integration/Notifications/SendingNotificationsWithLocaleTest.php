@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Notifications\Notification;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Notifications\Channels\MailChannel;
@@ -53,11 +54,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->string('name')->nullable();
@@ -73,7 +74,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         NotificationFacade::send($user, new GreetingMailNotification);
 
-        $this->assertContains('hello',
+        $this->assertStringContainsString('hello',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -87,7 +88,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -107,11 +108,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         NotificationFacade::send($users, (new GreetingMailNotification)->locale('fr'));
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[1]->getBody()
         );
     }
@@ -125,14 +126,14 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotificationWithMailable);
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
 
     public function test_mail_is_sent_with_locale_updated_listeners_called()
     {
-        Carbon::setTestNow(Carbon::parse('2018-07-25'));
+        Carbon::setTestNow('2018-07-25');
 
         Event::listen(LocaleUpdated::class, function ($event) {
             Carbon::setLocale($event->locale);
@@ -145,7 +146,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         $user->notify((new GreetingMailNotification)->locale('fr'));
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
 
@@ -167,7 +168,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         $recipient->notify(new GreetingMailNotification);
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -192,13 +193,13 @@ class SendingNotificationsWithLocaleTest extends TestCase
             $recipients, new GreetingMailNotification
         );
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
-        $this->assertContains('hola',
+        $this->assertStringContainsString('hola',
             app('swift.transport')->messages()[1]->getBody()
         );
-        $this->assertContains('hi',
+        $this->assertStringContainsString('hi',
             app('swift.transport')->messages()[2]->getBody()
         );
     }
@@ -214,7 +215,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             (new GreetingMailNotification)->locale('fr')
         );
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
@@ -230,7 +231,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             $recipient, new GreetingMailNotification
         );
 
-        $this->assertContains('bonjour',
+        $this->assertStringContainsString('bonjour',
             app('swift.transport')->messages()[0]->getBody()
         );
     }

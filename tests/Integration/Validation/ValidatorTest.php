@@ -7,16 +7,17 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Translation\Translator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Translation\ArrayLoader;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class ValidatorTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('first_name');
         });

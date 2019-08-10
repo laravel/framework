@@ -9,7 +9,7 @@ use Illuminate\Support\MessageBag;
 
 class SupportMessageBagTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -133,6 +133,7 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
+        $this->assertFalse($container->hasAny());
         $container->add('foo', 'bar');
         $container->add('bar', 'foo');
         $container->add('boom', 'baz');

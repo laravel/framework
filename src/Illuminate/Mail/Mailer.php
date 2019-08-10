@@ -62,9 +62,9 @@ class Mailer implements MailerContract, MailQueueContract
     protected $to;
 
     /**
-     * The queue implementation.
+     * The queue factory implementation.
      *
-     * @var \Illuminate\Contracts\Queue\Queue
+     * @var \Illuminate\Contracts\Queue\Factory
      */
     protected $queue;
 
@@ -172,7 +172,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Send a new message when only a raw text part.
+     * Send a new message with only a raw text part.
      *
      * @param  string  $text
      * @param  mixed  $callback
@@ -184,7 +184,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Send a new message when only a plain part.
+     * Send a new message with only a plain part.
      *
      * @param  string  $view
      * @param  array  $data
@@ -220,7 +220,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string|null  $callback
      * @return void
      */
     public function send($view, array $data = [], $callback = null)
@@ -271,7 +271,8 @@ class Mailer implements MailerContract, MailQueueContract
     protected function sendMailable(MailableContract $mailable)
     {
         return $mailable instanceof ShouldQueue
-                ? $mailable->queue($this->queue) : $mailable->send($this);
+                        ? $mailable->queue($this->queue)
+                        : $mailable->send($this);
     }
 
     /**
@@ -368,7 +369,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Queue a new e-mail message for sending.
      *
-     * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable  $view
      * @param  string|null  $queue
      * @return mixed
      *
@@ -380,14 +381,18 @@ class Mailer implements MailerContract, MailQueueContract
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->queue(is_null($queue) ? $this->queue : $queue);
+        if (is_string($queue)) {
+            $view->onQueue($queue);
+        }
+
+        return $view->queue($this->queue);
     }
 
     /**
      * Queue a new e-mail message for sending on the given queue.
      *
      * @param  string  $queue
-     * @param  string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable  $view
      * @return mixed
      */
     public function onQueue($queue, $view)
@@ -401,7 +406,7 @@ class Mailer implements MailerContract, MailQueueContract
      * This method didn't match rest of framework's "onQueue" phrasing. Added "onQueue".
      *
      * @param  string  $queue
-     * @param  string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable  $view
      * @return mixed
      */
     public function queueOn($queue, $view)
@@ -413,7 +418,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Queue a new e-mail message for sending after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable  $view
      * @param  string|null  $queue
      * @return mixed
      *
@@ -433,7 +438,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable  $view
      * @return mixed
      */
     public function laterOn($queue, $delay, $view)
@@ -471,7 +476,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a Swift Message instance.
      *
      * @param  \Swift_Message  $message
-     * @return void
+     * @return int|null
      */
     protected function sendSwiftMessage($message)
     {
@@ -529,13 +534,13 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Get the view factory instance.
+     * Get the array of failed recipients.
      *
-     * @return \Illuminate\Contracts\View\Factory
+     * @return array
      */
-    public function getViewFactory()
+    public function failures()
     {
-        return $this->views;
+        return $this->failedRecipients;
     }
 
     /**
@@ -549,13 +554,13 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Get the array of failed recipients.
+     * Get the view factory instance.
      *
-     * @return array
+     * @return \Illuminate\Contracts\View\Factory
      */
-    public function failures()
+    public function getViewFactory()
     {
-        return $this->failedRecipients;
+        return $this->views;
     }
 
     /**

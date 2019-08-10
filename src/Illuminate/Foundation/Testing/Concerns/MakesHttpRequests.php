@@ -87,7 +87,7 @@ trait MakesHttpRequests
     /**
      * Disable middleware for the test.
      *
-     * @param  string|array  $middleware
+     * @param  string|array|null  $middleware
      * @return $this
      */
     public function withoutMiddleware($middleware = null)
@@ -113,7 +113,7 @@ trait MakesHttpRequests
     /**
      * Enable the given middleware for the test.
      *
-     * @param  string|array  $middleware
+     * @param  string|array|null  $middleware
      * @return $this
      */
     public function withMiddleware($middleware = null)
@@ -144,13 +144,15 @@ trait MakesHttpRequests
     }
 
     /**
-     * Set the referer header to simulate a previous request.
+     * Set the referer header and previous URL session value in order to simulate a previous request.
      *
      * @param  string  $url
      * @return $this
      */
     public function from(string $url)
     {
+        $this->app['session']->setPreviousUrl($url);
+
         return $this->withHeader('referer', $url);
     }
 
@@ -293,6 +295,34 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given URI with a OPTION request.
+     *
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    public function option($uri, array $data = [], array $headers = [])
+    {
+        $server = $this->transformHeadersToServerVars($headers);
+
+        return $this->call('OPTION', $uri, $data, [], [], $server);
+    }
+
+    /**
+     * Visit the given URI with a OPTION request, expecting a JSON response.
+     *
+     * @param  string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    public function optionJson($uri, array $data = [], array $headers = [])
+    {
+        return $this->json('OPTION', $uri, $data, $headers);
+    }
+
+    /**
      * Call the given URI with a JSON request.
      *
      * @param  string  $method
@@ -327,7 +357,7 @@ trait MakesHttpRequests
      * @param  array  $cookies
      * @param  array  $files
      * @param  array  $server
-     * @param  string  $content
+     * @param  string|null  $content
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
@@ -434,7 +464,7 @@ trait MakesHttpRequests
      * Follow a redirect chain until a non-redirect is received.
      *
      * @param  \Illuminate\Http\Response  $response
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Foundation\Testing\TestResponse
      */
     protected function followRedirects($response)
     {

@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Support;
 
 use DateTime;
 use Carbon\Factory;
+use CustomDateClass;
 use Carbon\CarbonImmutable;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\DateFactory;
@@ -12,7 +14,7 @@ use Illuminate\Support\Facades\Date;
 
 class DateFacadeTest extends TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         DateFactory::use(Carbon::class);
@@ -55,10 +57,6 @@ class DateFacadeTest extends TestCase
 
     public function testCarbonImmutable()
     {
-        if (! class_exists(CarbonImmutable::class)) {
-            $this->markTestSkipped('Test for Carbon 2 only');
-        }
-
         DateFactory::use(CarbonImmutable::class);
         $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
         DateFactory::use(Carbon::class);
@@ -79,17 +77,25 @@ class DateFacadeTest extends TestCase
         DateFactory::use(Carbon::class);
         $this->assertSame('en', Date::now()->locale);
         include_once __DIR__.'/fixtures/CustomDateClass.php';
-        DateFactory::use(\CustomDateClass::class);
-        $this->assertInstanceOf(\CustomDateClass::class, Date::now());
+        DateFactory::use(CustomDateClass::class);
+        $this->assertInstanceOf(CustomDateClass::class, Date::now());
         $this->assertInstanceOf(Carbon::class, Date::now()->getOriginal());
         DateFactory::use(Carbon::class);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testUseInvalidHandler()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         DateFactory::use(42);
+    }
+
+    public function testMacro()
+    {
+        Date::macro('returnNonDate', function () {
+            return 'string';
+        });
+
+        $this->assertSame('string', Date::returnNonDate());
     }
 }

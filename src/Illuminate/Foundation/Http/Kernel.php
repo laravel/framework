@@ -66,7 +66,7 @@ class Kernel implements KernelContract
     /**
      * The priority-sorted list of middleware.
      *
-     * Forces the listed middleware to always be in the given order.
+     * Forces non-global middleware to always be in the given order.
      *
      * @var array
      */
@@ -324,6 +324,26 @@ class Kernel implements KernelContract
     protected function renderException($request, Exception $e)
     {
         return $this->app[ExceptionHandler::class]->render($request, $e);
+    }
+
+    /**
+     * Get the application's route middleware groups.
+     *
+     * @return array
+     */
+    public function getMiddlewareGroups()
+    {
+        return $this->middlewareGroups;
+    }
+
+    /**
+     * Get the application's route middleware.
+     *
+     * @return array
+     */
+    public function getRouteMiddleware()
+    {
+        return $this->routeMiddleware;
     }
 
     /**

@@ -45,7 +45,7 @@ class SeedCommandTest extends TestCase
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
