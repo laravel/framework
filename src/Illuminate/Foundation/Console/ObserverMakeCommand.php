@@ -51,6 +51,14 @@ class ObserverMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('model') && $this->hasOption('basic')) {
+	    return __DIR__ . '/stubs/observer.basic.stub';
+        }
+
+        if ($this->option('model') && $this->hasOption('all')) {
+            return __DIR__ . '/stubs/observer.all.stub';
+        }
+
         return $this->option('model')
                     ? __DIR__.'/stubs/observer.stub'
                     : __DIR__.'/stubs/observer.plain.stub';
@@ -108,6 +116,8 @@ class ObserverMakeCommand extends GeneratorCommand
     {
         return [
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the observer applies to.'],
+            ['basic', 'b', InputOption::VALUE_OPTIONAL, 'Generate with basic observer events.'],
+            ['all', 'a', InputOption::VALUE_OPTIONAL, 'Generate with all observer events.'],
         ];
     }
 }

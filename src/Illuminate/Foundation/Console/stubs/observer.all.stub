@@ -1,0 +1,140 @@
+<?php
+
+namespace DummyNamespace;
+
+use NamespacedDummyModel;
+
+class DummyClass
+{
+    /**
+     * Handle the DocDummyModel "retrieved" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function retrieved(DummyModel $dummyModel)
+    {
+        //
+    }
+    
+    /**
+     * Handle the DocDummyModel "creating" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function creating(DummyModel $dummyModel)
+    {
+        //
+    }
+    
+    /**
+     * Handle the DocDummyModel "created" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function created(DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Handle the DocDummyModel "updating" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function updating(DummyModel $dummyModel)
+    {
+        //
+    }
+    
+    /**
+     * Handle the DocDummyModel "updated" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function updated(DummyModel $dummyModel)
+    {
+        //
+    }
+    
+    /**
+     * Handle the DocDummyModel "saving" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function saving(DummyModel $dummyModel)
+    {
+        //
+    }
+    
+    /**
+     * Handle the DocDummyModel "saved" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function saved(DummyModel $dummyModel)
+    {
+        //
+    }
+    
+    /**
+     * Handle the DocDummyModel "deleting" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function deleting(DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Handle the DocDummyModel "deleted" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function deleted(DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Handle the DocDummyModel "restoring" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function restoring(DummyModel $dummyModel)
+    {
+        //
+    }
+    
+    /**
+     * Handle the DocDummyModel "restored" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function restored(DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Handle the DocDummyModel "force deleted" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function forceDeleted(DummyModel $dummyModel)
+    {
+        //
+    }
+}
