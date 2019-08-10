@@ -223,11 +223,25 @@ class Command extends SymfonyCommand
      */
     protected function createInputFromArguments(array $arguments)
     {
-        return tap(new ArrayInput($arguments), function ($input) {
+        return tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
             if ($input->hasParameterOption(['--no-interaction'], true)) {
                 $input->setInteractive(false);
             }
         });
+    }
+
+    /**
+     * Get all of the context passed to the command.
+     *
+     * @return array
+     */
+    protected function context()
+    {
+        $options = array_only($this->option(), ['no-interaction', 'ansi', 'no-ansi', 'quiet', 'verbose']);
+
+        return collect($options)->mapWithKeys(function ($value, $key) {
+            return ["--{$key}" => $value];
+        })->filter()->all();
     }
 
     /**
