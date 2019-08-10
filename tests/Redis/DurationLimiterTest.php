@@ -22,6 +22,13 @@ class DurationLimiterTest extends TestCase
         $this->setUpRedis();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->tearDownRedis();
+    }
+
     public function test_it_locks_tasks_when_no_slot_available()
     {
         $store = [];
