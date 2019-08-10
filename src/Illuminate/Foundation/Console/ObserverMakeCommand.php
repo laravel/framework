@@ -52,11 +52,11 @@ class ObserverMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('model') && $this->hasOption('basic')) {
-	    return __DIR__ . '/stubs/observer.basic.stub';
+	    return __DIR__.'/stubs/observer.basic.stub';
         }
 
         if ($this->option('model') && $this->hasOption('all')) {
-            return __DIR__ . '/stubs/observer.all.stub';
+            return __DIR__.'/stubs/observer.all.stub';
         }
 
         return $this->option('model')
