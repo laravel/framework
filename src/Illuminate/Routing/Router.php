@@ -531,7 +531,7 @@ class Router implements RegistrarContract, BindingRegistrar
         $group = end($this->groupStack);
 
         return isset($group['namespace']) && strpos($class, '\\') !== 0
-                && Str::startsWith($class, app()->getNamespace()) !== true
+		&& strpos($class, app()->getNamespace()) !== 0
                 ? $group['namespace'].'\\'.$class : $class;
     }
 
