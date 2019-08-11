@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Support;
 
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\Support\Fixtures\NullableManager;
 
 class ManagerTest extends TestCase
 {
@@ -11,6 +12,6 @@ class ManagerTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Fixtures\NullableManager($this->app))->driver();
+        (new NullableManager($this->app))->driver();
     }
 }
