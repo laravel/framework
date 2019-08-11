@@ -111,7 +111,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation();
         $mockModel = $this->getMockBuilder(Model::class)->setMethods(['save'])->getMock();
-        $mockModel->expects($this->once())->method('save')->will($this->returnValue(true));
+        $mockModel->expects($this->once())->method('save')->willReturn(true);
         $result = $relation->save($mockModel);
 
         $attributes = $result->getAttributes();
@@ -122,7 +122,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation();
         $created = $this->getMockBuilder(Model::class)->setMethods(['save', 'getKey', 'setAttribute'])->getMock();
-        $created->expects($this->once())->method('save')->will($this->returnValue(true));
+        $created->expects($this->once())->method('save')->willReturn(true);
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
 

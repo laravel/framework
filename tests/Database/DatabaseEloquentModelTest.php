@@ -259,7 +259,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('where')->once()->with('id', '=', 1);
         $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
@@ -282,7 +282,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('where')->once()->with('id', '=', 1);
         $query->shouldReceive('update')->once()->with(['created_at' => 'foo', 'updated_at' => 'bar'])->andReturn(1);
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until');
         $events->shouldReceive('dispatch');
@@ -299,7 +299,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(false);
         $model->exists = true;
@@ -311,7 +311,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
@@ -325,7 +325,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = $this->getMockBuilder(EloquentModelEventObjectStub::class)->setMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with(m::type(EloquentModelSavingEventStub::class))->andReturn(false);
         $model->exists = true;
@@ -340,9 +340,9 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('where')->once()->with('id', '=', 1);
         $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->never())->method('updateTimestamps');
-        $model->expects($this->any())->method('fireModelEvent')->will($this->returnValue(true));
+        $model->expects($this->any())->method('fireModelEvent')->willReturn(true);
 
         $model->id = 1;
         $model->syncOriginal();
@@ -357,7 +357,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('where')->once()->with('id', '=', 1);
         $query->shouldReceive('update')->once()->with(['id' => 2, 'foo' => 'bar'])->andReturn(1);
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
@@ -377,7 +377,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjects()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->setMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d'));
+        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d');
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
             'updated_at' => '2012-12-05',
@@ -390,7 +390,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjectsFromPlainDatesAndTimestamps()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->setMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
+        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d H:i:s');
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
             'updated_at' => $this->currentTime(),
@@ -491,7 +491,7 @@ class DatabaseEloquentModelTest extends TestCase
         }
 
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->setMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:s.vi'));
+        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d H:s.vi');
         $model->setRawAttributes([
             'created_at' => '2012-12-04 22:59.32130',
         ]);
@@ -506,7 +506,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'taylor'], 'id')->andReturn(1);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
@@ -525,7 +525,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insert')->once()->with(['name' => 'taylor']);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
         $model->setIncrementing(false);
 
@@ -547,7 +547,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = $this->getMockBuilder(EloquentModelStub::class)->setMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(false);
@@ -562,7 +562,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
         $query->shouldReceive('delete')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('touchOwners');
         $model->exists = true;
         $model->id = 1;
@@ -575,7 +575,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'taylor'], 'id')->andReturn(1);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
         $model->name = 'taylor';
@@ -592,7 +592,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'taylor'], 'id')->andReturn(1);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
         $model->name = 'taylor';
@@ -611,7 +611,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'related1'], 'id')->andReturn(2);
         $query->shouldReceive('getConnection')->once();
-        $related1->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $related1->expects($this->once())->method('newModelQuery')->willReturn($query);
         $related1->expects($this->once())->method('updateTimestamps');
         $related1->name = 'related1';
         $related1->exists = false;
@@ -620,7 +620,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'taylor'], 'id')->andReturn(1);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
         $model->name = 'taylor';
@@ -642,7 +642,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'taylor'], 'id')->andReturn(1);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
         $model->name = 'taylor';
@@ -661,7 +661,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'related1'], 'id')->andReturn(2);
         $query->shouldReceive('getConnection')->once();
-        $related1->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $related1->expects($this->once())->method('newModelQuery')->willReturn($query);
         $related1->expects($this->once())->method('updateTimestamps');
         $related1->name = 'related1';
         $related1->exists = false;
@@ -670,7 +670,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'related2'], 'id')->andReturn(3);
         $query->shouldReceive('getConnection')->once();
-        $related2->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $related2->expects($this->once())->method('newModelQuery')->willReturn($query);
         $related2->expects($this->once())->method('updateTimestamps');
         $related2->name = 'related2';
         $related2->exists = false;
@@ -679,7 +679,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with(['name' => 'taylor'], 'id')->andReturn(1);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
         $model->name = 'taylor';
@@ -1791,7 +1791,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn(1);
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
 
         $this->assertTrue($model->save());
         $this->assertEquals(1, $model->id);
@@ -1803,7 +1803,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn('string id');
         $query->shouldReceive('getConnection')->once();
-        $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
 
         $this->assertTrue($model->save());
         $this->assertEquals('string id', $model->id);

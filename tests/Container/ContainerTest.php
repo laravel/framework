@@ -413,7 +413,7 @@ class ContainerTest extends TestCase
         $mock->expects($this->once())
              ->method('make')
              ->with(ContainerDefaultValueStub::class, ['default' => 'laurence'])
-             ->will($this->returnValue(new stdClass));
+             ->willReturn(new stdClass);
 
         $result = $mock->makeWith(ContainerDefaultValueStub::class, ['default' => 'laurence']);
 

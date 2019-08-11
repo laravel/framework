@@ -218,7 +218,7 @@ class SupportCollectionTest extends TestCase
     public function testToJsonEncodesTheJsonSerializeResult()
     {
         $c = $this->getMockBuilder(Collection::class)->setMethods(['jsonSerialize'])->getMock();
-        $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
+        $c->expects($this->once())->method('jsonSerialize')->willReturn('foo');
         $results = $c->toJson();
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
@@ -227,7 +227,7 @@ class SupportCollectionTest extends TestCase
     public function testCastingToStringJsonEncodesTheToArrayResult()
     {
         $c = $this->getMockBuilder(Collection::class)->setMethods(['jsonSerialize'])->getMock();
-        $c->expects($this->once())->method('jsonSerialize')->will($this->returnValue('foo'));
+        $c->expects($this->once())->method('jsonSerialize')->willReturn('foo');
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
     }

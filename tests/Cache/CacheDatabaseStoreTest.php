@@ -36,7 +36,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['expiration' => 1]);
-        $store->expects($this->once())->method('forget')->with($this->equalTo('foo'))->will($this->returnValue(null));
+        $store->expects($this->once())->method('forget')->with($this->equalTo('foo'))->willReturn(null);
 
         $this->assertNull($store->get('foo'));
     }
@@ -68,7 +68,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
+        $store->expects($this->once())->method('getTime')->willReturn(1);
         $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
 
         $result = $store->put('foo', 'bar', 60);
@@ -80,7 +80,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
-        $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
+        $store->expects($this->once())->method('getTime')->willReturn(1);
         $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnUsing(function () {
             throw new Exception;
         });
@@ -96,7 +96,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getMockBuilder(DatabaseStore::class)->setMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
+        $store->expects($this->once())->method('getTime')->willReturn(1);
         $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61])->andReturnTrue();
 
         $result = $store->put('foo', "\0", 60);

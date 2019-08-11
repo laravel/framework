@@ -25,7 +25,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $conn->shouldReceive('statement')->once()->with('bar');
         $grammar = m::mock(MySqlGrammar::class);
         $blueprint = $this->getMockBuilder(Blueprint::class)->setMethods(['toSql'])->setConstructorArgs(['users'])->getMock();
-        $blueprint->expects($this->once())->method('toSql')->with($this->equalTo($conn), $this->equalTo($grammar))->will($this->returnValue(['foo', 'bar']));
+        $blueprint->expects($this->once())->method('toSql')->with($this->equalTo($conn), $this->equalTo($grammar))->willReturn(['foo', 'bar']);
 
         $blueprint->build($conn, $grammar);
     }

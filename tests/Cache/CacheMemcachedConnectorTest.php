@@ -21,7 +21,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $connector = $this->connectorMock();
         $connector->expects($this->once())
             ->method('createMemcachedInstance')
-            ->will($this->returnValue($memcached));
+            ->willReturn($memcached);
 
         $result = $this->connect($connector);
 
@@ -38,7 +38,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $connector->expects($this->once())
             ->method('createMemcachedInstance')
             ->with($persistentConnectionId)
-            ->will($this->returnValue($memcached));
+            ->willReturn($memcached);
 
         $result = $this->connect($connector, $persistentConnectionId);
 
@@ -62,7 +62,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $connector = $this->connectorMock();
         $connector->expects($this->once())
             ->method('createMemcachedInstance')
-            ->will($this->returnValue($memcached));
+            ->willReturn($memcached);
 
         $result = $this->connect($connector, false, $validOptions);
 
@@ -84,7 +84,7 @@ class CacheMemcachedConnectorTest extends TestCase
             ->andReturn(true);
 
         $connector = $this->connectorMock();
-        $connector->expects($this->once())->method('createMemcachedInstance')->will($this->returnValue($memcached));
+        $connector->expects($this->once())->method('createMemcachedInstance')->willReturn($memcached);
 
         $result = $this->connect($connector, false, [], $saslCredentials);
 

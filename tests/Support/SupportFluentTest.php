@@ -108,7 +108,7 @@ class SupportFluentTest extends TestCase
     public function testToJsonEncodesTheToArrayResult()
     {
         $fluent = $this->getMockBuilder(Fluent::class)->setMethods(['toArray'])->getMock();
-        $fluent->expects($this->once())->method('toArray')->will($this->returnValue('foo'));
+        $fluent->expects($this->once())->method('toArray')->willReturn('foo');
         $results = $fluent->toJson();
 
         $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
