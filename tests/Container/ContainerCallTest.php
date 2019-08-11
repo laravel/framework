@@ -112,9 +112,11 @@ class ContainerCallTest extends TestCase
     {
         $container = new Container;
         $container->call(function (ContainerCallConcreteStub $stub) {
+            //
         }, ['foo' => 'bar']);
 
         $container->call(function (ContainerCallConcreteStub $stub) {
+            //
         }, ['foo' => 'bar', 'stub' => new ContainerCallConcreteStub]);
     }
 

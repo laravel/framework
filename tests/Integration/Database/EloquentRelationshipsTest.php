@@ -207,6 +207,7 @@ class CustomHasManyThrough extends HasManyThrough
 
 class CustomHasOneThrough extends HasOneThrough
 {
+    //
 }
 
 class CustomMorphToMany extends MorphToMany

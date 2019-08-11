@@ -85,6 +85,7 @@ class PusherBroadcasterTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
 
         $this->broadcaster->channel('test', function () {
+            //
         });
 
         $this->broadcaster->auth(

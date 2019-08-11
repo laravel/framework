@@ -260,6 +260,7 @@ class ModelSerializationTestUser extends Model
 
 class ModelSerializationTestCustomUserCollection extends Collection
 {
+    //
 }
 
 class ModelSerializationTestCustomUser extends Model

@@ -55,12 +55,16 @@ class BladeCustomTest extends AbstractBladeTestCase
     public function testValidCustomNames()
     {
         $this->assertNull($this->compiler->directive('custom', function () {
+            //
         }));
         $this->assertNull($this->compiler->directive('custom_custom', function () {
+            //
         }));
         $this->assertNull($this->compiler->directive('customCustom', function () {
+            //
         }));
         $this->assertNull($this->compiler->directive('custom::custom', function () {
+            //
         }));
     }
 
@@ -69,6 +73,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The directive name [custom-custom] is not valid.');
         $this->compiler->directive('custom-custom', function () {
+            //
         });
     }
 
@@ -77,6 +82,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The directive name [custom:custom] is not valid.');
         $this->compiler->directive('custom:custom', function () {
+            //
         });
     }
 

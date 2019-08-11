@@ -544,6 +544,7 @@ class Gate implements GateContract
         }
 
         return function () {
+            //
         };
     }
 
