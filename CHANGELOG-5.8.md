@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.31...5.8)
 
+### TODO:
+- Resolve columns with schema references ([#29448](https://github.com/laravel/framework/pull/29448))
+
 
 ## [v5.8.31 (2019-08-06)](https://github.com/laravel/framework/compare/v5.8.30...v5.8.31)
 
