@@ -340,4 +340,5 @@ class MyCustomGuardStub
 
 class MyDispatcherLessCustomGuardStub
 {
+    //
 }

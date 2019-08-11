@@ -21,6 +21,7 @@ class NullStore extends TaggableStore
      */
     public function get($key)
     {
+        //
     }
 
     /**
