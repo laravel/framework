@@ -63,7 +63,11 @@ class ClearCommand extends Command
         $this->laravel['events']->dispatch(
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
-
+            
+        if (! $this->files->exists($storagePath = storage_path('framework/cache/data'))) {
+            return $this->error('Failed to clear cache since the data folder does not exist');
+        }
+        
         $successful = $this->cache()->flush();
 
         $this->flushFacades();
