@@ -280,6 +280,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Wrap a union subquery in parentheses.
+     *
+     * @param  string  $sql
+     * @return string
+     */
+    protected function wrapUnion($sql)
+    {
+        return 'select * from ('.$sql.') as '.$this->wrapTable('temp_table');
+    }
+
+    /**
      * Compile an exists statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

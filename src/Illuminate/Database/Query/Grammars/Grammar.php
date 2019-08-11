@@ -34,7 +34,6 @@ class Grammar extends BaseGrammar
         'orders',
         'limit',
         'offset',
-        'unions',
         'lock',
     ];
 
@@ -65,6 +64,10 @@ class Grammar extends BaseGrammar
         $sql = trim($this->concatenate(
             $this->compileComponents($query))
         );
+
+        if ($query->unions) {
+            $sql = $this->wrapUnion($sql).' '.$this->compileUnions($query);
+        }
 
         $query->columns = $original;
 
@@ -793,7 +796,18 @@ class Grammar extends BaseGrammar
     {
         $conjunction = $union['all'] ? ' union all ' : ' union ';
 
-        return $conjunction.$union['query']->toSql();
+        return $conjunction.$this->wrapUnion($union['query']->toSql());
+    }
+
+    /**
+     * Wrap a union subquery in parentheses.
+     *
+     * @param  string  $sql
+     * @return string
+     */
+    protected function wrapUnion($sql)
+    {
+        return '('.$sql.')';
     }
 
     /**

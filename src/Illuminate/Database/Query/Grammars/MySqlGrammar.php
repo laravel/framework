@@ -15,46 +15,6 @@ class MySqlGrammar extends Grammar
     protected $operators = ['sounds like'];
 
     /**
-     * The components that make up a select clause.
-     *
-     * @var array
-     */
-    protected $selectComponents = [
-        'aggregate',
-        'columns',
-        'from',
-        'joins',
-        'wheres',
-        'groups',
-        'havings',
-        'orders',
-        'limit',
-        'offset',
-        'lock',
-    ];
-
-    /**
-     * Compile a select query into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileSelect(Builder $query)
-    {
-        if ($query->unions && $query->aggregate) {
-            return $this->compileUnionAggregate($query);
-        }
-
-        $sql = parent::compileSelect($query);
-
-        if ($query->unions) {
-            $sql = '('.$sql.') '.$this->compileUnions($query);
-        }
-
-        return $sql;
-    }
-
-    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column
@@ -81,19 +41,6 @@ class MySqlGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_length('.$field.$path.') '.$operator.' '.$value;
-    }
-
-    /**
-     * Compile a single union statement.
-     *
-     * @param  array  $union
-     * @return string
-     */
-    protected function compileUnion(array $union)
-    {
-        $conjunction = $union['all'] ? ' union all ' : ' union ';
-
-        return $conjunction.'('.$union['query']->toSql().')';
     }
 
     /**

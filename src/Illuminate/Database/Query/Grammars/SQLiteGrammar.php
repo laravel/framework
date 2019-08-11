@@ -9,25 +9,6 @@ use Illuminate\Database\Query\Builder;
 class SQLiteGrammar extends Grammar
 {
     /**
-     * The components that make up a select clause.
-     *
-     * @var array
-     */
-    protected $selectComponents = [
-        'aggregate',
-        'columns',
-        'from',
-        'joins',
-        'wheres',
-        'groups',
-        'havings',
-        'orders',
-        'limit',
-        'offset',
-        'lock',
-    ];
-
-    /**
      * All of the available clause operators.
      *
      * @var array
@@ -39,37 +20,14 @@ class SQLiteGrammar extends Grammar
     ];
 
     /**
-     * Compile a select query into SQL.
+     * Wrap a union subquery in parentheses.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sql
      * @return string
      */
-    public function compileSelect(Builder $query)
+    protected function wrapUnion($sql)
     {
-        if ($query->unions && $query->aggregate) {
-            return $this->compileUnionAggregate($query);
-        }
-
-        $sql = parent::compileSelect($query);
-
-        if ($query->unions) {
-            $sql = 'select * from ('.$sql.') '.$this->compileUnions($query);
-        }
-
-        return $sql;
-    }
-
-    /**
-     * Compile a single union statement.
-     *
-     * @param  array  $union
-     * @return string
-     */
-    protected function compileUnion(array $union)
-    {
-        $conjunction = $union['all'] ? ' union all ' : ' union ';
-
-        return $conjunction.'select * from ('.$union['query']->toSql().')';
+        return 'select * from ('.$sql.')';
     }
 
     /**
