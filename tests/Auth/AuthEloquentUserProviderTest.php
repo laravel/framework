@@ -24,7 +24,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $mock->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
         $mock->shouldReceive('where')->once()->with('id', 1)->andReturn($mock);
         $mock->shouldReceive('first')->once()->andReturn('bar');
-        $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
+        $provider->expects($this->once())->method('createModel')->willReturn($mock);
         $user = $provider->retrieveById(1);
 
         $this->assertEquals('bar', $user);
@@ -41,7 +41,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $mock->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
         $mock->shouldReceive('where')->once()->with('id', 1)->andReturn($mock);
         $mock->shouldReceive('first')->once()->andReturn($mockUser);
-        $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
+        $provider->expects($this->once())->method('createModel')->willReturn($mock);
         $user = $provider->retrieveByToken(1, 'a');
 
         $this->assertEquals($mockUser, $user);
@@ -55,7 +55,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $mock->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
         $mock->shouldReceive('where')->once()->with('id', 1)->andReturn($mock);
         $mock->shouldReceive('first')->once()->andReturn(null);
-        $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
+        $provider->expects($this->once())->method('createModel')->willReturn($mock);
         $user = $provider->retrieveByToken(1, 'a');
 
         $this->assertNull($user);
@@ -72,7 +72,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $mock->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
         $mock->shouldReceive('where')->once()->with('id', 1)->andReturn($mock);
         $mock->shouldReceive('first')->once()->andReturn($mockUser);
-        $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
+        $provider->expects($this->once())->method('createModel')->willReturn($mock);
         $user = $provider->retrieveByToken(1, 'a');
 
         $this->assertNull($user);
@@ -86,7 +86,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $mock->shouldReceive('where')->once()->with('username', 'dayle');
         $mock->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
         $mock->shouldReceive('first')->once()->andReturn('bar');
-        $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
+        $provider->expects($this->once())->method('createModel')->willReturn($mock);
         $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo', 'group' => ['one', 'two']]);
 
         $this->assertEquals('bar', $user);

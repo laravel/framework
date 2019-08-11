@@ -20,7 +20,7 @@ class QueueRedisQueueTest extends TestCase
     public function testPushProperlyPushesJobOntoRedis()
     {
         $queue = $this->getMockBuilder(RedisQueue::class)->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
+        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
 
@@ -31,7 +31,7 @@ class QueueRedisQueueTest extends TestCase
     public function testPushProperlyPushesJobOntoRedisWithCustomPayloadHook()
     {
         $queue = $this->getMockBuilder(RedisQueue::class)->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
+        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0]));
 
@@ -48,7 +48,7 @@ class QueueRedisQueueTest extends TestCase
     public function testPushProperlyPushesJobOntoRedisWithTwoCustomPayloadHook()
     {
         $queue = $this->getMockBuilder(RedisQueue::class)->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
+        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0]));
 
@@ -69,8 +69,8 @@ class QueueRedisQueueTest extends TestCase
     public function testDelayedPushProperlyPushesJobOntoRedis()
     {
         $queue = $this->getMockBuilder(RedisQueue::class)->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
-        $queue->expects($this->once())->method('availableAt')->with(1)->will($this->returnValue(2));
+        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
+        $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(
@@ -87,8 +87,8 @@ class QueueRedisQueueTest extends TestCase
     {
         $date = Carbon::now();
         $queue = $this->getMockBuilder(RedisQueue::class)->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
-        $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
-        $queue->expects($this->once())->method('availableAt')->with($date)->will($this->returnValue(2));
+        $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
+        $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(2);
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(

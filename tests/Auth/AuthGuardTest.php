@@ -128,7 +128,7 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->setMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $user = m::mock(Authenticatable::class);
-        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+        $mock->expects($this->once())->method('getName')->willReturn('foo');
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
         $session->shouldReceive('migrate')->once();
@@ -156,7 +156,7 @@ class AuthGuardTest extends TestCase
         $user = m::mock(Authenticatable::class);
         $events->shouldReceive('dispatch')->once()->with(m::type(Login::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
-        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+        $mock->expects($this->once())->method('getName')->willReturn('foo');
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
         $session->shouldReceive('migrate')->once();
@@ -230,7 +230,7 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->setMethods(['user'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->expects($this->exactly(2))->method('user')->will($this->returnValue(null));
+        $mock->expects($this->exactly(2))->method('user')->willReturn(null);
         $this->assertFalse($mock->check());
         $this->assertTrue($mock->guest());
     }
@@ -268,9 +268,9 @@ class AuthGuardTest extends TestCase
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getRememberToken')->once()->andReturn('a');
         $user->shouldReceive('setRememberToken')->once();
-        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
-        $mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
-        $mock->expects($this->once())->method('recaller')->will($this->returnValue('non-null-cookie'));
+        $mock->expects($this->once())->method('getName')->willReturn('foo');
+        $mock->expects($this->once())->method('getRecallerName')->willReturn('bar');
+        $mock->expects($this->once())->method('recaller')->willReturn('non-null-cookie');
         $provider->shouldReceive('updateRememberToken')->once();
 
         $cookie = m::mock(Cookie::class);
@@ -289,8 +289,8 @@ class AuthGuardTest extends TestCase
         $mock->setCookieJar($cookies = m::mock(CookieJar::class));
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getRememberToken')->andReturn(null);
-        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
-        $mock->expects($this->once())->method('recaller')->will($this->returnValue(null));
+        $mock->expects($this->once())->method('getName')->willReturn('foo');
+        $mock->expects($this->once())->method('recaller')->willReturn(null);
 
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
@@ -332,9 +332,9 @@ class AuthGuardTest extends TestCase
         $mock = $this->getMockBuilder(SessionGuard::class)->setMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $mock->setCookieJar($cookies = m::mock(CookieJar::class));
         $user = m::mock(Authenticatable::class);
-        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
-        $mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
-        $mock->expects($this->once())->method('recaller')->will($this->returnValue('non-null-cookie'));
+        $mock->expects($this->once())->method('getName')->willReturn('foo');
+        $mock->expects($this->once())->method('getRecallerName')->willReturn('bar');
+        $mock->expects($this->once())->method('recaller')->willReturn('non-null-cookie');
 
         $cookie = m::mock(Cookie::class);
         $cookies->shouldReceive('forget')->once()->with('bar')->andReturn($cookie);
@@ -352,8 +352,8 @@ class AuthGuardTest extends TestCase
         $mock->setCookieJar($cookies = m::mock(CookieJar::class));
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getRememberToken')->andReturn(null);
-        $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
-        $mock->expects($this->once())->method('recaller')->will($this->returnValue(null));
+        $mock->expects($this->once())->method('getName')->willReturn('foo');
+        $mock->expects($this->once())->method('recaller')->willReturn(null);
 
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
