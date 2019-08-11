@@ -20,7 +20,7 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 /**
  * @mixin \Illuminate\Contracts\Cache\Store
  */
-class Repository implements CacheContract, ArrayAccess
+class Repository implements ArrayAccess, CacheContract
 {
     use InteractsWithTime;
     use Macroable {
