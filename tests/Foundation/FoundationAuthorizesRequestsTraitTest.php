@@ -139,14 +139,14 @@ class FoundationAuthorizesRequestTestPolicy
         return true;
     }
 
-    public function test_policy_method_may_be_guessed_passing_model_instance()
+    public function testPolicyMethodMayBeGuessedPassingModelInstance()
     {
         $_SERVER['_test.authorizes.trait.policy'] = true;
 
         return true;
     }
 
-    public function test_policy_method_may_be_guessed_passing_class_name()
+    public function testPolicyMethodMayBeGuessedPassingClassName()
     {
         $_SERVER['_test.authorizes.trait.policy'] = true;
 
