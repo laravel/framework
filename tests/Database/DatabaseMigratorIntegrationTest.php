@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
+use CreateUsersTable;
 use Illuminate\Support\Str;
+use CreatePasswordResetsTable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Container\Container;
@@ -68,8 +70,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue($this->db->schema()->hasTable('users'));
         $this->assertTrue($this->db->schema()->hasTable('password_resets'));
 
-        $this->assertTrue(Str::contains($ran[0], 'users'));
-        $this->assertTrue(Str::contains($ran[1], 'password_resets'));
+        $this->assertTrue($ran[0] instanceof CreateUsersTable);
+        $this->assertTrue($ran[1] instanceof CreatePasswordResetsTable);
     }
 
     public function testMigrationsCanBeRolledBack()
