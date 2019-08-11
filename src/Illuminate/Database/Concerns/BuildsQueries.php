@@ -133,6 +133,87 @@ trait BuildsQueries
     }
 
     /**
+     * Generate items while chunking.
+     *
+     * @param  int  $count
+     * @return \Generator
+     */
+    public function generator($count = 1000)
+    {
+        $this->enforceOrderBy();
+
+        $page = 1;
+
+        do {
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
+            $results = $this->forPage($page, $count)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
+            // Yield each chunk result and let the developer take care of everyting
+            // 1 result at the time, which allows us to keep the memory low
+            // for spinning through large result sets for working.
+            foreach ($results as $key => $value) {
+                yield $key => $value;
+            }
+
+            unset($results);
+
+            $page++;
+        } while ($countResults == $count);
+    }
+
+
+    /**
+     * Generate items while chunking by id.
+     *
+     * @param  int  $count
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return \Generator
+     */
+    public function generatorById($count = 1000, $column = null, $alias = null)
+    {
+        $column = $column ?? $this->defaultKeyName();
+
+        $alias = $alias ?? $column;
+
+        $lastId = null;
+
+        do {
+            $clone = clone $this;
+
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
+            $results = $clone->forPageAfterId($count, $lastId, $column)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
+            // Yield each chunk result and let the developer take care of everyting
+            // 1 result at the time, which allows us to keep the memory low
+            // for spinning through large result sets for working.
+            foreach ($results as $key => $value) {
+                yield $key => $value;
+            }
+
+            $lastId = $results->last()->{$alias};
+
+            unset($results);
+        } while ($countResults == $count);
+    }
+
+    /**
      * Execute the query and get the first result.
      *
      * @param  array  $columns
