@@ -2,7 +2,6 @@
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         bootstrap="tests/bootstrap.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -26,9 +25,10 @@
         </whitelist>
     </filter>
     <php>
-      <!--
-      <env name="REDIS_HOST" value="127.0.0.1" />
-      <env name="REDIS_PORT" value="6379" />
-      -->
+        <ini name="date.timezone" value="UTC" />
+        <!--
+          <env name="REDIS_HOST" value="127.0.0.1" />
+          <env name="REDIS_PORT" value="6379" />
+        -->
     </php>
 </phpunit>
