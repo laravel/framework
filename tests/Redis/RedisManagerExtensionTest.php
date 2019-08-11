@@ -44,14 +44,14 @@ class RedisManagerExtensionTest extends TestCase
         });
     }
 
-    public function test_using_custom_redis_connector_with_single_redis_instance()
+    public function testUsingCustomRedisConnectorWithSingleRedisInstance()
     {
         $this->assertEquals(
             'my-redis-connection', $this->redis->resolve()
         );
     }
 
-    public function test_using_custom_redis_connector_with_redis_cluster_instance()
+    public function testUsingCustomRedisConnectorWithRedisClusterInstance()
     {
         $this->assertEquals(
             'my-redis-cluster-connection', $this->redis->resolve('my-cluster')

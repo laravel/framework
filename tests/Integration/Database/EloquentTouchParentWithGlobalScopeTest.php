@@ -34,7 +34,7 @@ class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
         Carbon::setTestNow(null);
     }
 
-    public function test_basic_create_and_retrieve()
+    public function testBasicCreateAndRetrieve()
     {
         $post = Post::create(['title' => Str::random(), 'updated_at' => '2016-10-10 10:10:10']);
 

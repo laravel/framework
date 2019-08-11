@@ -45,7 +45,7 @@ class InteractsWithAuthenticationTest extends TestCase
         ]);
     }
 
-    public function test_acting_as_is_properly_handled_for_session_auth()
+    public function testActingAsIsProperlyHandledForSessionAuth()
     {
         Route::get('me', function (Request $request) {
             return 'Hello '.$request->user()->username;
@@ -59,7 +59,7 @@ class InteractsWithAuthenticationTest extends TestCase
             ->assertSeeText('Hello taylorotwell');
     }
 
-    public function test_acting_as_is_properly_handled_for_auth_via_request()
+    public function testActingAsIsProperlyHandledForAuthViaRequest()
     {
         Route::get('me', function (Request $request) {
             return 'Hello '.$request->user()->username;

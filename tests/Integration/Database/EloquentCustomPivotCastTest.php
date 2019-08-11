@@ -33,7 +33,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         });
     }
 
-    public function test_casts_are_respected_on_attach()
+    public function testCastsAreRespectedOnAttach()
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -49,7 +49,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
 
-    public function test_casts_are_respected_on_attach_array()
+    public function testCastsAreRespectedOnAttachArray()
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -73,7 +73,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
     }
 
-    public function test_casts_are_respected_on_sync()
+    public function testCastsAreRespectedOnSync()
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -89,7 +89,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
 
-    public function test_casts_are_respected_on_sync_array()
+    public function testCastsAreRespectedOnSyncArray()
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -113,7 +113,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
     }
 
-    public function test_casts_are_respected_on_sync_array_while_updating_existing()
+    public function testCastsAreRespectedOnSyncArrayWhileUpdatingExisting()
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',

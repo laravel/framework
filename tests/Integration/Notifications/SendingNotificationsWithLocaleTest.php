@@ -65,7 +65,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         });
     }
 
-    public function test_mail_is_sent_with_default_locale()
+    public function testMailIsSentWithDefaultLocale()
     {
         $user = NotifiableLocalizedUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -79,7 +79,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
-    public function test_mail_is_sent_with_facade_selected_locale()
+    public function testMailIsSentWithFacadeSelectedLocale()
     {
         $user = NotifiableLocalizedUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -93,7 +93,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
-    public function test_mail_is_sent_with_notification_selected_locale()
+    public function testMailIsSentWithNotificationSelectedLocale()
     {
         $users = [
             NotifiableLocalizedUser::forceCreate([
@@ -117,7 +117,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
-    public function test_mailable_is_sent_with_selected_locale()
+    public function testMailableIsSentWithSelectedLocale()
     {
         $user = NotifiableLocalizedUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -131,7 +131,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
-    public function test_mail_is_sent_with_locale_updated_listeners_called()
+    public function testMailIsSentWithLocaleUpdatedListenersCalled()
     {
         Carbon::setTestNow('2018-07-25');
 
@@ -159,7 +159,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $this->assertSame('en', Carbon::getLocale());
     }
 
-    public function test_locale_is_sent_with_notifiable_preferred_locale()
+    public function testLocaleIsSentWithNotifiablePreferredLocale()
     {
         $recipient = new NotifiableEmailLocalePreferredUser([
             'email' => 'test@mail.com',
@@ -173,7 +173,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
-    public function test_locale_is_sent_with_notifiable_preferred_locale_for_multiple_recipients()
+    public function testLocaleIsSentWithNotifiablePreferredLocaleForMultipleRecipients()
     {
         $recipients = [
             new NotifiableEmailLocalePreferredUser([
@@ -204,7 +204,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
-    public function test_locale_is_sent_with_notification_selected_locale_overriding_notifiable_preferred_locale()
+    public function testLocaleIsSentWithNotificationSelectedLocaleOverridingNotifiablePreferredLocale()
     {
         $recipient = new NotifiableEmailLocalePreferredUser([
             'email' => 'test@mail.com',
@@ -220,7 +220,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
-    public function test_locale_is_sent_with_facade_selected_locale_overriding_notifiable_preferred_locale()
+    public function testLocaleIsSentWithFacadeSelectedLocaleOverridingNotifiablePreferredLocale()
     {
         $recipient = new NotifiableEmailLocalePreferredUser([
             'email' => 'test@mail.com',

@@ -17,7 +17,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         Container::setInstance(null);
     }
 
-    public function test_basic_gate_check()
+    public function testBasicGateCheck()
     {
         unset($_SERVER['_test.authorizes.trait']);
 
@@ -35,7 +35,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait']);
     }
 
-    public function test_exception_is_thrown_if_gate_check_fails()
+    public function testExceptionIsThrownIfGateCheckFails()
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
@@ -49,7 +49,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         (new FoundationTestAuthorizeTraitClass)->authorize('baz');
     }
 
-    public function test_policies_may_be_called()
+    public function testPoliciesMayBeCalled()
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
@@ -63,7 +63,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
-    public function test_policy_method_may_be_guessed_passing_model_instance()
+    public function testPolicyMethodMayBeGuessedPassingModelInstance()
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
@@ -77,7 +77,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
-    public function test_policy_method_may_be_guessed_passing_class_name()
+    public function testPolicyMethodMayBeGuessedPassingClassName()
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
@@ -91,7 +91,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
-    public function test_policy_method_may_be_guessed_and_normalized()
+    public function testPolicyMethodMayBeGuessedAndNormalized()
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
@@ -139,14 +139,14 @@ class FoundationAuthorizesRequestTestPolicy
         return true;
     }
 
-    public function test_policy_method_may_be_guessed_passing_model_instance()
+    public function testPolicyMethodMayBeGuessedPassingModelInstance()
     {
         $_SERVER['_test.authorizes.trait.policy'] = true;
 
         return true;
     }
 
-    public function test_policy_method_may_be_guessed_passing_class_name()
+    public function testPolicyMethodMayBeGuessedPassingClassName()
     {
         $_SERVER['_test.authorizes.trait.policy'] = true;
 

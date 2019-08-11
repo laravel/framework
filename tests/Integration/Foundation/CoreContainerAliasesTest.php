@@ -8,7 +8,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 
 class CoreContainerAliasesTest extends TestCase
 {
-    public function test_it_can_resolve_core_container_aliases()
+    public function testItCanResolveCoreContainerAliases()
     {
         $this->assertInstanceOf(DatabaseManager::class, $this->app->make(ConnectionResolverInterface::class));
     }

@@ -49,7 +49,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         });
     }
 
-    public function test_pivot_can_be_serialized_and_restored()
+    public function testPivotCanBeSerializedAndRestored()
     {
         $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
         $project = PivotSerializationTestProject::forceCreate(['name' => 'Test Project']);
@@ -66,7 +66,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class->pivot->save();
     }
 
-    public function test_morph_pivot_can_be_serialized_and_restored()
+    public function testMorphPivotCanBeSerializedAndRestored()
     {
         $project = PivotSerializationTestProject::forceCreate(['name' => 'Test Project']);
         $tag = PivotSerializationTestTag::forceCreate(['name' => 'Test Tag']);
@@ -84,7 +84,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class->pivot->save();
     }
 
-    public function test_collection_of_pivots_can_be_serialized_and_restored()
+    public function testCollectionOfPivotsCanBeSerializedAndRestored()
     {
         $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
         $user2 = PivotSerializationTestUser::forceCreate(['email' => 'mohamed@laravel.com']);
@@ -102,7 +102,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $this->assertEquals($project->collaborators[1]->pivot->project_id, $class->pivots[1]->project_id);
     }
 
-    public function test_collection_of_morph_pivots_can_be_serialized_and_restored()
+    public function testCollectionOfMorphPivotsCanBeSerializedAndRestored()
     {
         $tag = PivotSerializationTestTag::forceCreate(['name' => 'Test Tag 1']);
         $tag2 = PivotSerializationTestTag::forceCreate(['name' => 'Test Tag 2']);

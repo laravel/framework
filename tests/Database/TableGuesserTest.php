@@ -7,7 +7,7 @@ use Illuminate\Database\Console\Migrations\TableGuesser;
 
 class TableGuesserTest extends TestCase
 {
-    public function test_migration_is_properly_parsed()
+    public function testMigrationIsProperlyParsed()
     {
         [$table, $create] = TableGuesser::guess('create_users_table');
         $this->assertEquals('users', $table);
@@ -26,7 +26,7 @@ class TableGuesserTest extends TestCase
         $this->assertFalse($create);
     }
 
-    public function test_migration_is_properly_parsed_without_table_suffix()
+    public function testMigrationIsProperlyParsedWithoutTableSuffix()
     {
         [$table, $create] = TableGuesser::guess('create_users');
         $this->assertEquals('users', $table);

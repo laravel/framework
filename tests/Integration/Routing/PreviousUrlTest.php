@@ -9,7 +9,7 @@ use Illuminate\Session\SessionServiceProvider;
 
 class PreviousUrlTest extends TestCase
 {
-    public function test_previous_url_without_session()
+    public function testPreviousUrlWithoutSession()
     {
         Route::post('/previous-url', function (DummyFormRequest $request) {
             return 'OK';

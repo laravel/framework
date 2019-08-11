@@ -20,7 +20,7 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         $app['config']->set('app.debug', 'true');
     }
 
-    public function test_mail_is_sent()
+    public function testMailIsSent()
     {
         $notifiable = (new AnonymousNotifiable)
             ->route('testchannel', 'enzo')
@@ -36,7 +36,7 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         ], $_SERVER['__notifiable.route']);
     }
 
-    public function test_faking()
+    public function testFaking()
     {
         $fake = NotificationFacade::fake();
 

@@ -13,7 +13,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
  */
 class FoundationHelpersTest extends TestCase
 {
-    public function test_rescue()
+    public function testRescue()
     {
         $this->assertEquals(rescue(function () {
             throw new Exception;
