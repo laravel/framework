@@ -74,7 +74,7 @@ class MigratorEventsTest extends DatabaseTestCase
         });
     }
 
-    public function test_migration_events_are_fired_when_no_migrations_are_to_be_ran()
+    public function test_migration_events_are_still_fired_when_no_migrations_need_to_be_migrated()
     {
         Event::fake();
 
