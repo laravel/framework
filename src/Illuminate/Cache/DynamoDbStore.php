@@ -11,7 +11,7 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\LockProvider;
 use Aws\DynamoDb\Exception\DynamoDbException;
 
-class DynamoDbStore implements Store, LockProvider
+class DynamoDbStore implements LockProvider, Store
 {
     use InteractsWithTime;
 

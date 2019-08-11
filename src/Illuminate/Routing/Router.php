@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 /**
  * @mixin \Illuminate\Routing\RouteRegistrar
  */
-class Router implements RegistrarContract, BindingRegistrar
+class Router implements BindingRegistrar, RegistrarContract
 {
     use Macroable {
         __call as macroCall;

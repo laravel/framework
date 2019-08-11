@@ -26,7 +26,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoun
 /**
  * @mixin \League\Flysystem\FilesystemInterface
  */
-class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
+class FilesystemAdapter implements CloudFilesystemContract
 {
     /**
      * The Flysystem filesystem implementation.
