@@ -22,7 +22,7 @@ class DurationLimiterTest extends TestCase
         $this->setUpRedis();
     }
 
-    public function test_it_locks_tasks_when_no_slot_available()
+    public function testItLocksTasksWhenNoSlotAvailable()
     {
         $store = [];
 
@@ -53,7 +53,7 @@ class DurationLimiterTest extends TestCase
         $this->assertEquals([1, 2, 3], $store);
     }
 
-    public function test_it_fails_immediately_or_retries_for_a_while_based_on_a_given_timeout()
+    public function testItFailsImmediatelyOrRetriesForAWhileBasedOnAGivenTimeout()
     {
         $store = [];
 

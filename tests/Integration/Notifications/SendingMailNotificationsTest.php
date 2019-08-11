@@ -66,7 +66,7 @@ class SendingMailNotificationsTest extends TestCase
         });
     }
 
-    public function test_mail_is_sent()
+    public function testMailIsSent()
     {
         $notification = new TestMailNotification;
 
@@ -109,7 +109,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_to_named_address()
+    public function testMailIsSentToNamedAddress()
     {
         $notification = new TestMailNotification;
 
@@ -153,7 +153,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_with_subject()
+    public function testMailIsSentWithSubject()
     {
         $notification = new TestMailNotificationWithSubject;
 
@@ -186,7 +186,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_to_multiple_adresses()
+    public function testMailIsSentToMultipleAdresses()
     {
         $notification = new TestMailNotificationWithSubject;
 
@@ -219,7 +219,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_using_mailable()
+    public function testMailIsSentUsingMailable()
     {
         $notification = new TestMailNotificationWithMailable;
 

@@ -46,7 +46,7 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($video)->save();
     }
 
-    public function test_lazy_eager_loading()
+    public function testLazyEagerLoading()
     {
         $comments = Comment::all();
 

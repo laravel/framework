@@ -25,7 +25,7 @@ class CallQueuedHandlerTest extends TestCase
         m::close();
     }
 
-    public function test_job_can_be_dispatched()
+    public function testJobCanBeDispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;
 
@@ -45,7 +45,7 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
     }
 
-    public function test_job_can_be_dispatched_through_middleware()
+    public function testJobCanBeDispatchedThroughMiddleware()
     {
         CallQueuedHandlerTestJobWithMiddleware::$handled = false;
         CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = null;
@@ -67,7 +67,7 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue(CallQueuedHandlerTestJobWithMiddleware::$handled);
     }
 
-    public function test_job_can_be_dispatched_through_middleware_on_dispatch()
+    public function testJobCanBeDispatchedThroughMiddlewareOnDispatch()
     {
         $_SERVER['__test.dispatchMiddleware'] = false;
         CallQueuedHandlerTestJobWithMiddleware::$handled = false;
@@ -94,7 +94,7 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue($_SERVER['__test.dispatchMiddleware']);
     }
 
-    public function test_job_is_marked_as_failed_if_model_not_found_exception_is_thrown()
+    public function testJobIsMarkedAsFailedIfModelNotFoundExceptionIsThrown()
     {
         $instance = new CallQueuedHandler(new Dispatcher(app()));
 
@@ -107,7 +107,7 @@ class CallQueuedHandlerTest extends TestCase
         ]);
     }
 
-    public function test_job_is_deleted_if_has_delete_property()
+    public function testJobIsDeletedIfHasDeleteProperty()
     {
         Event::fake();
 

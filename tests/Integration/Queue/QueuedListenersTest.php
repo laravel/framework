@@ -13,7 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
  */
 class QueuedListenersTest extends TestCase
 {
-    public function test_listeners_can_be_queued_optionally()
+    public function testListenersCanBeQueuedOptionally()
     {
         Queue::fake();
 

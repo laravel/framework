@@ -19,12 +19,12 @@ class EncryptionTest extends TestCase
         return [EncryptionServiceProvider::class];
     }
 
-    public function test_encryption_provider_bind()
+    public function testEncryptionProviderBind()
     {
         self::assertInstanceOf(Encrypter::class, $this->app->make('encrypter'));
     }
 
-    public function test_encryption_will_not_be_instantiable_when_missing_app_key()
+    public function testEncryptionWillNotBeInstantiableWhenMissingAppKey()
     {
         $this->expectException(RuntimeException::class);
 

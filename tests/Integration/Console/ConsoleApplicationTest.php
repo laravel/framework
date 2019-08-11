@@ -16,21 +16,21 @@ class ConsoleApplicationTest extends TestCase
         $this->app[Kernel::class]->registerCommand(new FooCommandStub);
     }
 
-    public function test_artisan_call_using_command_name()
+    public function testArtisanCallUsingCommandName()
     {
         $this->artisan('foo:bar', [
             'id' => 1,
         ])->assertExitCode(0);
     }
 
-    public function test_artisan_call_using_command_class()
+    public function testArtisanCallUsingCommandClass()
     {
         $this->artisan(FooCommandStub::class, [
             'id' => 1,
         ])->assertExitCode(0);
     }
 
-    public function test_artisan_call_now()
+    public function testArtisanCallNow()
     {
         $exitCode = $this->artisan('foo:bar', [
             'id' => 1,
@@ -39,7 +39,7 @@ class ConsoleApplicationTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function test_artisan_with_mock_call_after_call_now()
+    public function testArtisanWithMockCallAfterCallNow()
     {
         $exitCode = $this->artisan('foo:bar', [
             'id' => 1,
@@ -53,7 +53,7 @@ class ConsoleApplicationTest extends TestCase
         $mock->assertExitCode(0);
     }
 
-    public function test_artisan_instantiate_schedule_when_need()
+    public function testArtisanInstantiateScheduleWhenNeed()
     {
         $this->assertFalse($this->app->resolved(Schedule::class));
 

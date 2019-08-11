@@ -15,7 +15,7 @@ use Illuminate\Routing\Middleware\ValidateSignature;
  */
 class UrlSigningTest extends TestCase
 {
-    public function test_signing_url()
+    public function testSigningUrl()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
@@ -25,7 +25,7 @@ class UrlSigningTest extends TestCase
         $this->assertEquals('valid', $this->get($url)->original);
     }
 
-    public function test_temporary_signed_urls()
+    public function testTemporarySignedUrls()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
@@ -39,7 +39,7 @@ class UrlSigningTest extends TestCase
         $this->assertEquals('invalid', $this->get($url)->original);
     }
 
-    public function test_signed_url_with_url_without_signature_parameter()
+    public function testSignedUrlWithUrlWithoutSignatureParameter()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
@@ -48,7 +48,7 @@ class UrlSigningTest extends TestCase
         $this->assertEquals('invalid', $this->get('/foo/1')->original);
     }
 
-    public function test_signed_middleware()
+    public function testSignedMiddleware()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
@@ -59,7 +59,7 @@ class UrlSigningTest extends TestCase
         $this->assertEquals('valid', $this->get($url)->original);
     }
 
-    public function test_signed_middleware_with_invalid_url()
+    public function testSignedMiddlewareWithInvalidUrl()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
@@ -73,7 +73,7 @@ class UrlSigningTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_signed_middleware_with_routable_parameter()
+    public function testSignedMiddlewareWithRoutableParameter()
     {
         $model = new RoutableInterfaceStub;
         $model->routable = 'routable';

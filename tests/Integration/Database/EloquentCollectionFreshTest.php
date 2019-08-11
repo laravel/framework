@@ -21,7 +21,7 @@ class EloquentCollectionFreshTest extends DatabaseTestCase
         });
     }
 
-    public function test_eloquent_collection_fresh()
+    public function testEloquentCollectionFresh()
     {
         User::insert([
             ['email' => 'laravel@framework.com'],

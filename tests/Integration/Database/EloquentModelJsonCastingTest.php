@@ -28,7 +28,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         });
     }
 
-    public function test_strings_are_castable()
+    public function testStringsAreCastable()
     {
         /** @var JsonCast $object */
         $object = JsonCast::create([
@@ -40,7 +40,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $this->assertEquals('{"key1":"value1"}', $object->json_string_as_json_field);
     }
 
-    public function test_arrays_are_castable()
+    public function testArraysAreCastable()
     {
         /** @var JsonCast $object */
         $object = JsonCast::create([
@@ -50,7 +50,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $this->assertEquals(['key1' => 'value1'], $object->array_as_json_field);
     }
 
-    public function test_objects_are_castable()
+    public function testObjectsAreCastable()
     {
         $object = new stdClass();
         $object->key1 = 'value1';
@@ -64,7 +64,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $this->assertEquals('value1', $user->object_as_json_field->key1);
     }
 
-    public function test_collections_are_castable()
+    public function testCollectionsAreCastable()
     {
         /** @var JsonCast $user */
         $user = JsonCast::create([

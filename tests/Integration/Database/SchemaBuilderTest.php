@@ -15,7 +15,7 @@ use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
  */
 class SchemaBuilderTest extends DatabaseTestCase
 {
-    public function test_drop_all_tables()
+    public function testDropAllTables()
     {
         Schema::create('table', function (Blueprint $table) {
             $table->increments('id');
@@ -30,7 +30,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(true);
     }
 
-    public function test_drop_all_views()
+    public function testDropAllViews()
     {
         DB::statement('create view "view"("id") as select 1');
 
@@ -41,7 +41,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(true);
     }
 
-    public function test_register_custom_doctrine_type()
+    public function testRegisterCustomDoctrineType()
     {
         Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 

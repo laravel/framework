@@ -71,12 +71,12 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    public function test_basic_auth_protects_route()
+    public function testBasicAuthProtectsRoute()
     {
         $this->get('basic')->assertStatus(401);
     }
 
-    public function test_basic_auth_passes_on_correct_credentials()
+    public function testBasicAuthPassesOnCorrectCredentials()
     {
         $response = $this->get('basic', [
             'Authorization' => 'Basic '.base64_encode('email:password'),
@@ -86,7 +86,7 @@ class AuthenticationTest extends TestCase
         $this->assertEquals('email', $response->decodeResponseJson()['email']);
     }
 
-    public function test_basic_auth_respects_additional_conditions()
+    public function testBasicAuthRespectsAdditionalConditions()
     {
         AuthenticationTestUser::create([
             'username' => 'username2',
@@ -104,14 +104,14 @@ class AuthenticationTest extends TestCase
         ])->assertStatus(200);
     }
 
-    public function test_basic_auth_fails_on_wrong_credentials()
+    public function testBasicAuthFailsOnWrongCredentials()
     {
         $this->get('basic', [
             'Authorization' => 'Basic '.base64_encode('email:wrong_password'),
         ])->assertStatus(401);
     }
 
-    public function test_logging_in_fails_via_attempt()
+    public function testLoggingInFailsViaAttempt()
     {
         Event::fake();
 
@@ -135,7 +135,7 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    public function test_logging_in_succeeds_via_attempt()
+    public function testLoggingInSucceedsViaAttempt()
     {
         Event::fake();
 
@@ -165,7 +165,7 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    public function test_logging_in_using_id()
+    public function testLoggingInUsingId()
     {
         $this->app['auth']->loginUsingId(1);
         $this->assertEquals(1, $this->app['auth']->user()->id);
@@ -173,7 +173,7 @@ class AuthenticationTest extends TestCase
         $this->assertFalse($this->app['auth']->loginUsingId(1000));
     }
 
-    public function test_logging_out()
+    public function testLoggingOut()
     {
         Event::fake();
 
@@ -190,7 +190,7 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    public function test_logging_out_other_devices()
+    public function testLoggingOutOtherDevices()
     {
         Event::fake();
 
@@ -211,7 +211,7 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    public function test_logging_in_out_via_attempt_remembering()
+    public function testLoggingInOutViaAttemptRemembering()
     {
         $this->assertTrue(
             $this->app['auth']->attempt(['email' => 'email', 'password' => 'password'], true)
@@ -229,7 +229,7 @@ class AuthenticationTest extends TestCase
         $this->assertNotEquals($oldToken, $user->getRememberToken());
     }
 
-    public function test_logging_in_out_current_device_via_remembering()
+    public function testLoggingInOutCurrentDeviceViaRemembering()
     {
         $this->assertTrue(
             $this->app['auth']->attempt(['email' => 'email', 'password' => 'password'], true)
@@ -247,7 +247,7 @@ class AuthenticationTest extends TestCase
         $this->assertEquals($oldToken, $user->getRememberToken());
     }
 
-    public function test_auth_via_attempt_remembering()
+    public function testAuthViaAttemptRemembering()
     {
         $provider = new EloquentUserProvider(app('hash'), AuthenticationTestUser::class);
 
@@ -268,7 +268,7 @@ class AuthenticationTest extends TestCase
         $this->assertNull($provider->retrieveByToken($user->id, $token));
     }
 
-    public function test_dispatcher_changes_if_there_is_one_on_the_auth_guard()
+    public function testDispatcherChangesIfThereIsOneOnTheAuthGuard()
     {
         $this->assertInstanceOf(SessionGuard::class, $this->app['auth']->guard());
         $this->assertInstanceOf(Dispatcher::class, $this->app['auth']->guard()->getDispatcher());
@@ -279,7 +279,7 @@ class AuthenticationTest extends TestCase
         $this->assertInstanceOf(EventFake::class, $this->app['auth']->guard()->getDispatcher());
     }
 
-    public function test_dispatcher_changes_if_there_is_one_on_the_custom_auth_guard()
+    public function testDispatcherChangesIfThereIsOneOnTheCustomAuthGuard()
     {
         $this->app['config']['auth.guards.myGuard'] = [
             'driver' => 'myCustomDriver',
@@ -299,7 +299,7 @@ class AuthenticationTest extends TestCase
         $this->assertInstanceOf(EventFake::class, $this->app['auth']->guard()->getDispatcher());
     }
 
-    public function test_has_no_problem_if_there_is_no_dispatching_the_auth_custom_guard()
+    public function testHasNoProblemIfThereIsNoDispatchingTheAuthCustomGuard()
     {
         $this->app['config']['auth.guards.myGuard'] = [
             'driver' => 'myCustomDriver',

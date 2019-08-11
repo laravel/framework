@@ -10,7 +10,7 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Li
 
 class DiscoverEventsTest extends TestCase
 {
-    public function test_events_can_be_discovered()
+    public function testEventsCanBeDiscovered()
     {
         class_alias(Listener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener');
 

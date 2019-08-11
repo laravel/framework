@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class MemcachedTaggedCacheTest extends MemcachedIntegrationTest
 {
-    public function test_memcached_can_store_and_retrieve_tagged_cache_items()
+    public function testMemcachedCanStoreAndRetrieveTaggedCacheItems()
     {
         $store = Cache::store('memcached');
 
@@ -32,7 +32,7 @@ class MemcachedTaggedCacheTest extends MemcachedIntegrationTest
         $this->assertNull($store->tags(['people', 'artists'])->get('John'));
     }
 
-    public function test_memcached_can_store_many_tagged_cache_items()
+    public function testMemcachedCanStoreManyTaggedCacheItems()
     {
         $store = Cache::store('memcached');
 

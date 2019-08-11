@@ -11,7 +11,7 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
  */
 class MemcachedCacheLockTest extends MemcachedIntegrationTest
 {
-    public function test_memcached_locks_can_be_acquired_and_released()
+    public function testMemcachedLocksCanBeAcquiredAndReleased()
     {
         Cache::store('memcached')->lock('foo')->forceRelease();
         $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->get());
@@ -22,7 +22,7 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
         Cache::store('memcached')->lock('foo')->forceRelease();
     }
 
-    public function test_memcached_locks_can_block_for_seconds()
+    public function testMemcachedLocksCanBlockForSeconds()
     {
         Carbon::setTestNow();
 
@@ -35,7 +35,7 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
         $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->block(1));
     }
 
-    public function test_locks_can_run_callbacks()
+    public function testLocksCanRunCallbacks()
     {
         Cache::store('memcached')->lock('foo')->forceRelease();
         $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->get(function () {
@@ -43,7 +43,7 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
         }));
     }
 
-    public function test_locks_throw_timeout_if_block_expires()
+    public function testLocksThrowTimeoutIfBlockExpires()
     {
         $this->expectException(LockTimeoutException::class);
 
@@ -56,7 +56,7 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
         }));
     }
 
-    public function test_concurrent_memcached_locks_are_released_safely()
+    public function testConcurrentMemcachedLocksAreReleasedSafely()
     {
         Cache::store('memcached')->lock('bar')->forceRelease();
 
@@ -72,7 +72,7 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
         $this->assertTrue(Cache::store('memcached')->has('bar'));
     }
 
-    public function test_memcached_locks_can_be_released_using_owner_token()
+    public function testMemcachedLocksCanBeReleasedUsingOwnerToken()
     {
         Cache::store('memcached')->lock('foo')->forceRelease();
 

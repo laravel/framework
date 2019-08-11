@@ -12,7 +12,7 @@ use Illuminate\Tests\Integration\Routing\Fixtures\ApiResourceTestController;
  */
 class RouteApiResourceTest extends TestCase
 {
-    public function test_api_resource()
+    public function testApiResource()
     {
         Route::apiResource('tests', ApiResourceTestController::class);
 
@@ -40,7 +40,7 @@ class RouteApiResourceTest extends TestCase
         $this->assertEquals('I`m destroy', $response->getContent());
     }
 
-    public function test_api_resource_with_only()
+    public function testApiResourceWithOnly()
     {
         Route::apiResource('tests', ApiResourceTestController::class)->only(['index', 'store']);
 
@@ -58,7 +58,7 @@ class RouteApiResourceTest extends TestCase
         $this->assertEquals(404, $this->delete('/tests/1')->getStatusCode());
     }
 
-    public function test_api_resources()
+    public function testApiResources()
     {
         Route::apiResources([
             'tests' => ApiResourceTestController::class,

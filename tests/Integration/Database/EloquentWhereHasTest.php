@@ -41,7 +41,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($post)->save();
     }
 
-    public function test_with_count()
+    public function testWithCount()
     {
         $users = User::whereHas('posts', function ($query) {
             $query->where('public', true);

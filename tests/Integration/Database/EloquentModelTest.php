@@ -29,7 +29,7 @@ class EloquentModelTest extends DatabaseTestCase
         });
     }
 
-    public function test_user_can_update_nullable_date()
+    public function testUserCanUpdateNullableDate()
     {
         $user = TestModel1::create([
             'nullable_date' => null,
@@ -44,7 +44,7 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertEquals($now->toDateString(), $user->nullable_date->toDateString());
     }
 
-    public function test_attribute_changes()
+    public function testAttributeChanges()
     {
         $user = TestModel2::create([
             'name' => Str::random(), 'title' => Str::random(),

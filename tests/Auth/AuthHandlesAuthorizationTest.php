@@ -9,7 +9,7 @@ class AuthHandlesAuthorizationTest extends TestCase
 {
     use HandlesAuthorization;
 
-    public function test_allow_method()
+    public function testAllowMethod()
     {
         $response = $this->allow('some message', 'some_code');
 
@@ -19,7 +19,7 @@ class AuthHandlesAuthorizationTest extends TestCase
         $this->assertEquals('some_code', $response->code());
     }
 
-    public function test_deny_method()
+    public function testDenyMethod()
     {
         $response = $this->deny('some message', 'some_code');
 

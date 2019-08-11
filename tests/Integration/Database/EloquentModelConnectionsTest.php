@@ -59,7 +59,7 @@ class EloquentModelConnectionsTest extends TestCase
         });
     }
 
-    public function test_child_obeys_parent_connection()
+    public function testChildObeysParentConnection()
     {
         $parent1 = ParentModel::create(['name' => Str::random()]);
         $parent1->children()->create(['name' => 'childOnConn1']);
@@ -76,7 +76,7 @@ class EloquentModelConnectionsTest extends TestCase
         $this->assertEquals('childOnConn2', $parents2[0]->children[0]->name);
     }
 
-    public function test_child_uses_its_own_connection_if_set()
+    public function testChildUsesItsOwnConnectionIfSet()
     {
         $parent1 = ParentModel::create(['name' => Str::random()]);
         $parent1->childrenDefaultConn2()->create(['name' => 'childAlwaysOnConn2']);
@@ -87,7 +87,7 @@ class EloquentModelConnectionsTest extends TestCase
         $this->assertEquals('childAlwaysOnConn2', $parents1[0]->childrenDefaultConn2[0]->name);
     }
 
-    public function test_child_uses_its_own_connection_if_set_even_if_parent_explicit_connection()
+    public function testChildUsesItsOwnConnectionIfSetEvenIfParentExplicitConnection()
     {
         $parent1 = ParentModel::on('conn1')->create(['name' => Str::random()]);
         $parent1->childrenDefaultConn2()->create(['name' => 'childAlwaysOnConn2']);

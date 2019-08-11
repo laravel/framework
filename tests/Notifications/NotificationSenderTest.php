@@ -22,7 +22,7 @@ class NotificationSenderTest extends TestCase
         m::close();
     }
 
-    public function test_it_can_send_queued_notifications_with_a_string_via()
+    public function testItCanSendQueuedNotificationsWithAStringVia()
     {
         $notifiable = m::mock(Notifiable::class);
         $manager = m::mock(ChannelManager::class);
