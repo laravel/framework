@@ -1899,6 +1899,20 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('There is a duplication!', $v->messages()->first('foo.1'));
     }
 
+    public function testValidateDistinctForTopLevelArrays()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [['foo' => 1], ['foo' => 1]], ['*' => 'array', '*.foo' => 'distinct']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, [['foo' => 'a'], ['foo' => 'A']], ['*' => 'array', '*.foo' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, [['foo' => [['id' => 1]]], ['foo' => [['id' => 1]]]], ['*' => 'array', '*.foo' => 'array', '*.foo.*.id' => 'distinct']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateUnique()
     {
         $trans = $this->getIlluminateArrayTranslator();
