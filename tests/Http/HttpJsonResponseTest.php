@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Http;
 
+use stdClass;
 use JsonSerializable;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Support\Jsonable;
@@ -13,13 +15,13 @@ class HttpJsonResponseTest extends TestCase
     /**
      * @dataProvider setAndRetrieveDataProvider
      *
-     * @param  $data
+     * @param  mixed  $data
      */
     public function testSetAndRetrieveData($data): void
     {
         $response = new JsonResponse($data);
 
-        $this->assertInstanceOf(\stdClass::class, $response->getData());
+        $this->assertInstanceOf(stdClass::class, $response->getData());
         $this->assertEquals('bar', $response->getData()->foo);
     }
 
@@ -67,14 +69,12 @@ class HttpJsonResponseTest extends TestCase
     }
 
     /**
-     * @param mixed $data
-     *
-     * @expectedException \InvalidArgumentException
-     *
      * @dataProvider jsonErrorDataProvider
      */
     public function testInvalidArgumentExceptionOnJsonError($data)
     {
+        $this->expectException(InvalidArgumentException::class);
+
         new JsonResponse(['data' => $data]);
     }
 
@@ -97,8 +97,8 @@ class HttpJsonResponseTest extends TestCase
         $resource = tmpfile();
 
         // Recursion can't be encoded
-        $recursiveObject = new \stdClass();
-        $objectB = new \stdClass();
+        $recursiveObject = new stdClass;
+        $objectB = new stdClass;
         $recursiveObject->b = $objectB;
         $objectB->a = $recursiveObject;
 

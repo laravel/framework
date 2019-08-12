@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Str;
+use Illuminate\Foundation\Mix;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Date;
@@ -108,9 +108,9 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @param  string  $abstract
+     * @param  string|null  $abstract
      * @param  array   $parameters
-     * @return mixed|\Illuminate\Foundation\Application
+     * @return mixed|\Illuminate\Contracts\Foundation\Application
      */
     function app($abstract = null, array $parameters = [])
     {
@@ -131,7 +131,7 @@ if (! function_exists('app_path')) {
      */
     function app_path($path = '')
     {
-        return app('path').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->path($path);
     }
 }
 
@@ -140,7 +140,7 @@ if (! function_exists('asset')) {
      * Generate an asset path for the application.
      *
      * @param  string  $path
-     * @param  bool    $secure
+     * @param  bool|null  $secure
      * @return string
      */
     function asset($path, $secure = null)
@@ -190,7 +190,7 @@ if (! function_exists('base_path')) {
      */
     function base_path($path = '')
     {
-        return app()->basePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->basePath($path);
     }
 }
 
@@ -266,7 +266,7 @@ if (! function_exists('config')) {
      *
      * If an array is passed as the key, we will assume you want to set an array of values.
      *
-     * @param  array|string  $key
+     * @param  array|string|null  $key
      * @param  mixed  $default
      * @return mixed|\Illuminate\Config\Repository
      */
@@ -293,7 +293,7 @@ if (! function_exists('config_path')) {
      */
     function config_path($path = '')
     {
-        return app()->make('path.config').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->configPath($path);
     }
 }
 
@@ -301,11 +301,11 @@ if (! function_exists('cookie')) {
     /**
      * Create a new cookie instance.
      *
-     * @param  string  $name
-     * @param  string  $value
+     * @param  string|null  $name
+     * @param  string|null  $value
      * @param  int  $minutes
-     * @param  string  $path
-     * @param  string  $domain
+     * @param  string|null  $path
+     * @param  string|null  $domain
      * @param  bool  $secure
      * @param  bool  $httpOnly
      * @param  bool  $raw
@@ -524,7 +524,7 @@ if (! function_exists('logger')) {
     /**
      * Log a debug message to the logs.
      *
-     * @param  string  $message
+     * @param  string|null  $message
      * @param  array  $context
      * @return \Illuminate\Log\LogManager|null
      */
@@ -542,7 +542,7 @@ if (! function_exists('logs')) {
     /**
      * Get a log driver instance.
      *
-     * @param  string  $driver
+     * @param  string|null  $driver
      * @return \Illuminate\Log\LogManager|\Psr\Log\LoggerInterface
      */
     function logs($driver = null)
@@ -576,47 +576,7 @@ if (! function_exists('mix')) {
      */
     function mix($path, $manifestDirectory = '')
     {
-        static $manifests = [];
-
-        if (! Str::startsWith($path, '/')) {
-            $path = "/{$path}";
-        }
-
-        if ($manifestDirectory && ! Str::startsWith($manifestDirectory, '/')) {
-            $manifestDirectory = "/{$manifestDirectory}";
-        }
-
-        if (file_exists(public_path($manifestDirectory.'/hot'))) {
-            $url = rtrim(file_get_contents(public_path($manifestDirectory.'/hot')));
-
-            if (Str::startsWith($url, ['http://', 'https://'])) {
-                return new HtmlString(Str::after($url, ':').$path);
-            }
-
-            return new HtmlString("//localhost:8080{$path}");
-        }
-
-        $manifestPath = public_path($manifestDirectory.'/mix-manifest.json');
-
-        if (! isset($manifests[$manifestPath])) {
-            if (! file_exists($manifestPath)) {
-                throw new Exception('The Mix manifest does not exist.');
-            }
-
-            $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
-        }
-
-        $manifest = $manifests[$manifestPath];
-
-        if (! isset($manifest[$path])) {
-            report(new Exception("Unable to locate Mix file: {$path}."));
-
-            if (! app('config')->get('app.debug')) {
-                return $path;
-            }
-        }
-
-        return new HtmlString($manifestDirectory.$manifest[$path]);
+        return app(Mix::class)(...func_get_args());
     }
 }
 
@@ -637,7 +597,7 @@ if (! function_exists('old')) {
     /**
      * Retrieve an old input item.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -682,7 +642,7 @@ if (! function_exists('redirect')) {
      * @param  string|null  $to
      * @param  int     $status
      * @param  array   $headers
-     * @param  bool    $secure
+     * @param  bool|null    $secure
      * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
      */
     function redirect($to = null, $status = 302, $headers = [], $secure = null)
@@ -699,7 +659,7 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return void
      */
     function report($exception)
@@ -717,7 +677,7 @@ if (! function_exists('request')) {
     /**
      * Get an instance of the current request or an input item from the request.
      *
-     * @param  array|string  $key
+     * @param  array|string|null  $key
      * @param  mixed   $default
      * @return \Illuminate\Http\Request|string|array
      */
@@ -743,14 +703,17 @@ if (! function_exists('rescue')) {
      *
      * @param  callable  $callback
      * @param  mixed  $rescue
+     * @param  bool  $report
      * @return mixed
      */
-    function rescue(callable $callback, $rescue = null)
+    function rescue(callable $callback, $rescue = null, $report = true)
     {
         try {
             return $callback();
         } catch (Throwable $e) {
-            report($e);
+            if ($report) {
+                report($e);
+            }
 
             return value($rescue);
         }
@@ -762,11 +725,12 @@ if (! function_exists('resolve')) {
      * Resolve a service from the container.
      *
      * @param  string  $name
+     * @param  array  $parameters
      * @return mixed
      */
-    function resolve($name)
+    function resolve($name, array $parameters = [])
     {
-        return app($name);
+        return app($name, $parameters);
     }
 }
 
@@ -852,7 +816,7 @@ if (! function_exists('session')) {
      *
      * If an array is passed as the key, we will assume you want to set an array of values.
      *
-     * @param  array|string  $key
+     * @param  array|string|null  $key
      * @param  mixed  $default
      * @return mixed|\Illuminate\Session\Store|\Illuminate\Session\SessionManager
      */
@@ -900,9 +864,9 @@ if (! function_exists('trans')) {
     /**
      * Translate the given message.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  array   $replace
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return \Illuminate\Contracts\Translation\Translator|string|array|null
      */
     function trans($key = null, $replace = [], $locale = null)
@@ -922,7 +886,7 @@ if (! function_exists('trans_choice')) {
      * @param  string  $key
      * @param  int|array|\Countable  $number
      * @param  array   $replace
-     * @param  string  $locale
+     * @param  string|null  $locale
      * @return string
      */
     function trans_choice($key, $number, array $replace = [], $locale = null)
@@ -935,14 +899,14 @@ if (! function_exists('__')) {
     /**
      * Translate the given message.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  array  $replace
-     * @param  string  $locale
-     * @return string|array|null
+     * @param  string|null  $locale
+     * @return \Illuminate\Contracts\Translation\Translator|string|array|null
      */
-    function __($key, $replace = [], $locale = null)
+    function __($key = null, $replace = [], $locale = null)
     {
-        return app('translator')->getFromJson($key, $replace, $locale);
+        return trans($key, $replace, $locale);
     }
 }
 
@@ -952,7 +916,7 @@ if (! function_exists('url')) {
      *
      * @param  string  $path
      * @param  mixed   $parameters
-     * @param  bool    $secure
+     * @param  bool|null    $secure
      * @return \Illuminate\Contracts\Routing\UrlGenerator|string
      */
     function url($path = null, $parameters = [], $secure = null)
@@ -991,8 +955,8 @@ if (! function_exists('view')) {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string  $view
-     * @param  array   $data
+     * @param  string|null  $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
      * @param  array   $mergeData
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */

@@ -18,7 +18,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
  */
 class SendingMailWithLocaleTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -46,32 +46,32 @@ class SendingMailWithLocaleTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
-    public function test_mail_is_sent_with_default_locale()
+    public function testMailIsSentWithDefaultLocale()
     {
-        Mail::to('test@mail.com')->send(new TestMail());
+        Mail::to('test@mail.com')->send(new TestMail);
 
-        $this->assertContains('name',
+        $this->assertStringContainsString('name',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
 
-    public function test_mail_is_sent_with_selected_locale()
+    public function testMailIsSentWithSelectedLocale()
     {
-        Mail::to('test@mail.com')->locale('ar')->send(new TestMail());
+        Mail::to('test@mail.com')->locale('ar')->send(new TestMail);
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
 
-    public function test_mail_is_sent_with_locale_updated_listeners_called()
+    public function testMailIsSentWithLocaleUpdatedListenersCalled()
     {
-        Carbon::setTestNow(Carbon::parse('2018-04-01'));
+        Carbon::setTestNow('2018-04-01');
 
         Event::listen(LocaleUpdated::class, function ($event) {
             Carbon::setLocale($event->locale);
@@ -86,35 +86,35 @@ class SendingMailWithLocaleTest extends TestCase
         $this->assertEquals('en', Carbon::getLocale());
     }
 
-    public function test_locale_is_sent_with_model_preferred_locale()
+    public function testLocaleIsSentWithModelPreferredLocale()
     {
         $recipient = new TestEmailLocaleUser([
             'email' => 'test@mail.com',
             'email_locale' => 'ar',
         ]);
 
-        Mail::to($recipient)->send(new TestMail());
+        Mail::to($recipient)->send(new TestMail);
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
 
-    public function test_locale_is_sent_with_selected_locale_overriding_model_preferred_locale()
+    public function testLocaleIsSentWithSelectedLocaleOverridingModelPreferredLocale()
     {
         $recipient = new TestEmailLocaleUser([
             'email' => 'test@mail.com',
             'email_locale' => 'en',
         ]);
 
-        Mail::to($recipient)->locale('ar')->send(new TestMail());
+        Mail::to($recipient)->locale('ar')->send(new TestMail);
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
 
-    public function test_locale_is_sent_with_model_preferred_locale_will_ignore_preferred_locale_of_the_cc_recipient()
+    public function testLocaleIsSentWithModelPreferredLocaleWillIgnorePreferredLocaleOfTheCcRecipient()
     {
         $toRecipient = new TestEmailLocaleUser([
             'email' => 'test@mail.com',
@@ -126,14 +126,14 @@ class SendingMailWithLocaleTest extends TestCase
             'email_locale' => 'en',
         ]);
 
-        Mail::to($toRecipient)->cc($ccRecipient)->send(new TestMail());
+        Mail::to($toRecipient)->cc($ccRecipient)->send(new TestMail);
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
 
-    public function test_locale_is_not_sent_with_model_preferred_locale_when_there_are_multiple_recipients()
+    public function testLocaleIsNotSentWithModelPreferredLocaleWhenThereAreMultipleRecipients()
     {
         $recipients = [
             new TestEmailLocaleUser([
@@ -146,25 +146,25 @@ class SendingMailWithLocaleTest extends TestCase
             ]),
         ];
 
-        Mail::to($recipients)->send(new TestMail());
+        Mail::to($recipients)->send(new TestMail);
 
-        $this->assertContains('name',
+        $this->assertStringContainsString('name',
             app('swift.transport')->messages()[0]->getBody()
         );
     }
 
-    public function test_locale_is_set_back_to_default_after_mail_sent()
+    public function testLocaleIsSetBackToDefaultAfterMailSent()
     {
-        Mail::to('test@mail.com')->locale('ar')->send(new TestMail());
-        Mail::to('test@mail.com')->send(new TestMail());
+        Mail::to('test@mail.com')->locale('ar')->send(new TestMail);
+        Mail::to('test@mail.com')->send(new TestMail);
 
         $this->assertEquals('en', app('translator')->getLocale());
 
-        $this->assertContains('esm',
+        $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()
         );
 
-        $this->assertContains('name',
+        $this->assertStringContainsString('name',
             app('swift.transport')->messages()[1]->getBody()
         );
     }

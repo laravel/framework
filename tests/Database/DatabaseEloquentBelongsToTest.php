@@ -15,7 +15,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     protected $related;
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -26,7 +26,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentBelongsToModelStub();  //ie Blog
+        $newModel = new EloquentBelongsToModelStub;  //ie Blog
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -41,7 +41,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentBelongsToModelStub();
+        $newModel = new EloquentBelongsToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -56,7 +56,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentBelongsToModelStub();
+        $newModel = new EloquentBelongsToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -65,21 +65,12 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertSame('taylor', $newModel->username);
     }
 
-    public function testUpdateMethodRetrievesModelAndUpdates()
-    {
-        $relation = $this->getRelation();
-        $mock = m::mock(Model::class);
-        $mock->shouldReceive('fill')->once()->with(['attributes'])->andReturn($mock);
-        $mock->shouldReceive('save')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('first')->once()->andReturn($mock);
-
-        $this->assertTrue($relation->update(['attributes']));
-    }
-
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 'foreign.value.two']);
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', ['foreign.value', 'foreign.value.two']);
         $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStub, new AnotherEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }
@@ -87,7 +78,9 @@ class DatabaseEloquentBelongsToTest extends TestCase
     public function testIdsInEagerConstraintsCanBeZero()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 0]);
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', ['foreign.value', 0]);
         $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStubWithZeroId];
         $relation->addEagerConstraints($models);
     }
@@ -148,41 +141,45 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
+        $parent->shouldReceive('isDirty')->once()->andReturn(true);
+        $parent->shouldReceive('unsetRelation')->once()->with($relation->getRelationName());
         $relation->associate(1);
     }
 
     public function testDefaultEagerConstraintsWhenIncrementing()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', m::mustBe([]));
         $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }
 
     public function testDefaultEagerConstraintsWhenIncrementingAndNonIntKeyType()
     {
-        $relation = $this->getRelation(null, false, 'string');
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
+        $relation = $this->getRelation(null, 'string');
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([]));
         $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }
 
     public function testDefaultEagerConstraintsWhenNotIncrementing()
     {
-        $relation = $this->getRelation(null, false);
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
+        $relation = $this->getRelation();
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', m::mustBe([]));
         $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
         $relation->addEagerConstraints($models);
     }
 
-    protected function getRelation($parent = null, $incrementing = true, $keyType = 'int')
+    protected function getRelation($parent = null, $keyType = 'int')
     {
         $this->builder = m::mock(Builder::class);
         $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $this->related = m::mock(Model::class);
-        $this->related->incrementing = $incrementing;
         $this->related->shouldReceive('getKeyType')->andReturn($keyType);
-        $this->related->shouldReceive('getIncrementing')->andReturn($incrementing);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->builder->shouldReceive('getModel')->andReturn($this->related);

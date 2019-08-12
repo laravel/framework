@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -163,27 +163,6 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
-    public function testUpdateMethodUpdatesModelsWithTimestamps()
-    {
-        $relation = $this->getRelation();
-        $relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
-        $relation->getRelated()->shouldReceive('freshTimestampString')->once()->andReturn(100);
-        $relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $relation->getQuery()->shouldReceive('update')->once()->with(['foo' => 'bar', 'updated_at' => 100])->andReturn('results');
-
-        $this->assertEquals('results', $relation->update(['foo' => 'bar']));
-    }
-
-    public function testUpdateMethodUpdatesModelsWithNullUpdatedAt()
-    {
-        $relation = $this->getRelation();
-        $relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
-        $relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn(null);
-        $relation->getQuery()->shouldReceive('update')->once()->with(['foo' => 'bar'])->andReturn('results');
-
-        $this->assertEquals('results', $relation->update(['foo' => 'bar']));
-    }
-
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
@@ -200,6 +179,21 @@ class DatabaseEloquentHasManyTest extends TestCase
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
+        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
+        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('table.foreign_key', [1, 2]);
+        $model1 = new EloquentHasManyModelStub;
+        $model1->id = 1;
+        $model2 = new EloquentHasManyModelStub;
+        $model2->id = 2;
+        $relation->addEagerConstraints([$model1, $model2]);
+    }
+
+    public function testEagerConstraintsAreProperlyAddedWithStringKey()
+    {
+        $relation = $this->getRelation();
+        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
+        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
         $model1 = new EloquentHasManyModelStub;
         $model1->id = 1;

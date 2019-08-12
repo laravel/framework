@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager;
@@ -12,7 +13,7 @@ use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -125,15 +126,14 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertFalse($schema->hasColumn('users', 'name'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The database driver in use does not support spatial indexes.
-     */
     public function testDropSpatialIndex()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The database driver in use does not support spatial indexes.');
+
         $blueprint = new Blueprint('geo');
         $blueprint->dropSpatialIndex(['coordinates']);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testRenameTable()
@@ -231,26 +231,24 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The database driver in use does not support spatial indexes.
-     */
     public function testAddingSpatialIndex()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The database driver in use does not support spatial indexes.');
+
         $blueprint = new Blueprint('geo');
         $blueprint->spatialIndex('coordinates');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The database driver in use does not support spatial indexes.
-     */
     public function testAddingFluentSpatialIndex()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The database driver in use does not support spatial indexes.');
+
         $blueprint = new Blueprint('geo');
         $blueprint->point('coordinates')->spatialIndex();
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testAddingIncrementingID()

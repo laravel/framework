@@ -11,7 +11,7 @@ use Illuminate\Database\Schema\Blueprint;
  */
 class EloquentPushTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ class EloquentPushTest extends DatabaseTestCase
 
     public function testPushMethodSavesTheRelationshipsRecursively()
     {
-        $user = new UserX();
+        $user = new UserX;
         $user->name = 'Test';
         $user->save();
         $user->posts()->create(['title' => 'Test title']);

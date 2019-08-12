@@ -12,7 +12,7 @@ use Illuminate\Queue\DatabaseQueue;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -20,14 +20,14 @@ class QueueDatabaseQueueUnitTest extends TestCase
     public function testPushProperlyPushesJobOntoDatabase()
     {
         $queue = $this->getMockBuilder(DatabaseQueue::class)->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
-        $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
+        $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
-            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
+            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
-            $this->assertInternalType('int', $array['available_at']);
+            $this->assertIsInt($array['available_at']);
         });
 
         $queue->push('foo', ['data']);
@@ -40,14 +40,14 @@ class QueueDatabaseQueueUnitTest extends TestCase
             ['currentTime'])->setConstructorArgs(
             [$database = m::mock(Connection::class), 'table', 'default']
         )->getMock();
-        $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
+        $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
             $this->assertEquals('default', $array['queue']);
-            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
+            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
-            $this->assertInternalType('int', $array['available_at']);
+            $this->assertIsInt($array['available_at']);
         });
 
         $queue->later(10, 'foo', ['data']);
@@ -90,20 +90,20 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = m::mock(Connection::class);
         $queue = $this->getMockBuilder(DatabaseQueue::class)->setMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
-        $queue->expects($this->any())->method('currentTime')->will($this->returnValue('created'));
-        $queue->expects($this->any())->method('availableAt')->will($this->returnValue('available'));
+        $queue->expects($this->any())->method('currentTime')->willReturn('created');
+        $queue->expects($this->any())->method('availableAt')->willReturn('available');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[
                 'queue' => 'queue',
-                'payload' => json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
+                'payload' => json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
                 'created_at' => 'created',
             ], [
                 'queue' => 'queue',
-                'payload' => json_encode(['displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
+                'payload' => json_encode(['displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',

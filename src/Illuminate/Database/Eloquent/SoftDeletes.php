@@ -2,6 +2,11 @@
 
 namespace Illuminate\Database\Eloquent;
 
+/**
+ * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withTrashed()
+ * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder onlyTrashed()
+ * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withoutTrashed()
+ */
 trait SoftDeletes
 {
     /**
@@ -19,6 +24,16 @@ trait SoftDeletes
     public static function bootSoftDeletes()
     {
         static::addGlobalScope(new SoftDeletingScope);
+    }
+
+    /**
+     * Initialize the soft deleting trait for an instance.
+     *
+     * @return void
+     */
+    public function initializeSoftDeletes()
+    {
+        $this->dates[] = $this->getDeletedAtColumn();
     }
 
     /**
@@ -49,7 +64,7 @@ trait SoftDeletes
         if ($this->forceDeleting) {
             $this->exists = false;
 
-            return $this->newModelQuery()->where($this->getKeyName(), $this->getKey())->forceDelete();
+            return $this->setKeysForSaveQuery($this->newModelQuery())->forceDelete();
         }
 
         return $this->runSoftDelete();
@@ -62,7 +77,7 @@ trait SoftDeletes
      */
     protected function runSoftDelete()
     {
-        $query = $this->newModelQuery()->where($this->getKeyName(), $this->getKey());
+        $query = $this->setKeysForSaveQuery($this->newModelQuery());
 
         $time = $this->freshTimestamp();
 

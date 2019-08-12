@@ -3,18 +3,12 @@
 namespace Illuminate\Broadcasting;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 
-class BroadcastServiceProvider extends ServiceProvider
+class BroadcastServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     /**
      * Register the service provider.
      *

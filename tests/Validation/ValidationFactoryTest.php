@@ -11,7 +11,7 @@ use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
 
 class ValidationFactoryTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -27,10 +27,13 @@ class ValidationFactoryTest extends TestCase
 
         $presence = m::mock(PresenceVerifierInterface::class);
         $noop1 = function () {
+            //
         };
         $noop2 = function () {
+            //
         };
         $noop3 = function () {
+            //
         };
         $factory->extend('foo', $noop1);
         $factory->extendImplicit('implicit', $noop2);

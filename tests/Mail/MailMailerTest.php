@@ -18,7 +18,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 
 class MailMailerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -28,7 +28,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock(Swift_Mime_SimpleMessage::class);
-        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $mailer->expects($this->once())->method('createMessage')->willReturn($message);
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
@@ -48,7 +48,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock(Swift_Mime_SimpleMessage::class);
-        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $mailer->expects($this->once())->method('createMessage')->willReturn($message);
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->never();
         $view->shouldReceive('render')->never();
@@ -69,7 +69,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock(Swift_Mime_SimpleMessage::class);
-        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $mailer->expects($this->once())->method('createMessage')->willReturn($message);
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->never();
         $view->shouldReceive('render')->never();
@@ -89,7 +89,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock(Swift_Mime_SimpleMessage::class);
-        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $mailer->expects($this->once())->method('createMessage')->willReturn($message);
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message])->andReturn($view);
@@ -111,7 +111,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder(Mailer::class)->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
         $message = m::mock(Swift_Mime_SimpleMessage::class);
-        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $mailer->expects($this->once())->method('createMessage')->willReturn($message);
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
         $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message])->andReturn($view);
@@ -141,6 +141,7 @@ class MailMailerTest extends TestCase
             $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
         });
         $mailer->send('foo', ['data'], function ($m) {
+            //
         });
     }
 
@@ -157,6 +158,7 @@ class MailMailerTest extends TestCase
         $mailer->setSwiftMailer($swift);
 
         $mailer->send('foo', ['data'], function ($m) {
+            //
         });
 
         $this->assertEquals(['taylorotwell@gmail.com'], $mailer->failures());
@@ -175,6 +177,7 @@ class MailMailerTest extends TestCase
         $this->setSwiftMailer($mailer);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), []);
         $mailer->send('foo', ['data'], function ($m) {
+            //
         });
     }
 
@@ -230,6 +233,6 @@ class FailingSwiftMailerStub
 
     public function createMessage()
     {
-        return new \Swift_Message;
+        return new Swift_Message;
     }
 }

@@ -3,13 +3,12 @@
 namespace Illuminate\Tests\Database;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $db = new DB;
 
@@ -56,7 +55,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->schema()->drop('users');
         $this->schema()->drop('articles');

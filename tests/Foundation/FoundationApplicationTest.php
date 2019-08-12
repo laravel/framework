@@ -8,11 +8,12 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 
 class FoundationApplicationTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -75,11 +76,11 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame($instance, $app->make(AbstractClass::class));
     }
 
-    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent()
+    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
         $provider = m::mock(ServiceProvider::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->never();
+        $provider->shouldReceive('register')->once();
         $app = new Application;
         $app->register($provider);
 
@@ -189,10 +190,35 @@ class FoundationApplicationTest extends TestCase
         $this->assertFalse($app->environment(['qux', 'bar']));
     }
 
+    public function testEnvironmentHelpers()
+    {
+        $local = new Application;
+        $local['env'] = 'local';
+
+        $this->assertTrue($local->isLocal());
+        $this->assertFalse($local->isProduction());
+        $this->assertFalse($local->runningUnitTests());
+
+        $production = new Application;
+        $production['env'] = 'production';
+
+        $this->assertTrue($production->isProduction());
+        $this->assertFalse($production->isLocal());
+        $this->assertFalse($production->runningUnitTests());
+
+        $testing = new Application;
+        $testing['env'] = 'testing';
+
+        $this->assertTrue($testing->runningUnitTests());
+        $this->assertFalse($testing->isLocal());
+        $this->assertFalse($testing->isProduction());
+    }
+
     public function testMethodAfterLoadingEnvironmentAddsClosure()
     {
         $app = new Application;
         $closure = function () {
+            //
         };
         $app->afterLoadingEnvironment($closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables'));
@@ -202,18 +228,120 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
         $closure = function () {
+            //
         };
         $app->beforeBootstrapping(RegisterFacades::class, $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades'));
+    }
+
+    public function testTerminationTests()
+    {
+        $app = new Application;
+
+        $result = [];
+        $callback1 = function () use (&$result) {
+            $result[] = 1;
+        };
+
+        $callback2 = function () use (&$result) {
+            $result[] = 2;
+        };
+
+        $callback3 = function () use (&$result) {
+            $result[] = 3;
+        };
+
+        $app->terminating($callback1);
+        $app->terminating($callback2);
+        $app->terminating($callback3);
+
+        $app->terminate();
+
+        $this->assertEquals([1, 2, 3], $result);
     }
 
     public function testAfterBootstrappingAddsClosure()
     {
         $app = new Application;
         $closure = function () {
+            //
         };
         $app->afterBootstrapping(RegisterFacades::class, $closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\RegisterFacades'));
+    }
+
+    public function testTerminationCallbacksCanAcceptAtNotation()
+    {
+        $app = new Application;
+        $app->terminating(ConcreteTerminator::class.'@terminate');
+
+        $app->terminate();
+
+        $this->assertEquals(1, ConcreteTerminator::$counter);
+    }
+
+    public function testBootingCallbacks()
+    {
+        $application = new Application;
+
+        $counter = 0;
+        $closure = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $closure2 = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $application->booting($closure);
+        $application->booting($closure2);
+
+        $application->boot();
+
+        $this->assertEquals(2, $counter);
+    }
+
+    public function testBootedCallbacks()
+    {
+        $application = new Application;
+
+        $counter = 0;
+        $closure = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $closure2 = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $closure3 = function ($app) use (&$counter, $application) {
+            $counter++;
+            $this->assertSame($application, $app);
+        };
+
+        $application->booting($closure);
+        $application->booted($closure);
+        $application->booted($closure2);
+        $application->boot();
+
+        $this->assertEquals(3, $counter);
+
+        $application->booted($closure3);
+
+        $this->assertEquals(4, $counter);
+    }
+
+    public function testGetNamespace()
+    {
+        $app1 = new Application(realpath(__DIR__.'/fixtures/laravel1'));
+        $app2 = new Application(realpath(__DIR__.'/fixtures/laravel2'));
+
+        $this->assertSame('Laravel\\One\\', $app1->getNamespace());
+        $this->assertSame('Laravel\\Two\\', $app2->getNamespace());
     }
 }
 
@@ -230,34 +358,30 @@ class ApplicationBasicServiceProviderStub extends ServiceProvider
     }
 }
 
-class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider
+class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider implements DeferrableProvider
 {
-    protected $defer = true;
-
     public function register()
     {
         $this->app->singleton('foo', function () {
-            return new \stdClass;
+            return new stdClass;
         });
     }
 }
 
-class ApplicationDeferredServiceProviderCountStub extends ServiceProvider
+class ApplicationDeferredServiceProviderCountStub extends ServiceProvider implements DeferrableProvider
 {
     public static $count = 0;
-    protected $defer = true;
 
     public function register()
     {
         static::$count++;
-        $this->app['foo'] = new \stdClass;
+        $this->app['foo'] = new stdClass;
     }
 }
 
-class ApplicationDeferredServiceProviderStub extends ServiceProvider
+class ApplicationDeferredServiceProviderStub extends ServiceProvider implements DeferrableProvider
 {
     public static $initialized = false;
-    protected $defer = true;
 
     public function register()
     {
@@ -266,10 +390,8 @@ class ApplicationDeferredServiceProviderStub extends ServiceProvider
     }
 }
 
-class ApplicationFactoryProviderStub extends ServiceProvider
+class ApplicationFactoryProviderStub extends ServiceProvider implements DeferrableProvider
 {
-    protected $defer = true;
-
     public function register()
     {
         $this->app->bind('foo', function () {
@@ -280,10 +402,8 @@ class ApplicationFactoryProviderStub extends ServiceProvider
     }
 }
 
-class ApplicationMultiProviderStub extends ServiceProvider
+class ApplicationMultiProviderStub extends ServiceProvider implements DeferrableProvider
 {
-    protected $defer = true;
-
     public function register()
     {
         $this->app->singleton('foo', function () {
@@ -303,4 +423,14 @@ abstract class AbstractClass
 class ConcreteClass extends AbstractClass
 {
     //
+}
+
+class ConcreteTerminator
+{
+    public static $counter = 0;
+
+    public function terminate()
+    {
+        return self::$counter++;
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelLoadMissingTest;
 
+use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,7 +13,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentModelLoadMissingTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,11 +37,11 @@ class EloquentModelLoadMissingTest extends DatabaseTestCase
     {
         $post = Post::with('comments')->first();
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $post->loadMissing('comments.parent');
 
-        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertCount(1, DB::getQueryLog());
         $this->assertTrue($post->comments[0]->relationLoaded('parent'));
     }
 }
@@ -53,7 +54,7 @@ class Comment extends Model
 
     public function parent()
     {
-        return $this->belongsTo(Comment::class);
+        return $this->belongsTo(self::class);
     }
 }
 

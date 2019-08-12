@@ -4,11 +4,8 @@ namespace Illuminate\Notifications;
 
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
-use Nexmo\Client as NexmoClient;
-use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
-use Nexmo\Client\Credentials\Basic as NexmoCredentials;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 
@@ -96,32 +93,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected function createMailDriver()
     {
         return $this->app->make(Channels\MailChannel::class);
-    }
-
-    /**
-     * Create an instance of the Nexmo driver.
-     *
-     * @return \Illuminate\Notifications\Channels\NexmoSmsChannel
-     */
-    protected function createNexmoDriver()
-    {
-        return new Channels\NexmoSmsChannel(
-            new NexmoClient(new NexmoCredentials(
-                $this->app['config']['services.nexmo.key'],
-                $this->app['config']['services.nexmo.secret']
-            )),
-            $this->app['config']['services.nexmo.sms_from']
-        );
-    }
-
-    /**
-     * Create an instance of the Slack driver.
-     *
-     * @return \Illuminate\Notifications\Channels\SlackWebhookChannel
-     */
-    protected function createSlackDriver()
-    {
-        return new Channels\SlackWebhookChannel(new HttpClient);
     }
 
     /**

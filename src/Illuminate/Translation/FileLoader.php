@@ -54,16 +54,16 @@ class FileLoader implements Loader
      *
      * @param  string  $locale
      * @param  string  $group
-     * @param  string  $namespace
+     * @param  string|null  $namespace
      * @return array
      */
     public function load($locale, $group, $namespace = null)
     {
-        if ($group == '*' && $namespace == '*') {
+        if ($group === '*' && $namespace === '*') {
             return $this->loadJsonPaths($locale);
         }
 
-        if (is_null($namespace) || $namespace == '*') {
+        if (is_null($namespace) || $namespace === '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
 

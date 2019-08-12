@@ -2,9 +2,11 @@
 
 namespace Illuminate\Redis;
 
+use Closure;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Support\ConfigurationUrlParser;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
@@ -14,7 +16,7 @@ class RedisManager implements Factory
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -24,6 +26,13 @@ class RedisManager implements Factory
      * @var string
      */
     protected $driver;
+
+    /**
+     * The registered custom driver creators.
+     *
+     * @var array
+     */
+    protected $customCreators = [];
 
     /**
      * The Redis server configurations.
@@ -49,7 +58,7 @@ class RedisManager implements Factory
     /**
      * Create a new Redis manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  string  $driver
      * @param  array  $config
      * @return void
@@ -95,7 +104,10 @@ class RedisManager implements Factory
         $options = $this->config['options'] ?? [];
 
         if (isset($this->config[$name])) {
-            return $this->connector()->connect($this->config[$name], $options);
+            return $this->connector()->connect(
+                $this->parseConnectionConfiguration($this->config[$name]),
+                $options
+            );
         }
 
         if (isset($this->config['clusters'][$name])) {
@@ -113,10 +125,12 @@ class RedisManager implements Factory
      */
     protected function resolveCluster($name)
     {
-        $clusterOptions = $this->config['clusters']['options'] ?? [];
-
         return $this->connector()->connectToCluster(
-            $this->config['clusters'][$name], $clusterOptions, $this->config['options'] ?? []
+            array_map(function ($config) {
+                return $this->parseConnectionConfiguration($config);
+            }, $this->config['clusters'][$name]),
+            $this->config['clusters']['options'] ?? [],
+            $this->config['options'] ?? []
         );
     }
 
@@ -141,16 +155,37 @@ class RedisManager implements Factory
     /**
      * Get the connector instance for the current driver.
      *
-     * @return \Illuminate\Redis\Connectors\PhpRedisConnector|\Illuminate\Redis\Connectors\PredisConnector
+     * @return \Illuminate\Contracts\Redis\Connector
      */
     protected function connector()
     {
+        $customCreator = $this->customCreators[$this->driver] ?? null;
+
+        if ($customCreator) {
+            return call_user_func($customCreator);
+        }
+
         switch ($this->driver) {
             case 'predis':
                 return new Connectors\PredisConnector;
             case 'phpredis':
                 return new Connectors\PhpRedisConnector;
         }
+    }
+
+    /**
+     * Parse the Redis connection configuration.
+     *
+     * @param  mixed  $config
+     * @return array
+     */
+    protected function parseConnectionConfiguration($config)
+    {
+        $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
+
+        return array_filter($parsed, function ($key) {
+            return ! in_array($key, ['driver', 'username'], true);
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -181,6 +216,31 @@ class RedisManager implements Factory
     public function disableEvents()
     {
         $this->events = false;
+    }
+
+    /**
+     * Set the default driver.
+     *
+     * @param  string  $driver
+     * @return void
+     */
+    public function setDriver($driver)
+    {
+        $this->driver = $driver;
+    }
+
+    /**
+     * Register a custom driver creator Closure.
+     *
+     * @param  string  $driver
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function extend($driver, Closure $callback)
+    {
+        $this->customCreators[$driver] = $callback->bindTo($this, $this);
+
+        return $this;
     }
 
     /**

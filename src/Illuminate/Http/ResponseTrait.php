@@ -117,6 +117,16 @@ trait ResponseTrait
     }
 
     /**
+     * Get the callback of the response.
+     *
+     * @return string|null
+     */
+    public function getCallback()
+    {
+        return $this->callback ?? null;
+    }
+
+    /**
      * Set the exception to attach to the response.
      *
      * @param  \Exception  $e

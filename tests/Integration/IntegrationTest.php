@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
  */
 class IntegrationTest extends TestCase
 {
-    public function test_simple_route_through_the_framework()
+    public function testSimpleRouteThroughTheFramework()
     {
         Route::get('/', function () {
             return 'Hello World';

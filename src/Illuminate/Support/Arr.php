@@ -55,10 +55,10 @@ class Arr
                 continue;
             }
 
-            $results = array_merge($results, $values);
+            $results[] = $values;
         }
 
-        return $results;
+        return array_merge([], ...$results);
     }
 
     /**
@@ -213,10 +213,14 @@ class Arr
 
             if (! is_array($item)) {
                 $result[] = $item;
-            } elseif ($depth === 1) {
-                $result = array_merge($result, array_values($item));
             } else {
-                $result = array_merge($result, static::flatten($item, $depth - 1));
+                $values = $depth === 1
+                    ? array_values($item)
+                    : static::flatten($item, $depth - 1);
+
+                foreach ($values as $value) {
+                    $result[] = $value;
+                }
             }
         }
 
@@ -271,7 +275,7 @@ class Arr
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  string|int  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -313,17 +317,9 @@ class Arr
      */
     public static function has($array, $keys)
     {
-        if (is_null($keys)) {
-            return false;
-        }
-
         $keys = (array) $keys;
 
-        if (! $array) {
-            return false;
-        }
-
-        if ($keys === []) {
+        if (! $array || $keys === []) {
             return false;
         }
 
@@ -549,11 +545,9 @@ class Arr
         if (is_null($seed)) {
             shuffle($array);
         } else {
-            srand($seed);
-
-            usort($array, function () {
-                return rand(-1, 1);
-            });
+            mt_srand($seed);
+            shuffle($array);
+            mt_srand();
         }
 
         return $array;
@@ -629,6 +623,6 @@ class Arr
             return [];
         }
 
-        return ! is_array($value) ? [$value] : $value;
+        return is_array($value) ? $value : [$value];
     }
 }

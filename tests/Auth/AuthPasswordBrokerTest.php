@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
 use Illuminate\Support\Arr;
+use UnexpectedValueException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -14,7 +15,7 @@ use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 
 class AuthPasswordBrokerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -23,17 +24,16 @@ class AuthPasswordBrokerTest extends TestCase
     {
         $mocks = $this->getMocks();
         $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['getUser', 'makeErrorRedirect'])->setConstructorArgs(array_values($mocks))->getMock();
-        $broker->expects($this->once())->method('getUser')->will($this->returnValue(null));
+        $broker->expects($this->once())->method('getUser')->willReturn(null);
 
         $this->assertEquals(PasswordBrokerContract::INVALID_USER, $broker->sendResetLink(['credentials']));
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage User must implement CanResetPassword interface.
-     */
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
     {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('User must implement CanResetPassword interface.');
+
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn('bar');
 
@@ -55,6 +55,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $callback = function () {
+            //
         };
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
@@ -67,61 +68,19 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['creds'])->andReturn(null);
 
         $this->assertEquals(PasswordBrokerContract::INVALID_USER, $broker->reset(['creds'], function () {
-        }));
-    }
-
-    public function testRedirectReturnedByRemindWhenPasswordsDontMatch()
-    {
-        $creds = ['password' => 'foo', 'password_confirmation' => 'bar'];
-        $broker = $this->getBroker($mocks = $this->getMocks());
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
-
-        $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
-        }));
-    }
-
-    public function testRedirectReturnedByRemindWhenPasswordNotSet()
-    {
-        $creds = ['password' => null, 'password_confirmation' => null];
-        $broker = $this->getBroker($mocks = $this->getMocks());
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
-
-        $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
-        }));
-    }
-
-    public function testRedirectReturnedByRemindWhenPasswordsLessThanEightCharacters()
-    {
-        $creds = ['password' => 'abcdefg', 'password_confirmation' => 'abcdefg'];
-        $broker = $this->getBroker($mocks = $this->getMocks());
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
-
-        $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
-        }));
-    }
-
-    public function testRedirectReturnedByRemindWhenPasswordDoesntPassValidator()
-    {
-        $creds = ['password' => 'abcdef', 'password_confirmation' => 'abcdef'];
-        $broker = $this->getBroker($mocks = $this->getMocks());
-        $broker->validator(function ($credentials) {
-            return strlen($credentials['password']) >= 7;
-        });
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
-
-        $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
+            //
         }));
     }
 
     public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable()
     {
         $creds = ['token' => 'token'];
-        $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['validateNewPassword'])->setConstructorArgs(array_values($mocks = $this->getMocks()))->getMock();
+        $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(Arr::except($creds, ['token']))->andReturn($user = m::mock(CanResetPassword::class));
-        $broker->expects($this->once())->method('validateNewPassword')->will($this->returnValue(true));
         $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 
         $this->assertEquals(PasswordBrokerContract::INVALID_TOKEN, $broker->reset($creds, function () {
+            //
         }));
     }
 
@@ -129,7 +88,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         unset($_SERVER['__password.reset.test']);
         $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['validateReset', 'getPassword', 'getToken'])->setConstructorArgs(array_values($mocks = $this->getMocks()))->getMock();
-        $broker->expects($this->once())->method('validateReset')->will($this->returnValue($user = m::mock(CanResetPassword::class)));
+        $broker->expects($this->once())->method('validateReset')->willReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('delete')->once()->with($user);
         $callback = function ($user, $password) {
             $_SERVER['__password.reset.test'] = compact('user', 'password');

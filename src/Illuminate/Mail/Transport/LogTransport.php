@@ -56,4 +56,14 @@ class LogTransport extends Transport
 
         return $string;
     }
+
+    /**
+     * Get the logger for the LogTransport instance.
+     *
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function logger()
+    {
+        return $this->logger;
+    }
 }

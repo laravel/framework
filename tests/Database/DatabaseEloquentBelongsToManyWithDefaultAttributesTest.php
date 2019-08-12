@@ -10,18 +10,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
 
-    public function testwithPivotValueMethodSetsWhereConditionsForFetching()
+    public function testWithPivotValueMethodSetsWhereConditionsForFetching()
     {
         $relation = $this->getMockBuilder(BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);
     }
 
-    public function testwithPivotValueMethodSetsDefaultArgumentsForInsertion()
+    public function testWithPivotValueMethodSetsDefaultArgumentsForInsertion()
     {
         $relation = $this->getMockBuilder(BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);

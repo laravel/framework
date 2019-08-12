@@ -15,6 +15,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static bool check(iterable|string $abilities, array|mixed $arguments = [])
  * @method static bool any(iterable|string $abilities, array|mixed $arguments = [])
  * @method static \Illuminate\Auth\Access\Response authorize(string $ability, array|mixed $arguments = [])
+ * @method static mixed raw(string $ability, array|mixed $arguments = [])
  * @method static mixed getPolicyFor(object|string $class)
  * @method static \Illuminate\Contracts\Auth\Access\Gate forUser(\Illuminate\Contracts\Auth\Authenticatable|mixed $user)
  * @method static array abilities()

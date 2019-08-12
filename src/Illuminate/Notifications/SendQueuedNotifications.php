@@ -32,11 +32,25 @@ class SendQueuedNotifications implements ShouldQueue
     public $channels;
 
     /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries;
+
+    /**
+     * The number of seconds the job can run before timing out.
+     *
+     * @var int
+     */
+    public $timeout;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Support\Collection  $notifiables
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  array  $channels
+     * @param  array|null  $channels
      * @return void
      */
     public function __construct($notifiables, $notification, array $channels = null)
@@ -44,6 +58,8 @@ class SendQueuedNotifications implements ShouldQueue
         $this->channels = $channels;
         $this->notifiables = $notifiables;
         $this->notification = $notification;
+        $this->tries = property_exists($notification, 'tries') ? $notification->tries : null;
+        $this->timeout = property_exists($notification, 'timeout') ? $notification->timeout : null;
     }
 
     /**
@@ -78,6 +94,20 @@ class SendQueuedNotifications implements ShouldQueue
         if (method_exists($this->notification, 'failed')) {
             $this->notification->failed($e);
         }
+    }
+
+    /**
+     * Get the retry delay for the notification.
+     *
+     * @return mixed
+     */
+    public function retryAfter()
+    {
+        if (! method_exists($this->notification, 'retryAfter') && ! isset($this->notification->retryAfter)) {
+            return;
+        }
+
+        return $this->notification->retryAfter ?? $this->notification->retryAfter();
     }
 
     /**

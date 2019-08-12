@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Auth\ApiAuthenticationWithEloquentTest;
 
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Auth\User as FoundationUser;
 
 class ApiAuthenticationWithEloquentTest extends TestCase
 {
@@ -29,10 +31,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function authentication_via_api_with_eloquent_using_wrong_database_credentials_should_not_cause_infinite_loop()
+    public function testAuthenticationViaApiWithEloquentUsingWrongDatabaseCredentialsShouldNotCauseInfiniteLoop()
     {
         Route::get('/auth', function () {
             return 'success';
@@ -42,10 +41,19 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
         $this->expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES) (SQL: select * from `users` where `api_token` = whatever limit 1)");
 
-        $this->withoutExceptionHandling()->get('/auth', ['Authorization' => 'Bearer whatever']);
+        try {
+            $this->withoutExceptionHandling()->get('/auth', ['Authorization' => 'Bearer whatever']);
+        } catch (QueryException $e) {
+            if (Str::startsWith($e->getMessage(), 'SQLSTATE[HY000] [2002]')) {
+                $this->markTestSkipped('MySQL instance required.');
+            }
+
+            throw $e;
+        }
     }
 }
 
-class User extends \Illuminate\Foundation\Auth\User
+class User extends FoundationUser
 {
+    //
 }

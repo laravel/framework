@@ -15,6 +15,7 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
+use Monolog\Handler\WhatFailureGroupHandler;
 
 class LogManager implements LoggerInterface
 {
@@ -23,7 +24,7 @@ class LogManager implements LoggerInterface
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -44,7 +45,7 @@ class LogManager implements LoggerInterface
     /**
      * Create a new Log manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -216,6 +217,10 @@ class LogManager implements LoggerInterface
             return $this->channel($channel)->getHandlers();
         })->all();
 
+        if ($config['ignore_exceptions'] ?? false) {
+            $handlers = [new WhatFailureGroupHandler($handlers)];
+        }
+
         return new Monolog($this->parseChannel($config), $handlers);
     }
 
@@ -232,7 +237,7 @@ class LogManager implements LoggerInterface
                 new StreamHandler(
                     $config['path'], $this->level($config),
                     $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-                )
+                ), $config
             ),
         ]);
     }
@@ -249,7 +254,7 @@ class LogManager implements LoggerInterface
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config),
                 $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
-            )),
+            ), $config),
         ]);
     }
 
@@ -270,8 +275,10 @@ class LogManager implements LoggerInterface
                 $config['emoji'] ?? ':boom:',
                 $config['short'] ?? false,
                 $config['context'] ?? true,
-                $this->level($config)
-            )),
+                $this->level($config),
+                $config['bubble'] ?? true,
+                $config['exclude_fields'] ?? []
+            ), $config),
         ]);
     }
 
@@ -285,8 +292,9 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                Str::snake($this->app['config']['app.name'], '-'), $config['facility'] ?? LOG_USER, $this->level($config))
-            ),
+                Str::snake($this->app['config']['app.name'], '-'),
+                $config['facility'] ?? LOG_USER, $this->level($config)
+            ), $config),
         ]);
     }
 
@@ -300,8 +308,8 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new ErrorLogHandler(
-                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config))
-            ),
+                $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config)
+            )),
         ]);
     }
 
@@ -322,7 +330,11 @@ class LogManager implements LoggerInterface
             );
         }
 
-        $with = array_merge($config['with'] ?? [], $config['handler_with'] ?? []);
+        $with = array_merge(
+            ['level' => $this->level($config)],
+            $config['with'] ?? [],
+            $config['handler_with'] ?? []
+        );
 
         return new Monolog($this->parseChannel($config), [$this->prepareHandler(
             $this->app->make($config['handler'], $with), $config
@@ -433,8 +445,8 @@ class LogManager implements LoggerInterface
     /**
      * System is unusable.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -449,8 +461,8 @@ class LogManager implements LoggerInterface
      * Example: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -464,8 +476,8 @@ class LogManager implements LoggerInterface
      *
      * Example: Application component unavailable, unexpected exception.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -478,8 +490,8 @@ class LogManager implements LoggerInterface
      * Runtime errors that do not require immediate action but should typically
      * be logged and monitored.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -494,8 +506,8 @@ class LogManager implements LoggerInterface
      * Example: Use of deprecated APIs, poor use of an API, undesirable things
      * that are not necessarily wrong.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -507,8 +519,8 @@ class LogManager implements LoggerInterface
     /**
      * Normal but significant events.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -522,8 +534,8 @@ class LogManager implements LoggerInterface
      *
      * Example: User logs in, SQL logs.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -535,8 +547,8 @@ class LogManager implements LoggerInterface
     /**
      * Detailed debug information.
      *
-     * @param string $message
-     * @param array  $context
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -548,9 +560,9 @@ class LogManager implements LoggerInterface
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
+     * @param  mixed  $level
+     * @param  string  $message
+     * @param  array  $context
      *
      * @return void
      */
@@ -563,7 +575,7 @@ class LogManager implements LoggerInterface
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

@@ -14,14 +14,14 @@ class UsePusherChannelConventionsTest extends TestCase
      */
     public $broadcaster;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->broadcaster = new FakeBroadcasterUsingPusherChannelsNames();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -97,13 +97,16 @@ class FakeBroadcasterUsingPusherChannelsNames extends Broadcaster
 
     public function auth($request)
     {
+        //
     }
 
     public function validAuthenticationResponse($request, $result)
     {
+        //
     }
 
     public function broadcast(array $channels, $event, array $payload = [])
     {
+        //
     }
 }

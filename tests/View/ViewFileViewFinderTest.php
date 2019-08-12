@@ -3,13 +3,14 @@
 namespace Illuminate\Tests\View;
 
 use Mockery as m;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\View\FileViewFinder;
 use Illuminate\Filesystem\Filesystem;
 
 class ViewFileViewFinderTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -38,6 +39,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.css')->andReturn(false);
+        $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.html')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/nested/foo.blade.php')->andReturn(true);
 
         $this->assertEquals(__DIR__.'/nested/foo.blade.php', $finder->find('foo'));
@@ -69,40 +71,39 @@ class ViewFileViewFinderTest extends TestCase
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.css')->andReturn(false);
+        $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.html')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/bar/bar/baz.blade.php')->andReturn(true);
 
         $this->assertEquals(__DIR__.'/bar/bar/baz.blade.php', $finder->find('foo::bar.baz'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionThrownWhenViewNotFound()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $finder = $this->getFinder();
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.css')->andReturn(false);
+        $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.html')->andReturn(false);
 
         $finder->find('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No hint path defined for [name].
-     */
     public function testExceptionThrownOnInvalidViewName()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No hint path defined for [name].');
+
         $finder = $this->getFinder();
         $finder->find('name::');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No hint path defined for [name].
-     */
     public function testExceptionThrownWhenNoHintPathIsRegistered()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No hint path defined for [name].');
+
         $finder = $this->getFinder();
         $finder->find('name::foo');
     }
@@ -121,7 +122,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder->addExtension('baz');
         $finder->addExtension('baz');
 
-        $this->assertCount(4, $finder->getExtensions());
+        $this->assertCount(5, $finder->getExtensions());
     }
 
     public function testPassingViewWithHintReturnsTrue()
@@ -143,6 +144,24 @@ class ViewFileViewFinderTest extends TestCase
         $finder = $this->getFinder();
 
         $this->assertFalse($finder->hasHintInformation('::foo.bar'));
+    }
+
+    public function pathsProvider()
+    {
+        return [
+            ['incorrect_path', 'incorrect_path'],
+        ];
+    }
+
+    /**
+     * @dataProvider pathsProvider
+     */
+    public function testNormalizedPaths($originalPath, $exceptedPath)
+    {
+        $finder = $this->getFinder();
+        $finder->prependLocation($originalPath);
+        $normalizedPath = $finder->getPaths()[0];
+        $this->assertSame($exceptedPath, $normalizedPath);
     }
 
     protected function getFinder()

@@ -15,7 +15,7 @@ class SupportFacadesEventTest extends TestCase
 {
     private $events;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class SupportFacadesEventTest extends TestCase
         Facade::setFacadeApplication($container);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         Event::clearResolvedInstances();
 
@@ -37,14 +37,14 @@ class SupportFacadesEventTest extends TestCase
     public function testFakeFor()
     {
         Event::fakeFor(function () {
-            (new FakeForStub())->dispatch();
+            (new FakeForStub)->dispatch();
 
             Event::assertDispatched(EventStub::class);
         });
 
         $this->events->shouldReceive('dispatch')->once();
 
-        (new FakeForStub())->dispatch();
+        (new FakeForStub)->dispatch();
     }
 
     public function testFakeForSwapsDispatchers()

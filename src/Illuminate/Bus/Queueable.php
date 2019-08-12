@@ -2,6 +2,8 @@
 
 namespace Illuminate\Bus;
 
+use Illuminate\Support\Arr;
+
 trait Queueable
 {
     /**
@@ -38,6 +40,11 @@ trait Queueable
      * @var \DateTimeInterface|\DateInterval|int|null
      */
     public $delay;
+
+    /**
+     * The middleware the job should be dispatched through.
+     */
+    public $middleware = [];
 
     /**
      * The jobs that should run if this job is successful.
@@ -109,6 +116,29 @@ trait Queueable
     public function delay($delay)
     {
         $this->delay = $delay;
+
+        return $this;
+    }
+
+    /**
+     * Get the middleware the job should be dispatched through.
+     *
+     * @return array
+     */
+    public function middleware()
+    {
+        return $this->middleware ?: [];
+    }
+
+    /**
+     * Specify the middleware the job should be dispatched through.
+     *
+     * @param  array|object
+     * @return $this
+     */
+    public function through($middleware)
+    {
+        $this->middleware = Arr::wrap($middleware);
 
         return $this;
     }

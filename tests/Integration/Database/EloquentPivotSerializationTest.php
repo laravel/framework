@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
@@ -14,41 +15,41 @@ use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
  */
 class EloquentPivotSerializationTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
             $table->timestamps();
         });
 
-        Schema::create('projects', function ($table) {
+        Schema::create('projects', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('project_users', function ($table) {
+        Schema::create('project_users', function (Blueprint $table) {
             $table->integer('user_id');
             $table->integer('project_id');
         });
 
-        Schema::create('tags', function ($table) {
+        Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('taggables', function ($table) {
+        Schema::create('taggables', function (Blueprint $table) {
             $table->integer('tag_id');
             $table->integer('taggable_id');
             $table->string('taggable_type');
         });
     }
 
-    public function test_pivot_can_be_serialized_and_restored()
+    public function testPivotCanBeSerializedAndRestored()
     {
         $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
         $project = PivotSerializationTestProject::forceCreate(['name' => 'Test Project']);
@@ -65,7 +66,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class->pivot->save();
     }
 
-    public function test_morph_pivot_can_be_serialized_and_restored()
+    public function testMorphPivotCanBeSerializedAndRestored()
     {
         $project = PivotSerializationTestProject::forceCreate(['name' => 'Test Project']);
         $tag = PivotSerializationTestTag::forceCreate(['name' => 'Test Tag']);
@@ -83,7 +84,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class->pivot->save();
     }
 
-    public function test_collection_of_pivots_can_be_serialized_and_restored()
+    public function testCollectionOfPivotsCanBeSerializedAndRestored()
     {
         $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
         $user2 = PivotSerializationTestUser::forceCreate(['email' => 'mohamed@laravel.com']);
@@ -101,7 +102,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $this->assertEquals($project->collaborators[1]->pivot->project_id, $class->pivots[1]->project_id);
     }
 
-    public function test_collection_of_morph_pivots_can_be_serialized_and_restored()
+    public function testCollectionOfMorphPivotsCanBeSerializedAndRestored()
     {
         $tag = PivotSerializationTestTag::forceCreate(['name' => 'Test Tag 1']);
         $tag2 = PivotSerializationTestTag::forceCreate(['name' => 'Test Tag 2']);

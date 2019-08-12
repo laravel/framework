@@ -12,7 +12,7 @@ use Illuminate\Database\Console\Migrations\ResetCommand;
 
 class DatabaseMigrationResetCommandTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -62,7 +62,7 @@ class ApplicationDatabaseResetStub extends Application
         }
     }
 
-    public function environment()
+    public function environment(...$environments)
     {
         return 'development';
     }

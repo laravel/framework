@@ -11,7 +11,7 @@ use Illuminate\Database\Query\Processors\Processor;
 
 class DatabaseProcessorTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -19,7 +19,7 @@ class DatabaseProcessorTest extends TestCase
     public function testInsertGetIdProcessing()
     {
         $pdo = $this->createMock(ProcessorTestPDOStub::class);
-        $pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->will($this->returnValue('1'));
+        $pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->willReturn('1');
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('insert')->once()->with('sql', ['foo']);
         $connection->shouldReceive('getPdo')->once()->andReturn($pdo);
@@ -35,9 +35,11 @@ class ProcessorTestPDOStub extends PDO
 {
     public function __construct()
     {
+        //
     }
 
     public function lastInsertId($sequence = null)
     {
+        //
     }
 }

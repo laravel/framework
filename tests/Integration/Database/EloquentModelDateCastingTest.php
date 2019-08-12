@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -12,18 +13,18 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentModelDateCastingTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('test_model1', function ($table) {
+        Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->date('date_field')->nullable();
             $table->datetime('datetime_field')->nullable();
         });
     }
 
-    public function test_dates_are_custom_castable()
+    public function testDatesAreCustomCastable()
     {
         $user = TestModel1::create([
             'date_field' => '2019-10-01',

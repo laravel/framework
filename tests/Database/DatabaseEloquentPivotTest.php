@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DatabaseEloquentPivotTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }
@@ -110,21 +110,22 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testDeleteMethodDeletesModelByKeys()
     {
-        $pivot = $this->getMockBuilder(Pivot::class)->setMethods(['newQuery'])->getMock();
+        $pivot = $this->getMockBuilder(Pivot::class)->setMethods(['newQueryWithoutRelationships'])->getMock();
         $pivot->setPivotKeys('foreign', 'other');
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
         $query = m::mock(stdClass::class);
         $query->shouldReceive('where')->once()->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->andReturn($query);
         $query->shouldReceive('delete')->once()->andReturn(true);
-        $pivot->expects($this->once())->method('newQuery')->will($this->returnValue($query));
+        $pivot->expects($this->once())->method('newQueryWithoutRelationships')->willReturn($query);
 
-        $this->assertTrue($pivot->delete());
+        $rowsAffected = $pivot->delete();
+        $this->assertEquals(1, $rowsAffected);
     }
 
     public function testPivotModelTableNameIsSingular()
     {
-        $pivot = new Pivot();
+        $pivot = new Pivot;
 
         $this->assertEquals('pivot', $pivot->getTable());
     }
@@ -135,7 +136,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('parent_created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('parent_updated_at');
 
-        $pivotWithParent = new Pivot();
+        $pivotWithParent = new Pivot;
         $pivotWithParent->pivotParent = $parent;
 
         $this->assertEquals('parent_created_at', $pivotWithParent->getCreatedAtColumn());
@@ -144,9 +145,9 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPivotModelWithoutParentReturnsModelTimestampColumns()
     {
-        $model = new DummyModel();
+        $model = new DummyModel;
 
-        $pivotWithoutParent = new Pivot();
+        $pivotWithoutParent = new Pivot;
 
         $this->assertEquals($model->getCreatedAtColumn(), $pivotWithoutParent->getCreatedAtColumn());
         $this->assertEquals($model->getUpdatedAtColumn(), $pivotWithoutParent->getUpdatedAtColumn());
@@ -187,4 +188,5 @@ class DatabaseEloquentPivotTestJsonCastStub extends Pivot
 
 class DummyModel extends Model
 {
+    //
 }

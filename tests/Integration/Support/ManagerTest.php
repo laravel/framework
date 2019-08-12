@@ -2,15 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Tests\Integration\Support\Fixtures\NullableManager;
 
 class ManagerTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDefaultDriverCannotBeNull()
     {
-        (new Fixtures\NullableManager($this->app))->driver();
+        $this->expectException(InvalidArgumentException::class);
+
+        (new NullableManager($this->app))->driver();
     }
 }

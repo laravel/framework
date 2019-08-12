@@ -31,16 +31,25 @@ class BeanstalkdQueue extends Queue implements QueueContract
     protected $timeToRun;
 
     /**
+     * The maximum number of seconds to block for a job.
+     *
+     * @var int
+     */
+    protected $blockFor;
+
+    /**
      * Create a new Beanstalkd queue instance.
      *
      * @param  \Pheanstalk\Pheanstalk  $pheanstalk
      * @param  string  $default
      * @param  int  $timeToRun
+     * @param  int  $blockFor
      * @return void
      */
-    public function __construct(Pheanstalk $pheanstalk, $default, $timeToRun)
+    public function __construct(Pheanstalk $pheanstalk, $default, $timeToRun, $blockFor = 0)
     {
         $this->default = $default;
+        $this->blockFor = $blockFor;
         $this->timeToRun = $timeToRun;
         $this->pheanstalk = $pheanstalk;
     }
@@ -48,7 +57,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Get the size of the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return int
      */
     public function size($queue = null)
@@ -63,7 +72,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @param  string  $job
      * @param  mixed   $data
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -75,7 +84,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @param  array   $options
      * @return mixed
      */
@@ -92,7 +101,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -110,14 +119,14 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
     {
         $queue = $this->getQueue($queue);
 
-        $job = $this->pheanstalk->watchOnly($queue)->reserve(0);
+        $job = $this->pheanstalk->watchOnly($queue)->reserveWithTimeout($this->blockFor);
 
         if ($job instanceof PheanstalkJob) {
             return new BeanstalkdJob(

@@ -18,9 +18,11 @@ use Illuminate\Notifications\Events\NotificationSending;
 
 class NotificationChannelManagerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         m::close();
+
+        Container::setInstance(null);
     }
 
     public function testNotificationCanBeDispatchedToDriver()

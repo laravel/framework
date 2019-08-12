@@ -11,7 +11,7 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Container\Container;
 
-class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
+class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerInterface
 {
     use InteractsWithTime;
 

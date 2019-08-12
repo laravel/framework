@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphManyTest;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -12,17 +14,17 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentMorphManyTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
             $table->timestamps();
         });
 
-        Schema::create('comments', function ($table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->integer('commentable_id');
@@ -33,12 +35,9 @@ class EloquentMorphManyTest extends DatabaseTestCase
         Carbon::setTestNow(null);
     }
 
-    /**
-     * @test
-     */
-    public function update_model_with_default_withCount()
+    public function testUpdateModelWithDefaultWithCount()
     {
-        $post = Post::create(['title' => str_random()]);
+        $post = Post::create(['title' => Str::random()]);
 
         $post->update(['title' => 'new name']);
 

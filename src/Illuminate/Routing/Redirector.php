@@ -77,19 +77,19 @@ class Redirector
      * @param  string  $path
      * @param  int     $status
      * @param  array   $headers
-     * @param  bool    $secure
+     * @param  bool|null    $secure
      * @return \Illuminate\Http\RedirectResponse
      */
     public function guest($path, $status = 302, $headers = [], $secure = null)
     {
         $request = $this->generator->getRequest();
 
-        $intended = $request->method() == 'GET' && $request->route() && ! $request->expectsJson()
+        $intended = $request->method() === 'GET' && $request->route() && ! $request->expectsJson()
                         ? $this->generator->full()
                         : $this->generator->previous();
 
         if ($intended) {
-            $this->session->put('url.intended', $intended);
+            $this->setIntendedUrl($intended);
         }
 
         return $this->to($path, $status, $headers, $secure);
@@ -101,7 +101,7 @@ class Redirector
      * @param  string  $default
      * @param  int     $status
      * @param  array   $headers
-     * @param  bool    $secure
+     * @param  bool|null    $secure
      * @return \Illuminate\Http\RedirectResponse
      */
     public function intended($default = '/', $status = 302, $headers = [], $secure = null)
@@ -112,12 +112,23 @@ class Redirector
     }
 
     /**
+     * Set the intended url.
+     *
+     * @param  string  $url
+     * @return void
+     */
+    public function setIntendedUrl($url)
+    {
+        $this->session->put('url.intended', $url);
+    }
+
+    /**
      * Create a new redirect response to the given path.
      *
      * @param  string  $path
      * @param  int     $status
      * @param  array   $headers
-     * @param  bool    $secure
+     * @param  bool|null    $secure
      * @return \Illuminate\Http\RedirectResponse
      */
     public function to($path, $status = 302, $headers = [], $secure = null)

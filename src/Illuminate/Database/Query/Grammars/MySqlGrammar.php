@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
 
@@ -14,42 +13,6 @@ class MySqlGrammar extends Grammar
      * @var array
      */
     protected $operators = ['sounds like'];
-
-    /**
-     * The components that make up a select clause.
-     *
-     * @var array
-     */
-    protected $selectComponents = [
-        'aggregate',
-        'columns',
-        'from',
-        'joins',
-        'wheres',
-        'groups',
-        'havings',
-        'orders',
-        'limit',
-        'offset',
-        'lock',
-    ];
-
-    /**
-     * Compile a select query into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileSelect(Builder $query)
-    {
-        $sql = parent::compileSelect($query);
-
-        if ($query->unions) {
-            $sql = '('.$sql.') '.$this->compileUnions($query);
-        }
-
-        return $sql;
-    }
 
     /**
      * Compile a "JSON contains" statement into SQL.
@@ -81,19 +44,6 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile a single union statement.
-     *
-     * @param  array  $union
-     * @return string
-     */
-    protected function compileUnion(array $union)
-    {
-        $conjunction = $union['all'] ? ' union all ' : ' union ';
-
-        return $conjunction.'('.$union['query']->toSql().')';
-    }
-
-    /**
      * Compile the random statement into SQL.
      *
      * @param  string  $seed
@@ -118,6 +68,22 @@ class MySqlGrammar extends Grammar
         }
 
         return $value;
+    }
+
+    /**
+     * Compile an insert statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileInsert(Builder $query, array $values)
+    {
+        if (empty($values)) {
+            $values = [[]];
+        }
+
+        return parent::compileInsert($query, $values);
     }
 
     /**
@@ -213,41 +179,11 @@ class MySqlGrammar extends Grammar
     {
         $values = collect($values)->reject(function ($value, $column) {
             return $this->isJsonSelector($column) && is_bool($value);
+        })->map(function ($value) {
+            return is_array($value) ? json_encode($value) : $value;
         })->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);
-    }
-
-    /**
-     * Compile a delete statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileDelete(Builder $query)
-    {
-        $table = $this->wrapTable($query->from);
-
-        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return isset($query->joins)
-                    ? $this->compileDeleteWithJoins($query, $table, $where)
-                    : $this->compileDeleteWithoutJoins($query, $table, $where);
-    }
-
-    /**
-     * Prepare the bindings for a delete statement.
-     *
-     * @param  array  $bindings
-     * @return array
-     */
-    public function prepareBindingsForDelete(array $bindings)
-    {
-        $cleanBindings = Arr::except($bindings, ['join', 'select']);
-
-        return array_values(
-            array_merge($bindings['join'], Arr::flatten($cleanBindings))
-        );
     }
 
     /**
@@ -255,12 +191,12 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
-     * @param  array  $where
+     * @param  string  $where
      * @return string
      */
-    protected function compileDeleteWithoutJoins($query, $table, $where)
+    protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
     {
-        $sql = trim("delete from {$table} {$where}");
+        $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
 
         // When using MySQL, delete statements may contain order by statements and limits
         // so we will compile both of those here. Once we have finished compiling this
@@ -274,24 +210,6 @@ class MySqlGrammar extends Grammar
         }
 
         return $sql;
-    }
-
-    /**
-     * Compile a delete query that uses joins.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $table
-     * @param  array  $where
-     * @return string
-     */
-    protected function compileDeleteWithJoins($query, $table, $where)
-    {
-        $joins = ' '.$this->compileJoins($query, $query->joins);
-
-        $alias = stripos($table, ' as ') !== false
-                ? explode(' as ', $table)[1] : $table;
-
-        return trim("delete {$alias} from {$table}{$joins} {$where}");
     }
 
     /**
@@ -316,5 +234,18 @@ class MySqlGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_unquote(json_extract('.$field.$path.'))';
+    }
+
+    /**
+     * Wrap the given JSON selector for boolean values.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonBooleanSelector($value)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
+
+        return 'json_extract('.$field.$path.')';
     }
 }

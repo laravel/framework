@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
@@ -15,13 +16,13 @@ class FilesystemAdapterTest extends TestCase
     private $tempDir;
     private $filesystem;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tempDir = __DIR__.'/tmp';
         $this->filesystem = new Filesystem(new Local($this->tempDir));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
         $filesystem->deleteDir(basename($this->tempDir));
@@ -49,6 +50,33 @@ class FilesystemAdapterTest extends TestCase
         $response = $files->download('file.txt', 'hello.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
         // $this->assertEquals('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
+    }
+
+    public function testDownloadNonAsciiFilename()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem);
+        $response = $files->download('file.txt', 'пиздюк.txt');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals("attachment; filename=pizdyuk.txt; filename*=utf-8''%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt", $response->headers->get('content-disposition'));
+    }
+
+    public function testDownloadNonAsciiEmptyFilename()
+    {
+        $this->filesystem->write('пиздюк.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem);
+        $response = $files->download('пиздюк.txt');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=pizdyuk.txt; filename*=utf-8\'\'%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt', $response->headers->get('content-disposition'));
+    }
+
+    public function testDownloadPercentInFilename()
+    {
+        $this->filesystem->write('Hello%World.txt', 'Hello World');
+        $files = new FilesystemAdapter($this->filesystem);
+        $response = $files->download('Hello%World.txt', 'Hello%World.txt');
+        $this->assertInstanceOf(StreamedResponse::class, $response);
+        $this->assertEquals('attachment; filename=HelloWorld.txt; filename*=utf-8\'\'Hello%25World.txt', $response->headers->get('content-disposition'));
     }
 
     public function testExists()
@@ -186,7 +214,7 @@ class FilesystemAdapterTest extends TestCase
 
     public function testStreamInvalidResourceThrows()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }

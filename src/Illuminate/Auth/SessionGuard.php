@@ -135,9 +135,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If the user is null, but we decrypt a "recaller" cookie we can attempt to
         // pull the user data on that cookie which serves as a remember cookie on
         // the application. Once we have a user we can return it to the caller.
-        $recaller = $this->recaller();
-
-        if (is_null($this->user) && ! is_null($recaller)) {
+        if (is_null($this->user) && ! is_null($recaller = $this->recaller())) {
             $this->user = $this->userFromRecaller($recaller);
 
             if ($this->user) {
@@ -489,7 +487,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // listening for anytime a user signs out of this application manually.
         $this->clearUserDataFromStorage();
 
-        if (! is_null($this->user)) {
+        if (! is_null($this->user) && ! empty($user->getRememberToken())) {
             $this->cycleRememberToken($user);
         }
 
@@ -534,6 +532,32 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Log the user out of the application on their current device only.
+     *
+     * @return void
+     */
+    public function logoutCurrentDevice()
+    {
+        $user = $this->user();
+
+        // If we have an event dispatcher instance, we can fire off the logout event
+        // so any further processing can be done. This allows the developer to be
+        // listening for anytime a user signs out of this application manually.
+        $this->clearUserDataFromStorage();
+
+        if (isset($this->events)) {
+            $this->events->dispatch(new Events\CurrentDeviceLogout($this->name, $user));
+        }
+
+        // Once we have fired the logout event we will clear the users out of memory
+        // so they are no longer available as the user is no longer considered as
+        // being signed into this application and should not be available here.
+        $this->user = null;
+
+        $this->loggedOut = true;
+    }
+
+    /**
      * Invalidate other sessions for the current user.
      *
      * The application must be using the AuthenticateSession middleware.
@@ -552,7 +576,12 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             $attribute => Hash::make($password),
         ]))->save();
 
-        $this->queueRecallerCookie($this->user());
+        if ($this->recaller() ||
+            $this->getCookieJar()->hasQueued($this->getRecallerName())) {
+            $this->queueRecallerCookie($this->user());
+        }
+
+        $this->fireOtherDeviceLogoutEvent($this->user());
 
         return $result;
     }
@@ -612,6 +641,21 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         if (isset($this->events)) {
             $this->events->dispatch(new Events\Authenticated(
+                $this->name, $user
+            ));
+        }
+    }
+
+    /**
+     * Fire the other device logout event if the dispatcher is set.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
+     */
+    protected function fireOtherDeviceLogoutEvent($user)
+    {
+        if (isset($this->events)) {
+            $this->events->dispatch(new Events\OtherDeviceLogout(
                 $this->name, $user
             ));
         }

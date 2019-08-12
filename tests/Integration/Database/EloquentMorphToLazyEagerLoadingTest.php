@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToLazyEagerLoadingTest;
 
+use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,7 +13,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,15 +46,15 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($video)->save();
     }
 
-    public function test_lazy_eager_loading()
+    public function testLazyEagerLoading()
     {
         $comments = Comment::all();
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $comments->load('commentable');
 
-        $this->assertCount(3, \DB::getQueryLog());
+        $this->assertCount(3, DB::getQueryLog());
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
