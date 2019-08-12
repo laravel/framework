@@ -46,10 +46,10 @@ class EncrypterTest extends TestCase
         $this->assertEquals('foo', $e->decrypt($encrypted));
     }
 
-    public function testDoNoAllowLongerKey()
+    public function testDoNotAllowLongerKey()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key length.');
 
         new Encrypter(str_repeat('z', 32));
     }
@@ -57,7 +57,7 @@ class EncrypterTest extends TestCase
     public function testWithBadKeyLength()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key length.');
 
         new Encrypter(str_repeat('a', 5));
     }
@@ -65,7 +65,7 @@ class EncrypterTest extends TestCase
     public function testWithBadKeyLengthAlternativeCipher()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key length.');
 
         new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
     }
@@ -73,7 +73,7 @@ class EncrypterTest extends TestCase
     public function testWithUnsupportedCipher()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+        $this->expectExceptionMessage('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key length.');
 
         new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
     }
