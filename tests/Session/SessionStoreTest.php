@@ -182,6 +182,46 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->isStarted());
     }
 
+    public function testSessionIsReSavedWhenNothingHasChangedExceptSessionId()
+    {
+        $session = $this->getSession();
+        $oldId = $session->getId();
+        $token = Str::random(40);
+        $session->getHandler()->shouldReceive('read')->once()->with($oldId)->andReturn(serialize([
+            '_token' => $token,
+            'foo' => 'bar',
+            'baz' => 'boom',
+            '_flash' => [
+                'new' => [],
+                'old' => [],
+            ],
+        ]));
+        $session->start();
+
+        $oldId = $session->getId();
+        $session->migrate();
+        $newId = $session->getId();
+
+        $this->assertNotEquals($newId, $oldId);
+
+        $session->getHandler()->shouldReceive('write')->once()->with(
+            $newId,
+            serialize([
+                '_token' => $token,
+                'foo' => 'bar',
+                'baz' => 'boom',
+                '_flash' => [
+                    'new' => [],
+                    'old' => [],
+                ],
+            ])
+        );
+
+        $session->save();
+
+        $this->assertFalse($session->isStarted());
+    }
+
     public function testOldInputFlashing()
     {
         $session = $this->getSession();
