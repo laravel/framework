@@ -23,6 +23,7 @@ use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -218,6 +219,28 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch(Request::create('foo/bar', 'GET'))->getContent();
         $this->assertEquals('hello caught', $response);
+    }
+
+    public function testReturnsResponseWhenMiddlewareReturnsResponsable()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', [
+            'uses' => RouteTestClosureMiddlewareController::class.'@index',
+            'middleware' => ['foo', 'bar', 'baz'],
+        ]);
+        $router->aliasMiddleware('foo', function ($request, $next) {
+            return $next($request);
+        });
+        $router->aliasMiddleware('bar', function ($request, $next) {
+            return new ResponsableResponse;
+        });
+        $router->aliasMiddleware('baz', function ($request, $next) {
+            return $next($request);
+        });
+        $this->assertEquals(
+            'bar',
+            $router->dispatch(Request::create('foo/bar', 'GET'))->getContent()
+        );
     }
 
     public function testDefinedClosureMiddleware()
@@ -1846,6 +1869,14 @@ class RouteTestControllerExceptMiddleware
         $_SERVER['route.test.controller.except.middleware'] = true;
 
         return $next($request);
+    }
+}
+
+class ResponsableResponse implements Responsable
+{
+    public function toResponse($request)
+    {
+        return new Response('bar');
     }
 }
 
