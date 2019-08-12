@@ -150,7 +150,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->isStarted());
     }
 
-    public function testSessionIsReSavedWhenNothingHasChanged()
+    public function testSessionIsNotReSavedWhenNothingHasChanged()
     {
         $session = $this->getSession();
         $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([

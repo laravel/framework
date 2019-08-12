@@ -47,6 +47,13 @@ class Store implements Session
     protected $started = false;
 
     /**
+     * Serialized version of the session data.
+     *
+     * @var array
+     */
+    protected $originalData = [];
+
+    /**
      * Create a new session instance.
      *
      * @param  string $name
@@ -94,7 +101,9 @@ class Store implements Session
      */
     protected function readFromHandler()
     {
-        if ($data = $this->handler->read($this->getId())) {
+        $this->originalData['id'] = $this->getId();
+
+        if ($this->originalData['data'] = $data = $this->handler->read($this->getId())) {
             $data = @unserialize($this->prepareForUnserialize($data));
 
             if ($data !== false && ! is_null($data) && is_array($data)) {
@@ -125,9 +134,14 @@ class Store implements Session
     {
         $this->ageFlashData();
 
-        $this->handler->write($this->getId(), $this->prepareForStorage(
-            serialize($this->attributes)
-        ));
+        $data = $this->prepareForStorage(serialize($this->attributes));
+
+        // If the serialized session data has not changed
+        // during the life cycle of the request we just
+        // skip overriding that with the same thing.
+        if ($this->isDirty($data)) {
+            $this->handler->write($this->getId(), $data);
+        }
 
         $this->started = false;
     }
@@ -668,5 +682,17 @@ class Store implements Session
         if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
+    }
+
+    /**
+     * Determine if the session data has changed since loaded.
+     *
+     * @param $data
+     *
+     * @return bool
+     */
+    protected function isDirty($data)
+    {
+        return $this->getId() !== $this->originalData['id'] || $data !== $this->originalData['data'];
     }
 }
