@@ -211,8 +211,8 @@ class PostgresGrammar extends Grammar
         // When gathering the columns for an update statement, we'll wrap each of the
         // columns and convert it to a parameter value. Then we will concatenate a
         // list of the columns that can be added into this update query clauses.
-        return collect($values)->map(function ($value, $key) use ($query) {
-            $column = Str::after($key, '.');
+        return collect($values)->map(function ($value, $key) {
+            $column = last(explode('.', $key));
 
             if ($this->isJsonSelector($key)) {
                 return $this->compileJsonUpdateColumn($column, $value);

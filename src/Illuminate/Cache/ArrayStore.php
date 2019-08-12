@@ -110,9 +110,13 @@ class ArrayStore extends TaggableStore
      */
     public function forget($key)
     {
-        unset($this->storage[$key]);
+        if (array_key_exists($key, $this->storage)) {
+            unset($this->storage[$key]);
 
-        return true;
+            return true;
+        }
+
+        return false;
     }
 
     /**
