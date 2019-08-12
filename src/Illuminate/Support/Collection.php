@@ -1584,6 +1584,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Search a multidimensional collection for a given value in the given column and return the corresponding key if successful.
+     *
+     * @param  mixed  $value
+     * @param  string  $columnName
+     * @param  bool  $strict
+     * @return mixed
+     */
+    public function searchMultidimensional($value, $columnName, $strict = false)
+    {
+        $column = array_combine(array_keys($this->items), array_column($this->items, $columnName));
+
+        return array_search($value, $column, $strict);
+    }
+
+    /**
      * Get and remove the first item from the collection.
      *
      * @return mixed

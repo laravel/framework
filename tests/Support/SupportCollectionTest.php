@@ -2291,6 +2291,36 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
+    public function testSearchMultidimensionalReturnsIndexOfFirstFoundItem()
+    {
+        $c = new Collection([['first' => 'Taylor', 'last' => 'Otwell'], ['first' => 'Jeffrey', 'last' => 'Way'], 3 => ['first' => 'Adam', 'last' => 'Wathan']]);
+
+        $this->assertEquals(0, $c->searchMultidimensional('Taylor', 'first'));
+        $this->assertEquals(1, $c->searchMultidimensional('Way', 'last'));
+        $this->assertEquals(3, $c->searchMultidimensional('Adam', 'first'));
+    }
+
+    public function testSearchMultidimensionalInStrictMode()
+    {
+        $c = new Collection([['bool' => false, 'number' => 1, 'array' => [], 'string' => '2'], 2 => ['bool' => true, 'number' => 3, 'array' => ['item'], 'string' => '4']]);
+
+        $this->assertFalse($c->searchMultidimensional('false', 'bool', true));
+        $this->assertFalse($c->searchMultidimensional('1', 'number', true));
+        $this->assertFalse($c->searchMultidimensional('item', 'array', true));
+        $this->assertFalse($c->searchMultidimensional(2, 'string', true));
+        $this->assertEquals(2, $c->searchMultidimensional(true, 'bool', true));
+        $this->assertEquals(2, $c->searchMultidimensional(3, 'number', true));
+        $this->assertEquals(2, $c->searchMultidimensional('4', 'string', true));
+    }
+
+    public function testSearchMultidimensionalReturnsFalseWhenItemIsNotFound()
+    {
+        $c = new Collection([['first' => 'Taylor', 'last' => 'Otwell'], ['first' => 'Jeffrey', 'last' => 'Way'], 3 => ['first' => 'Adam', 'last' => 'Wathan']]);
+
+        $this->assertFalse($c->searchMultidimensional('Matt', 'first'));
+        $this->assertFalse($c->searchMultidimensional('Stauffer', 'last'));
+    }
+
     public function testKeys()
     {
         $c = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
