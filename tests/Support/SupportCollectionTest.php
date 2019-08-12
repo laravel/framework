@@ -2302,13 +2302,15 @@ class SupportCollectionTest extends TestCase
 
     public function testSearchMultidimensionalInStrictMode()
     {
-        $c = new Collection([['bool' => false, 'number' => 1, 'array' => [], 'string' => '2'], 2 => ['bool' => true, 'number' => 3, 'array' => ['item'], 'string' => '4']]);
+        $c = new Collection([['bool' => true, 'number' => 1, 'array' => [], 'string' => '2'], 2 => ['bool' => false, 'number' => 3, 'array' => ['item'], 'string' => '4']]);
 
-        $this->assertFalse($c->searchMultidimensional('false', 'bool', true));
+        $this->assertFalse($c->searchMultidimensional('true', 'bool', true));
         $this->assertFalse($c->searchMultidimensional('1', 'number', true));
         $this->assertFalse($c->searchMultidimensional('item', 'array', true));
         $this->assertFalse($c->searchMultidimensional(2, 'string', true));
-        $this->assertEquals(2, $c->searchMultidimensional(true, 'bool', true));
+        $this->assertEquals(0, $c->searchMultidimensional('true', 'bool'));
+        $this->assertEquals(0, $c->searchMultidimensional('1', 'number'));
+        $this->assertEquals(2, $c->searchMultidimensional(false, 'bool', true));
         $this->assertEquals(2, $c->searchMultidimensional(3, 'number', true));
         $this->assertEquals(2, $c->searchMultidimensional('4', 'string', true));
     }
