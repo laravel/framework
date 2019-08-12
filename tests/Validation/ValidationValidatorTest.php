@@ -112,7 +112,7 @@ class ValidationValidatorTest extends TestCase
     public function testHasNotFailedValidationRules()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('trans')->never();
+        $trans->shouldReceive('get')->never();
         $v = new Validator($trans, ['foo' => 'taylor'], ['name' => 'Confirmed']);
         $this->assertTrue($v->passes());
         $this->assertEmpty($v->failed());
@@ -121,7 +121,7 @@ class ValidationValidatorTest extends TestCase
     public function testSometimesCanSkipRequiredRules()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('trans')->never();
+        $trans->shouldReceive('get')->never();
         $v = new Validator($trans, [], ['name' => 'sometimes|required']);
         $this->assertTrue($v->passes());
         $this->assertEmpty($v->failed());
@@ -130,7 +130,7 @@ class ValidationValidatorTest extends TestCase
     public function testInValidatableRulesReturnsValid()
     {
         $trans = $this->getTranslator();
-        $trans->shouldReceive('trans')->never();
+        $trans->shouldReceive('get')->never();
         $v = new Validator($trans, ['foo' => 'taylor'], ['name' => 'Confirmed']);
         $this->assertTrue($v->passes());
     }
