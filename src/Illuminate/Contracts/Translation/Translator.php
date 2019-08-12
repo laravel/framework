@@ -5,12 +5,23 @@ namespace Illuminate\Contracts\Translation;
 interface Translator
 {
     /**
+     * Get the translation for the given key.
+     *
+     * @param  string  $key
+     * @param  array   $replace
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return string|array
+     */
+    public function get($key, array $replace = [], $locale = null, $fallback = true);
+
+    /**
      * Get the translation for a given key.
      *
      * @param  string  $key
      * @param  array   $replace
      * @param  string|null  $locale
-     * @return mixed
+     * @return string|array
      */
     public function trans($key, array $replace = [], $locale = null);
 
