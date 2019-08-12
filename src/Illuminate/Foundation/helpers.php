@@ -875,7 +875,7 @@ if (! function_exists('trans')) {
             return app('translator');
         }
 
-        return app('translator')->trans($key, $replace, $locale);
+        return app('translator')->get($key, $replace, $locale);
     }
 }
 
@@ -891,7 +891,7 @@ if (! function_exists('trans_choice')) {
      */
     function trans_choice($key, $number, array $replace = [], $locale = null)
     {
-        return app('translator')->transChoice($key, $number, $replace, $locale);
+        return app('translator')->choice($key, $number, $replace, $locale);
     }
 }
 
