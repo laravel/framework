@@ -2748,7 +2748,6 @@ class Builder
         $columns = [];
 
         foreach ($values as $column => $amount) {
-
             if (! is_numeric($amount)) {
                 throw new InvalidArgumentException('Non-numeric value passed to incrementMultiple method.');
             }
@@ -2775,7 +2774,6 @@ class Builder
         $columns = [];
 
         foreach ($values as $column => $amount) {
-
             if (! is_numeric($amount)) {
                 throw new InvalidArgumentException('Non-numeric value passed to decrementMultiple method.');
             }
