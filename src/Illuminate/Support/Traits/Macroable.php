@@ -5,6 +5,7 @@ namespace Illuminate\Support\Traits;
 use Closure;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionFunction;
 use BadMethodCallException;
 
 trait Macroable
@@ -80,11 +81,15 @@ trait Macroable
             ));
         }
 
-        if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(Closure::bind(static::$macros[$method], null, static::class), $parameters);
+        $macro = static::$macros[$method];
+
+        if ($macro instanceof Closure) {
+            $newThis = (new ReflectionFunction($macro))->getClosureThis();
+
+            return call_user_func_array($macro->bindTo($newThis), $parameters);
         }
 
-        return call_user_func_array(static::$macros[$method], $parameters);
+        return call_user_func_array($macro, $parameters);
     }
 
     /**
