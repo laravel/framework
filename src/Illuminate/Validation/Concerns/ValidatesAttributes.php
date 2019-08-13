@@ -891,7 +891,11 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue) && ! is_numeric($value) && ! is_numeric($comparedToValue)) {
+        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+            return $value > $comparedToValue;
+        }
+
+        if (! $this->isSameType($value, $comparedToValue)) {
             return false;
         }
 
@@ -918,7 +922,11 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue) && ! is_numeric($value) && ! is_numeric($comparedToValue)) {
+        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+            return $value < $comparedToValue;
+        }
+
+        if (! $this->isSameType($value, $comparedToValue)) {
             return false;
         }
 
@@ -945,7 +953,11 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue) && ! is_numeric($value) && ! is_numeric($comparedToValue)) {
+        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+            return $value >= $comparedToValue;
+        }
+
+        if (! $this->isSameType($value, $comparedToValue)) {
             return false;
         }
 
@@ -972,7 +984,11 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue) && ! is_numeric($value) && ! is_numeric($comparedToValue)) {
+        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+            return $value <= $comparedToValue;
+        }
+
+        if (! $this->isSameType($value, $comparedToValue)) {
             return false;
         }
 
