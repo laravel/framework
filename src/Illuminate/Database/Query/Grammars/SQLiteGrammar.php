@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 
 class SQLiteGrammar extends Grammar
@@ -127,35 +126,49 @@ class SQLiteGrammar extends Grammar
      * @param  array  $values
      * @return string
      */
-    public function compileUpdate(Builder $query, $values)
+    public function compileUpdate(Builder $query, array $values)
     {
-        $table = $this->wrapTable($query->from);
-
-        $columns = collect($values)->map(function ($value, $key) {
-            return $this->wrap(Str::after($key, '.')).' = '.$this->parameter($value);
-        })->implode(', ');
-
         if (isset($query->joins) || isset($query->limit)) {
-            return $this->compileUpdateWithJoinsOrLimit($query, $columns);
+            return $this->compileUpdateWithJoinsOrLimit($query, $values);
         }
 
-        return trim("update {$table} set {$columns} {$this->compileWheres($query)}");
+        return parent::compileUpdate($query, $values);
+    }
+
+    /**
+     * Compile the columns for an update statement.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    protected function compileUpdateColumns(Builder $query, array $values)
+    {
+        return collect($values)->map(function ($value, $key) {
+            $column = last(explode('.', $key));
+
+            return $this->wrap($column).' = '.$this->parameter($value);
+        })->implode(', ');
     }
 
     /**
      * Compile an update statement with joins or limit into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $columns
+     * @param  array  $values
      * @return string
      */
-    protected function compileUpdateWithJoinsOrLimit(Builder $query, $columns)
+    protected function compileUpdateWithJoinsOrLimit(Builder $query, array $values)
     {
+        $table = $this->wrapTable($query->from);
+
+        $columns = $this->compileUpdateColumns($query, $values);
+
         $alias = last(preg_split('/\s+as\s+/i', $query->from));
 
-        $selectSql = parent::compileSelect($query->select($alias.'.rowid'));
+        $selectSql = $this->compileSelect($query->select($alias.'.rowid'));
 
-        return "update {$this->wrapTable($query->from)} set {$columns} where {$this->wrap('rowid')} in ({$selectSql})";
+        return "update {$table} set {$columns} where {$this->wrap('rowid')} in ({$selectSql})";
     }
 
     /**
