@@ -703,6 +703,33 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull($comment->owner);
     }
 
+    public function testIncrementMultipleMethodAndDecrementMultipleMethod()
+    {
+        $this->schema()->create('increments', function ($table) {
+            $table->increments('id');
+            $table->string('count');
+            $table->string('times');
+            $table->string('remark');
+            $table->string('created_at');
+            $table->string('updated_at');
+        });
+
+        TestIncrementMultiple::create(['id' => 1, 'count' => 2, 'times' => 3, 'remark' => 'remark']);
+        $this->assertCount(1, TestIncrementMultiple::where('id', 1)->get());
+        $this->assertEquals(2, TestIncrementMultiple::where('id', 1)->first()->count);
+        $this->assertEquals(3, TestIncrementMultiple::where('id', 1)->first()->times);
+
+        TestIncrementMultiple::where('id', 1)->incrementMultiple(['count' => 1, 'times' => 1], ['remark' => 'kramer']);
+        $this->assertEquals(3, TestIncrementMultiple::where('id', 1)->first()->count);
+        $this->assertEquals(4, TestIncrementMultiple::where('id', 1)->first()->times);
+        $this->assertEquals('kramer', TestIncrementMultiple::where('id', 1)->first()->remark);
+
+        TestIncrementMultiple::where('id', 1)->decrementMultiple(['count' => 2, 'times' => 2], ['remark' => 'remark']);
+        $this->assertEquals(1, TestIncrementMultiple::where('id', 1)->first()->count);
+        $this->assertEquals(2, TestIncrementMultiple::where('id', 1)->first()->times);
+        $this->assertEquals('remark', TestIncrementMultiple::where('id', 1)->first()->remark);
+    }
+
     /**
      * Helpers...
      */
@@ -872,4 +899,10 @@ class SoftDeletesTestGroup extends Eloquent
     {
         $this->hasMany(SoftDeletesTestUser::class);
     }
+}
+
+class TestIncrementMultiple extends Eloquent
+{
+    protected $table = 'increments';
+    protected $fillable = ['id', 'count', 'times', 'remark'];
 }
