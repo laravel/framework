@@ -71,7 +71,7 @@ class TranslationTranslatorTest extends TestCase
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'breeze <p>test</p>']);
-        $this->assertSame('breeze <p>test</p>', $t->trans('foo.bar', [], 'en'));
+        $this->assertSame('breeze <p>test</p>', $t->get('foo.bar', [], 'en'));
     }
 
     public function testGetMethodProperlyLoadsAndRetrievesItemWithCapitalization()
