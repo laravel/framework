@@ -58,6 +58,7 @@ trait HandlesRaceCondition
      * Returns the Job instance.
      *
      * @return \Illuminate\Contracts\Queue\Job
+     * @throws \LogicException
      */
     public function getJob()
     {
