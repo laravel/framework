@@ -90,7 +90,7 @@ class CallbackEvent extends Event
      */
     protected function removeMutex()
     {
-        if ($this->description) {
+        if ($this->description && $this->withoutOverlapping) {
             $this->mutex->forget($this);
         }
     }

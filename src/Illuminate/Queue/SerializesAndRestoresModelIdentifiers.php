@@ -84,8 +84,8 @@ trait SerializesAndRestoresModelIdentifiers
 
         return new $collectionClass(
             collect($value->id)->map(function ($id) use ($collection) {
-                return $collection[$id];
-            })
+                return $collection[$id] ?? null;
+            })->filter()
         );
     }
 

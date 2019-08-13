@@ -236,6 +236,26 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($unserialized->users->last()->email, 'mohamed@laravel.com');
     }
 
+    public function testItCanUnserializeACollectionInCorrectOrderAndHandleDeletedModels()
+    {
+        ModelSerializationTestUser::create(['email' => '2@laravel.com']);
+        ModelSerializationTestUser::create(['email' => '3@laravel.com']);
+        ModelSerializationTestUser::create(['email' => '1@laravel.com']);
+
+        $serialized = serialize(new CollectionSerializationTestClass(
+            ModelSerializationTestUser::orderByDesc('email')->get()
+        ));
+
+        ModelSerializationTestUser::where(['email' => '2@laravel.com'])->delete();
+
+        $unserialized = unserialize($serialized);
+
+        $this->assertCount(2, $unserialized->users);
+
+        $this->assertEquals($unserialized->users->first()->email, '3@laravel.com');
+        $this->assertEquals($unserialized->users->last()->email, '1@laravel.com');
+    }
+
     public function testItCanUnserializeCustomCollection()
     {
         ModelSerializationTestCustomUser::create(['email' => 'mohamed@laravel.com']);
