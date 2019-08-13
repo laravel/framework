@@ -62,8 +62,8 @@ trait HandlesRaceCondition
      */
     public function getJob()
     {
-        if (!in_array(InteractsWithQueue::class, class_uses_recursive($this))) {
-            throw new LogicException('Class '. class_basename($this) . ' needs InteractsWithQueue trait to work.');
+        if (! in_array(InteractsWithQueue::class, class_uses_recursive($this))) {
+            throw new LogicException('Class '.class_basename($this).' needs InteractsWithQueue trait to work.');
         }
 
         return $this->job;

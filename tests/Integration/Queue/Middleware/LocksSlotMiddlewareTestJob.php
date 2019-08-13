@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Queue\Middleware;
 
 use Exception;
-use LogicException;
 use Mockery as m;
+use LogicException;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Queue\JobLocker;
 use Illuminate\Routing\Pipeline;
