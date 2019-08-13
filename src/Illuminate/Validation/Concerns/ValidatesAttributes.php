@@ -891,7 +891,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
+        if (! $this->isSameType($value, $comparedToValue) && ! is_numeric($value) && ! is_numeric($comparedToValue)) {
             return false;
         }
 
@@ -918,7 +918,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
+        if (! $this->isSameType($value, $comparedToValue) && ! is_numeric($value) && ! is_numeric($comparedToValue)) {
             return false;
         }
 
@@ -945,7 +945,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
+        if (! $this->isSameType($value, $comparedToValue) && ! is_numeric($value) && ! is_numeric($comparedToValue)) {
             return false;
         }
 
@@ -972,7 +972,7 @@ trait ValidatesAttributes
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
-        if (! $this->isSameType($value, $comparedToValue)) {
+        if (! $this->isSameType($value, $comparedToValue) && ! is_numeric($value) && ! is_numeric($comparedToValue)) {
             return false;
         }
 

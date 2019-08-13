@@ -1088,8 +1088,20 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15, 'rhs' => 'string'], ['lhs' => 'numeric|gt:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 15.0, 'rhs' => 10], ['lhs' => 'numeric|gt:rhs']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15', 'rhs' => 10], ['lhs' => 'numeric|gt:rhs']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gt:rhs']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|gt:10']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|gt:10']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'gt:rhs']);
         $this->assertTrue($v->passes());
@@ -1117,7 +1129,19 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15, 'rhs' => 'string'], ['lhs' => 'numeric|lt:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 15.0, 'rhs' => 10], ['lhs' => 'numeric|lt:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => '15', 'rhs' => 10], ['lhs' => 'numeric|lt:rhs']);
+        $this->assertTrue($v->fails());
+
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|lt:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|lt:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|lt:10']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'lt:rhs']);
@@ -1146,8 +1170,20 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15, 'rhs' => 'string'], ['lhs' => 'numeric|gte:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 15.0, 'rhs' => 15], ['lhs' => 'numeric|gte:rhs']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15', 'rhs' => 15], ['lhs' => 'numeric|gte:rhs']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gte:rhs']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|gte:15']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|gte:15']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'gte:rhs']);
         $this->assertTrue($v->passes());
@@ -1175,7 +1211,19 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15, 'rhs' => 'string'], ['lhs' => 'numeric|lte:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 15.0, 'rhs' => 15], ['lhs' => 'numeric|lte:rhs']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15', 'rhs' => 15], ['lhs' => 'numeric|lte:rhs']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|lte:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|lte:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|lte:10']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'lte:rhs']);
@@ -3352,7 +3400,8 @@ class ValidationValidatorTest extends TestCase
     public function testCustomDependentValidators()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             [
                 ['name' => 'Jamie', 'age' => 27],
             ],
@@ -3408,37 +3457,51 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         // string passes
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             ['foo' => [['name' => 'first'], ['name' => 'second']]],
-            ['foo' => 'Array', 'foo.*.name' => 'Required|String']);
+            ['foo' => 'Array', 'foo.*.name' => 'Required|String']
+        );
         $this->assertTrue($v->passes());
 
         // numeric fails
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             ['foo' => [['name' => 'first'], ['name' => 'second']]],
-            ['foo' => 'Array', 'foo.*.name' => 'Required|Numeric']);
+            ['foo' => 'Array', 'foo.*.name' => 'Required|Numeric']
+        );
         $this->assertFalse($v->passes());
 
         // nested array fails
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
-            ['foo' => 'Array', 'foo.*.name' => 'Required|String', 'foo.*.votes.*' => 'Required|Integer']);
+            ['foo' => 'Array', 'foo.*.name' => 'Required|String', 'foo.*.votes.*' => 'Required|Integer']
+        );
         $this->assertFalse($v->passes());
 
         // multiple items passes
-        $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
-            ['foo' => 'Array', 'foo.*.name' => ['Required', 'String']]);
+        $v = new Validator(
+            $trans,
+            ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'String']]
+        );
         $this->assertTrue($v->passes());
 
         // multiple items fails
-        $v = new Validator($trans, ['foo' => [['name' => 'first'], ['name' => 'second']]],
-            ['foo' => 'Array', 'foo.*.name' => ['Required', 'Numeric']]);
+        $v = new Validator(
+            $trans,
+            ['foo' => [['name' => 'first'], ['name' => 'second']]],
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'Numeric']]
+        );
         $this->assertFalse($v->passes());
 
         // nested arrays fails
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
-            ['foo' => 'Array', 'foo.*.name' => ['Required', 'String'], 'foo.*.votes.*' => ['Required', 'Integer']]);
+            ['foo' => 'Array', 'foo.*.name' => ['Required', 'String'], 'foo.*.votes.*' => ['Required', 'Integer']]
+        );
         $this->assertFalse($v->passes());
     }
 
@@ -3570,22 +3633,32 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'size:4']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans,
-            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'min:3']);
+        $v = new Validator(
+            $trans,
+            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]],
+            ['foo.*.bar' => 'min:3']
+        );
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans,
-            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'between:3,6']);
+        $v = new Validator(
+            $trans,
+            ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]],
+            ['foo.*.bar' => 'between:3,6']
+        );
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             ['foo' => [['name' => 'first', 'votes' => [1, 2]], ['name' => 'second', 'votes' => ['something', 2]]]],
-            ['foo.*.votes' => ['Required', 'Size:2']]);
+            ['foo.*.votes' => ['Required', 'Size:2']]
+        );
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             ['foo' => [['name' => 'first', 'votes' => [1, 2, 3]], ['name' => 'second', 'votes' => ['something', 2]]]],
-            ['foo.*.votes' => ['Required', 'Size:2']]);
+            ['foo.*.votes' => ['Required', 'Size:2']]
+        );
         $this->assertFalse($v->passes());
     }
 
@@ -4097,7 +4170,8 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             [
                 ['name' => 'John'],
                 ['name' => null],
@@ -4105,20 +4179,23 @@ class ValidationValidatorTest extends TestCase
             ],
             [
                 '*.name' => 'required',
-            ]);
+            ]
+        );
 
         $this->assertEquals($v->invalid(), [
             1 => ['name' => null],
             2 => ['name' => ''],
         ]);
 
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             [
                 'name' => '',
             ],
             [
                 'name' => 'required',
-            ]);
+            ]
+        );
 
         $this->assertEquals($v->invalid(), [
             'name' => '',
@@ -4129,7 +4206,8 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             [
                 ['name' => 'John'],
                 ['name' => null],
@@ -4138,14 +4216,16 @@ class ValidationValidatorTest extends TestCase
             ],
             [
                 '*.name' => 'required',
-            ]);
+            ]
+        );
 
         $this->assertEquals($v->valid(), [
             0 => ['name' => 'John'],
             3 => ['name' => 'Doe'],
         ]);
 
-        $v = new Validator($trans,
+        $v = new Validator(
+            $trans,
             [
                 'name' => 'Carlos',
                 'age' => 'unknown',
@@ -4155,7 +4235,8 @@ class ValidationValidatorTest extends TestCase
                 'name' => 'required',
                 'gender' => 'in:male,female',
                 'age' => 'required|int',
-            ]);
+            ]
+        );
 
         $this->assertEquals($v->valid(), [
             'name' => 'Carlos',
@@ -4538,7 +4619,8 @@ class ValidationValidatorTest extends TestCase
     public function getIlluminateArrayTranslator()
     {
         return new Translator(
-            new ArrayLoader, 'en'
+            new ArrayLoader,
+            'en'
         );
     }
 }
