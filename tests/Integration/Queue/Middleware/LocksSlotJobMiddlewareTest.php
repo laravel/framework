@@ -3,18 +3,18 @@
 namespace Illuminate\Tests\Integration\Queue\Middleware;
 
 use Exception;
+use Mockery as m;
 use Illuminate\Bus\Dispatcher;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Queue\JobLocker;
+use Illuminate\Routing\Pipeline;
+use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
-use Illuminate\Queue\HandlesRaceCondition;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\JobLocker;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Queue\HandlesRaceCondition;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\Middleware\RaceConditionJobMiddleware;
-use Illuminate\Routing\Pipeline;
-use Mockery as m;
-use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -240,7 +240,7 @@ class LocksSlotJobMiddlewareTest extends TestCase
         $job_1->releaseAndUpdateSlot(); // Inverse Order
         $job_0->releaseAndUpdateSlot(); // Inverse Order
         $job_3->reserveNextAvailableSlot();
-        $job_3->handleCommand();// Starts when other is stalled
+        $job_3->handleCommand(); // Starts when other is stalled
         $job_3->releaseAndUpdateSlot(); // Ends when other is stalled
         $job_4->reserveNextAvailableSlot();
         $job_4->handleCommand();
@@ -425,7 +425,6 @@ class CustomLockableTestJob extends LockableTestJob
     {
         return $this->cache ?? $this->cache = m::mock(Repository::class);
     }
-
 }
 
 class TaggedCacheTestJob extends LockableTestJob
@@ -435,12 +434,12 @@ class TaggedCacheTestJob extends LockableTestJob
     public function cache()
     {
         return $this->cache = m::mock(Repository::class);
-    }    public function handle()
+    }
+
+    public function handle()
     {
         return true;
     }
-
-
 }
 
 class JobLockerTest extends JobLocker
@@ -452,4 +451,3 @@ class JobLockerTest extends JobLocker
         });
     }
 }
-

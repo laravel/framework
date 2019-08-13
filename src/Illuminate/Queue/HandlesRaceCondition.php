@@ -7,14 +7,14 @@ trait HandlesRaceCondition
     use InteractsWithQueue;
 
     /**
-     * Slot being used by the current command instance
+     * Slot being used by the current command instance.
      *
      * @var string
      */
     protected $slot;
 
     /**
-     * Returns the Slot being used by the command
+     * Returns the Slot being used by the command.
      *
      * @return string
      */
@@ -24,7 +24,7 @@ trait HandlesRaceCondition
     }
 
     /**
-     * Sets the Slot to use by the command
+     * Sets the Slot to use by the command.
      *
      * @param $slot
      */
@@ -34,7 +34,7 @@ trait HandlesRaceCondition
     }
 
     /**
-     * The initial slot the command should start from
+     * The initial slot the command should start from.
      *
      * @return int
      */
@@ -44,7 +44,7 @@ trait HandlesRaceCondition
     }
 
     /**
-     * Returns the next slot from a given slot
+     * Returns the next slot from a given slot.
      *
      * @param $next
      * @return mixed
@@ -55,7 +55,7 @@ trait HandlesRaceCondition
     }
 
     /**
-     * Returns the Job instance
+     * Returns the Job instance.
      *
      * @return \Illuminate\Contracts\Queue\Job
      */

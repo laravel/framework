@@ -3,15 +3,15 @@
 namespace Illuminate\Queue\Middleware;
 
 use Closure;
+use Throwable;
+use Illuminate\Queue\JobLocker;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Queue\HandlesRaceCondition;
-use Illuminate\Queue\JobLocker;
-use Throwable;
 
 class RaceConditionJobMiddleware
 {
     /**
-     * Cache instance to handle the Job
+     * Cache instance to handle the Job.
      *
      * @var \Illuminate\Contracts\Cache\Repository
      */
@@ -28,7 +28,7 @@ class RaceConditionJobMiddleware
     }
 
     /**
-     * Handles the current command
+     * Handles the current command.
      *
      * @param  $command
      * @param  \Closure $next
@@ -37,7 +37,7 @@ class RaceConditionJobMiddleware
      */
     public function handle($command, Closure $next)
     {
-        if (!in_array(HandlesRaceCondition::class, class_uses_recursive($command))) {
+        if (! in_array(HandlesRaceCondition::class, class_uses_recursive($command))) {
             return $next($command);
         }
 
@@ -67,7 +67,7 @@ class RaceConditionJobMiddleware
     }
 
     /**
-     * Creates a new Locker instance to use
+     * Creates a new Locker instance to use.
      *
      * @param  mixed $command
      * @return \Illuminate\Queue\JobLocker
@@ -83,7 +83,7 @@ class RaceConditionJobMiddleware
     }
 
     /**
-     * Returns the Cache to use with the Job
+     * Returns the Cache to use with the Job.
      *
      * @param  mixed $command
      * @return \Illuminate\Contracts\Cache\Repository
@@ -94,7 +94,7 @@ class RaceConditionJobMiddleware
     }
 
     /**
-     * Return the Job maximum time to live before timing out
+     * Return the Job maximum time to live before timing out.
      *
      * @param  mixed $command
      * @return null|int
@@ -107,7 +107,7 @@ class RaceConditionJobMiddleware
     }
 
     /**
-     * Return the prefix to use with the Locker
+     * Return the prefix to use with the Locker.
      *
      * @param $instance
      * @return string

@@ -3,12 +3,12 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Queue\Job;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Pipeline\Pipeline;
 use ReflectionClass;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Job;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CallQueuedHandler
 {
