@@ -287,40 +287,38 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->allows('null'));
     }
 
-    public function testAfterCallbacksDoNotOverridePreviousResult()
+    public function testAfterCallbacksThrowsExceptionWhenHasPreviousResult()
     {
         $gate = $this->getBasicGate();
-
-        $gate->define('deny', function ($user) {
-            return false;
-        });
 
         $gate->define('allow', function ($user) {
             return true;
         });
 
         $gate->after(function ($user, $ability, $result) {
-            return ! $result;
+            return false;
         });
 
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot override permission result in after callback because a result has already been sent in either a before callback or previous policy check.');
         $this->assertTrue($gate->allows('allow'));
-        $this->assertTrue($gate->denies('deny'));
     }
 
-    public function testAfterCallbacksDoNotOverrideEachOther()
+    public function testAfterCallbacksThrowsExceptionWhenHasPreviousResultForMultipleAfterCallbacks()
     {
         $gate = $this->getBasicGate();
 
         $gate->after(function ($user, $ability, $result) {
-            return $ability == 'allow';
+            return false;
         });
 
         $gate->after(function ($user, $ability, $result) {
-            return ! $result;
+            return true;
         });
 
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot override permission result in after callback because a result has already been sent in either a before callback or previous policy check.');
         $this->assertTrue($gate->allows('allow'));
-        $this->assertTrue($gate->denies('deny'));
     }
 
     public function testCurrentUserThatIsOnGateAlwaysInjectedIntoClosureCallbacks()

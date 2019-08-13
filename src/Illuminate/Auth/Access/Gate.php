@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Access;
 
 use Exception;
+use LogicException;
 use ReflectionClass;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
@@ -496,8 +497,8 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
-     * @param  bool  $result
-     * @return bool|null
+     * @param  mixed  $result
+     * @return mixed
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
@@ -507,6 +508,10 @@ class Gate implements GateContract
             }
 
             $afterResult = $after($user, $ability, $result, $arguments);
+
+            if (! is_null($result) && ! is_null($afterResult)) {
+                throw new LogicException('Cannot override permission result in after callback because a result has already been sent in either a before callback or previous policy check.');
+            }
 
             $result = $result ?? $afterResult;
         }
