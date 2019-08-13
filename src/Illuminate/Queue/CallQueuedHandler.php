@@ -67,7 +67,7 @@ class CallQueuedHandler
      */
     protected function dispatchThroughMiddleware(Job $job, $command)
     {
-        return new Pipeline(Container::getInstance())->send($command)
+        return (new Pipeline(Container::getInstance()))->send($command)
                 ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
                 ->then(function ($command) use ($job) {
                     return $this->dispatcher->dispatchNow(
