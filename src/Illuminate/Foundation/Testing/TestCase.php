@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Illuminate\Support\Str;
 use Mockery;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -165,7 +166,13 @@ abstract class TestCase extends BaseTestCase
                 $this->addToAssertionCount($container->mockery_getExpectationCount());
             }
 
-            Mockery::close();
+            try{
+                Mockery::close();
+            }catch(\Throwable $e){
+                if(! Str::contains($e->getMessage(), ['doWrite', 'askQuestion'])){
+                    throw $e;
+                }
+            }
         }
 
         if (class_exists(Carbon::class)) {
