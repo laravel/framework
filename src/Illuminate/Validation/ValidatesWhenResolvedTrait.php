@@ -25,6 +25,8 @@ trait ValidatesWhenResolvedTrait
         if ($instance->fails()) {
             $this->failedValidation($instance);
         }
+
+        $this->afterValidation();
     }
 
     /**
@@ -33,6 +35,16 @@ trait ValidatesWhenResolvedTrait
      * @return void
      */
     protected function prepareForValidation()
+    {
+        // no default action
+    }
+
+    /**
+     * Prepare the data for further processing.
+     *
+     * @return void
+     */
+    protected function afterValidation()
     {
         // no default action
     }
