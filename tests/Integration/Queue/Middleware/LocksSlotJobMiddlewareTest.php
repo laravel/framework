@@ -8,10 +8,10 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
-use Illuminate\Queue\HandlesSlots;
+use Illuminate\Queue\HandlesRaceCondition;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\JobLocker;
-use Illuminate\Queue\Middleware\LocksSlotJobMiddleware;
+use Illuminate\Queue\Middleware\RaceConditionJobMiddleware;
 use Illuminate\Routing\Pipeline;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -345,7 +345,7 @@ class LocksSlotJobMiddlewareTest extends TestCase
 
 class NonLockableTestJob
 {
-    use HandlesSlots;
+    use HandlesRaceCondition;
 
     public static $handled = false;
 
@@ -357,7 +357,7 @@ class NonLockableTestJob
 
 class LockableTestJob
 {
-    use HandlesSlots;
+    use HandlesRaceCondition;
     use InteractsWithQueue;
 
     public static $slots = [];
@@ -367,7 +367,7 @@ class LockableTestJob
     public static $handled = false;
 
     public $middleware = [
-        LocksSlotJobMiddleware::class,
+        RaceConditionJobMiddleware::class,
     ];
 
     public $should_throw = false;

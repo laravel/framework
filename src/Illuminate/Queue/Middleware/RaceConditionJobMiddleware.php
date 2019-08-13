@@ -4,11 +4,11 @@ namespace Illuminate\Queue\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Queue\HandlesSlots;
+use Illuminate\Queue\HandlesRaceCondition;
 use Illuminate\Queue\JobLocker;
 use Throwable;
 
-class LocksSlotJobMiddleware
+class RaceConditionJobMiddleware
 {
     /**
      * Cache instance to handle the Job
@@ -37,7 +37,7 @@ class LocksSlotJobMiddleware
      */
     public function handle($command, Closure $next)
     {
-        if (!in_array(HandlesSlots::class, class_uses_recursive($command))) {
+        if (!in_array(HandlesRaceCondition::class, class_uses_recursive($command))) {
             return $next($command);
         }
 

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue;
 
-trait HandlesSlots
+trait HandlesRaceCondition
 {
     use InteractsWithQueue;
 
