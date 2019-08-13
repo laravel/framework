@@ -3,11 +3,12 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use ReflectionClass;
-use Illuminate\Pipeline\Pipeline;
-use Illuminate\Contracts\Queue\Job;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pipeline\Pipeline;
+use ReflectionClass;
 
 class CallQueuedHandler
 {
@@ -66,7 +67,7 @@ class CallQueuedHandler
      */
     protected function dispatchThroughMiddleware(Job $job, $command)
     {
-        return (new Pipeline)->send($command)
+        return (new Pipeline(Container::getInstance()))->send($command)
                 ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
                 ->then(function ($command) use ($job) {
                     return $this->dispatcher->dispatchNow(
