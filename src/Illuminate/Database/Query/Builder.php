@@ -2758,6 +2758,60 @@ class Builder
     }
 
     /**
+     * Increment multiple column's value by given amount array.
+     *
+     * @param  array   $values
+     * @param  array   $extra
+     * @return int
+     */
+    public function incrementMultiple(array $values, array $extra = [])
+    {
+        $columns = [];
+
+        foreach ($values as $column => $amount) {
+            
+            if (! is_numeric($amount)) {
+                throw new InvalidArgumentException('Non-numeric value passed to incrementMultiple method.');
+            }
+
+            $wrapped = $this->grammar->wrap($column);
+
+            $columns[$column] = $this->raw("$wrapped + $amount");
+        }
+
+        $columns = array_merge($columns, $extra);
+
+        return $this->update($columns);
+    }
+
+    /**
+     * Decrement multiple column's value by given amount array.
+     *
+     * @param  array   $values
+     * @param  array   $extra
+     * @return int
+     */
+    public function decrementMultiple(array $values, array $extra = [])
+    {
+        $columns = [];
+
+        foreach ($values as $column => $amount) {
+
+            if (! is_numeric($amount)) {
+                throw new InvalidArgumentException('Non-numeric value passed to decrementMultiple method.');
+            }
+
+            $wrapped = $this->grammar->wrap($column);
+
+            $columns[$column] = $this->raw("$wrapped - $amount");
+        }
+
+        $columns = array_merge($columns, $extra);
+
+        return $this->update($columns);
+    }
+
+    /**
      * Delete a record from the database.
      *
      * @param  mixed  $id

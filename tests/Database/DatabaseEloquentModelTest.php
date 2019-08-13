@@ -1540,6 +1540,46 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('category'));
     }
 
+    public function testIncrementMultipleOnExistingModelCallsQueryAndSetsAttribute()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 2;
+        $model->category = 3;
+        $model->name = 4;
+
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('increment');
+
+        $model->publicIncrementMultiple(['foo' => 1, 'category' => 1], ['name' => 5]);
+        $this->assertEquals(3, $model->foo);
+        $this->assertEquals(4, $model->category);
+        $this->assertTrue($model->isDirty('name'));
+    }
+
+    public function testDecrementMultipleOnExistingModelCallsQueryAndSetsAttribute()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 2;
+        $model->category = 3;
+        $model->name = 4;
+
+        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('increment');
+
+        $model->publicDecrementMultiple(['foo' => 1, 'category' => 1], ['name' => 5]);
+        $this->assertEquals(1, $model->foo);
+        $this->assertEquals(2, $model->category);
+        $this->assertTrue($model->isDirty('name'));
+    }
+
     public function testRelationshipTouchOwnersIsPropagated()
     {
         $relation = $this->getMockBuilder(BelongsTo::class)->setMethods(['touch'])->disableOriginalConstructor()->getMock();
@@ -1976,6 +2016,16 @@ class EloquentModelStub extends Model
     public function publicIncrement($column, $amount = 1, $extra = [])
     {
         return $this->increment($column, $amount, $extra);
+    }
+
+    public function publicIncrementMultiple($values, $extra = [])
+    {
+        return $this->incrementMultiple($values, $extra);
+    }
+
+    public function publicDecrementMultiple($values, $extra = [])
+    {
+        return $this->decrementMultiple($values, $extra);
     }
 
     public function belongsToStub()
