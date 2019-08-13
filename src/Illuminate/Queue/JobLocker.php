@@ -7,35 +7,35 @@ use Illuminate\Contracts\Cache\Repository;
 class JobLocker
 {
     /**
-     * Cache Store
+     * Cache Store.
      *
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $store;
 
     /**
-     * Queued Lockable Job instance
+     * Queued Lockable Job instance.
      *
      * @var mixed
      */
     protected $command;
 
     /**
-     * Prefix to use in the Cache Repository
+     * Prefix to use in the Cache Repository.
      *
      * @var string
      */
     protected $prefix;
 
     /**
-     * Slot Reservation Time to Live
+     * Slot Reservation Time to Live.
      *
      * @var int
      */
     protected $ttl;
 
     /**
-     * Creates a new Concurrent instance
+     * Creates a new Concurrent instance.
      *
      * @param  $command
      * @param  \Illuminate\Contracts\Cache\Repository $store
@@ -51,7 +51,7 @@ class JobLocker
     }
 
     /**
-     * Handles the release of the slot
+     * Handles the release of the slot.
      *
      * @return void
      */
@@ -62,7 +62,7 @@ class JobLocker
     }
 
     /**
-     * Updates the last Slot used so next Jobs can start reserving from there
+     * Updates the last Slot used so next Jobs can start reserving from there.
      *
      * @return void
      */
@@ -72,23 +72,23 @@ class JobLocker
         // was saved before the moment we reserved the next in the locker. Otherwise, we will not
         // update it, since it will make the next job to use a (probably) already used old slot.
         if ($this->lastSlotTime() < $this->reservedSlotTime()) {
-            $this->store->forever($this->prefix . ':microtime', microtime(true));
-            $this->store->forever($this->prefix . ':last_slot', $this->command->getSlot());
+            $this->store->forever($this->prefix.':microtime', microtime(true));
+            $this->store->forever($this->prefix.':last_slot', $this->command->getSlot());
         }
     }
 
     /**
-     * Return when was saved the last slot
+     * Return when was saved the last slot.
      *
      * @return int
      */
     protected function lastSlotTime()
     {
-        return $this->store->get($this->prefix . ':microtime', 0);
+        return $this->store->get($this->prefix.':microtime', 0);
     }
 
     /**
-     * Return the time of the reserved slot
+     * Return the time of the reserved slot.
      *
      * @return float
      */
@@ -101,18 +101,18 @@ class JobLocker
     }
 
     /**
-     * Returns the slot key
+     * Returns the slot key.
      *
      * @param $slot
      * @return string
      */
     protected function key($slot)
     {
-        return $this->prefix . '|' . ($slot ?? 'null');
+        return $this->prefix.'|'.($slot ?? 'null');
     }
 
     /**
-     * Deletes the slot used by the Job
+     * Deletes the slot used by the Job.
      *
      * @return bool
      */
@@ -124,7 +124,7 @@ class JobLocker
     }
 
     /**
-     * Returns the next available slot to use by the Job
+     * Returns the next available slot to use by the Job.
      *
      * @return mixed
      */
@@ -140,7 +140,7 @@ class JobLocker
     }
 
     /**
-     * Retrieves the initial Slot to start reserving
+     * Retrieves the initial Slot to start reserving.
      *
      * @return mixed
      */
@@ -149,13 +149,13 @@ class JobLocker
         // The logic in these lines is fairly simplistic. If we did not save in the cache the
         // last slot, we will call the job to tell us where to start. Once we save it, we
         // will prefer retrieving the last slot from the cache because its be faster.
-        return $this->store->remember($this->prefix . ':last_slot', null, function () {
+        return $this->store->remember($this->prefix.':last_slot', null, function () {
             return $this->command->startFrom();
         });
     }
 
     /**
-     * Return if the slot has been reserved by other Job
+     * Return if the slot has been reserved by other Job.
      *
      * @param $slot
      * @return bool
@@ -166,7 +166,7 @@ class JobLocker
     }
 
     /**
-     * Reserves the Slot into the Repository
+     * Reserves the Slot into the Repository.
      *
      * @param $slot
      * @return mixed
