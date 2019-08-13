@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Queue\Middleware;
 
 use Exception;
+use LogicException;
 use Mockery as m;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Queue\JobLocker;
@@ -39,6 +40,18 @@ class LocksSlotJobMiddlewareTest extends TestCase
         $this->assertTrue(NonLockableTestJob::$handled);
 
         NonLockableTestJob::$handled = false;
+    }
+
+    public function testFailsIfJobLacksInteractsWithQueueTrait()
+    {
+        $this->expectException(LogicException::class);
+
+        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $job = m::mock(Job::class);
+
+        $instance->call($job, [
+            'command' => serialize(new WithoutTraitTestJob),
+        ]);
     }
 
     public function testReceivesLockableJob()
@@ -223,13 +236,13 @@ class LocksSlotJobMiddlewareTest extends TestCase
     {
         $command = new LockableTestJob;
 
-        $job_0 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_1 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_2 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_3 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_4 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_5 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_6 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_0 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_1 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_2 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_3 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_4 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_5 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_6 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
 
         $job_0->reserveNextAvailableSlot();
         $job_0->handleCommand();
@@ -267,10 +280,10 @@ class LocksSlotJobMiddlewareTest extends TestCase
         $failCommand = new LockableTestJob;
         $failCommand->should_throw = true;
 
-        $job_0 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_1 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_2 = app(JobLockerTest::class, ['command' => $failCommand, 'prefix' => 'locker', 'ttl' => 60]);
-        $job_3 = app(JobLockerTest::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_0 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_1 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_2 = app(LockerTestJob::class, ['command' => $failCommand, 'prefix' => 'locker', 'ttl' => 60]);
+        $job_3 = app(LockerTestJob::class, ['command' => $command, 'prefix' => 'locker', 'ttl' => 60]);
 
         $job_0->reserveNextAvailableSlot();
         $job_0->handleCommand();
@@ -346,6 +359,7 @@ class LocksSlotJobMiddlewareTest extends TestCase
 class NonLockableTestJob
 {
     use HandlesRaceCondition;
+    use InteractsWithQueue;
 
     public static $handled = false;
 
@@ -442,12 +456,26 @@ class TaggedCacheTestJob extends LockableTestJob
     }
 }
 
-class JobLockerTest extends JobLocker
+class LockerTestJob extends JobLocker
 {
     public function handleCommand()
     {
         $this->command->handle(1, function ($result) {
             return $result;
         });
+    }
+}
+
+class WithoutTraitTestJob
+{
+    use HandlesRaceCondition;
+
+    public $middleware = [
+        RaceConditionJobMiddleware::class,
+    ];
+
+    public function handle()
+    {
+        return true;
     }
 }
