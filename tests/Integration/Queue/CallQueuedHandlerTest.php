@@ -29,7 +29,7 @@ class CallQueuedHandlerTest extends TestCase
     {
         CallQueuedHandlerTestJob::$handled = false;
 
-        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
@@ -50,7 +50,7 @@ class CallQueuedHandlerTest extends TestCase
         CallQueuedHandlerTestJobWithMiddleware::$handled = false;
         CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = null;
 
-        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
@@ -73,7 +73,7 @@ class CallQueuedHandlerTest extends TestCase
         CallQueuedHandlerTestJobWithMiddleware::$handled = false;
         CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = null;
 
-        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
@@ -96,7 +96,7 @@ class CallQueuedHandlerTest extends TestCase
 
     public function testJobIsMarkedAsFailedIfModelNotFoundExceptionIsThrown()
     {
-        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
         $job->shouldReceive('resolveName')->andReturn(__CLASS__);
@@ -111,7 +111,7 @@ class CallQueuedHandlerTest extends TestCase
     {
         Event::fake();
 
-        $instance = new CallQueuedHandler(new Dispatcher(app()));
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
