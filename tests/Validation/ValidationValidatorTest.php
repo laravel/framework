@@ -1088,8 +1088,20 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15, 'rhs' => 'string'], ['lhs' => 'numeric|gt:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 15.0, 'rhs' => 10], ['lhs' => 'numeric|gt:rhs']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15', 'rhs' => 10], ['lhs' => 'numeric|gt:rhs']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gt:rhs']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|gt:10']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|gt:10']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'gt:rhs']);
         $this->assertTrue($v->passes());
@@ -1117,7 +1129,19 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15, 'rhs' => 'string'], ['lhs' => 'numeric|lt:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 15.0, 'rhs' => 10], ['lhs' => 'numeric|lt:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => '15', 'rhs' => 10], ['lhs' => 'numeric|lt:rhs']);
+        $this->assertTrue($v->fails());
+
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|lt:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|lt:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|lt:10']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'lt:rhs']);
@@ -1146,8 +1170,20 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15, 'rhs' => 'string'], ['lhs' => 'numeric|gte:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 15.0, 'rhs' => 15], ['lhs' => 'numeric|gte:rhs']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15', 'rhs' => 15], ['lhs' => 'numeric|gte:rhs']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gte:rhs']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|gte:15']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|gte:15']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'gte:rhs']);
         $this->assertTrue($v->passes());
@@ -1175,7 +1211,19 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 15, 'rhs' => 'string'], ['lhs' => 'numeric|lte:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 15.0, 'rhs' => 15], ['lhs' => 'numeric|lte:rhs']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => '15', 'rhs' => 15], ['lhs' => 'numeric|lte:rhs']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|lte:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 15.0], ['lhs' => 'numeric|lte:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => '15'], ['lhs' => 'numeric|lte:10']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'lte:rhs']);
