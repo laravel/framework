@@ -36,17 +36,7 @@ trait ValidatesWhenResolvedTrait
      */
     protected function prepareForValidation()
     {
-        // no default action
-    }
-
-    /**
-     * Prepare the data for further processing.
-     *
-     * @return void
-     */
-    protected function passedValidation()
-    {
-        // no default action
+        //
     }
 
     /**
@@ -57,6 +47,16 @@ trait ValidatesWhenResolvedTrait
     protected function getValidatorInstance()
     {
         return $this->validator();
+    }
+
+    /**
+     * Handle a passed validation attempt.
+     *
+     * @return void
+     */
+    protected function passedValidation()
+    {
+        //
     }
 
     /**
