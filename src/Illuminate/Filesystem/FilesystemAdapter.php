@@ -533,6 +533,8 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function getAwsTemporaryUrl($adapter, $path, $expiration, $options)
     {
         $client = $adapter->getClient();
+        $requestOptions = $options['request_options'] ?? [];
+        unset($options['request_options']);
 
         $command = $client->getCommand('GetObject', array_merge([
             'Bucket' => $adapter->getBucket(),
@@ -540,7 +542,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         ], $options));
 
         return (string) $client->createPresignedRequest(
-            $command, $expiration
+            $command, $expiration, $requestOptions
         )->getUri();
     }
 
