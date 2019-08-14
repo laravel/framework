@@ -1761,7 +1761,7 @@ class Builder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $column
      * @param  string  $direction
      * @return $this
      *
@@ -1769,6 +1769,16 @@ class Builder
      */
     public function orderBy($column, $direction = 'asc')
     {
+        if ($column instanceof self ||
+            $column instanceof EloquentBuilder ||
+            $column instanceof Closure) {
+            [$query, $bindings] = $this->createSub($column);
+
+            $column = new Expression('('.$query.')');
+
+            $this->addBinding($bindings, 'order');
+        }
+
         $direction = strtolower($direction);
 
         if (! in_array($direction, ['asc', 'desc'], true)) {
