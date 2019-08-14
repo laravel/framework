@@ -1817,6 +1817,31 @@ class Builder
     }
 
     /**
+     * Add an "order by" subquery clause to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  string  $direction
+     * @return $this
+     */
+    public function orderBySub($query, $direction = 'asc')
+    {
+        [$query, $bindings] = $this->createSub($query);
+
+        return $this->addBinding($bindings, 'order')->orderBy(new Expression('('.$query.')'), $direction);
+    }
+
+    /**
+     * Add a descending "order by" subquery clause to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @return $this
+     */
+    public function orderBySubDesc($query)
+    {
+        return $this->orderBySub($query, 'desc');
+    }
+
+    /**
      * Put the query's results in random order.
      *
      * @param  string  $seed
