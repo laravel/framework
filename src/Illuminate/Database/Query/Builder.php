@@ -2646,6 +2646,40 @@ class Builder
             $this->cleanBindings(Arr::flatten($values, 1))
         );
     }
+    
+    /**
+     * Insert ignore a new record into the database.
+     *
+     * @param  array  $values
+     * @return bool
+     */
+    public function insertIgnore(array $values)
+    {
+        // Since every insert gets treated like a batch insert, we will make sure the
+        // bindings are structured in a way that is convenient when building these
+        // inserts statements by verifying these elements are actually an array.
+        if (empty($values)) {
+            return true;
+        }
+    
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+            
+                $values[$key] = $value;
+            }
+        }
+    
+        // Finally, we will run this query against the database connection and return
+        // the results. We will need to also flatten these bindings before running
+        // the query so they are all in one huge, flattened array for execution.
+        return $this->connection->insert(
+            $this->grammar->compileInsertIgnore($this, $values),
+            $this->cleanBindings(Arr::flatten($values, 1))
+        );
+    }
 
     /**
      * Insert a new record and get the value of the primary key.
