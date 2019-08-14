@@ -108,31 +108,6 @@ class MySqlGrammar extends Grammar
     }
     
     /**
-     * Compile an insert ignore statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
-     * @return string
-     */
-    public function compileInsertIgnore(Builder $query, array $values)
-    {
-
-        $table = $this->wrapTable($query->from);
-    
-        if (! is_array(reset($values))) {
-            $values = [$values];
-        }
-    
-        $columns = $this->columnize(array_keys(reset($values)));
-    
-        $parameters = collect($values)->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
-    
-        return "insert ignore into $table ($columns) values $parameters";
-    }
-    
-    /**
      * Compile the lock into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
