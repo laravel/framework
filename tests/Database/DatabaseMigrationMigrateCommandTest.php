@@ -26,7 +26,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['only' => false, 'pretend' => false, 'step' => false]);
         $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
@@ -43,7 +43,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['only' => false, 'pretend' => false, 'step' => false]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(false);
         $command->expects($this->once())->method('call')->with($this->equalTo('migrate:install'), $this->equalTo([]));
 
@@ -59,7 +59,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => false]);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['only' => false, 'pretend' => true, 'step' => false]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
         $this->runCommand($command, ['--pretend' => true]);
@@ -74,7 +74,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with('foo');
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['only' => false, 'pretend' => false, 'step' => false]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
         $this->runCommand($command, ['--database' => 'foo']);
@@ -89,10 +89,26 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => true]);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['only' => false, 'pretend' => false, 'step' => true]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
         $this->runCommand($command, ['--step' => true]);
+    }
+
+    public function testOnlyMayBeSet()
+    {
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class));
+        $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('setConnection')->once()->with(null);
+        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['only' => '2019_08_14_000000_test_only_migration', 'pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+
+        $this->runCommand($command, ['--only' => '2019_08_14_000000_test_only_migration']);
     }
 
     protected function runCommand($command, $input = [])
