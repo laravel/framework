@@ -315,7 +315,7 @@ class FoundationTestFormRequestHooks extends FormRequest
         $this->replace(['name' => 'Taylor']);
     }
 
-    public function afterValidation()
+    public function passedValidation()
     {
         $this->replace(['name' => 'Adam']);
     }
