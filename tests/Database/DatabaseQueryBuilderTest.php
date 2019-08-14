@@ -1867,6 +1867,48 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testInsertIgnoreMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support INSERT IGNORE');
+        
+        $builder = $this->getBuilder();
+        $builder->from('users')->insertIgnore(['email' => 'foo']);
+    }
+    
+    public function testMySqlInsertIgnoreMethod()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert ignore into "users" ("email") values (?)', ['foo'])->andReturn(true);
+        $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
+        $this->assertTrue($result);
+    }
+    
+    public function testPostgresInsertIgnoreMethod()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (?) ON CONFLICT DO NOTHING', ['foo'])->andReturn(true);
+        $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
+        $this->assertTrue($result);
+    }
+
+    public function testSQLiteInsertIgnoreMethod()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert or ignore into "users" ("email") values (?)', ['foo'])->andReturn(true);
+        $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
+        $this->assertTrue($result);
+    }
+    
+    public function testSqlServerInsertIgnoreMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support INSERT IGNORE');
+    
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('users')->insertIgnore(['email' => 'foo']);
+    }
+
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();
