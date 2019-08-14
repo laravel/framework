@@ -5,37 +5,10 @@ namespace Illuminate\Database\Eloquent;
 use ArrayAccess;
 use Faker\Generator as Faker;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Database\Eloquent\Factory\StateManager;
 
 class Factory implements ArrayAccess
 {
-    /**
-     * The model definitions in the container.
-     *
-     * @var array
-     */
-    protected $definitions = [];
-
-    /**
-     * The registered model states.
-     *
-     * @var array
-     */
-    protected $states = [];
-
-    /**
-     * The registered after making callbacks.
-     *
-     * @var array
-     */
-    protected $afterMaking = [];
-
-    /**
-     * The registered after creating callbacks.
-     *
-     * @var array
-     */
-    protected $afterCreating = [];
-
     /**
      * The Faker instance for the builder.
      *
@@ -44,14 +17,23 @@ class Factory implements ArrayAccess
     protected $faker;
 
     /**
+     * The StateManager that holds all definitions.
+     *
+     * @var \Illuminate\Database\Eloquent\Factory\StateManager
+     */
+    protected $stateManager;
+
+    /**
      * Create a new factory instance.
      *
      * @param  \Faker\Generator  $faker
+     * @param  \Illuminate\Database\Eloquent\Factory\StateManager  $stateManager
      * @return void
      */
-    public function __construct(Faker $faker)
+    public function __construct(Faker $faker, StateManager $stateManager)
     {
         $this->faker = $faker;
+        $this->stateManager = $stateManager;
     }
 
     /**
@@ -65,7 +47,7 @@ class Factory implements ArrayAccess
     {
         $pathToFactories = $pathToFactories ?: database_path('factories');
 
-        return (new static($faker))->load($pathToFactories);
+        return (new static($faker, new StateManager()))->load($pathToFactories);
     }
 
     /**
@@ -91,7 +73,22 @@ class Factory implements ArrayAccess
      */
     public function define($class, callable $attributes, $name = 'default')
     {
-        $this->definitions[$class][$name] = $attributes;
+        $this->stateManager->define($class, $name, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * Define a preset with a callable.
+     *
+     * @param  string  $class
+     * @param  string  $state
+     * @param  callable  $callable
+     * @return $this
+     */
+    public function preset($class, $state, callable $callable)
+    {
+        $this->stateManager->preset($class, $state, $callable);
 
         return $this;
     }
@@ -106,7 +103,7 @@ class Factory implements ArrayAccess
      */
     public function state($class, $state, $attributes)
     {
-        $this->states[$class][$state] = $attributes;
+        $this->stateManager->state($class, $state, $attributes);
 
         return $this;
     }
@@ -121,7 +118,7 @@ class Factory implements ArrayAccess
      */
     public function afterMaking($class, callable $callback, $name = 'default')
     {
-        $this->afterMaking[$class][$name][] = $callback;
+        $this->stateManager->afterMaking($class, $name, $callback);
 
         return $this;
     }
@@ -136,7 +133,9 @@ class Factory implements ArrayAccess
      */
     public function afterMakingState($class, $state, callable $callback)
     {
-        return $this->afterMaking($class, $callback, $state);
+        $this->stateManager->afterMaking($class, $state, $callback);
+
+        return $this;
     }
 
     /**
@@ -144,12 +143,12 @@ class Factory implements ArrayAccess
      *
      * @param  string  $class
      * @param  callable  $callback
-     * @param  string $name
+     * @param  string  $name
      * @return $this
      */
     public function afterCreating($class, callable $callback, $name = 'default')
     {
-        $this->afterCreating[$class][$name][] = $callback;
+        $this->stateManager->afterCreating($class, $name, $callback);
 
         return $this;
     }
@@ -164,7 +163,9 @@ class Factory implements ArrayAccess
      */
     public function afterCreatingState($class, $state, callable $callback)
     {
-        return $this->afterCreating($class, $callback, $state);
+        $this->stateManager->afterCreating($class, $state, $callback);
+
+        return $this;
     }
 
     /**
@@ -241,7 +242,7 @@ class Factory implements ArrayAccess
     public function raw($class, array $attributes = [], $name = 'default')
     {
         return array_merge(
-            call_user_func($this->definitions[$class][$name], $this->faker), $attributes
+            call_user_func($this->stateManager->getDefinition($class, $name), $this->faker), $attributes
         );
     }
 
@@ -254,10 +255,7 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder(
-            $class, $name, $this->definitions, $this->states,
-            $this->afterMaking, $this->afterCreating, $this->faker
-        );
+        return tap(new FactoryBuilder($class, $this->stateManager, $this->faker))->definition($name);
     }
 
     /**
@@ -287,7 +285,7 @@ class Factory implements ArrayAccess
      */
     public function offsetExists($offset)
     {
-        return isset($this->definitions[$offset]);
+        return $this->stateManager->definitionExists($offset);
     }
 
     /**
@@ -321,6 +319,6 @@ class Factory implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        unset($this->definitions[$offset]);
+        $this->stateManager->forgetDefinitions($offset);
     }
 }

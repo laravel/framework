@@ -2,20 +2,23 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Closure;
+use Illuminate\Support\Arr;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Database\Eloquent\Factory\StateManager;
+use Illuminate\Database\Eloquent\Factory\RelationRequest;
+use Illuminate\Database\Eloquent\Factory\PrototypesModels;
+use Illuminate\Database\Eloquent\Factory\BuildsRelationships;
+use Illuminate\Database\Eloquent\Factory\NormalizesAttributes;
 
 class FactoryBuilder
 {
-    use Macroable;
-
-    /**
-     * The model definitions in the container.
-     *
-     * @var array
-     */
-    protected $definitions;
+    use BuildsRelationships,
+        Macroable,
+        NormalizesAttributes,
+        PrototypesModels;
 
     /**
      * The model being built.
@@ -25,46 +28,11 @@ class FactoryBuilder
     protected $class;
 
     /**
-     * The name of the model being built.
-     *
-     * @var string
-     */
-    protected $name = 'default';
-
-    /**
      * The database connection on which the model instance should be persisted.
      *
      * @var string
      */
     protected $connection;
-
-    /**
-     * The model states.
-     *
-     * @var array
-     */
-    protected $states;
-
-    /**
-     * The model after making callbacks.
-     *
-     * @var array
-     */
-    protected $afterMaking = [];
-
-    /**
-     * The model after creating callbacks.
-     *
-     * @var array
-     */
-    protected $afterCreating = [];
-
-    /**
-     * The states to apply.
-     *
-     * @var array
-     */
-    protected $activeStates = [];
 
     /**
      * The Faker instance for the builder.
@@ -74,45 +42,132 @@ class FactoryBuilder
     protected $faker;
 
     /**
-     * The number of models to build.
+     * The model states.
      *
-     * @var int|null
+     * @var StateManager
      */
-    protected $amount = null;
+    protected $stateManager;
 
     /**
      * Create an new builder instance.
      *
      * @param  string  $class
-     * @param  string  $name
-     * @param  array  $definitions
-     * @param  array  $states
-     * @param  array  $afterMaking
-     * @param  array  $afterCreating
+     * @param  \Illuminate\Database\Eloquent\Factory\StateManager  $stateManager
      * @param  \Faker\Generator  $faker
      * @return void
      */
-    public function __construct($class, $name, array $definitions, array $states,
-                                array $afterMaking, array $afterCreating, Faker $faker)
+    public function __construct($class, StateManager $stateManager, Faker $faker)
     {
-        $this->name = $name;
         $this->class = $class;
         $this->faker = $faker;
-        $this->states = $states;
-        $this->definitions = $definitions;
-        $this->afterMaking = $afterMaking;
-        $this->afterCreating = $afterCreating;
+        $this->stateManager = $stateManager;
     }
 
     /**
-     * Set the amount of models you wish to create / make.
+     * Set the database connection on which the model instance should be persisted.
      *
-     * @param  int  $amount
+     * @param  string  $name
+     * @return \Illuminate\Database\Eloquent\FactoryBuilder
+     */
+    public function connection($name)
+    {
+        $this->connection = $name;
+
+        return $this;
+    }
+
+    /**
+     * Set the name of definition to be used.
+     *
+     * @param  string  $name
      * @return $this
      */
-    public function times($amount)
+    public function definition($name)
     {
-        $this->amount = $amount;
+        $this->definition = $name;
+
+        if ($name !== 'default' && ! $this->stateManager->definitionExists($this->class, $name)) {
+            throw new InvalidArgumentException("Unable to locate factory with name [{$name}] on [{$this->class}].");
+        }
+
+        return $this;
+    }
+
+    /**
+     * Fill attributes on the model.
+     *
+     * @param  array|callable  $attributes
+     * @return $this
+     */
+    public function fill($attributes)
+    {
+        array_push($this->attributes, $this->wrapCallable($attributes));
+
+        return $this;
+    }
+
+    /**
+     * Fill attributes on the pivot model.
+     *
+     * @param  array|callable  $attributes
+     * @return $this
+     */
+    public function fillPivot($attributes)
+    {
+        array_push($this->pivotAttributes, $this->wrapCallable($attributes));
+
+        return $this;
+    }
+
+    /**
+     * Apply the callback given certain odds are met.
+     *
+     * Example odds: 50, '50%', 1/2
+     *
+     * @param  mixed  $odds
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return $this
+     */
+    public function odds($odds, $callback, $default = null)
+    {
+        if (is_string($odds)) {
+            $odds = intval($odds);
+        }
+
+        if (is_numeric($odds) && $odds >= 0 && $odds <= 1) {
+            $odds = $odds * 100;
+        }
+
+        return $this->when(rand(0, 100) <= $odds, $callback, $default);
+    }
+
+    /**
+     * Apply one or more presets to the model.
+     *
+     * @param  string  $preset
+     * @return $this
+     */
+    public function preset($preset)
+    {
+        return $this->presets($preset);
+    }
+
+    /**
+     * Apply one or more presets to the model.
+     *
+     * @param  array|mixed  $presets
+     * @return $this
+     */
+    public function presets($presets)
+    {
+        $this->presets = is_array($presets) ? $presets : func_get_args();
+
+        foreach ($this->presets as $preset) {
+            if (! $this->stateManager->presetsExists($this->class, $preset)) {
+                throw new InvalidArgumentException("Unable to locate preset with name [{$preset}] on [{$this->class}].");
+            }
+        }
 
         return $this;
     }
@@ -133,25 +188,96 @@ class FactoryBuilder
      *
      * @param  array|mixed  $states
      * @return $this
+     *
+     * @throws InvalidArgumentException
      */
     public function states($states)
     {
-        $this->activeStates = is_array($states) ? $states : func_get_args();
+        $this->states = is_array($states) ? $states : func_get_args();
+
+        foreach ($this->states as $state) {
+            if (! $this->stateManager->statesExists($this->class, $state) &&
+                ! $this->stateManager->afterCallbackExists($this->class, $state)) {
+                throw new InvalidArgumentException("Unable to locate state with name [{$state}] on [{$this->class}].");
+            }
+        }
 
         return $this;
     }
 
     /**
-     * Set the database connection on which the model instance should be persisted.
+     * Pass the builder to the given callback and then return it.
      *
-     * @param  string  $name
+     * @param  callable  $callback
      * @return $this
      */
-    public function connection($name)
+    public function tap($callback)
     {
-        $this->connection = $name;
+        call_user_func($callback, $this, $this->faker);
 
         return $this;
+    }
+
+    /**
+     * Set the amount of models you wish to create / make.
+     *
+     * @param  int  $amount
+     * @return $this
+     */
+    public function times($amount)
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    /**
+     * Apply the callback if the value is truthy.
+     *
+     * @param  bool  $value
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return $this
+     */
+    public function when($value, $callback, $default = null)
+    {
+        if ($value) {
+            call_user_func($callback, $this, $value);
+        } elseif ($default) {
+            call_user_func($default, $this, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Build the model with specified relations.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function with(...$args)
+    {
+        if (count($args) === 1 && $args[0] instanceof RelationRequest) {
+            return tap($this)->loadRelation($args[0]);
+        }
+
+        return tap($this)->loadRelation(
+            new RelationRequest($this->class, $this->currentBatch, $this->stateManager, $args)
+        );
+    }
+
+    /**
+     * Build relations in a new batch. Multiple batches can be
+     * created on the same relation, so that ie. multiple
+     * has-many relations can be configured differently.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function andWith(...$args)
+    {
+        return $this->newBatch()->with(...$args);
     }
 
     /**
@@ -177,15 +303,7 @@ class FactoryBuilder
     {
         $results = $this->make($attributes);
 
-        if ($results instanceof Model) {
-            $this->store(collect([$results]));
-
-            $this->callAfterCreating(collect([$results]));
-        } else {
-            $this->store($results);
-
-            $this->callAfterCreating($results);
-        }
+        $this->store($results);
 
         return $results;
     }
@@ -198,12 +316,18 @@ class FactoryBuilder
      */
     protected function store($results)
     {
-        $results->each(function ($model) {
+        $this->collect($results)->each(function (Model $model) {
             if (! isset($this->connection)) {
                 $model->setConnection($model->newQueryWithoutScopes()->getConnection()->getName());
             }
 
+            $this->createBelongsTo($model);
+
             $model->save();
+
+            $this->createHasMany($model);
+            $this->createBelongsToMany($model);
+            $this->callAfterCreating($model);
         });
     }
 
@@ -215,23 +339,9 @@ class FactoryBuilder
      */
     public function make(array $attributes = [])
     {
-        if ($this->amount === null) {
-            return tap($this->makeInstance($attributes), function ($instance) {
-                $this->callAfterMaking(collect([$instance]));
-            });
-        }
-
-        if ($this->amount < 1) {
-            return (new $this->class)->newCollection();
-        }
-
-        $instances = (new $this->class)->newCollection(array_map(function () use ($attributes) {
+        return $this->buildResults([new $this->class, 'newCollection'], function () use ($attributes) {
             return $this->makeInstance($attributes);
-        }, range(1, $this->amount)));
-
-        $this->callAfterMaking($instances);
-
-        return $instances;
+        });
     }
 
     /**
@@ -242,41 +352,29 @@ class FactoryBuilder
      */
     public function raw(array $attributes = [])
     {
-        if ($this->amount === null) {
+        return $this->buildResults([Arr::class, 'wrap'], function () use ($attributes) {
             return $this->getRawAttributes($attributes);
-        }
-
-        if ($this->amount < 1) {
-            return [];
-        }
-
-        return array_map(function () use ($attributes) {
-            return $this->getRawAttributes($attributes);
-        }, range(1, $this->amount));
+        });
     }
 
     /**
-     * Get a raw attributes array for the model.
+     * Build the results to either a single item or collection of items.
      *
-     * @param  array  $attributes
+     * @param  callable  $collect
+     * @param  callable  $item
      * @return mixed
-     *
-     * @throws \InvalidArgumentException
      */
-    protected function getRawAttributes(array $attributes = [])
+    protected function buildResults($collect, $item)
     {
-        if (! isset($this->definitions[$this->class][$this->name])) {
-            throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
+        if ($this->amount === null) {
+            return call_user_func($item);
         }
 
-        $definition = call_user_func(
-            $this->definitions[$this->class][$this->name],
-            $this->faker, $attributes
-        );
+        if ($this->amount < 1) {
+            return call_user_func($collect);
+        }
 
-        return $this->expandAttributes(
-            array_merge($this->applyStates($definition, $attributes), $attributes)
-        );
+        return call_user_func($collect, array_map($item, range(1, $this->amount)));
     }
 
     /**
@@ -296,57 +394,63 @@ class FactoryBuilder
                 $instance->setConnection($this->connection);
             }
 
-            return $instance;
+            return tap($instance, function ($instance) {
+                $this->callAfterMaking($instance);
+            });
         });
     }
 
     /**
-     * Apply the active states to the model definition array.
+     * Get a raw attributes array for the model.
      *
-     * @param  array  $definition
      * @param  array  $attributes
-     * @return array
-     *
-     * @throws \InvalidArgumentException
+     * @return mixed
      */
-    protected function applyStates(array $definition, array $attributes = [])
+    protected function getRawAttributes(array $attributes = [])
     {
-        foreach ($this->activeStates as $state) {
-            if (! isset($this->states[$this->class][$state])) {
-                if ($this->stateHasAfterCallback($state)) {
-                    continue;
-                }
+        $this->applyPresets();
 
-                throw new InvalidArgumentException("Unable to locate [{$state}] state for [{$this->class}].");
-            }
-
-            $definition = array_merge(
-                $definition,
-                $this->stateAttributes($state, $attributes)
-            );
-        }
-
-        return $definition;
+        return collect([$this->stateManager->getDefinition($this->class, $this->definition)])
+            ->concat(collect($this->states)->filter()->map(function ($state) {
+                return $this->stateManager->getState($this->class, $state) ?: $this->wrapCallable([]);
+            }))
+            ->concat($this->attributes)
+            ->push($this->wrapCallable($attributes))
+            ->pipe(function ($callables) use ($attributes) {
+                return $this->mergeAndExpandAttributes($callables, $attributes);
+            });
     }
 
     /**
-     * Get the state attributes.
+     * Apply the queued presets and finally clear them.
      *
-     * @param  string  $state
-     * @param  array  $attributes
+     * @return $this
+     */
+    protected function applyPresets()
+    {
+        collect($this->presets)->each(function ($preset) {
+            $this->tap($this->stateManager->getPreset($this->class, $preset));
+        });
+
+        $this->presets = [];
+
+        return $this;
+    }
+
+    /**
+     * Run attribute closures, merge resulting attributes, and
+     * finally expand to their underlying values.
+     *
+     * @param  array|\Illuminate\Support\Collection  $attributes
+     * @param  array  $inlineAttributes
      * @return array
      */
-    protected function stateAttributes($state, array $attributes)
+    protected function mergeAndExpandAttributes($attributes, array $inlineAttributes = [])
     {
-        $stateAttributes = $this->states[$this->class][$state];
-
-        if (! is_callable($stateAttributes)) {
-            return $stateAttributes;
-        }
-
-        return call_user_func(
-            $stateAttributes,
-            $this->faker, $attributes
+        return $this->expandAttributes(
+            collect($attributes)->reduce(function ($attributes, $generate) use ($inlineAttributes) {
+                return array_merge($attributes, call_user_func($generate, $this->faker, $inlineAttributes));
+            }, [])
         );
     }
 
@@ -358,17 +462,17 @@ class FactoryBuilder
      */
     protected function expandAttributes(array $attributes)
     {
-        foreach ($attributes as &$attribute) {
-            if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
-                $attribute = $attribute($attributes);
+        foreach ($attributes as $key => $attribute) {
+            if ($attribute instanceof Closure) {
+                $attributes[$key] = $attribute($attributes);
             }
 
             if ($attribute instanceof static) {
-                $attribute = $attribute->create()->getKey();
+                $attributes[$key] = $attribute->create()->getKey();
             }
 
             if ($attribute instanceof Model) {
-                $attribute = $attribute->getKey();
+                $attributes[$key] = $attribute->getKey();
             }
         }
 
@@ -378,71 +482,40 @@ class FactoryBuilder
     /**
      * Run after making callbacks on a collection of models.
      *
-     * @param  \Illuminate\Support\Collection  $models
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      */
-    public function callAfterMaking($models)
+    protected function callAfterMaking($model)
     {
-        $this->callAfter($this->afterMaking, $models);
+        $this->callAfter($this->stateManager->afterMaking, $model);
     }
 
     /**
      * Run after creating callbacks on a collection of models.
      *
-     * @param  \Illuminate\Support\Collection  $models
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      */
-    public function callAfterCreating($models)
+    protected function callAfterCreating($model)
     {
-        $this->callAfter($this->afterCreating, $models);
+        $this->callAfter($this->stateManager->afterCreating, $model);
     }
 
     /**
-     * Call after callbacks for each model and state.
-     *
-     * @param  array  $afterCallbacks
-     * @param  \Illuminate\Support\Collection  $models
-     * @return void
-     */
-    protected function callAfter(array $afterCallbacks, $models)
-    {
-        $states = array_merge([$this->name], $this->activeStates);
-
-        $models->each(function ($model) use ($states, $afterCallbacks) {
-            foreach ($states as $state) {
-                $this->callAfterCallbacks($afterCallbacks, $model, $state);
-            }
-        });
-    }
-
-    /**
-     * Call after callbacks for each model and state.
+     * Call after callbacks for each state on model.
      *
      * @param  array  $afterCallbacks
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string  $state
      * @return void
      */
-    protected function callAfterCallbacks(array $afterCallbacks, $model, $state)
+    protected function callAfter(array $afterCallbacks, $model)
     {
-        if (! isset($afterCallbacks[$this->class][$state])) {
-            return;
-        }
+        $states = array_merge([$this->definition], $this->states);
 
-        foreach ($afterCallbacks[$this->class][$state] as $callback) {
-            $callback($model, $this->faker);
-        }
-    }
+        foreach ($states as $state) {
+            $callbacks = data_get($afterCallbacks, "{$this->class}.{$state}", []);
 
-    /**
-     * Determine if the given state has an "after" callback.
-     *
-     * @param  string  $state
-     * @return bool
-     */
-    protected function stateHasAfterCallback($state)
-    {
-        return isset($this->afterMaking[$this->class][$state]) ||
-               isset($this->afterCreating[$this->class][$state]);
+            foreach ($callbacks as $callback) {
+                call_user_func($callback, $model, $this->faker);
+            }
+        }
     }
 }

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factory\StateManager;
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 
 /**
  * @group integration
@@ -31,7 +33,7 @@ class EloquentFactoryBuilderTest extends TestCase
             'prefix' => '',
         ]);
 
-        $factory = new Factory($app->make(Generator::class));
+        $factory = new EloquentFactory($app->make(Generator::class), new StateManager());
 
         $factory->define(FactoryBuildableUser::class, function (Generator $faker) {
             return [
