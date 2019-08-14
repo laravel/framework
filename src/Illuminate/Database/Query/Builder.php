@@ -335,10 +335,23 @@ class Builder
      * Add a new select column to the query.
      *
      * @param  array|mixed  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string|null  $query
      * @return $this
      */
-    public function addSelect($column)
+    public function addSelect($column, $query = null)
     {
+        if (is_string($column) && (
+            $query instanceof self ||
+            $query instanceof EloquentBuilder ||
+            $query instanceof Closure
+        )) {
+            if (is_null($this->columns)) {
+                $this->select($this->from.'.*');
+            }
+
+            return $this->selectSub($query, $column);
+        }
+
         $column = is_array($column) ? $column : func_get_args();
 
         $this->columns = array_merge((array) $this->columns, $column);
