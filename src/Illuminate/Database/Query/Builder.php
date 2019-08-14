@@ -245,6 +245,25 @@ class Builder
     }
 
     /**
+     * Add a subselect expression to the query, ensuring to select all columns
+     * if the user hasn't already explicitly specified any columns.
+     *
+     * @param  string  $as
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @return \Illuminate\Database\Query\Builder|static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function addSelectSub($as, $query)
+    {
+        if (is_null($this->columns)) {
+            $this->select($this->from.'.*');
+        }
+
+        return $this->selectSub($query, $as);
+    }
+
+    /**
      * Add a new "raw" select expression to the query.
      *
      * @param  string  $expression
