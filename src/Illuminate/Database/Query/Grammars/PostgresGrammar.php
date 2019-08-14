@@ -222,7 +222,7 @@ class PostgresGrammar extends Grammar
             return '('.$this->parameterize($record).')';
         })->implode(', ');
         
-        return "insert into $table ($columns) values $parameters ON CONFLICT DO NOTHING";
+        return "insert into $table ($columns) values $parameters on conflict do nothing";
     }
 
     /**

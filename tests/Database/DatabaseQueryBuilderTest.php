@@ -1887,7 +1887,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPostgresInsertIgnoreMethod()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (?) ON CONFLICT DO NOTHING', ['foo'])->andReturn(true);
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (?) on conflict do nothing', ['foo'])->andReturn(true);
         $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
         $this->assertTrue($result);
     }
