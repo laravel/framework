@@ -63,7 +63,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        return substr_replace($this->compileInsert($query, $values), 'insert ignore', 0, 6);
+        return substr_replace($this->compileInsert($query, $values), ' ignore', 6, 0);
     }
 
     /**
