@@ -11,6 +11,8 @@ class MailMarkdownTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         m::close();
     }
 
@@ -24,9 +26,9 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('make')->with('mail::themes.default')->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
-        $result = $markdown->render('view', []);
+        $result = $markdown->render('view', [])->toHtml();
 
-        $this->assertTrue(strpos($result, '<html></html>') !== false);
+        $this->assertNotFalse(strpos($result, '<html></html>'));
     }
 
     public function testRenderFunctionReturnsHtmlWithCustomTheme()
@@ -40,9 +42,9 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('make')->with('mail::themes.yaz')->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
-        $result = $markdown->render('view', []);
+        $result = $markdown->render('view', [])->toHtml();
 
-        $this->assertTrue(strpos($result, '<html></html>') !== false);
+        $this->assertNotFalse(strpos($result, '<html></html>'));
     }
 
     public function testRenderTextReturnsText()
