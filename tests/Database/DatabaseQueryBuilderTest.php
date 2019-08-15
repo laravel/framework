@@ -1870,7 +1870,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('This database engine does not support INSERT IGNORE');
+        $this->expectExceptionMessage('This database engine does not support insert or ignore.');
 
         $builder = $this->getBuilder();
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
@@ -1903,7 +1903,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSqlServerInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('This database engine does not support INSERT IGNORE');
+        $this->expectExceptionMessage('This database engine does not support insert or ignore.');
 
         $builder = $this->getSqlServerBuilder();
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
