@@ -2138,6 +2138,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateEmailWithStrictCheck()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar '], ['x' => 'email:strict']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateEmailWithFilterCheck()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar'], ['x' => 'email:filter']);
+        $this->assertFalse($v->passes());
+    }
+
     /**
      * @dataProvider validUrls
      */
