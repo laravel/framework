@@ -2653,7 +2653,7 @@ class Builder
      * @param  array  $values
      * @return int
      */
-    public function insertIgnore(array $values)
+    public function insertOrIgnore(array $values)
     {
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient when building these
@@ -2676,7 +2676,7 @@ class Builder
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.
         return $this->connection->affectingStatement(
-            $this->grammar->compileInsertIgnore($this, $values),
+            $this->grammar->compileInsertOrIgnore($this, $values),
             $this->cleanBindings(Arr::flatten($values, 1))
         );
     }

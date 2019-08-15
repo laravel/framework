@@ -1867,46 +1867,46 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testInsertIgnoreMethod()
+    public function testInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('This database engine does not support INSERT IGNORE');
         
         $builder = $this->getBuilder();
-        $builder->from('users')->insertIgnore(['email' => 'foo']);
+        $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
     
-    public function testMySqlInsertIgnoreMethod()
+    public function testMySqlInsertOrIgnoreMethod()
     {
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into `users` (`email`) values (?)', ['foo'])->andReturn(1);
-        $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
+        $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
         $this->assertEquals(1, $result);
     }
     
-    public function testPostgresInsertIgnoreMethod()
+    public function testPostgresInsertOrIgnoreMethod()
     {
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email") values (?) on conflict do nothing', ['foo'])->andReturn(1);
-        $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
+        $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
         $this->assertEquals(1, $result);
     }
 
-    public function testSQLiteInsertIgnoreMethod()
+    public function testSQLiteInsertOrIgnoreMethod()
     {
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "users" ("email") values (?)', ['foo'])->andReturn(1);
-        $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
+        $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
         $this->assertEquals(1, $result);
     }
     
-    public function testSqlServerInsertIgnoreMethod()
+    public function testSqlServerInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('This database engine does not support INSERT IGNORE');
     
         $builder = $this->getSqlServerBuilder();
-        $builder->from('users')->insertIgnore(['email' => 'foo']);
+        $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
 
     public function testInsertGetIdMethod()

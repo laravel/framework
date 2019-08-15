@@ -202,7 +202,7 @@ class PostgresGrammar extends Grammar
      * @param  array  $values
      * @return string
      */
-    public function compileInsertIgnore(Builder $query, array $values)
+    public function compileInsertOrIgnore(Builder $query, array $values)
     {
         return $this->compileInsert($query, $values).' on conflict do nothing';
     }
