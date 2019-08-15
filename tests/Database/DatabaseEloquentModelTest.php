@@ -149,7 +149,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue(isset($model['connection']));
         $this->assertEquals($model['connection'], 2);
         $this->assertFalse(isset($model['table']));
-        $this->assertNull($model['table']);
+        $this->assertEquals($model['table'], null);
         $this->assertFalse(isset($model['with']));
     }
 
