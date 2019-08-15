@@ -103,24 +103,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('foo')->addSelect('bar')->addSelect(['baz', 'boom'])->from('users');
         $this->assertEquals('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
-
-        $builder = $this->getBuilder();
-        $builder->select('foo')->addSelect('bar')->addSelect('baz', 'boom')->from('users');
-        $this->assertEquals('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
-
-        $builder = $this->getBuilder();
-        $builder->from('sub')->select(['foo', 'bar'])->addSelect('sub', function ($query) {
-            $query->from('two')->select('baz')->where('subkey', '=', 'subval');
-        });
-        $this->assertEquals('select "foo", "bar", (select "baz" from "two" where "subkey" = ?) as "sub" from "sub"', $builder->toSql());
-        $this->assertEquals(['subval'], $builder->getBindings());
-
-        $builder = $this->getBuilder();
-        $builder->from('sub')->addSelect('sub', function ($query) {
-            $query->from('two')->select('baz')->where('subkey', '=', 'subval');
-        });
-        $this->assertEquals('select "sub".*, (select "baz" from "two" where "subkey" = ?) as "sub" from "sub"', $builder->toSql());
-        $this->assertEquals(['subval'], $builder->getBindings());
     }
 
     public function testBasicSelectWithPrefix()

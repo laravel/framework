@@ -221,7 +221,21 @@ class Builder
      */
     public function select($columns = ['*'])
     {
-        $this->columns = is_array($columns) ? $columns : func_get_args();
+        $this->columns = [];
+
+        $columns = is_array($columns) ? $columns : func_get_args();
+
+        foreach ($columns as $as => $column) {
+            if (is_string($as) && (
+                $column instanceof self ||
+                $column instanceof EloquentBuilder ||
+                $column instanceof Closure
+            )) {
+                $this->selectSub($column, $as);
+            } else {
+                $this->columns[] = $column;
+            }
+        }
 
         return $this;
     }
@@ -335,26 +349,27 @@ class Builder
      * Add a new select column to the query.
      *
      * @param  array|mixed  $column
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string|null  $query
      * @return $this
      */
-    public function addSelect($column, $query = null)
+    public function addSelect($column)
     {
-        if (is_string($column) && (
-            $query instanceof self ||
-            $query instanceof EloquentBuilder ||
-            $query instanceof Closure
-        )) {
-            if (is_null($this->columns)) {
-                $this->select($this->from.'.*');
+        $columns = is_array($column) ? $column : func_get_args();
+
+        foreach ($columns as $as => $column) {
+            if (is_string($as) && (
+                $column instanceof self ||
+                $column instanceof EloquentBuilder ||
+                $column instanceof Closure
+            )) {
+                if (is_null($this->columns)) {
+                    $this->select($this->from.'.*');
+                }
+
+                $this->selectSub($column, $as);
+            } else {
+                $this->columns[] = $column;
             }
-
-            return $this->selectSub($query, $column);
         }
-
-        $column = is_array($column) ? $column : func_get_args();
-
-        $this->columns = array_merge((array) $this->columns, $column);
 
         return $this;
     }
