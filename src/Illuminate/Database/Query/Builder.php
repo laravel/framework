@@ -2651,7 +2651,7 @@ class Builder
      * Insert ignore a new record into the database.
      *
      * @param  array  $values
-     * @param  array  $target Only used for SqlServer
+     * @param  array|string|null  $target Only used for SqlServer
      * @return int
      */
     public function insertOrIgnore(array $values, $target = null)
