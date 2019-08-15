@@ -7,7 +7,6 @@ use ArrayAccess;
 use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Collection;
-use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
@@ -73,7 +72,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return \Illuminate\Support\HtmlString
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
     public function links($view = null, $data = [])
     {
@@ -85,14 +84,14 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return \Illuminate\Support\HtmlString
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
     public function render($view = null, $data = [])
     {
-        return new HtmlString(static::viewFactory()->make($view ?: static::$defaultView, array_merge($data, [
+        return static::viewFactory()->make($view ?: static::$defaultView, array_merge($data, [
             'paginator' => $this,
             'elements' => $this->elements(),
-        ]))->render());
+        ]));
     }
 
     /**
