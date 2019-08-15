@@ -18,7 +18,7 @@ interface Translator
      * Get a translation according to an integer value.
      *
      * @param  string  $key
-     * @param  int|array|\Countable  $number
+     * @param  mixed  $number
      * @param  array   $replace
      * @param  string|null  $locale
      * @return string

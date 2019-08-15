@@ -10,9 +10,9 @@ class MessageSelector
      * Select a proper translation string based on the given number.
      *
      * @param  string  $line
-     * @param  int  $number
+     * @param  mixed  $number
      * @param  string  $locale
-     * @return mixed
+     * @return string
      */
     public function choose($line, $number, $locale)
     {
@@ -37,7 +37,7 @@ class MessageSelector
      * Extract a translation string using inline conditions.
      *
      * @param  array  $segments
-     * @param  int  $number
+     * @param  mixed  $number
      * @return mixed
      */
     private function extract($segments, $number)
@@ -53,7 +53,7 @@ class MessageSelector
      * Get the translation string if the condition matches.
      *
      * @param  string  $part
-     * @param  int  $number
+     * @param  mixed  $number
      * @return mixed
      */
     private function extractFromString($part, $number)
@@ -99,312 +99,478 @@ class MessageSelector
     /**
      * Get the index to use for pluralization.
      *
-     * The plural rules are derived from code of the Zend Framework (2010-09-25), which
-     * is subject to the new BSD license (http://framework.zend.com/license/new-bsd)
-     * Copyright (c) 2005-2010 - Zend Technologies USA Inc. (http://www.zend.com)
+     * @see https://www.unicode.org/cldr/charts/35/supplemental/language_plural_rules.html
      *
      * @param  string  $locale
-     * @param  int  $number
+     * @param  mixed  $number
      * @return int
      */
     public function getPluralIndex($locale, $number)
     {
+        if ($locale !== 'pt_PT') {
+            $locale = explode('_', $locale)[0];
+        }
+
+        $dc = new DecimalQuantity($number);
+
         switch ($locale) {
-            case 'az':
-            case 'az_AZ':
+            // other
+            case 'bm':
             case 'bo':
-            case 'bo_CN':
-            case 'bo_IN':
             case 'dz':
-            case 'dz_BT':
             case 'id':
-            case 'id_ID':
+            case 'ig':
+            case 'ii':
+            case 'in':
             case 'ja':
-            case 'ja_JP':
+            case 'jbo':
             case 'jv':
-            case 'ka':
-            case 'ka_GE':
+            case 'jw':
+            case 'kde':
+            case 'kea':
             case 'km':
-            case 'km_KH':
-            case 'kn':
-            case 'kn_IN':
             case 'ko':
-            case 'ko_KR':
+            case 'lkt':
+            case 'lo':
             case 'ms':
-            case 'ms_MY':
+            case 'my':
+            case 'nqo':
+            case 'sah':
+            case 'ses':
+            case 'sg':
             case 'th':
-            case 'th_TH':
-            case 'tr':
-            case 'tr_CY':
-            case 'tr_TR':
+            case 'to':
             case 'vi':
-            case 'vi_VN':
+            case 'wo':
+            case 'yo':
+            case 'yue':
             case 'zh':
-            case 'zh_CN':
-            case 'zh_HK':
-            case 'zh_SG':
-            case 'zh_TW':
                 return 0;
-            case 'af':
-            case 'af_ZA':
+
+            // one, other
+            case 'am':
+            case 'as':
             case 'bn':
-            case 'bn_BD':
-            case 'bn_IN':
-            case 'bg':
-            case 'bg_BG':
-            case 'ca':
-            case 'ca_AD':
-            case 'ca_ES':
-            case 'ca_FR':
-            case 'ca_IT':
-            case 'da':
-            case 'da_DK':
-            case 'de':
-            case 'de_AT':
-            case 'de_BE':
-            case 'de_CH':
-            case 'de_DE':
-            case 'de_LI':
-            case 'de_LU':
-            case 'el':
-            case 'el_CY':
-            case 'el_GR':
-            case 'en':
-            case 'en_AG':
-            case 'en_AU':
-            case 'en_BW':
-            case 'en_CA':
-            case 'en_DK':
-            case 'en_GB':
-            case 'en_HK':
-            case 'en_IE':
-            case 'en_IN':
-            case 'en_NG':
-            case 'en_NZ':
-            case 'en_PH':
-            case 'en_SG':
-            case 'en_US':
-            case 'en_ZA':
-            case 'en_ZM':
-            case 'en_ZW':
-            case 'eo':
-            case 'eo_US':
-            case 'es':
-            case 'es_AR':
-            case 'es_BO':
-            case 'es_CL':
-            case 'es_CO':
-            case 'es_CR':
-            case 'es_CU':
-            case 'es_DO':
-            case 'es_EC':
-            case 'es_ES':
-            case 'es_GT':
-            case 'es_HN':
-            case 'es_MX':
-            case 'es_NI':
-            case 'es_PA':
-            case 'es_PE':
-            case 'es_PR':
-            case 'es_PY':
-            case 'es_SV':
-            case 'es_US':
-            case 'es_UY':
-            case 'es_VE':
-            case 'et':
-            case 'et_EE':
-            case 'eu':
-            case 'eu_ES':
-            case 'eu_FR':
             case 'fa':
-            case 'fa_IR':
-            case 'fi':
-            case 'fi_FI':
-            case 'fo':
-            case 'fo_FO':
-            case 'fur':
-            case 'fur_IT':
-            case 'fy':
-            case 'fy_DE':
-            case 'fy_NL':
-            case 'gl':
-            case 'gl_ES':
             case 'gu':
-            case 'gu_IN':
-            case 'ha':
-            case 'ha_NG':
-            case 'he':
-            case 'he_IL':
-            case 'hu':
-            case 'hu_HU':
-            case 'is':
-            case 'is_IS':
-            case 'it':
-            case 'it_CH':
-            case 'it_IT':
-            case 'ku':
-            case 'ku_TR':
-            case 'lb':
-            case 'lb_LU':
-            case 'ml':
-            case 'ml_IN':
-            case 'mn':
-            case 'mn_MN':
-            case 'mr':
-            case 'mr_IN':
-            case 'nah':
-            case 'nb':
-            case 'nb_NO':
-            case 'ne':
-            case 'ne_NP':
-            case 'nl':
-            case 'nl_AW':
-            case 'nl_BE':
-            case 'nl_NL':
-            case 'nn':
-            case 'nn_NO':
-            case 'no':
-            case 'om':
-            case 'om_ET':
-            case 'om_KE':
-            case 'or':
-            case 'or_IN':
-            case 'pa':
-            case 'pa_IN':
-            case 'pa_PK':
-            case 'pap':
-            case 'pap_AN':
-            case 'pap_AW':
-            case 'pap_CW':
-            case 'ps':
-            case 'ps_AF':
+            case 'hi':
+            case 'kn':
+            case 'zu':
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+
+                return ($i == 0 || $n == 1) ? 0 : 1;
+
+            // one, other
+            case 'ff':
+            case 'fr':
+            case 'hy':
+            case 'kab':
             case 'pt':
             case 'pt_BR':
+                $i = $dc->getPluralOperand('i');
+
+                return ($i == 0 || $i == 1) ? 0 : 1;
+
+            // one, other
+            case 'ast':
+            case 'ca':
+            case 'de':
+            case 'en':
+            case 'et':
+            case 'fi':
+            case 'fy':
+            case 'gl':
+            case 'ia':
+            case 'io':
+            case 'it':
+            case 'ji':
+            case 'nl':
             case 'pt_PT':
-            case 'so':
-            case 'so_DJ':
-            case 'so_ET':
-            case 'so_KE':
-            case 'so_SO':
-            case 'sq':
-            case 'sq_AL':
-            case 'sq_MK':
+            case 'sc':
+            case 'scn':
             case 'sv':
-            case 'sv_FI':
-            case 'sv_SE':
             case 'sw':
-            case 'sw_KE':
-            case 'sw_TZ':
-            case 'ta':
-            case 'ta_IN':
-            case 'ta_LK':
-            case 'te':
-            case 'te_IN':
-            case 'tk':
-            case 'tk_TM':
             case 'ur':
-            case 'ur_IN':
-            case 'ur_PK':
-            case 'zu':
-            case 'zu_ZA':
-                return ($number == 1) ? 0 : 1;
-            case 'am':
-            case 'am_ET':
+            case 'yi':
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                return ($i == 1 && $v == 0) ? 0 : 1;
+
+            // one, other
+            case 'si':
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+                $f = $dc->getPluralOperand('f');
+
+                return (($n == 0 || $n == 1) || ($i == 0 && $f == 1)) ? 0 : 1;
+
+            // one, other
+            case 'ak':
             case 'bh':
-            case 'fil':
-            case 'fil_PH':
-            case 'fr':
-            case 'fr_BE':
-            case 'fr_CA':
-            case 'fr_CH':
-            case 'fr_FR':
-            case 'fr_LU':
-            case 'gun':
-            case 'hi':
-            case 'hi_IN':
-            case 'hy':
-            case 'hy_AM':
+            case 'guw':
             case 'ln':
-            case 'ln_CD':
             case 'mg':
-            case 'mg_MG':
             case 'nso':
-            case 'nso_ZA':
+            case 'pa':
             case 'ti':
-            case 'ti_ER':
-            case 'ti_ET':
             case 'wa':
-            case 'wa_BE':
-            case 'xbr':
-                return (($number == 0) || ($number == 1)) ? 0 : 1;
-            case 'be':
-            case 'be_BY':
-            case 'bs':
-            case 'bs_BA':
-            case 'hr':
-            case 'hr_HR':
-            case 'ru':
-            case 'ru_RU':
-            case 'ru_UA':
-            case 'sr':
-            case 'sr_ME':
-            case 'sr_RS':
-            case 'uk':
-            case 'uk_UA':
-                return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
-            case 'cs':
-            case 'cs_CZ':
-            case 'sk':
-            case 'sk_SK':
-                return ($number == 1) ? 0 : ((($number >= 2) && ($number <= 4)) ? 1 : 2);
-            case 'ga':
-            case 'ga_IE':
-                return ($number == 1) ? 0 : (($number == 2) ? 1 : 2);
-            case 'lt':
-            case 'lt_LT':
-                return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
-            case 'sl':
-            case 'sl_SI':
-                return ($number % 100 == 1) ? 0 : (($number % 100 == 2) ? 1 : ((($number % 100 == 3) || ($number % 100 == 4)) ? 2 : 3));
+                $n = $dc->getPluralOperand('n');
+
+                return ($n == 0 || $n == 1) ? 0 : 1;
+
+            // one, other
+            case 'tzm':
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                return (($n == 0 || $n == 1) || ($v == 0 && $i >= 11 && $i <= 99)) ? 0 : 1;
+
+            // one, other
+            case 'af':
+            case 'asa':
+            case 'az':
+            case 'bem':
+            case 'bez':
+            case 'bg':
+            case 'brx':
+            case 'ce':
+            case 'cgg':
+            case 'chr':
+            case 'ckb':
+            case 'dv':
+            case 'ee':
+            case 'el':
+            case 'eo':
+            case 'es':
+            case 'eu':
+            case 'fo':
+            case 'fur':
+            case 'gsw':
+            case 'ha':
+            case 'haw':
+            case 'hu':
+            case 'jgo':
+            case 'jmc':
+            case 'ka':
+            case 'kaj':
+            case 'kcg':
+            case 'kk':
+            case 'kkj':
+            case 'kl':
+            case 'ks':
+            case 'ksb':
+            case 'ku':
+            case 'ky':
+            case 'lb':
+            case 'lg':
+            case 'mas':
+            case 'mgo':
+            case 'ml':
+            case 'mn':
+            case 'mr':
+            case 'nah':
+            case 'nb':
+            case 'nd':
+            case 'ne':
+            case 'nn':
+            case 'nnh':
+            case 'no':
+            case 'nr':
+            case 'ny':
+            case 'nyn':
+            case 'om':
+            case 'or':
+            case 'os':
+            case 'pap':
+            case 'ps':
+            case 'rm':
+            case 'rof':
+            case 'rwk':
+            case 'saq':
+            case 'sd':
+            case 'sdh':
+            case 'seh':
+            case 'sn':
+            case 'so':
+            case 'sq':
+            case 'ss':
+            case 'ssy':
+            case 'st':
+            case 'syr':
+            case 'ta':
+            case 'te':
+            case 'teo':
+            case 'tig':
+            case 'tk':
+            case 'tn':
+            case 'tr':
+            case 'ts':
+            case 'ug':
+            case 'uz':
+            case 've':
+            case 'vo':
+            case 'vun':
+            case 'wae':
+            case 'xh':
+            case 'xog':
+                $n = $dc->getPluralOperand('n');
+
+                return ($n == 1) ? 0 : 1;
+
+            // one, other
+            case 'da':
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+                $t = $dc->getPluralOperand('t');
+
+                return (($n == 1 || $t != 0) && ($i == 0 || $i == 1)) ? 0 : 1;
+
+            // one, other
+            case 'is':
+                $i = $dc->getPluralOperand('i');
+                $t = $dc->getPluralOperand('t');
+
+                return (($t == 0 && $i % 10 == 1 && $i % 100 != 11) || $t != 0) ? 0 : 1;
+
+            // one, other
             case 'mk':
-            case 'mk_MK':
-                return ($number % 10 == 1) ? 0 : 1;
-            case 'mt':
-            case 'mt_MT':
-                return ($number == 1) ? 0 : ((($number == 0) || (($number % 100 > 1) && ($number % 100 < 11))) ? 1 : ((($number % 100 > 10) && ($number % 100 < 20)) ? 2 : 3));
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+                $f = $dc->getPluralOperand('f');
+                $t = $dc->getPluralOperand('t');
+
+                return (($v == 0 && $i % 10 == 1 && $i % 100 != 11) || ($f % 10 == 1 && $f % 100 != 11)) ? 0 : 1;
+
+            // one, other
+            case 'ceb':
+            case 'fil':
+            case 'tl':
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+                $f = $dc->getPluralOperand('f');
+
+                return (($v == 0 && $i >= 1 && $i <= 3) || ($v == 0 && ! in_array($i % 10, [4, 6, 9])) || ($v != 0 && ! in_array($f % 10, [4, 6, 9]))) ? 0 : 1;
+
+            // zero, one, other
             case 'lv':
-            case 'lv_LV':
-                return ($number == 0) ? 0 : ((($number % 10 == 1) && ($number % 100 != 11)) ? 1 : 2);
-            case 'pl':
-            case 'pl_PL':
-                return ($number == 1) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 12) || ($number % 100 > 14))) ? 1 : 2);
-            case 'cy':
-            case 'cy_GB':
-                return ($number == 1) ? 0 : (($number == 2) ? 1 : ((($number == 8) || ($number == 11)) ? 2 : 3));
+            case 'prg':
+                $n = $dc->getPluralOperand('n');
+                $v = $dc->getPluralOperand('v');
+                $f = $dc->getPluralOperand('f');
+
+                $n10 = fmod($n, 10);
+                $n100 = fmod($n, 100);
+                $f10 = $f % 10;
+                $f100 = $f % 100;
+
+                return (($n10 == 0 || ($n100 >= 11 && $n100 <= 19)) || ($v == 2 && $f100 >= 11 && $f100 <= 19)) ? 0 : ((($n10 == 1 && $n100 != 11) || ($v == 2 && $f10 == 1 && $f100 != 11) || ($v != 2 && $f10 == 1)) ? 1 : 2);
+
+            // zero, one, other
+            case 'lag':
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+
+                return ($n == 0) ? 0 : ((($i == 0 || $i == 1) && $n != 0) ? 1 : 2);
+
+            // zero, one, other
+            case 'ksh':
+                $n = $dc->getPluralOperand('n');
+
+                return ($n == 0) ? 0 : (($n == 1) ? 1 : 2);
+
+            // one, two, other
+            case 'iu':
+            case 'naq':
+            case 'se':
+            case 'sma':
+            case 'smi':
+            case 'smj':
+            case 'smn':
+            case 'sms':
+                $n = $dc->getPluralOperand('n');
+
+                return ($n == 1) ? 0 : (($n == 2) ? 1 : 2);
+
+            // one, few, other
+            case 'shi':
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+                $f = $dc->getPluralOperand('f');
+
+                return ($i == 0 || $n == 1) ? 0 : (($f == 0 && $n >= 2 && $n <= 10) ? 1 : 2);
+
+            // one, few, other
+            case 'mo':
             case 'ro':
-            case 'ro_RO':
-                return ($number == 1) ? 0 : ((($number == 0) || (($number % 100 > 0) && ($number % 100 < 20))) ? 1 : 2);
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                $n100 = fmod($n, 100);
+
+                return ($i == 1 && $v == 0) ? 0 : (($v != 0 || $n == 0 || ($n100 >= 2 && $n100 <= 19)) ? 1 : 2);
+
+            // one, few, other
+            case 'bs':
+            case 'hr':
+            case 'sh':
+            case 'sr':
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+                $f = $dc->getPluralOperand('f');
+
+                $i10 = $i % 10;
+                $i100 = $i % 100;
+                $f10 = $f % 10;
+                $f100 = $f % 100;
+
+                return (($v == 0 && $i10 == 1 && $i100 != 11) || ($f10 == 1 && $f100 != 11)) ? 0 : ((($v == 0 && $i10 >= 2 && $i10 <= 4 && ! ($i100 >= 12 && $i100 <= 14)) || ($f10 >= 2 && $f10 <= 4 && ! ($f100 >= 12 && $f100 <= 14))) ? 1 : 2);
+
+            // one, two, few, other
+            case 'gd':
+                $n = $dc->getPluralOperand('n');
+                $f = $dc->getPluralOperand('f');
+
+                return ($n == 1 || $n == 11) ? 0 : (($n == 2 || $n == 12) ? 1 : (($f == 0 && (($n >= 3 && $n <= 10) || ($n >= 13 && $n <= 19))) ? 2 : 3));
+
+            // one, two, few, other
+            case 'sl':
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                $i100 = $i % 100;
+
+                return ($v == 0 && $i100 == 1) ? 0 : (($v == 0 && $i100 == 2) ? 1 : ((($v == 0 && $i100 >= 3 && $i100 <= 4) || $v != 0) ? 2 : 3));
+
+            // one, two, few, other
+            case 'dsb':
+            case 'hsb':
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+                $f = $dc->getPluralOperand('f');
+
+                $i100 = $i % 100;
+                $f100 = $f % 100;
+
+                return (($v == 0 && $i100 == 1) || $f100 == 1) ? 0 : ((($v == 0 && $i100 == 2) || $f100 == 2) ? 1 : ((($v == 0 && $i100 >= 3 && $i100 <= 4) || ($f100 >= 3 && $f100 <= 4)) ? 2 : 3));
+
+            // one, two, many, other
+            case 'he':
+            case 'iw':
+                $n = $dc->getPluralOperand('n');
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                return ($i == 1 && $v == 0) ? 0 : (($i == 2 && $v == 0) ? 1 : (($v == 0 & $n > 10 && fmod($n, 10) == 0) ? 2 : 3));
+
+            // one, few, many, other
+            case 'cs':
+            case 'sk':
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                return ($i == 1 && $v == 0) ? 0 : (($i >= 2 && $i <= 4 && $v == 0) ? 1 : (($v != 0) ? 2 : 3));
+
+            // one, few, many, other
+            case 'pl':
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                $i10 = $i % 10;
+                $i100 = $i % 100;
+
+                return ($i == 1 && $v == 0) ? 0 : (($v == 0 && $i10 >= 2 && $i10 <= 4 && ! ($i100 >= 12 && $i100 <= 14)) ? 1 : ((($v == 0 && $i != 1 && $i10 >= 0 && $i10 <= 1) || ($v == 0 && $i10 >= 5 && $i10 <= 9) || ($v == 0 && $i100 >= 12 && $i100 <= 14)) ? 2 : 3));
+
+            // one, few, many, other
+            case 'be':
+                $n = $dc->getPluralOperand('n');
+
+                $n10 = fmod($n, 10);
+                $n100 = fmod($n, 100);
+
+                return ($n10 == 1 && $n100 != 11) ? 0 : (($n10 >= 2 && $n10 <= 4 && ($n100 < 12 || $n100 > 14)) ? 1 : (($n10 == 0 || ($n10 >= 5 && $n10 <= 9) || ($n100 >= 11 && $n100 <= 14)) ? 2 : 3));
+
+            // one, few, many, other
+            case 'lt':
+                $n = $dc->getPluralOperand('n');
+                $f = $dc->getPluralOperand('f');
+
+                $n10 = fmod($n, 10);
+                $n100 = fmod($n, 100);
+
+                return ($n10 == 1 && ! ($n100 >= 11 && $n100 <= 19)) ? 0 : (($n10 >= 2 && $n10 <= 9 && ! ($n100 >= 11 && $n100 <= 19)) ? 1 : (($f != 0) ? 2 : 3));
+
+            // one, few, many, other
+            case 'mt':
+                $n = $dc->getPluralOperand('n');
+
+                $n100 = fmod($n, 100);
+
+                return ($n == 1) ? 0 : (($n == 0 || ($n100 >= 2 && $n100 <= 10)) ? 1 : (($n100 >= 11 && $n100 <= 19) ? 2 : 3));
+
+            // one, few, many, other
+            case 'ru':
+            case 'uk':
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                $i10 = $i % 10;
+                $i100 = $i % 100;
+
+                return ($v == 0 && $i10 == 1 && $i100 != 11) ? 0 : (($v == 0 && $i10 >= 2 && $i10 <= 4 && ! ($i100 >= 12 && $i100 <= 14)) ? 1 : ((($v == 0 && $i10 == 0) || ($v == 0 && $i10 >= 5 && $i10 <= 9) || ($v == 0 && $i100 >= 11 && $i100 <= 14)) ? 2 : 3));
+
+            // one, two, few, many, other
+            case 'br':
+                $n = $dc->getPluralOperand('n');
+
+                $n10 = fmod($n, 10);
+                $n100 = fmod($n, 100);
+
+                return ($n10 == 1 && ! in_array($n100, [11, 71, 91])) ? 0 : (($n10 == 2 && ! in_array($n100, [12, 72, 92])) ? 1 : (((($n10 >= 3 && $n10 <= 4) || $n10 == 9) && ! (($n100 >= 10 && $n100 <= 19) || ($n100 >= 70 && $n100 <= 79) || ($n100 >= 90 && $n100 <= 99))) ? 2 : (($n != 0 && fmod($n, 1000000) == 0) ? 3 : 4)));
+
+            // one, two, few, many, other
+            case 'ga':
+                $n = $dc->getPluralOperand('n');
+
+                return ($n == 1) ? 0 : (($n == 2) ? 1 : (($n >= 3 && $n <= 6) ? 2 : (($n >= 7 && $n <= 10) ? 3 : 4)));
+
+            // one, two, few, many, other
+            case 'gv':
+                $i = $dc->getPluralOperand('i');
+                $v = $dc->getPluralOperand('v');
+
+                $i10 = $i % 10;
+
+                return ($v == 0 && $i10 == 1) ? 0 : (($v == 0 && $i10 == 2) ? 1 : (($v == 0 && in_array($i % 100, [0, 20, 40, 60, 80])) ? 2 : (($v != 0) ? 3 : 4)));
+
+            // zero, one, two, few, many, other
             case 'ar':
-            case 'ar_AE':
-            case 'ar_BH':
-            case 'ar_DZ':
-            case 'ar_EG':
-            case 'ar_IN':
-            case 'ar_IQ':
-            case 'ar_JO':
-            case 'ar_KW':
-            case 'ar_LB':
-            case 'ar_LY':
-            case 'ar_MA':
-            case 'ar_OM':
-            case 'ar_QA':
-            case 'ar_SA':
-            case 'ar_SD':
-            case 'ar_SS':
-            case 'ar_SY':
-            case 'ar_TN':
-            case 'ar_YE':
-                return ($number == 0) ? 0 : (($number == 1) ? 1 : (($number == 2) ? 2 : ((($number % 100 >= 3) && ($number % 100 <= 10)) ? 3 : ((($number % 100 >= 11) && ($number % 100 <= 99)) ? 4 : 5))));
+            case 'ars':
+                $n = $dc->getPluralOperand('n');
+
+                $n100 = fmod($n, 100);
+
+                return ($n == 0) ? 0 : (($n == 1) ? 1 : (($n == 2) ? 2 : (($n100 >= 3 && $n100 <= 10) ? 3 : (($n100 >= 11 && $n100 <= 99) ? 4 : 5))));
+
+            // zero, one, two, few, many, other
+            case 'cy':
+                $n = $dc->getPluralOperand('n');
+
+                return ($n == 0) ? 0 : (($n == 1) ? 1 : (($n == 2) ? 2 : (($n == 3) ? 3 : (($n == 6) ? 4 : 5))));
+
+            // zero, one, two, few, many, other
+            case 'kw':
+                $n = $dc->getPluralOperand('n');
+
+                $n100 = fmod($n, 100);
+                $n100000 = fmod($n, 100000);
+
+                return ($n == 0) ? 0 : (($n == 1) ? 1 : ((in_array($n100, [2, 22, 42, 62, 82]) || (fmod($n, 1000) == 0 && (($n100000 >= 1000 && $n100000 <= 20000) || in_array($n100000, [40000, 60000, 80000]))) || ($n != 0 && fmod($n, 1000000) == 100000)) ? 2 : (in_array($n100, [3, 23, 43, 63, 83]) ? 3 : (($n != 1 && in_array($n100, [1, 21, 41,61, 81])) ? 4 : 5))));
+
             default:
                 return 0;
         }
