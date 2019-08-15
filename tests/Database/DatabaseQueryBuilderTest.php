@@ -1871,11 +1871,11 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('This database engine does not support INSERT IGNORE');
-        
+
         $builder = $this->getBuilder();
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
-    
+
     public function testMySqlInsertOrIgnoreMethod()
     {
         $builder = $this->getMySqlBuilder();
@@ -1883,7 +1883,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
         $this->assertEquals(1, $result);
     }
-    
+
     public function testPostgresInsertOrIgnoreMethod()
     {
         $builder = $this->getPostgresBuilder();
@@ -1899,12 +1899,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
         $this->assertEquals(1, $result);
     }
-    
+
     public function testSqlServerInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('This database engine does not support INSERT IGNORE');
-    
+
         $builder = $this->getSqlServerBuilder();
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }

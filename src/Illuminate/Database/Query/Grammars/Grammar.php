@@ -871,7 +871,7 @@ class Grammar extends BaseGrammar
 
         return "insert into $table ($columns) values $parameters";
     }
-    
+
     /**
      * Compile an insert ignore statement into SQL.
      *

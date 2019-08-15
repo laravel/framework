@@ -177,7 +177,7 @@ class SQLiteGrammar extends Grammar
                 ? "insert into {$table} DEFAULT VALUES"
                 : parent::compileInsert($query, $values);
     }
-    
+
     /**
      * Compile an insert ignore statement into SQL.
      *
@@ -187,9 +187,9 @@ class SQLiteGrammar extends Grammar
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        return substr_replace($this->compileInsert($query, $values),'insert or ignore', 0, 6);
+        return substr_replace($this->compileInsert($query, $values), 'insert or ignore', 0, 6);
     }
-    
+
     /**
      * Compile an update statement into SQL.
      *

@@ -53,7 +53,7 @@ class MySqlGrammar extends Grammar
 
         return $sql;
     }
-    
+
     /**
      * Compile an insert ignore statement into SQL.
      *
@@ -63,9 +63,9 @@ class MySqlGrammar extends Grammar
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        return substr_replace($this->compileInsert($query, $values),'insert ignore', 0, 6);
+        return substr_replace($this->compileInsert($query, $values), 'insert ignore', 0, 6);
     }
-    
+
     /**
      * Compile a "JSON contains" statement into SQL.
      *
@@ -118,7 +118,7 @@ class MySqlGrammar extends Grammar
     {
         return 'RAND('.$seed.')';
     }
-    
+
     /**
      * Compile the lock into SQL.
      *

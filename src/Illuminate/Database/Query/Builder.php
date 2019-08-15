@@ -2646,7 +2646,7 @@ class Builder
             $this->cleanBindings(Arr::flatten($values, 1))
         );
     }
-    
+
     /**
      * Insert ignore a new record into the database.
      *
@@ -2661,17 +2661,17 @@ class Builder
         if (empty($values)) {
             return 0;
         }
-    
+
         if (! is_array(reset($values))) {
             $values = [$values];
         } else {
             foreach ($values as $key => $value) {
                 ksort($value);
-            
+
                 $values[$key] = $value;
             }
         }
-    
+
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.

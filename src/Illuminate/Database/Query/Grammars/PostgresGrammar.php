@@ -194,7 +194,7 @@ class PostgresGrammar extends Grammar
                 ? "insert into {$table} DEFAULT VALUES"
                 : parent::compileInsert($query, $values);
     }
-    
+
     /**
      * Compile an insert ignore statement into SQL.
      *
