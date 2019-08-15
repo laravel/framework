@@ -30,7 +30,7 @@ class MailMailerTest extends TestCase
         $message = m::mock(Swift_Mime_SimpleMessage::class);
         $mailer->expects($this->once())->method('createMessage')->willReturn($message);
         $view = m::mock(stdClass::class);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message], ['data'])->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
         $message->shouldReceive('setFrom')->never();
@@ -39,7 +39,7 @@ class MailMailerTest extends TestCase
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->send('foo', ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
-        });
+        }, ['data']);
         unset($_SERVER['__mailer.test']);
     }
 
@@ -91,8 +91,8 @@ class MailMailerTest extends TestCase
         $message = m::mock(Swift_Mime_SimpleMessage::class);
         $mailer->expects($this->once())->method('createMessage')->willReturn($message);
         $view = m::mock(stdClass::class);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message], ['data'])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message], ['data'])->andReturn($view);
         $view->shouldReceive('render')->twice()->andReturn('rendered.view');
         $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
         $message->shouldReceive('addPart')->once()->with('rendered.view', 'text/plain');
@@ -102,7 +102,7 @@ class MailMailerTest extends TestCase
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->send(['foo', 'bar'], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
-        });
+        }, ['data']);
         unset($_SERVER['__mailer.test']);
     }
 
@@ -113,8 +113,8 @@ class MailMailerTest extends TestCase
         $message = m::mock(Swift_Mime_SimpleMessage::class);
         $mailer->expects($this->once())->method('createMessage')->willReturn($message);
         $view = m::mock(stdClass::class);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message])->andReturn($view);
-        $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('foo', ['data', 'message' => $message], ['data'])->andReturn($view);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->with('bar', ['data', 'message' => $message], ['data'])->andReturn($view);
         $view->shouldReceive('render')->twice()->andReturn('rendered.view');
         $message->shouldReceive('setBody')->once()->with('rendered.view', 'text/html');
         $message->shouldReceive('addPart')->once()->with('rendered.view', 'text/plain');
@@ -124,7 +124,7 @@ class MailMailerTest extends TestCase
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with($message, []);
         $mailer->send(['html' => 'foo', 'text' => 'bar'], ['data'], function ($m) {
             $_SERVER['__mailer.test'] = $m;
-        });
+        }, ['data']);
         unset($_SERVER['__mailer.test']);
     }
 

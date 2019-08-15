@@ -280,9 +280,10 @@ class MailFake implements Mailer, MailQueue
      * @param  string|array  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
+     * @param  array  $viewData
      * @return void
      */
-    public function send($view, array $data = [], $callback = null)
+    public function send($view, array $data = [], $callback = null, array $viewData = [])
     {
         if (! $view instanceof Mailable) {
             return;

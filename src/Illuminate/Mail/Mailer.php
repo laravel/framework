@@ -193,7 +193,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function plain($view, array $data, $callback)
     {
-        return $this->send(['text' => $view], $data, $callback);
+        return $this->send(['text' => $view], $data, $callback, $data);
     }
 
     /**
@@ -201,9 +201,10 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string|array  $view
      * @param  array  $data
+     * @param  array  $viewData
      * @return string
      */
-    public function render($view, array $data = [])
+    public function render($view, array $data = [], array $viewData = [])
     {
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
@@ -212,7 +213,7 @@ class Mailer implements MailerContract, MailQueueContract
 
         $data['message'] = $this->createMessage();
 
-        return $this->renderView($view ?: $plain, $data);
+        return $this->renderView($view ?: $plain, $data, $viewData);
     }
 
     /**
@@ -221,9 +222,10 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
+     * @param array $viewData
      * @return void
      */
-    public function send($view, array $data = [], $callback = null)
+    public function send($view, array $data = [], $callback = null, array $viewData = [])
     {
         if ($view instanceof MailableContract) {
             return $this->sendMailable($view);
@@ -241,7 +243,7 @@ class Mailer implements MailerContract, MailQueueContract
         // to creating view based emails that are able to receive arrays of data.
         call_user_func($callback, $message);
 
-        $this->addContent($message, $view, $plain, $raw, $data);
+        $this->addContent($message, $view, $plain, $raw, $data, $viewData);
 
         // If a global "to" address has been set, we will set that address on the mail
         // message. This is primarily useful during local development in which each
@@ -318,18 +320,19 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string  $plain
      * @param  string  $raw
      * @param  array  $data
+     * @param  array  $viewData
      * @return void
      */
-    protected function addContent($message, $view, $plain, $raw, $data)
+    protected function addContent($message, $view, $plain, $raw, $data, $viewData)
     {
         if (isset($view)) {
-            $message->setBody($this->renderView($view, $data), 'text/html');
+            $message->setBody($this->renderView($view, $data, $viewData), 'text/html');
         }
 
         if (isset($plain)) {
             $method = isset($view) ? 'addPart' : 'setBody';
 
-            $message->$method($this->renderView($plain, $data), 'text/plain');
+            $message->$method($this->renderView($plain, $data, $viewData), 'text/plain');
         }
 
         if (isset($raw)) {
@@ -344,13 +347,14 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $view
      * @param  array  $data
+     * @param  array $viewData
      * @return string
      */
-    protected function renderView($view, $data)
+    protected function renderView($view, $data, $viewData)
     {
         return $view instanceof Htmlable
                         ? $view->toHtml()
-                        : $this->views->make($view, $data)->render();
+                        : $this->views->make($view, $data, $viewData)->render();
     }
 
     /**

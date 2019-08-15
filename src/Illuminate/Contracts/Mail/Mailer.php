@@ -35,9 +35,10 @@ interface Mailer
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
+     * @param  array $viewData
      * @return void
      */
-    public function send($view, array $data = [], $callback = null);
+    public function send($view, array $data = [], $callback = null, array $viewData = []);
 
     /**
      * Get the array of failed recipients.
