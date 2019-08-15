@@ -62,7 +62,8 @@ class MailChannel
         $this->mailer->send(
             $this->buildView($message),
             array_merge($message->data(), $this->additionalMessageData($notification)),
-            $this->messageBuilder($notifiable, $notification, $message)
+            $this->messageBuilder($notifiable, $notification, $message),
+            $message->viewData
         );
     }
 
