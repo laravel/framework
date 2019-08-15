@@ -239,9 +239,11 @@ class Builder
     {
         [$query, $bindings] = $this->createSub($query);
 
-        return $this->selectRaw(
-            '('.$query.') as '.$this->grammar->wrap($as), $bindings
-        );
+        $this->addSelect(new Expression('('.$query.') as '.$this->grammar->wrap($as)));
+
+        $this->addBinding($bindings, 'select');
+
+        return $this;
     }
 
     /**
@@ -253,7 +255,7 @@ class Builder
      */
     public function selectRaw($expression, array $bindings = [])
     {
-        $this->addSelect(new Expression($expression));
+        $this->select(new Expression($expression));
 
         if ($bindings) {
             $this->addBinding($bindings, 'select');
@@ -339,6 +341,10 @@ class Builder
      */
     public function addSelect($column)
     {
+        if (is_null($this->columns)) {
+            $this->select([$this->from.'.*']);
+        }
+
         $column = is_array($column) ? $column : func_get_args();
 
         $this->columns = array_merge((array) $this->columns, $column);

@@ -1842,7 +1842,7 @@ class DatabaseQueryBuilderTest extends TestCase
         }, 'post');
         $count = $builder->count();
         $this->assertEquals(1, $count);
-        $this->assertEquals('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->columns[0]->getValue());
+        $this->assertEquals('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->columns[1]->getValue());
         $this->assertEquals(['foo'], $builder->getBindings());
     }
 

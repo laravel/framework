@@ -52,10 +52,10 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
         $comments = Comment::with(['commentable' => function ($query) {
             $query->selectSub(function ($query) {
                 $query->select('id');
-            }, 'id');
+            }, 'post_id');
         }])->get();
 
-        $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
+        $this->assertEquals(1, $comments[0]->commentable->id);
     }
 
     public function testAddSelect()
@@ -64,7 +64,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
             $query->addSelect('id');
         }])->get();
 
-        $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
+        $this->assertEquals(1, $comments[0]->commentable->id);
     }
 
     public function testLazyLoading()

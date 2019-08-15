@@ -357,10 +357,6 @@ trait QueriesRelationships
             return $this;
         }
 
-        if (is_null($this->query->columns)) {
-            $this->query->select([$this->query->from.'.*']);
-        }
-
         $relations = is_array($relations) ? $relations : func_get_args();
 
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
