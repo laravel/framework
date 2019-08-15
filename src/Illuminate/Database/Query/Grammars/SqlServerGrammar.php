@@ -108,10 +108,9 @@ class SqlServerGrammar extends Grammar
      * @param \Illuminate\Database\Query\Builder $query
      * @param array $values
      * @param array $target
-     * @param array|null $update
      * @return string
      */
-    public function compileMerge(Builder $query, array $values, array $target, array $update = null)
+    public function compileMerge(Builder $query, array $values, array $target)
     {
         $columns = $this->columnize(array_keys(reset($values)));
 
@@ -127,18 +126,7 @@ class SqlServerGrammar extends Grammar
             return "{$this->wrap("laravel_source.$column")} = {$this->wrap("{$query->from}.$column")}";
         })->implode(' and ');
 
-        $sql .= "on $on ";
-
-        if ($update) {
-            $update = collect($update)->map(function ($value, $key) {
-                return is_numeric($key)
-                    ? $this->wrap($value).' = '.$this->wrap('laravel_source.'.$value)
-                    : $this->wrap($key).' = '.$this->parameter($value);
-            })->implode(', ');
-            $sql .= "when matched then update set $update ";
-        }
-
-        $sql .= "when not matched then insert ($columns) values ($columns);";
+        $sql .= "on $on when not matched then insert ($columns) values ($columns);";
 
         return $sql;
     }
