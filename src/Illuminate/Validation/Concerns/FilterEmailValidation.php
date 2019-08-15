@@ -3,9 +3,9 @@
 namespace Illuminate\Validation\Concerns;
 
 use Egulias\EmailValidator\EmailLexer;
+use Egulias\EmailValidator\Warning\Warning;
 use Egulias\EmailValidator\Exception\InvalidEmail;
 use Egulias\EmailValidator\Validation\EmailValidation;
-use Egulias\EmailValidator\Warning\Warning;
 
 class FilterEmailValidation implements EmailValidation
 {
@@ -29,7 +29,6 @@ class FilterEmailValidation implements EmailValidation
      */
     public function getError()
     {
-        return null;
     }
 
     /**
