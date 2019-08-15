@@ -372,9 +372,7 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        if (isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
+        return $this->attributes[$key] ?? null;
     }
 
     /**
