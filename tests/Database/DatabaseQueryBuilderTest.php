@@ -1879,25 +1879,25 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlInsertIgnoreMethod()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert ignore into `users` (`email`) values (?)', ['foo'])->andReturn(true);
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into `users` (`email`) values (?)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
-        $this->assertTrue($result);
+        $this->assertEquals(1, $result);
     }
     
     public function testPostgresInsertIgnoreMethod()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (?) on conflict do nothing', ['foo'])->andReturn(true);
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email") values (?) on conflict do nothing', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
-        $this->assertTrue($result);
+        $this->assertEquals(1, $result);
     }
 
     public function testSQLiteInsertIgnoreMethod()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert or ignore into "users" ("email") values (?)', ['foo'])->andReturn(true);
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "users" ("email") values (?)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
-        $this->assertTrue($result);
+        $this->assertEquals(1, $result);
     }
     
     public function testSqlServerInsertIgnoreMethod()

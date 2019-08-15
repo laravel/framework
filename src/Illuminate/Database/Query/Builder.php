@@ -2651,7 +2651,7 @@ class Builder
      * Insert ignore a new record into the database.
      *
      * @param  array  $values
-     * @return bool
+     * @return int
      */
     public function insertIgnore(array $values)
     {
@@ -2659,7 +2659,7 @@ class Builder
         // bindings are structured in a way that is convenient when building these
         // inserts statements by verifying these elements are actually an array.
         if (empty($values)) {
-            return true;
+            return 0;
         }
     
         if (! is_array(reset($values))) {
@@ -2675,7 +2675,7 @@ class Builder
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.
-        return $this->connection->insert(
+        return $this->connection->affectingStatement(
             $this->grammar->compileInsertIgnore($this, $values),
             $this->cleanBindings(Arr::flatten($values, 1))
         );
