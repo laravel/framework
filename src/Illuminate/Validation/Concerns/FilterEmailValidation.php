@@ -12,9 +12,8 @@ class FilterEmailValidation implements EmailValidation
     /**
      * Returns true if the given email is valid.
      *
-     * @param string $email The email you want to validate.
-     * @param EmailLexer $emailLexer The email lexer.
-     *
+     * @param  string  $email
+     * @param  EmailLexer
      * @return bool
      */
     public function isValid($email, EmailLexer $emailLexer)
@@ -29,6 +28,7 @@ class FilterEmailValidation implements EmailValidation
      */
     public function getError()
     {
+        //
     }
 
     /**
