@@ -2656,7 +2656,6 @@ class Builder
      */
     public function insertOrIgnore(array $values, $target = null)
     {
-
         if (empty($values)) {
             return 0;
         }
