@@ -1879,7 +1879,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlInsertIgnoreMethod()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert ignore into "users" ("email") values (?)', ['foo'])->andReturn(true);
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert ignore into `users` (`email`) values (?)', ['foo'])->andReturn(true);
         $result = $builder->from('users')->insertIgnore(['email' => 'foo']);
         $this->assertTrue($result);
     }
