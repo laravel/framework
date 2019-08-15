@@ -2651,13 +2651,12 @@ class Builder
      * Insert ignore a new record into the database.
      *
      * @param  array  $values
+     * @param  array  $target Only used for SqlServer
      * @return int
      */
-    public function insertOrIgnore(array $values)
+    public function insertOrIgnore(array $values, $target = null)
     {
-        // Since every insert gets treated like a batch insert, we will make sure the
-        // bindings are structured in a way that is convenient when building these
-        // inserts statements by verifying these elements are actually an array.
+
         if (empty($values)) {
             return 0;
         }
@@ -2672,11 +2671,8 @@ class Builder
             }
         }
 
-        // Finally, we will run this query against the database connection and return
-        // the results. We will need to also flatten these bindings before running
-        // the query so they are all in one huge, flattened array for execution.
         return $this->connection->affectingStatement(
-            $this->grammar->compileInsertOrIgnore($this, $values),
+            $this->grammar->compileInsertOrIgnore($this, $values, (array) $target),
             $this->cleanBindings(Arr::flatten($values, 1))
         );
     }

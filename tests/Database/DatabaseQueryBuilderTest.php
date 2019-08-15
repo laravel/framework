@@ -1902,11 +1902,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testSqlServerInsertOrIgnoreMethod()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('This database engine does not support insert or ignore.');
-
         $builder = $this->getSqlServerBuilder();
-        $builder->from('users')->insertOrIgnore(['email' => 'foo']);
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (values (?)) [laravel_source] ([email]) on [laravel_source].[email] = [users].[email] when not matched then insert ([email]) values ([email]);', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->insertOrIgnore(['email' => 'foo'], ['email']);
+        $this->assertEquals(1, $result);
     }
 
     public function testInsertGetIdMethod()
