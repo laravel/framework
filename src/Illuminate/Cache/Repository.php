@@ -199,7 +199,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function set($key, $value, $ttl = null)
     {
-        $this->put($key, $value, $ttl);
+        $this->put($key, $value, $ttl === null ? null : $ttl / 60);
     }
 
     /**
@@ -225,7 +225,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function setMultiple($values, $ttl = null)
     {
-        $this->putMany(is_array($values) ? $values : iterator_to_array($values), $ttl);
+        $this->putMany(is_array($values) ? $values : iterator_to_array($values), $ttl === null ? null : $ttl / 60);
     }
 
     /**
