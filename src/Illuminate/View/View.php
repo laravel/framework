@@ -109,11 +109,6 @@ class View implements ArrayAccess, Htmlable, ViewContract
         }
     }
 
-    public function toHtml()
-    {
-        return $this->render();
-    }
-
     /**
      * Get the contents of the view instance.
      *
@@ -419,6 +414,16 @@ class View implements ArrayAccess, Htmlable, ViewContract
         }
 
         return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
+    }
+
+    /**
+     * Get content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return $this->render();
     }
 
     /**
