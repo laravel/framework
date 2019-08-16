@@ -151,11 +151,14 @@ class WorkCommand extends Command
     {
         switch ($status) {
             case 'starting':
-                return $this->writeStatus($job, 'Processing', 'comment');
+                $this->writeStatus($job, 'Processing', 'comment');
+                break;
             case 'success':
-                return $this->writeStatus($job, 'Processed', 'info');
+                $this->writeStatus($job, 'Processed', 'info');
+                break;
             case 'failed':
-                return $this->writeStatus($job, 'Failed', 'error');
+                $this->writeStatus($job, 'Failed', 'error');
+                break;
         }
     }
 

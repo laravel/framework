@@ -42,7 +42,9 @@ class CallQueuedHandler
                 $job, unserialize($data['command'])
             );
         } catch (ModelNotFoundException $e) {
-            return $this->handleModelNotFound($job, $e);
+            $this->handleModelNotFound($job, $e);
+
+            return;
         }
 
         $this->dispatcher->dispatchNow(

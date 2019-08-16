@@ -26,7 +26,9 @@ class QueueFake extends QueueManager implements Queue
     public function assertPushed($job, $callback = null)
     {
         if (is_numeric($callback)) {
-            return $this->assertPushedTimes($job, $callback);
+            $this->assertPushedTimes($job, $callback);
+
+            return;
         }
 
         PHPUnit::assertTrue(
@@ -60,7 +62,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertPushedOn($queue, $job, $callback = null)
     {
-        return $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
+        $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
             if ($pushedQueue !== $queue) {
                 return false;
             }

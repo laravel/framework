@@ -24,7 +24,9 @@ class BusFake implements Dispatcher
     public function assertDispatched($command, $callback = null)
     {
         if (is_numeric($callback)) {
-            return $this->assertDispatchedTimes($command, $callback);
+            $this->assertDispatchedTimes($command, $callback);
+
+            return;
         }
 
         PHPUnit::assertTrue(

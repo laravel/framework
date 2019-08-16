@@ -187,7 +187,9 @@ class Migrator
         );
 
         if ($pretend) {
-            return $this->pretendToRun($migration, 'up');
+            $this->pretendToRun($migration, 'up');
+
+            return;
         }
 
         $this->note("<comment>Migrating:</comment> {$name}");
@@ -350,7 +352,9 @@ class Migrator
         $this->note("<comment>Rolling back:</comment> {$name}");
 
         if ($pretend) {
-            return $this->pretendToRun($instance, 'down');
+            $this->pretendToRun($instance, 'down');
+
+            return;
         }
 
         $startTime = microtime(true);

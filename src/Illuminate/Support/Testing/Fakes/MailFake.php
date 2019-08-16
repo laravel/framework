@@ -34,7 +34,9 @@ class MailFake implements Mailer, MailQueue
     public function assertSent($mailable, $callback = null)
     {
         if (is_numeric($callback)) {
-            return $this->assertSentTimes($mailable, $callback);
+            $this->assertSentTimes($mailable, $callback);
+
+            return;
         }
 
         $message = "The expected [{$mailable}] mailable was not sent.";
@@ -99,7 +101,9 @@ class MailFake implements Mailer, MailQueue
     public function assertQueued($mailable, $callback = null)
     {
         if (is_numeric($callback)) {
-            return $this->assertQueuedTimes($mailable, $callback);
+            $this->assertQueuedTimes($mailable, $callback);
+
+            return;
         }
 
         PHPUnit::assertTrue(

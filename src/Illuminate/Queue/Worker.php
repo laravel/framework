@@ -233,7 +233,9 @@ class Worker
         // from this method. If there is no job on the queue, we will "sleep" the worker
         // for the specified number of seconds, then keep processing jobs after sleep.
         if ($job) {
-            return $this->runJob($job, $connectionName, $options);
+            $this->runJob($job, $connectionName, $options);
+
+            return;
         }
 
         $this->sleep($options->sleep);
@@ -280,7 +282,7 @@ class Worker
     protected function runJob($job, $connectionName, WorkerOptions $options)
     {
         try {
-            return $this->process($connectionName, $job, $options);
+            $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             $this->exceptions->report($e);
 
@@ -328,7 +330,9 @@ class Worker
             );
 
             if ($job->isDeleted()) {
-                return $this->raiseAfterJobEvent($connectionName, $job);
+                $this->raiseAfterJobEvent($connectionName, $job);
+
+                return;
             }
 
             // Here we will fire off the job and let it process. We will catch any exceptions so

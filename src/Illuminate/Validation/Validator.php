@@ -379,7 +379,9 @@ class Validator implements ValidatorContract
         if ($value instanceof UploadedFile && ! $value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
         ) {
-            return $this->addFailure($attribute, 'uploaded', []);
+            $this->addFailure($attribute, 'uploaded', []);
+
+            return;
         }
 
         // If we have made it this far we will make sure the attribute is validatable and if it is
