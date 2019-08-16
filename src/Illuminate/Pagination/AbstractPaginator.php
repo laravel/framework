@@ -528,36 +528,6 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Determine if the list of items is empty.
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return $this->items->isEmpty();
-    }
-
-    /**
-     * Determine if the list of items is not empty.
-     *
-     * @return bool
-     */
-    public function isNotEmpty()
-    {
-        return $this->items->isNotEmpty();
-    }
-
-    /**
-     * Get the number of items for the current page.
-     *
-     * @return int
-     */
-    public function count()
-    {
-        return $this->items->count();
-    }
-
-    /**
      * Get the paginator's underlying collection.
      *
      * @return \Illuminate\Support\Collection
