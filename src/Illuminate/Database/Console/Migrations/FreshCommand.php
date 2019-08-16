@@ -37,21 +37,12 @@ class FreshCommand extends Command
 
         $database = $this->input->getOption('database');
 
-        if ($this->option('drop-views')) {
-            $this->dropAllViews($database);
-
-            $this->info('Dropped all views successfully.');
-        }
-
-        $this->dropAllTables($database);
-
-        $this->info('Dropped all tables successfully.');
-
-        if ($this->option('drop-types')) {
-            $this->dropAllTypes($database);
-
-            $this->info('Dropped all types successfully.');
-        }
+        $this->call('db:wipe', array_filter([
+            '--database' => $database,
+            '--drop-views' => $this->option('drop-views'),
+            '--drop-types' => $this->option('drop-types'),
+            '--force' => true,
+        ]));
 
         $this->call('migrate', array_filter([
             '--database' => $database,
