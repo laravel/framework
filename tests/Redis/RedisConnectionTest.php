@@ -291,12 +291,16 @@ class RedisConnectionTest extends TestCase
 
     public function test_it_returns_range_in_sorted_set()
     {
-        foreach ($this->connections() as $redis) {
+        foreach ($this->connections() as $connector => $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
             $this->assertEquals(['jeffrey', 'matt'], $redis->zrange('set', 0, 1));
             $this->assertEquals(['jeffrey', 'matt', 'taylor'], $redis->zrange('set', 0, -1));
 
-            $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, 'withscores'));
+            if ($connector === 'predis') {
+                $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, 'withscores'));
+            } else {
+                $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, true));
+            }
 
             $redis->flushall();
         }
@@ -304,12 +308,16 @@ class RedisConnectionTest extends TestCase
 
     public function test_it_returns_rev_range_in_sorted_set()
     {
-        foreach ($this->connections() as $redis) {
+        foreach ($this->connections() as $connector => $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
             $this->assertEquals(['taylor', 'matt'], $redis->ZREVRANGE('set', 0, 1));
             $this->assertEquals(['taylor', 'matt', 'jeffrey'], $redis->ZREVRANGE('set', 0, -1));
 
-            $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, 'withscores'));
+            if ($connector === 'predis') {
+                $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, 'withscores'));
+            } else {
+                $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, true));
+            }
 
             $redis->flushall();
         }
@@ -550,8 +558,8 @@ class RedisConnectionTest extends TestCase
     public function connections()
     {
         $connections = [
-            $this->redis['predis']->connection(),
-            $this->redis['phpredis']->connection(),
+            'predis' => $this->redis['predis']->connection(),
+            'phpredis' => $this->redis['phpredis']->connection(),
         ];
 
         if (extension_loaded('redis')) {
