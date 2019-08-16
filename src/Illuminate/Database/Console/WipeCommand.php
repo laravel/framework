@@ -46,6 +46,12 @@ class WipeCommand extends Command
         $this->dropAllTables($database);
 
         $this->info('Dropped all tables successfully.');
+
+        if ($this->option('drop-types')) {
+            $this->dropAllTypes($database);
+
+            $this->info('Dropped all types successfully.');
+        }
     }
 
     /**
@@ -72,6 +78,19 @@ class WipeCommand extends Command
         $this->laravel['db']->connection($database)
                     ->getSchemaBuilder()
                     ->dropAllViews();
+    }
+
+    /**
+     * Drop all of the database types.
+     *
+     * @param string $database
+     * @return void
+     */
+    protected function dropAllTypes($database)
+    {
+        $this->laravel['db']->connection($database)
+                    ->getSchemaBuilder()
+                    ->dropAllTypes();
     }
 
     /**

@@ -58,45 +58,6 @@ class FreshCommand extends Command
     }
 
     /**
-     * Drop all of the database tables.
-     *
-     * @param  string  $database
-     * @return void
-     */
-    protected function dropAllTables($database)
-    {
-        $this->laravel['db']->connection($database)
-                    ->getSchemaBuilder()
-                    ->dropAllTables();
-    }
-
-    /**
-     * Drop all of the database views.
-     *
-     * @param  string  $database
-     * @return void
-     */
-    protected function dropAllViews($database)
-    {
-        $this->laravel['db']->connection($database)
-                    ->getSchemaBuilder()
-                    ->dropAllViews();
-    }
-
-    /**
-     * Drop all of the database types.
-     *
-     * @param string $database
-     * @return void
-     */
-    protected function dropAllTypes($database)
-    {
-        $this->laravel['db']->connection($database)
-                    ->getSchemaBuilder()
-                    ->dropAllTypes();
-    }
-
-    /**
      * Determine if the developer has requested database seeding.
      *
      * @return bool
