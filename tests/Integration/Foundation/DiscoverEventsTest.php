@@ -7,7 +7,6 @@ use Illuminate\Foundation\Events\DiscoverEvents;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventOne;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventTwo;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
-use Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener as ListenerAlias;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface;
 
