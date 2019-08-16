@@ -1,9 +1,15 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.31...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.32...5.8)
 
-### TODO:
-- Resolve columns with schema references ([#29448](https://github.com/laravel/framework/pull/29448))
+
+## [v5.8.32 (2019-08-13)](https://github.com/laravel/framework/compare/v5.8.31...v5.8.32)
+
+### Fixed
+- Fixed top level wildcard validation for `distinct` validator ([#29499](https://github.com/laravel/framework/pull/29499))
+- Fixed resolving of columns with schema references in Postgres ([#29448](https://github.com/laravel/framework/pull/29448))
+- Only remove the event mutex if it was created ([#29526](https://github.com/laravel/framework/pull/29526))
+- Fixed restoring serialized collection with deleted models ([#29533](https://github.com/laravel/framework/pull/29533), [74b62bb](https://github.com/laravel/framework/commit/74b62bbbb32674dfa167e2812231bf302454e67f))
 
 
 ## [v5.8.31 (2019-08-06)](https://github.com/laravel/framework/compare/v5.8.30...v5.8.31)
