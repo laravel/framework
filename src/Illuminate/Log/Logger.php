@@ -48,7 +48,7 @@ class Logger implements LoggerInterface
      */
     public function emergency($message, array $context = [])
     {
-        $this->writeLog(__FUNCTION__, $message, $context);
+        $this->log(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -60,7 +60,7 @@ class Logger implements LoggerInterface
      */
     public function alert($message, array $context = [])
     {
-        $this->writeLog(__FUNCTION__, $message, $context);
+        $this->log(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -72,7 +72,7 @@ class Logger implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        $this->writeLog(__FUNCTION__, $message, $context);
+        $this->log(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -84,7 +84,7 @@ class Logger implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
-        $this->writeLog(__FUNCTION__, $message, $context);
+        $this->log(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -96,7 +96,7 @@ class Logger implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        $this->writeLog(__FUNCTION__, $message, $context);
+        $this->log(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -108,7 +108,7 @@ class Logger implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        $this->writeLog(__FUNCTION__, $message, $context);
+        $this->log(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -120,7 +120,7 @@ class Logger implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
-        $this->writeLog(__FUNCTION__, $message, $context);
+        $this->log(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -132,7 +132,7 @@ class Logger implements LoggerInterface
      */
     public function debug($message, array $context = [])
     {
-        $this->writeLog(__FUNCTION__, $message, $context);
+        $this->log(__FUNCTION__, $message, $context);
     }
 
     /**
@@ -144,32 +144,6 @@ class Logger implements LoggerInterface
      * @return void
      */
     public function log($level, $message, array $context = [])
-    {
-        $this->writeLog($level, $message, $context);
-    }
-
-    /**
-     * Dynamically pass log calls into the writer.
-     *
-     * @param  string  $level
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
-     */
-    public function write($level, $message, array $context = [])
-    {
-        $this->writeLog($level, $message, $context);
-    }
-
-    /**
-     * Write a message to the log.
-     *
-     * @param  string  $level
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
-     */
-    protected function writeLog($level, $message, $context)
     {
         $this->fireLogEvent($level, $message = $this->formatMessage($message), $context);
 
