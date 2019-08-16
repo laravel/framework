@@ -72,7 +72,11 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
         if (is_array($address) && isset($address['address'])) {
             $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
         }
+        elseif (is_array($address) && isset($address[0]) && $type === 'to'){
+            $mailer->{'always'.Str::studly($type)}($address);
+        }
     }
+
 
     /**
      * Register the Swift Mailer instance.

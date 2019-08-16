@@ -123,7 +123,11 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function alwaysTo($address, $name = null)
     {
+        if(is_array($address)){
+          $this->to = $address;
+        }else{
         $this->to = compact('address', 'name');
+        }
     }
 
     /**
@@ -246,7 +250,7 @@ class Mailer implements MailerContract, MailQueueContract
         // If a global "to" address has been set, we will set that address on the mail
         // message. This is primarily useful during local development in which each
         // message should be delivered into a single mail address for inspection.
-        if (isset($this->to['address'])) {
+        if (isset($this->to['address']) || isset($this->to[0])) {
             $this->setGlobalToAndRemoveCcAndBcc($message);
         }
 
@@ -361,7 +365,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function setGlobalToAndRemoveCcAndBcc($message)
     {
-        $message->to($this->to['address'], $this->to['name'], true);
+        $message->to($this->to['address'] ?? $this->to, $this->to['name'] ?? null, true);
         $message->cc(null, null, true);
         $message->bcc(null, null, true);
     }
