@@ -633,7 +633,7 @@ class Command extends SymfonyCommand
     /**
      * Set the Laravel application instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $laravel
+     * @param  \Illuminate\Contracts\Foundation\Application  $laravel
      * @return void
      */
     public function setLaravel($laravel)
