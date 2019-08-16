@@ -130,8 +130,6 @@ class Router implements BindingRegistrar, RegistrarContract
         $this->events = $events;
         $this->routes = new RouteCollection;
         $this->container = $container ?: new Container;
-
-        dd('hello');
     }
 
     /**
