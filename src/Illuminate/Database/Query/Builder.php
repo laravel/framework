@@ -367,12 +367,19 @@ class Builder
     /**
      * Set the table which the query is targeting.
      *
-     * @param  string  $table
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
+     * @param  string|null  $as
      * @return $this
      */
-    public function from($table)
+    public function from($table, $as = null)
     {
-        $this->from = $table;
+        if ($table instanceof self ||
+            $table instanceof EloquentBuilder ||
+            $table instanceof Closure) {
+            return $this->fromSub($table, $as);
+        }
+
+        $this->from = $as ? "{$table} as {$as}" : $table;
 
         return $this;
     }

@@ -77,13 +77,14 @@ class Manager
     /**
      * Get a fluent query builder instance.
      *
-     * @param  string  $table
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
+     * @param  string|null  $as
      * @param  string|null  $connection
      * @return \Illuminate\Database\Query\Builder
      */
-    public static function table($table, $connection = null)
+    public static function table($table, $as = null, $connection = null)
     {
-        return static::$instance->connection($connection)->table($table);
+        return static::$instance->connection($connection)->table($table, $as);
     }
 
     /**
