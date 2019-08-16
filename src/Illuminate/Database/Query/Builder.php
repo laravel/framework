@@ -367,11 +367,17 @@ class Builder
     /**
      * Set the table which the query is targeting.
      *
-     * @param  string  $table
+     * @param  string|array  $table
      * @return $this
      */
     public function from($table)
     {
+        if (is_array($table)) {
+            foreach ($table as $as => $query) {
+                return $this->fromSub($query, $as);
+            }
+        }
+
         $this->from = $table;
 
         return $this;

@@ -31,6 +31,16 @@ class QueryBuilderTest extends DatabaseTestCase
         ]);
     }
 
+    public function testFromWithSubQuery()
+    {
+        $this->assertSame(
+            'Fake Post',
+            DB::table(['posts' => function ($query) {
+                $query->selectRaw("'Fake Post' as title");
+            }])->first()->title
+        );
+    }
+
     public function testWhereDate()
     {
         $this->assertSame(1, DB::table('posts')->whereDate('created_at', '2018-01-02')->count());
