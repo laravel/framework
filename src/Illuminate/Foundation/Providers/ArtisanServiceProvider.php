@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Auth\Console\AuthMakeCommand;
+use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
