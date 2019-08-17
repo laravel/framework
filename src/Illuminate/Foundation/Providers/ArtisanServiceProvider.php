@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Auth\Console\AuthMakeCommand;
@@ -90,6 +91,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ClearResets' => 'command.auth.resets.clear',
         'ConfigCache' => 'command.config.cache',
         'ConfigClear' => 'command.config.clear',
+        'DbWipe' => 'command.db.wipe',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
         'EventCache' => 'command.event.cache',
@@ -333,6 +335,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.controller.make', function ($app) {
             return new ControllerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDbWipeCommand()
+    {
+        $this->app->singleton('command.db.wipe', function () {
+            return new WipeCommand;
         });
     }
 
