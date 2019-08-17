@@ -1067,6 +1067,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderByDesc('name');
         $this->assertEquals('select * from "users" order by "name" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('public', 1)
+            ->unionAll($this->getBuilder()->select('*')->from('videos')->where('public', 1))
+            ->orderByRaw('field(category, ?, ?) asc', ['news', 'opinion']);
+        $this->assertEquals('(select * from "posts" where "public" = ?) union all (select * from "videos" where "public" = ?) order by field(category, ?, ?) asc', $builder->toSql());
+        $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
     public function testOrderBySubQueries()
@@ -1084,6 +1091,13 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder()->select('*')->from('users')->orderByDesc($subQuery);
         $this->assertEquals("$expected desc", $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('public', 1)
+            ->unionAll($this->getBuilder()->select('*')->from('videos')->where('public', 1))
+            ->orderBy($this->getBuilder()->selectRaw('field(category, ?, ?)', ['news', 'opinion']));
+        $this->assertEquals('(select * from "posts" where "public" = ?) union all (select * from "videos" where "public" = ?) order by (select field(category, ?, ?)) asc', $builder->toSql());
+        $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
     public function testOrderByInvalidDirectionParam()
