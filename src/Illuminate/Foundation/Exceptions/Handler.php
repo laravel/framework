@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
+use Whoops\Handler\HandlerInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
@@ -24,6 +25,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -350,7 +352,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function whoopsHandler()
     {
-        return (new WhoopsHandler)->forDebug();
+        try {
+            return app(HandlerInterface::class);
+        } catch (BindingResolutionException $e) {
+            return (new WhoopsHandler)->forDebug();
+        }
     }
 
     /**

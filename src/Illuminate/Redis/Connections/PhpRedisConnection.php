@@ -268,7 +268,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zinterstore($output, $keys, $options = [])
     {
-        return $this->command('zInter', [$output, $keys,
+        return $this->command('zinterstore', [$output, $keys,
             $options['weights'] ?? null,
             $options['aggregate'] ?? 'sum',
         ]);
@@ -284,7 +284,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zunionstore($output, $keys, $options = [])
     {
-        return $this->command('zUnion', [$output, $keys,
+        return $this->command('zunionstore', [$output, $keys,
             $options['weights'] ?? null,
             $options['aggregate'] ?? 'sum',
         ]);
