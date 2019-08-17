@@ -54,7 +54,7 @@ class LogLoggerTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Events dispatcher has not been set.');
 
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer = new Logger(m::mock(Monolog::class));
         $writer->listen(function () {
             //
         });
@@ -62,7 +62,7 @@ class LogLoggerTest extends TestCase
 
     public function testListenShortcut()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class), $events = m::mock(DispatcherContract::class));
+        $writer = new Logger(m::mock(Monolog::class), $events = m::mock(DispatcherContract::class));
 
         $callback = function () {
             return 'success';

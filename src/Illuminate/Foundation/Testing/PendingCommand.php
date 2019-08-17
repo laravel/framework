@@ -165,6 +165,7 @@ class PendingCommand
 
         foreach ($this->test->expectedQuestions as $i => $question) {
             $mock->shouldReceive('askQuestion')
+                ->once()
                 ->ordered()
                 ->with(Mockery::on(function ($argument) use ($question) {
                     return $argument->getQuestion() == $question[0];
@@ -194,6 +195,7 @@ class PendingCommand
 
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')
+                ->once()
                 ->ordered()
                 ->with($output, Mockery::any())
                 ->andReturnUsing(function () use ($i) {

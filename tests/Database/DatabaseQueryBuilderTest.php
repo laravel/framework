@@ -1069,6 +1069,23 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "users" order by "name" desc', $builder->toSql());
     }
 
+    public function testOrderBySubQueries()
+    {
+        $expected = 'select * from "users" order by (select "created_at" from "logins" where "user_id" = "users"."id" limit 1)';
+        $subQuery = function ($query) {
+            return $query->select('created_at')->from('logins')->whereColumn('user_id', 'users.id')->limit(1);
+        };
+
+        $builder = $this->getBuilder()->select('*')->from('users')->orderBy($subQuery);
+        $this->assertEquals("$expected asc", $builder->toSql());
+
+        $builder = $this->getBuilder()->select('*')->from('users')->orderBy($subQuery, 'desc');
+        $this->assertEquals("$expected desc", $builder->toSql());
+
+        $builder = $this->getBuilder()->select('*')->from('users')->orderByDesc($subQuery);
+        $this->assertEquals("$expected desc", $builder->toSql());
+    }
+
     public function testOrderByInvalidDirectionParam()
     {
         $this->expectException(InvalidArgumentException::class);

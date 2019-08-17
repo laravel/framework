@@ -320,6 +320,10 @@ trait FormatsMessages
             return $line;
         }
 
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
         return $value;
     }
 

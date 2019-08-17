@@ -635,8 +635,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueRestartCommand()
     {
-        $this->app->singleton('command.queue.restart', function () {
-            return new QueueRestartCommand;
+        $this->app->singleton('command.queue.restart', function ($app) {
+            return new QueueRestartCommand($app['cache.store']);
         });
     }
 
@@ -660,7 +660,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueWorkCommand()
     {
         $this->app->singleton('command.queue.work', function ($app) {
-            return new QueueWorkCommand($app['queue.worker']);
+            return new QueueWorkCommand($app['queue.worker'], $app['cache.store']);
         });
     }
 
