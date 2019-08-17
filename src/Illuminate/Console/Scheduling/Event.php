@@ -483,39 +483,48 @@ class Event
 
     /**
      * Register a callback to ping a given URL before the job runs.
+     * Pass in an array to send data to the given URL as a POST.   
      *
      * @param  string  $url
+     * @param array $payload
      * @return $this
      */
-    public function pingBefore($url)
+    public function pingBefore($url, $payload = [])
     {
-        return $this->before(function () use ($url) {
-            (new HttpClient)->get($url);
+        return $this->before(function () use ($url, $payload) {
+            empty($payload) 
+            ? (new HttpClient)->get($url) 
+            : (new HttpClient)->post($url, ['json' => $this->buildPayloadForPing($payload)]);
         });
     }
-
+    
     /**
      * Register a callback to ping a given URL before the job runs if the given condition is true.
      *
      * @param  bool  $value
      * @param  string  $url
+     * @param  array  $payload
      * @return $this
      */
-    public function pingBeforeIf($value, $url)
+    public function pingBeforeIf($value, $url, $payload = [])
     {
-        return $value ? $this->pingBefore($url) : $this;
+        return $value ? $this->pingBefore($url, $payload) : $this;
     }
 
     /**
      * Register a callback to ping a given URL after the job runs.
+     * Pass in a array to send data to the given URL as a POST.  
      *
      * @param  string  $url
+     * @param  array  $payload
      * @return $this
      */
-    public function thenPing($url)
+    public function thenPing($url, $payload = [])
     {
-        return $this->then(function () use ($url) {
-            (new HttpClient)->get($url);
+        return $this->then(function () use ($url, $payload) {
+            empty($payload) 
+            ? (new HttpClient)->get($url) 
+            : (new HttpClient)->post($url, ['json' => $this->buildPayloadForPing($payload)]);
         });
     }
 
@@ -524,23 +533,27 @@ class Event
      *
      * @param  bool  $value
      * @param  string  $url
+     * @param  array  $payload
      * @return $this
      */
-    public function thenPingIf($value, $url)
+    public function thenPingIf($value, $url, $payload = [])
     {
-        return $value ? $this->thenPing($url) : $this;
+        return $value ? $this->thenPing($url, $payload) : $this;
     }
 
     /**
      * Register a callback to ping a given URL if the operation succeeds.
      *
      * @param  string  $url
+     * @param  array  $payload
      * @return $this
      */
-    public function pingOnSuccess($url)
+    public function pingOnSuccess($url, $payload = [])
     {
-        return $this->onSuccess(function () use ($url) {
-            (new HttpClient)->get($url);
+        return $this->onSuccess(function () use ($url, $payload) {
+            empty($payload) 
+            ? (new HttpClient)->get($url) 
+            : (new HttpClient)->post($url, ['json' => $this->buildPayloadForPing($payload)]);
         });
     }
 
@@ -548,13 +561,32 @@ class Event
      * Register a callback to ping a given URL if the operation fails.
      *
      * @param  string  $url
+     * @param  array  $payload
      * @return $this
      */
-    public function pingOnFailure($url)
+    public function pingOnFailure($url, $payload = [])
     {
-        return $this->onFailure(function () use ($url) {
-            (new HttpClient)->get($url);
+        return $this->onFailure(function () use ($url, $payload) {
+            empty($payload) 
+            ? (new HttpClient)->get($url) 
+            : (new HttpClient)->post($url, ['json' => $this->buildPayloadForPing($payload)]);
         });
+    }
+
+    /**
+     * Collect useful schedule information to send in the payload to a given Ping URL
+     *
+     * @return array
+     */
+    protected function buildPayloadForPing($payload = [])
+    {
+        return array_merge([
+            'timestamp' => now(),
+            'timezone' => $this->timezone,
+            'last_scheduled_run_at' => Carbon::instance(CronExpression::factory($this->expression)->getPreviousRunDate()),
+            'next_scheduled_run_at' =>  Carbon::instance(CronExpression::factory($this->expression)->getNextRunDate()),
+            'expression' => $this->expression,
+        ], $payload);
     }
 
     /**
