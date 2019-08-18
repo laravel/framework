@@ -1212,8 +1212,35 @@ class LazyCollection implements Enumerable
         return new static(function () use ($original, $limit) {
             $iterator = $original->getIterator();
 
-            for (; $iterator->valid() && $limit--; $iterator->next()) {
+            while ($limit--) {
+                if (! $iterator->valid()) {
+                    break;
+                }
+
                 yield $iterator->key() => $iterator->current();
+
+                if ($limit) {
+                    $iterator->next();
+                }
+            }
+        });
+    }
+
+    /**
+     * Pass each item in the collection to the given callback, lazily.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function tapEach(callable $callback)
+    {
+        $original = clone $this;
+
+        return new static(function () use ($original, $callback) {
+            foreach ($original as $key => $value) {
+                $callback($value, $key);
+
+                yield $key => $value;
             }
         });
     }
