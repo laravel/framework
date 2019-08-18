@@ -200,7 +200,7 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Get the pipes through which commands should be piped before dispatching.
      *
-     * @return void
+     * @return array
      */
     public function getPipes()
     {
@@ -211,7 +211,7 @@ class Dispatcher implements QueueingDispatcher
      * Add a pipe through which commands should be piped before dispatching.
      *
      * @param mixed $pipe
-     * @return void
+     * @return $this
      */
     public function pipeThrough($pipe)
     {

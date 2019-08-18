@@ -48,7 +48,7 @@ interface Dispatcher
     /**
      * Get the pipes through which commands should be piped before dispatching.
      *
-     * @return void
+     * @return array
      */
     public function getPipes();
 
@@ -56,7 +56,7 @@ interface Dispatcher
      * Add a pipe through which commands should be piped before dispatching.
      *
      * @param mixed $pipe
-     * @return void
+     * @return $this
      */
     public function pipeThrough($pipe);
 
