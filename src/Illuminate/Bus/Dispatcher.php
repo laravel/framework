@@ -190,9 +190,32 @@ class Dispatcher implements QueueingDispatcher
      * @param  array  $pipes
      * @return $this
      */
-    public function pipeThrough(array $pipes)
+    public function setPipes(array $pipes)
     {
         $this->pipes = $pipes;
+
+        return $this;
+    }
+
+    /**
+     * Get the pipes through which commands should be piped before dispatching.
+     *
+     * @return void
+     */
+    public function getPipes()
+    {
+        return $this->pipes;
+    }
+
+    /**
+     * Add a pipe through which commands should be piped before dispatching.
+     *
+     * @param mixed $pipe
+     * @return void
+     */
+    public function pipeThrough($pipe)
+    {
+        $this->pipes[] = $pipe;
 
         return $this;
     }

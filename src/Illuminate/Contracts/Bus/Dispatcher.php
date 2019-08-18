@@ -38,12 +38,27 @@ interface Dispatcher
     public function getCommandHandler($command);
 
     /**
-     * Set the pipes commands should be piped through before dispatching.
+     * Set the pipes through which commands should be piped before dispatching.
      *
      * @param  array  $pipes
      * @return $this
      */
-    public function pipeThrough(array $pipes);
+    public function setPipes(array $pipes);
+
+    /**
+     * Get the pipes through which commands should be piped before dispatching.
+     *
+     * @return void
+     */
+    public function getPipes();
+
+    /**
+     * Add a pipe through which commands should be piped before dispatching.
+     *
+     * @param mixed $pipe
+     * @return void
+     */
+    public function pipeThrough($pipe);
 
     /**
      * Map a command to a handler.
