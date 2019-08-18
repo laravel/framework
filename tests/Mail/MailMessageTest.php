@@ -63,6 +63,12 @@ class MailMessageTest extends TestCase
         $this->assertInstanceOf(Message::class, $this->message->to('foo@bar.baz', 'Foo', true));
     }
 
+    public function testMultipleTosMethodWithOverride()
+    {
+        $this->swift->shouldReceive('setTo')->once()->with(['foo@bar.baz', 'foobar@baz.bar'], null);
+        $this->assertInstanceOf(Message::class, $this->message->to(['foo@bar.baz', 'foobar@baz.bar'], null, true));
+    }
+
     public function testCcMethod()
     {
         $this->swift->shouldReceive('addCc')->once()->with('foo@bar.baz', 'Foo');
