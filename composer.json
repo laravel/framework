@@ -132,7 +132,7 @@
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^3.0).",
-        "symfony/cache": "Required to psr-6 cache bridge (^4.3).",
+        "symfony/cache": "Required to PSR-6 cache bridge (^4.3).",
         "symfony/css-selector": "Required to use some of the crawler integration testing tools (^4.3).",
         "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (^4.3).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^1.1).",
