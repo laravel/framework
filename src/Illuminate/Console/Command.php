@@ -641,8 +641,10 @@ class Command extends SymfonyCommand
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @return int
      */
-    private function runCommand($command, array $arguments, OutputInterface $output): int
+    private function runCommand($command, array $arguments, OutputInterface $output)
     {
+        $arguments['command'] = $command;
+
         return $this->resolveCommand($command)->run(
             $this->createInputFromArguments($arguments), $output
         );
