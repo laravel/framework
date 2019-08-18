@@ -53,12 +53,12 @@ interface Dispatcher
     public function getPipes();
 
     /**
-     * Add a pipe through which commands should be piped before dispatching.
+     * Add pipes through which commands should be piped before dispatching.
      *
-     * @param mixed $pipe
+     * @param mixed $pipes
      * @return $this
      */
-    public function pipeThrough($pipe);
+    public function pipeThrough($pipes);
 
     /**
      * Map a command to a handler.

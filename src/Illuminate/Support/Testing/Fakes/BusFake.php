@@ -183,7 +183,31 @@ class BusFake implements Dispatcher
      * @param  array  $pipes
      * @return $this
      */
-    public function pipeThrough(array $pipes)
+    public function setPipes($pipes)
+    {
+        $this->dispatcher->setPipes($pipes);
+
+        return $this;
+    }
+
+    /**
+     * Set the pipes commands should be piped through before dispatching.
+     *
+     * @param  mixed  $pipes
+     * @return array
+     */
+    public function getPipes()
+    {
+        return $this->dispatcher->getPipes();
+    }
+
+    /**
+     * Add pipes commands should be piped through before dispatching.
+     *
+     * @param  mixed  $pipes
+     * @return $this
+     */
+    public function pipeThrough($pipes)
     {
         $this->dispatcher->pipeThrough($pipes);
 

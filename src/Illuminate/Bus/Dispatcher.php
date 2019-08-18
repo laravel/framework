@@ -208,14 +208,18 @@ class Dispatcher implements QueueingDispatcher
     }
 
     /**
-     * Add a pipe through which commands should be piped before dispatching.
+     * Add pipes through which commands should be piped before dispatching.
      *
-     * @param mixed $pipe
+     * @param mixed $pipes
      * @return $this
      */
-    public function pipeThrough($pipe)
+    public function pipeThrough($pipes)
     {
-        $this->pipes[] = $pipe;
+        if (! is_array($pipes)) {
+            $pipes = [$pipes];
+        }
+
+        $this->pipes = array_merge($this->pipes, $pipes);
 
         return $this;
     }
