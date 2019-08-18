@@ -636,15 +636,15 @@ class Builder
     }
 
     /**
-     * Get a generator for the given query.
+     * Get a lazy collection for the given query.
      *
-     * @return \Generator
+     * @return \Illuminate\Support\LazyCollection
      */
     public function cursor()
     {
-        foreach ($this->applyScopes()->query->cursor() as $record) {
-            yield $this->newModelInstance()->newFromBuilder($record);
-        }
+        return $this->applyScopes()->query->cursor()->map(function ($record) {
+            return $this->newModelInstance()->newFromBuilder($record);
+        });
     }
 
     /**
