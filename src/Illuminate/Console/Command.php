@@ -656,16 +656,20 @@ class Command extends SymfonyCommand
      */
     private function resolveCommand($command)
     {
+        if (!class_exists($command)) {
+            return $this->getApplication()->find($command);
+        }
+
+        $command = new $command;
+
         if ($command instanceof SymfonyCommand) {
-            return $command;
+            $command->setApplication($this->getApplication());
         }
 
-        if (class_exists($command)) {
-            $command = new $command;
+        if ($command instanceof Command) {
             $command->setLaravel($this->getLaravel());
-            return $command;
         }
 
-        return $this->getApplication()->find($command);
+        return $command;
     }
 }
