@@ -9,7 +9,7 @@ use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 
 class ConvertEmptyStringsToNullTest extends TestCase
 {
-    public function testConvertEmptyStringsToNull() : void
+    public function testConvertEmptyStringsToNull()
     {
         $middleware = new ConvertEmptyStringsToNull();
         $symfonyRequest = new SymfonyRequest([
