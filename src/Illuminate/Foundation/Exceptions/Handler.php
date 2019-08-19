@@ -351,7 +351,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function whoopsHandler()
     {
-        if ($this->container->bound(HandlerInterface::class)){
+        if ($this->container->bound(HandlerInterface::class)) {
             return $this->container->make(HandlerInterface::class);
         }
 
