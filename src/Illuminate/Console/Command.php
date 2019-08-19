@@ -217,6 +217,48 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Run the given the console command.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|string $command
+     * @param  array  $arguments
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return int
+     */
+    protected function runCommand($command, array $arguments, OutputInterface $output)
+    {
+        $arguments['command'] = $command;
+
+        return $this->resolveCommand($command)->run(
+            $this->createInputFromArguments($arguments), $output
+        );
+    }
+
+    /**
+     * Resolve the console command instance for the given command.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @return \Symfony\Component\Console\Command\Command
+     */
+    protected function resolveCommand($command)
+    {
+        if (! class_exists($command)) {
+            return $this->getApplication()->find($command);
+        }
+
+        $command = new $command;
+
+        if ($command instanceof SymfonyCommand) {
+            $command->setApplication($this->getApplication());
+        }
+
+        if ($command instanceof self) {
+            $command->setLaravel($this->getLaravel());
+        }
+
+        return $command;
+    }
+
+    /**
      * Create an input instance from the given arguments.
      *
      * @param  array  $arguments
@@ -631,47 +673,5 @@ class Command extends SymfonyCommand
     public function setLaravel($laravel)
     {
         $this->laravel = $laravel;
-    }
-
-    /**
-     * Runs the console command.
-     *
-     * @param  \Symfony\Component\Console\Command\Command|string $command
-     * @param  array  $arguments
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return int
-     */
-    private function runCommand($command, array $arguments, OutputInterface $output)
-    {
-        $arguments['command'] = $command;
-
-        return $this->resolveCommand($command)->run(
-            $this->createInputFromArguments($arguments), $output
-        );
-    }
-
-    /**
-     * Resolve console command instance.
-     *
-     * @param  \Symfony\Component\Console\Command\Command|string  $command
-     * @return \Symfony\Component\Console\Command\Command
-     */
-    private function resolveCommand($command)
-    {
-        if (! class_exists($command)) {
-            return $this->getApplication()->find($command);
-        }
-
-        $command = new $command;
-
-        if ($command instanceof SymfonyCommand) {
-            $command->setApplication($this->getApplication());
-        }
-
-        if ($command instanceof self) {
-            $command->setLaravel($this->getLaravel());
-        }
-
-        return $command;
     }
 }
