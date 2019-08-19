@@ -9,10 +9,10 @@ class ConvertEmptyStringsToNull extends TransformsRequest
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return mixed
+     * @return mixed|null
      */
     protected function transform($key, $value)
     {
-        return is_string($value) && $value === '' ? null : $value;
+        return $value === '' ? null : $value;
     }
 }
