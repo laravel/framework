@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -223,6 +224,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $country = HasManyThroughTestCountry::find(2);
 
         $posts = $country->posts()->cursor();
+
+        $this->assertInstanceOf(LazyCollection::class, $posts);
 
         foreach ($posts as $post) {
             $this->assertEquals([
