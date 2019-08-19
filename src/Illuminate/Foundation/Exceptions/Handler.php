@@ -25,7 +25,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -352,11 +351,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function whoopsHandler()
     {
-        try {
-            return app(HandlerInterface::class);
-        } catch (BindingResolutionException $e) {
-            return (new WhoopsHandler)->forDebug();
+        if ($this->container->bound(HandlerInterface::class)){
+            return $this->container->make(HandlerInterface::class);
         }
+
+        return (new WhoopsHandler)->forDebug();
     }
 
     /**
