@@ -183,7 +183,7 @@ class BusFake implements Dispatcher
      * @param  array  $pipes
      * @return $this
      */
-    public function setPipes($pipes)
+    public function withPipes($pipes)
     {
         $this->dispatcher->setPipes($pipes);
 
@@ -196,7 +196,7 @@ class BusFake implements Dispatcher
      * @param  mixed  $pipes
      * @return array
      */
-    public function getPipes()
+    public function pipes()
     {
         return $this->dispatcher->getPipes();
     }

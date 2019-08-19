@@ -190,7 +190,7 @@ class Dispatcher implements QueueingDispatcher
      * @param  array  $pipes
      * @return $this
      */
-    public function setPipes(array $pipes)
+    public function withPipes(array $pipes)
     {
         $this->pipes = $pipes;
 
@@ -202,7 +202,7 @@ class Dispatcher implements QueueingDispatcher
      *
      * @return array
      */
-    public function getPipes()
+    public function pipes()
     {
         return $this->pipes;
     }
