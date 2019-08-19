@@ -881,7 +881,7 @@ class Grammar extends BaseGrammar
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        throw new RuntimeException('This database engine does not support insert or ignore.');
+        throw new RuntimeException('This database engine does not support inserting while ignoring errors.');
     }
 
     /**

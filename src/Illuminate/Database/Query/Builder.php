@@ -2648,7 +2648,7 @@ class Builder
     }
 
     /**
-     * Insert ignore a new record into the database.
+     * Insert a new record into the database while ignoring errors.
      *
      * @param  array  $values
      * @return int

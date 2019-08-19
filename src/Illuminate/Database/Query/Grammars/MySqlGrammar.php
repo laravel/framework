@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
 
@@ -63,7 +64,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        return substr_replace($this->compileInsert($query, $values), ' ignore', 6, 0);
+        return Str::replaceFirst('insert', 'insert ignore', $this->compileInsert($query, $values));
     }
 
     /**

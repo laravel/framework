@@ -187,7 +187,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        return substr_replace($this->compileInsert($query, $values), ' or ignore', 6, 0);
+        return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsert($query, $values));
     }
 
     /**
