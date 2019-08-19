@@ -178,9 +178,9 @@ class BusFake implements Dispatcher
     }
 
     /**
-     * Set the pipes commands should be piped through before dispatching.
+     * Set the pipes through which commands should be piped before dispatching.
      *
-     * @param  array  $pipes
+     * @param  object[]  $pipes
      * @return $this
      */
     public function withPipes($pipes)
@@ -191,10 +191,9 @@ class BusFake implements Dispatcher
     }
 
     /**
-     * Set the pipes commands should be piped through before dispatching.
+     * Get the pipes through which commands should be piped before dispatching.
      *
-     * @param  mixed  $pipes
-     * @return array
+     * @return object[]
      */
     public function pipes()
     {
@@ -202,9 +201,9 @@ class BusFake implements Dispatcher
     }
 
     /**
-     * Add pipes commands should be piped through before dispatching.
+     * Add pipes through which commands should be piped before dispatching.
      *
-     * @param  mixed  $pipes
+     * @param  object[]|object  $pipes
      * @return $this
      */
     public function pipeThrough($pipes)

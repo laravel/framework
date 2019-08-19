@@ -15,7 +15,7 @@ interface Piper
     /**
      * Get the pipes through which commands should be piped before dispatching.
      *
-     * @return array
+     * @return object[]
      */
     public function pipes();
 
