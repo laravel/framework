@@ -2,9 +2,7 @@
 
 namespace Illuminate\Contracts\Bus;
 
-use Illuminate\Contracts\Pipeline\Piper;
-
-interface Dispatcher extends Piper
+interface Dispatcher
 {
     /**
      * Dispatch a command to its appropriate handler.
@@ -38,6 +36,29 @@ interface Dispatcher extends Piper
      * @return bool|mixed
      */
     public function getCommandHandler($command);
+
+    /**
+     * Set the pipes through which commands should be piped before dispatching.
+     *
+     * @param  object[]  $pipes
+     * @return $this
+     */
+    public function withPipes(array $pipes);
+
+    /**
+     * Get the pipes through which commands should be piped before dispatching.
+     *
+     * @return object[]
+     */
+    public function pipes();
+
+    /**
+     * Add pipes through which commands should be piped before dispatching.
+     *
+     * @param  object[]|object  $pipes
+     * @return $this
+     */
+    public function pipeThrough($pipes);
 
     /**
      * Map a command to a handler.
