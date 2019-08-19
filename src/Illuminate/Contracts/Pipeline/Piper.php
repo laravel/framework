@@ -22,7 +22,7 @@ interface Piper
     /**
      * Add pipes through which commands should be piped before dispatching.
      *
-     * @param mixed $pipes
+     * @param  object[]|object  $pipes
      * @return $this
      */
     public function pipeThrough($pipes);
