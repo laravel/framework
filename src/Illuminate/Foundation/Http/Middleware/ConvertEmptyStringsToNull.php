@@ -9,7 +9,7 @@ class ConvertEmptyStringsToNull extends TransformsRequest
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return mixed|null
+     * @return mixed
      */
     protected function transform($key, $value)
     {
