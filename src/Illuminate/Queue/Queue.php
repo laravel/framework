@@ -237,7 +237,11 @@ abstract class Queue
             foreach (static::$createPayloadCallbacks as $callback) {
                 $new = $callback($this->getConnectionName(), $queue, $payload);
                 foreach ($new as $key => $value) {
-                    $payload[$key] = array_merge($payload[$key] ?? [], $value);
+                    if (is_array($payload[$key] ?? []) && is_array($value)) {
+                        $payload[$key] = array_merge($payload[$key] ?? [], $value);
+                    } else {
+                        $payload[$key] = $value;
+                    }
                 }
             }
         }
