@@ -7,7 +7,7 @@ interface Piper
     /**
      * Set the pipes through which commands should be piped before dispatching.
      *
-     * @param  array  $pipes
+     * @param  object[]  $pipes
      * @return $this
      */
     public function withPipes(array $pipes);
