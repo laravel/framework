@@ -235,9 +235,10 @@ abstract class Queue
     {
         if (! empty(static::$createPayloadCallbacks)) {
             foreach (static::$createPayloadCallbacks as $callback) {
-                $payload = array_merge($payload, call_user_func(
-                    $callback, $this->getConnectionName(), $queue, $payload
-                ));
+                $new = $callback($this->getConnectionName(), $queue, $payload);
+                foreach ($new as $key => $value) {
+                    $payload[$key] = array_merge($payload[$key] ?? [], $value);
+                }
             }
         }
 
