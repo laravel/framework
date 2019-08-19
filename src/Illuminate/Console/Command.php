@@ -195,8 +195,8 @@ class Command extends SymfonyCommand
     /**
      * Call another console command.
      *
-     * @param  string|\Symfony\Component\Console\Command\Command  $command
-     * @param  array   $arguments
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @param  array  $arguments
      * @return int
      */
     public function call($command, array $arguments = [])
@@ -207,8 +207,8 @@ class Command extends SymfonyCommand
     /**
      * Call another console command silently.
      *
-     * @param  string|\Symfony\Component\Console\Command\Command  $command
-     * @param  array   $arguments
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @param  array  $arguments
      * @return int
      */
     public function callSilent($command, array $arguments = [])
@@ -636,9 +636,9 @@ class Command extends SymfonyCommand
     /**
      * Runs the console command.
      *
-     * @param string|\Symfony\Component\Console\Command\Command $command
-     * @param array $arguments
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param  \Symfony\Component\Console\Command\Command|string $command
+     * @param  array  $arguments
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return int
      */
     private function runCommand($command, array $arguments, OutputInterface $output)
@@ -653,7 +653,7 @@ class Command extends SymfonyCommand
     /**
      * Resolve console command instance.
      *
-     * @param string|\Symfony\Component\Console\Command\Command $command
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
      * @return \Symfony\Component\Console\Command\Command
      */
     private function resolveCommand($command)
