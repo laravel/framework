@@ -21,9 +21,7 @@ trait BuildsQueries
         if ($enforceOrderBy) {
             $this->enforceOrderBy();
         }
-        
         $page = 1;
-        
         do {
             // We'll execute the query for the given page and get the results. If there are
             // no results we can just break and return from here. When there are results
