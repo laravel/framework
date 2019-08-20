@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 
 class OptimizeClearCommand extends Command
 {
@@ -27,11 +28,11 @@ class OptimizeClearCommand extends Command
      */
     public function handle()
     {
-        $this->call('view:clear');
-        $this->call('cache:clear');
-        $this->call('route:clear');
-        $this->call('config:clear');
-        $this->call('clear-compiled');
+        $this->call(ViewClearCommand::class);
+        $this->call(CacheClearCommand::class);
+        $this->call(RouteClearCommand::class);
+        $this->call(ConfigClearCommand::class);
+        $this->call(ClearCompiledCommand::class);
 
         $this->info('Caches cleared successfully!');
     }

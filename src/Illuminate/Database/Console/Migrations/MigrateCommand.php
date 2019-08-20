@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Database\Console\Seeds\SeedCommand;
 
 class MigrateCommand extends BaseCommand
 {
@@ -75,7 +76,7 @@ class MigrateCommand extends BaseCommand
         // seed task to re-populate the database, which is convenient when adding
         // a migration and a seed at the same time, as it is only this command.
         if ($this->option('seed') && ! $this->option('pretend')) {
-            $this->call('db:seed', ['--force' => true]);
+            $this->call(SeedCommand::class, ['--force' => true]);
         }
     }
 
@@ -89,7 +90,7 @@ class MigrateCommand extends BaseCommand
         $this->migrator->setConnection($this->option('database'));
 
         if (! $this->migrator->repositoryExists()) {
-            $this->call('migrate:install', array_filter([
+            $this->call(InstallCommand::class, array_filter([
                 '--database' => $this->option('database'),
             ]));
         }

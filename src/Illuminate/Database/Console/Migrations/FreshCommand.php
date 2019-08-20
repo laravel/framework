@@ -4,7 +4,9 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Database\Console\WipeCommand;
 use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Database\Console\Seeds\SeedCommand;
 
 class FreshCommand extends Command
 {
@@ -37,14 +39,14 @@ class FreshCommand extends Command
 
         $database = $this->input->getOption('database');
 
-        $this->call('db:wipe', array_filter([
+        $this->call(WipeCommand::class, array_filter([
             '--database' => $database,
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),
             '--force' => true,
         ]));
 
-        $this->call('migrate', array_filter([
+        $this->call(MigrateCommand::class, array_filter([
             '--database' => $database,
             '--path' => $this->input->getOption('path'),
             '--realpath' => $this->input->getOption('realpath'),
@@ -75,7 +77,7 @@ class FreshCommand extends Command
      */
     protected function runSeeder($database)
     {
-        $this->call('db:seed', array_filter([
+        $this->call(SeedCommand::class, array_filter([
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
             '--force' => true,

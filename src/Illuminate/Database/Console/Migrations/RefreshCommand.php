@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console\Migrations;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Database\Console\Seeds\SeedCommand;
 
 class RefreshCommand extends Command
 {
@@ -56,7 +57,7 @@ class RefreshCommand extends Command
         // The refresh command is essentially just a brief aggregate of a few other of
         // the migration commands and just provides a convenient wrapper to execute
         // them in succession. We'll also see if we need to re-seed the database.
-        $this->call('migrate', array_filter([
+        $this->call(MigrateCommand::class, array_filter([
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
@@ -78,7 +79,7 @@ class RefreshCommand extends Command
      */
     protected function runRollback($database, $path, $step)
     {
-        $this->call('migrate:rollback', array_filter([
+        $this->call(RollbackCommand::class, array_filter([
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
@@ -96,7 +97,7 @@ class RefreshCommand extends Command
      */
     protected function runReset($database, $path)
     {
-        $this->call('migrate:reset', array_filter([
+        $this->call(ResetCommand::class, array_filter([
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
@@ -122,7 +123,7 @@ class RefreshCommand extends Command
      */
     protected function runSeeder($database)
     {
-        $this->call('db:seed', array_filter([
+        $this->call(SeedCommand::class, array_filter([
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
             '--force' => true,

@@ -50,7 +50,7 @@ class RouteCacheCommand extends Command
      */
     public function handle()
     {
-        $this->call('route:clear');
+        $this->call(RouteClearCommand::class);
 
         $routes = $this->getFreshApplicationRoutes();
 

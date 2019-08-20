@@ -27,8 +27,8 @@ class OptimizeCommand extends Command
      */
     public function handle()
     {
-        $this->call('config:cache');
-        $this->call('route:cache');
+        $this->call(ConfigCacheCommand::class);
+        $this->call(RouteCacheCommand::class);
 
         $this->info('Files cached successfully!');
     }

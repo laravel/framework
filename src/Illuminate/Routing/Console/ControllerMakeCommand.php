@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Foundation\Console\ModelMakeCommand;
 
 class ControllerMakeCommand extends GeneratorCommand
 {
@@ -111,7 +112,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if (! class_exists($parentModelClass)) {
             if ($this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $parentModelClass]);
+                $this->call(ModelMakeCommand::class, ['name' => $parentModelClass]);
             }
         }
 
@@ -134,7 +135,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if (! class_exists($modelClass)) {
             if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $modelClass]);
+                $this->call(ModelMakeCommand::class, ['name' => $modelClass]);
             }
         }
 

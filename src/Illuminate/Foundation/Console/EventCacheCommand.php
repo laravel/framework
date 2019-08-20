@@ -28,7 +28,7 @@ class EventCacheCommand extends Command
      */
     public function handle()
     {
-        $this->call('event:clear');
+        $this->call(EventClearCommand::class);
 
         file_put_contents(
             $this->laravel->getCachedEventsPath(),

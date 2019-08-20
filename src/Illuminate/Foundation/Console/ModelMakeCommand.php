@@ -5,6 +5,9 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Routing\Console\ControllerMakeCommand;
+use Illuminate\Database\Console\Factories\FactoryMakeCommand;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 
 class ModelMakeCommand extends GeneratorCommand
 {
@@ -69,7 +72,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $factory = Str::studly(class_basename($this->argument('name')));
 
-        $this->call('make:factory', [
+        $this->call(FactoryMakeCommand::class, [
             'name' => "{$factory}Factory",
             '--model' => $this->qualifyClass($this->getNameInput()),
         ]);
@@ -88,7 +91,7 @@ class ModelMakeCommand extends GeneratorCommand
             $table = Str::singular($table);
         }
 
-        $this->call('make:migration', [
+        $this->call(MigrateMakeCommand::class, [
             'name' => "create_{$table}_table",
             '--create' => $table,
         ]);
@@ -105,7 +108,7 @@ class ModelMakeCommand extends GeneratorCommand
 
         $modelName = $this->qualifyClass($this->getNameInput());
 
-        $this->call('make:controller', [
+        $this->call(ControllerMakeCommand::class, [
             'name' => "{$controller}Controller",
             '--model' => $this->option('resource') ? $modelName : null,
         ]);
