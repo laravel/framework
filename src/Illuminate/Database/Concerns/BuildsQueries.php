@@ -13,12 +13,15 @@ trait BuildsQueries
      *
      * @param  int  $count
      * @param  callable  $callback
+     * @param  boolean  $enforceOrderBy
      * @return bool
      */
-    public function chunk($count, callable $callback)
+    public function chunk($count, callable $callback, $enforceOrderBy = true)
     {
-        $this->enforceOrderBy();
-
+        if ( $enforceOrderBy ) {
+            $this->enforceOrderBy();
+        }
+        
         $page = 1;
 
         do {
