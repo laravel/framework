@@ -58,7 +58,7 @@ interface ConnectionInterface
      *
      * @param  string  $query
      * @param  array   $bindings
-     * @return bool
+     * @return int
      */
     public function insert($query, $bindings = []);
 

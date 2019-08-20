@@ -100,12 +100,12 @@ class DatabaseStore implements Store
         $expiration = $this->getTime() + $seconds;
 
         try {
-            return $this->table()->insert(compact('key', 'value', 'expiration'));
+            $affected = $this->table()->insert(compact('key', 'value', 'expiration'));
         } catch (Exception $e) {
-            $result = $this->table()->where('key', $key)->update(compact('value', 'expiration'));
-
-            return $result > 0;
+            $affected = $this->table()->where('key', $key)->update(compact('value', 'expiration'));
         }
+
+        return $affected > 0;
     }
 
     /**

@@ -2580,7 +2580,7 @@ class Builder
      * Insert a new record into the database.
      *
      * @param  array  $values
-     * @return bool
+     * @return int
      */
     public function insert(array $values)
     {
@@ -2588,7 +2588,7 @@ class Builder
         // bindings are structured in a way that is convenient when building these
         // inserts statements by verifying these elements are actually an array.
         if (empty($values)) {
-            return true;
+            return 0;
         }
 
         if (! is_array(reset($values))) {
@@ -2636,7 +2636,7 @@ class Builder
             }
         }
 
-        return $this->connection->affectingStatement(
+        return $this->connection->insert(
             $this->grammar->compileInsertOrIgnore($this, $values),
             $this->cleanBindings(Arr::flatten($values, 1))
         );
@@ -2669,7 +2669,7 @@ class Builder
     {
         [$sql, $bindings] = $this->createSub($query);
 
-        return $this->connection->affectingStatement(
+        return $this->connection->insert(
             $this->grammar->compileInsertUsing($this, $columns, $sql),
             $this->cleanBindings($bindings)
         );
@@ -2695,7 +2695,7 @@ class Builder
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return bool
+     * @return int
      */
     public function updateOrInsert(array $attributes, array $values = [])
     {
@@ -2704,10 +2704,10 @@ class Builder
         }
 
         if (empty($values)) {
-            return true;
+            return 0;
         }
 
-        return (bool) $this->take(1)->update($values);
+        return $this->take(1)->update($values);
     }
 
     /**

@@ -142,14 +142,14 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      *
      * @param  string  $sessionId
      * @param  string  $payload
-     * @return bool|null
+     * @return int
      */
     protected function performInsert($sessionId, $payload)
     {
         try {
             return $this->getQuery()->insert(Arr::set($payload, 'id', $sessionId));
         } catch (QueryException $e) {
-            $this->performUpdate($sessionId, $payload);
+            return $this->performUpdate($sessionId, $payload);
         }
     }
 

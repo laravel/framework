@@ -959,24 +959,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testMultiInsertsWithDifferentValues()
     {
         $date = '1970-01-01';
-        $result = EloquentTestPost::insert([
+        $affected = EloquentTestPost::insert([
             ['user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date],
             ['user_id' => 2, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date],
         ]);
 
-        $this->assertTrue($result);
+        $this->assertEquals(2, $affected);
         $this->assertEquals(2, EloquentTestPost::count());
     }
 
     public function testMultiInsertsWithSameValues()
     {
         $date = '1970-01-01';
-        $result = EloquentTestPost::insert([
+        $affected = EloquentTestPost::insert([
             ['user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date],
             ['user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date],
         ]);
 
-        $this->assertTrue($result);
+        $this->assertEquals(2, $affected);
         $this->assertEquals(2, EloquentTestPost::count());
     }
 

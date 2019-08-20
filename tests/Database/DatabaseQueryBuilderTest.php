@@ -1905,7 +1905,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertUsingMethod()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(1);
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertUsing(
             ['foo'],
@@ -1928,7 +1928,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlInsertOrIgnoreMethod()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into `users` (`email`) values (?)', ['foo'])->andReturn(1);
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert ignore into `users` (`email`) values (?)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
         $this->assertEquals(1, $result);
     }
@@ -1936,7 +1936,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPostgresInsertOrIgnoreMethod()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email") values (?) on conflict do nothing', ['foo'])->andReturn(1);
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (?) on conflict do nothing', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
         $this->assertEquals(1, $result);
     }
@@ -1944,7 +1944,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSQLiteInsertOrIgnoreMethod()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "users" ("email") values (?)', ['foo'])->andReturn(1);
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert or ignore into "users" ("email") values (?)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
         $this->assertEquals(1, $result);
     }
@@ -2165,9 +2165,9 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
         $builder->shouldReceive('exists')->once()->andReturn(false);
-        $builder->shouldReceive('insert')->once()->with(['email' => 'foo', 'name' => 'bar'])->andReturn(true);
+        $builder->shouldReceive('insert')->once()->with(['email' => 'foo', 'name' => 'bar'])->andReturn(1);
 
-        $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
+        $this->assertEquals(1, $builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
         $builder = m::mock(Builder::class.'[where,exists,update]', [
             m::mock(ConnectionInterface::class),
@@ -2180,7 +2180,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('take')->andReturnSelf();
         $builder->shouldReceive('update')->once()->with(['name' => 'bar'])->andReturn(1);
 
-        $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
+        $this->assertEquals(1, $builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
     }
 
     public function testUpdateOrInsertMethodWorksWithEmptyUpdateValues()
@@ -2194,7 +2194,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
         $builder->shouldReceive('exists')->once()->andReturn(true);
 
-        $this->assertTrue($builder->updateOrInsert(['email' => 'foo']));
+        $this->assertEquals(0, $builder->updateOrInsert(['email' => 'foo']));
         $builder->shouldNotHaveReceived('update');
     }
 

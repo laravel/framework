@@ -405,11 +405,11 @@ class Connection implements ConnectionInterface
      *
      * @param  string  $query
      * @param  array   $bindings
-     * @return bool
+     * @return int
      */
     public function insert($query, $bindings = [])
     {
-        return $this->statement($query, $bindings);
+        return $this->affectingStatement($query, $bindings);
     }
 
     /**

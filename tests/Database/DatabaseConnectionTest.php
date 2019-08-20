@@ -76,10 +76,10 @@ class DatabaseConnectionTest extends TestCase
         $this->assertIsNumeric($log[0]['time']);
     }
 
-    public function testInsertCallsTheStatementMethod()
+    public function testInsertCallsTheAffectingStatementMethod()
     {
-        $connection = $this->getMockConnection(['statement']);
-        $connection->expects($this->once())->method('statement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn('baz');
+        $connection = $this->getMockConnection(['affectingStatement']);
+        $connection->expects($this->once())->method('affectingStatement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn('baz');
         $results = $connection->insert('foo', ['bar']);
         $this->assertEquals('baz', $results);
     }
