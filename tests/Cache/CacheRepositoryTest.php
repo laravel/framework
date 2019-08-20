@@ -116,18 +116,16 @@ class CacheRepositoryTest extends TestCase
 
     public function testSettingMultipleItemsInCacheArray()
     {
-        // Alias of PuttingMultiple
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1);
-        $repo->setMultiple(['foo' => 'bar', 'bar' => 'baz'], 1);
+        $repo->setMultiple(['foo' => 'bar', 'bar' => 'baz'], 60);
     }
 
     public function testSettingMultipleItemsInCacheIterator()
     {
-        // Alias of PuttingMultiple
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1);
-        $repo->setMultiple(new ArrayIterator(['foo' => 'bar', 'bar' => 'baz']), 1);
+        $repo->setMultiple(new ArrayIterator(['foo' => 'bar', 'bar' => 'baz']), 60);
     }
 
     public function testPutWithDatetimeInPastOrZeroSecondsDoesntSaveItem()
@@ -210,7 +208,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 1);
-        $repo->set($key, $value, 1);
+        $repo->set($key, $value, 60);
     }
 
     public function testClearingWholeCache()
