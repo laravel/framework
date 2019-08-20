@@ -162,7 +162,7 @@ class Arr
     public static function first($array, callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : array_values($array)[0];
+            return empty($array) ? value($default) : reset($array);
         }
 
         foreach ($array as $key => $value) {
