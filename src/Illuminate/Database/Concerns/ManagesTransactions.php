@@ -5,6 +5,7 @@ namespace Illuminate\Database\Concerns;
 use Closure;
 use Exception;
 use Throwable;
+use TransactionException;
 
 trait ManagesTransactions
 {
@@ -155,11 +156,12 @@ trait ManagesTransactions
     {
         if ($this->transactions == 1) {
             $this->getPdo()->commit();
+        } elseif ($this->transactions == 0) {
+            throw new TransactionException;
+        } else {
+            $this->transactions = max(0, $this->transactions - 1);
+            $this->fireConnectionEvent('committed');
         }
-
-        $this->transactions = max(0, $this->transactions - 1);
-
-        $this->fireConnectionEvent('committed');
     }
 
     /**
@@ -176,8 +178,8 @@ trait ManagesTransactions
         // that this given transaction level is valid before attempting to rollback to
         // that level. If it's not we will just return out and not attempt anything.
         $toLevel = is_null($toLevel)
-                    ? $this->transactions - 1
-                    : $toLevel;
+        ? $this->transactions - 1
+        : $toLevel;
 
         if ($toLevel < 0 || $toLevel >= $this->transactions) {
             return;
