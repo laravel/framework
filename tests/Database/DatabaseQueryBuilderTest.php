@@ -1905,7 +1905,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertUsingMethod()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(true);
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertUsing(
             ['foo'],
@@ -1914,7 +1914,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertTrue($result);
+        $this->assertEquals(1, $result);
     }
 
     public function testInsertGetIdMethod()
