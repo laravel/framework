@@ -1067,6 +1067,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderByDesc('name');
         $this->assertEquals('select * from "users" order by "name" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('public', 1)
+            ->unionAll($this->getBuilder()->select('*')->from('videos')->where('public', 1))
+            ->orderByRaw('field(category, ?, ?) asc', ['news', 'opinion']);
+        $this->assertEquals('(select * from "posts" where "public" = ?) union all (select * from "videos" where "public" = ?) order by field(category, ?, ?) asc', $builder->toSql());
+        $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
     public function testOrderBySubQueries()
@@ -1084,6 +1091,13 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder()->select('*')->from('users')->orderByDesc($subQuery);
         $this->assertEquals("$expected desc", $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('public', 1)
+            ->unionAll($this->getBuilder()->select('*')->from('videos')->where('public', 1))
+            ->orderBy($this->getBuilder()->selectRaw('field(category, ?, ?)', ['news', 'opinion']));
+        $this->assertEquals('(select * from "posts" where "public" = ?) union all (select * from "videos" where "public" = ?) order by (select field(category, ?, ?)) asc', $builder->toSql());
+        $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
     public function testOrderByInvalidDirectionParam()
@@ -1891,7 +1905,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertUsingMethod()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(true);
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertUsing(
             ['foo'],
@@ -1900,7 +1914,47 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertTrue($result);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertOrIgnoreMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getBuilder();
+        $builder->from('users')->insertOrIgnore(['email' => 'foo']);
+    }
+
+    public function testMySqlInsertOrIgnoreMethod()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into `users` (`email`) values (?)', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testPostgresInsertOrIgnoreMethod()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email") values (?) on conflict do nothing', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testSQLiteInsertOrIgnoreMethod()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "users" ("email") values (?)', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testSqlServerInsertOrIgnoreMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
 
     public function testInsertGetIdMethod()
