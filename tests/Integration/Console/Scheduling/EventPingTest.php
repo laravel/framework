@@ -26,7 +26,7 @@ class EventPingTest extends TestCase
         m::close();
     }
 
-    public function sdsdsdstestPingRescuesTransferExceptions()
+    public function testPingRescuesTransferExceptions()
     {
         $this->spy(ExceptionHandler::class)
             ->shouldReceive('report')
