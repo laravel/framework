@@ -45,6 +45,13 @@ trait HasAttributes
     protected $casts = [];
 
     /**
+     * The attributes that should be encrypted and decrypted on get and set.
+     *
+     * @var array
+     */
+    protected $encrypt = [];
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -195,10 +202,6 @@ trait HasAttributes
             if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
-
-            if ($attributes[$key] instanceof Arrayable) {
-                $attributes[$key] = $attributes[$key]->toArray();
-            }
         }
 
         return $attributes;
@@ -285,6 +288,36 @@ trait HasAttributes
     }
 
     /**
+     * Determine whether an attribute will be encrypted.
+     *
+     * @return bool
+     */
+    protected function hasEncryption($key)
+    {
+        return in_array($key, $this->encrypt);
+    }
+
+    /**
+     * Encrypt attribute's value.
+     *
+     * @return void
+     */
+    public function encryptAttribute($key, $value)
+    {
+        $this->attributes[$key] = is_null($value) ? null : encrypt($value);
+    }
+
+    /**
+     * Decrypt attribute's value.
+     *
+     * @return mixed
+     */
+    public function decryptAttribute($value)
+    {
+        return is_null($value) ? null : decrypt($value);
+    }
+
+    /**
      * Get an attribute array of all arrayable values.
      *
      * @param  array  $values
@@ -319,7 +352,8 @@ trait HasAttributes
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
         if (array_key_exists($key, $this->attributes) ||
-            $this->hasGetMutator($key)) {
+            $this->hasGetMutator($key) ||
+            $this->hasEncryption($key)) {
             return $this->getAttributeValue($key);
         }
 
@@ -355,6 +389,13 @@ trait HasAttributes
         // given with the key in the pair. Dayle made this comment line up.
         if ($this->hasCast($key)) {
             return $this->castAttribute($key, $value);
+        }
+
+        // If the user has added the $encrypt array to their model, then we are
+        // going to perform the decryption of that value before returning it to
+        // the user.
+        if ($this->hasEncryption($key)) {
+            return $this->decryptAttribute($value);
         }
 
         // If the attribute is listed as a date, we will convert it to a DateTime
@@ -571,6 +612,12 @@ trait HasAttributes
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
             return $this->setMutatedAttributeValue($key, $value);
+        }
+
+        // Does the user want this attribute to be encrypted? Yes? Well, then
+        // encrypt the attribute before we save it.
+        if ($this->hasEncryption($key)) {
+            return $this->encryptAttribute($key, $value);
         }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime
