@@ -6,27 +6,28 @@ use Swift_Message;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Mail\TransportManager;
-use Illuminate\Foundation\Application;
 use Illuminate\Mail\Transport\SesTransport;
 
 class MailSesTransportTest extends TestCase
 {
+    /** @group Foo */
     public function testGetTransport()
     {
-        /** @var Application $app */
-        $app = [
-            'config' => new Collection([
+        $container = new Container();
+        $container->singleton('config', function () {
+            return new Repository([
                 'services.ses' => [
-                    'key'    => 'foo',
+                    'key' => 'foo',
                     'secret' => 'bar',
                     'region' => 'us-east-1',
                 ],
-            ]),
-        ];
+            ]);
+        });
 
-        $manager = new TransportManager($app);
+        $manager = new TransportManager($container);
 
         /** @var SesTransport $transport */
         $transport = $manager->driver('ses');
