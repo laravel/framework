@@ -22,7 +22,7 @@ class WipeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Drop all tables, views & types';
+    protected $description = 'Drop all tables, views, and types';
 
     /**
      * Execute the console command.
