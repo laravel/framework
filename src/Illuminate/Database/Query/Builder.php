@@ -2636,13 +2636,13 @@ class Builder
      *
      * @param  array  $columns
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
-     * @return bool
+     * @return int
      */
     public function insertUsing(array $columns, $query)
     {
         [$sql, $bindings] = $this->createSub($query);
 
-        return $this->connection->insert(
+        return $this->connection->affectingStatement(
             $this->grammar->compileInsertUsing($this, $columns, $sql),
             $this->cleanBindings($bindings)
         );
