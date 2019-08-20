@@ -791,6 +791,12 @@ class LazyCollection implements Enumerable
                 foreach ($original as $key => $value) {
                     if (array_key_exists($key, $keys)) {
                         yield $key => $value;
+
+                        unset($keys[$key]);
+
+                        if (empty($keys)) {
+                            break;
+                        }
                     }
                 }
             }
@@ -944,22 +950,19 @@ class LazyCollection implements Enumerable
 
         return new static(function () use ($original, $items) {
             $items = $this->getArrayableItems($items);
-            $usedItems = [];
 
             foreach ($original as $key => $value) {
                 if (array_key_exists($key, $items)) {
                     yield $key => $items[$key];
 
-                    $usedItems[$key] = true;
+                    unset($items[$key]);
                 } else {
                     yield $key => $value;
                 }
             }
 
             foreach ($items as $key => $value) {
-                if (! array_key_exists($key, $usedItems)) {
-                    yield $key => $value;
-                }
+                yield $key => $value;
             }
         });
     }
@@ -1104,13 +1107,25 @@ class LazyCollection implements Enumerable
             $iterator = $original->getIterator();
 
             while ($iterator->valid()) {
-                $values = [];
+                $chunk = [];
 
-                for ($i = 0; $iterator->valid() && $i < $size; $i++, $iterator->next()) {
-                    $values[$iterator->key()] = $iterator->current();
+                while (true) {
+                    $chunk[$iterator->key()] = $iterator->current();
+
+                    if (count($chunk) < $size) {
+                        $iterator->next();
+
+                        if (! $iterator->valid()) {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
                 }
 
-                yield new static($values);
+                yield new static($chunk);
+
+                $iterator->next();
             }
         });
     }
