@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Console\Scheduling;
+namespace Illuminate\Tests\Integration\Console\Scheduling;
 
 use Mockery as m;
 use GuzzleHttp\HandlerStack;
@@ -14,27 +14,32 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
+/**
+ * @group integration
+ */
 class EventPingTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         m::close();
     }
 
-    public function testPingRescuesTransferExceptions()
+    public function sdsdsdstestPingRescuesTransferExceptions()
     {
         $this->spy(ExceptionHandler::class)
             ->shouldReceive('report')
             ->once()
             ->with(m::type(ServerException::class));
 
-        $clientMock = new HttpClient([
+        $httpMock = new HttpClient([
             'handler' => HandlerStack::create(
                 new MockHandler([new Psr7Response(500)])
-            )
+            ),
         ]);
 
-        $this->app->instance(HttpClient::class, $clientMock);
+        $this->swap(HttpClient::class, $httpMock);
 
         $event = new Event(m::mock(EventMutex::class), 'php -i');
 
