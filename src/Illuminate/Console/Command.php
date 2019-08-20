@@ -245,7 +245,7 @@ class Command extends SymfonyCommand
             return $this->getApplication()->find($command);
         }
 
-        $command = new $command;
+        $command = $this->laravel->make($command);
 
         if ($command instanceof SymfonyCommand) {
             $command->setApplication($this->getApplication());
