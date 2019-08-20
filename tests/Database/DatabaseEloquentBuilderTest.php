@@ -607,6 +607,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('insert')->once()->with(['bar'])->andReturn('foo');
 
         $this->assertEquals('foo', $builder->insert(['bar']));
+
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('insertOrIgnore')->once()->with(['bar'])->andReturn('foo');
+
+        $this->assertEquals('foo', $builder->insertOrIgnore(['bar']));
+
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('insertGetId')->once()->with(['bar'])->andReturn('foo');
+
+        $this->assertEquals('foo', $builder->insertGetId(['bar']));
+
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('insertUsing')->once()->with(['bar'], 'baz')->andReturn('foo');
+
+        $this->assertEquals('foo', $builder->insertUsing(['bar'], 'baz'));
     }
 
     public function testQueryScopes()
