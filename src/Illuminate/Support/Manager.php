@@ -16,7 +16,7 @@ abstract class Manager
     protected $container;
 
     /**
-     * The config repository instance.
+     * The configuration repository instance.
      *
      * @var \Illuminate\Contracts\Config\Repository
      */
@@ -44,8 +44,8 @@ abstract class Manager
      */
     public function __construct(Container $container)
     {
-        $this->config = $container->make('config');
         $this->container = $container;
+        $this->config = $container->make('config');
     }
 
     /**
