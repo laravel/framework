@@ -70,7 +70,8 @@ class VerifyCsrfToken
             $this->isReading($request) ||
             $this->runningUnitTests() ||
             $this->inExceptArray($request) ||
-            $this->tokensMatch($request)
+            $this->tokensMatch($request) ||
+            $request->user() && $request->is('login')
         ) {
             return tap($next($request), function ($response) use ($request) {
                 if ($this->shouldAddXsrfTokenCookie()) {
