@@ -1517,6 +1517,40 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testChunkStartingWith($collection)
+    {
+        $data = new $collection(
+            ['header', 1, 2, 'header', 1, 'header', 'header']
+        );
+
+        $this->assertEquals(
+            [['header', 1, 2], ['header', 1], ['header'], ['header']],
+            $data->chunkStartingWith(function ($value, $key) {
+                return $value == 'header';
+            })->map->values()->toArray()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testChunkEndingWith($collection)
+    {
+        $data = new $collection(
+            ['footer', 1, 2, 'footer', 1, 'footer', 1, 2]
+        );
+
+        $this->assertEquals(
+            [['footer'], [1, 2, 'footer'], [1, 'footer'], [1, 2]],
+            $data->chunkEndingWith(function ($value, $key) {
+                return $value == 'footer';
+            })->map->values()->toArray()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testEvery($collection)
     {
         $c = new $collection([]);

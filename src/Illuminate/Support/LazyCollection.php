@@ -1131,6 +1131,62 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Chunk the collection into chunks that
+     * start with an item passing the given test.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function chunkStartingWith(callable $callback)
+    {
+        return new static(function () use ($callback) {
+            $chunk = [];
+
+            foreach ($this as $key => $value) {
+                if ($callback($value, $key) && ! empty($chunk)) {
+                    yield new static($chunk);
+
+                    $chunk = [];
+                }
+
+                $chunk[$key] = $value;
+            }
+
+            if (! empty($chunk)) {
+                yield new static($chunk);
+            }
+        });
+    }
+
+    /**
+     * Chunk the collection into chunks that
+     * end with an item passing the given test.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function chunkEndingWith(callable $callback)
+    {
+        return new static(function () use ($callback) {
+            $chunk = [];
+
+            foreach ($this as $key => $value) {
+                $chunk[$key] = $value;
+
+                if ($callback($value, $key) && ! empty($chunk)) {
+                    yield new static($chunk);
+
+                    $chunk = [];
+                }
+            }
+
+            if (! empty($chunk)) {
+                yield new static($chunk);
+            }
+        });
+    }
+
+    /**
      * Sort through each item with a callback.
      *
      * @param  callable|null  $callback

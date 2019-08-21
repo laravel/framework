@@ -1034,6 +1034,34 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Chunk the collection into chunks that
+     * start with an item passing the given test.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function chunkStartingWith(callable $callback)
+    {
+        return new static(
+            $this->lazy()->chunkStartingWith($callback)->mapInto(static::class)
+        );
+    }
+
+    /**
+     * Chunk the collection into chunks that
+     * end with an item passing the given test.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function chunkEndingWith(callable $callback)
+    {
+        return new static(
+            $this->lazy()->chunkEndingWith($callback)->mapInto(static::class)
+        );
+    }
+
+    /**
      * Sort through each item with a callback.
      *
      * @param  callable|null  $callback

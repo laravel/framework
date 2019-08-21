@@ -801,6 +801,24 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function chunk($size);
 
     /**
+     * Chunk the collection into chunks that
+     * start with an item passing the given test.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function chunkStartingWith(callable $callback);
+
+    /**
+     * Chunk the collection into chunks that
+     * end with an item passing the given test.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function chunkEndingWith(callable $callback);
+
+    /**
      * Sort through each item with a callback.
      *
      * @param  callable|null  $callback

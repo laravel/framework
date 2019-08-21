@@ -30,6 +30,36 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testChunkEndingWithIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->chunkEndingWith(function ($value) {
+                return $value % 5 == 0;
+            });
+        });
+
+        $this->assertEnumerates(15, function ($collection) {
+            $collection->chunkEndingWith(function ($value) {
+                return $value % 5 == 0;
+            })->take(3)->all();
+        });
+    }
+
+    public function testChunkStartingWithIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->chunkStartingWith(function ($value) {
+                return $value % 5 == 0;
+            });
+        });
+
+        $this->assertEnumerates(15, function ($collection) {
+            $collection->chunkStartingWith(function ($value) {
+                return $value % 5 == 0;
+            })->take(3)->all();
+        });
+    }
+
     public function testCollapseIsLazy()
     {
         $collection = LazyCollection::make([
