@@ -149,10 +149,8 @@ class LazyCollection implements Enumerable
      */
     public function collapse()
     {
-        $original = clone $this;
-
-        return new static(function () use ($original) {
-            foreach ($original as $values) {
+        return new static(function () {
+            foreach ($this as $values) {
                 if (is_array($values) || $values instanceof Enumerable) {
                     foreach ($values as $value) {
                         yield $value;
@@ -321,10 +319,8 @@ class LazyCollection implements Enumerable
             };
         }
 
-        $original = clone $this;
-
-        return new static(function () use ($original, $callback) {
-            foreach ($original as $key => $value) {
+        return new static(function () use ($callback) {
+            foreach ($this as $key => $value) {
                 if ($callback($value, $key)) {
                     yield $key => $value;
                 }
@@ -368,10 +364,8 @@ class LazyCollection implements Enumerable
      */
     public function flatten($depth = INF)
     {
-        $original = clone $this;
-
-        $instance = new static(function () use ($original, $depth) {
-            foreach ($original as $item) {
+        $instance = new static(function () use ($depth) {
+            foreach ($this as $item) {
                 if (! is_array($item) && ! $item instanceof Enumerable) {
                     yield $item;
                 } elseif ($depth === 1) {
@@ -392,10 +386,8 @@ class LazyCollection implements Enumerable
      */
     public function flip()
     {
-        $original = clone $this;
-
-        return new static(function () use ($original) {
-            foreach ($original as $key => $value) {
+        return new static(function () {
+            foreach ($this as $key => $value) {
                 yield $value => $key;
             }
         });
@@ -443,12 +435,10 @@ class LazyCollection implements Enumerable
      */
     public function keyBy($keyBy)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $keyBy) {
+        return new static(function () use ($keyBy) {
             $keyBy = $this->valueRetriever($keyBy);
 
-            foreach ($original as $key => $item) {
+            foreach ($this as $key => $item) {
                 $resolvedKey = $keyBy($item, $key);
 
                 if (is_object($resolvedKey)) {
@@ -543,10 +533,8 @@ class LazyCollection implements Enumerable
      */
     public function keys()
     {
-        $original = clone $this;
-
-        return new static(function () use ($original) {
-            foreach ($original as $key => $value) {
+        return new static(function () {
+            foreach ($this as $key => $value) {
                 yield $key;
             }
         });
@@ -581,12 +569,10 @@ class LazyCollection implements Enumerable
      */
     public function pluck($value, $key = null)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $value, $key) {
+        return new static(function () use ($value, $key) {
             [$value, $key] = $this->explodePluckParameters($value, $key);
 
-            foreach ($original as $item) {
+            foreach ($this as $item) {
                 $itemValue = data_get($item, $value);
 
                 if (is_null($key)) {
@@ -612,10 +598,8 @@ class LazyCollection implements Enumerable
      */
     public function map(callable $callback)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $callback) {
-            foreach ($original as $key => $value) {
+        return new static(function () use ($callback) {
+            foreach ($this as $key => $value) {
                 yield $key => $callback($value, $key);
             }
         });
@@ -644,10 +628,8 @@ class LazyCollection implements Enumerable
      */
     public function mapWithKeys(callable $callback)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $callback) {
-            foreach ($original as $key => $value) {
+        return new static(function () use ($callback) {
+            foreach ($this as $key => $value) {
                 yield from $callback($value, $key);
             }
         });
@@ -683,14 +665,12 @@ class LazyCollection implements Enumerable
      */
     public function combine($values)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $values) {
+        return new static(function () use ($values) {
             $values = $this->makeIterator($values);
 
             $errorMessage = 'Both parameters should have an equal number of elements';
 
-            foreach ($original as $key) {
+            foreach ($this as $key) {
                 if (! $values->valid()) {
                     trigger_error($errorMessage, E_USER_WARNING);
 
@@ -728,12 +708,10 @@ class LazyCollection implements Enumerable
      */
     public function nth($step, $offset = 0)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $step, $offset) {
+        return new static(function () use ($step, $offset) {
             $position = 0;
 
-            foreach ($original as $item) {
+            foreach ($this as $item) {
                 if ($position % $step === $offset) {
                     yield $item;
                 }
@@ -757,15 +735,13 @@ class LazyCollection implements Enumerable
             $keys = is_array($keys) ? $keys : func_get_args();
         }
 
-        $original = clone $this;
-
-        return new static(function () use ($original, $keys) {
+        return new static(function () use ($keys) {
             if (is_null($keys)) {
-                yield from $original;
+                yield from $this;
             } else {
                 $keys = array_flip($keys);
 
-                foreach ($original as $key => $value) {
+                foreach ($this as $key => $value) {
                     if (array_key_exists($key, $keys)) {
                         yield $key => $value;
 
@@ -788,10 +764,8 @@ class LazyCollection implements Enumerable
      */
     public function concat($source)
     {
-        $original = clone $this;
-
-        return (new static(function () use ($original, $source) {
-            yield from $original;
+        return (new static(function () use ($source) {
+            yield from $this;
             yield from $source;
         }))->values();
     }
@@ -837,12 +811,10 @@ class LazyCollection implements Enumerable
      */
     public function replace($items)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $items) {
+        return new static(function () use ($items) {
             $items = $this->getArrayableItems($items);
 
-            foreach ($original as $key => $value) {
+            foreach ($this as $key => $value) {
                 if (array_key_exists($key, $items)) {
                     yield $key => $items[$key];
 
@@ -922,10 +894,8 @@ class LazyCollection implements Enumerable
      */
     public function skip($count)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $count) {
-            $iterator = $original->getIterator();
+        return new static(function () use ($count) {
+            $iterator = $this->getIterator();
 
             while ($iterator->valid() && $count--) {
                 $iterator->next();
@@ -980,10 +950,8 @@ class LazyCollection implements Enumerable
             return static::empty();
         }
 
-        $original = clone $this;
-
-        return new static(function () use ($original, $size) {
-            $iterator = $original->getIterator();
+        return new static(function () use ($size) {
+            $iterator = $this->getIterator();
 
             while ($iterator->valid()) {
                 $chunk = [];
@@ -1080,10 +1048,8 @@ class LazyCollection implements Enumerable
             return $this->passthru('take', func_get_args());
         }
 
-        $original = clone $this;
-
-        return new static(function () use ($original, $limit) {
-            $iterator = $original->getIterator();
+        return new static(function () use ($limit) {
+            $iterator = $this->getIterator();
 
             while ($limit--) {
                 if (! $iterator->valid()) {
@@ -1107,10 +1073,8 @@ class LazyCollection implements Enumerable
      */
     public function tapEach(callable $callback)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $callback) {
-            foreach ($original as $key => $value) {
+        return new static(function () use ($callback) {
+            foreach ($this as $key => $value) {
                 $callback($value, $key);
 
                 yield $key => $value;
@@ -1125,10 +1089,8 @@ class LazyCollection implements Enumerable
      */
     public function values()
     {
-        $original = clone $this;
-
-        return new static(function () use ($original) {
-            foreach ($original as $item) {
+        return new static(function () {
+            foreach ($this as $item) {
                 yield $item;
             }
         });
@@ -1147,12 +1109,10 @@ class LazyCollection implements Enumerable
     {
         $iterables = func_get_args();
 
-        $original = clone $this;
-
-        return new static(function () use ($original, $iterables) {
+        return new static(function () use ($iterables) {
             $iterators = Collection::make($iterables)->map(function ($iterable) {
                 return $this->makeIterator($iterable);
-            })->prepend($original->getIterator());
+            })->prepend($this->getIterator());
 
             while ($iterators->contains->valid()) {
                 yield new static($iterators->map->current());
@@ -1175,12 +1135,10 @@ class LazyCollection implements Enumerable
             return $this->passthru('pad', func_get_args());
         }
 
-        $original = clone $this;
-
-        return new static(function () use ($original, $size, $value) {
+        return new static(function () use ($size, $value) {
             $yielded = 0;
 
-            foreach ($original as $index => $item) {
+            foreach ($this as $index => $item) {
                 yield $index => $item;
 
                 $yielded++;
@@ -1260,22 +1218,8 @@ class LazyCollection implements Enumerable
      */
     protected function passthru($method, array $params)
     {
-        $original = clone $this;
-
-        return new static(function () use ($original, $method, $params) {
-            yield from $original->collect()->$method(...$params);
+        return new static(function () use ($method, $params) {
+            yield from $this->collect()->$method(...$params);
         });
-    }
-
-    /**
-     * Finish cloning the collection instance.
-     *
-     * @return void
-     */
-    public function __clone()
-    {
-        if (! is_array($this->source)) {
-            $this->source = clone $this->source;
-        }
     }
 }
