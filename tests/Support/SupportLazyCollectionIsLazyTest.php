@@ -8,17 +8,6 @@ use Illuminate\Support\LazyCollection;
 
 class SupportLazyCollectionIsLazyTest extends TestCase
 {
-    public function testAddIsLazy()
-    {
-        $this->assertDoesNotEnumerate(function ($collection) {
-            $collection->add(11);
-        });
-
-        $this->assertEnumerates(2, function ($collection) {
-            $collection->add(11)->take(2)->all();
-        });
-    }
-
     public function testChunkIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -379,17 +368,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
-    public function testForgetIsLazy()
-    {
-        $this->assertDoesNotEnumerate(function ($collection) {
-            $collection->forget(5);
-        });
-
-        $this->assertEnumeratesOnce(function ($collection) {
-            $collection->forget(5)->all();
-        });
-    }
-
     public function testForPageIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -727,47 +705,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
-    public function testPopEnumeratesOnce()
-    {
-        $this->assertEnumeratesOnce(function ($collection) {
-            $collection->pop();
-            $collection->all();
-        });
-    }
-
-    public function testPrependIsLazy()
-    {
-        $this->assertDoesNotEnumerate(function ($collection) {
-            $collection->prepend(0);
-        });
-
-        $this->assertEnumeratesOnce(function ($collection) {
-            $collection->prepend(0)->all();
-        });
-    }
-
-    public function testPushIsLazy()
-    {
-        $this->assertDoesNotEnumerate(function ($collection) {
-            $collection->push(11);
-        });
-
-        $this->assertEnumerates(2, function ($collection) {
-            $collection->push(11)->take(2)->all();
-        });
-    }
-
-    public function testPutIsLazy()
-    {
-        $this->assertDoesNotEnumerate(function ($collection) {
-            $collection->put(20, 'a');
-        });
-
-        $this->assertEnumeratesOnce(function ($collection) {
-            $collection->put(20, 'a')->all();
-        });
-    }
-
     public function testRandomEnumeratesOnce()
     {
         $this->assertEnumeratesOnce(function ($collection) {
@@ -857,20 +794,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->search('missing');
-        });
-    }
-
-    public function testShiftIsLazy()
-    {
-        $this->assertEnumerates(1, function ($collection) {
-            $collection->shift();
-        });
-
-        $data = $this->make([1, 2, 3, 4, 5]);
-
-        $this->assertEnumeratesCollection($data, 6, function ($collection) {
-            $collection->shift();
-            $collection->all();
         });
     }
 
@@ -995,13 +918,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
-    public function testSpliceEnumeratesOnce()
-    {
-        $this->assertEnumeratesOnce(function ($collection) {
-            $collection->splice(2);
-        });
-    }
-
     public function testSplitIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -1075,21 +991,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->toJson();
-        });
-    }
-
-    public function testTransformIsLazy()
-    {
-        $this->assertDoesNotEnumerate(function ($collection) {
-            $collection->transform(function ($value) {
-                return $value * 2;
-            });
-        });
-
-        $this->assertEnumeratesOnce(function ($collection) {
-            $collection->transform(function ($value) {
-                return $value * 2;
-            })->all();
         });
     }
 
@@ -1247,9 +1148,10 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
     public function testWhereInstanceOfIsLazy()
     {
-        $data = $this->make([['a' => 1], ['a' => 2], ['a' => 3], ['a' => 4]])
-                     ->mapInto(stdClass::class)
-                     ->prepend(['a' => 0]);
+        $data = $this->make(['a' => 0])->concat(
+            $this->make([['a' => 1], ['a' => 2], ['a' => 3], ['a' => 4]])
+                 ->mapInto(stdClass::class)
+         );
 
         $this->assertDoesNotEnumerateCollection($data, function ($collection) {
             $collection->whereInstanceOf(stdClass::class);

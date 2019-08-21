@@ -378,17 +378,6 @@ trait EnumeratesValues
     }
 
     /**
-     * Push an item onto the end.
-     *
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function push($value)
-    {
-        return $this->add($value);
-    }
-
-    /**
      * Get the sum of the given values.
      *
      * @param  callable|string|null  $callback
