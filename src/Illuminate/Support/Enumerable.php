@@ -409,14 +409,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function flip();
 
     /**
-     * Remove an item by key.
-     *
-     * @param  string|array  $keys
-     * @return $this
-     */
-    public function forget($keys);
-
-    /**
      * Get an item from the collection by key.
      *
      * @param  mixed  $key
@@ -661,45 +653,12 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function partition($key, $operator = null, $value = null);
 
     /**
-     * Get and remove the last item from the collection.
-     *
-     * @return mixed
-     */
-    public function pop();
-
-    /**
-     * Push an item onto the beginning of the collection.
-     *
-     * @param  mixed  $value
-     * @param  mixed  $key
-     * @return $this
-     */
-    public function prepend($value, $key = null);
-
-    /**
-     * Push an item onto the end of the collection.
-     *
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function push($value);
-
-    /**
      * Push all of the given items onto the collection.
      *
      * @param  iterable  $source
      * @return static
      */
     public function concat($source);
-
-    /**
-     * Put an item in the collection by key.
-     *
-     * @param  mixed  $key
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function put($key, $value);
 
     /**
      * Get one or a specified number of items randomly from the collection.
@@ -751,13 +710,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return mixed
      */
     public function search($value, $strict = false);
-
-    /**
-     * Get and remove the first item from the collection.
-     *
-     * @return mixed
-     */
-    public function shift();
 
     /**
      * Shuffle the items in the collection.
@@ -845,16 +797,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function sortKeysDesc($options = SORT_REGULAR);
 
     /**
-     * Splice a portion of the underlying collection array.
-     *
-     * @param  int  $offset
-     * @param  int|null  $length
-     * @param  mixed  $replacement
-     * @return static
-     */
-    public function splice($offset, $length = null, $replacement = []);
-
-    /**
      * Get the sum of the given values.
      *
      * @param  callable|string|null  $callback
@@ -877,14 +819,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return $this
      */
     public function tap(callable $callback);
-
-    /**
-     * Transform each item in the collection using a callback.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function transform(callable $callback);
 
     /**
      * Pass the enumerable to the given callback and return the result.
@@ -951,14 +885,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return static
      */
     public function countBy($callback = null);
-
-    /**
-     * Add an item to the collection.
-     *
-     * @param  mixed  $item
-     * @return $this
-     */
-    public function add($item);
 
     /**
      * Convert the collection to its string representation.

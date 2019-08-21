@@ -402,29 +402,6 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Remove an item by key.
-     *
-     * @param  string|array  $keys
-     * @return $this
-     */
-    public function forget($keys)
-    {
-        $original = clone $this;
-
-        $this->source = function () use ($original, $keys) {
-            $keys = array_flip((array) $keys);
-
-            foreach ($original as $key => $value) {
-                if (! array_key_exists($key, $keys)) {
-                    yield $key => $value;
-                }
-            }
-        };
-
-        return $this;
-    }
-
-    /**
      * Get an item by key.
      *
      * @param  mixed  $key
@@ -804,50 +781,6 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Get and remove the last item from the collection.
-     *
-     * @return mixed
-     */
-    public function pop()
-    {
-        $items = $this->collect();
-
-        $result = $items->pop();
-
-        $this->source = $items;
-
-        return $result;
-    }
-
-    /**
-     * Push an item onto the beginning of the collection.
-     *
-     * @param  mixed  $value
-     * @param  mixed  $key
-     * @return $this
-     */
-    public function prepend($value, $key = null)
-    {
-        $original = clone $this;
-
-        $this->source = function () use ($original, $value, $key) {
-            $instance = new static(function () use ($original, $value, $key) {
-                yield $key => $value;
-
-                yield from $original;
-            });
-
-            if (is_null($key)) {
-                $instance = $instance->values();
-            }
-
-            yield from $instance;
-        };
-
-        return $this;
-    }
-
-    /**
      * Push all of the given items onto the collection.
      *
      * @param  iterable  $source
@@ -861,48 +794,6 @@ class LazyCollection implements Enumerable
             yield from $original;
             yield from $source;
         }))->values();
-    }
-
-    /**
-     * Put an item in the collection by key.
-     *
-     * @param  mixed  $key
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function put($key, $value)
-    {
-        $original = clone $this;
-
-        if (is_null($key)) {
-            $this->source = function () use ($original, $value) {
-                foreach ($original as $innerKey => $innerValue) {
-                    yield $innerKey => $innerValue;
-                }
-
-                yield $value;
-            };
-        } else {
-            $this->source = function () use ($original, $key, $value) {
-                $found = false;
-
-                foreach ($original as $innerKey => $innerValue) {
-                    if ($innerKey == $key) {
-                        yield $key => $value;
-
-                        $found = true;
-                    } else {
-                        yield $innerKey => $innerValue;
-                    }
-                }
-
-                if (! $found) {
-                    yield $key => $value;
-                }
-            };
-        }
-
-        return $this;
     }
 
     /**
@@ -1010,18 +901,6 @@ class LazyCollection implements Enumerable
         }
 
         return false;
-    }
-
-    /**
-     * Get and remove the first item from the collection.
-     *
-     * @return mixed
-     */
-    public function shift()
-    {
-        return tap($this->first(), function () {
-            $this->source = $this->skip(1);
-        });
     }
 
     /**
@@ -1190,27 +1069,6 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Splice a portion of the underlying collection array.
-     *
-     * @param  int  $offset
-     * @param  int|null  $length
-     * @param  mixed  $replacement
-     * @return static
-     */
-    public function splice($offset, $length = null, $replacement = [])
-    {
-        $items = $this->collect();
-
-        $extracted = $items->splice(...func_get_args());
-
-        $this->source = function () use ($items) {
-            yield from $items;
-        };
-
-        return new static($extracted);
-    }
-
-    /**
      * Take the first or last {$limit} items.
      *
      * @param  int  $limit
@@ -1258,23 +1116,6 @@ class LazyCollection implements Enumerable
                 yield $key => $value;
             }
         });
-    }
-
-    /**
-     * Transform each item in the collection using a callback.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function transform(callable $callback)
-    {
-        $original = clone $this;
-
-        $this->source = function () use ($original, $callback) {
-            yield from $original->map($callback);
-        };
-
-        return $this;
     }
 
     /**
@@ -1373,27 +1214,6 @@ class LazyCollection implements Enumerable
         }
 
         return iterator_count($this->getIterator());
-    }
-
-    /**
-     * Add an item to the collection.
-     *
-     * @param  mixed  $item
-     * @return $this
-     */
-    public function add($item)
-    {
-        $original = clone $this;
-
-        $this->source = function () use ($original, $item) {
-            foreach ($original as $value) {
-                yield $value;
-            }
-
-            yield $item;
-        };
-
-        return $this;
     }
 
     /**

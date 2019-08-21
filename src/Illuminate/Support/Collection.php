@@ -806,6 +806,19 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Push an item onto the end of the collection.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function push($value)
+    {
+        $this->items[] = $value;
+
+        return $this;
+    }
+
+    /**
      * Push all of the given items onto the collection.
      *
      * @param  iterable  $source

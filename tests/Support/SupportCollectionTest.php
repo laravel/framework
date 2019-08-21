@@ -127,23 +127,17 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testPopReturnsAndRemovesLastItemInCollection($collection)
+    public function testPopReturnsAndRemovesLastItemInCollection()
     {
-        $c = new $collection(['foo', 'bar']);
+        $c = new Collection(['foo', 'bar']);
 
         $this->assertEquals('bar', $c->pop());
         $this->assertEquals('foo', $c->first());
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testShiftReturnsAndRemovesFirstItemInCollection($collection)
+    public function testShiftReturnsAndRemovesFirstItemInCollection()
     {
-        $data = new $collection(['Taylor', 'Otwell']);
+        $data = new Collection(['Taylor', 'Otwell']);
 
         $this->assertEquals('Taylor', $data->shift());
         $this->assertEquals('Otwell', $data->first());
@@ -365,32 +359,26 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse(isset($c[1]));
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testForgetSingleKey($collection)
+    public function testForgetSingleKey()
     {
-        $c = new $collection(['foo', 'bar']);
+        $c = new Collection(['foo', 'bar']);
         $c = $c->forget(0)->all();
         $this->assertFalse(isset($c['foo']));
 
-        $c = new $collection(['foo' => 'bar', 'baz' => 'qux']);
+        $c = new Collection(['foo' => 'bar', 'baz' => 'qux']);
         $c = $c->forget('foo')->all();
         $this->assertFalse(isset($c['foo']));
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testForgetArrayOfKeys($collection)
+    public function testForgetArrayOfKeys()
     {
-        $c = new $collection(['foo', 'bar', 'baz']);
+        $c = new Collection(['foo', 'bar', 'baz']);
         $c = $c->forget([0, 2])->all();
         $this->assertFalse(isset($c[0]));
         $this->assertFalse(isset($c[2]));
         $this->assertTrue(isset($c[1]));
 
-        $c = new $collection(['name' => 'taylor', 'foo' => 'bar', 'baz' => 'qux']);
+        $c = new Collection(['name' => 'taylor', 'foo' => 'bar', 'baz' => 'qux']);
         $c = $c->forget(['foo', 'baz'])->all();
         $this->assertFalse(isset($c['foo']));
         $this->assertFalse(isset($c['baz']));
@@ -1543,7 +1531,7 @@ class SupportCollectionTest extends TestCase
         $c = new $collection([['active' => true], ['active' => true]]);
         $this->assertTrue($c->every('active'));
         $this->assertTrue($c->every->active);
-        $this->assertFalse($c->push(['active' => false])->every->active);
+        $this->assertFalse($c->concat([['active' => false]])->every->active);
     }
 
     /**
@@ -1630,22 +1618,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor', 'dayle'], $data->all());
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testPut($collection)
+    public function testPut()
     {
-        $data = new $collection(['name' => 'taylor', 'email' => 'foo']);
+        $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
         $data = $data->put('name', 'dayle');
         $this->assertEquals(['name' => 'dayle', 'email' => 'foo'], $data->all());
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testPutWithNoKey($collection)
+    public function testPutWithNoKey()
     {
-        $data = new $collection(['taylor', 'shawn']);
+        $data = new Collection(['taylor', 'shawn']);
         $data = $data->put(null, 'dayle');
         $this->assertEquals(['taylor', 'shawn', 'dayle'], $data->all());
     }
@@ -1965,24 +1947,21 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $data->all());
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testSplice($collection)
+    public function testSplice()
     {
-        $data = new $collection(['foo', 'baz']);
+        $data = new Collection(['foo', 'baz']);
         $data->splice(1);
         $this->assertEquals(['foo'], $data->all());
 
-        $data = new $collection(['foo', 'baz']);
+        $data = new Collection(['foo', 'baz']);
         $data->splice(1, 0, 'bar');
         $this->assertEquals(['foo', 'bar', 'baz'], $data->all());
 
-        $data = new $collection(['foo', 'baz']);
+        $data = new Collection(['foo', 'baz']);
         $data->splice(1, 1);
         $this->assertEquals(['foo'], $data->all());
 
-        $data = new $collection(['foo', 'baz']);
+        $data = new Collection(['foo', 'baz']);
         $cut = $data->splice(1, 1, 'bar');
         $this->assertEquals(['foo', 'bar'], $data->all());
         $this->assertEquals(['baz'], $cut->all());
@@ -2261,12 +2240,9 @@ class SupportCollectionTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testTransform($collection)
+    public function testTransform()
     {
-        $data = new $collection(['first' => 'taylor', 'last' => 'otwell']);
+        $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
         $data->transform(function ($item, $key) {
             return $key.'-'.strrev($item);
         });
@@ -2851,15 +2827,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([], $c->forPage(3, 2)->all());
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testPrepend($collection)
+    public function testPrepend()
     {
-        $c = new $collection(['one', 'two', 'three', 'four']);
+        $c = new Collection(['one', 'two', 'three', 'four']);
         $this->assertEquals(['zero', 'one', 'two', 'three', 'four'], $c->prepend('zero')->all());
 
-        $c = new $collection(['one' => 1, 'two' => 2]);
+        $c = new Collection(['one' => 1, 'two' => 2]);
         $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $c->prepend(0, 'zero')->all());
     }
 
@@ -3670,16 +3643,16 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->when('adam', function ($data, $newName) {
-            return $data->push($newName);
+        $data = $data->when('adam', function ($data, $newName) {
+            return $data->concat([$newName]);
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
 
         $data = new $collection(['michael', 'tom']);
 
-        $data->when(false, function ($collection) {
-            return $data->push('adam');
+        $data = $data->when(false, function ($data) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame(['michael', 'tom'], $data->toArray());
@@ -3692,10 +3665,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->when(false, function ($data) {
-            return $data->push('adam');
+        $data = $data->when(false, function ($data) {
+            return $data->concat(['adam']);
         }, function ($data) {
-            return $data->push('taylor');
+            return $data->concat(['taylor']);
         });
 
         $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
@@ -3708,16 +3681,16 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->whenEmpty(function ($collection) {
-            return $data->push('adam');
+        $data = $data->whenEmpty(function ($collection) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame(['michael', 'tom'], $data->toArray());
 
         $data = new $collection;
 
-        $data->whenEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->whenEmpty(function ($data) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame(['adam'], $data->toArray());
@@ -3730,10 +3703,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->whenEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->whenEmpty(function ($data) {
+            return $data->concat(['adam']);
         }, function ($data) {
-            return $data->push('taylor');
+            return $data->concat(['taylor']);
         });
 
         $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
@@ -3746,16 +3719,16 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->whenNotEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->whenNotEmpty(function ($data) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
 
         $data = new $collection;
 
-        $data->whenNotEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->whenNotEmpty(function ($data) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame([], $data->toArray());
@@ -3768,10 +3741,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->whenNotEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->whenNotEmpty(function ($data) {
+            return $data->concat(['adam']);
         }, function ($data) {
-            return $data->push('taylor');
+            return $data->concat(['taylor']);
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
@@ -3784,16 +3757,16 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->unless(false, function ($data) {
-            return $data->push('caleb');
+        $data = $data->unless(false, function ($data) {
+            return $data->concat(['caleb']);
         });
 
         $this->assertSame(['michael', 'tom', 'caleb'], $data->toArray());
 
         $data = new $collection(['michael', 'tom']);
 
-        $data->unless(true, function ($data) {
-            return $data->push('caleb');
+        $data = $data->unless(true, function ($data) {
+            return $data->concat(['caleb']);
         });
 
         $this->assertSame(['michael', 'tom'], $data->toArray());
@@ -3806,10 +3779,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->unless(true, function ($data) {
-            return $data->push('caleb');
+        $data = $data->unless(true, function ($data) {
+            return $data->concat(['caleb']);
         }, function ($data) {
-            return $data->push('taylor');
+            return $data->concat(['taylor']);
         });
 
         $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
@@ -3822,16 +3795,16 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->unlessEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->unlessEmpty(function ($data) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
 
         $data = new $collection;
 
-        $data->unlessEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->unlessEmpty(function ($data) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame([], $data->toArray());
@@ -3844,10 +3817,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->unlessEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->unlessEmpty(function ($data) {
+            return $data->concat(['adam']);
         }, function ($data) {
-            return $data->push('taylor');
+            return $data->concat(['taylor']);
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
@@ -3860,16 +3833,16 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->unlessNotEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->unlessNotEmpty(function ($data) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame(['michael', 'tom'], $data->toArray());
 
         $data = new $collection;
 
-        $data->unlessNotEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->unlessNotEmpty(function ($data) {
+            return $data->concat(['adam']);
         });
 
         $this->assertSame(['adam'], $data->toArray());
@@ -3882,10 +3855,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data->unlessNotEmpty(function ($data) {
-            return $data->push('adam');
+        $data = $data->unlessNotEmpty(function ($data) {
+            return $data->concat(['adam']);
         }, function ($data) {
-            return $data->push('taylor');
+            return $data->concat(['taylor']);
         });
 
         $this->assertSame(['michael', 'tom', 'taylor'], $data->toArray());
@@ -3903,12 +3876,9 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse($data->has('baz'));
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testPutAddsItemToCollection($collection)
+    public function testPutAddsItemToCollection()
     {
-        $data = new $collection;
+        $data = new Collection;
         $this->assertSame([], $data->toArray());
         $data->put('foo', 1);
         $this->assertSame(['foo' => 1], $data->toArray());
