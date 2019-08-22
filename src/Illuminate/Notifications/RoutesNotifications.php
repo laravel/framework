@@ -48,8 +48,6 @@ trait RoutesNotifications
                 return $this->notifications();
             case 'mail':
                 return $this->email;
-            case 'nexmo':
-                return $this->phone_number;
         }
     }
 }
