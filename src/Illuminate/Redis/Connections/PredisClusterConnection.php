@@ -3,7 +3,7 @@
 namespace Illuminate\Redis\Connections;
 
 /**
- * @deprecated Maintenance of Predis has been abandoned by the original package and will be removed from Laravel in 7.0
+ * @deprecated Predis is no longer maintained by its original author and will be removed from Laravel 7.0
  */
 class PredisClusterConnection extends PredisConnection
 {
