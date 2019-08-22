@@ -19,6 +19,7 @@ abstract class Manager
      * The container instance.
      *
      * @var \Illuminate\Contracts\Container\Container
+     *
      * @deprecated Use the $container property instead.
      */
     protected $app;
