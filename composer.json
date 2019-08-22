@@ -88,8 +88,6 @@
         "phpunit/phpunit": "^8.0",
         "predis/predis": "^1.1.1",
         "symfony/cache": "^4.3",
-        "symfony/css-selector": "^4.3",
-        "symfony/dom-crawler": "^4.3",
         "true/punycode": "^2.1"
     },
     "autoload": {
