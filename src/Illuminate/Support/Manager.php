@@ -16,6 +16,14 @@ abstract class Manager
     protected $container;
 
     /**
+     * The container instance.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     * @deprecated Use the $container property instead.
+     */
+    protected $app;
+
+    /**
      * The configuration repository instance.
      *
      * @var \Illuminate\Contracts\Config\Repository
@@ -44,6 +52,7 @@ abstract class Manager
      */
     public function __construct(Container $container)
     {
+        $this->app = $container;
         $this->container = $container;
         $this->config = $container->make('config');
     }
