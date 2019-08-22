@@ -13,6 +13,13 @@ use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 class PredisConnection extends Connection implements ConnectionContract
 {
     /**
+     * The Predis client.
+     *
+     * @var \Predis\Client
+     */
+    protected $client;
+
+    /**
      * Create a new Predis connection.
      *
      * @param  \Predis\Client  $client

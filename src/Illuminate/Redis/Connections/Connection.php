@@ -14,9 +14,9 @@ use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 abstract class Connection
 {
     /**
-     * The Predis client.
+     * The Redis client.
      *
-     * @var \Predis\Client
+     * @var \Redis
      */
     protected $client;
 
