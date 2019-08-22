@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Mockery;
+use Illuminate\Console\Application as Artisan;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Console\Application as Artisan;
+use Mockery;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -64,7 +64,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp()
     {
-        if (! $this->app) {
+        if (!$this->app) {
             $this->refreshApplication();
         }
 
@@ -93,7 +93,7 @@ abstract class TestCase extends BaseTestCase
         }
         $this->app = $this->createApplication();
     }
-    
+
     /**
      * Removes the application instance.
      *
@@ -187,7 +187,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Register a callback to be run after the application is created.
      *
-     * @param  callable  $callback
+     * @param callable $callback
      * @return void
      */
     public function afterApplicationCreated(callable $callback)
@@ -202,7 +202,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Register a callback to be run before the application is destroyed.
      *
-     * @param  callable  $callback
+     * @param callable $callback
      * @return void
      */
     protected function beforeApplicationDestroyed(callable $callback)
