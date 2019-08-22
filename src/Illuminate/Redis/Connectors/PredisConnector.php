@@ -8,6 +8,9 @@ use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 
+/**
+ * @deprecated Maintenance of Predis has been abandoned by the original package and will be removed from Laravel in 7.0
+ */
 class PredisConnector implements Connector
 {
     /**

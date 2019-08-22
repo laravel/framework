@@ -117,6 +117,7 @@
     "suggest": {
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
+        "ext-redis": "Required to use the redis cache and queue drivers.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (^3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6).",
         "filp/whoops": "Required for friendly error pages in development (^2.4).",
@@ -130,7 +131,6 @@
         "moontoast/math": "Required to use ordered UUIDs (^1.1).",
         "nexmo/client": "Required to use the Nexmo transport (^1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
-        "predis/predis": "Required to use the redis cache and queue drivers (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^3.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^4.3).",
         "symfony/css-selector": "Required to use some of the crawler integration testing tools (^4.3).",

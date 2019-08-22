@@ -8,9 +8,6 @@ use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Redis\Limiters\DurationLimiterBuilder;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 
-/**
- * @mixin \Predis\Client
- */
 abstract class Connection
 {
     /**
