@@ -88,7 +88,22 @@ abstract class TestCase extends BaseTestCase
      */
     protected function refreshApplication()
     {
+        if ($this->app) {
+            $this->clearApplication();
+        }
+
         $this->app = $this->createApplication();
+    }
+
+    /**
+     * Removes the application instance.
+     *
+     * @return void
+     */
+    private function clearApplication()
+    {
+        $this->app->flush();
+        $this->app = null;
     }
 
     /**
@@ -139,9 +154,7 @@ abstract class TestCase extends BaseTestCase
                 call_user_func($callback);
             }
 
-            $this->app->flush();
-
-            $this->app = null;
+            $this->clearApplication();
         }
 
         $this->setUpHasRun = false;
