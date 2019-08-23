@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Aws\CloudFront\CloudFrontClient;
 use League\Flysystem\AdapterInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
 use League\Flysystem\FileExistsException;
@@ -532,6 +533,24 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function getAwsTemporaryUrl($adapter, $path, $expiration, $options)
     {
+        if (env('AWS_S3_VIA_CLOUDFRONT')) {
+            $this->getAwsCloudfrontSignedUrl($path, $expiration, $options);
+        }
+
+        return $this->getAwsS3PreSignedUrl($adapter, $path, $expiration, $options);
+    }
+
+    /**
+     * Get a pre-signed URL for the file in Aws S3 bucket.
+     *
+     * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getAwsS3PreSignedUrl($adapter, $path, $expiration, $options)
+    {
         $client = $adapter->getClient();
 
         $command = $client->getCommand('GetObject', array_merge([
@@ -542,6 +561,33 @@ class FilesystemAdapter implements CloudFilesystemContract
         return (string) $client->createPresignedRequest(
             $command, $expiration
         )->getUri();
+    }
+
+    /**
+     * Get a signed URL for Aws S3 via Cloudfront.
+     *
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getAwsCloudfrontSignedUrl($path, $expiration, $options)
+    {
+        $client = new CloudFrontClient([
+            'version' => 'latest',
+            'region' => env('AWS_DEFAULT_REGION'),
+            'debug' => env('APP_DEBUG'),
+        ]);
+
+        $resourceUrl = env('AWS_CLOUDFRONT_PROTOCOL').'://'.env('AWS_CLOUDFRONT_DOMAIN').$path;
+
+        // Create a signed URL for the resource using the canned policy
+        return (string) $client->getSignedUrl(array_merge([
+            'url' => $resourceUrl,
+            'expires' => $expires,
+            'private_key' => base_path(env('AWS_CLOUDFRONT_PRIVATE_KEY_PATH')),
+            'key_pair_id' => env('AWS_CLOUDFRONT_KEY_PAIR_ID'),
+        ], $options));
     }
 
     /**
