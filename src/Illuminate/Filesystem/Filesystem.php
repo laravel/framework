@@ -15,7 +15,7 @@ class Filesystem
     /**
      * Determine if a file or directory exists.
      *
-     * @param  string  $path
+     * @param string $path
      * @return bool
      */
     public function exists($path)
