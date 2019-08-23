@@ -308,6 +308,16 @@ abstract class Job
     }
 
     /**
+     * Get the job handler instance.
+     *
+     * @return mixed
+     */
+    public function getInstance()
+    {
+        return $this->instance;
+    }
+
+    /**
      * Get the service container instance.
      *
      * @return \Illuminate\Container\Container
