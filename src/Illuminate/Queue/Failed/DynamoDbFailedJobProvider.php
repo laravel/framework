@@ -2,7 +2,10 @@
 
 namespace Illuminate\Queue\Failed;
 
+use Exception;
+use DateTimeInterface;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Support\Facades\Date;
 
@@ -16,6 +19,13 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     protected $dynamo;
 
     /**
+     * The application name.
+     *
+     * @var string
+     */
+    protected $applicationName;
+
+    /**
      * The table name.
      *
      * @var string
@@ -26,13 +36,15 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * Create a new DynamoDb failed job provider.
      *
      * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
+     * @param  string  $applicationName
      * @param  string  $table
      * @return void
      */
-    public function __construct(DynamoDbClient $dynamo, $table)
+    public function __construct(DynamoDbClient $dynamo, $applicationName, $table)
     {
         $this->table = $table;
         $this->dynamo = $dynamo;
+        $this->applicationName = $applicationName;
     }
 
     /**
@@ -48,17 +60,19 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     {
         $id = (string) Str::orderedUuid();
 
+        $failedAt = Date::now();
+
         $this->dynamo->putItem([
             'TableName' => $this->table,
             'Item' => [
-                'application' => ['S' => 'laravel'],
+                'application' => ['S' => $this->applicationName],
                 'uuid' => ['S' => $id],
                 'connection' => ['S' => $connection],
                 'queue' => ['S' => $queue],
                 'payload' => ['S' => $payload],
                 'exception' => ['S' => (string) $exception],
-                'failed_at' => ['N' => (string) Date::now()->getTimestamp()],
-                'expires_at' => ['N' => (string) Date::now()->addDays(3)->getTimestamp()]
+                'failed_at' => ['N' => (string) $failedAt->getTimestamp()],
+                'expires_at' => ['N' => (string) $failedAt->addDays(3)->getTimestamp()]
             ],
         ]);
 
@@ -77,12 +91,23 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
             'Select' => 'ALL_ATTRIBUTES',
             'KeyConditionExpression' => 'application = :application',
             'ExpressionAttributeValues' => [
-                ':application' => ['S' => 'laravel'],
+                ':application' => ['S' => $this->applicationName],
             ],
             'ScanIndexForward' => false,
         ]);
 
-        dd($results);
+        return collect($results['Items'])->map(function ($result) {
+            return (object) [
+                'id' => $result['uuid']['S'],
+                'connection' => $result['connection']['S'],
+                'queue' => $result['queue']['S'],
+                'payload' => $result['payload']['S'],
+                'exception' => $result['exception']['S'],
+                'failed_at' => Carbon::createFromTimestamp(
+                    (int) $result['failed_at']['N']
+                )->format(DateTimeInterface::ISO8601),
+            ];
+        })->all();
     }
 
     /**
@@ -93,15 +118,28 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      */
     public function find($id)
     {
-        $results = $this->dynamo->getItem([
+        $result = $this->dynamo->getItem([
             'TableName' => $this->table,
             'Key' => [
-                'application' => ['S' => 'laravel'],
+                'application' => ['S' => $this->applicationName],
                 'uuid' => ['S' => $id],
             ],
         ]);
 
-        dd($results);
+        if (! isset($result['Item'])) {
+            return;
+        }
+
+        return (object) [
+            'id' => $result['Item']['uuid']['S'],
+            'connection' => $result['Item']['connection']['S'],
+            'queue' => $result['Item']['queue']['S'],
+            'payload' => $result['Item']['payload']['S'],
+            'exception' => $result['Item']['exception']['S'],
+            'failed_at' => Carbon::createFromTimestamp(
+                (int) $result['Item']['failed_at']['N']
+            )->format(DateTimeInterface::ISO8601),
+        ];
     }
 
     /**
@@ -112,13 +150,15 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      */
     public function forget($id)
     {
-        $results = $this->dynamo->deleteItem([
+        $this->dynamo->deleteItem([
             'TableName' => $this->table,
             'Key' => [
-                'application' => ['S' => 'laravel'],
+                'application' => ['S' => $this->applicationName],
                 'uuid' => ['S' => $id],
             ],
         ]);
+
+        return true;
     }
 
     /**
@@ -128,6 +168,6 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      */
     public function flush()
     {
-        //
+        throw new Exception("DynamoDb failed job storage may not be flushed. Please use DynamoDb's TTL features on your expires_at attribute.");
     }
 }
