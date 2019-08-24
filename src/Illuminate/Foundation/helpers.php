@@ -884,7 +884,7 @@ if (! function_exists('trans_choice')) {
      * Translates the given message based on a count.
      *
      * @param  string  $key
-     * @param  int|array|\Countable  $number
+     * @param  \Countable|int|array  $number
      * @param  array   $replace
      * @param  string|null  $locale
      * @return string

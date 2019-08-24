@@ -17,8 +17,8 @@ abstract class Assert extends PHPUnit
      *
      * This method was taken over from PHPUnit where it was deprecated. See link for more info.
      *
-     * @param  array|\ArrayAccess  $subset
-     * @param  array|\ArrayAccess  $array
+     * @param  \ArrayAccess|array  $subset
+     * @param  \ArrayAccess|array  $array
      * @param  bool  $checkForObjectIdentity
      * @param  string  $message
      * @return void

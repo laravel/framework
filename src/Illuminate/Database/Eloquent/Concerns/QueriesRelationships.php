@@ -16,7 +16,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
      * @param  string  $operator
      * @param  int     $count
      * @param  string  $boolean
