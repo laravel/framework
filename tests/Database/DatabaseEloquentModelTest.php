@@ -68,6 +68,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(json_encode(['name' => 'taylor']), $attributes['list_items']);
     }
 
+    public function testSetAttributeWithNumericKey()
+    {
+        $model = new EloquentDateModelStub();
+        $model->setAttribute(0, 'value');
+
+        $this->assertEquals([0 => 'value'], $model->getAttributes());
+    }
+
     public function testDirtyAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
