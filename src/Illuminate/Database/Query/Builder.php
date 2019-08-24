@@ -1961,7 +1961,11 @@ class Builder
         $this->orders = $this->removeExistingOrdersFor($column);
 
         if (! is_null($lastId)) {
-            $this->where($column, '<', $lastId);
+            $clonedQuery = clone $this;
+            $this->wheres = [];
+            $this->bindings['where'] = [];
+            $this->addNestedWhereQuery($clonedQuery)
+                ->where($column, '<', $lastId);
         }
 
         return $this->orderBy($column, 'desc')
@@ -1981,7 +1985,11 @@ class Builder
         $this->orders = $this->removeExistingOrdersFor($column);
 
         if (! is_null($lastId)) {
-            $this->where($column, '>', $lastId);
+            $clonedQuery = clone $this;
+            $this->wheres = [];
+            $this->bindings['where'] = [];
+            $this->addNestedWhereQuery($clonedQuery)
+                ->where($column, '>', $lastId);
         }
 
         return $this->orderBy($column, 'asc')
