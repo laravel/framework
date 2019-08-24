@@ -58,10 +58,10 @@ class EloquentCustomPivotCustomEventsTest extends DatabaseTestCase
 
         $this->assertSame(
             [
-                'user_id' => "1",
-                'project_id' => "1",
+                'user_id' => '1',
+                'project_id' => '1',
                 'permissions' => '["foo","bar"]',
-                'role' => 'Lead Developer'
+                'role' => 'Lead Developer',
             ],
             $_SERVER['pivot_attributes']
         );
@@ -83,7 +83,7 @@ class EloquentCustomPivotCustomEventsTest extends DatabaseTestCase
 
         $project->collaborators()->updateExistingPivot($user->id, ['role' => 'Lead Developer']);
 
-        $this->assertSame(['role' => 'Lead Developer'],$_SERVER['pivot_dirty_attributes']);
+        $this->assertSame(['role' => 'Lead Developer'], $_SERVER['pivot_dirty_attributes']);
     }
 }
 
