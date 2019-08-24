@@ -33,6 +33,33 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.two']);
     }
 
+    public function testMultiplePipelinesBackAndForthExecutionOrder()
+    {
+        $pipeTwo = function ($piped, $next) {
+            $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_forward2';
+
+            $value = $next($piped);
+
+            $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_backward2';
+
+            return $value;
+        };
+
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through([PipelineTestPipeBack::class, $pipeTwo])
+            ->then(function ($piped) {
+                $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_core';
+
+                return $piped;
+            });
+
+        $this->assertEquals('foo', $result);
+        $this->assertEquals('forward1_forward2_core_backward2_backward1', $_SERVER['__test.pipeline']);
+
+        unset($_SERVER['__test.pipeline']);
+    }
+
     public function testPipelineUsageWithObjects()
     {
         $result = (new Pipeline(new Container))
@@ -174,6 +201,20 @@ class PipelineTest extends TestCase
         $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
+    }
+}
+
+class PipelineTestPipeBack
+{
+    public function handle($piped, $next)
+    {
+        $_SERVER['__test.pipeline'] = 'forward1';
+
+        $value = $next($piped);
+
+        $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_backward1';
+
+        return $value;
     }
 }
 
