@@ -227,10 +227,9 @@ trait InteractsWithPivotTable
 
         $updated = $pivot ? $pivot->fill($attributes)->isDirty() : false;
 
-        $this->newPivot([
-            $this->foreignPivotKey => $this->parent->{$this->parentKey},
-            $this->relatedPivotKey => $this->parseId($id),
-        ], true)->fill($attributes)->save();
+        if ($updated) {
+            $pivot->save();
+        }
 
         if ($touch) {
             $this->touchIfTouching();
@@ -478,7 +477,9 @@ trait InteractsWithPivotTable
         return $this->currentlyAttached ?: $this->newPivotQuery()->get()->map(function ($record) {
             $class = $this->using ? $this->using : Pivot::class;
 
-            return (new $class)->setRawAttributes((array) $record, true);
+            $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
+
+            return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
         });
     }
 
