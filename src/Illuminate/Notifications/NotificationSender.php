@@ -55,8 +55,8 @@ class NotificationSender
     {
         $this->bus = $bus;
         $this->events = $events;
-        $this->manager = $manager;
         $this->locale = $locale;
+        $this->manager = $manager;
     }
 
     /**

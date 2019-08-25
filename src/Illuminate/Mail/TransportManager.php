@@ -25,7 +25,7 @@ class TransportManager extends Manager
      */
     protected function createSmtpDriver()
     {
-        $config = $this->app->make('config')->get('mail');
+        $config = $this->config->get('mail');
 
         // The Swift SMTP transport instance will allow us to use any SMTP backend
         // for delivering mail such as Sendgrid, Amazon SES, or a custom server
@@ -79,7 +79,7 @@ class TransportManager extends Manager
      */
     protected function createSendmailDriver()
     {
-        return new SendmailTransport($this->app['config']['mail']['sendmail']);
+        return new SendmailTransport($this->config->get('mail.sendmail'));
     }
 
     /**
@@ -89,7 +89,7 @@ class TransportManager extends Manager
      */
     protected function createSesDriver()
     {
-        $config = array_merge($this->app['config']->get('services.ses', []), [
+        $config = array_merge($this->config->get('services.ses', []), [
             'version' => 'latest', 'service' => 'email',
         ]);
 
@@ -131,7 +131,7 @@ class TransportManager extends Manager
      */
     protected function createMailgunDriver()
     {
-        $config = $this->app['config']->get('services.mailgun', []);
+        $config = $this->config->get('services.mailgun', []);
 
         return new MailgunTransport(
             $this->guzzle($config),
@@ -149,7 +149,7 @@ class TransportManager extends Manager
     protected function createPostmarkDriver()
     {
         return new PostmarkTransport(
-            $this->app['config']->get('services.postmark.token')
+            $this->config->get('services.postmark.token')
         );
     }
 
@@ -160,10 +160,10 @@ class TransportManager extends Manager
      */
     protected function createLogDriver()
     {
-        $logger = $this->app->make(LoggerInterface::class);
+        $logger = $this->container->make(LoggerInterface::class);
 
         if ($logger instanceof LogManager) {
-            $logger = $logger->channel($this->app['config']['mail.log_channel']);
+            $logger = $logger->channel($this->config->get('mail.log_channel'));
         }
 
         return new LogTransport($logger);
@@ -199,7 +199,7 @@ class TransportManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['mail.driver'];
+        return $this->config->get('mail.driver');
     }
 
     /**
@@ -210,6 +210,6 @@ class TransportManager extends Manager
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['mail.driver'] = $name;
+        $this->config->set('mail.driver', $name);
     }
 }

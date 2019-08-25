@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 
 class SQLiteGrammar extends Grammar
@@ -133,6 +134,18 @@ class SQLiteGrammar extends Grammar
         }
 
         return parent::compileUpdate($query, $values);
+    }
+
+    /**
+     * Compile an insert ignore statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileInsertOrIgnore(Builder $query, array $values)
+    {
+        return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsert($query, $values));
     }
 
     /**

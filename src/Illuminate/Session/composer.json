@@ -16,9 +16,9 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "illuminate/contracts": "^6.0",
-        "illuminate/filesystem": "^6.0",
-        "illuminate/support": "^6.0",
+        "illuminate/contracts": "^7.0",
+        "illuminate/filesystem": "^7.0",
+        "illuminate/support": "^7.0",
         "symfony/finder": "^4.3",
         "symfony/http-foundation": "^4.3"
     },
@@ -29,11 +29,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.0-dev"
+            "dev-master": "7.0-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the session:table command (^6.0)."
+        "illuminate/console": "Required to use the session:table command (^7.0)."
     },
     "config": {
         "sort-packages": true

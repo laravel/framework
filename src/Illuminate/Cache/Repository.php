@@ -205,7 +205,7 @@ class Repository implements ArrayAccess, CacheContract
         $seconds = $this->getSeconds($ttl);
 
         if ($seconds <= 0) {
-            return $this->delete($key);
+            return $this->forget($key);
         }
 
         $result = $this->store->put($this->itemKey($key), $value, $seconds);

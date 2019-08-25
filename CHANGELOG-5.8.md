@@ -1,9 +1,35 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.31...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.32...5.8)
+
+### Added
+- Added `ValidatesWhenResolvedTrait::passedValidation()` callback ([#29549](https://github.com/laravel/framework/pull/29549))
+- Implement new types for email validation support ([#29589](https://github.com/laravel/framework/pull/29589))
+- Added Redis 5 support ([#29606](https://github.com/laravel/framework/pull/29606))
+
+### Fixed
+- Fixed non-displayable boolean values in validation messages ([#29560](https://github.com/laravel/framework/pull/29560))
+- Avoid undefined index errors when using AWS IAM ([#29565](https://github.com/laravel/framework/pull/29565))
+- Fixed exception message in the `ProviderRepository::writeManifest()` ([#29568](https://github.com/laravel/framework/pull/29568))
+- Fixed invalid link expiry count in ResetPassword ([#29579](https://github.com/laravel/framework/pull/29579))
+
+### Refactoring
+- Simplified `isset()` ([#29581](https://github.com/laravel/framework/pull/29581))
 
 ### TODO:
-- Resolve columns with schema references ([#29448](https://github.com/laravel/framework/pull/29448))
+- Fix command output/questions expectations ([#29580](https://github.com/laravel/framework/pull/29580))
+- Allow custom Whoops handlers ([#29564](https://github.com/laravel/framework/pull/29564))
+- Ignore classes which are not instantiable during event discovery ([#29587](https://github.com/laravel/framework/pull/29587))
+- Use real classname for seeders ([#29601](https://github.com/laravel/framework/pull/29601))
+
+
+## [v5.8.32 (2019-08-13)](https://github.com/laravel/framework/compare/v5.8.31...v5.8.32)
+
+### Fixed
+- Fixed top level wildcard validation for `distinct` validator ([#29499](https://github.com/laravel/framework/pull/29499))
+- Fixed resolving of columns with schema references in Postgres ([#29448](https://github.com/laravel/framework/pull/29448))
+- Only remove the event mutex if it was created ([#29526](https://github.com/laravel/framework/pull/29526))
+- Fixed restoring serialized collection with deleted models ([#29533](https://github.com/laravel/framework/pull/29533), [74b62bb](https://github.com/laravel/framework/commit/74b62bbbb32674dfa167e2812231bf302454e67f))
 
 
 ## [v5.8.31 (2019-08-06)](https://github.com/laravel/framework/compare/v5.8.30...v5.8.31)

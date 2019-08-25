@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
+use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
@@ -80,6 +81,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ClearResets' => 'command.auth.resets.clear',
         'ConfigCache' => 'command.config.cache',
         'ConfigClear' => 'command.config.clear',
+        'DbWipe' => 'command.db.wipe',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
         'EventCache' => 'command.event.cache',
@@ -289,6 +291,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.controller.make', function ($app) {
             return new ControllerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDbWipeCommand()
+    {
+        $this->app->singleton('command.db.wipe', function () {
+            return new WipeCommand;
         });
     }
 
@@ -635,8 +649,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueRestartCommand()
     {
-        $this->app->singleton('command.queue.restart', function () {
-            return new QueueRestartCommand;
+        $this->app->singleton('command.queue.restart', function ($app) {
+            return new QueueRestartCommand($app['cache.store']);
         });
     }
 
@@ -660,7 +674,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueWorkCommand()
     {
         $this->app->singleton('command.queue.work', function ($app) {
-            return new QueueWorkCommand($app['queue.worker']);
+            return new QueueWorkCommand($app['queue.worker'], $app['cache.store']);
         });
     }
 

@@ -31,6 +31,66 @@ class QueryBuilderTest extends DatabaseTestCase
         ]);
     }
 
+    public function testSelect()
+    {
+        $expected = ['id' => '1', 'title' => 'Foo Post'];
+
+        $this->assertSame($expected, (array) DB::table('posts')->select('id', 'title')->first());
+        $this->assertSame($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
+    }
+
+    public function testSelectReplacesExistingSelects()
+    {
+        $this->assertSame(
+            ['id' => '1', 'title' => 'Foo Post'],
+            (array) DB::table('posts')->select('content')->select(['id', 'title'])->first()
+        );
+    }
+
+    public function testSelectWithSubQuery()
+    {
+        $this->assertSame(
+            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
+            (array) DB::table('posts')->select(['id', 'title', 'foo' => function ($query) {
+                $query->select('bar');
+            }])->first()
+        );
+    }
+
+    public function testAddSelect()
+    {
+        $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.'];
+
+        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
+        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
+        $this->assertSame($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
+    }
+
+    public function testAddSelectWithSubQuery()
+    {
+        $this->assertSame(
+            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
+            (array) DB::table('posts')->addSelect(['id', 'title', 'foo' => function ($query) {
+                $query->select('bar');
+            }])->first()
+        );
+    }
+
+    public function testFromWithAlias()
+    {
+        $this->assertSame('select * from "posts" as "alias"', DB::table('posts', 'alias')->toSql());
+    }
+
+    public function testFromWithSubQuery()
+    {
+        $this->assertSame(
+            'Fake Post',
+            DB::table(function ($query) {
+                $query->selectRaw("'Fake Post' as title");
+            }, 'posts')->first()->title
+        );
+    }
+
     public function testWhereDate()
     {
         $this->assertSame(1, DB::table('posts')->whereDate('created_at', '2018-01-02')->count());
