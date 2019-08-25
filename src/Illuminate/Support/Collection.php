@@ -1562,7 +1562,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Search the collection for a given value and return the corresponding key if successful.
+     * Search the collection for a given value and return the key of its first occurrence if successful.
      *
      * @param  mixed  $value
      * @param  bool  $strict
@@ -1581,6 +1581,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return false;
+    }
+
+    /**
+     * Search the collection for a given value and return the key of its last occurrence if successful.
+     *
+     * @param  mixed  $value
+     * @param  bool  $strict
+     * @return mixed
+     */
+    public function searchLast($value, $strict = false)
+    {
+        $result = false;
+
+        foreach ($this->items as $key => $item) {
+            if ($this->useAsCallable($value)) {
+                if (call_user_func($value, $item, $key)) {
+                    $result = $key;
+                }
+            } else {
+                if (($strict && $item === $value) || (! $strict && $item == $value)) {
+                    $result = $key;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
