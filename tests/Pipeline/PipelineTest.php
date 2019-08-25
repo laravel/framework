@@ -199,6 +199,16 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.parameters']);
     }
 
+    public function testItCanWorkWithNoPipe()
+    {
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through([])
+            ->thenReturn();
+
+        $this->assertEquals('foo', $result);
+    }
+
     public function testPipelineViaChangesTheMethodBeingCalledOnThePipes()
     {
         $piped = function ($piped, $next) {
