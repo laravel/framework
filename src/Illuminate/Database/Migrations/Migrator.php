@@ -12,6 +12,7 @@ use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\MigrationsStarted;
+use Illuminate\Database\Events\MigrationsStarting;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
@@ -94,6 +95,8 @@ class Migrator
      */
     public function run($paths = [], array $options = [])
     {
+        $this->fireMigrationEvent(new MigrationsStarting($paths, $options));
+
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
@@ -215,6 +218,8 @@ class Migrator
      */
     public function rollback($paths = [], array $options = [])
     {
+        $this->fireMigrationEvent(new MigrationsStarting($paths, $options));
+
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
