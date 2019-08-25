@@ -1105,6 +1105,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(1, $results->first()->id);
     }
 
+    public function testForPageBeforeIdCorrectlyNestExistingWhereClauses()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'jamesotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 4, 'email' => 'victoriaotwell@gmail.com']);
+
+        // Without nesting the query, it would generate something along the lines
+        // of `WHERE id = 4 OR (id = 1 AND id < 3)`, which would return 2 rows,
+        // When correctly nested, it generates a proper where clause, such as:
+        // `WHERE (id = 4 OR id = 1) AND id < 3`, which returns a single row
+        $results = EloquentTestUser::where('id', 4)->orWhere('id', 1)->forPageBeforeId(15, 3);
+        $this->assertInstanceOf(Builder::class, $results);
+        $this->assertEquals(1, $results->count());
+        $this->assertEquals(1, $results->first()->id);
+    }
+
     public function testForPageAfterIdCorrectlyPaginates()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -1115,6 +1132,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(2, $results->first()->id);
 
         $results = EloquentTestUser::orderBy('id', 'desc')->forPageAfterId(15, 1);
+        $this->assertInstanceOf(Builder::class, $results);
+        $this->assertEquals(2, $results->first()->id);
+    }
+
+    public function testForPageAfterIdCorrectlyNestExistingWhereClauses()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        // Without nesting the query, it would generate something along the lines
+        // of `WHERE id = 1 OR (id = 2 AND id > 1)`, which would always return 1.
+        // When correctly nested, it generates a proper where clause, such as:
+        // `WHERE (id = 1 OR id = 2) AND id > 1`
+        $results = EloquentTestUser::where('id', 1)->orWhere('id', 2)->forPageAfterId(15, 1);
         $this->assertInstanceOf(Builder::class, $results);
         $this->assertEquals(2, $results->first()->id);
     }
