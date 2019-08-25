@@ -2291,6 +2291,48 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
+    public function testSearchLastReturnsIndexOfLastFoundItem()
+    {
+        $c = new Collection(['foo' => 'bar', 1, 2, 3, 4, 5, 2, 5, 'key' => 'bar']);
+
+        $this->assertEquals(5, $c->searchLast(2));
+        $this->assertEquals(5, $c->searchLast('2'));
+        $this->assertEquals('key', $c->searchLast('bar'));
+        $this->assertEquals(6, $c->searchLast(function ($value) {
+            return $value > 4;
+        }));
+        $this->assertEquals('key', $c->searchLast(function ($value) {
+            return ! is_numeric($value);
+        }));
+    }
+
+    public function testSearchLastInStrictMode()
+    {
+        $c = new Collection([false, 0, 1, [], 1, '', false]);
+
+        $this->assertFalse($c->searchLast('false', true));
+        $this->assertFalse($c->searchLast('1', true));
+        $this->assertEquals(6, $c->searchLast(false, true));
+        $this->assertEquals(1, $c->searchLast(0, true));
+        $this->assertEquals(4, $c->searchLast(1, true));
+        $this->assertEquals(3, $c->searchLast([], true));
+        $this->assertEquals(5, $c->searchLast('', true));
+    }
+
+    public function testSearchLastReturnsFalseWhenItemIsNotFound()
+    {
+        $c = new Collection([1, 2, 3, 4, 1, 'foo' => 'bar']);
+
+        $this->assertFalse($c->searchLast(6));
+        $this->assertFalse($c->searchLast('foo'));
+        $this->assertFalse($c->searchLast(function ($value) {
+            return $value < 1 && is_numeric($value);
+        }));
+        $this->assertFalse($c->searchLast(function ($value) {
+            return $value == 'nope';
+        }));
+    }
+
     public function testKeys()
     {
         $c = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
