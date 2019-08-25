@@ -111,6 +111,10 @@ class PipelineTest extends TestCase
 
     public function testPipelineUsageWithCallable()
     {
+        $callablePipeOne = [new PipelineTestPipeOne, 'method_handle'];
+
+        $callablePipeTwo = [PipelineTestPipeOne::class, 'static_handle'];
+
         $function = function ($piped, $next) {
             $_SERVER['__test.pipe.one'] = 'foo';
 
@@ -119,7 +123,7 @@ class PipelineTest extends TestCase
 
         $result = (new Pipeline(new Container))
             ->send('foo')
-            ->through([$function])
+            ->through([$function, $callablePipeOne, $callablePipeTwo])
             ->then(
                 function ($piped) {
                     return $piped;
@@ -128,8 +132,12 @@ class PipelineTest extends TestCase
 
         $this->assertEquals('foo', $result);
         $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.static']);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.method']);
 
         unset($_SERVER['__test.pipe.one']);
+        unset($_SERVER['__test.pipe.static']);
+        unset($_SERVER['__test.pipe.method']);
     }
 
     public function testPipelineUsageWithInvokableClass()
@@ -220,6 +228,20 @@ class PipelineTestPipeBack
 
 class PipelineTestPipeOne
 {
+    public static function static_handle($piped, $next)
+    {
+        $_SERVER['__test.pipe.static'] = $piped;
+
+        return $next($piped);
+    }
+
+    public static function method_handle($piped, $next)
+    {
+        $_SERVER['__test.pipe.method'] = $piped;
+
+        return $next($piped);
+    }
+
     public function handle($piped, $next)
     {
         $_SERVER['__test.pipe.one'] = $piped;
