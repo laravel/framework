@@ -7,14 +7,14 @@ use Illuminate\Contracts\Database\Events\MigrationEvent as MigrationEventContrac
 class MigrationsStarting implements MigrationEventContract
 {
     /**
-     * An array of paths used by the migrator
+     * An array of paths used by the migrator.
      *
      * @var array
      */
     public $paths;
 
     /**
-     * An array of options used by the migrator
+     * An array of options used by the migrator.
      *
      * @var array
      */

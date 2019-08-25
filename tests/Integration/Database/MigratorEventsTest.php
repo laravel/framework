@@ -21,7 +21,7 @@ class MigratorEventsTest extends DatabaseTestCase
 
         $this->artisan('migrate', $this->migrateOptions());
 
-        Event::assertDispatched(MigrationsStarting::class, function (MigrationsStarting $event){
+        Event::assertDispatched(MigrationsStarting::class, function (MigrationsStarting $event) {
             return in_array(realpath(__DIR__.'/stubs/'), $event->paths);
         });
     }
