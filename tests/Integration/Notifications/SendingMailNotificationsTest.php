@@ -103,7 +103,8 @@ class SendingMailNotificationsTest extends TestCase
                 $closure($message);
 
                 return true;
-            })
+            }),
+            []
         );
 
         $user->notify($notification);
@@ -147,7 +148,8 @@ class SendingMailNotificationsTest extends TestCase
                 $closure($message);
 
                 return true;
-            })
+            }),
+            []
         );
 
         $user->notify($notification);
@@ -180,7 +182,8 @@ class SendingMailNotificationsTest extends TestCase
                 $closure($message);
 
                 return true;
-            })
+            }),
+            []
         );
 
         $user->notify($notification);
@@ -213,7 +216,8 @@ class SendingMailNotificationsTest extends TestCase
                 $closure($message);
 
                 return true;
-            })
+            }),
+            []
         );
 
         $user->notify($notification);
