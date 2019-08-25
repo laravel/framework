@@ -5,6 +5,7 @@ namespace Illuminate\Pipeline;
 use Closure;
 use RuntimeException;
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
@@ -143,7 +144,7 @@ class Pipeline implements PipelineContract
                     // otherwise we'll resolve the pipes out of the container and call it with
                     // the appropriate method and arguments, returning the results back out.
                     return $pipe($passable, $stack);
-                } elseif (! is_object($pipe)) {
+                } elseif (is_string($pipe)) {
                     [$name, $parameters] = $this->parsePipeString($pipe);
 
                     // If the pipe is a string we will parse the string and resolve the class out
@@ -152,11 +153,13 @@ class Pipeline implements PipelineContract
                     $pipe = $this->getContainer()->make($name);
 
                     $parameters = array_merge([$passable, $stack], $parameters);
-                } else {
+                } elseif (is_object($pipe)) {
                     // If the pipe is already an object we'll just make a callable and pass it to
                     // the pipe as-is. There is no need to do any extra parsing and formatting
                     // since the object we're given was already a fully instantiated object.
                     $parameters = [$passable, $stack];
+                } else {
+                    throw new InvalidArgumentException(sprintf('A pipe must be an object, a string or a callable. %s given', gettype($pipe)));
                 }
 
                 $response = method_exists($pipe, $this->method)
