@@ -33,6 +33,7 @@ class Inspiring
             'Computer science is no more about computers than astronomy is about telescopes. - Edsger Dijkstra',
             'It always seems impossible until it is done. - Nelson Mandela',
             'Act only according to that maxim whereby you can, at the same time, will that it should become a universal law. - Immanuel Kant',
+            'There are no problems, only challenges.'
         ])->random();
     }
 }
