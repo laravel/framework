@@ -4,14 +4,12 @@ namespace Illuminate\Tests\Queue;
 
 use Exception;
 use Mockery as m;
-use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Aws\DynamoDb\DynamoDbClient;
-use Ramsey\Uuid\UuidFactoryInterface;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 
 class DynamoDbFailedJobProviderTest extends TestCase
@@ -45,7 +43,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'payload' => ['S' => 'payload'],
                 'exception' => ['S' => (string) $exception],
                 'failed_at' => ['N' => (string) $now->getTimestamp()],
-                'expires_at' => ['N' => (string) $now->addDays(3)->getTimestamp()]
+                'expires_at' => ['N' => (string) $now->addDays(3)->getTimestamp()],
             ],
         ]);
 
@@ -55,7 +53,6 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         Str::createUuidsNormally();
     }
-
 
     public function testCanRetrieveAllFailedJobs()
     {
@@ -81,8 +78,8 @@ class DynamoDbFailedJobProviderTest extends TestCase
                     'payload' => ['S' => 'payload'],
                     'exception' => ['S' => 'exception'],
                     'failed_at' => ['N' => (string) $time],
-                    'expires_at' => ['N' => (string) $time]
-                ]
+                    'expires_at' => ['N' => (string) $time],
+                ],
             ],
         ]);
 
@@ -102,7 +99,6 @@ class DynamoDbFailedJobProviderTest extends TestCase
         ], $response);
     }
 
-
     public function testASingleJobCanBeFound()
     {
         $dynamoDbClient = m::mock(DynamoDbClient::class);
@@ -114,7 +110,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             'Key' => [
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'id'],
-            ]
+            ],
         ])->andReturn([
             'Item' => [
                 'application' => ['S' => 'application'],
@@ -124,7 +120,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'payload' => ['S' => 'payload'],
                 'exception' => ['S' => 'exception'],
                 'failed_at' => ['N' => (string) $time],
-                'expires_at' => ['N' => (string) $time]
+                'expires_at' => ['N' => (string) $time],
             ],
         ]);
 
@@ -144,7 +140,6 @@ class DynamoDbFailedJobProviderTest extends TestCase
         );
     }
 
-
     public function testNullIsReturnedIfJobNotFound()
     {
         $dynamoDbClient = m::mock(DynamoDbClient::class);
@@ -156,7 +151,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             'Key' => [
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'id'],
-            ]
+            ],
         ])->andReturn([]);
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
@@ -165,7 +160,6 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $this->assertNull($response);
     }
-
 
     public function testJobsCanBeDeleted()
     {
@@ -178,7 +172,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             'Key' => [
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'id'],
-            ]
+            ],
         ])->andReturn([]);
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');

@@ -3,8 +3,6 @@
 namespace Illuminate\Support;
 
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidFactory;
-use Ramsey\Uuid\UuidInterface;
 use Illuminate\Support\Traits\Macroable;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
