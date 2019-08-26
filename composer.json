@@ -88,8 +88,6 @@
         "phpunit/phpunit": "^8.0",
         "predis/predis": "^1.1.1",
         "symfony/cache": "^4.3",
-        "symfony/css-selector": "^4.3",
-        "symfony/dom-crawler": "^4.3",
         "true/punycode": "^2.1"
     },
     "autoload": {
@@ -117,6 +115,7 @@
     "suggest": {
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
+        "ext-redis": "Required to use the Redis cache and queue drivers.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (^3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6).",
         "filp/whoops": "Required for friendly error pages in development (^2.4).",
@@ -128,13 +127,9 @@
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (^1.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
         "moontoast/math": "Required to use ordered UUIDs (^1.1).",
-        "nexmo/client": "Required to use the Nexmo transport (^1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
-        "predis/predis": "Required to use the redis cache and queue drivers (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^3.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^4.3).",
-        "symfony/css-selector": "Required to use some of the crawler integration testing tools (^4.3).",
-        "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (^4.3).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^1.1).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
     },

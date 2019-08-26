@@ -49,7 +49,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has been deleted.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Model  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this

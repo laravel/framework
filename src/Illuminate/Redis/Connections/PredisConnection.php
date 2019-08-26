@@ -9,9 +9,17 @@ use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 
 /**
  * @mixin \Predis\Client
+ * @deprecated Predis is no longer maintained by its original author and will be removed from Laravel 7.0
  */
 class PredisConnection extends Connection implements ConnectionContract
 {
+    /**
+     * The Predis client.
+     *
+     * @var \Predis\Client
+     */
+    protected $client;
+
     /**
      * Create a new Predis connection.
      *

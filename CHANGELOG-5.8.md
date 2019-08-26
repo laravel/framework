@@ -1,26 +1,35 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.32...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.33...5.8)
+
+### Fixed
+- Fixed `MailMessage::render()` if `view` method was used ([#29698](https://github.com/laravel/framework/pull/29698))
+
+### TODO:
+- Mock events until method ([#29708](https://github.com/laravel/framework/pull/29708))
+- Use custom attributes in lt/lte/gt/gte rules messages ([#29716](https://github.com/laravel/framework/pull/29716))
+
+
+## [v5.8.33 (2019-08-20)](https://github.com/laravel/framework/compare/v5.8.32...v5.8.33)
 
 ### Added
 - Added `ValidatesWhenResolvedTrait::passedValidation()` callback ([#29549](https://github.com/laravel/framework/pull/29549))
 - Implement new types for email validation support ([#29589](https://github.com/laravel/framework/pull/29589))
 - Added Redis 5 support ([#29606](https://github.com/laravel/framework/pull/29606))
+- Added `insertOrIgnore` support ([#29639](https://github.com/laravel/framework/pull/29639), [46d7e96](https://github.com/laravel/framework/commit/46d7e96ab3ab59339ef0ea8802963b2db84f9ab3), [#29645](https://github.com/laravel/framework/pull/29645))
+- Allowed to override the existing `Whoops` handler.([#29564](https://github.com/laravel/framework/pull/29564))
 
 ### Fixed
 - Fixed non-displayable boolean values in validation messages ([#29560](https://github.com/laravel/framework/pull/29560))
 - Avoid undefined index errors when using AWS IAM ([#29565](https://github.com/laravel/framework/pull/29565))
 - Fixed exception message in the `ProviderRepository::writeManifest()` ([#29568](https://github.com/laravel/framework/pull/29568))
 - Fixed invalid link expiry count in ResetPassword ([#29579](https://github.com/laravel/framework/pull/29579))
+- Fixed command testing of `output` and `questions` expectations ([#29580](https://github.com/laravel/framework/pull/29580))
+- Added ignoring of classes which are not instantiable during event discovery ([#29587](https://github.com/laravel/framework/pull/29587))
+- Used real classname for seeders in the output ([#29601](https://github.com/laravel/framework/pull/29601))
 
 ### Refactoring
 - Simplified `isset()` ([#29581](https://github.com/laravel/framework/pull/29581))
-
-### TODO:
-- Fix command output/questions expectations ([#29580](https://github.com/laravel/framework/pull/29580))
-- Allow custom Whoops handlers ([#29564](https://github.com/laravel/framework/pull/29564))
-- Ignore classes which are not instantiable during event discovery ([#29587](https://github.com/laravel/framework/pull/29587))
-- Use real classname for seeders ([#29601](https://github.com/laravel/framework/pull/29601))
 
 
 ## [v5.8.32 (2019-08-13)](https://github.com/laravel/framework/compare/v5.8.31...v5.8.32)

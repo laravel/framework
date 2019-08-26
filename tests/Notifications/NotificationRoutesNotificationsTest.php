@@ -49,7 +49,6 @@ class NotificationRoutesNotificationsTest extends TestCase
         $instance = new RoutesNotificationsTestInstance;
         $this->assertEquals('bar', $instance->routeNotificationFor('foo'));
         $this->assertEquals('taylor@laravel.com', $instance->routeNotificationFor('mail'));
-        $this->assertEquals('5555555555', $instance->routeNotificationFor('nexmo'));
     }
 }
 
@@ -58,7 +57,6 @@ class RoutesNotificationsTestInstance
     use RoutesNotifications;
 
     protected $email = 'taylor@laravel.com';
-    protected $phone_number = '5555555555';
 
     public function routeNotificationForFoo()
     {
