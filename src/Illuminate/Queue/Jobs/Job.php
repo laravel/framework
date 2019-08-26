@@ -216,6 +216,16 @@ abstract class Job
     }
 
     /**
+     * Get the resolved job handler instance.
+     *
+     * @return mixed
+     */
+    public function getResolvedJob()
+    {
+        return $this->instance;
+    }
+
+    /**
      * Get the decoded body of the job.
      *
      * @return array
@@ -305,16 +315,6 @@ abstract class Job
     public function getQueue()
     {
         return $this->queue;
-    }
-
-    /**
-     * Get the job handler instance.
-     *
-     * @return mixed
-     */
-    public function getInstance()
-    {
-        return $this->instance;
     }
 
     /**
