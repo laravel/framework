@@ -2,7 +2,9 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Aws\DynamoDb\DynamoDbClient;
 use Opis\Closure\SerializableClosure;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Connectors\SqsConnector;
@@ -15,6 +17,7 @@ use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
+use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 
 class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -196,9 +199,13 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->singleton('queue.failer', function () {
             $config = $this->app['config']['queue.failed'];
 
-            return isset($config['table'])
-                ? $this->databaseFailedJobProvider($config)
-                : new NullFailedJobProvider;
+            if (isset($config['driver']) && $config['driver'] === 'dynamodb') {
+                return $this->dynamoFailedJobProvider($config);
+            } elseif (isset($config['table'])) {
+                return $this->databaseFailedJobProvider($config);
+            } else {
+                return NullFailedJobProvider;
+            }
         });
     }
 
@@ -212,6 +219,33 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         return new DatabaseFailedJobProvider(
             $this->app['db'], $config['database'], $config['table']
+        );
+    }
+
+    /**
+     * Create a new DynamoDb failed job provider.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Queue\Failed\DynamoDbFailedJobProvider
+     */
+    protected function dynamoFailedJobProvider($config)
+    {
+        $dynamoConfig = [
+            'region' => $config['region'],
+            'version' => 'latest',
+            'endpoint' => $config['endpoint'] ?? null,
+        ];
+
+        if (! empty($config['key']) && ! empty($config['secret'])) {
+            $dynamoConfig['credentials'] = Arr::only(
+                $config, ['key', 'secret', 'token']
+            );
+        }
+
+        return new DynamoDbFailedJobProvider(
+            new DynamoDbClient($dynamoConfig),
+            $this->app['config']['app.name'],
+            $config['table']
         );
     }
 
