@@ -572,7 +572,7 @@ class Str
      */
     public static function uuid()
     {
-        return static::$UuidFactory
+        return static::$uuidFactory
                     ? call_user_func(static::$uuidFactory)
                     : Uuid::uuid4();
     }
