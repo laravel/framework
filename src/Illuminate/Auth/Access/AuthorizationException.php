@@ -17,11 +17,11 @@ class AuthorizationException extends Exception
      * Create a new authorization exception instance.
      *
      * @param  string|null  $message
-     * @param  mixed|null  $code
+     * @param  mixed  $code
      * @param  \Exception|null  $previous
      * @return void
      */
-    public function __construct($message = null, $code = null, Exception $previous = null)
+    public function __construct($message = null, $code = 0, Exception $previous = null)
     {
         parent::__construct($message ?? 'This action is unauthorized.', 0, $previous);
 
