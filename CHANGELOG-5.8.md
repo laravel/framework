@@ -2,6 +2,13 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.33...5.8)
 
+### Fixed
+- Fixed `MailMessage::render()` if `view` method was used ([#29698](https://github.com/laravel/framework/pull/29698))
+
+### TODO:
+- Mock events until method ([#29708](https://github.com/laravel/framework/pull/29708))
+- Use custom attributes in lt/lte/gt/gte rules messages ([#29716](https://github.com/laravel/framework/pull/29716))
+
 
 ## [v5.8.33 (2019-08-20)](https://github.com/laravel/framework/compare/v5.8.32...v5.8.33)
 
