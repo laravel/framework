@@ -52,7 +52,7 @@ trait InteractsWithRedis
         }
 
         try {
-            $this->redis['predis']->connection()->flushdb();
+            $this->redis['phpredis']->connection()->flushdb();
         } catch (Exception $e) {
             if ($host === '127.0.0.1' && $port === 6379 && getenv('REDIS_HOST') === false) {
                 static::$connectionFailedOnceWithDefaultsSkip = true;
@@ -68,7 +68,7 @@ trait InteractsWithRedis
      */
     public function tearDownRedis()
     {
-        $this->redis['predis']->connection()->flushdb();
+        $this->redis['phpredis']->connection()->flushdb();
 
         foreach ($this->redisDriverProvider() as $driver) {
             $this->redis[$driver[0]]->connection()->disconnect();
@@ -82,15 +82,10 @@ trait InteractsWithRedis
      */
     public function redisDriverProvider()
     {
-        $providers = [
+        return [
             ['predis'],
+            ['phpredis'],
         ];
-
-        if (extension_loaded('redis')) {
-            $providers[] = ['phpredis'];
-        }
-
-        return $providers;
     }
 
     /**

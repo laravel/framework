@@ -76,6 +76,7 @@
         "tightenco/collect": "<5.5.33"
     },
     "require-dev": {
+        "ext-redis": "*",
         "aws/aws-sdk-php": "^3.0",
         "doctrine/dbal": "^2.6",
         "filp/whoops": "^2.4",

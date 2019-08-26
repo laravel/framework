@@ -142,7 +142,7 @@ class ConcurrentLimiterTest extends TestCase
 
     private function redis()
     {
-        return $this->redis['predis']->connection();
+        return $this->redis['phpredis']->connection();
     }
 }
 
