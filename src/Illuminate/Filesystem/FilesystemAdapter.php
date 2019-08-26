@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Aws\CloudFront\CloudFrontClient;
 use League\Flysystem\AdapterInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
 use League\Flysystem\FileExistsException;
@@ -532,6 +533,24 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function getAwsTemporaryUrl($adapter, $path, $expiration, $options)
     {
+        if ($this->driver->getConfig()->get('serve_via_cloudfront')) {
+            return $this->getAwsCloudFrontSignedUrl($path, $expiration, $options);
+        }
+
+        return $this->getAwsS3PreSignedUrl($adapter, $path, $expiration, $options);
+    }
+
+    /**
+     * Get a pre-signed URL for the file in Aws S3 bucket.
+     *
+     * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getAwsS3PreSignedUrl($adapter, $path, $expiration, $options)
+    {
         $client = $adapter->getClient();
 
         $command = $client->getCommand('GetObject', array_merge([
@@ -542,6 +561,34 @@ class FilesystemAdapter implements CloudFilesystemContract
         return (string) $client->createPresignedRequest(
             $command, $expiration
         )->getUri();
+    }
+
+    /**
+     * Get a signed URL for Aws S3 via Cloudfront.
+     *
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getAwsCloudFrontSignedUrl($path, $expiration, $options)
+    {
+        $cloudFrontConfig = $this->driver->getConfig()->get('cloudfront');
+
+        $client = new CloudFrontClient([
+            'version' => 'latest',
+            'region' => $this->driver->getConfig()->get('region'),
+            'debug' => config('app.debug'),
+        ]);
+
+        $resourceUrl = $this->concatPathToUrl($cloudFrontConfig['protocol'].'://'.$cloudFrontConfig['domain'], $path);
+        // Create a signed URL for the resource using the canned policy
+        return (string) $client->getSignedUrl(array_merge([
+            'url' => $resourceUrl,
+            'expires' => time() + $expiration,
+            'private_key' => base_path($cloudFrontConfig['private_key_path']),
+            'key_pair_id' => $cloudFrontConfig['key_pair_id'],
+        ], $options));
     }
 
     /**

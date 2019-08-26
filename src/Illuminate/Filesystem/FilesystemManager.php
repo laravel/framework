@@ -235,8 +235,6 @@ class FilesystemManager implements FactoryContract
     {
         $cache = Arr::pull($config, 'cache');
 
-        $config = Arr::only($config, ['visibility', 'disable_asserts', 'url']);
-
         if ($cache) {
             $adapter = new CachedAdapter($adapter, $this->createCacheStore($cache));
         }
