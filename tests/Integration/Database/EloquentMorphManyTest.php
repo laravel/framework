@@ -18,6 +18,9 @@ class EloquentMorphManyTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');

@@ -35,6 +35,9 @@ class CacheEventMutexTest extends TestCase
     {
         parent::setUp();
 
+
+
+
         $this->cacheFactory = m::mock(Factory::class);
         $this->cacheRepository = m::mock(Repository::class);
         $this->cacheFactory->shouldReceive('store')->andReturn($this->cacheRepository);

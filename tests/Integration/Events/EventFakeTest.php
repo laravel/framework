@@ -40,6 +40,9 @@ class EventFakeTest extends TestCase
     {
         parent::setUp();
 
+
+
+
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
@@ -55,9 +58,12 @@ class EventFakeTest extends TestCase
      */
     protected function tearDown(): void
     {
+
+
         Schema::dropIfExists('posts');
 
         parent::tearDown();
+
     }
 
     public function testNonFakedEventGetsProperlyDispatched()

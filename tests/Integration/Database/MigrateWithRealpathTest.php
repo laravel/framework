@@ -15,6 +15,9 @@ class MigrateWithRealpathTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         $options = [
             '--path' => realpath(__DIR__.'/stubs/'),
             '--realpath' => true,

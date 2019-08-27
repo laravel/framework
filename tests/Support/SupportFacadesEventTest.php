@@ -19,6 +19,9 @@ class SupportFacadesEventTest extends TestCase
     {
         parent::setUp();
 
+
+
+
         $this->events = m::spy(Dispatcher::class);
 
         $container = new Container;
@@ -29,6 +32,9 @@ class SupportFacadesEventTest extends TestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+
         Event::clearResolvedInstances();
 
         m::close();

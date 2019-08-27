@@ -42,6 +42,9 @@ class ClearCommandTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         $this->cacheManager = m::mock(CacheManager::class);
         $this->files = m::mock(Filesystem::class);
         $this->cacheRepository = m::mock(Repository::class);
@@ -54,6 +57,9 @@ class ClearCommandTest extends TestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         m::close();
     }
 

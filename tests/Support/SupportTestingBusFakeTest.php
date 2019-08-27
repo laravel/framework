@@ -17,12 +17,18 @@ class SupportTestingBusFakeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+       
+
         $this->fake = new BusFake(m::mock(Dispatcher::class));
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
+
+       
+
         m::close();
     }
 

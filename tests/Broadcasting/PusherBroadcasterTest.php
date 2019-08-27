@@ -21,6 +21,9 @@ class PusherBroadcasterTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         $this->pusher = m::mock('Pusher\Pusher');
         $this->broadcaster = m::mock(PusherBroadcaster::class, [$this->pusher])->makePartial();
     }

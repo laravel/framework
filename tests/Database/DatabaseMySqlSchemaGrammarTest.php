@@ -13,6 +13,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+
         m::close();
     }
 

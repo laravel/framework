@@ -19,6 +19,9 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('some_default_value');

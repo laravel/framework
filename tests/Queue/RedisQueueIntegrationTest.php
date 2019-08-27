@@ -22,15 +22,21 @@ class RedisQueueIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        Carbon::setTestNow(Carbon::now());
         parent::setUp();
+
+       
+        Carbon::setTestNow(Carbon::now());
+
         $this->setUpRedis();
     }
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
         parent::tearDown();
+
+       
+        Carbon::setTestNow(null);
+
         $this->tearDownRedis();
         m::close();
     }

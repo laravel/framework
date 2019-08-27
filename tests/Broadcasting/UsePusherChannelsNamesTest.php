@@ -18,11 +18,17 @@ class UsePusherChannelConventionsTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         $this->broadcaster = new FakeBroadcasterUsingPusherChannelsNames();
     }
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         m::close();
     }
 

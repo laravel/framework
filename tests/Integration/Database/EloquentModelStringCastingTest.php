@@ -15,6 +15,9 @@ class EloquentModelStringCastingTest extends TestCase
 {
     protected function setUp(): void
     {
+        parent::setUp();
+
+       
         $db = new DB;
 
         $db->addConnection([
@@ -51,6 +54,9 @@ class EloquentModelStringCastingTest extends TestCase
      */
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         $this->schema()->drop('casting_table');
     }
 

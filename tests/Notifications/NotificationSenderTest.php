@@ -19,6 +19,9 @@ class NotificationSenderTest extends TestCase
     {
         parent::tearDown();
 
+       
+
+
         m::close();
     }
 

@@ -16,6 +16,9 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->decimal('decimal_field_2', 8, 2)->nullable();

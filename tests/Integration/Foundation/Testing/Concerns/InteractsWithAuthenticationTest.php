@@ -28,6 +28,9 @@ class InteractsWithAuthenticationTest extends TestCase
     {
         parent::setUp();
 
+
+
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');

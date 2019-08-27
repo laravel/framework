@@ -36,6 +36,9 @@ class EloquentModelConnectionsTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('parent', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');

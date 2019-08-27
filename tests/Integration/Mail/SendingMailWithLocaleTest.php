@@ -22,6 +22,9 @@ class SendingMailWithLocaleTest extends TestCase
     {
         parent::tearDown();
 
+
+
+
         m::close();
     }
 
@@ -49,6 +52,9 @@ class SendingMailWithLocaleTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+
+
     }
 
     public function testMailIsSentWithDefaultLocale()

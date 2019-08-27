@@ -15,6 +15,9 @@ class AuthDatabaseUserProviderTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+
         m::close();
     }
 

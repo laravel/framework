@@ -16,6 +16,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
     protected function setUp(): void
     {
+        parent::setUp();
+
+
         Carbon::setTestNow(Carbon::now());
 
         $db = new DB;
@@ -87,6 +90,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+
         Carbon::setTestNow(null);
 
         $this->schema()->drop('users');

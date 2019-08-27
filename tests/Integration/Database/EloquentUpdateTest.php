@@ -31,6 +31,9 @@ class EloquentUpdateTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();

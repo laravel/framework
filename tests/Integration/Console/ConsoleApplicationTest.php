@@ -13,6 +13,9 @@ class ConsoleApplicationTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         $this->app[Kernel::class]->registerCommand(new FooCommandStub);
     }
 

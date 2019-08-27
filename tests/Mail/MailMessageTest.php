@@ -24,12 +24,18 @@ class MailMessageTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         $this->swift = m::mock(Swift_Mime_Message::class);
         $this->message = new Message($this->swift);
     }
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         m::close();
     }
 

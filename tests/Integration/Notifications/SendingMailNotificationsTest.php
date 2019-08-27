@@ -28,6 +28,9 @@ class SendingMailNotificationsTest extends TestCase
     {
         parent::tearDown();
 
+       
+
+
         m::close();
     }
 
@@ -58,6 +61,9 @@ class SendingMailNotificationsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+       
+
 
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');

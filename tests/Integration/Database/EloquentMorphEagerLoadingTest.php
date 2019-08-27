@@ -17,6 +17,9 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
         });

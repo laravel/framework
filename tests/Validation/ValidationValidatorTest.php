@@ -28,6 +28,9 @@ class ValidationValidatorTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+
         Carbon::setTestNow();
         m::close();
     }

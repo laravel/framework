@@ -23,11 +23,17 @@ class BroadcasterTest extends TestCase
     {
         parent::setUp();
 
+
+
+
         $this->broadcaster = new FakeBroadcaster;
     }
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+
         m::close();
 
         Container::setInstance(null);

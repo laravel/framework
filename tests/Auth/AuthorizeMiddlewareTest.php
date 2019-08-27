@@ -27,6 +27,9 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         $this->user = new stdClass;
 
         Container::setInstance($this->container = new Container);
@@ -46,6 +49,9 @@ class AuthorizeMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         m::close();
 
         Container::setInstance(null);

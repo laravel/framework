@@ -16,15 +16,21 @@ abstract class AbstractBladeTestCase extends TestCase
 
     protected function setUp(): void
     {
-        $this->compiler = new BladeCompiler($this->getFiles(), __DIR__);
         parent::setUp();
+
+       
+        $this->compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
     }
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         m::close();
 
-        parent::tearDown();
+
     }
 
     protected function getFiles()

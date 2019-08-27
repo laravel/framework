@@ -29,6 +29,9 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
+       
         $db = new DB;
 
         $db->addConnection([
@@ -97,6 +100,9 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         $this->schema()->drop('jobs');
     }
 

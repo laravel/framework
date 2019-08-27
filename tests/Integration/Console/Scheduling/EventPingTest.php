@@ -23,6 +23,9 @@ class EventPingTest extends TestCase
     {
         parent::tearDown();
 
+       
+
+
         m::close();
     }
 

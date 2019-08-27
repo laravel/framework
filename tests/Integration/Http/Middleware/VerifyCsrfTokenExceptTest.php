@@ -15,6 +15,9 @@ class VerifyCsrfTokenExceptTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         $this->stub = new VerifyCsrfTokenExceptStub(app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
         $this->request = Request::create('http://example.com/foo/bar', 'POST');
     }

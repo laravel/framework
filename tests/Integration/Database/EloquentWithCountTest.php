@@ -16,6 +16,9 @@ class EloquentWithCountTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('one', function (Blueprint $table) {
             $table->increments('id');
         });

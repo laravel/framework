@@ -32,6 +32,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     protected function setUp(): void
     {
+        parent::setUp();
+
+       
         $db = new DB;
 
         $db->addConnection([
@@ -132,6 +135,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');

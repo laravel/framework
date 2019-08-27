@@ -14,6 +14,9 @@ abstract class MemcachedIntegrationTest extends TestCase
     {
         parent::setUp();
 
+
+
+
         if (! extension_loaded('memcached')) {
             $this->markTestSkipped('Memcached module not installed');
         }

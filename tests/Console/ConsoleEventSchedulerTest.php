@@ -23,6 +23,9 @@ class ConsoleEventSchedulerTest extends TestCase
     {
         parent::setUp();
 
+
+
+
         $container = Container::getInstance();
 
         $container->instance(EventMutex::class, m::mock(CacheEventMutex::class));
@@ -34,6 +37,9 @@ class ConsoleEventSchedulerTest extends TestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+
         m::close();
     }
 

@@ -18,6 +18,9 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
      */
     protected function setUp(): void
     {
+        parent::setUp();
+
+       
         $this->db = $db = new DB;
 
         $db->addConnection([
@@ -34,6 +37,9 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
     }

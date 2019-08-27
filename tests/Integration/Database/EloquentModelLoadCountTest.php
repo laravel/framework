@@ -17,6 +17,9 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
     {
         parent::setUp();
 
+
+
+
         Schema::create('base_models', function (Blueprint $table) {
             $table->increments('id');
         });

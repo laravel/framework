@@ -19,12 +19,18 @@ class DurationLimiterTest extends TestCase
     {
         parent::setUp();
 
+
+
+
         $this->setUpRedis();
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
+
+
+
 
         $this->tearDownRedis();
     }

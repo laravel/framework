@@ -18,6 +18,9 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('slug')->nullable();

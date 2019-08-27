@@ -21,11 +21,17 @@ class RouteRegistrarTest extends TestCase
     {
         parent::setUp();
 
+       
+
+
         $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
     }
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         m::close();
     }
 

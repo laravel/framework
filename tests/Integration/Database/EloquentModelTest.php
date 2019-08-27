@@ -17,6 +17,9 @@ class EloquentModelTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamp('nullable_date')->nullable();

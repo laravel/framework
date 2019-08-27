@@ -17,6 +17,9 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
     {
         parent::setUp();
 
+       
+
+
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->date('date_field')->nullable();

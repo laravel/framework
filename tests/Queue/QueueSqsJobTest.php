@@ -14,6 +14,9 @@ class QueueSqsJobTest extends TestCase
 {
     protected function setUp(): void
     {
+        parent::setUp();
+
+       
         $this->key = 'AMAZONSQSKEY';
         $this->secret = 'AmAz0n+SqSsEcReT+aLpHaNuM3R1CsTr1nG';
         $this->service = 'sqs';
@@ -52,6 +55,9 @@ class QueueSqsJobTest extends TestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
+       
         m::close();
     }
 
