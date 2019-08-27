@@ -34,6 +34,18 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
     }
 
+    public function testAny()
+    {
+        $this->assertTrue(Arr::any([0, 1]));
+        $this->assertFalse(Arr::any([0, 1], function ($item) {
+            return $item === 2;
+        }));
+
+        $this->assertTrue(Arr::any([0, 1, 2], function ($item) {
+            return $item === 2;
+        }));
+    }
+
     public function testCollapse()
     {
         $data = [['foo', 'bar'], ['baz']];

@@ -127,6 +127,22 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testAny()
+    {
+        $data = new Collection();
+        $this->assertFalse($data->any());
+        $data->add('foo');
+        $this->assertTrue($data->any());
+
+        $callback = function ($item) {
+            return $item === 'bar';
+        };
+
+        $this->assertFalse($data->any($callback));
+        $data->add('bar');
+        $this->assertTrue($data->any($callback));
+    }
+
     public function testPopReturnsAndRemovesLastItemInCollection()
     {
         $c = new Collection(['foo', 'bar']);

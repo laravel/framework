@@ -61,6 +61,17 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Returns true if any element of the collection is truthy. If not, returns false.
+     *
+     * @param  callable|null  $callback
+     * @return bool
+     */
+    public function any(callable $callback = null)
+    {
+        return Arr::any($this->items, $callback);
+    }
+
+    /**
      * Get a lazy collection for the items in this collection.
      *
      * @return \Illuminate\Support\LazyCollection

@@ -39,6 +39,28 @@ class Arr
     }
 
     /**
+     * Returns true if any element of the array is truthy. If not, returns false.
+     *
+     * @param  $array  $array
+     * @param  callable|null  $callback
+     * @return bool
+     */
+    public static function any($array, callable $callback = null)
+    {
+        $callback = $callback ?: function ($value) {
+            return $value;
+        };
+
+        foreach ($array as $value) {
+            if ($callback($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  array  $array
