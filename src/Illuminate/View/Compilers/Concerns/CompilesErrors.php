@@ -14,9 +14,11 @@ trait CompilesErrors
     {
         $expression = $this->stripParentheses($expression);
 
-        return '<?php if ($errors->has('.$expression.')) :
-if (isset($message)) { $messageCache = $message; }
-$message = $errors->first('.$expression.'); ?>';
+        return '<?php $__args = ['.$expression.'];
+$__bag = $errors->getBag($__args[1] ?? \'default\');
+if ($__bag->has($__args[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__args[0]); ?>';
     }
 
     /**
@@ -28,7 +30,8 @@ $message = $errors->first('.$expression.'); ?>';
     protected function compileEnderror($expression)
     {
         return '<?php unset($message);
-if (isset($messageCache)) { $message = $messageCache; }
-endif; ?>';
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__args, $__bag); ?>';
     }
 }
