@@ -43,6 +43,19 @@ class EloquentMorphManyTest extends DatabaseTestCase
 
         $this->assertSame('new name', $post->title);
     }
+
+    public function test_self_referencing_existence_query()
+    {
+        $post = Post::create(['title' => 'foo']);
+
+        $comment = tap((new Comment(['name' => 'foo']))->commentable()->associate($post))->save();
+
+        (new Comment(['name' => 'bar']))->commentable()->associate($comment)->save();
+
+        $comments = Comment::has('replies')->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
+    }
 }
 
 class Post extends Model
@@ -67,5 +80,10 @@ class Comment extends Model
     public function commentable()
     {
         return $this->morphTo();
+    }
+
+    public function replies()
+    {
+        return $this->morphMany(self::class, 'commentable');
     }
 }
