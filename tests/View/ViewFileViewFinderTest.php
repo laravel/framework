@@ -113,7 +113,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder = $this->getFinder();
         $finder->addExtension('baz');
         $extensions = $finder->getExtensions();
-        $this->assertEquals('baz', reset($extensions));
+        $this->assertSame('baz', reset($extensions));
     }
 
     public function testAddingExtensionsReplacesOldOnes()

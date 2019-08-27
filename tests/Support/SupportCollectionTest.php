@@ -27,7 +27,7 @@ class SupportCollectionTest extends TestCase
     public function testFirstReturnsFirstItemInCollection($collection)
     {
         $c = new $collection(['foo', 'bar']);
-        $this->assertEquals('foo', $c->first());
+        $this->assertSame('foo', $c->first());
     }
 
     /**
@@ -39,7 +39,7 @@ class SupportCollectionTest extends TestCase
         $result = $data->first(function ($value) {
             return $value === 'bar';
         });
-        $this->assertEquals('bar', $result);
+        $this->assertSame('bar', $result);
     }
 
     /**
@@ -51,7 +51,7 @@ class SupportCollectionTest extends TestCase
         $result = $data->first(function ($value) {
             return $value === 'baz';
         }, 'default');
-        $this->assertEquals('default', $result);
+        $this->assertSame('default', $result);
     }
 
     /**
@@ -61,7 +61,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection;
         $result = $data->first(null, 'default');
-        $this->assertEquals('default', $result);
+        $this->assertSame('default', $result);
     }
 
     /**
@@ -74,8 +74,8 @@ class SupportCollectionTest extends TestCase
             ['material' => 'rubber', 'type' => 'gasket'],
         ]);
 
-        $this->assertEquals('book', $data->firstWhere('material', 'paper')['type']);
-        $this->assertEquals('gasket', $data->firstWhere('material', 'rubber')['type']);
+        $this->assertSame('book', $data->firstWhere('material', 'paper')['type']);
+        $this->assertSame('gasket', $data->firstWhere('material', 'rubber')['type']);
         $this->assertNull($data->firstWhere('material', 'nonexistant'));
         $this->assertNull($data->firstWhere('nonexistant', 'key'));
     }
@@ -86,7 +86,7 @@ class SupportCollectionTest extends TestCase
     public function testLastReturnsLastItemInCollection($collection)
     {
         $c = new $collection(['foo', 'bar']);
-        $this->assertEquals('bar', $c->last());
+        $this->assertSame('bar', $c->last());
     }
 
     /**
@@ -114,7 +114,7 @@ class SupportCollectionTest extends TestCase
         $result = $data->last(function ($value) {
             return $value === 'baz';
         }, 'default');
-        $this->assertEquals('default', $result);
+        $this->assertSame('default', $result);
     }
 
     /**
@@ -124,24 +124,24 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection;
         $result = $data->last(null, 'default');
-        $this->assertEquals('default', $result);
+        $this->assertSame('default', $result);
     }
 
     public function testPopReturnsAndRemovesLastItemInCollection()
     {
         $c = new Collection(['foo', 'bar']);
 
-        $this->assertEquals('bar', $c->pop());
-        $this->assertEquals('foo', $c->first());
+        $this->assertSame('bar', $c->pop());
+        $this->assertSame('foo', $c->first());
     }
 
     public function testShiftReturnsAndRemovesFirstItemInCollection()
     {
         $data = new Collection(['Taylor', 'Otwell']);
 
-        $this->assertEquals('Taylor', $data->shift());
-        $this->assertEquals('Otwell', $data->first());
-        $this->assertEquals('Otwell', $data->shift());
+        $this->assertSame('Taylor', $data->shift());
+        $this->assertSame('Otwell', $data->first());
+        $this->assertSame('Otwell', $data->shift());
         $this->assertEquals(null, $data->first());
     }
 
@@ -315,14 +315,14 @@ class SupportCollectionTest extends TestCase
     public function testOffsetAccess()
     {
         $c = new Collection(['name' => 'taylor']);
-        $this->assertEquals('taylor', $c['name']);
+        $this->assertSame('taylor', $c['name']);
         $c['name'] = 'dayle';
-        $this->assertEquals('dayle', $c['name']);
+        $this->assertSame('dayle', $c['name']);
         $this->assertTrue(isset($c['name']));
         unset($c['name']);
         $this->assertFalse(isset($c['name']));
         $c[] = 'jason';
-        $this->assertEquals('jason', $c[0]);
+        $this->assertSame('jason', $c[0]);
     }
 
     public function testArrayAccessOffsetExists()
@@ -336,8 +336,8 @@ class SupportCollectionTest extends TestCase
     public function testArrayAccessOffsetGet()
     {
         $c = new Collection(['foo', 'bar']);
-        $this->assertEquals('foo', $c->offsetGet(0));
-        $this->assertEquals('bar', $c->offsetGet(1));
+        $this->assertSame('foo', $c->offsetGet(0));
+        $this->assertSame('bar', $c->offsetGet(1));
     }
 
     public function testArrayAccessOffsetSet()
@@ -345,10 +345,10 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'foo']);
 
         $c->offsetSet(1, 'bar');
-        $this->assertEquals('bar', $c[1]);
+        $this->assertSame('bar', $c[1]);
 
         $c->offsetSet(null, 'qux');
-        $this->assertEquals('qux', $c[2]);
+        $this->assertSame('qux', $c[2]);
     }
 
     public function testArrayAccessOffsetUnset()
@@ -1286,15 +1286,15 @@ class SupportCollectionTest extends TestCase
      */
     public function testJoin($collection)
     {
-        $this->assertEquals('a, b, c', (new $collection(['a', 'b', 'c']))->join(', '));
+        $this->assertSame('a, b, c', (new $collection(['a', 'b', 'c']))->join(', '));
 
-        $this->assertEquals('a, b and c', (new $collection(['a', 'b', 'c']))->join(', ', ' and '));
+        $this->assertSame('a, b and c', (new $collection(['a', 'b', 'c']))->join(', ', ' and '));
 
-        $this->assertEquals('a and b', (new $collection(['a', 'b']))->join(', ', ' and '));
+        $this->assertSame('a and b', (new $collection(['a', 'b']))->join(', ', ' and '));
 
-        $this->assertEquals('a', (new $collection(['a']))->join(', ', ' and '));
+        $this->assertSame('a', (new $collection(['a']))->join(', ', ' and '));
 
-        $this->assertEquals('', (new $collection([]))->join(', ', ' and '));
+        $this->assertSame('', (new $collection([]))->join(', ', ' and '));
     }
 
     /**
@@ -1600,12 +1600,12 @@ class SupportCollectionTest extends TestCase
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
-        $this->assertEquals('foobar', $data->implode('email'));
-        $this->assertEquals('foo,bar', $data->implode('email', ','));
+        $this->assertSame('foobar', $data->implode('email'));
+        $this->assertSame('foo,bar', $data->implode('email', ','));
 
         $data = new $collection(['taylor', 'dayle']);
-        $this->assertEquals('taylordayle', $data->implode(''));
-        $this->assertEquals('taylor,dayle', $data->implode(','));
+        $this->assertSame('taylordayle', $data->implode(''));
+        $this->assertSame('taylor,dayle', $data->implode(','));
     }
 
     /**
@@ -1857,7 +1857,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testUnwrapCollectionWithScalar($collection)
     {
-        $this->assertEquals('foo', $collection::unwrap('foo'));
+        $this->assertSame('foo', $collection::unwrap('foo'));
     }
 
     /**
@@ -2194,8 +2194,8 @@ class SupportCollectionTest extends TestCase
 
         $data = $data->mapInto(TestCollectionMapIntoObject::class);
 
-        $this->assertEquals('first', $data->get(0)->value);
-        $this->assertEquals('second', $data->get(1)->value);
+        $this->assertSame('first', $data->get(0)->value);
+        $this->assertSame('second', $data->get(1)->value);
     }
 
     /**
@@ -2686,7 +2686,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['foo', 'bar']);
 
-        $this->assertEquals('foo', $c->pull(0));
+        $this->assertSame('foo', $c->pull(0));
     }
 
     public function testPullRemovesItemFromCollection()
@@ -2700,7 +2700,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection([]);
         $value = $c->pull(0, 'foo');
-        $this->assertEquals('foo', $value);
+        $this->assertSame('foo', $value);
     }
 
     /**
@@ -2765,11 +2765,11 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals(1, $c->search(2));
         $this->assertEquals(1, $c->search('2'));
-        $this->assertEquals('foo', $c->search('bar'));
+        $this->assertSame('foo', $c->search('bar'));
         $this->assertEquals(4, $c->search(function ($value) {
             return $value > 4;
         }));
-        $this->assertEquals('foo', $c->search(function ($value) {
+        $this->assertSame('foo', $c->search(function ($value) {
             return ! is_numeric($value);
         }));
     }

@@ -19,20 +19,20 @@ class CookieTest extends TestCase
         $cookie = $this->getCreator();
         $cookie->setDefaultPathAndDomain('foo', 'bar');
         $c = $cookie->make('color', 'blue', 10, '/path', '/domain', true, false, false, 'lax');
-        $this->assertEquals('blue', $c->getValue());
+        $this->assertSame('blue', $c->getValue());
         $this->assertFalse($c->isHttpOnly());
         $this->assertTrue($c->isSecure());
-        $this->assertEquals('/domain', $c->getDomain());
-        $this->assertEquals('/path', $c->getPath());
-        $this->assertEquals('lax', $c->getSameSite());
+        $this->assertSame('/domain', $c->getDomain());
+        $this->assertSame('/path', $c->getPath());
+        $this->assertSame('lax', $c->getSameSite());
 
         $c2 = $cookie->forever('color', 'blue', '/path', '/domain', true, false, false, 'strict');
-        $this->assertEquals('blue', $c2->getValue());
+        $this->assertSame('blue', $c2->getValue());
         $this->assertFalse($c2->isHttpOnly());
         $this->assertTrue($c2->isSecure());
-        $this->assertEquals('/domain', $c2->getDomain());
-        $this->assertEquals('/path', $c2->getPath());
-        $this->assertEquals('strict', $c2->getSameSite());
+        $this->assertSame('/domain', $c2->getDomain());
+        $this->assertSame('/path', $c2->getPath());
+        $this->assertSame('strict', $c2->getSameSite());
 
         $c3 = $cookie->forget('color');
         $this->assertNull($c3->getValue());
@@ -44,11 +44,11 @@ class CookieTest extends TestCase
         $cookie = $this->getCreator();
         $cookie->setDefaultPathAndDomain('/path', '/domain', true, 'lax');
         $c = $cookie->make('color', 'blue');
-        $this->assertEquals('blue', $c->getValue());
+        $this->assertSame('blue', $c->getValue());
         $this->assertTrue($c->isSecure());
-        $this->assertEquals('/domain', $c->getDomain());
-        $this->assertEquals('/path', $c->getPath());
-        $this->assertEquals('lax', $c->getSameSite());
+        $this->assertSame('/domain', $c->getDomain());
+        $this->assertSame('/path', $c->getPath());
+        $this->assertSame('lax', $c->getSameSite());
     }
 
     public function testCookiesCanSetSecureOptionUsingDefaultPathAndDomain()
@@ -56,11 +56,11 @@ class CookieTest extends TestCase
         $cookie = $this->getCreator();
         $cookie->setDefaultPathAndDomain('/path', '/domain', true, 'lax');
         $c = $cookie->make('color', 'blue', 10, null, null, false);
-        $this->assertEquals('blue', $c->getValue());
+        $this->assertSame('blue', $c->getValue());
         $this->assertFalse($c->isSecure());
-        $this->assertEquals('/domain', $c->getDomain());
-        $this->assertEquals('/path', $c->getPath());
-        $this->assertEquals('lax', $c->getSameSite());
+        $this->assertSame('/domain', $c->getDomain());
+        $this->assertSame('/path', $c->getPath());
+        $this->assertSame('lax', $c->getSameSite());
     }
 
     public function testQueuedCookies()
@@ -151,7 +151,7 @@ class CookieTest extends TestCase
         $cookie->macro('foo', function () {
             return 'bar';
         });
-        $this->assertEquals('bar', $cookie->foo());
+        $this->assertSame('bar', $cookie->foo());
     }
 
     public function testQueueCookie(): void

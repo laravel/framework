@@ -93,14 +93,14 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('foo', 'baz');
-        $this->assertEquals('bar', $container->first('foo'));
+        $this->assertSame('bar', $container->first('foo'));
     }
 
     public function testFirstReturnsEmptyStringIfNoMessagesFound()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $this->assertEquals('', $container->first('foo'));
+        $this->assertSame('', $container->first('foo'));
     }
 
     public function testFirstReturnsSingleMessageFromDotKeys()
@@ -109,7 +109,7 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat(':message');
         $container->add('name.first', 'jon');
         $container->add('name.last', 'snow');
-        $this->assertEquals('jon', $container->first('name.*'));
+        $this->assertSame('jon', $container->first('name.*'));
     }
 
     public function testHasIndicatesExistence()
@@ -181,15 +181,15 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat('<p>:message</p>');
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
-        $this->assertEquals('<p>bar</p>', $container->first('foo'));
+        $this->assertSame('<p>bar</p>', $container->first('foo'));
         $this->assertEquals(['<p>bar</p>'], $container->get('foo'));
         $this->assertEquals(['<p>bar</p>', '<p>baz</p>'], $container->all());
-        $this->assertEquals('bar', $container->first('foo', ':message'));
+        $this->assertSame('bar', $container->first('foo', ':message'));
         $this->assertEquals(['bar'], $container->get('foo', ':message'));
         $this->assertEquals(['bar', 'baz'], $container->all(':message'));
 
         $container->setFormat(':key :message');
-        $this->assertEquals('foo bar', $container->first('foo'));
+        $this->assertSame('foo bar', $container->first('foo'));
     }
 
     public function testUnique()
@@ -219,7 +219,7 @@ class SupportMessageBagTest extends TestCase
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
 
-        $this->assertEquals('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
+        $this->assertSame('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
     }
 
     public function testCountReturnsCorrectValue()
@@ -254,7 +254,7 @@ class SupportMessageBagTest extends TestCase
         $container = new MessageBag;
         $container->setFormat(':message');
         $container->add('foo.bar', 'baz');
-        $this->assertEquals('baz', $container->first('foo.*'));
+        $this->assertSame('baz', $container->first('foo.*'));
     }
 
     public function testIsEmptyTrue()
@@ -287,14 +287,14 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->add('foo.bar', 'baz');
-        $this->assertEquals('{"foo.bar":["baz"]}', (string) $container);
+        $this->assertSame('{"foo.bar":["baz"]}', (string) $container);
     }
 
     public function testGetFormat()
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $this->assertEquals(':message', $container->getFormat());
+        $this->assertSame(':message', $container->getFormat());
     }
 
     public function testConstructorUniquenessConsistency()

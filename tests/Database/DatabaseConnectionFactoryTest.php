@@ -135,7 +135,7 @@ class DatabaseConnectionFactoryTest extends TestCase
         $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
         $container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
 
-        $this->assertEquals('connector', $factory->createConnector(['driver' => 'foo']));
+        $this->assertSame('connector', $factory->createConnector(['driver' => 'foo']));
     }
 
     public function testSqliteForeignKeyConstraints()

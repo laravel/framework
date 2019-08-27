@@ -39,10 +39,10 @@ class LogLoggerTest extends TestCase
 
         $writer->error('foo');
         $this->assertTrue(isset($_SERVER['__log.level']));
-        $this->assertEquals('error', $_SERVER['__log.level']);
+        $this->assertSame('error', $_SERVER['__log.level']);
         unset($_SERVER['__log.level']);
         $this->assertTrue(isset($_SERVER['__log.message']));
-        $this->assertEquals('foo', $_SERVER['__log.message']);
+        $this->assertSame('foo', $_SERVER['__log.message']);
         unset($_SERVER['__log.message']);
         $this->assertTrue(isset($_SERVER['__log.context']));
         $this->assertEquals([], $_SERVER['__log.context']);

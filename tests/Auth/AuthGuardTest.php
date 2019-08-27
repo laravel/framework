@@ -143,7 +143,7 @@ class AuthGuardTest extends TestCase
             return 'bar';
         });
 
-        $this->assertEquals(
+        $this->assertSame(
             'bar', $guard->foo()
         );
     }

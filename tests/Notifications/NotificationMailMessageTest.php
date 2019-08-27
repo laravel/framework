@@ -11,11 +11,11 @@ class NotificationMailMessageTest extends TestCase
     {
         $message = new MailMessage;
 
-        $this->assertEquals('notifications::email', $message->markdown);
+        $this->assertSame('notifications::email', $message->markdown);
 
         $message->template('notifications::foo');
 
-        $this->assertEquals('notifications::foo', $message->markdown);
+        $this->assertSame('notifications::foo', $message->markdown);
     }
 
     public function testCcIsSetCorrectly()

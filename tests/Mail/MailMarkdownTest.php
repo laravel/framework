@@ -54,9 +54,9 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->andReturn('text');
 
-        $result = $markdown->renderText('view', []);
+        $result = $markdown->renderText('view', [])->toHtml();
 
-        $this->assertEquals('text', $result);
+        $this->assertSame('text', $result);
     }
 
     public function testParseReturnsParsedMarkdown()
@@ -64,8 +64,8 @@ class MailMarkdownTest extends TestCase
         $viewFactory = m::mock(Factory::class);
         $markdown = new Markdown($viewFactory);
 
-        $result = $markdown->parse('# Something');
+        $result = $markdown->parse('# Something')->toHtml();
 
-        $this->assertEquals('<h1>Something</h1>', $result);
+        $this->assertSame('<h1>Something</h1>', $result);
     }
 }

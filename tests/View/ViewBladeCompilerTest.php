@@ -59,14 +59,14 @@ class ViewBladeCompilerTest extends TestCase
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
         $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
-        $this->assertEquals('foo', $compiler->getPath());
+        $this->assertSame('foo', $compiler->getPath());
     }
 
     public function testCompileSetAndGetThePath()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $compiler->setPath('foo');
-        $this->assertEquals('foo', $compiler->getPath());
+        $this->assertSame('foo', $compiler->getPath());
     }
 
     public function testCompileWithPathSetBefore()
@@ -78,7 +78,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler->setPath('foo');
         // trigger compilation with $path
         $compiler->compile();
-        $this->assertEquals('foo', $compiler->getPath());
+        $this->assertSame('foo', $compiler->getPath());
     }
 
     public function testRawTagsCanBeSetToLegacyValues()
@@ -86,9 +86,9 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $compiler->setEchoFormat('%s');
 
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
+        $this->assertSame('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
+        $this->assertSame('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
+        $this->assertSame('<?php echo $name; ?>', $compiler->compileString('{{
             $name
         }}'));
     }

@@ -28,12 +28,12 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class.'@inject');
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
 
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class.'@inject', ['default' => 'foo']);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('foo', $result[1]);
+        $this->assertSame('foo', $result[1]);
 
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class, ['foo', 'bar'], 'work');
@@ -53,7 +53,7 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $result = $container->call('Illuminate\Tests\Container\ContainerStaticMethodStub::inject');
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
     }
 
     public function testCallWithGlobalMethodName()
@@ -61,7 +61,7 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $result = $container->call('Illuminate\Tests\Container\containerTestInject');
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
     }
 
     public function testCallWithBoundMethod()
@@ -83,12 +83,12 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo', 'default' => 'bar']);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('bar', $result[1]);
+        $this->assertSame('bar', $result[1]);
 
         $container = new Container;
         $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo']);
         $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
     }
 
     public function testBindMethodAcceptsAnArray()
@@ -135,7 +135,7 @@ class ContainerCallTest extends TestCase
         }, ['bar' => 'taylor']);
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
 
         $stub = new ContainerCallConcreteStub;
         $result = $container->call(function (stdClass $foo, ContainerCallConcreteStub $bar) {
@@ -156,7 +156,7 @@ class ContainerCallTest extends TestCase
         $result = $result();
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
-        $this->assertEquals('taylor', $result[1]);
+        $this->assertSame('taylor', $result[1]);
     }
 }
 

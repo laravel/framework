@@ -23,10 +23,10 @@ class DynamoDbStoreTest extends TestCase
     public function testItemsCanBeStoredAndRetrieved()
     {
         Cache::driver('dynamodb')->put('name', 'Taylor', 10);
-        $this->assertEquals('Taylor', Cache::driver('dynamodb')->get('name'));
+        $this->assertSame('Taylor', Cache::driver('dynamodb')->get('name'));
 
         Cache::driver('dynamodb')->put(['name' => 'Abigail', 'age' => 28], 10);
-        $this->assertEquals('Abigail', Cache::driver('dynamodb')->get('name'));
+        $this->assertSame('Abigail', Cache::driver('dynamodb')->get('name'));
         $this->assertEquals(28, Cache::driver('dynamodb')->get('age'));
 
         $this->assertEquals([

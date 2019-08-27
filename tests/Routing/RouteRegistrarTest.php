@@ -157,7 +157,7 @@ class RouteRegistrarTest extends TestCase
             $router->get('users', 'UsersController@index');
         });
 
-        $this->assertEquals(
+        $this->assertSame(
             'App\Http\Controllers\UsersController@index',
             $this->getRoute()->getAction()['uses']
         );
@@ -169,7 +169,7 @@ class RouteRegistrarTest extends TestCase
             $router->get('users', 'UsersController@index');
         });
 
-        $this->assertEquals('api/users', $this->getRoute()->uri());
+        $this->assertSame('api/users', $this->getRoute()->uri());
     }
 
     public function testCanRegisterGroupWithPrefixAndWhere()
@@ -189,7 +189,7 @@ class RouteRegistrarTest extends TestCase
             $router->get('users', 'UsersController@index')->name('users');
         });
 
-        $this->assertEquals('api.users', $this->getRoute()->getName());
+        $this->assertSame('api.users', $this->getRoute()->getName());
     }
 
     public function testCanRegisterGroupWithDomain()
@@ -198,7 +198,7 @@ class RouteRegistrarTest extends TestCase
             $router->get('users', 'UsersController@index');
         });
 
-        $this->assertEquals('{account}.myapp.com', $this->getRoute()->getDomain());
+        $this->assertSame('{account}.myapp.com', $this->getRoute()->getDomain());
     }
 
     public function testCanRegisterGroupWithDomainAndNamePrefix()
@@ -207,8 +207,8 @@ class RouteRegistrarTest extends TestCase
             $router->get('users', 'UsersController@index')->name('users');
         });
 
-        $this->assertEquals('{account}.myapp.com', $this->getRoute()->getDomain());
-        $this->assertEquals('api.users', $this->getRoute()->getName());
+        $this->assertSame('{account}.myapp.com', $this->getRoute()->getDomain());
+        $this->assertSame('api.users', $this->getRoute()->getName());
     }
 
     public function testRegisteringNonApprovedAttributesThrows()
@@ -498,7 +498,7 @@ class RouteRegistrarTest extends TestCase
         });
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
-        $this->assertEquals('users.index', $this->getRoute()->getName());
+        $this->assertSame('users.index', $this->getRoute()->getName());
     }
 
     public function testCanSetRouteNameUsingNameAlias()
@@ -508,7 +508,7 @@ class RouteRegistrarTest extends TestCase
         });
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
-        $this->assertEquals('users.index', $this->getRoute()->getName());
+        $this->assertSame('users.index', $this->getRoute()->getName());
     }
 
     /**

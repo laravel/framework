@@ -27,7 +27,7 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
         Carbon::setTestNow();
 
         Cache::store('memcached')->lock('foo')->forceRelease();
-        $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {
+        $this->assertSame('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
 
@@ -38,7 +38,7 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
     public function testLocksCanRunCallbacks()
     {
         Cache::store('memcached')->lock('foo')->forceRelease();
-        $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->get(function () {
+        $this->assertSame('taylor', Cache::store('memcached')->lock('foo', 10)->get(function () {
             return 'taylor';
         }));
     }
@@ -51,7 +51,7 @@ class MemcachedCacheLockTest extends MemcachedIntegrationTest
 
         Cache::store('memcached')->lock('foo')->release();
         Cache::store('memcached')->lock('foo', 5)->get();
-        $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {
+        $this->assertSame('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
     }

@@ -13,14 +13,14 @@ class SupportTappableTest extends TestCase
             $tappable->setName('MyName');
         })->getName();
 
-        $this->assertEquals('MyName', $name);
+        $this->assertSame('MyName', $name);
     }
 
     public function testTappableClassWithoutCallback()
     {
         $name = TappableClass::make()->tap()->setName('MyName')->getName();
 
-        $this->assertEquals('MyName', $name);
+        $this->assertSame('MyName', $name);
     }
 }
 

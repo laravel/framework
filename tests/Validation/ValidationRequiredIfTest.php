@@ -13,20 +13,20 @@ class ValidationRequiredIfTest extends TestCase
             return true;
         });
 
-        $this->assertEquals('required', (string) $rule);
+        $this->assertSame('required', (string) $rule);
 
         $rule = new RequiredIf(function () {
             return false;
         });
 
-        $this->assertEquals('', (string) $rule);
+        $this->assertSame('', (string) $rule);
 
         $rule = new RequiredIf(true);
 
-        $this->assertEquals('required', (string) $rule);
+        $this->assertSame('required', (string) $rule);
 
         $rule = new RequiredIf(false);
 
-        $this->assertEquals('', (string) $rule);
+        $this->assertSame('', (string) $rule);
     }
 }

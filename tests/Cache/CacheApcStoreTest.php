@@ -21,7 +21,7 @@ class CacheApcStoreTest extends TestCase
         $apc = $this->getMockBuilder(ApcWrapper::class)->setMethods(['get'])->getMock();
         $apc->expects($this->once())->method('get')->willReturn('bar');
         $store = new ApcStore($apc);
-        $this->assertEquals('bar', $store->get('foo'));
+        $this->assertSame('bar', $store->get('foo'));
     }
 
     public function testGetMultipleReturnsNullWhenNotFoundAndValueWhenFound()

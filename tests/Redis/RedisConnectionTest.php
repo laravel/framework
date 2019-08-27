@@ -41,23 +41,23 @@ class RedisConnectionTest extends TestCase
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed', 'EX', 5, 'NX');
-            $this->assertEquals('mohamed', $redis->get('one'));
+            $this->assertSame('mohamed', $redis->get('one'));
             $this->assertNotEquals(-1, $redis->ttl('one'));
 
             // It doesn't override when NX mode
             $redis->set('one', 'taylor', 'EX', 5, 'NX');
-            $this->assertEquals('mohamed', $redis->get('one'));
+            $this->assertSame('mohamed', $redis->get('one'));
 
             // It overrides when XX mode
             $redis->set('one', 'taylor', 'EX', 5, 'XX');
-            $this->assertEquals('taylor', $redis->get('one'));
+            $this->assertSame('taylor', $redis->get('one'));
 
             // It fails if XX mode is on and key doesn't exist
             $redis->set('two', 'taylor', 'PX', 5, 'XX');
             $this->assertNull($redis->get('two'));
 
             $redis->set('three', 'mohamed', 'PX', 5000);
-            $this->assertEquals('mohamed', $redis->get('three'));
+            $this->assertSame('mohamed', $redis->get('three'));
             $this->assertNotEquals(-1, $redis->ttl('three'));
             $this->assertNotEquals(-1, $redis->pttl('three'));
 
@@ -127,17 +127,17 @@ class RedisConnectionTest extends TestCase
             $redis->set('one', 'mohamed');
             $redis->rename('one', 'two');
             $this->assertNull($redis->get('one'));
-            $this->assertEquals('mohamed', $redis->get('two'));
+            $this->assertSame('mohamed', $redis->get('two'));
 
             $redis->set('three', 'adam');
             $redis->renamenx('two', 'three');
-            $this->assertEquals('mohamed', $redis->get('two'));
-            $this->assertEquals('adam', $redis->get('three'));
+            $this->assertSame('mohamed', $redis->get('two'));
+            $this->assertSame('adam', $redis->get('three'));
 
             $redis->renamenx('two', 'four');
             $this->assertNull($redis->get('two'));
-            $this->assertEquals('mohamed', $redis->get('four'));
-            $this->assertEquals('adam', $redis->get('three'));
+            $this->assertSame('mohamed', $redis->get('four'));
+            $this->assertSame('adam', $redis->get('three'));
 
             $redis->flushall();
         }
@@ -204,10 +204,10 @@ class RedisConnectionTest extends TestCase
             $redis->set('name', 'mohamed');
 
             $this->assertSame(0, $redis->setnx('name', 'taylor'));
-            $this->assertEquals('mohamed', $redis->get('name'));
+            $this->assertSame('mohamed', $redis->get('name'));
 
             $this->assertSame(1, $redis->setnx('boss', 'taylor'));
-            $this->assertEquals('taylor', $redis->get('boss'));
+            $this->assertSame('taylor', $redis->get('boss'));
 
             $redis->flushall();
         }
@@ -219,10 +219,10 @@ class RedisConnectionTest extends TestCase
             $redis->hset('person', 'name', 'mohamed');
 
             $this->assertSame(0, $redis->hsetnx('person', 'name', 'taylor'));
-            $this->assertEquals('mohamed', $redis->hget('person', 'name'));
+            $this->assertSame('mohamed', $redis->hget('person', 'name'));
 
             $this->assertSame(1, $redis->hsetnx('person', 'boss', 'taylor'));
-            $this->assertEquals('taylor', $redis->hget('person', 'boss'));
+            $this->assertSame('taylor', $redis->hget('person', 'boss'));
 
             $redis->flushall();
         }
@@ -468,7 +468,7 @@ class RedisConnectionTest extends TestCase
     {
         foreach ($this->connections() as $redis) {
             $redis->eval('redis.call("set", KEYS[1], ARGV[1])', 1, 'name', 'mohamed');
-            $this->assertEquals('mohamed', $redis->get('name'));
+            $this->assertSame('mohamed', $redis->get('name'));
 
             $redis->flushall();
         }
@@ -529,9 +529,9 @@ class RedisConnectionTest extends TestCase
             $redis->setEventDispatcher($events = m::mock(Dispatcher::class));
 
             $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
-                $this->assertEquals('get', $event->command);
+                $this->assertSame('get', $event->command);
                 $this->assertEquals(['foobar'], $event->parameters);
-                $this->assertEquals('default', $event->connectionName);
+                $this->assertSame('default', $event->connectionName);
                 $this->assertInstanceOf(Connection::class, $event->connection);
 
                 return true;
@@ -549,7 +549,7 @@ class RedisConnectionTest extends TestCase
             $this->markTestSkipped('PhpRedis does not support persistent connections with PHP_ZTS enabled.');
         }
 
-        $this->assertEquals(
+        $this->assertSame(
             'laravel',
             $this->connections()['persistent']->getPersistentID()
         );

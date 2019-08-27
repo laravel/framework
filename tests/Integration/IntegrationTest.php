@@ -18,6 +18,6 @@ class IntegrationTest extends TestCase
 
         $response = $this->get('/');
 
-        $this->assertEquals('Hello World', $response->content());
+        $this->assertSame('Hello World', $response->content());
     }
 }

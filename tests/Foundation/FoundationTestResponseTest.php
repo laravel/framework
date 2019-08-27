@@ -708,7 +708,7 @@ class FoundationTestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse(new Response);
 
-        $this->assertEquals(
+        $this->assertSame(
             'bar', $response->foo()
         );
     }
@@ -731,7 +731,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
-        $this->assertEquals('foo', $response->json('foobar.foobar_foo'));
+        $this->assertSame('foo', $response->json('foobar.foobar_foo'));
         $this->assertEquals(
             json_decode($response->getContent(), true),
             $response->json()

@@ -83,7 +83,7 @@ class SendingMailWithLocaleTest extends TestCase
             app('swift.transport')->messages()[0]->getBody()
         );
 
-        $this->assertEquals('en', Carbon::getLocale());
+        $this->assertSame('en', Carbon::getLocale());
     }
 
     public function testLocaleIsSentWithModelPreferredLocale()
@@ -158,7 +158,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to('test@mail.com')->locale('ar')->send(new TestMail);
         Mail::to('test@mail.com')->send(new TestMail);
 
-        $this->assertEquals('en', app('translator')->getLocale());
+        $this->assertSame('en', app('translator')->getLocale());
 
         $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()

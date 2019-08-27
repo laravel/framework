@@ -49,7 +49,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['value' => serialize('bar'), 'expiration' => 999999999999999]);
 
-        $this->assertEquals('bar', $store->get('foo'));
+        $this->assertSame('bar', $store->get('foo'));
     }
 
     public function testValueIsReturnedOnPostgres()
@@ -60,7 +60,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['value' => base64_encode(serialize('bar')), 'expiration' => 999999999999999]);
 
-        $this->assertEquals('bar', $store->get('foo'));
+        $this->assertSame('bar', $store->get('foo'));
     }
 
     public function testValueIsInsertedWhenNoExceptionsAreThrown()

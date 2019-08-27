@@ -30,10 +30,10 @@ class FluentRoutingTest extends TestCase
             return 'Hello World';
         })->middleware([Middleware::class, Middleware2::class]);
 
-        $this->assertEquals('middleware output', $this->get('one')->content());
-        $this->assertEquals('middleware output', $this->get('two')->content());
-        $this->assertEquals('middleware output', $this->get('three')->content());
-        $this->assertEquals('middleware output', $this->get('four')->content());
+        $this->assertSame('middleware output', $this->get('one')->content());
+        $this->assertSame('middleware output', $this->get('two')->content());
+        $this->assertSame('middleware output', $this->get('three')->content());
+        $this->assertSame('middleware output', $this->get('four')->content());
     }
 }
 
