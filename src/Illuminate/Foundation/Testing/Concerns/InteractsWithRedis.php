@@ -33,6 +33,11 @@ trait InteractsWithRedis
         $host = getenv('REDIS_HOST') ?: '127.0.0.1';
         $port = getenv('REDIS_PORT') ?: 6379;
 
+        if (!extension_loaded('redis')) {
+            $this->markTestSkipped('The redis extension is not installed. Please install the extension to enable '.__CLASS__);
+
+            return;
+        }
         if (static::$connectionFailedOnceWithDefaultsSkip) {
             $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
 
