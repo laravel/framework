@@ -74,7 +74,7 @@ class EloquentUpdateTest extends TestCase
         TestUpdateModel1::latest('id')->limit(3)->update(['title'=>'Dr.']);
 
         $this->assertSame('Dr.', TestUpdateModel1::find(8)->title);
-        $this->assertNotEquals('Dr.', TestUpdateModel1::find(7)->title);
+        $this->assertNotSame('Dr.', TestUpdateModel1::find(7)->title);
     }
 
     public function testUpdatedAtWithJoins()

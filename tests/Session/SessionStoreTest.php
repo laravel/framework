@@ -72,7 +72,7 @@ class SessionStoreTest extends TestCase
         $this->assertNotSame(['a'], $session->getId());
 
         $session->setId('wrong');
-        $this->assertNotEquals('wrong', $session->getId());
+        $this->assertNotSame('wrong', $session->getId());
     }
 
     public function testSessionInvalidate()

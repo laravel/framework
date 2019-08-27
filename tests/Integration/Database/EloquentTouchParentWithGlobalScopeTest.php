@@ -42,7 +42,7 @@ class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
 
         $post->comments()->create(['title' => Str::random()]);
 
-        $this->assertNotEquals('2016-10-10', $post->fresh()->updated_at->toDateString());
+        $this->assertNotSame('2016-10-10', $post->fresh()->updated_at->toDateString());
     }
 }
 

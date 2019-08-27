@@ -13,7 +13,7 @@ class EncrypterTest extends TestCase
     {
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt('foo');
-        $this->assertNotEquals('foo', $encrypted);
+        $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
     }
 
@@ -21,7 +21,7 @@ class EncrypterTest extends TestCase
     {
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encryptString('foo');
-        $this->assertNotEquals('foo', $encrypted);
+        $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decryptString($encrypted));
     }
 
@@ -29,7 +29,7 @@ class EncrypterTest extends TestCase
     {
         $e = new Encrypter(random_bytes(16));
         $encrypted = $e->encrypt('foo');
-        $this->assertNotEquals('foo', $encrypted);
+        $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
     }
 
@@ -37,12 +37,12 @@ class EncrypterTest extends TestCase
     {
         $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
         $encrypted = $e->encrypt('bar');
-        $this->assertNotEquals('bar', $encrypted);
+        $this->assertNotSame('bar', $encrypted);
         $this->assertSame('bar', $e->decrypt($encrypted));
 
         $e = new Encrypter(random_bytes(32), 'AES-256-CBC');
         $encrypted = $e->encrypt('foo');
-        $this->assertNotEquals('foo', $encrypted);
+        $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
     }
 

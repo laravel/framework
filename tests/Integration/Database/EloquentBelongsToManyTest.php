@@ -496,12 +496,12 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->touchingTags()->attach([$tag->id]);
 
-        $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
+        $this->assertNotSame('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
 
         Carbon::setTestNow('2017-10-10 10:10:10');
 
         $tag->update(['name' => $tag->name]);
-        $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
+        $this->assertNotSame('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
 
         $tag->update(['name' => Str::random()]);
         $this->assertSame('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
@@ -513,8 +513,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post = Post::create(['title' => Str::random()]);
 
-        $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
-        $this->assertNotEquals('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
+        $this->assertNotSame('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
+        $this->assertNotSame('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
 
         Carbon::setTestNow('2017-10-10 10:10:10');
 
@@ -530,15 +530,15 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post = Post::create(['title' => Str::random()]);
 
-        $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
-        $this->assertNotEquals('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
+        $this->assertNotSame('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
+        $this->assertNotSame('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
 
         Carbon::setTestNow('2017-10-10 10:10:10');
 
         $tag->posts()->sync([$post->id]);
 
-        $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
-        $this->assertNotEquals('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
+        $this->assertNotSame('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
+        $this->assertNotSame('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
     }
 
     public function testCanRetrieveRelatedIds()
@@ -582,7 +582,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $this->assertSame('2017-10-10 10:10:10', $date);
         }
 
-        $this->assertNotEquals('2017-10-10 10:10:10', Tag::find(300)->updated_at);
+        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(300)->updated_at);
     }
 
     public function testWherePivotOnString()

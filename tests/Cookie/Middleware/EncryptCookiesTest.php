@@ -50,7 +50,7 @@ class EncryptCookiesTest extends TestCase
         $cookies = $response->headers->getCookies();
         $this->assertCount(2, $cookies);
         $this->assertSame('encrypted_cookie', $cookies[0]->getName());
-        $this->assertNotEquals('value', $cookies[0]->getValue());
+        $this->assertNotSame('value', $cookies[0]->getValue());
         $this->assertSame('unencrypted_cookie', $cookies[1]->getName());
         $this->assertSame('value', $cookies[1]->getValue());
     }
@@ -67,7 +67,7 @@ class EncryptCookiesTest extends TestCase
         $cookies = $response->headers->getCookies();
         $this->assertCount(2, $cookies);
         $this->assertSame('encrypted_cookie', $cookies[0]->getName());
-        $this->assertNotEquals('value', $cookies[0]->getValue());
+        $this->assertNotSame('value', $cookies[0]->getValue());
         $this->assertSame('unencrypted_cookie', $cookies[1]->getName());
         $this->assertSame('value', $cookies[1]->getValue());
     }
