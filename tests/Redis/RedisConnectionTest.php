@@ -18,14 +18,6 @@ class RedisConnectionTest extends TestCase
     {
         parent::setUp();
         $this->setUpRedis();
-
-        if (! isset($this->redis['phpredis'])) {
-            $this->markTestSkipped('PhpRedis should be enabled to run the tests');
-        }
-
-        if (! isset($this->redis['predis'])) {
-            $this->markTestSkipped('Predis should be enabled to run the tests');
-        }
     }
 
     protected function tearDown(): void
@@ -562,38 +554,36 @@ class RedisConnectionTest extends TestCase
             'phpredis' => $this->redis['phpredis']->connection(),
         ];
 
-        if (extension_loaded('redis')) {
-            $host = getenv('REDIS_HOST') ?: '127.0.0.1';
-            $port = getenv('REDIS_PORT') ?: 6379;
+        $host = getenv('REDIS_HOST') ?: '127.0.0.1';
+        $port = getenv('REDIS_PORT') ?: 6379;
 
-            $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
-                'cluster' => false,
-                'default' => [
-                    'url' => "redis://user@$host:$port",
-                    'host' => 'overwrittenByUrl',
-                    'port' => 'overwrittenByUrl',
-                    'database' => 5,
-                    'options' => ['prefix' => 'laravel:'],
-                    'timeout' => 0.5,
-                ],
-            ]);
+        $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'url' => "redis://user@$host:$port",
+                'host' => 'overwrittenByUrl',
+                'port' => 'overwrittenByUrl',
+                'database' => 5,
+                'options' => ['prefix' => 'laravel:'],
+                'timeout' => 0.5,
+            ],
+        ]);
 
-            $persistentPhpRedis = new RedisManager(new Application, 'phpredis', [
-                'cluster' => false,
-                'default' => [
-                    'host' => $host,
-                    'port' => $port,
-                    'database' => 6,
-                    'options' => ['prefix' => 'laravel:'],
-                    'timeout' => 0.5,
-                    'persistent' => true,
-                    'persistent_id' => 'laravel',
-                ],
-            ]);
+        $persistentPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 6,
+                'options' => ['prefix' => 'laravel:'],
+                'timeout' => 0.5,
+                'persistent' => true,
+                'persistent_id' => 'laravel',
+            ],
+        ]);
 
-            $connections[] = $prefixedPhpredis->connection();
-            $connections['persistent'] = $persistentPhpRedis->connection();
-        }
+        $connections[] = $prefixedPhpredis->connection();
+        $connections['persistent'] = $persistentPhpRedis->connection();
 
         return $connections;
     }
