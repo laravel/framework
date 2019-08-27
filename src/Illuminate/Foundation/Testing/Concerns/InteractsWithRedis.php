@@ -38,6 +38,7 @@ trait InteractsWithRedis
 
             return;
         }
+
         if (static::$connectionFailedOnceWithDefaultsSkip) {
             $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
 
