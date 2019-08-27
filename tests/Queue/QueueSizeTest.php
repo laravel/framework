@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Queue;
 use Illuminate\Bus\Queueable;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,10 +11,10 @@ class QueueSizeTest extends TestCase
 {
     public function test_queue_size()
     {
-        \Queue::fake();
+        Queue::fake();
 
-        $this->assertEquals(0, \Queue::size());
-        $this->assertEquals(0, \Queue::size('Q2'));
+        $this->assertEquals(0, Queue::size());
+        $this->assertEquals(0, Queue::size('Q2'));
 
         $job = new TestJob1;
 
@@ -21,8 +22,8 @@ class QueueSizeTest extends TestCase
         dispatch(new TestJob2);
         dispatch($job)->onQueue('Q2');
 
-        $this->assertEquals(2, \Queue::size());
-        $this->assertEquals(1, \Queue::size('Q2'));
+        $this->assertEquals(2, Queue::size());
+        $this->assertEquals(1, Queue::size('Q2'));
     }
 }
 
