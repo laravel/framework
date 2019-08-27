@@ -20,8 +20,10 @@ class PhpRedisClusterConnection extends PhpRedisConnection
             }
         }
         $key = $this->applyPrefix($key);
+
         return $this->client->zAdd($key, ...$dictionary);
     }
+
     /**
      * Determine if the given keys exist.
      *
@@ -33,10 +35,12 @@ class PhpRedisClusterConnection extends PhpRedisConnection
         $keys = collect($keys)->map(function ($key) {
             return $this->applyPrefix($key);
         });
+
         return $keys->reduce(function ($carry, $key) {
             return $carry + $this->client->exists($key);
         });
     }
+
     /**
      * Apply prefix to the given key if necessary.
      *
@@ -46,6 +50,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     private function applyPrefix($key)
     {
         $prefix = (string) $this->client->getOption(\RedisCluster::OPT_PREFIX);
+
         return $prefix.$key;
     }
 }
