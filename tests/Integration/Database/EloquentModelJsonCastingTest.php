@@ -36,8 +36,8 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
             'json_string_as_json_field' => '{"key1":"value1"}',
         ]);
 
-        $this->assertEquals('this is a string', $object->basic_string_as_json_field);
-        $this->assertEquals('{"key1":"value1"}', $object->json_string_as_json_field);
+        $this->assertSame('this is a string', $object->basic_string_as_json_field);
+        $this->assertSame('{"key1":"value1"}', $object->json_string_as_json_field);
     }
 
     public function testArraysAreCastable()
@@ -61,7 +61,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         ]);
 
         $this->assertInstanceOf(stdClass::class, $user->object_as_json_field);
-        $this->assertEquals('value1', $user->object_as_json_field->key1);
+        $this->assertSame('value1', $user->object_as_json_field->key1);
     }
 
     public function testCollectionsAreCastable()
@@ -72,7 +72,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         ]);
 
         $this->assertInstanceOf(Collection::class, $user->collection_as_json_field);
-        $this->assertEquals('value1', $user->collection_as_json_field->get('key1'));
+        $this->assertSame('value1', $user->collection_as_json_field->get('key1'));
     }
 }
 

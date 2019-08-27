@@ -38,7 +38,7 @@ class ConsoleScheduledEventTest extends TestCase
         $app->shouldReceive('environment')->andReturn('production');
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertSame('* * * * *', $event->getExpression());
         $this->assertTrue($event->isDue($app));
         $this->assertTrue($event->skip(function () {
             return true;
@@ -48,17 +48,17 @@ class ConsoleScheduledEventTest extends TestCase
         })->filtersPass($app));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertSame('* * * * *', $event->getExpression());
         $this->assertFalse($event->environments('local')->isDue($app));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertSame('* * * * *', $event->getExpression());
         $this->assertFalse($event->when(function () {
             return false;
         })->filtersPass($app));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * *', $event->getExpression());
+        $this->assertSame('* * * * *', $event->getExpression());
         $this->assertFalse($event->when(false)->filtersPass($app));
 
         // chained rules should be commutative
@@ -83,11 +83,11 @@ class ConsoleScheduledEventTest extends TestCase
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('* * * * 4', $event->thursdays()->getExpression());
+        $this->assertSame('* * * * 4', $event->thursdays()->getExpression());
         $this->assertTrue($event->isDue($app));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals('0 19 * * 3', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
+        $this->assertSame('0 19 * * 3', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
         $this->assertTrue($event->isDue($app));
     }
 

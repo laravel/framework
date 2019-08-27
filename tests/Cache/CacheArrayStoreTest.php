@@ -13,7 +13,7 @@ class CacheArrayStoreTest extends TestCase
         $store = new ArrayStore;
         $result = $store->put('foo', 'bar', 10);
         $this->assertTrue($result);
-        $this->assertEquals('bar', $store->get('foo'));
+        $this->assertSame('bar', $store->get('foo'));
     }
 
     public function testMultipleItemsCanBeSetAndRetrieved()

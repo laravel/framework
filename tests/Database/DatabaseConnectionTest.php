@@ -52,7 +52,7 @@ class DatabaseConnectionTest extends TestCase
     {
         $connection = $this->getMockConnection(['select']);
         $connection->expects($this->once())->method('select')->with('foo', ['bar' => 'baz'])->willReturn(['foo']);
-        $this->assertEquals('foo', $connection->selectOne('foo', ['bar' => 'baz']));
+        $this->assertSame('foo', $connection->selectOne('foo', ['bar' => 'baz']));
     }
 
     public function testSelectProperlyCallsPDO()
@@ -71,7 +71,7 @@ class DatabaseConnectionTest extends TestCase
         $results = $mock->select('foo', ['foo' => 'bar']);
         $this->assertEquals(['boom'], $results);
         $log = $mock->getQueryLog();
-        $this->assertEquals('foo', $log[0]['query']);
+        $this->assertSame('foo', $log[0]['query']);
         $this->assertEquals(['foo' => 'bar'], $log[0]['bindings']);
         $this->assertIsNumeric($log[0]['time']);
     }
@@ -81,7 +81,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['statement']);
         $connection->expects($this->once())->method('statement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn('baz');
         $results = $connection->insert('foo', ['bar']);
-        $this->assertEquals('baz', $results);
+        $this->assertSame('baz', $results);
     }
 
     public function testUpdateCallsTheAffectingStatementMethod()
@@ -89,7 +89,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['affectingStatement']);
         $connection->expects($this->once())->method('affectingStatement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn('baz');
         $results = $connection->update('foo', ['bar']);
-        $this->assertEquals('baz', $results);
+        $this->assertSame('baz', $results);
     }
 
     public function testDeleteCallsTheAffectingStatementMethod()
@@ -97,7 +97,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['affectingStatement']);
         $connection->expects($this->once())->method('affectingStatement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn('baz');
         $results = $connection->delete('foo', ['bar']);
-        $this->assertEquals('baz', $results);
+        $this->assertSame('baz', $results);
     }
 
     public function testStatementProperlyCallsPDO()
@@ -110,9 +110,9 @@ class DatabaseConnectionTest extends TestCase
         $mock = $this->getMockConnection(['prepareBindings'], $pdo);
         $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['bar']))->willReturn(['bar']);
         $results = $mock->statement('foo', ['bar']);
-        $this->assertEquals('foo', $results);
+        $this->assertSame('foo', $results);
         $log = $mock->getQueryLog();
-        $this->assertEquals('foo', $log[0]['query']);
+        $this->assertSame('foo', $log[0]['query']);
         $this->assertEquals(['bar'], $log[0]['bindings']);
         $this->assertIsNumeric($log[0]['time']);
     }
@@ -130,7 +130,7 @@ class DatabaseConnectionTest extends TestCase
         $results = $mock->update('foo', ['foo' => 'bar']);
         $this->assertEquals(['boom'], $results);
         $log = $mock->getQueryLog();
-        $this->assertEquals('foo', $log[0]['query']);
+        $this->assertSame('foo', $log[0]['query']);
         $this->assertEquals(['foo' => 'bar'], $log[0]['bindings']);
         $this->assertIsNumeric($log[0]['time']);
     }
@@ -267,7 +267,7 @@ class DatabaseConnectionTest extends TestCase
                 throw new Exception('foo');
             });
         } catch (Exception $e) {
-            $this->assertEquals('foo', $e->getMessage());
+            $this->assertSame('foo', $e->getMessage());
         }
     }
 
@@ -305,7 +305,7 @@ class DatabaseConnectionTest extends TestCase
             $called = true;
         });
 
-        $this->assertEquals('result', $connection->statement('foo'));
+        $this->assertSame('result', $connection->statement('foo'));
 
         $this->assertTrue($called);
     }
@@ -350,7 +350,7 @@ class DatabaseConnectionTest extends TestCase
         $conn->setPostProcessor(m::mock(Processor::class));
         $builder = $conn->table('users');
         $this->assertInstanceOf(BaseBuilder::class, $builder);
-        $this->assertEquals('users', $builder->from);
+        $this->assertSame('users', $builder->from);
     }
 
     public function testPrepareBindings()
@@ -381,7 +381,7 @@ class DatabaseConnectionTest extends TestCase
         $queries = $connection->pretend(function ($connection) {
             $connection->select('foo bar', ['baz']);
         });
-        $this->assertEquals('foo bar', $queries[0]['query']);
+        $this->assertSame('foo bar', $queries[0]['query']);
         $this->assertEquals(['baz'], $queries[0]['bindings']);
     }
 

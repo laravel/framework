@@ -31,8 +31,8 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             'datetime_field' => '2019-10-01 10:15:20',
         ]);
 
-        $this->assertEquals('2019-10', $user->toArray()['date_field']);
-        $this->assertEquals('2019-10 10:15', $user->toArray()['datetime_field']);
+        $this->assertSame('2019-10', $user->toArray()['date_field']);
+        $this->assertSame('2019-10 10:15', $user->toArray()['datetime_field']);
         $this->assertInstanceOf(Carbon::class, $user->date_field);
         $this->assertInstanceOf(Carbon::class, $user->datetime_field);
     }

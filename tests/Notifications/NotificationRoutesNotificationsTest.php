@@ -47,8 +47,8 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationOptionRouting()
     {
         $instance = new RoutesNotificationsTestInstance;
-        $this->assertEquals('bar', $instance->routeNotificationFor('foo'));
-        $this->assertEquals('taylor@laravel.com', $instance->routeNotificationFor('mail'));
+        $this->assertSame('bar', $instance->routeNotificationFor('foo'));
+        $this->assertSame('taylor@laravel.com', $instance->routeNotificationFor('mail'));
     }
 }
 

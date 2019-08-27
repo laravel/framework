@@ -87,7 +87,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $models);
         $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
-        $this->assertEquals('abigailotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[0]->email);
         $this->assertCount(1, $models);
     }
 

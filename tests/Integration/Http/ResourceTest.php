@@ -279,7 +279,7 @@ class ResourceTest extends TestCase
             'title' => 'Test Title',
         ]));
 
-        $this->assertEquals('http://localhost/post/5', url('/post', $post));
+        $this->assertSame('http://localhost/post/5', url('/post', $post));
     }
 
     public function testNamedRoutesAreUrlRoutable()
@@ -295,7 +295,7 @@ class ResourceTest extends TestCase
 
         $response = $this->withoutExceptionHandling()->get('/post/1');
 
-        $this->assertEquals('http://localhost/post/5', $response->original);
+        $this->assertSame('http://localhost/post/5', $response->original);
     }
 
     public function testResourcesMayBeSerializable()

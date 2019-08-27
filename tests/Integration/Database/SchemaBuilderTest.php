@@ -66,7 +66,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $blueprint->build($this->getConnection(), new SQLiteGrammar());
 
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertEquals('tinyinteger', Schema::getColumnType('test', 'test_column'));
+        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
         $this->assertEquals($expected, $statements);
     }
 }

@@ -19,7 +19,7 @@ class ResolvingCallbackTest extends TestCase
         });
         $instance = $container->make('foo');
 
-        $this->assertEquals('taylor', $instance->name);
+        $this->assertSame('taylor', $instance->name);
     }
 
     public function testResolvingCallbacksAreCalled()
@@ -33,7 +33,7 @@ class ResolvingCallbackTest extends TestCase
         });
         $instance = $container->make('foo');
 
-        $this->assertEquals('taylor', $instance->name);
+        $this->assertSame('taylor', $instance->name);
     }
 
     public function testResolvingCallbacksAreCalledForType()
@@ -47,7 +47,7 @@ class ResolvingCallbackTest extends TestCase
         });
         $instance = $container->make('foo');
 
-        $this->assertEquals('taylor', $instance->name);
+        $this->assertSame('taylor', $instance->name);
     }
 
     public function testResolvingCallbacksShouldBeFiredWhenCalledWithAliases()
@@ -62,7 +62,7 @@ class ResolvingCallbackTest extends TestCase
         });
         $instance = $container->make('foo');
 
-        $this->assertEquals('taylor', $instance->name);
+        $this->assertSame('taylor', $instance->name);
     }
 
     public function testResolvingCallbacksAreCalledOnceForImplementation()

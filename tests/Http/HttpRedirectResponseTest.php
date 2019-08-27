@@ -25,11 +25,11 @@ class HttpRedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $this->assertNull($response->headers->get('foo'));
         $response->header('foo', 'bar');
-        $this->assertEquals('bar', $response->headers->get('foo'));
+        $this->assertSame('bar', $response->headers->get('foo'));
         $response->header('foo', 'baz', false);
-        $this->assertEquals('bar', $response->headers->get('foo'));
+        $this->assertSame('bar', $response->headers->get('foo'));
         $response->header('foo', 'baz');
-        $this->assertEquals('baz', $response->headers->get('foo'));
+        $this->assertSame('baz', $response->headers->get('foo'));
     }
 
     public function testWithOnRedirect()
@@ -48,8 +48,8 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertEquals($response, $response->withCookie(new Cookie('foo', 'bar')));
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
-        $this->assertEquals('foo', $cookies[0]->getName());
-        $this->assertEquals('bar', $cookies[0]->getValue());
+        $this->assertSame('foo', $cookies[0]->getName());
+        $this->assertSame('bar', $cookies[0]->getValue());
     }
 
     public function testInputOnRedirect()

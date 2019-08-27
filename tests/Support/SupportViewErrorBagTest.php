@@ -123,6 +123,6 @@ class SupportViewErrorBagTest extends TestCase
     {
         $viewErrorBag = new ViewErrorBag;
         $viewErrorBag = $viewErrorBag->put('default', new MessageBag(['message' => 'content']));
-        $this->assertEquals('{"message":["content"]}', (string) $viewErrorBag);
+        $this->assertSame('{"message":["content"]}', (string) $viewErrorBag);
     }
 }

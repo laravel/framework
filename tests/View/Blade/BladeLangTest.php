@@ -13,7 +13,7 @@ class BladeLangTest extends AbstractBladeTestCase
 
     public function testLanguageAndChoicesAreCompiled()
     {
-        $this->assertEquals('<?php echo app(\'translator\')->get(\'foo\'); ?>', $this->compiler->compileString("@lang('foo')"));
-        $this->assertEquals('<?php echo app(\'translator\')->choice(\'foo\', 1); ?>', $this->compiler->compileString("@choice('foo', 1)"));
+        $this->assertSame('<?php echo app(\'translator\')->get(\'foo\'); ?>', $this->compiler->compileString("@lang('foo')"));
+        $this->assertSame('<?php echo app(\'translator\')->choice(\'foo\', 1); ?>', $this->compiler->compileString("@choice('foo', 1)"));
     }
 }

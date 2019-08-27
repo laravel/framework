@@ -24,9 +24,9 @@ class PipelineTest extends TestCase
                         return $piped;
                     });
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.two']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $_SERVER['__test.pipe.two']);
 
         unset($_SERVER['__test.pipe.one']);
         unset($_SERVER['__test.pipe.two']);
@@ -41,8 +41,8 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -58,8 +58,8 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -81,8 +81,8 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -98,8 +98,8 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -115,7 +115,7 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
         $this->assertEquals($parameters, $_SERVER['__test.pipe.parameters']);
 
         unset($_SERVER['__test.pipe.parameters']);
@@ -130,7 +130,7 @@ class PipelineTest extends TestCase
             ->then(function ($piped) {
                 return $piped;
             });
-        $this->assertEquals('data', $result);
+        $this->assertSame('data', $result);
     }
 
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
@@ -152,8 +152,8 @@ class PipelineTest extends TestCase
                     ->through([PipelineTestPipeOne::class])
                     ->thenReturn();
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }

@@ -20,7 +20,7 @@ class FoundationEnvironmentDetectorTest extends TestCase
         $result = $env->detect(function () {
             return 'foobar';
         });
-        $this->assertEquals('foobar', $result);
+        $this->assertSame('foobar', $result);
     }
 
     public function testConsoleEnvironmentDetection()
@@ -30,7 +30,7 @@ class FoundationEnvironmentDetectorTest extends TestCase
         $result = $env->detect(function () {
             return 'foobar';
         }, ['--env=local']);
-        $this->assertEquals('local', $result);
+        $this->assertSame('local', $result);
     }
 
     public function testConsoleEnvironmentDetectionSeparatedWithSpace()
@@ -40,7 +40,7 @@ class FoundationEnvironmentDetectorTest extends TestCase
         $result = $env->detect(function () {
             return 'foobar';
         }, ['--env', 'local']);
-        $this->assertEquals('local', $result);
+        $this->assertSame('local', $result);
     }
 
     public function testConsoleEnvironmentDetectionWithNoValue()
@@ -50,6 +50,6 @@ class FoundationEnvironmentDetectorTest extends TestCase
         $result = $env->detect(function () {
             return 'foobar';
         }, ['--env']);
-        $this->assertEquals('foobar', $result);
+        $this->assertSame('foobar', $result);
     }
 }

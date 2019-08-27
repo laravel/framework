@@ -83,7 +83,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        $this->assertEquals('email', $response->decodeResponseJson()['email']);
+        $this->assertSame('email', $response->decodeResponseJson()['email']);
     }
 
     public function testBasicAuthRespectsAdditionalConditions()
@@ -121,13 +121,13 @@ class AuthenticationTest extends TestCase
         $this->assertFalse($this->app['auth']->check());
         $this->assertNull($this->app['auth']->user());
         Event::assertDispatched(Attempting::class, function ($event) {
-            $this->assertEquals('web', $event->guard);
+            $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
 
             return true;
         });
         Event::assertDispatched(Failed::class, function ($event) {
-            $this->assertEquals('web', $event->guard);
+            $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
             $this->assertNull($event->user);
 
@@ -146,19 +146,19 @@ class AuthenticationTest extends TestCase
         $this->assertTrue($this->app['auth']->check());
 
         Event::assertDispatched(Attempting::class, function ($event) {
-            $this->assertEquals('web', $event->guard);
+            $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'email', 'password' => 'password'], $event->credentials);
 
             return true;
         });
         Event::assertDispatched(Login::class, function ($event) {
-            $this->assertEquals('web', $event->guard);
+            $this->assertSame('web', $event->guard);
             $this->assertEquals(1, $event->user->id);
 
             return true;
         });
         Event::assertDispatched(Authenticated::class, function ($event) {
-            $this->assertEquals('web', $event->guard);
+            $this->assertSame('web', $event->guard);
             $this->assertEquals(1, $event->user->id);
 
             return true;
@@ -183,7 +183,7 @@ class AuthenticationTest extends TestCase
         $this->app['auth']->logout();
         $this->assertNull($this->app['auth']->user());
         Event::assertDispatched(Logout::class, function ($event) {
-            $this->assertEquals('web', $event->guard);
+            $this->assertSame('web', $event->guard);
             $this->assertEquals(1, $event->user->id);
 
             return true;
@@ -204,7 +204,7 @@ class AuthenticationTest extends TestCase
         $this->assertEquals(1, $user->id);
 
         Event::assertDispatched(OtherDeviceLogout::class, function ($event) {
-            $this->assertEquals('web', $event->guard);
+            $this->assertSame('web', $event->guard);
             $this->assertEquals(1, $event->user->id);
 
             return true;

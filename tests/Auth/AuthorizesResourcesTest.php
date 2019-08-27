@@ -69,7 +69,7 @@ class AuthorizesResourcesTest extends TestCase
         $router->aliasMiddleware('can', AuthorizesResourcesMiddleware::class);
         $router->get($method)->uses(AuthorizesResourcesController::class.'@'.$method);
 
-        $this->assertEquals(
+        $this->assertSame(
             'caught '.$middleware,
             $router->dispatch(Request::create($method, 'GET'))->getContent(),
             "The [{$middleware}] middleware was not registered for method [{$method}]"

@@ -159,7 +159,7 @@ class EloquentFactoryBuilderTest extends TestCase
     {
         $user = factory(FactoryBuildableUser::class)->create(['name' => 'Zain']);
 
-        $this->assertEquals('Zain', $user->name);
+        $this->assertSame('Zain', $user->name);
     }
 
     public function testCreatingCollectionOfModels()
@@ -182,9 +182,9 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $callableServer = factory(FactoryBuildableServer::class)->state('callable')->create();
 
-        $this->assertEquals('active', $server->status);
+        $this->assertSame('active', $server->status);
         $this->assertEquals(['Storage', 'Data'], $server->tags);
-        $this->assertEquals('callable', $callableServer->status);
+        $this->assertSame('callable', $callableServer->status);
     }
 
     public function testCreatingModelsWithInlineState()
@@ -193,8 +193,8 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $inlineServer = factory(FactoryBuildableServer::class)->state('inline')->create();
 
-        $this->assertEquals('active', $server->status);
-        $this->assertEquals('inline', $inlineServer->status);
+        $this->assertSame('active', $server->status);
+        $this->assertSame('inline', $inlineServer->status);
     }
 
     public function testCreatingModelsWithRelationships()
@@ -217,7 +217,7 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $dbUser = FactoryBuildableUser::on('alternative-connection')->find(1);
 
-        $this->assertEquals('alternative-connection', $user->getConnectionName());
+        $this->assertSame('alternative-connection', $user->getConnectionName());
         $this->assertTrue($user->is($dbUser));
     }
 
@@ -242,7 +242,7 @@ class EloquentFactoryBuilderTest extends TestCase
             ->connection('alternative-connection')
             ->make();
 
-        $this->assertEquals('alternative-connection', $user->getConnectionName());
+        $this->assertSame('alternative-connection', $user->getConnectionName());
     }
 
     public function testMakingModelsWithAfterCallback()

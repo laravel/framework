@@ -23,7 +23,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
-            $this->assertEquals('default', $array['queue']);
+            $this->assertSame('default', $array['queue']);
             $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
@@ -43,7 +43,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
-            $this->assertEquals('default', $array['queue']);
+            $this->assertSame('default', $array['queue']);
             $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);

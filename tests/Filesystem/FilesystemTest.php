@@ -32,7 +32,7 @@ class FilesystemTest extends TestCase
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $files = new Filesystem;
-        $this->assertEquals('Hello World', $files->get($this->tempDir.'/file.txt'));
+        $this->assertSame('Hello World', $files->get($this->tempDir.'/file.txt'));
     }
 
     public function testPutStoresFiles()
@@ -168,7 +168,7 @@ class FilesystemTest extends TestCase
         $files->macro('getFoo', function () use ($files, $tempDir) {
             return $files->get($tempDir.'/foo.txt');
         });
-        $this->assertEquals('Hello World', $files->getFoo());
+        $this->assertSame('Hello World', $files->getFoo());
     }
 
     public function testFilesMethod()
@@ -271,7 +271,7 @@ class FilesystemTest extends TestCase
     {
         file_put_contents($this->tempDir.'/file.php', '<?php return "Howdy?"; ?>');
         $files = new Filesystem;
-        $this->assertEquals('Howdy?', $files->getRequire($this->tempDir.'/file.php'));
+        $this->assertSame('Howdy?', $files->getRequire($this->tempDir.'/file.php'));
     }
 
     public function testGetRequireThrowsExceptionNonExistingFile()
@@ -305,21 +305,21 @@ class FilesystemTest extends TestCase
     {
         file_put_contents($this->tempDir.'/foobar.txt', 'foo');
         $filesystem = new Filesystem;
-        $this->assertEquals('foobar', $filesystem->name($this->tempDir.'/foobar.txt'));
+        $this->assertSame('foobar', $filesystem->name($this->tempDir.'/foobar.txt'));
     }
 
     public function testExtensionReturnsExtension()
     {
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $files = new Filesystem;
-        $this->assertEquals('txt', $files->extension($this->tempDir.'/foo.txt'));
+        $this->assertSame('txt', $files->extension($this->tempDir.'/foo.txt'));
     }
 
     public function testBasenameReturnsBasename()
     {
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $files = new Filesystem;
-        $this->assertEquals('foo.txt', $files->basename($this->tempDir.'/foo.txt'));
+        $this->assertSame('foo.txt', $files->basename($this->tempDir.'/foo.txt'));
     }
 
     public function testDirnameReturnsDirectory()
@@ -333,14 +333,14 @@ class FilesystemTest extends TestCase
     {
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $files = new Filesystem;
-        $this->assertEquals('file', $files->type($this->tempDir.'/foo.txt'));
+        $this->assertSame('file', $files->type($this->tempDir.'/foo.txt'));
     }
 
     public function testTypeIdentifiesDirectory()
     {
         mkdir($this->tempDir.'/foo');
         $files = new Filesystem;
-        $this->assertEquals('dir', $files->type($this->tempDir.'/foo'));
+        $this->assertSame('dir', $files->type($this->tempDir.'/foo'));
     }
 
     public function testSizeOutputsSize()
@@ -357,7 +357,7 @@ class FilesystemTest extends TestCase
     {
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $files = new Filesystem;
-        $this->assertEquals('text/plain', $files->mimeType($this->tempDir.'/foo.txt'));
+        $this->assertSame('text/plain', $files->mimeType($this->tempDir.'/foo.txt'));
     }
 
     public function testIsWritable()
@@ -527,15 +527,15 @@ class FilesystemTest extends TestCase
         /** @var Ftp $adapter */
         $adapter = $driver->getAdapter();
         $this->assertEquals(0700, $adapter->getPermPublic());
-        $this->assertEquals('ftp.example.com', $adapter->getHost());
-        $this->assertEquals('admin', $adapter->getUsername());
+        $this->assertSame('ftp.example.com', $adapter->getHost());
+        $this->assertSame('admin', $adapter->getUsername());
     }
 
     public function testHash()
     {
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $filesystem = new Filesystem;
-        $this->assertEquals('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash($this->tempDir.'/foo.txt'));
+        $this->assertSame('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash($this->tempDir.'/foo.txt'));
     }
 
     /**
