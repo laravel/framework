@@ -41,7 +41,7 @@ class Arr
     /**
      * Returns true if any element of the array is truthy. If not, returns false.
      *
-     * @param  $array  $array
+     * @param  array  $array
      * @param  callable|null  $callback
      * @return bool
      */
