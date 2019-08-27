@@ -236,6 +236,7 @@ class QueueFake extends QueueManager implements Queue
                 $count += $job['queue'] === $queue;
             }
         }
+
         return $count;
     }
 
