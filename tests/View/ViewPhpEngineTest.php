@@ -16,7 +16,7 @@ class ViewPhpEngineTest extends TestCase
     public function testViewsMayBeProperlyRendered()
     {
         $engine = new PhpEngine;
-        $this->assertEquals('Hello World
+        $this->assertSame('Hello World
 ', $engine->get(__DIR__.'/fixtures/basic.php'));
     }
 }

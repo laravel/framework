@@ -29,7 +29,7 @@ class AuthDatabaseUserProviderTest extends TestCase
 
         $this->assertInstanceOf(GenericUser::class, $user);
         $this->assertEquals(1, $user->getAuthIdentifier());
-        $this->assertEquals('Dayle', $user->name);
+        $this->assertSame('Dayle', $user->name);
     }
 
     public function testRetrieveByIDReturnsNullWhenUserIsNotFound()
@@ -99,7 +99,7 @@ class AuthDatabaseUserProviderTest extends TestCase
 
         $this->assertInstanceOf(GenericUser::class, $user);
         $this->assertEquals(1, $user->getAuthIdentifier());
-        $this->assertEquals('taylor', $user->name);
+        $this->assertSame('taylor', $user->name);
     }
 
     public function testRetrieveByCredentialsReturnsNullWhenUserIsFound()

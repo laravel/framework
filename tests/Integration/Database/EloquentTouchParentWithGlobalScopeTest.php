@@ -38,7 +38,7 @@ class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
     {
         $post = Post::create(['title' => Str::random(), 'updated_at' => '2016-10-10 10:10:10']);
 
-        $this->assertEquals('2016-10-10', $post->fresh()->updated_at->toDateString());
+        $this->assertSame('2016-10-10', $post->fresh()->updated_at->toDateString());
 
         $post->comments()->create(['title' => Str::random()]);
 

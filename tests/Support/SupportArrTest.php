@@ -294,13 +294,13 @@ class SupportArrTest extends TestCase
                 ['name' => 'chair'],
             ],
         ];
-        $this->assertEquals('desk', Arr::get($array, 'products.0.name'));
-        $this->assertEquals('chair', Arr::get($array, 'products.1.name'));
+        $this->assertSame('desk', Arr::get($array, 'products.0.name'));
+        $this->assertSame('chair', Arr::get($array, 'products.1.name'));
 
         // Test return default value for non-existing key.
         $array = ['names' => ['developer' => 'taylor']];
-        $this->assertEquals('dayle', Arr::get($array, 'names.otherDeveloper', 'dayle'));
-        $this->assertEquals('dayle', Arr::get($array, 'names.otherDeveloper', function () {
+        $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', 'dayle'));
+        $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
             return 'dayle';
         }));
     }
@@ -523,13 +523,13 @@ class SupportArrTest extends TestCase
     {
         $array = ['name' => 'Desk', 'price' => 100];
         $name = Arr::pull($array, 'name');
-        $this->assertEquals('Desk', $name);
+        $this->assertSame('Desk', $name);
         $this->assertEquals(['price' => 100], $array);
 
         // Only works on first level keys
         $array = ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane'];
         $name = Arr::pull($array, 'joe@example.com');
-        $this->assertEquals('Joe', $name);
+        $this->assertSame('Joe', $name);
         $this->assertEquals(['jane@localhost' => 'Jane'], $array);
 
         // Does not work for nested keys

@@ -27,7 +27,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $provider->expects($this->once())->method('createModel')->willReturn($mock);
         $user = $provider->retrieveById(1);
 
-        $this->assertEquals('bar', $user);
+        $this->assertSame('bar', $user);
     }
 
     public function testRetrieveByTokenReturnsUser()
@@ -89,7 +89,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $provider->expects($this->once())->method('createModel')->willReturn($mock);
         $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo', 'group' => ['one', 'two']]);
 
-        $this->assertEquals('bar', $user);
+        $this->assertSame('bar', $user);
     }
 
     public function testCredentialValidation()

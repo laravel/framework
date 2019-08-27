@@ -35,17 +35,17 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->unique(['foo', 'bar']);
         $commands = $blueprint->getCommands();
-        $this->assertEquals('users_foo_bar_unique', $commands[0]->index);
+        $this->assertSame('users_foo_bar_unique', $commands[0]->index);
 
         $blueprint = new Blueprint('users');
         $blueprint->index('foo');
         $commands = $blueprint->getCommands();
-        $this->assertEquals('users_foo_index', $commands[0]->index);
+        $this->assertSame('users_foo_index', $commands[0]->index);
 
         $blueprint = new Blueprint('geo');
         $blueprint->spatialIndex('coordinates');
         $commands = $blueprint->getCommands();
-        $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
+        $this->assertSame('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testIndexDefaultNamesWhenPrefixSupplied()
@@ -53,17 +53,17 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = new Blueprint('users', null, 'prefix_');
         $blueprint->unique(['foo', 'bar']);
         $commands = $blueprint->getCommands();
-        $this->assertEquals('prefix_users_foo_bar_unique', $commands[0]->index);
+        $this->assertSame('prefix_users_foo_bar_unique', $commands[0]->index);
 
         $blueprint = new Blueprint('users', null, 'prefix_');
         $blueprint->index('foo');
         $commands = $blueprint->getCommands();
-        $this->assertEquals('prefix_users_foo_index', $commands[0]->index);
+        $this->assertSame('prefix_users_foo_index', $commands[0]->index);
 
         $blueprint = new Blueprint('geo', null, 'prefix_');
         $blueprint->spatialIndex('coordinates');
         $commands = $blueprint->getCommands();
-        $this->assertEquals('prefix_geo_coordinates_spatialindex', $commands[0]->index);
+        $this->assertSame('prefix_geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testDropIndexDefaultNames()
@@ -71,17 +71,17 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->dropUnique(['foo', 'bar']);
         $commands = $blueprint->getCommands();
-        $this->assertEquals('users_foo_bar_unique', $commands[0]->index);
+        $this->assertSame('users_foo_bar_unique', $commands[0]->index);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropIndex(['foo']);
         $commands = $blueprint->getCommands();
-        $this->assertEquals('users_foo_index', $commands[0]->index);
+        $this->assertSame('users_foo_index', $commands[0]->index);
 
         $blueprint = new Blueprint('geo');
         $blueprint->dropSpatialIndex(['coordinates']);
         $commands = $blueprint->getCommands();
-        $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
+        $this->assertSame('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testDropIndexDefaultNamesWhenPrefixSupplied()
@@ -89,17 +89,17 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = new Blueprint('users', null, 'prefix_');
         $blueprint->dropUnique(['foo', 'bar']);
         $commands = $blueprint->getCommands();
-        $this->assertEquals('prefix_users_foo_bar_unique', $commands[0]->index);
+        $this->assertSame('prefix_users_foo_bar_unique', $commands[0]->index);
 
         $blueprint = new Blueprint('users', null, 'prefix_');
         $blueprint->dropIndex(['foo']);
         $commands = $blueprint->getCommands();
-        $this->assertEquals('prefix_users_foo_index', $commands[0]->index);
+        $this->assertSame('prefix_users_foo_index', $commands[0]->index);
 
         $blueprint = new Blueprint('geo', null, 'prefix_');
         $blueprint->dropSpatialIndex(['coordinates']);
         $commands = $blueprint->getCommands();
-        $this->assertEquals('prefix_geo_coordinates_spatialindex', $commands[0]->index);
+        $this->assertSame('prefix_geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testDefaultCurrentDateTime()

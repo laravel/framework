@@ -14,7 +14,7 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decrypt($encrypted));
+        $this->assertSame('foo', $e->decrypt($encrypted));
     }
 
     public function testRawStringEncryption()
@@ -22,7 +22,7 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encryptString('foo');
         $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decryptString($encrypted));
+        $this->assertSame('foo', $e->decryptString($encrypted));
     }
 
     public function testEncryptionUsingBase64EncodedKey()
@@ -30,7 +30,7 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(random_bytes(16));
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decrypt($encrypted));
+        $this->assertSame('foo', $e->decrypt($encrypted));
     }
 
     public function testWithCustomCipher()
@@ -38,12 +38,12 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
         $encrypted = $e->encrypt('bar');
         $this->assertNotEquals('bar', $encrypted);
-        $this->assertEquals('bar', $e->decrypt($encrypted));
+        $this->assertSame('bar', $e->decrypt($encrypted));
 
         $e = new Encrypter(random_bytes(32), 'AES-256-CBC');
         $encrypted = $e->encrypt('foo');
         $this->assertNotEquals('foo', $encrypted);
-        $this->assertEquals('foo', $e->decrypt($encrypted));
+        $this->assertSame('foo', $e->decrypt($encrypted));
     }
 
     public function testDoNoAllowLongerKey()

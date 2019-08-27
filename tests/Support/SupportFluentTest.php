@@ -53,9 +53,9 @@ class SupportFluentTest extends TestCase
     {
         $fluent = new Fluent(['name' => 'Taylor']);
 
-        $this->assertEquals('Taylor', $fluent->get('name'));
-        $this->assertEquals('Default', $fluent->get('foo', 'Default'));
-        $this->assertEquals('Taylor', $fluent->name);
+        $this->assertSame('Taylor', $fluent->get('name'));
+        $this->assertSame('Default', $fluent->get('foo', 'Default'));
+        $this->assertSame('Taylor', $fluent->name);
         $this->assertNull($fluent->foo);
     }
 
@@ -79,7 +79,7 @@ class SupportFluentTest extends TestCase
         $fluent->developer();
         $fluent->age(25);
 
-        $this->assertEquals('Taylor', $fluent->name);
+        $this->assertSame('Taylor', $fluent->name);
         $this->assertTrue($fluent->developer);
         $this->assertEquals(25, $fluent->age);
         $this->assertInstanceOf(Fluent::class, $fluent->programmer());

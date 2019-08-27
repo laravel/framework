@@ -22,7 +22,7 @@ class UrlSigningTest extends TestCase
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
-        $this->assertEquals('valid', $this->get($url)->original);
+        $this->assertSame('valid', $this->get($url)->original);
     }
 
     public function testTemporarySignedUrls()
@@ -33,10 +33,10 @@ class UrlSigningTest extends TestCase
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
         $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
-        $this->assertEquals('valid', $this->get($url)->original);
+        $this->assertSame('valid', $this->get($url)->original);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
-        $this->assertEquals('invalid', $this->get($url)->original);
+        $this->assertSame('invalid', $this->get($url)->original);
     }
 
     public function testSignedUrlWithUrlWithoutSignatureParameter()
@@ -45,7 +45,7 @@ class UrlSigningTest extends TestCase
             return $request->hasValidSignature() ? 'valid' : 'invalid';
         })->name('foo');
 
-        $this->assertEquals('invalid', $this->get('/foo/1')->original);
+        $this->assertSame('invalid', $this->get('/foo/1')->original);
     }
 
     public function testSignedMiddleware()
@@ -56,7 +56,7 @@ class UrlSigningTest extends TestCase
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
         $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
-        $this->assertEquals('valid', $this->get($url)->original);
+        $this->assertSame('valid', $this->get($url)->original);
     }
 
     public function testSignedMiddlewareWithInvalidUrl()
@@ -83,7 +83,7 @@ class UrlSigningTest extends TestCase
         })->name('foo');
 
         $this->assertIsString($url = URL::signedRoute('foo', $model));
-        $this->assertEquals('routable', $this->get($url)->original);
+        $this->assertSame('routable', $this->get($url)->original);
     }
 }
 

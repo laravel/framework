@@ -15,8 +15,8 @@ class AuthHandlesAuthorizationTest extends TestCase
 
         $this->assertTrue($response->allowed());
         $this->assertFalse($response->denied());
-        $this->assertEquals('some message', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('some message', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 
     public function testDenyMethod()
@@ -25,7 +25,7 @@ class AuthHandlesAuthorizationTest extends TestCase
 
         $this->assertTrue($response->denied());
         $this->assertFalse($response->allowed());
-        $this->assertEquals('some message', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('some message', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 }

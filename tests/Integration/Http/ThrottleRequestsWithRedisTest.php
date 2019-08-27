@@ -39,12 +39,12 @@ class ThrottleRequestsWithRedisTest extends TestCase
             })->middleware(ThrottleRequestsWithRedis::class.':2,1');
 
             $response = $this->withoutExceptionHandling()->get('/');
-            $this->assertEquals('yes', $response->getContent());
+            $this->assertSame('yes', $response->getContent());
             $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
             $this->assertEquals(1, $response->headers->get('X-RateLimit-Remaining'));
 
             $response = $this->withoutExceptionHandling()->get('/');
-            $this->assertEquals('yes', $response->getContent());
+            $this->assertSame('yes', $response->getContent());
             $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
             $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
 

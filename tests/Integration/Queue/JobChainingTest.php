@@ -134,14 +134,14 @@ class JobChainingTest extends TestCase
             new JobChainingTestThirdJob,
         ]);
 
-        $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
 
-        $this->assertEquals('some_queue', JobChainingTestSecondJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestSecondJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestSecondJob::$usedConnection);
 
-        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestThirdJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestThirdJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestThirdJob::$usedConnection);
     }
 
     public function testChainJobsUseOwnConfig()
@@ -151,14 +151,14 @@ class JobChainingTest extends TestCase
             new JobChainingTestThirdJob,
         ]);
 
-        $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
 
-        $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
-        $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
+        $this->assertSame('another_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertSame('sync2', JobChainingTestSecondJob::$usedConnection);
 
-        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestThirdJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestThirdJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestThirdJob::$usedConnection);
     }
 
     public function testChainJobsUseDefaultConfig()
@@ -168,11 +168,11 @@ class JobChainingTest extends TestCase
             new JobChainingTestThirdJob,
         ]);
 
-        $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
 
-        $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
-        $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
+        $this->assertSame('another_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertSame('sync2', JobChainingTestSecondJob::$usedConnection);
 
         $this->assertNull(JobChainingTestThirdJob::$usedQueue);
         $this->assertNull(JobChainingTestThirdJob::$usedConnection);

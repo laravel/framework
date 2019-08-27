@@ -49,7 +49,7 @@ class RedisCacheLockTest extends TestCase
         Carbon::setTestNow();
 
         Cache::store('redis')->lock('foo')->forceRelease();
-        $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
+        $this->assertSame('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
 

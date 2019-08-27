@@ -189,7 +189,7 @@ class MailMailerTest extends TestCase
 
         $mailer = $this->getMailer();
 
-        $this->assertEquals(
+        $this->assertSame(
             'bar', $mailer->foo()
         );
     }

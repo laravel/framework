@@ -25,7 +25,7 @@ class QueueRedisQueueTest extends TestCase
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
 
         $id = $queue->push('foo', ['data']);
-        $this->assertEquals('foo', $id);
+        $this->assertSame('foo', $id);
     }
 
     public function testPushProperlyPushesJobOntoRedisWithCustomPayloadHook()
@@ -40,7 +40,7 @@ class QueueRedisQueueTest extends TestCase
         });
 
         $id = $queue->push('foo', ['data']);
-        $this->assertEquals('foo', $id);
+        $this->assertSame('foo', $id);
 
         Queue::createPayloadUsing(null);
     }
@@ -61,7 +61,7 @@ class QueueRedisQueueTest extends TestCase
         });
 
         $id = $queue->push('foo', ['data']);
-        $this->assertEquals('foo', $id);
+        $this->assertSame('foo', $id);
 
         Queue::createPayloadUsing(null);
     }
@@ -80,7 +80,7 @@ class QueueRedisQueueTest extends TestCase
         );
 
         $id = $queue->later(1, 'foo', ['data']);
-        $this->assertEquals('foo', $id);
+        $this->assertSame('foo', $id);
     }
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()

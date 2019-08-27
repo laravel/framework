@@ -123,7 +123,7 @@ class EventFakeTest extends TestCase
             $this->fail('should not be called');
         });
 
-        $this->assertEquals('two', Event::until('test'));
+        $this->assertSame('two', Event::until('test'));
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }

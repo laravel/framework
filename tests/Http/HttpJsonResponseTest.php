@@ -22,7 +22,7 @@ class HttpJsonResponseTest extends TestCase
         $response = new JsonResponse($data);
 
         $this->assertInstanceOf(stdClass::class, $response->getData());
-        $this->assertEquals('bar', $response->getData()->foo);
+        $this->assertSame('bar', $response->getData()->foo);
     }
 
     public function setAndRetrieveDataProvider(): array

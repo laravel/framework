@@ -12,43 +12,43 @@ class ConsoleParserTest extends TestCase
     {
         $results = Parser::parse('command:name');
 
-        $this->assertEquals('command:name', $results[0]);
+        $this->assertSame('command:name', $results[0]);
 
         $results = Parser::parse('command:name {argument} {--option}');
 
-        $this->assertEquals('command:name', $results[0]);
-        $this->assertEquals('argument', $results[1][0]->getName());
-        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('argument', $results[1][0]->getName());
+        $this->assertSame('option', $results[2][0]->getName());
         $this->assertFalse($results[2][0]->acceptValue());
 
         $results = Parser::parse('command:name {argument*} {--option=}');
 
-        $this->assertEquals('command:name', $results[0]);
-        $this->assertEquals('argument', $results[1][0]->getName());
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('argument', $results[1][0]->getName());
         $this->assertTrue($results[1][0]->isArray());
         $this->assertTrue($results[1][0]->isRequired());
-        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertSame('option', $results[2][0]->getName());
         $this->assertTrue($results[2][0]->acceptValue());
 
         $results = Parser::parse('command:name {argument?*} {--option=*}');
 
-        $this->assertEquals('command:name', $results[0]);
-        $this->assertEquals('argument', $results[1][0]->getName());
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('argument', $results[1][0]->getName());
         $this->assertTrue($results[1][0]->isArray());
         $this->assertFalse($results[1][0]->isRequired());
-        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertSame('option', $results[2][0]->getName());
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
 
         $results = Parser::parse('command:name {argument?* : The argument description.}    {--option=* : The option description.}');
 
-        $this->assertEquals('command:name', $results[0]);
-        $this->assertEquals('argument', $results[1][0]->getName());
-        $this->assertEquals('The argument description.', $results[1][0]->getDescription());
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('argument', $results[1][0]->getName());
+        $this->assertSame('The argument description.', $results[1][0]->getDescription());
         $this->assertTrue($results[1][0]->isArray());
         $this->assertFalse($results[1][0]->isRequired());
-        $this->assertEquals('option', $results[2][0]->getName());
-        $this->assertEquals('The option description.', $results[2][0]->getDescription());
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertSame('The option description.', $results[2][0]->getDescription());
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
 
@@ -56,13 +56,13 @@ class ConsoleParserTest extends TestCase
             {argument?* : The argument description.}
             {--option=* : The option description.}');
 
-        $this->assertEquals('command:name', $results[0]);
-        $this->assertEquals('argument', $results[1][0]->getName());
-        $this->assertEquals('The argument description.', $results[1][0]->getDescription());
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('argument', $results[1][0]->getName());
+        $this->assertSame('The argument description.', $results[1][0]->getDescription());
         $this->assertTrue($results[1][0]->isArray());
         $this->assertFalse($results[1][0]->isRequired());
-        $this->assertEquals('option', $results[2][0]->getName());
-        $this->assertEquals('The option description.', $results[2][0]->getDescription());
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertSame('The option description.', $results[2][0]->getDescription());
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
     }
@@ -71,40 +71,40 @@ class ConsoleParserTest extends TestCase
     {
         $results = Parser::parse('command:name {--o|option}');
 
-        $this->assertEquals('o', $results[2][0]->getShortcut());
-        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertSame('o', $results[2][0]->getShortcut());
+        $this->assertSame('option', $results[2][0]->getName());
         $this->assertFalse($results[2][0]->acceptValue());
 
         $results = Parser::parse('command:name {--o|option=}');
 
-        $this->assertEquals('o', $results[2][0]->getShortcut());
-        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertSame('o', $results[2][0]->getShortcut());
+        $this->assertSame('option', $results[2][0]->getName());
         $this->assertTrue($results[2][0]->acceptValue());
 
         $results = Parser::parse('command:name {--o|option=*}');
 
-        $this->assertEquals('command:name', $results[0]);
-        $this->assertEquals('o', $results[2][0]->getShortcut());
-        $this->assertEquals('option', $results[2][0]->getName());
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('o', $results[2][0]->getShortcut());
+        $this->assertSame('option', $results[2][0]->getName());
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
 
         $results = Parser::parse('command:name {--o|option=* : The option description.}');
 
-        $this->assertEquals('command:name', $results[0]);
-        $this->assertEquals('o', $results[2][0]->getShortcut());
-        $this->assertEquals('option', $results[2][0]->getName());
-        $this->assertEquals('The option description.', $results[2][0]->getDescription());
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('o', $results[2][0]->getShortcut());
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertSame('The option description.', $results[2][0]->getDescription());
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
 
         $results = Parser::parse('command:name
             {--o|option=* : The option description.}');
 
-        $this->assertEquals('command:name', $results[0]);
-        $this->assertEquals('o', $results[2][0]->getShortcut());
-        $this->assertEquals('option', $results[2][0]->getName());
-        $this->assertEquals('The option description.', $results[2][0]->getDescription());
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('o', $results[2][0]->getShortcut());
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertSame('The option description.', $results[2][0]->getDescription());
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
     }
@@ -114,9 +114,9 @@ class ConsoleParserTest extends TestCase
         $results = Parser::parse('command:name {argument=defaultArgumentValue} {--option=defaultOptionValue}');
 
         $this->assertFalse($results[1][0]->isRequired());
-        $this->assertEquals('defaultArgumentValue', $results[1][0]->getDefault());
+        $this->assertSame('defaultArgumentValue', $results[1][0]->getDefault());
         $this->assertTrue($results[2][0]->acceptValue());
-        $this->assertEquals('defaultOptionValue', $results[2][0]->getDefault());
+        $this->assertSame('defaultOptionValue', $results[2][0]->getDefault());
 
         $results = Parser::parse('command:name {argument=*defaultArgumentValue1,defaultArgumentValue2} {--option=*defaultOptionValue1,defaultOptionValue2}');
 

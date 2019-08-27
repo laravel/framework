@@ -30,14 +30,14 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
             'decimal_field_4' => '1234',
         ]);
 
-        $this->assertEquals('12.00', $user->toArray()['decimal_field_2']);
-        $this->assertEquals('1234.0000', $user->toArray()['decimal_field_4']);
+        $this->assertSame('12.00', $user->toArray()['decimal_field_2']);
+        $this->assertSame('1234.0000', $user->toArray()['decimal_field_4']);
 
         $user->decimal_field_2 = 12;
         $user->decimal_field_4 = '1234';
 
-        $this->assertEquals('12.00', $user->toArray()['decimal_field_2']);
-        $this->assertEquals('1234.0000', $user->toArray()['decimal_field_4']);
+        $this->assertSame('12.00', $user->toArray()['decimal_field_2']);
+        $this->assertSame('1234.0000', $user->toArray()['decimal_field_4']);
 
         $this->assertFalse($user->isDirty());
 

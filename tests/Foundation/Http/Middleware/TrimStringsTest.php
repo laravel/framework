@@ -22,10 +22,10 @@ class TrimStringsTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertEquals('123', $request->get('abc'));
-            $this->assertEquals('456', $request->get('xyz'));
-            $this->assertEquals('  789  ', $request->get('foo'));
-            $this->assertEquals('  010  ', $request->get('bar'));
+            $this->assertSame('123', $request->get('abc'));
+            $this->assertSame('456', $request->get('xyz'));
+            $this->assertSame('  789  ', $request->get('foo'));
+            $this->assertSame('  010  ', $request->get('bar'));
         });
     }
 }

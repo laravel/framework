@@ -39,8 +39,8 @@ class FilesystemAdapterTest extends TestCase
         $content = ob_get_clean();
 
         $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertEquals('Hello World', $content);
-        // $this->assertEquals('inline; filename="file.txt"', $response->headers->get('content-disposition'));
+        $this->assertSame('Hello World', $content);
+        // $this->assertSame('inline; filename="file.txt"', $response->headers->get('content-disposition'));
     }
 
     public function testDownload()
@@ -49,7 +49,7 @@ class FilesystemAdapterTest extends TestCase
         $files = new FilesystemAdapter($this->filesystem);
         $response = $files->download('file.txt', 'hello.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
-        // $this->assertEquals('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
+        // $this->assertSame('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
     }
 
     public function testDownloadNonAsciiFilename()
@@ -58,7 +58,7 @@ class FilesystemAdapterTest extends TestCase
         $files = new FilesystemAdapter($this->filesystem);
         $response = $files->download('file.txt', 'пиздюк.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertEquals("attachment; filename=pizdyuk.txt; filename*=utf-8''%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt", $response->headers->get('content-disposition'));
+        $this->assertSame("attachment; filename=pizdyuk.txt; filename*=utf-8''%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt", $response->headers->get('content-disposition'));
     }
 
     public function testDownloadNonAsciiEmptyFilename()
@@ -67,7 +67,7 @@ class FilesystemAdapterTest extends TestCase
         $files = new FilesystemAdapter($this->filesystem);
         $response = $files->download('пиздюк.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertEquals('attachment; filename=pizdyuk.txt; filename*=utf-8\'\'%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt', $response->headers->get('content-disposition'));
+        $this->assertSame('attachment; filename=pizdyuk.txt; filename*=utf-8\'\'%D0%BF%D0%B8%D0%B7%D0%B4%D1%8E%D0%BA.txt', $response->headers->get('content-disposition'));
     }
 
     public function testDownloadPercentInFilename()
@@ -76,7 +76,7 @@ class FilesystemAdapterTest extends TestCase
         $files = new FilesystemAdapter($this->filesystem);
         $response = $files->download('Hello%World.txt', 'Hello%World.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertEquals('attachment; filename=HelloWorld.txt; filename*=utf-8\'\'Hello%25World.txt', $response->headers->get('content-disposition'));
+        $this->assertSame('attachment; filename=HelloWorld.txt; filename*=utf-8\'\'Hello%25World.txt', $response->headers->get('content-disposition'));
     }
 
     public function testExists()
@@ -97,7 +97,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
-        $this->assertEquals('Hello World', $filesystemAdapter->get('file.txt'));
+        $this->assertSame('Hello World', $filesystemAdapter->get('file.txt'));
     }
 
     public function testGetFileNotFound()

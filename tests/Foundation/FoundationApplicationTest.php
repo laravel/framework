@@ -92,7 +92,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app->setDeferredServices(['foo' => ApplicationDeferredServiceProviderStub::class]);
         $this->assertTrue($app->bound('foo'));
-        $this->assertEquals('foo', $app->make('foo'));
+        $this->assertSame('foo', $app->make('foo'));
     }
 
     public function testDeferredServicesAreSharedProperly()
@@ -114,7 +114,7 @@ class FoundationApplicationTest extends TestCase
         $app->extend('foo', function ($instance, $container) {
             return $instance.'bar';
         });
-        $this->assertEquals('foobar', $app->make('foo'));
+        $this->assertSame('foobar', $app->make('foo'));
     }
 
     public function testDeferredServiceProviderIsRegisteredOnlyOnce()
@@ -147,7 +147,7 @@ class FoundationApplicationTest extends TestCase
             return $instance.'bar';
         });
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
-        $this->assertEquals('foobar', $app->make('foo'));
+        $this->assertSame('foobar', $app->make('foo'));
         $this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
     }
 
@@ -168,8 +168,8 @@ class FoundationApplicationTest extends TestCase
             'foo' => ApplicationMultiProviderStub::class,
             'bar' => ApplicationMultiProviderStub::class,
         ]);
-        $this->assertEquals('foo', $app->make('foo'));
-        $this->assertEquals('foobar', $app->make('bar'));
+        $this->assertSame('foo', $app->make('foo'));
+        $this->assertSame('foobar', $app->make('bar'));
     }
 
     public function testEnvironment()
@@ -177,7 +177,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app['env'] = 'foo';
 
-        $this->assertEquals('foo', $app->environment());
+        $this->assertSame('foo', $app->environment());
 
         $this->assertTrue($app->environment('foo'));
         $this->assertTrue($app->environment('f*'));

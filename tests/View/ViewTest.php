@@ -45,10 +45,10 @@ class ViewTest extends TestCase
 
         $callback = function (View $rendered, $contents) use ($view) {
             $this->assertEquals($view, $rendered);
-            $this->assertEquals('contents', $contents);
+            $this->assertSame('contents', $contents);
         };
 
-        $this->assertEquals('contents', $view->render($callback));
+        $this->assertSame('contents', $view->render($callback));
     }
 
     public function testRenderHandlingCallbackReturnValues()
@@ -61,7 +61,7 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('decrementRender');
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering');
 
-        $this->assertEquals('new contents', $view->render(function () {
+        $this->assertSame('new contents', $view->render(function () {
             return 'new contents';
         }));
 
@@ -69,7 +69,7 @@ class ViewTest extends TestCase
             return '';
         }));
 
-        $this->assertEquals('contents', $view->render(function () {
+        $this->assertSame('contents', $view->render(function () {
             //
         }));
     }
@@ -99,8 +99,8 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('decrementRender')->twice();
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->twice();
 
-        $this->assertEquals('contents', $view->render());
-        $this->assertEquals('contents', (string) $view);
+        $this->assertSame('contents', $view->render());
+        $this->assertSame('contents', (string) $view);
     }
 
     public function testViewNestBindsASubView()
@@ -119,7 +119,7 @@ class ViewTest extends TestCase
 
         $view = $this->getView($arrayable);
 
-        $this->assertEquals('bar', $view->foo);
+        $this->assertSame('bar', $view->foo);
         $this->assertEquals(['qux', 'corge'], $view->baz);
     }
 
@@ -192,7 +192,7 @@ class ViewTest extends TestCase
 
         $view->renderable = m::mock(Renderable::class);
         $view->renderable->shouldReceive('render')->once()->andReturn('text');
-        $this->assertEquals('contents', $view->render());
+        $this->assertSame('contents', $view->render());
     }
 
     public function testViewRenderSections()

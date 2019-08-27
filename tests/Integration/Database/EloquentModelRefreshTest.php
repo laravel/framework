@@ -55,7 +55,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $this->assertEmpty($post->getDirty());
 
-        $this->assertEquals('patrick', $post->getOriginal('title'));
+        $this->assertSame('patrick', $post->getOriginal('title'));
     }
 }
 

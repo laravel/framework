@@ -52,14 +52,14 @@ class RedisManagerExtensionTest extends TestCase
 
     public function testUsingCustomRedisConnectorWithSingleRedisInstance()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'my-redis-connection', $this->redis->resolve()
         );
     }
 
     public function testUsingCustomRedisConnectorWithRedisClusterInstance()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'my-redis-cluster-connection', $this->redis->resolve('my-cluster')
         );
     }

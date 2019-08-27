@@ -87,17 +87,17 @@ class ModelSerializationTest extends TestCase
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertEquals('testbench', $unSerialized->user->getConnectionName());
-        $this->assertEquals('mohamed@laravel.com', $unSerialized->user->email);
+        $this->assertSame('testbench', $unSerialized->user->getConnectionName());
+        $this->assertSame('mohamed@laravel.com', $unSerialized->user->email);
 
         $serialized = serialize(new ModelSerializationTestClass(ModelSerializationTestUser::on('testbench')->get()));
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertEquals('testbench', $unSerialized->user[0]->getConnectionName());
-        $this->assertEquals('mohamed@laravel.com', $unSerialized->user[0]->email);
-        $this->assertEquals('testbench', $unSerialized->user[1]->getConnectionName());
-        $this->assertEquals('taylor@laravel.com', $unSerialized->user[1]->email);
+        $this->assertSame('testbench', $unSerialized->user[0]->getConnectionName());
+        $this->assertSame('mohamed@laravel.com', $unSerialized->user[0]->email);
+        $this->assertSame('testbench', $unSerialized->user[1]->getConnectionName());
+        $this->assertSame('taylor@laravel.com', $unSerialized->user[1]->email);
     }
 
     public function testItSerializeUserOnDifferentConnection()
@@ -114,17 +114,17 @@ class ModelSerializationTest extends TestCase
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertEquals('custom', $unSerialized->user->getConnectionName());
-        $this->assertEquals('mohamed@laravel.com', $unSerialized->user->email);
+        $this->assertSame('custom', $unSerialized->user->getConnectionName());
+        $this->assertSame('mohamed@laravel.com', $unSerialized->user->email);
 
         $serialized = serialize(new ModelSerializationTestClass(ModelSerializationTestUser::on('custom')->get()));
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertEquals('custom', $unSerialized->user[0]->getConnectionName());
-        $this->assertEquals('mohamed@laravel.com', $unSerialized->user[0]->email);
-        $this->assertEquals('custom', $unSerialized->user[1]->getConnectionName());
-        $this->assertEquals('taylor@laravel.com', $unSerialized->user[1]->email);
+        $this->assertSame('custom', $unSerialized->user[0]->getConnectionName());
+        $this->assertSame('mohamed@laravel.com', $unSerialized->user[0]->email);
+        $this->assertSame('custom', $unSerialized->user[1]->getConnectionName());
+        $this->assertSame('taylor@laravel.com', $unSerialized->user[1]->email);
     }
 
     public function testItFailsIfModelsOnMultiConnections()

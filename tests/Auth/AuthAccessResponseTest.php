@@ -14,8 +14,8 @@ class AuthAccessResponseTest extends TestCase
 
         $this->assertTrue($response->allowed());
         $this->assertFalse($response->denied());
-        $this->assertEquals('some message', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('some message', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 
     public function testDenyMethod()
@@ -24,8 +24,8 @@ class AuthAccessResponseTest extends TestCase
 
         $this->assertTrue($response->denied());
         $this->assertFalse($response->allowed());
-        $this->assertEquals('some message', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('some message', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 
     public function testDenyMethodWithNoMessageReturnsNull()
@@ -42,8 +42,8 @@ class AuthAccessResponseTest extends TestCase
         try {
             $response->authorize();
         } catch (AuthorizationException $e) {
-            $this->assertEquals('Some message.', $e->getMessage());
-            $this->assertEquals('some_code', $e->getCode());
+            $this->assertSame('Some message.', $e->getMessage());
+            $this->assertSame('some_code', $e->getCode());
             $this->assertEquals($response, $e->response());
         }
     }
@@ -55,7 +55,7 @@ class AuthAccessResponseTest extends TestCase
         try {
             $response->authorize();
         } catch (AuthorizationException $e) {
-            $this->assertEquals('This action is unauthorized.', $e->getMessage());
+            $this->assertSame('This action is unauthorized.', $e->getMessage());
         }
     }
 

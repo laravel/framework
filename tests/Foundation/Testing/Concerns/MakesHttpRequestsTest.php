@@ -33,21 +33,21 @@ class MakesHttpRequestsTest extends TestCase
         };
 
         $this->assertFalse($this->app->has(MyMiddleware::class));
-        $this->assertEquals(
+        $this->assertSame(
             'fooWithMiddleware',
             $this->app->make(MyMiddleware::class)->handle('foo', $next)
         );
 
         $this->withoutMiddleware(MyMiddleware::class);
         $this->assertTrue($this->app->has(MyMiddleware::class));
-        $this->assertEquals(
+        $this->assertSame(
             'foo',
             $this->app->make(MyMiddleware::class)->handle('foo', $next)
         );
 
         $this->withMiddleware(MyMiddleware::class);
         $this->assertFalse($this->app->has(MyMiddleware::class));
-        $this->assertEquals(
+        $this->assertSame(
             'fooWithMiddleware',
             $this->app->make(MyMiddleware::class)->handle('foo', $next)
         );

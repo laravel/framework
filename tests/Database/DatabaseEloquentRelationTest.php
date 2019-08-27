@@ -244,7 +244,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $relation = new EloquentRelationStub($model->newQuery(), $model);
 
         $result = $relation->foo();
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
     }
 }
 

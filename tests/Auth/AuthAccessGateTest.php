@@ -227,7 +227,7 @@ class AuthAccessGateTest extends TestCase
             return true;
         });
         $gate->before(function ($user, $ability) {
-            $this->assertEquals('foo', $ability);
+            $this->assertSame('foo', $ability);
 
             return false;
         });
@@ -627,8 +627,8 @@ class AuthAccessGateTest extends TestCase
 
         $this->assertTrue($response->denied());
         $this->assertFalse($response->allowed());
-        $this->assertEquals('Not allowed.', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('Not allowed.', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 
     public function testAuthorizeReturnsAllowedResponse()
@@ -669,7 +669,7 @@ class AuthAccessGateTest extends TestCase
         $response = $gate->inspect('view', new AccessGateTestDummy);
 
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals('Not allowed to view as it is not published.', $response->message());
+        $this->assertSame('Not allowed to view as it is not published.', $response->message());
         $this->assertFalse($response->allowed());
         $this->assertTrue($response->denied());
         $this->assertEquals($response->code(), 'unpublished');
@@ -812,22 +812,22 @@ class AuthAccessGateTest extends TestCase
         AccessGateTestClassForGuest::$calledMethod = '';
 
         $this->assertTrue($gate->check('foo'));
-        $this->assertEquals('foo was called', AccessGateTestClassForGuest::$calledMethod);
+        $this->assertSame('foo was called', AccessGateTestClassForGuest::$calledMethod);
 
         $this->assertTrue($gate->check('static_foo'));
-        $this->assertEquals('static foo was invoked', AccessGateTestClassForGuest::$calledMethod);
+        $this->assertSame('static foo was invoked', AccessGateTestClassForGuest::$calledMethod);
 
         $this->assertTrue($gate->check('bar'));
-        $this->assertEquals('bar got invoked', AccessGateTestClassForGuest::$calledMethod);
+        $this->assertSame('bar got invoked', AccessGateTestClassForGuest::$calledMethod);
 
         $this->assertTrue($gate->check('static_@foo'));
-        $this->assertEquals('static foo was invoked', AccessGateTestClassForGuest::$calledMethod);
+        $this->assertSame('static foo was invoked', AccessGateTestClassForGuest::$calledMethod);
 
         $this->assertTrue($gate->check('invokable'));
-        $this->assertEquals('__invoke was called', AccessGateTestGuestInvokableClass::$calledMethod);
+        $this->assertSame('__invoke was called', AccessGateTestGuestInvokableClass::$calledMethod);
 
         $this->assertTrue($gate->check('nullable_invokable'));
-        $this->assertEquals('Nullable __invoke was called', AccessGateTestGuestNullableInvokable::$calledMethod);
+        $this->assertSame('Nullable __invoke was called', AccessGateTestGuestNullableInvokable::$calledMethod);
 
         $this->assertFalse($gate->check('absent_invokable'));
     }

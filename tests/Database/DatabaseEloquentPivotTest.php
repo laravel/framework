@@ -23,8 +23,8 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
 
         $this->assertEquals(['foo' => 'bar', 'created_at' => '2015-09-12 00:00:00'], $pivot->getAttributes());
-        $this->assertEquals('connection', $pivot->getConnectionName());
-        $this->assertEquals('table', $pivot->getTable());
+        $this->assertSame('connection', $pivot->getConnectionName());
+        $this->assertSame('table', $pivot->getTable());
         $this->assertTrue($pivot->exists);
     }
 
@@ -104,8 +104,8 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar'], 'table');
         $pivot->setPivotKeys('foreign', 'other');
 
-        $this->assertEquals('foreign', $pivot->getForeignKey());
-        $this->assertEquals('other', $pivot->getOtherKey());
+        $this->assertSame('foreign', $pivot->getForeignKey());
+        $this->assertSame('other', $pivot->getOtherKey());
     }
 
     public function testDeleteMethodDeletesModelByKeys()
@@ -127,7 +127,7 @@ class DatabaseEloquentPivotTest extends TestCase
     {
         $pivot = new Pivot;
 
-        $this->assertEquals('pivot', $pivot->getTable());
+        $this->assertSame('pivot', $pivot->getTable());
     }
 
     public function testPivotModelWithParentReturnsParentsTimestampColumns()
@@ -139,8 +139,8 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivotWithParent = new Pivot;
         $pivotWithParent->pivotParent = $parent;
 
-        $this->assertEquals('parent_created_at', $pivotWithParent->getCreatedAtColumn());
-        $this->assertEquals('parent_updated_at', $pivotWithParent->getUpdatedAtColumn());
+        $this->assertSame('parent_created_at', $pivotWithParent->getCreatedAtColumn());
+        $this->assertSame('parent_updated_at', $pivotWithParent->getUpdatedAtColumn());
     }
 
     public function testPivotModelWithoutParentReturnsModelTimestampColumns()

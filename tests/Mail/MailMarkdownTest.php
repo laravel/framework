@@ -56,7 +56,7 @@ class MailMarkdownTest extends TestCase
 
         $result = $markdown->renderText('view', []);
 
-        $this->assertEquals('text', $result);
+        $this->assertSame('text', $result);
     }
 
     public function testParseReturnsParsedMarkdown()
@@ -66,6 +66,6 @@ class MailMarkdownTest extends TestCase
 
         $result = $markdown->parse('# Something');
 
-        $this->assertEquals('<h1>Something</h1>', $result);
+        $this->assertSame('<h1>Something</h1>', $result);
     }
 }

@@ -63,7 +63,7 @@ class CacheFileStoreTest extends TestCase
         $contents = '9999999999'.serialize('Hello World');
         $files->expects($this->once())->method('get')->willReturn($contents);
         $store = new FileStore($files, __DIR__);
-        $this->assertEquals('Hello World', $store->get('foo'));
+        $this->assertSame('Hello World', $store->get('foo'));
     }
 
     public function testStoreItemProperlyStoresValues()
@@ -99,7 +99,7 @@ class CacheFileStoreTest extends TestCase
         $store->forever('foo', 'Hello World');
         $store->increment('foo');
         $files->expects($this->once())->method('get')->willReturn($contents);
-        $this->assertEquals('Hello World', $store->get('foo'));
+        $this->assertSame('Hello World', $store->get('foo'));
     }
 
     public function testIncrementDoesNotExtendCacheLife()
