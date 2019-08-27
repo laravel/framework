@@ -81,7 +81,7 @@ class RedisQueueIntegrationTest extends TestCase
             $this->assertEquals(12, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command)->i);
         } elseif ($pid == 0) {
             $this->setUpRedis();
-            $this->setQueue('predis');
+            $this->setQueue('phpredis');
             sleep(1);
             $this->queue->push(new RedisQueueIntegrationTestJob(12));
             die;
