@@ -112,7 +112,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         $relation = $this->getRelationAssociate($parent);
 
         $associate = m::mock(Model::class);
-        $associate->shouldReceive('getKey')->once()->andReturn(1);
+        $associate->shouldReceive('getAttribute')->once()->with('id')->andReturn(1);
         $associate->shouldReceive('getMorphClass')->once()->andReturn('Model');
 
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
