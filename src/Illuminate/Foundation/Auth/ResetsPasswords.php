@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -108,6 +109,8 @@ trait ResetsPasswords
 
         if (is_null($user->email_verified_at)) {
             $user->email_verified_at = now();
+
+            event(new Verified($user));
         }
 
         $user->save();
