@@ -166,8 +166,6 @@ class RedisManager implements Factory
         }
 
         switch ($this->driver) {
-            case 'predis':
-                return new Connectors\PredisConnector;
             case 'phpredis':
                 return new Connectors\PhpRedisConnector;
         }

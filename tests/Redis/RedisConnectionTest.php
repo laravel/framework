@@ -287,12 +287,7 @@ class RedisConnectionTest extends TestCase
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
             $this->assertEquals(['jeffrey', 'matt'], $redis->zrange('set', 0, 1));
             $this->assertEquals(['jeffrey', 'matt', 'taylor'], $redis->zrange('set', 0, -1));
-
-            if ($connector === 'predis') {
-                $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, 'withscores'));
-            } else {
-                $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, true));
-            }
+            $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, true));
 
             $redis->flushall();
         }
@@ -304,12 +299,7 @@ class RedisConnectionTest extends TestCase
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
             $this->assertEquals(['taylor', 'matt'], $redis->ZREVRANGE('set', 0, 1));
             $this->assertEquals(['taylor', 'matt', 'jeffrey'], $redis->ZREVRANGE('set', 0, -1));
-
-            if ($connector === 'predis') {
-                $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, 'withscores'));
-            } else {
-                $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, true));
-            }
+            $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, true));
 
             $redis->flushall();
         }
@@ -550,7 +540,6 @@ class RedisConnectionTest extends TestCase
     public function connections()
     {
         $connections = [
-            'predis' => $this->redis['predis']->connection(),
             'phpredis' => $this->redis['phpredis']->connection(),
         ];
 

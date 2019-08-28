@@ -24,8 +24,7 @@
         }
     },
     "suggest": {
-        "ext-redis": "Required to use the phpredis connector.",
-        "predis/predis": "Required to use the predis connector (^1.0)."
+        "ext-redis": "Required to use the phpredis connector."
     },
     "extra": {
         "branch-alias": {

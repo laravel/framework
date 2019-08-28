@@ -89,7 +89,6 @@ trait InteractsWithRedis
     public function redisDriverProvider()
     {
         return [
-            ['predis'],
             ['phpredis'],
         ];
     }
