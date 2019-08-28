@@ -1,13 +1,22 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.33...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.34...5.8)
+
+### Fixed
+- Fixed `MorphTo::associate()` with custom owner key ([#29767](https://github.com/laravel/framework/pull/29767))
+- Fixed self-referencing `MorphOneOrMany` existence queries ([#29765](https://github.com/laravel/framework/pull/29765))
+
+
+## [v5.8.34 (2019-08-27)](https://github.com/laravel/framework/compare/v5.8.33...v5.8.34)
 
 ### Fixed
 - Fixed `MailMessage::render()` if `view` method was used ([#29698](https://github.com/laravel/framework/pull/29698))
+- Fixed setting of numeric values as model attribute ([#29714](https://github.com/laravel/framework/pull/29714)) 
+- Fixed mocking of events `until` method in `MocksApplicationServices` ([#29708](https://github.com/laravel/framework/pull/29708))
+- Fixed: Use custom attributes in lt/lte/gt/gte rules messages ([#29716](https://github.com/laravel/framework/pull/29716))
 
-### TODO:
-- Mock events until method ([#29708](https://github.com/laravel/framework/pull/29708))
-- Use custom attributes in lt/lte/gt/gte rules messages ([#29716](https://github.com/laravel/framework/pull/29716))
+### Changed:
+- Changed applying of Aws Instance Profile ([#29738](https://github.com/laravel/framework/pull/29738))
 
 
 ## [v5.8.33 (2019-08-20)](https://github.com/laravel/framework/compare/v5.8.32...v5.8.33)
