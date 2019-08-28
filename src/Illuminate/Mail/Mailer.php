@@ -239,8 +239,6 @@ class Mailer implements MailerContract, MailQueueContract
         // Once we have retrieved the view content for the e-mail we will set the body
         // of this message using the HTML type, which will provide a simple wrapper
         // to creating view based emails that are able to receive arrays of data.
-        call_user_func($callback, $message);
-
         $this->addContent($message, $view, $plain, $raw, $data);
 
         // If a global "to" address has been set, we will set that address on the mail
@@ -249,6 +247,10 @@ class Mailer implements MailerContract, MailQueueContract
         if (isset($this->to['address'])) {
             $this->setGlobalToAndRemoveCcAndBcc($message);
         }
+
+        // Execute any user-defined callbacks in order to allow the user to
+        // make any custom changes to the message object
+        call_user_func($callback, $message);
 
         // Next we will determine if the message should be sent. We give the developer
         // one final chance to stop this message and then we will send it to all of
