@@ -1129,8 +1129,8 @@ trait HasAttributes
 
         foreach ($this->getAttributes() as $key => $value) {
             if (
-                !$this->originalIsEquivalent($key, $value) &&
-                !array_key_exists($key, $this->getArrayableAppends())
+                ! $this->originalIsEquivalent($key, $value) &&
+                ! array_key_exists($key, $this->getArrayableAppends())
             ) {
                 $dirty[$key] = $value;
             }
