@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 
 abstract class ServiceProvider
 {
@@ -58,7 +59,7 @@ abstract class ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        if (! $this->app->configurationIsCached()) {
+        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
             $this->app['config']->set($key, array_merge(
                 require $path, $this->app['config']->get($key, [])
             ));
