@@ -2,7 +2,6 @@
 
 namespace Illuminate\Contracts\Foundation;
 
-use Closure;
 use Illuminate\Contracts\Container\Container;
 
 interface Application extends Container
@@ -45,13 +44,6 @@ interface Application extends Container
      * @return string
      */
     public function databasePath($path = '');
-
-    /**
-     * Get the path to the environment file directory.
-     *
-     * @return string
-     */
-    public function environmentPath();
 
     /**
      * Get the path to the resources directory.
@@ -162,26 +154,11 @@ interface Application extends Container
     public function bootstrapWith(array $bootstrappers);
 
     /**
-     * Detect the application's current environment.
-     *
-     * @param  \Closure  $callback
-     * @return string
-     */
-    public function detectEnvironment(Closure $callback);
-
-    /**
-     * Get the environment file the application is using.
+     * Get the path to the cached services.php file.
      *
      * @return string
      */
-    public function environmentFile();
-
-    /**
-     * Get the fully qualified path to the environment file.
-     *
-     * @return string
-     */
-    public function environmentFilePath();
+    public function getCachedServicesPath();
 
     /**
      * Get the path to the cached packages.php file.
@@ -227,14 +204,6 @@ interface Application extends Container
      * @return void
      */
     public function loadDeferredProviders();
-
-    /**
-     * Set the environment file to be loaded during bootstrapping.
-     *
-     * @param  string  $file
-     * @return $this
-     */
-    public function loadEnvironmentFrom($file);
 
     /**
      * Set the current application locale.
