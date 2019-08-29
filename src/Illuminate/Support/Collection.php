@@ -109,7 +109,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $number
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return static
      */
     public static function times($number, callable $callback = null)
@@ -557,7 +557,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  bool  $value
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return static|mixed
      */
     public function when($value, callable $callback, callable $default = null)
@@ -575,7 +575,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Apply the callback if the collection is empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|mull  $default
      * @return static|mixed
      */
     public function whenEmpty(callable $callback, callable $default = null)
@@ -587,7 +587,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Apply the callback if the collection is not empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|mull  $default
      * @return static|mixed
      */
     public function whenNotEmpty(callable $callback, callable $default = null)
@@ -600,7 +600,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  bool  $value
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|mull  $default
      * @return static|mixed
      */
     public function unless($value, callable $callback, callable $default = null)
@@ -612,7 +612,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Apply the callback unless the collection is empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|mull  $default
      * @return static|mixed
      */
     public function unlessEmpty(callable $callback, callable $default = null)
@@ -624,7 +624,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Apply the callback unless the collection is not empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|mull  $default
      * @return static|mixed
      */
     public function unlessNotEmpty(callable $callback, callable $default = null)
@@ -1404,6 +1404,45 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Pass a collection of elements through an array or collection of callables
+     *
+     * @param array|static  $callables
+     * @param callable|null  $errorHandler
+     * @param bool  $breakOnError
+     * @return static
+     */
+    public function pipeEach($callables, callable $errorHandler = null, bool $breakOnError = true)
+    {
+        return $this->map(function ($element) use ($callables, $errorHandler, $breakOnError) {
+
+            if (!($callables instanceof Collection)) {
+                $callables = collect($callables);
+            }
+
+            $originalElement = $element;
+            $callables->each(function (\Closure $callable) use (
+                &$element,
+                $originalElement,
+                $errorHandler,
+                $breakOnError
+            ) {
+                try {
+                    $element = $callable($element, $originalElement) ?? $element;
+                } catch (\Exception $exception) {
+                    if (isset($errorHandler)) {
+                        $errorHandler($exception, $originalElement);
+                    } else {
+                        throw $exception;
+                    }
+                    return !$breakOnError;
+                }
+            });
+
+            return $element;
+        });
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @return mixed
@@ -2161,44 +2200,5 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return new HigherOrderCollectionProxy($this, $key);
-    }
-
-    /**
-     * Pass a collection of elements through an array or collection of callables
-     *
-     * @param array|static $callables
-     * @param callable|null $errorHandler
-     * @param bool $breakOnError
-     * @return static
-     */
-    public function pipeEach($callables, ?callable $errorHandler = null, bool $breakOnError = true)
-    {
-        return $this->map(function ($element) use ($callables, $errorHandler, $breakOnError) {
-
-            if (!($callables instanceof Collection)) {
-                $callables = collect($callables);
-            }
-
-            $originalElement = $element;
-            $callables->each(function (\Closure $callable) use (
-                &$element,
-                $originalElement,
-                $errorHandler,
-                $breakOnError
-            ) {
-                try {
-                    $element = $callable($element, $originalElement) ?? $element;
-                } catch (\Exception $exception) {
-                    if (isset($errorHandler)) {
-                        $errorHandler($exception, $originalElement);
-                    } else {
-                        throw $exception;
-                    }
-                    return !$breakOnError;
-                }
-            });
-
-            return $element;
-        });
     }
 }
