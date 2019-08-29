@@ -182,7 +182,7 @@ class Builder
         '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
         'like', 'like binary', 'not like', 'ilike',
         '&', '|', '^', '<<', '>>',
-        'rlike', 'regexp', 'not regexp',
+        'rlike', 'not rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
         'not similar to', 'not ilike', '~~*', '!~~*',
     ];
