@@ -2162,4 +2162,43 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return new HigherOrderCollectionProxy($this, $key);
     }
+
+    /**
+     * Pass a collection of elements through an array or collection of callables
+     *
+     * @param array|static $callables
+     * @param callable|null $errorHandler
+     * @param bool $breakOnError
+     * @return static
+     */
+    public function pipeEach($callables, ?callable $errorHandler = null, bool $breakOnError = true)
+    {
+        return $this->map(function ($element) use ($callables, $errorHandler, $breakOnError) {
+
+            if (!($callables instanceof Collection)) {
+                $callables = collect($callables);
+            }
+
+            $originalElement = $element;
+            $callables->each(function (\Closure $callable) use (
+                &$element,
+                $originalElement,
+                $errorHandler,
+                $breakOnError
+            ) {
+                try {
+                    $element = $callable($element, $originalElement) ?? $element;
+                } catch (\Exception $exception) {
+                    if (isset($errorHandler)) {
+                        $errorHandler($exception, $originalElement);
+                    } else {
+                        throw $exception;
+                    }
+                    return !$breakOnError;
+                }
+            });
+
+            return $element;
+        });
+    }
 }

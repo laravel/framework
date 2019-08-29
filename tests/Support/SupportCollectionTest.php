@@ -3194,6 +3194,41 @@ class SupportCollectionTest extends TestCase
         $collection = new Collection([1, 2, 3]);
         $this->assertNull($collection->get(null));
     }
+
+    public function testPipeEach()
+    {
+        $collection = new Collection([1,2]);
+        $numbers = $collection->pipeEach([
+            function ($i) {
+                return $i + 1;
+            },
+            function ($i) {
+                return $i * 3;
+            }
+        ]);
+        $this->assertInstanceOf(Collection::class, $numbers);
+        $this->assertEquals(6, $numbers[0]);
+        $this->assertEquals(9, $numbers[1]);
+    }
+
+    public function testPipeEachWithExceptionHandling()
+    {
+        $collection = new Collection([1,2]);
+        $numbers = $collection->pipeEach([
+            function ($i) {
+                return $i + 1;
+            },
+            function ($i) {
+                throw new \Exception('test');
+            }
+        ], function ($exception, $originalElement) {
+            $this->assertEquals('test', $exception->getMessage());
+            $this->assertTrue($originalElement == 1 || $originalElement == 2);
+        });
+        $this->assertInstanceOf(Collection::class, $numbers);
+        $this->assertEquals(2, $numbers[0]);
+        $this->assertEquals(3, $numbers[1]);
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
