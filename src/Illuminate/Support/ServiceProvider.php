@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 
@@ -74,7 +75,7 @@ abstract class ServiceProvider
      */
     protected function loadRoutesFrom($path)
     {
-        if (! $this->app->routesAreCached()) {
+        if (! ($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
             require $path;
         }
     }

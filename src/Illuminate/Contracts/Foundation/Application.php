@@ -191,13 +191,6 @@ interface Application extends Container
     public function getCachedPackagesPath();
 
     /**
-     * Get the path to the routes cache file.
-     *
-     * @return string
-     */
-    public function getCachedRoutesPath();
-
-    /**
      * Get the current application locale.
      *
      * @return string
@@ -242,13 +235,6 @@ interface Application extends Container
      * @return $this
      */
     public function loadEnvironmentFrom($file);
-
-    /**
-     * Determine if the application routes are cached.
-     *
-     * @return bool
-     */
-    public function routesAreCached();
 
     /**
      * Set the current application locale.
