@@ -102,4 +102,11 @@ interface Registrar
      * @return void
      */
     public function substituteImplicitBindings($route);
+
+    /**
+     * Get response from route model binding.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response|null
+     */
+    public function bindingsResponse();
 }

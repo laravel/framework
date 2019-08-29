@@ -119,6 +119,13 @@ class Router implements BindingRegistrar, RegistrarContract
     public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
     /**
+     * Response from route model binding.
+     *
+     * @var \Symfony\Component\HttpFoundation\Response|null
+     */
+    protected $bindingsResponse = null;
+
+    /**
      * Create a new Router instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
@@ -767,11 +774,38 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         foreach ($route->parameters() as $key => $value) {
             if (isset($this->binders[$key])) {
-                $route->setParameter($key, $this->performBinding($key, $value, $route));
+                $bound = $this->performBinding($key, $value, $route);
+
+                if ($bound instanceof SymfonyResponse) {
+                    $this->setBindingsResponse($bound);
+                    break;
+                }
+
+                $route->setParameter($key, $bound);
             }
         }
 
         return $route;
+    }
+
+    /**
+     * Set response from route model binding.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     */
+    protected function setBindingsResponse(SymfonyResponse $response)
+    {
+        $this->bindingsResponse = $response;
+    }
+
+    /**
+     * Get response from route model binding.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response|null
+     */
+    public function bindingsResponse()
+    {
+        return $this->bindingsResponse;
     }
 
     /**

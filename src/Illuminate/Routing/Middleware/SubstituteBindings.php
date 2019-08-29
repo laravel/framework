@@ -36,6 +36,10 @@ class SubstituteBindings
     {
         $this->router->substituteBindings($route = $request->route());
 
+        if ($response = $this->router->bindingsResponse()) {
+            return $response;
+        }
+
         $this->router->substituteImplicitBindings($route);
 
         return $next($request);

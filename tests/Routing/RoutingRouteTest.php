@@ -802,6 +802,24 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testRouteBindingWithCustomResponse()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
+            return $name;
+        }]);
+
+        $router->bind('bar', function ($value) {
+            return new JsonResponse(['name' => strtolower($value)], 201);
+        });
+
+        $response = $router->dispatch(Request::create('foo/TAYLOR', 'GET'));
+
+        $this->assertSame('{"name":"taylor"}', $response->getContent());
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertInstanceOf(JsonResponse::class, $response);
+    }
+
     public function testRouteClassBinding()
     {
         $router = $this->getRouter();
