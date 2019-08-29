@@ -204,7 +204,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             } elseif (isset($config['table'])) {
                 return $this->databaseFailedJobProvider($config);
             } else {
-                return NullFailedJobProvider;
+                return new NullFailedJobProvider;
             }
         });
     }
