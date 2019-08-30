@@ -72,14 +72,14 @@ class Command extends SymfonyCommand
     /**
      * The rules used to validate console command input.
      *
-     * @var array
+     * @var array|null
      */
     protected $rules;
 
     /**
      * The command input validator.
      *
-     * @var Validator
+     * @var \Illuminate\Contracts\Validation\Validator|null
      */
     protected $validator;
 
