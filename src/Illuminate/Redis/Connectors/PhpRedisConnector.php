@@ -66,7 +66,7 @@ class PhpRedisConnector implements Connector
     protected function createClient(array $config)
     {
         return tap(new Redis, function ($client) use ($config) {
-            
+
             if ($client instanceof RedisFacade) {
                 throw new LogicException(
                     'Rename or delete the "Redis" Facade to avoid collision with the underlaying Redis client class.'
