@@ -2,9 +2,11 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Validation\Factory;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -67,6 +69,20 @@ class Command extends SymfonyCommand
      * @var string
      */
     protected $help;
+
+    /**
+     * The rules used to validate console command input.
+     *
+     * @var array
+     */
+    protected $rules;
+
+    /**
+     * The command input validator.
+     *
+     * @var Validator
+     */
+    protected $validator;
 
     /**
      * Indicates whether the command should be shown in the Artisan command list.
@@ -189,7 +205,69 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->laravel->call([$this, 'handle']);
+        if ($this->hasValidInput()) {
+            return $this->laravel->call([$this, 'handle']);
+        }
+
+        $this->displayValidationErrors();
+    }
+
+    /**
+     * Check the argument and option values are valid.
+     *
+     * @param  \Illuminate\Contracts\Validation\Factory  $factory
+     * @return bool
+     */
+    protected function hasValidInput(Factory $factory = null)
+    {
+        if (! isset($this->rules)) {
+            return true;
+        }
+
+        $this->validator = $this->validator ?? $factory->make(
+            array_merge($this->arguments(), $this->options()),
+            $this->rules,
+            $this->messages(),
+            $this->attributes()
+        );
+
+        return ! $this->validator->fails();
+    }
+
+    /**
+     * Get the custom error messages for console command validation.
+     *
+     * @return array
+     */
+    protected function messages()
+    {
+        return [];
+    }
+
+    /**
+     * Get the custom attribute names for console command validation.
+     *
+     * @return array
+     */
+    protected function attributes()
+    {
+        return [];
+    }
+
+    /**
+     * Display the validation error messages for invalid arguments and options.
+     *
+     * @return void
+     */
+    protected function displayValidationErrors()
+    {
+        $this->info('Argument / option validation failed. Please check the error messages below:');
+
+        foreach ($this->validator->errors()->all() as $error) {
+            $this->error($error);
+        }
+
+        exit(1);
     }
 
     /**
