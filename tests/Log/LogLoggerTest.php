@@ -15,6 +15,8 @@ class LogLoggerTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         m::close();
     }
 
@@ -58,6 +60,28 @@ class LogLoggerTest extends TestCase
         $writer->listen(function () {
             //
         });
+    }
+
+    public function testLoggerSupportsMacro()
+    {
+        Logger::macro('track', function ($message) {
+            $this->error($message, ['foo' => 'bar']);
+        });
+
+        $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
+        $monolog->shouldReceive('error')->once()->with('message', ['foo' => 'bar']);
+
+        $events->listen(MessageLogged::class, function ($event) {
+            $_SERVER['__log.level'] = $event->level;
+            $_SERVER['__log.message'] = $event->message;
+            $_SERVER['__log.context'] = $event->context;
+        });
+
+        $writer->track('message');
+
+        $this->assertSame('error', $_SERVER['__log.level']);
+        $this->assertSame('message', $_SERVER['__log.message']);
+        $this->assertSame(['foo' => 'bar'], $_SERVER['__log.context']);
     }
 
     public function testListenShortcut()

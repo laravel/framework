@@ -6,12 +6,17 @@ use Closure;
 use RuntimeException;
 use Psr\Log\LoggerInterface;
 use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 
 class Logger implements LoggerInterface
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The underlying logger implementation.
      *
@@ -270,6 +275,10 @@ class Logger implements LoggerInterface
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->logger->{$method}(...$parameters);
     }
 }
