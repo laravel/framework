@@ -201,6 +201,8 @@ class Command extends SymfonyCommand
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -209,6 +211,8 @@ class Command extends SymfonyCommand
         }
 
         $this->displayValidationErrors();
+
+        return 1;
     }
 
     /**
@@ -266,8 +270,6 @@ class Command extends SymfonyCommand
         foreach ($this->validator->errors()->all() as $error) {
             $this->error($error);
         }
-
-        exit(1);
     }
 
     /**
