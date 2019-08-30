@@ -197,15 +197,11 @@ class RouteUrlGenerator
         $path = $this->replaceNamedParameters($path, $parameters);
 
         $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
-            // Reset numeric keys on $parameters so we can
-            // get the first non-associative element
-            // using Arr::pull($parameters, 0)
+            // Reset only the numeric keys...
             $parameters = array_merge($parameters);
 
             return (empty($parameters) && ! Str::endsWith($match[0], '?}'))
                         ? $match[0]
-                        // Use only non-associative elements, so we don't
-                        // replace parameters that were meant for query string.
                         : Arr::pull($parameters, 0);
         }, $path);
 
