@@ -7,8 +7,8 @@ use RedisCluster;
 use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Connector;
-use Illuminate\Support\Facades\Redis as RedisFacade;
 use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Support\Facades\Redis as RedisFacade;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 
 class PhpRedisConnector implements Connector
@@ -72,7 +72,7 @@ class PhpRedisConnector implements Connector
                     'Rename or delete the "Redis" Facade to avoid collision with the underlaying Redis client class.'
                 );
             }
-            
+
             $this->establishConnection($client, $config);
 
             if (! empty($config['password'])) {
