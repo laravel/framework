@@ -6,7 +6,6 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Validation\Factory;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
