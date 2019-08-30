@@ -215,16 +215,17 @@ class Command extends SymfonyCommand
     /**
      * Check the argument and option values are valid.
      *
-     * @param  \Illuminate\Contracts\Validation\Factory  $factory
      * @return bool
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected function hasValidInput(Factory $factory = null)
+    protected function hasValidInput()
     {
         if (! isset($this->rules)) {
             return true;
         }
 
-        $this->validator = $this->validator ?? $factory->make(
+        $this->validator = $this->validator ?? $this->laravel->make(Validator::class)->make(
             array_merge($this->arguments(), $this->options()),
             $this->rules,
             $this->messages(),
