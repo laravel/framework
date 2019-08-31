@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
 use Illuminate\Support\Traits\Macroable;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
@@ -588,7 +589,7 @@ class Str
             return call_user_func(static::$uuidFactory);
         }
 
-        $factory = Uuid::getFactory();
+        $factory = new UuidFactory();
 
         $factory->setRandomGenerator(new CombGenerator(
             $factory->getRandomGenerator(),
