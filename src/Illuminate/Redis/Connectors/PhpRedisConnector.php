@@ -4,9 +4,11 @@ namespace Illuminate\Redis\Connectors;
 
 use Redis;
 use RedisCluster;
+use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Support\Facades\Redis as RedisFacade;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 
 class PhpRedisConnector implements Connector
@@ -60,10 +62,17 @@ class PhpRedisConnector implements Connector
      *
      * @param  array  $config
      * @return \Redis
+     * @throws \LogicException
      */
     protected function createClient(array $config)
     {
         return tap(new Redis, function ($client) use ($config) {
+            if ($client instanceof RedisFacade) {
+                throw new LogicException(
+                    'Rename or delete the "Redis" Facade alias to avoid collision with the Redis client class.'
+                );
+            }
+
             $this->establishConnection($client, $config);
 
             if (! empty($config['password'])) {
