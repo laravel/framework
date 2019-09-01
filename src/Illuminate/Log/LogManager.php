@@ -47,7 +47,7 @@ class LogManager implements LoggerInterface
      *
      * @var string
      */
-    protected $dateFormat = "Y-m-d H:i:s";
+    protected $dateFormat = 'Y-m-d H:i:s';
 
     /**
      * Create a new Log manager instance.
