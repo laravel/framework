@@ -26,7 +26,7 @@ trait ManagesTransactions
             // catch any exception we can rollback this transaction so that none of this
             // gets actually persisted to a database or stored in a permanent fashion.
             try {
-                $callbackReturn = $callback($this);
+                $callbackResult = $callback($this);
             }
 
             // If we catch an exception we'll rollback this transaction and try again if we
@@ -44,8 +44,6 @@ trait ManagesTransactions
                 throw $e;
             }
 
-            // Exceptions on commit need to be handled separately as they automatically roll
-            // back the transaction, resulting in an error if we attempt to manually roll back.
             try {
                 $this->commit();
             } catch (Exception $e) {
@@ -56,7 +54,7 @@ trait ManagesTransactions
                 continue;
             }
 
-            return $callbackReturn;
+            return $callbackResult;
         }
     }
 
@@ -90,32 +88,6 @@ trait ManagesTransactions
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
             return;
-        }
-
-        throw $e;
-    }
-
-    /**
-     * Handle an exception encountered when committing a transaction.
-     *
-     * @param  \Exception  $e
-     * @param  int  $currentAttempt
-     * @param  int  $maxAttempts
-     * @return void
-     */
-    protected function handleCommitTransactionException($e, $currentAttempt, $maxAttempts)
-    {
-        // If the COMMIT fails, the transaction is automatically rolled back.
-        $this->transactions--;
-
-        // If we encountered a concurrency error, try again if we are not out of attempts.
-        if ($this->causedByConcurrencyError($e) &&
-            $currentAttempt < $maxAttempts) {
-            return;
-        }
-
-        if ($this->causedByLostConnection($e)) {
-            $this->transactions = 0;
         }
 
         throw $e;
@@ -200,6 +172,30 @@ trait ManagesTransactions
         $this->transactions = max(0, $this->transactions - 1);
 
         $this->fireConnectionEvent('committed');
+    }
+
+    /**
+     * Handle an exception encountered when committing a transaction.
+     *
+     * @param  \Exception  $e
+     * @param  int  $currentAttempt
+     * @param  int  $maxAttempts
+     * @return void
+     */
+    protected function handleCommitTransactionException($e, $currentAttempt, $maxAttempts)
+    {
+        $this->transactions--;
+
+        if ($this->causedByConcurrencyError($e) &&
+            $currentAttempt < $maxAttempts) {
+            return;
+        }
+
+        if ($this->causedByLostConnection($e)) {
+            $this->transactions = 0;
+        }
+
+        throw $e;
     }
 
     /**

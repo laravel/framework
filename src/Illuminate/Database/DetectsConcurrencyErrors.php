@@ -3,6 +3,7 @@
 namespace Illuminate\Database;
 
 use Exception;
+use PDOException;
 use Illuminate\Support\Str;
 
 trait DetectsConcurrencyErrors
@@ -15,12 +16,10 @@ trait DetectsConcurrencyErrors
      */
     protected function causedByConcurrencyError(Exception $e)
     {
-        // First check SQLSTATE code. This covers serialization failures and some deadlocks.
-        if ($e instanceof \PDOException && $e->getCode() === '40001') {
+        if ($e instanceof PDOException && $e->getCode() === '40001') {
             return true;
         }
 
-        // Some deadlocks are not reported using SQLSTATE 40001.
         $message = $e->getMessage();
 
         return Str::contains($message, [
