@@ -162,13 +162,6 @@ interface Application extends Container
     public function bootstrapWith(array $bootstrappers);
 
     /**
-     * Determine if the application configuration is cached.
-     *
-     * @return bool
-     */
-    public function configurationIsCached();
-
-    /**
      * Detect the application's current environment.
      *
      * @param  \Closure  $callback
@@ -191,32 +184,11 @@ interface Application extends Container
     public function environmentFilePath();
 
     /**
-     * Get the path to the configuration cache file.
-     *
-     * @return string
-     */
-    public function getCachedConfigPath();
-
-    /**
-     * Get the path to the cached services.php file.
-     *
-     * @return string
-     */
-    public function getCachedServicesPath();
-
-    /**
      * Get the path to the cached packages.php file.
      *
      * @return string
      */
     public function getCachedPackagesPath();
-
-    /**
-     * Get the path to the routes cache file.
-     *
-     * @return string
-     */
-    public function getCachedRoutesPath();
 
     /**
      * Get the current application locale.
@@ -263,13 +235,6 @@ interface Application extends Container
      * @return $this
      */
     public function loadEnvironmentFrom($file);
-
-    /**
-     * Determine if the application routes are cached.
-     *
-     * @return bool
-     */
-    public function routesAreCached();
 
     /**
      * Set the current application locale.

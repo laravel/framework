@@ -3,7 +3,9 @@
 namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 
 abstract class ServiceProvider
 {
@@ -58,7 +60,7 @@ abstract class ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        if (! $this->app->configurationIsCached()) {
+        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
             $this->app['config']->set($key, array_merge(
                 require $path, $this->app['config']->get($key, [])
             ));
@@ -73,7 +75,7 @@ abstract class ServiceProvider
      */
     protected function loadRoutesFrom($path)
     {
-        if (! $this->app->routesAreCached()) {
+        if (! ($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
             require $path;
         }
     }

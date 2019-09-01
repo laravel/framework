@@ -15,7 +15,9 @@ use Illuminate\Log\LogServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Contracts\Foundation\CachesRoutes;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
@@ -23,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
-class Application extends Container implements ApplicationContract, HttpKernelInterface
+class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
     /**
      * The Laravel framework version.

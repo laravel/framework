@@ -6,6 +6,7 @@ use Closure;
 use Pusher\Pusher;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
+use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -21,7 +22,7 @@ class BroadcastManager implements FactoryContract
     /**
      * The application instance.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $app;
 
@@ -42,7 +43,7 @@ class BroadcastManager implements FactoryContract
     /**
      * Create a new manager instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Container\Container  $app
      * @return void
      */
     public function __construct($app)
@@ -58,7 +59,7 @@ class BroadcastManager implements FactoryContract
      */
     public function routes(array $attributes = null)
     {
-        if ($this->app->routesAreCached()) {
+        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
             return;
         }
 
