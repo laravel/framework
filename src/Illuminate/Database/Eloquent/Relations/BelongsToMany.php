@@ -119,6 +119,20 @@ class BelongsToMany extends Relation
     protected $accessor = 'pivot';
 
     /**
+     * Instance of a pivot model if supplied in the constructor
+     *
+     * @var Pivot
+     */
+    protected $pivotModel;
+
+    /**
+     * Instance of the pivot query used to query the m:n relationship
+     *
+     * @var Builder
+     */
+    protected $pivotQuery;
+
+    /**
      * The count of self joins.
      *
      * @var int
@@ -183,8 +197,6 @@ class BelongsToMany extends Relation
      */
     public function addConstraints()
     {
-        $this->performJoin();
-
         if (static::$constraints) {
             $this->addWhereConstraints();
         }
@@ -207,7 +219,12 @@ class BelongsToMany extends Relation
 
         $key = $baseTable.'.'.$this->relatedKey;
 
-        $query->join($this->table, $key, '=', $this->getQualifiedRelatedPivotKeyName());
+        if($this->using){
+            $query->joinSub($this->pivotQuery, $this->pivotModel->getTable(), $key, '=', $this->getQualifiedRelatedPivotKeyName());
+        }
+        else{
+            $query->join($this->table, $key, '=', $this->getQualifiedRelatedPivotKeyName());
+        }
 
         return $this;
     }
@@ -323,6 +340,8 @@ class BelongsToMany extends Relation
     public function using($class)
     {
         $this->using = $class;
+        $this->pivotModel = new $class;
+        $this->pivotQuery = $this->pivotModel->newQuery();
 
         return $this;
     }
@@ -597,10 +616,15 @@ class BelongsToMany extends Relation
      */
     public function get($columns = ['*'])
     {
+        $this->performJoin();
+
         // First we'll add the proper select columns onto the query so it is run with
         // the proper columns. Then, we will get the results and hydrate out pivot
         // models with the result of those columns as a separate model relation.
         $builder = $this->query->applyScopes();
+        if($this->using){
+            $this->pivotQuery->applyScopes();
+        }
 
         $columns = $builder->getQuery()->columns ? [] : $columns;
 
@@ -1132,5 +1156,26 @@ class BelongsToMany extends Relation
     public function getPivotAccessor()
     {
         return $this->accessor;
+    }
+
+    /**
+     * Handle dynamic method calls to the relationship.
+     *
+     * @param  string $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (Str::startsWith($method, 'pivot')) {
+            $method = Str::camel(Str::replaceFirst('pivot', '', $method));
+            $result = $this->forwardCallTo($this->pivotQuery, $method, $parameters);
+            if ($result === $this->pivotQuery) {
+                return $this;
+            }
+        } else{
+            $result = parent::__call($method, $parameters);
+        }
+        return $result;
     }
 }
