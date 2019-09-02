@@ -4,6 +4,10 @@ namespace Illuminate\Cache;
 
 class RedisLock extends Lock
 {
+    const LOCK_SUCCESS = 'OK';
+    const IF_NOT_EXIST = 'NX';
+    const MILLISECONDS_EXPIRE_TIME = 'PX';
+    
     /**
      * The Redis factory implementation.
      *
@@ -34,13 +38,9 @@ class RedisLock extends Lock
      */
     public function acquire()
     {
-        $result = $this->redis->setnx($this->name, $this->owner);
+        $result = $this->redis->set($this->name, 1, self::MILLISECONDS_EXPIRE_TIME, $this->seconds, self::IF_NOT_EXIST);
 
-        if ($result === 1 && $this->seconds > 0) {
-            $this->redis->expire($this->name, $this->seconds);
-        }
-
-        return $result === 1;
+        return self::LOCK_SUCCESS === (string)$result;
     }
 
     /**
