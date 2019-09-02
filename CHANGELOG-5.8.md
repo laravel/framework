@@ -5,6 +5,7 @@
 ### Fixed
 - Fixed `MorphTo::associate()` with custom owner key ([#29767](https://github.com/laravel/framework/pull/29767))
 - Fixed self-referencing `MorphOneOrMany` existence queries ([#29765](https://github.com/laravel/framework/pull/29765))
+- Fixed Schedule runInBackground not fired on Windows ([#X](https://github.com/laravel/framework/pull/X))
 
 
 ## [v5.8.34 (2019-08-27)](https://github.com/laravel/framework/compare/v5.8.33...v5.8.34)
