@@ -2,9 +2,18 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.34...5.8)
 
+### Added
+- Added support of `NOT RLIKE` SQL operator ([#29788](https://github.com/laravel/framework/pull/29788))
+
 ### Fixed
-- Fixed `MorphTo::associate()` with custom owner key ([#29767](https://github.com/laravel/framework/pull/29767))
 - Fixed self-referencing `MorphOneOrMany` existence queries ([#29765](https://github.com/laravel/framework/pull/29765))
+- Fixed `QueueFake::size()` method ([#29761](https://github.com/laravel/framework/pull/29761), [ddaf6e6](https://github.com/laravel/framework/commit/ddaf6e63326263a9bb3732e887a2bf8b2381caa1))
+
+### Changed
+- Added note that the GD extension is required for generating images ([#29770](https://github.com/laravel/framework/pull/29770)) // TODO: update code
+
+### TODO
+- Added warning when not renaming the Redis facade ([#29808](https://github.com/laravel/framework/pull/29808), [980ed9e](https://github.com/laravel/framework/commit/980ed9ea4b5ce7af9df5a4ff0ff931befaab8cf9))
 
 
 ## [v5.8.34 (2019-08-27)](https://github.com/laravel/framework/compare/v5.8.33...v5.8.34)
