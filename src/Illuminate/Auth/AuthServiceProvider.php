@@ -17,10 +17,33 @@ class AuthServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerAuthenticator();
+        $this->registerCustomProviders();
         $this->registerUserResolver();
         $this->registerAccessGate();
         $this->registerRequestRebindHandler();
         $this->registerEventRebindHandler();
+    }
+
+    protected function registerCustomProviders()
+    {
+        $this->registerDatabaseProvider();
+        $this->registerEloquentProvider();
+    }
+
+    protected function registerDatabaseProvider()
+    {
+        $this->app['auth']->provider('database', function ($app, array $config) {
+            $connection = $app['db']->connection();
+
+            return new DatabaseUserProvider($connection, $app['hash'], $config['table']);
+        }); 
+    }
+
+    protected function registerEloquentProvider()
+    {
+        $this->app['auth']->provider('eloquent', function ($app, array $config) {
+            return new EloquentUserProvider($this->app['hash'], $config['model']);
+        }); 
     }
 
     /**
