@@ -887,6 +887,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function countBy($callback = null);
 
     /**
+     * Collect the values into a collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect();
+
+    /**
      * Convert the collection to its string representation.
      *
      * @return string
