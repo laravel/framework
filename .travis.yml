@@ -17,10 +17,6 @@ matrix:
     - php: 7.4snapshot
     - php: 7.4snapshot
       env: SETUP=lowest
-  allow_failures:
-    - php: 7.4snapshot
-    - php: 7.4snapshot
-      env: SETUP=lowest
 
 cache:
   directories:
