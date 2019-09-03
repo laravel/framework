@@ -1,13 +1,31 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.33...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.34...5.8)
+
+### Added
+- Added support of `NOT RLIKE` SQL operator ([#29788](https://github.com/laravel/framework/pull/29788))
+
+### Fixed
+- Fixed self-referencing `MorphOneOrMany` existence queries ([#29765](https://github.com/laravel/framework/pull/29765))
+- Fixed `QueueFake::size()` method ([#29761](https://github.com/laravel/framework/pull/29761), [ddaf6e6](https://github.com/laravel/framework/commit/ddaf6e63326263a9bb3732e887a2bf8b2381caa1))
+
+### Changed
+- Added note that the GD extension is required for generating images ([#29770](https://github.com/laravel/framework/pull/29770)) // TODO: update code
+
+### TODO
+- Added warning when not renaming the Redis facade ([#29808](https://github.com/laravel/framework/pull/29808), [980ed9e](https://github.com/laravel/framework/commit/980ed9ea4b5ce7af9df5a4ff0ff931befaab8cf9))
+
+
+## [v5.8.34 (2019-08-27)](https://github.com/laravel/framework/compare/v5.8.33...v5.8.34)
 
 ### Fixed
 - Fixed `MailMessage::render()` if `view` method was used ([#29698](https://github.com/laravel/framework/pull/29698))
+- Fixed setting of numeric values as model attribute ([#29714](https://github.com/laravel/framework/pull/29714)) 
+- Fixed mocking of events `until` method in `MocksApplicationServices` ([#29708](https://github.com/laravel/framework/pull/29708))
+- Fixed: Use custom attributes in lt/lte/gt/gte rules messages ([#29716](https://github.com/laravel/framework/pull/29716))
 
-### TODO:
-- Mock events until method ([#29708](https://github.com/laravel/framework/pull/29708))
-- Use custom attributes in lt/lte/gt/gte rules messages ([#29716](https://github.com/laravel/framework/pull/29716))
+### Changed:
+- Changed applying of Aws Instance Profile ([#29738](https://github.com/laravel/framework/pull/29738))
 
 
 ## [v5.8.33 (2019-08-20)](https://github.com/laravel/framework/compare/v5.8.32...v5.8.33)

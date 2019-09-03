@@ -26,6 +26,9 @@
             "Illuminate\\Http\\": ""
         }
     },
+    "suggest": {
+        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory\\image::()."
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "6.0-dev"
