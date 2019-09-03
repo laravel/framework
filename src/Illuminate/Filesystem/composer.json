@@ -17,7 +17,7 @@
         "php": "^7.2",
         "illuminate/contracts": "^7.0",
         "illuminate/support": "^7.0",
-        "symfony/finder": "^4.3"
+        "symfony/finder": "^4.3.4"
     },
     "autoload": {
         "psr-4": {

@@ -67,23 +67,6 @@ class SupportLazyCollectionTest extends TestCase
         ], $data->all());
     }
 
-    public function testCollect()
-    {
-        $data = LazyCollection::make(function () {
-            yield 'a' => 1;
-            yield 'b' => 2;
-            yield 'c' => 3;
-        })->collect();
-
-        $this->assertInstanceOf(Collection::class, $data);
-
-        $this->assertSame([
-            'a' => 1,
-            'b' => 2,
-            'c' => 3,
-        ], $data->all());
-    }
-
     public function testTapEach()
     {
         $data = LazyCollection::times(10);

@@ -24,8 +24,8 @@
         "illuminate/pipeline": "^7.0",
         "illuminate/support": "^7.0",
         "opis/closure": "^3.1",
-        "symfony/debug": "^4.3",
-        "symfony/process": "^4.3"
+        "symfony/debug": "^4.3.4",
+        "symfony/process": "^4.3.4"
     },
     "autoload": {
         "psr-4": {

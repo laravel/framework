@@ -184,13 +184,6 @@ interface Application extends Container
     public function environmentFilePath();
 
     /**
-     * Get the path to the cached packages.php file.
-     *
-     * @return string
-     */
-    public function getCachedPackagesPath();
-
-    /**
      * Get the current application locale.
      *
      * @return string

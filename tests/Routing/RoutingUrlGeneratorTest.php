@@ -197,6 +197,12 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
 
         /*
+         * Optional parameter
+         */
+        $route = new Route(['GET'], 'foo/bar/{baz?}', ['as' => 'optional']);
+        $routes->add($route);
+
+        /*
          * HTTPS...
          */
         $route = new Route(['GET'], 'foo/baz', ['as' => 'baz', 'https']);
@@ -251,6 +257,13 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
         $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
         $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional'));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', 'taylor'));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', ['taylor']));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor?breeze', $url->route('optional', ['taylor', 'breeze']));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor?wall=woz', $url->route('optional', ['wall' => 'woz', 'taylor']));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor?wall=woz&breeze', $url->route('optional', ['wall' => 'woz', 'breeze', 'baz' => 'taylor']));
+        $this->assertSame('http://www.foo.com/foo/bar?wall=woz', $url->route('optional', ['wall' => 'woz']));
         $this->assertSame('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', ['baz' => 'åαф']));
         $this->assertSame('/foo/bar#derp', $url->route('fragment', [], false));
         $this->assertSame('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));

@@ -43,6 +43,13 @@ class LogManager implements LoggerInterface
     protected $customCreators = [];
 
     /**
+     * The standard date format to use when writing logs.
+     *
+     * @var string
+     */
+    protected $dateFormat = 'Y-m-d H:i:s';
+
+    /**
      * Create a new Log manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -381,7 +388,7 @@ class LogManager implements LoggerInterface
      */
     protected function formatter()
     {
-        return tap(new LineFormatter(null, null, true, true), function ($formatter) {
+        return tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
             $formatter->includeStacktraces();
         });
     }
