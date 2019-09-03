@@ -27,7 +27,7 @@
         }
     },
     "suggest": {
-        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory\\image::()."
+        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image()."
     },
     "extra": {
         "branch-alias": {
