@@ -114,7 +114,7 @@
         }
     },
     "suggest": {
-        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory\\image::().",
+        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (^3.0).",
