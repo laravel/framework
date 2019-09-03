@@ -8,7 +8,7 @@
 ### Added
 - Added support of `NOT RLIKE` SQL operator ([#29788](https://github.com/laravel/framework/pull/29788))
 - Added hebrew letters to `Str:slug` language array ([#29838](https://github.com/laravel/framework/pull/29838), [ba772d6](https://github.com/laravel/framework/commit/ba772d643b88a4646c1161f5325e52de81d7a709))
-- Added partial support of `php7.4` ([#29842](https://github.com/laravel/framework/pull/29842))
+- Added support of `php7.4` ([#29842](https://github.com/laravel/framework/pull/29842))
 
 ### Fixed
 - Fixed self-referencing `MorphOneOrMany` existence queries ([#29765](https://github.com/laravel/framework/pull/29765))
