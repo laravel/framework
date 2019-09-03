@@ -85,6 +85,16 @@ class PipelineTest extends TestCase
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
+
+        $result = (new Pipeline(new Container))
+            ->send('bar')
+            ->through($function)
+            ->thenReturn();
+
+        $this->assertEquals('bar', $result);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
     }
 
     public function testPipelineUsageWithInvokableClass()
