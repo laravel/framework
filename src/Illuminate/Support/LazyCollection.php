@@ -100,16 +100,6 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Collect the values into a collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function collect()
-    {
-        return new Collection($this->all());
-    }
-
-    /**
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback

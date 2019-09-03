@@ -113,6 +113,7 @@
         }
     },
     "suggest": {
+        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory\\image::().",
         "ext-memcached": "Required to use the memcache cache driver.",
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
@@ -125,7 +126,6 @@
         "laravel/tinker": "Required to use the tinker console command (^1.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^1.0).",
         "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
-        "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (^1.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
         "moontoast/math": "Required to use ordered UUIDs (^1.1).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",

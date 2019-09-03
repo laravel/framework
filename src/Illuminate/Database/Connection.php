@@ -20,7 +20,7 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 
 class Connection implements ConnectionInterface
 {
-    use DetectsDeadlocks,
+    use DetectsConcurrencyErrors,
         DetectsLostConnections,
         Concerns\ManagesTransactions;
 

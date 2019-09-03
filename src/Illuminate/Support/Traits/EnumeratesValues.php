@@ -7,6 +7,7 @@ use Traversable;
 use CachingIterator;
 use JsonSerializable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\VarDumper\VarDumper;
@@ -672,6 +673,16 @@ trait EnumeratesValues
     public function uniqueStrict($key = null)
     {
         return $this->unique($key, true);
+    }
+
+    /**
+     * Collect the values into a collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect()
+    {
+        return new Collection($this->all());
     }
 
     /**
