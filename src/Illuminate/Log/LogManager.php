@@ -43,7 +43,7 @@ class LogManager implements LoggerInterface
     protected $customCreators = [];
 
     /**
-     * The date format for Monolog formatter instance.
+     * The standard date format to use when writing logs.
      *
      * @var string
      */
