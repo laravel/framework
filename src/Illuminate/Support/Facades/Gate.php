@@ -19,6 +19,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static mixed getPolicyFor(object|string $class)
  * @method static \Illuminate\Contracts\Auth\Access\Gate forUser(\Illuminate\Contracts\Auth\Authenticatable|mixed $user)
  * @method static array abilities()
+ * @method static \Illuminate\Auth\Access\Response inspect(string $ability, array|mixed $arguments = [])
  *
  * @see \Illuminate\Contracts\Auth\Access\Gate
  */
