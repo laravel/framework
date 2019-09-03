@@ -1707,7 +1707,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         // First we will loop through the items and get the comparator from a callback
         // function which we were given. Then, we will sort the returned values and
-        // and grab the corresponding values for the sorted keys from this array.
+        // grab the corresponding values for the sorted keys from this array.
         foreach ($this->items as $key => $value) {
             $results[$key] = $callback($value, $key);
         }
