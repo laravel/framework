@@ -9,7 +9,7 @@ then
     exit 1
 fi
 
-CURRENT_BRANCH="6.x"
+CURRENT_BRANCH="master"
 VERSION=$1
 
 # Always prepend with "v"
