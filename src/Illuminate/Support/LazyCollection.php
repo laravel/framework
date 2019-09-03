@@ -141,7 +141,7 @@ class LazyCollection implements Enumerable
     {
         return new static(function () {
             foreach ($this as $values) {
-                if (is_array($values) || $values instanceof Enumerable) {
+                if (is_iterable($values)) {
                     foreach ($values as $value) {
                         yield $value;
                     }
@@ -356,7 +356,7 @@ class LazyCollection implements Enumerable
     {
         $instance = new static(function () use ($depth) {
             foreach ($this as $item) {
-                if (! is_array($item) && ! $item instanceof Enumerable) {
+                if (! is_iterable($item)) {
                     yield $item;
                 } elseif ($depth === 1) {
                     yield from $item;
