@@ -67,6 +67,19 @@ class SupportLazyCollectionTest extends TestCase
         ], $data->all());
     }
 
+    public function testCache()
+    {
+        $source = [1, 2, 3, 4, 5];
+
+        $data = LazyCollection::make(function () use (&$source) {
+            yield from $source;
+        })->cache();
+
+        $source[] = 6;
+
+        $this->assertSame([1, 2, 3, 4, 5], $data->all());
+    }
+
     public function testTapEach()
     {
         $data = LazyCollection::times(10);

@@ -100,6 +100,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Cache all values by enumerating the collection
+     * into a new lazy collection backed by an array.
+     *
+     * @return static
+     */
+    public function cache()
+    {
+        return new static($this->all());
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback

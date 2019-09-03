@@ -8,6 +8,16 @@ use Illuminate\Support\LazyCollection;
 
 class SupportLazyCollectionIsLazyTest extends TestCase
 {
+    public function testCacheEnumeratesOnce()
+    {
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection = $collection->cache();
+
+            $collection->count();
+            $collection->all();
+        });
+    }
+
     public function testChunkIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
