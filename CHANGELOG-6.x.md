@@ -1,4 +1,4 @@
-# Release Notes for 6.0.x
+# Release Notes for 6.x
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.0.0...6.x)
 
