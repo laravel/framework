@@ -22,10 +22,10 @@
         "illuminate/pipeline": "^7.0",
         "illuminate/session": "^7.0",
         "illuminate/support": "^7.0",
-        "symfony/debug": "^4.3",
-        "symfony/http-foundation": "^4.3",
-        "symfony/http-kernel": "^4.3",
-        "symfony/routing": "^4.3"
+        "symfony/debug": "^4.3.4",
+        "symfony/http-foundation": "^4.3.4",
+        "symfony/http-kernel": "^4.3.4",
+        "symfony/routing": "^4.3.4"
     },
     "autoload": {
         "psr-4": {

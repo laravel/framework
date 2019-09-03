@@ -10,7 +10,7 @@
 - Fixed `QueueFake::size()` method ([#29761](https://github.com/laravel/framework/pull/29761), [ddaf6e6](https://github.com/laravel/framework/commit/ddaf6e63326263a9bb3732e887a2bf8b2381caa1))
 
 ### Changed
-- Added note that the GD extension is required for generating images ([#29770](https://github.com/laravel/framework/pull/29770)) // TODO: update code
+- Added note that the GD extension is required for generating images ([#29770](https://github.com/laravel/framework/pull/29770), [#29831](https://github.com/laravel/framework/pull/29831))
 
 ### TODO
 - Added warning when not renaming the Redis facade ([#29808](https://github.com/laravel/framework/pull/29808), [980ed9e](https://github.com/laravel/framework/commit/980ed9ea4b5ce7af9df5a4ff0ff931befaab8cf9))
