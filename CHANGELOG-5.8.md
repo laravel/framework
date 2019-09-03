@@ -1,9 +1,14 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.34...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.35...5.8)
+
+
+## [v5.8.35 (2019-09-03)](https://github.com/laravel/framework/compare/v5.8.34...v5.8.35)
 
 ### Added
 - Added support of `NOT RLIKE` SQL operator ([#29788](https://github.com/laravel/framework/pull/29788))
+- Added hebrew letters to `Str:slug` language array ([#29838](https://github.com/laravel/framework/pull/29838), [ba772d6](https://github.com/laravel/framework/commit/ba772d643b88a4646c1161f5325e52de81d7a709))
+- Added partial support of `php7.4` ([#29842](https://github.com/laravel/framework/pull/29842))
 
 ### Fixed
 - Fixed self-referencing `MorphOneOrMany` existence queries ([#29765](https://github.com/laravel/framework/pull/29765))
@@ -11,9 +16,7 @@
 
 ### Changed
 - Added note that the GD extension is required for generating images ([#29770](https://github.com/laravel/framework/pull/29770), [#29831](https://github.com/laravel/framework/pull/29831))
-
-### TODO
-- Added warning when not renaming the Redis facade ([#29808](https://github.com/laravel/framework/pull/29808), [980ed9e](https://github.com/laravel/framework/commit/980ed9ea4b5ce7af9df5a4ff0ff931befaab8cf9))
+- Changed `monolog/monolog` version to `^1.12` ([#29837](https://github.com/laravel/framework/pull/29837))
 
 
 ## [v5.8.34 (2019-08-27)](https://github.com/laravel/framework/compare/v5.8.33...v5.8.34)
