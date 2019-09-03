@@ -142,6 +142,37 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipeline']);
     }
 
+    public function testPipelineUsageWithArrayCallable()
+    {
+        $closure = function ($piped, $next) {
+            return $next($piped) + 1;
+        };
+        $callbleArray = [new PipelineTestPipeOne, 'differentMethod'];
+        $staticCallble = [PipelineTestPipeOne::class, 'staticMethod'];
+        $combination = [$callbleArray, $staticCallble, $closure, PipelineTestPipeDifferent::class.':3'];
+
+        $result = (new Pipeline(new Container))
+            ->send(1)
+            ->through($callbleArray)
+            ->thenReturn();
+
+        $this->assertEquals(2, $result);
+
+        $result = (new Pipeline(new Container))
+            ->send(1)
+            ->through($staticCallble)
+            ->thenReturn();
+
+        $this->assertEquals(2, $result);
+
+        $result = (new Pipeline(new Container))
+            ->send(0)
+            ->through($combination)
+            ->thenReturn();
+
+        $this->assertEquals(6, $result);
+    }
+
     public function testPipelineUsageWithCallable()
     {
         $function = function ($piped, $next) {
@@ -278,6 +309,11 @@ class PipelineTestPipeOne
     {
         return $next($piped) + 1;
     }
+
+    public static function staticMethod($piped, $next)
+    {
+        return $next($piped) + 1;
+    }
 }
 
 class PipelineTestPipeDifferent
@@ -285,6 +321,11 @@ class PipelineTestPipeDifferent
     public function differentMethod($piped, $next)
     {
         return $next($piped) + 1;
+    }
+
+    public function handle($piped, $next, $param = 0)
+    {
+        return $next($piped) + $param;
     }
 }
 

@@ -66,11 +66,12 @@ class Pipeline implements PipelineContract
     /**
      * Set the array of pipes.
      *
-     * @param  array|mixed  $pipes
+     * @param  callable|array|string  $pipes
      * @return $this
      */
     public function through($pipes)
     {
+        $pipes = is_callable($pipes) ? [$pipes] : $pipes;
         $this->pipes = is_array($pipes) ? $pipes : func_get_args();
 
         return $this;
