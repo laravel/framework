@@ -7,7 +7,6 @@
 
 ### Fixed
 - Fixed self-referencing `MorphOneOrMany` existence queries ([#29765](https://github.com/laravel/framework/pull/29765))
-- Fixed Schedule runInBackground not fired on Windows ([#29826](https://github.com/laravel/framework/pull/29826))
 - Fixed `QueueFake::size()` method ([#29761](https://github.com/laravel/framework/pull/29761), [ddaf6e6](https://github.com/laravel/framework/commit/ddaf6e63326263a9bb3732e887a2bf8b2381caa1))
 
 ### Changed
