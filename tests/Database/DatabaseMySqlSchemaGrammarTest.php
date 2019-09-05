@@ -467,14 +467,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` varchar(100) null default \'bar\'', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` varchar(100) null default (\'bar\')', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->string('foo', 100)->nullable()->default(new Expression('CURRENT TIMESTAMP'));
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` varchar(100) null default CURRENT TIMESTAMP', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` varchar(100) null default (CURRENT TIMESTAMP)', $statements[0]);
     }
 
     public function testAddingText()
@@ -771,7 +771,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at')->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame("alter table `users` add `created_at` timestamp not null default '2015-07-22 11:43:17'", $statements[0]);
+        $this->assertSame("alter table `users` add `created_at` timestamp not null default ('2015-07-22 11:43:17')", $statements[0]);
     }
 
     public function testAddingTimestampTz()
@@ -798,7 +798,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestampTz('created_at')->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame("alter table `users` add `created_at` timestamp not null default '2015-07-22 11:43:17'", $statements[0]);
+        $this->assertSame("alter table `users` add `created_at` timestamp not null default ('2015-07-22 11:43:17')", $statements[0]);
     }
 
     public function testAddingTimestamps()
