@@ -32,7 +32,7 @@ trait VerifiesEmails
      */
     public function verify(Request $request)
     {
-        if (! hash_equals((string) $request->route('id'), (string) $request->user()->getKey())) {
+        if (! hash_equals((string) $request->route('id'), (string) $request->user()->getRouteKey())) {
             throw new AuthorizationException;
         }
 
