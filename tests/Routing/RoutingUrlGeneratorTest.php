@@ -4,13 +4,13 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class RoutingUrlGeneratorTest extends TestCase
 {
@@ -566,7 +566,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRouteNotDefinedException()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RouteNotFoundException::class);
         $this->expectExceptionMessage('Route [not_exists_route] not defined.');
 
         $url = new UrlGenerator(
