@@ -13,7 +13,7 @@ class Redirector
     /**
      * The URL generator instance.
      *
-     * @var \Illuminate\Routing\UrlGenerator
+     * @var \Illuminate\Contracts\Routing\UrlGenerator
      */
     protected $generator;
 
@@ -27,7 +27,7 @@ class Redirector
     /**
      * Create a new Redirector instance.
      *
-     * @param  \Illuminate\Routing\UrlGenerator  $generator
+     * @param  \Illuminate\Contracts\Routing\UrlGenerator  $generator
      * @return void
      */
     public function __construct(UrlGenerator $generator)
@@ -85,8 +85,8 @@ class Redirector
         $request = $this->generator->getRequest();
 
         $intended = $request->method() === 'GET' && $request->route() && ! $request->expectsJson()
-                        ? $this->generator->full()
-                        : $this->generator->previous();
+            ? $this->generator->full()
+            : $this->generator->previous();
 
         if ($intended) {
             $this->setIntendedUrl($intended);
@@ -212,7 +212,7 @@ class Redirector
     /**
      * Get the URL generator instance.
      *
-     * @return \Illuminate\Routing\UrlGenerator
+     * @return \Illuminate\Contracts\Routing\UrlGenerator
      */
     public function getUrlGenerator()
     {

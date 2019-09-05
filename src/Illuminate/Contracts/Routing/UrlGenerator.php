@@ -76,4 +76,18 @@ interface UrlGenerator
      * @return $this
      */
     public function setRootControllerNamespace($rootNamespace);
+
+    /**
+     * Get the request instance.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    public function getRequest();
+
+    /**
+     * Get the full URL for the current request.
+     *
+     * @return string
+     */
+    public function full();
 }
