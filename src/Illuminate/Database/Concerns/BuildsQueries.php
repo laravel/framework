@@ -136,7 +136,7 @@ trait BuildsQueries
      * Execute the query and get the first result.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return \Illuminate\Database\Eloquent\Model|object|null
      */
     public function first($columns = ['*'])
     {
