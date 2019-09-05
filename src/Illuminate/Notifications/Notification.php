@@ -23,6 +23,11 @@ class Notification
     public $locale;
 
     /**
+     * @var string
+     */
+    public $type;
+
+    /**
      * Get the channels the event should broadcast on.
      *
      * @return array
