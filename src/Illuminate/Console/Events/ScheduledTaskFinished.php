@@ -14,6 +14,12 @@ class ScheduledTaskFinished
     public $task;
 
     /**
+     * The runtime of the scheduled event.
+     *
+     * @var float
+     */
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $task
@@ -22,5 +28,6 @@ class ScheduledTaskFinished
     public function __construct(Event $task)
     {
         $this->task = $task;
+        $this->runtime = microtime(true) - LARAVEL_START;
     }
 }
