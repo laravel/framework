@@ -11,16 +11,16 @@ class ScheduledTaskFinished
      *
      * @var \Illuminate\Console\Scheduling\Event
      */
-    public $event;
+    public $task;
 
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \Illuminate\Console\Scheduling\Event  $task
      * @return void
      */
-    public function __construct(Event $event)
+    public function __construct(Event $task)
     {
-        $this->event = $event;
+        $this->task = $task;
     }
 }
