@@ -18,6 +18,7 @@ class ScheduledTaskFinished
      *
      * @var float
      */
+    public $runtime;
 
     /**
      * Create a new event instance.
