@@ -12,6 +12,13 @@ interface UrlGenerator
     public function current();
 
     /**
+     * Get the full URL for the current request.
+     *
+     * @return string
+     */
+    public function full();
+
+    /**
      * Get the URL for the previous request.
      *
      * @param  mixed  $fallback
@@ -83,11 +90,4 @@ interface UrlGenerator
      * @return \Illuminate\Http\Request
      */
     public function getRequest();
-
-    /**
-     * Get the full URL for the current request.
-     *
-     * @return string
-     */
-    public function full();
 }
