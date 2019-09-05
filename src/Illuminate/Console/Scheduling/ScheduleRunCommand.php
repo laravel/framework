@@ -4,6 +4,9 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskStarting;
 
 class ScheduleRunCommand extends Command
 {
@@ -58,9 +61,10 @@ class ScheduleRunCommand extends Command
      * Execute the console command.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function handle(Schedule $schedule)
+    public function handle(Schedule $schedule, Dispatcher $dispatcher)
     {
         $this->schedule = $schedule;
 
@@ -69,11 +73,15 @@ class ScheduleRunCommand extends Command
                 continue;
             }
 
+            $dispatcher->dispatch(new ScheduledTaskStarting($event));
+
             if ($event->onOneServer) {
                 $this->runSingleServerEvent($event);
             } else {
                 $this->runEvent($event);
             }
+
+            $dispatcher->dispatch(new ScheduledTaskFinished($event));
 
             $this->eventsRan = true;
         }
