@@ -23,7 +23,7 @@ class PendingChain
      *
      * @var bool
      */
-    public $dispatched;
+    public $dispatched = false;
 
     /**
      * Create a new PendingChain instance.
