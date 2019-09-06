@@ -894,7 +894,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedServicesPath()
     {
-        return $this->normalizeCachePath('cache/services.php', 'APP_SERVICES_CACHE');
+        return $this->normalizeCachePath('APP_SERVICES_CACHE', 'cache/services.php');
     }
 
     /**
@@ -904,7 +904,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedPackagesPath()
     {
-        return $this->normalizeCachePath('cache/packages.php', 'APP_PACKAGES_CACHE');
+        return $this->normalizeCachePath('APP_PACKAGES_CACHE', 'cache/packages.php');
     }
 
     /**
@@ -924,7 +924,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedConfigPath()
     {
-        return $this->normalizeCachePath('cache/config.php', 'APP_CONFIG_CACHE');
+        return $this->normalizeCachePath('APP_CONFIG_CACHE', 'cache/config.php');
     }
 
     /**
@@ -944,7 +944,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedRoutesPath()
     {
-        return $this->normalizeCachePath('cache/routes.php', 'APP_ROUTES_CACHE');
+        return $this->normalizeCachePath('APP_ROUTES_CACHE', 'cache/routes.php');
     }
 
     /**
@@ -964,29 +964,25 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedEventsPath()
     {
-        return $this->normalizeCachePath('cache/events.php', 'APP_EVENTS_CACHE');
+        return $this->normalizeCachePath('APP_EVENTS_CACHE', 'cache/events.php');
     }
 
     /**
      * Normalize a relative or absolute path to a cache file.
      *
-     * @param  string  $path
      * @param  string  $key
+     * @param  string  $default
      * @return string
      */
-    protected function normalizeCachePath($path, $key)
+    protected function normalizeCachePath($key, $default)
     {
-        $env = Env::get($key);
-
-        if ($env === null) {
-            return $this->bootstrapPath($path);
+        if (is_null($env = Env::get($key))) {
+            return $this->bootstrapPath($default);
         }
 
-        if (Str::startsWith($env, '/')) {
-            return $env;
-        }
-
-        return $this->basePath($env);
+        return Str::startsWith($env, '/')
+                ? $env
+                : $this->basePath($env);
     }
 
     /**
