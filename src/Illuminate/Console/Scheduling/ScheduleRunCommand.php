@@ -46,6 +46,13 @@ class ScheduleRunCommand extends Command
     protected $eventsRan = false;
 
     /**
+     * The runtime of the scheduled task.
+     *
+     * @var float
+     */
+    protected $runtime;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -81,7 +88,7 @@ class ScheduleRunCommand extends Command
                 $this->runEvent($event);
             }
 
-            $dispatcher->dispatch(new ScheduledTaskFinished($event));
+            $dispatcher->dispatch(new ScheduledTaskFinished($event, $this->runtime));
 
             $this->eventsRan = true;
         }
@@ -116,7 +123,11 @@ class ScheduleRunCommand extends Command
     {
         $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
-        $event->run($this->laravel);
+        tap(Date::now(), function ($start) use ($event) {
+            $event->run($this->laravel);
+
+            $this->runtime = Date::now()->floatDiffInSeconds($start);
+        });
 
         $this->eventsRan = true;
     }
