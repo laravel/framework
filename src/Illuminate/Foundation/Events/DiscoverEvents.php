@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Events;
 
+use ReflectionException;
 use SplFileInfo;
 use ReflectionClass;
 use ReflectionMethod;
@@ -38,9 +39,13 @@ class DiscoverEvents
         $listenerEvents = [];
 
         foreach ($listeners as $listener) {
-            $listener = new ReflectionClass(
-                static::classFromFile($listener, $basePath)
-            );
+            try {
+                $listener = new ReflectionClass(
+                    static::classFromFile($listener, $basePath)
+                );
+            } catch (ReflectionException $e) {
+                continue;
+            }
 
             if (! $listener->isInstantiable()) {
                 continue;
