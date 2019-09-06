@@ -17,6 +17,13 @@ class PendingChain
      * @var array
      */
     public $chain;
+    
+    /**
+     * Indicates if the chain has already been dispatched.
+     *
+     * @var bool
+     */
+    public $dispatched;
 
     /**
      * Create a new PendingChain instance.
@@ -38,6 +45,8 @@ class PendingChain
      */
     public function dispatch()
     {
+        $this->dispatched = true;
+
         return (new PendingDispatch(
             new $this->class(...func_get_args())
         ))->chain($this->chain);
@@ -50,6 +59,8 @@ class PendingChain
      */
     public function __destruct()
     {
-        $this->dispatch();
+        if (! $this->dispatched) {
+            $this->dispatch();
+        };
     }
 }
