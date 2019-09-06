@@ -42,4 +42,14 @@ class PendingChain
             new $this->class(...func_get_args())
         ))->chain($this->chain);
     }
+    
+    /**
+     * Handle the object's destruction.
+     *
+     * @return void
+     */
+    public function __destruct()
+    {
+        $this->dispatch();
+    }
 }
