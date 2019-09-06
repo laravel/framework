@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Events;
 
-use ReflectionException;
 use SplFileInfo;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionException;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 
