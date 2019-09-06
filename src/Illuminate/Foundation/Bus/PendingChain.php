@@ -17,7 +17,7 @@ class PendingChain
      * @var array
      */
     public $chain;
-    
+
     /**
      * Indicates if the chain has already been dispatched.
      *
@@ -61,6 +61,6 @@ class PendingChain
     {
         if (! $this->dispatched) {
             $this->dispatch();
-        };
+        }
     }
 }
