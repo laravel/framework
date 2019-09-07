@@ -3,11 +3,11 @@
 namespace Illuminate\Support;
 
 use Ramsey\Uuid\Uuid;
+use voku\helper\ASCII;
 use Ramsey\Uuid\UuidFactory;
 use Illuminate\Support\Traits\Macroable;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
-use voku\helper\ASCII;
 
 class Str
 {
