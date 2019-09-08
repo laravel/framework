@@ -46,11 +46,11 @@ class ScheduleRunCommand extends Command
     protected $eventsRan = false;
 
     /**
-     * The runtime of the scheduled task.
+     * The event dispatcher.
      *
-     * @var float
+     * @var \Illuminate\Contracts\Notifications\Dispatcher
      */
-    protected $runtime;
+    protected $dispatcher;
 
     /**
      * Create a new command instance.
@@ -74,21 +74,18 @@ class ScheduleRunCommand extends Command
     public function handle(Schedule $schedule, Dispatcher $dispatcher)
     {
         $this->schedule = $schedule;
+        $this->dispatcher = $dispatcher;
 
         foreach ($this->schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 continue;
             }
 
-            $dispatcher->dispatch(new ScheduledTaskStarting($event));
-
             if ($event->onOneServer) {
                 $this->runSingleServerEvent($event);
             } else {
                 $this->runEvent($event);
             }
-
-            $dispatcher->dispatch(new ScheduledTaskFinished($event, $this->runtime));
 
             $this->eventsRan = true;
         }
@@ -123,11 +120,16 @@ class ScheduleRunCommand extends Command
     {
         $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
-        tap(Date::now(), function ($start) use ($event) {
-            $event->run($this->laravel);
+        $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
-            $this->runtime = Date::now()->floatDiffInSeconds($start);
-        });
+        $start = microtime(true);
+
+        $event->run($this->laravel);
+
+        $this->dispatcher->dispatch(new ScheduledTaskFinished(
+            $event,
+            round(microtime(true) - $start, 2)
+        ));
 
         $this->eventsRan = true;
     }
