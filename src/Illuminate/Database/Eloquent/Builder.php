@@ -552,22 +552,70 @@ class Builder
      */
     protected function eagerLoadRelation(array $models, $name, Closure $constraints)
     {
-        // First we will "back up" the existing where conditions on the query so we can
-        // add our eager constraints. Then we will merge the wheres that were on the
-        // query back to it in order that any where conditions might be specified.
-        $relation = $this->getRelation($name);
+        $groupedModels = [];
 
-        $relation->addEagerConstraints($models);
+        foreach ($models as $model) {
+            $groupedModels[get_class($model)][] = $model;
+        }
 
-        $constraints($relation);
+        $result = [];
+        foreach ($groupedModels as $modelClassName => $modelArray) {
+            // First we will "back up" the existing where conditions on the query so we can
+            // add our eager constraints. Then we will merge the wheres that were on the
+            // query back to it in order that any where conditions might be specified.
+            $model = new $modelClassName();
+            $relation = $this->getModelRelation($model, $name);
 
-        // Once we have the results, we just match those back up to their parent models
-        // using the relationship instance. Then we just return the finished arrays
-        // of models which have been eagerly hydrated and are readied for return.
-        return $relation->match(
-            $relation->initRelation($models, $name),
-            $relation->getEager(), $name
-        );
+            $relation->addEagerConstraints($modelArray);
+
+            $constraints($relation);
+
+            // Once we have the results, we just match those back up to their parent models
+            // using the relationship instance. Then we just return the finished arrays
+            // of models which have been eagerly hydrated and are readied for return.
+            $result = array_merge(
+                $result,
+                $relation->match(
+                    $relation->initRelation($modelArray, $name),
+                    $relation->getEager(),
+                    $name
+                )
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get the relation of the model for the given relation name.
+     *
+     * @param Illuminate\Database\Eloquent\Model $model
+     * @param string $name
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    public function getModelRelation(Model $model, $name)
+    {
+        // We want to run a relationship query without any constrains so that we will
+        // not have to remove these where clauses manually which gets really hacky
+        // and error prone. We don't want constraints because we add eager ones.
+        $relation = Relation::noConstraints(function () use ($name, $model) {
+            try {
+                return $model->newInstance()->$name();
+            } catch (BadMethodCallException $e) {
+                throw RelationNotFoundException::make($this->getModel(), $name);
+            }
+        });
+
+        $nested = $this->relationsNestedUnder($name);
+
+        // If there are nested relationships set on the query, we will put those onto
+        // the query instances so that they can be handled after this relationship
+        // is loaded. In this way they will all trickle down as they are loaded.
+        if (count($nested) > 0) {
+            $relation->getQuery()->with($nested);
+        }
+
+        return $relation;
     }
 
     /**
