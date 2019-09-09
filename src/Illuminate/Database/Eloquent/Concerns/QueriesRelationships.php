@@ -388,6 +388,11 @@ trait QueriesRelationships
 
             $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
 
+            // Because the ordering of the subresult does not influence the total count, we can
+            // safely remove it from the final result. Furthermore, the selected columns do
+            // not influence the count either, so we can safely remove those too
+            $query->orders = null;
+
             if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
             }
