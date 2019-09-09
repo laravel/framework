@@ -38,7 +38,7 @@ trait InteractsWithContainer
      *
      * @param  string  $abstract
      * @param  \Closure|null  $mock
-     * @return object
+     * @return \Mockery\MockInterface
      */
     protected function mock($abstract, Closure $mock = null)
     {
@@ -50,7 +50,7 @@ trait InteractsWithContainer
      *
      * @param  string  $abstract
      * @param  \Closure|null  $mock
-     * @return object
+     * @return \Mockery\MockInterface
      */
     protected function spy($abstract, Closure $mock = null)
     {
