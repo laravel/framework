@@ -21,7 +21,7 @@ trait AuthenticatesUsers
     }
 
     /**
-     * Check if has too many login attempts
+     * Check if has too many login attempts.
      *
      * @param Request $request
      * @return bool
