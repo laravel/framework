@@ -393,6 +393,8 @@ trait QueriesRelationships
             // not influence the count either, so we can safely remove those too
             $query->orders = null;
 
+            $query->setBindings([], 'order');
+
             if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
             }
