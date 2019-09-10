@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

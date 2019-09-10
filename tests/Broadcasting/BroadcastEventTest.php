@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class BroadcastEventTest extends TestCase
 {

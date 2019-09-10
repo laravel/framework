@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Composer;
 use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Support\Composer;
+use Illuminate\Support\Str;
 
 class MigrateMakeCommand extends BaseCommand
 {

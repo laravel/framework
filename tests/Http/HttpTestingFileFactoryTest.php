@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Http\Testing\FileFactory;
+use PHPUnit\Framework\TestCase;
 
 class HttpTestingFileFactoryTest extends TestCase
 {

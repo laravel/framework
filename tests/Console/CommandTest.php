@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Console;
 
-use Mockery as m;
-use Illuminate\Console\Command;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Application;
+use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 

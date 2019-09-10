@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayIterator;
-use ReflectionObject;
-use IteratorAggregate;
 use Illuminate\Support\Fluent;
+use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
 class SupportFluentTest extends TestCase
 {

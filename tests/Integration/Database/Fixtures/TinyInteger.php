@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\Fixtures;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\Type;
 
 class TinyInteger extends Type
 {

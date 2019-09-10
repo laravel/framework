@@ -3,8 +3,8 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
-use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class Arr
 {

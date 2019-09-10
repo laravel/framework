@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 /**

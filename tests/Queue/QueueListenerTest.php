@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Mockery as m;
 use Illuminate\Queue\Listener;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\ListenerOptions;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 class QueueListenerTest extends TestCase

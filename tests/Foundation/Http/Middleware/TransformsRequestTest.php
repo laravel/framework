@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TransformsRequestTest extends TestCase

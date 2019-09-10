@@ -3,8 +3,8 @@
 namespace Illuminate\Redis\Limiters;
 
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Support\Str;
 
 class ConcurrencyLimiter
 {

@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Env;
-use Illuminate\Support\Optional;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Optional;
 
 if (! function_exists('append_config')) {
     /**

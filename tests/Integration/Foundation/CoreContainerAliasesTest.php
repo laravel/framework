@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\DatabaseManager;
+use Orchestra\Testbench\TestCase;
 
 class CoreContainerAliasesTest extends TestCase
 {

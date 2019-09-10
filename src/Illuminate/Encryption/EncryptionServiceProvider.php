@@ -2,9 +2,9 @@
 
 namespace Illuminate\Encryption;
 
-use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 class EncryptionServiceProvider extends ServiceProvider
 {

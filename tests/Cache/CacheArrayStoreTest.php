@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cache\ArrayStore;
 
 class CacheArrayStoreTest extends TestCase
 {

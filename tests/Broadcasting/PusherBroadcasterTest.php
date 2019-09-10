@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Mockery as m;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
+use Illuminate\Http\Request;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PusherBroadcasterTest extends TestCase

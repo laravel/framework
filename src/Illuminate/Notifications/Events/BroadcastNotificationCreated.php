@@ -2,10 +2,10 @@
 
 namespace Illuminate\Notifications\Events;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
 
 class BroadcastNotificationCreated implements ShouldBroadcast
 {

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Session;
 
-use SessionHandlerInterface;
-use Illuminate\Support\Carbon;
-use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Carbon;
+use SessionHandlerInterface;
+use Symfony\Component\Finder\Finder;
 
 class FileSessionHandler implements SessionHandlerInterface
 {

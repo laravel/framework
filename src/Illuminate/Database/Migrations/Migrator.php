@@ -2,17 +2,17 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
-use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\MigrationsStarted;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Events\MigrationStarted;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class Migrator
 {
