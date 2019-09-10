@@ -21,6 +21,17 @@ trait AuthenticatesUsers
     }
 
     /**
+     * Check if has too many login attempts
+     *
+     * @param Request $request
+     * @return bool
+     */
+    public function hasTooManyLoginAttemptsCheck(Request $request)
+    {
+        return method_exists($this, 'hasTooManyLoginAttempts') && $this->hasTooManyLoginAttempts($request);
+    }
+
+    /**
      * Handle a login request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -35,8 +46,7 @@ trait AuthenticatesUsers
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
-        if (method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)) {
+        if ($this->hasTooManyLoginAttemptsCheck($request)) {
             $this->fireLockoutEvent($request);
 
             return $this->sendLockoutResponse($request);
