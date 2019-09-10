@@ -473,7 +473,7 @@ class Builder
             return $model;
         }
 
-        return call_user_func($callback);
+        return $callback();
     }
 
     /**

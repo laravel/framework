@@ -239,7 +239,7 @@ class Mailer implements MailerContract, MailQueueContract
         // Once we have retrieved the view content for the e-mail we will set the body
         // of this message using the HTML type, which will provide a simple wrapper
         // to creating view based emails that are able to receive arrays of data.
-        call_user_func($callback, $message);
+        $callback($message);
 
         $this->addContent($message, $view, $plain, $raw, $data);
 

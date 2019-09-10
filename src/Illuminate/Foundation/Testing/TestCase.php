@@ -82,7 +82,7 @@ abstract class TestCase extends BaseTestCase
         $this->setUpTraits();
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
-            call_user_func($callback);
+            $callback();
         }
 
         Facade::clearResolvedInstances();
@@ -206,7 +206,7 @@ abstract class TestCase extends BaseTestCase
         $this->afterApplicationCreatedCallbacks[] = $callback;
 
         if ($this->setUpHasRun) {
-            call_user_func($callback);
+            $callback();
         }
     }
 
@@ -230,7 +230,7 @@ abstract class TestCase extends BaseTestCase
     {
         foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
             try {
-                call_user_func($callback);
+                $callback();
             } catch (Throwable $e) {
                 if (! $this->callbackException) {
                     $this->callbackException = $e;

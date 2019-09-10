@@ -162,7 +162,7 @@ class RedisManager implements Factory
         $customCreator = $this->customCreators[$this->driver] ?? null;
 
         if ($customCreator) {
-            return call_user_func($customCreator);
+            return $customCreator();
         }
 
         switch ($this->driver) {

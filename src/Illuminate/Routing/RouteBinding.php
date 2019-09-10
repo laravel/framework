@@ -41,7 +41,7 @@ class RouteBinding
 
             $callable = [$container->make($class), $method];
 
-            return call_user_func($callable, $value, $route);
+            return $callable($value, $route);
         };
     }
 
@@ -73,7 +73,7 @@ class RouteBinding
             // what we should do when the model is not found. This just gives these
             // developer a little greater flexibility to decide what will happen.
             if ($callback instanceof Closure) {
-                return call_user_func($callback, $value);
+                return $callback($value);
             }
 
             throw (new ModelNotFoundException)->setModel($class);

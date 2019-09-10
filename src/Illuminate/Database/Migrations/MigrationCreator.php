@@ -157,7 +157,7 @@ class MigrationCreator
     protected function firePostCreateHooks($table)
     {
         foreach ($this->postCreate as $callback) {
-            call_user_func($callback, $table);
+            $callback($table);
         }
     }
 
