@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Composer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Composer;
-use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 class SupportComposerTest extends TestCase

@@ -3,13 +3,13 @@
 namespace Illuminate\Database;
 
 use Closure;
-use Exception;
-use Throwable;
-use Illuminate\Database\Schema\SqlServerBuilder;
 use Doctrine\DBAL\Driver\PDOSqlsrv\Driver as DoctrineDriver;
-use Illuminate\Database\Query\Processors\SqlServerProcessor;
+use Exception;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
+use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
+use Illuminate\Database\Schema\SqlServerBuilder;
+use Throwable;
 
 class SqlServerConnection extends Connection
 {

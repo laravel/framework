@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
+use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
 {

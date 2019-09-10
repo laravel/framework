@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Cookie\CookieJar;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cookie\CookieJar;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Routing\Controller;
-use Illuminate\Container\Container;
-use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class EncryptCookiesTest extends TestCase
 {

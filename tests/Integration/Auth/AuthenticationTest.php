@@ -2,23 +2,23 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
-use Illuminate\Support\Str;
-use Illuminate\Auth\Events\Login;
-use Illuminate\Auth\SessionGuard;
-use Illuminate\Events\Dispatcher;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Auth\Events\Attempting;
+use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\OtherDeviceLogout;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Auth\Events\Attempting;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Auth\EloquentUserProvider;
-use Illuminate\Auth\Events\Authenticated;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Auth\Events\OtherDeviceLogout;
+use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

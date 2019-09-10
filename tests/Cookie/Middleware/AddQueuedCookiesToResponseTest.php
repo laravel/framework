@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
+use Illuminate\Cookie\CookieJar;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cookie\CookieJar;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class AddQueuedCookiesToResponseTest extends TestCase
 {

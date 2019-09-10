@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

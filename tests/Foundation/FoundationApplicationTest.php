@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use stdClass;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Bootstrap\RegisterFacades;
+use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Support\ServiceProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Foundation\Bootstrap\RegisterFacades;
+use stdClass;
 
 class FoundationApplicationTest extends TestCase
 {

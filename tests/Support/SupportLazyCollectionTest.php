@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase
 {

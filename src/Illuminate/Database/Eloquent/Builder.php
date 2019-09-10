@@ -2,17 +2,17 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use BadMethodCallException;
 use Closure;
 use Exception;
-use BadMethodCallException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
@@ -473,7 +473,7 @@ class Builder
             return $model;
         }
 
-        return call_user_func($callback);
+        return $callback();
     }
 
     /**

@@ -3,13 +3,13 @@
 namespace Illuminate\Auth\Access;
 
 use Exception;
-use ReflectionClass;
-use ReflectionFunction;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use ReflectionClass;
+use ReflectionFunction;
 
 class Gate implements GateContract
 {

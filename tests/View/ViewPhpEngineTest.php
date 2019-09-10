@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\View\Engines\PhpEngine;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\View\Engines\PhpEngine;
 
 class ViewPhpEngineTest extends TestCase
 {

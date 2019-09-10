@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Throwable;
-use LogicException;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+use Illuminate\Filesystem\Filesystem;
+use LogicException;
+use Throwable;
 
 class ConfigCacheCommand extends Command
 {

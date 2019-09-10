@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

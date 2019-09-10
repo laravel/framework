@@ -2,15 +2,13 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.0.1...6.x)
 
-### Added
-- Resolving class command via container ([#29869](https://github.com/laravel/framework/pull/29869))
-
 ### Changed
 - Used `Application::normalizeCachePath()` method to define cache path`s ([#29890](https://github.com/laravel/framework/pull/29890), [ac9dbf6](https://github.com/laravel/framework/commit/ac9dbf6beaded2ad86f5595958c75e3c4b1147ae))
 - Wrapped `MySQL` default values in parentheses ([#29878](https://github.com/laravel/framework/pull/29878))
 
 ### Fixed
 - Prevent `event auto discovery` from crashing when trying to instantiate files without php classes ([#29895](https://github.com/laravel/framework/pull/29895))
+- Fix resolving class command via container ([#29869](https://github.com/laravel/framework/pull/29869))
 
 
 ## [v6.0.1 (2019-09-06)](https://github.com/laravel/framework/compare/v6.0.0...v6.0.1)

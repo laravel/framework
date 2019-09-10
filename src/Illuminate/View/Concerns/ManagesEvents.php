@@ -3,8 +3,8 @@
 namespace Illuminate\View\Concerns;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Support\Str;
 
 trait ManagesEvents
 {

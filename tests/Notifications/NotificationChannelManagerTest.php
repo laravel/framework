@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery as m;
 use Illuminate\Bus\Queueable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\ChannelManager;
-use Illuminate\Contracts\Bus\Dispatcher as Bus;
-use Illuminate\Notifications\Events\NotificationSent;
-use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Notifications\Events\NotificationSending;
+use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\SendQueuedNotifications;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class NotificationChannelManagerTest extends TestCase
 {

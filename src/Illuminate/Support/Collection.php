@@ -2,11 +2,11 @@
 
 namespace Illuminate\Support;
 
-use stdClass;
 use ArrayAccess;
 use ArrayIterator;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\EnumeratesValues;
+use Illuminate\Support\Traits\Macroable;
+use stdClass;
 
 class Collection implements ArrayAccess, Enumerable
 {
@@ -936,7 +936,7 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         foreach ($this->items as $key => $item) {
-            if (call_user_func($value, $item, $key)) {
+            if ($value($item, $key)) {
                 return $key;
             }
         }

@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Foundation\Events\DiscoverEvents;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventOne;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventTwo;
-use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface;
+use Orchestra\Testbench\TestCase;
 
 class DiscoverEventsTest extends TestCase
 {

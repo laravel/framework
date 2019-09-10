@@ -2,18 +2,18 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Mailer;
-use InvalidArgumentException;
-use Illuminate\Support\HtmlString;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
-use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
+use Illuminate\Contracts\Queue\Factory as QueueContract;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use Swift_Mailer;
 
 class Mailer implements MailerContract, MailQueueContract
 {
@@ -239,7 +239,7 @@ class Mailer implements MailerContract, MailQueueContract
         // Once we have retrieved the view content for the e-mail we will set the body
         // of this message using the HTML type, which will provide a simple wrapper
         // to creating view based emails that are able to receive arrays of data.
-        call_user_func($callback, $message);
+        $callback($message);
 
         $this->addContent($message, $view, $plain, $raw, $data);
 

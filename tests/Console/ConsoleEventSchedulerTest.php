@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Console;
 
-use Mockery as m;
 use Illuminate\Console\Command;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\CacheEventMutex;
-use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Console\Scheduling\CacheSchedulingMutex;
+use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Console\Scheduling\SchedulingMutex;
+use Illuminate\Container\Container;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class ConsoleEventSchedulerTest extends TestCase
 {

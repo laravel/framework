@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Schema;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Queue\SerializesModels;
 use LogicException;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Schema;
 
 /**
  * @group integration

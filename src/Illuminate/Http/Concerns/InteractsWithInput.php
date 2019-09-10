@@ -2,11 +2,11 @@
 
 namespace Illuminate\Http\Concerns;
 
-use stdClass;
-use SplFileInfo;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
+use SplFileInfo;
+use stdClass;
 
 trait InteractsWithInput
 {

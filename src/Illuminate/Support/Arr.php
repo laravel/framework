@@ -3,8 +3,8 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
-use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class Arr
 {
@@ -172,7 +172,7 @@ class Arr
         }
 
         foreach ($array as $key => $value) {
-            if (call_user_func($callback, $value, $key)) {
+            if ($callback($value, $key)) {
                 return $value;
             }
         }

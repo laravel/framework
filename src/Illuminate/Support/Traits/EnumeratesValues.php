@@ -2,17 +2,17 @@
 
 namespace Illuminate\Support\Traits;
 
-use Exception;
-use Traversable;
 use CachingIterator;
-use JsonSerializable;
+use Exception;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use Illuminate\Contracts\Support\Jsonable;
-use Symfony\Component\VarDumper\VarDumper;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\HigherOrderCollectionProxy;
+use JsonSerializable;
+use Symfony\Component\VarDumper\VarDumper;
+use Traversable;
 
 /**
  * @property-read HigherOrderCollectionProxy $average

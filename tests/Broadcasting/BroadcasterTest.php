@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Exception;
-use Mockery as m;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\BindingRegistrar;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BroadcasterTest extends TestCase

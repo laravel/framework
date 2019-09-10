@@ -3,32 +3,32 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
-use stdClass;
-use Exception;
-use Mockery as m;
-use LogicException;
-use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;
-use InvalidArgumentException;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Model;
+use Exception;
 use Foo\Bar\EloquentModelNamespacedStub;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\InteractsWithTime;
+use InvalidArgumentException;
+use LogicException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 
 class DatabaseEloquentModelTest extends TestCase
 {

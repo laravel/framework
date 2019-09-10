@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Events;
 
-use SplFileInfo;
-use ReflectionClass;
-use ReflectionMethod;
-use ReflectionException;
 use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
+use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
 class DiscoverEvents

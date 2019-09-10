@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Cookie;
 
-use Mockery;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Response;
+use Illuminate\Session\NullSessionHandler;
 use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Session\NullSessionHandler;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Str;
+use Mockery;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
