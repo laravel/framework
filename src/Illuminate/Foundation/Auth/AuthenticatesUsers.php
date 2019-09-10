@@ -23,7 +23,7 @@ trait AuthenticatesUsers
     /**
      * Check if has too many login attempts.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function hasTooManyLoginAttemptsCheck(Request $request)
