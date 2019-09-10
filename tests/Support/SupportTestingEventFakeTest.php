@@ -95,6 +95,19 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->assertDispatched('Bar');
         $fake->assertNotDispatched('Baz');
     }
+
+    public function testAssertDispatchedWithFlushed()
+    {
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('listen')->once();
+
+        $fake = new EventFake($dispatcher);
+
+        $fake->push(EventStub::class);
+        $fake->flush(EventStub::class);
+
+        $fake->assertDispatched('Illuminate\Tests\Support\EventStub_pushed');
+    }
 }
 
 class EventStub

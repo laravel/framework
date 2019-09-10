@@ -158,7 +158,9 @@ class EventFake implements Dispatcher
      */
     public function push($event, $payload = [])
     {
-        //
+        $this->dispatcher->listen($event.'_pushed', function () use ($event, $payload) {
+            $this->dispatch($event, $payload);
+        });
     }
 
     /**
@@ -180,7 +182,7 @@ class EventFake implements Dispatcher
      */
     public function flush($event)
     {
-        //
+        $this->dispatch($event.'_pushed');
     }
 
     /**
