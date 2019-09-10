@@ -919,7 +919,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolvePrimitive(ReflectionParameter $parameter)
     {
-        if (null !== ($concrete = $this->getContextualConcrete('$' . $parameter->name))) {
+        if (null !== ($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
             return $concrete instanceof Closure ? $concrete($this) : $concrete;
         }
 
