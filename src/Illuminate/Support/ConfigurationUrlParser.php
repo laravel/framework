@@ -64,7 +64,7 @@ class ConfigurationUrlParser
             'username' => $url['user'] ?? null,
             'password' => $url['pass'] ?? null,
         ], function ($value) {
-            return null !== $value;
+            return $value !== null;
         });
     }
 

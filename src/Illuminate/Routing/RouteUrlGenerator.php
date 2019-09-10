@@ -87,7 +87,7 @@ class RouteUrlGenerator
             $route
         ), $parameters);
 
-        if (preg_match('/{.*?}/', $uri)) {
+        if (preg_match('/\{.*?\}/', $uri)) {
             throw UrlGenerationException::forMissingParameters($route);
         }
 
@@ -196,7 +196,7 @@ class RouteUrlGenerator
     {
         $path = $this->replaceNamedParameters($path, $parameters);
 
-        $path = preg_replace_callback('/{.*?}/', function ($match) use (&$parameters) {
+        $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
             // Reset only the numeric keys...
             $parameters = array_merge($parameters);
 
@@ -205,7 +205,7 @@ class RouteUrlGenerator
                         : Arr::pull($parameters, 0);
         }, $path);
 
-        return trim(preg_replace('/{.*?\?}/', '', $path), '/');
+        return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
     }
 
     /**
@@ -217,7 +217,7 @@ class RouteUrlGenerator
      */
     protected function replaceNamedParameters($path, &$parameters)
     {
-        return preg_replace_callback('/{(.*?)\??}/', function ($m) use (&$parameters) {
+        return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
             if (isset($parameters[$m[1]])) {
                 return Arr::pull($parameters, $m[1]);
             } elseif (isset($this->defaultParameters[$m[1]])) {
@@ -240,13 +240,13 @@ class RouteUrlGenerator
         // If the URI has a fragment we will move it to the end of this URI since it will
         // need to come after any query string that may be added to the URL else it is
         // not going to be available. We will remove it then append it back on here.
-        if (null !== ($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {
+        if (($fragment = parse_url($uri, PHP_URL_FRAGMENT)) !== null) {
             $uri = preg_replace('/#.*/', '', $uri);
         }
 
         $uri .= $this->getRouteQueryString($parameters);
 
-        return null === $fragment ? $uri : $uri."#{$fragment}";
+        return $fragment === null ? $uri : $uri."#{$fragment}";
     }
 
     /**

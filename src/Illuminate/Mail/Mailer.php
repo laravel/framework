@@ -430,7 +430,7 @@ class Mailer implements MailerContract, MailQueueContract
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->later($delay, null === $queue ? $this->queue : $queue);
+        return $view->later($delay, $queue ?? $this->queue);
     }
 
     /**

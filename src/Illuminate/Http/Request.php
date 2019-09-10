@@ -349,7 +349,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
         }
 
-        if (null === $key) {
+        if ($key === null) {
             return $this->json;
         }
 
@@ -528,7 +528,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $route = call_user_func($this->getRouteResolver());
 
-        if (null === $route || null === $param) {
+        if ($route === null || $param === null) {
             return $route;
         }
 
@@ -683,7 +683,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __isset($key)
     {
-        return null !== $this->__get($key);
+        return $this->__get($key) !== null;
     }
 
     /**

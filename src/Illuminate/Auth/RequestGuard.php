@@ -50,7 +50,7 @@ class RequestGuard implements Guard
         // If we've already retrieved the user for the current request we can just
         // return it back immediately. We do not want to fetch the user data on
         // every call to this method because that would be tremendously slow.
-        if (null !== $this->user) {
+        if ($this->user !== null) {
             return $this->user;
         }
 
@@ -67,9 +67,9 @@ class RequestGuard implements Guard
      */
     public function validate(array $credentials = [])
     {
-        return null !== (new static(
+        return (new static(
             $this->callback, $credentials['request'], $this->getProvider()
-        ))->user();
+        ))->user() !== null;
     }
 
     /**

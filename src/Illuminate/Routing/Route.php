@@ -428,7 +428,7 @@ class Route
     public function parametersWithoutNulls()
     {
         return array_filter($this->parameters(), function ($p) {
-            return null !== $p;
+            return $p !== null;
         });
     }
 
@@ -453,7 +453,7 @@ class Route
      */
     protected function compileParameterNames()
     {
-        preg_match_all('/{(.*?)}/', $this->getDomain().$this->uri, $matches);
+        preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
 
         return array_map(function ($m) {
             return trim($m, '?');
@@ -588,7 +588,7 @@ class Route
      */
     public function domain($domain = null)
     {
-        if (null === $domain) {
+        if ($domain === null) {
             return $this->getDomain();
         }
 
@@ -687,7 +687,7 @@ class Route
      */
     public function named(...$patterns)
     {
-        if (null === ($routeName = $this->getName())) {
+        if (($routeName = $this->getName()) === null) {
             return false;
         }
 
@@ -784,7 +784,7 @@ class Route
      */
     public function gatherMiddleware()
     {
-        if (null !== $this->computedMiddleware) {
+        if ($this->computedMiddleware !== null) {
             return $this->computedMiddleware;
         }
 
@@ -803,7 +803,7 @@ class Route
      */
     public function middleware($middleware = null)
     {
-        if (null === $middleware) {
+        if ($middleware === null) {
             return (array) ($this->action['middleware'] ?? []);
         }
 

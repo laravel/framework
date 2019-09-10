@@ -217,7 +217,7 @@ abstract class Queue
      */
     public static function createPayloadUsing($callback)
     {
-        if (null === $callback) {
+        if ($callback === null) {
             static::$createPayloadCallbacks = [];
         } else {
             static::$createPayloadCallbacks[] = $callback;

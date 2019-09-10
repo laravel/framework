@@ -204,7 +204,7 @@ trait HasEvents
 
         $result = static::$dispatcher->$method(new $this->dispatchesEvents[$event]($this));
 
-        if (null !== $result) {
+        if ($result !== null) {
             return $result;
         }
     }
@@ -219,7 +219,7 @@ trait HasEvents
     {
         if (is_array($result)) {
             $result = array_filter($result, function ($response) {
-                return null !== $response;
+                return $response !== null;
             });
         }
 

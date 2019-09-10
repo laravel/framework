@@ -111,7 +111,7 @@ class VendorPublishCommand extends Command
             $choices = $this->publishableChoices()
         );
 
-        if ($choice == $choices[0] || null === $choice) {
+        if ($choice === null || $choice == $choices[0]) {
             return;
         }
 

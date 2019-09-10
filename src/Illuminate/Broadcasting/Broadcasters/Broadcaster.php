@@ -147,7 +147,7 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function extractChannelKeys($pattern, $channel)
     {
-        preg_match('/^'.preg_replace('/{(.*?)}/', '(?<$1>[^\.]+)', $pattern).'/', $channel, $keys);
+        preg_match('/^'.preg_replace('/\{(.*?)\}/', '(?<$1>[^\.]+)', $pattern).'/', $channel, $keys);
 
         return $keys;
     }
@@ -285,7 +285,7 @@ abstract class Broadcaster implements BroadcasterContract
 
         $guards = $options['guards'] ?? null;
 
-        if (null === $guards) {
+        if ($guards === null) {
             return $request->user();
         }
 
@@ -324,6 +324,6 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function channelNameMatchesPattern($channel, $pattern)
     {
-        return Str::is(preg_replace('/{(.*?)}/', '*', $pattern), $channel);
+        return Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel);
     }
 }

@@ -123,7 +123,7 @@ trait EnumeratesValues
         }
 
         if ($this->useAsCallable($key)) {
-            return null !== $this->first($key);
+            return $this->first($key) !== null;
         }
 
         foreach ($this as $item) {
@@ -311,9 +311,9 @@ trait EnumeratesValues
         return $this->map(function ($value) use ($callback) {
             return $callback($value);
         })->filter(function ($value) {
-            return null !== $value;
+            return $value !== null;
         })->reduce(function ($result, $value) {
-            return null === $result || $value < $result ? $value : $result;
+            return $result === null || $value < $result ? $value : $result;
         });
     }
 
@@ -328,11 +328,11 @@ trait EnumeratesValues
         $callback = $this->valueRetriever($callback);
 
         return $this->filter(function ($value) {
-            return null !== $value;
+            return $value !== null;
         })->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
-            return null === $result || $value > $result ? $value : $result;
+            return $result === null || $value > $result ? $value : $result;
         });
     }
 
@@ -386,7 +386,7 @@ trait EnumeratesValues
      */
     public function sum($callback = null)
     {
-        if (null === $callback) {
+        if ($callback === null) {
             $callback = function ($value) {
                 return $value;
             };
@@ -747,7 +747,7 @@ trait EnumeratesValues
      */
     public function countBy($callback = null)
     {
-        if (null === $callback) {
+        if ($callback === null) {
             $callback = function ($value) {
                 return $value;
             };

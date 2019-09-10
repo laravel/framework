@@ -310,7 +310,7 @@ class Command extends SymfonyCommand
      */
     public function argument($key = null)
     {
-        if (null === $key) {
+        if ($key === null) {
             return $this->input->getArguments();
         }
 
@@ -346,7 +346,7 @@ class Command extends SymfonyCommand
      */
     public function option($key = null)
     {
-        if (null === $key) {
+        if ($key === null) {
             return $this->input->getOptions();
         }
 

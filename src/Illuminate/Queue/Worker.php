@@ -174,7 +174,7 @@ class Worker
      */
     protected function timeoutForJob($job, WorkerOptions $options)
     {
-        return $job && null !== $job->timeout() ? $job->timeout() : $options->timeout;
+        return $job && $job->timeout() !== null ? $job->timeout() : $options->timeout;
     }
 
     /**
@@ -221,7 +221,7 @@ class Worker
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
             $this->stop();
-        } elseif ($options->stopWhenEmpty && null === $job) {
+        } elseif ($options->stopWhenEmpty && $job === null) {
             $this->stop();
         }
     }
@@ -261,7 +261,7 @@ class Worker
     {
         try {
             foreach (explode(',', $queue) as $queue) {
-                if (null !== ($job = $connection->pop($queue))) {
+                if (($job = $connection->pop($queue)) !== null) {
                     return $job;
                 }
             }
@@ -389,7 +389,7 @@ class Worker
             // another listener (or this same one). We will re-throw this exception after.
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
                 $job->release(
-                    method_exists($job, 'delaySeconds') && null !== $job->delaySeconds()
+                    method_exists($job, 'delaySeconds') && $job->delaySeconds() !== null
                                 ? $job->delaySeconds()
                                 : $options->delay
                 );

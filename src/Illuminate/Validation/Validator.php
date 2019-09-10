@@ -542,7 +542,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return null !== Arr::get($this->data, $attribute, 0);
+        return Arr::get($this->data, $attribute, 0) !== null;
     }
 
     /**
@@ -735,7 +735,7 @@ class Validator implements ValidatorContract
      */
     public function hasRule($attribute, $rules)
     {
-        return null !== $this->getRule($attribute, $rules);
+        return $this->getRule($attribute, $rules) !== null;
     }
 
     /**

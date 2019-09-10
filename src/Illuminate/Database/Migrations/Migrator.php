@@ -528,7 +528,7 @@ class Migrator
      */
     public function setConnection($name)
     {
-        if (null !== $name) {
+        if ($name !== null) {
             $this->resolver->setDefaultConnection($name);
         }
 
@@ -556,7 +556,7 @@ class Migrator
      */
     protected function getSchemaGrammar($connection)
     {
-        if (null === ($grammar = $connection->getSchemaGrammar())) {
+        if (($grammar = $connection->getSchemaGrammar()) === null) {
             $connection->useDefaultSchemaGrammar();
 
             $grammar = $connection->getSchemaGrammar();

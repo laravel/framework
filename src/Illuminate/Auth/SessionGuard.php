@@ -119,7 +119,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If we've already retrieved the user for the current request we can just
         // return it back immediately. We do not want to fetch the user data on
         // every call to this method because that would be tremendously slow.
-        if (null !== $this->user) {
+        if ($this->user !== null) {
             return $this->user;
         }
 
@@ -128,14 +128,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // First we will try to load the user using the identifier in the session if
         // one exists. Otherwise we will check for a "remember me" cookie in this
         // request, and if one exists, attempt to retrieve the user using that.
-        if (null !== $id && $this->user = $this->provider->retrieveById($id)) {
+        if ($id !== null && $this->user = $this->provider->retrieveById($id)) {
             $this->fireAuthenticatedEvent($this->user);
         }
 
         // If the user is null, but we decrypt a "recaller" cookie we can attempt to
         // pull the user data on that cookie which serves as a remember cookie on
         // the application. Once we have a user we can return it to the caller.
-        if (null === $this->user && null !== ($recaller = $this->recaller())) {
+        if ($this->user === null && ($recaller = $this->recaller()) !== null) {
             $this->user = $this->userFromRecaller($recaller);
 
             if ($this->user) {
@@ -165,9 +165,9 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // the application. Once we have a user we can return it to the caller.
         $this->recallAttempted = true;
 
-        $this->viaRemember = null !== ($user = $this->provider->retrieveByToken(
+        $this->viaRemember = ($user = $this->provider->retrieveByToken(
             $recaller->id(), $recaller->token()
-        ));
+        )) !== null;
 
         return $user;
     }
@@ -179,7 +179,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function recaller()
     {
-        if (null === $this->request) {
+        if ($this->request === null) {
             return;
         }
 
@@ -231,7 +231,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function onceUsingId($id)
     {
-        if (null !== ($user = $this->provider->retrieveById($id))) {
+        if (($user = $this->provider->retrieveById($id)) !== null) {
             $this->setUser($user);
 
             return $user;
@@ -374,7 +374,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function hasValidCredentials($user, $credentials)
     {
-        return null !== $user && $this->provider->validateCredentials($user, $credentials);
+        return $user !== null && $this->provider->validateCredentials($user, $credentials);
     }
 
     /**
@@ -386,7 +386,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function loginUsingId($id, $remember = false)
     {
-        if (null !== ($user = $this->provider->retrieveById($id))) {
+        if (($user = $this->provider->retrieveById($id)) !== null) {
             $this->login($user, $remember);
 
             return $user;
@@ -487,7 +487,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // listening for anytime a user signs out of this application manually.
         $this->clearUserDataFromStorage();
 
-        if (null !== $this->user && ! empty($user->getRememberToken())) {
+        if ($this->user !== null && ! empty($user->getRememberToken())) {
             $this->cycleRememberToken($user);
         }
 
@@ -512,7 +512,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         $this->session->remove($this->getName());
 
-        if (null !== $this->recaller()) {
+        if ($this->recaller() !== null) {
             $this->getCookieJar()->queue($this->getCookieJar()
                     ->forget($this->getRecallerName()));
         }

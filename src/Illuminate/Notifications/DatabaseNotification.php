@@ -52,7 +52,7 @@ class DatabaseNotification extends Model
      */
     public function markAsRead()
     {
-        if (null === $this->read_at) {
+        if ($this->read_at === null) {
             $this->forceFill(['read_at' => $this->freshTimestamp()])->save();
         }
     }
@@ -64,7 +64,7 @@ class DatabaseNotification extends Model
      */
     public function markAsUnread()
     {
-        if (null !== $this->read_at) {
+        if ($this->read_at !== null) {
             $this->forceFill(['read_at' => null])->save();
         }
     }

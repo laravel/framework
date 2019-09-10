@@ -101,7 +101,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      */
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
-        if (null === $retryAfter) {
+        if ($retryAfter === null) {
             return $this->remaining;
         }
 

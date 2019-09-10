@@ -120,7 +120,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             $locales = $fallback ? $this->localeArray($locale) : [$locale];
 
             foreach ($locales as $locale) {
-                if (null !== ($line = $this->getLine($namespace, $group, $locale, $item, $replace))) {
+                if (($line = $this->getLine($namespace, $group, $locale, $item, $replace)) !== null) {
                     return $line ?? $key;
                 }
             }
@@ -323,7 +323,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $segments = parent::parseKey($key);
 
-        if (null === $segments[0]) {
+        if ($segments[0] === null) {
             $segments[0] = '*';
         }
 

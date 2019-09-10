@@ -171,7 +171,7 @@ class LogManager implements LoggerInterface
     {
         $config = $this->configurationFor($name);
 
-        if (null === $config) {
+        if ($config === null) {
             throw new InvalidArgumentException("Log [{$name}] is not defined.");
         }
 

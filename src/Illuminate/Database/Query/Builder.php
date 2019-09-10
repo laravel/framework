@@ -363,7 +363,7 @@ class Builder
                 $column instanceof EloquentBuilder ||
                 $column instanceof Closure
             )) {
-                if (null === $this->columns) {
+                if ($this->columns === null) {
                     $this->select($this->from.'.*');
                 }
 
@@ -678,7 +678,7 @@ class Builder
         // If the value is "null", we will just assume the developer wants to add a
         // where null clause to the query. So, we will allow a short-cut here to
         // that method for convenience so the developer doesn't have to check.
-        if (null === $value) {
+        if ($value === null) {
             return $this->whereNull($column, $boolean, $operator !== '=');
         }
 
@@ -762,7 +762,7 @@ class Builder
      */
     protected function invalidOperatorAndValue($operator, $value)
     {
-        return null === $value && in_array($operator, $this->operators) &&
+        return $value === null && in_array($operator, $this->operators) &&
              ! in_array($operator, ['=', '<>', '!=']);
     }
 
@@ -1971,7 +1971,7 @@ class Builder
     {
         $this->orders = $this->removeExistingOrdersFor($column);
 
-        if (null !== $lastId) {
+        if ($lastId !== null) {
             $this->where($column, '<', $lastId);
         }
 
@@ -1991,7 +1991,7 @@ class Builder
     {
         $this->orders = $this->removeExistingOrdersFor($column);
 
-        if (null !== $lastId) {
+        if ($lastId !== null) {
             $this->where($column, '>', $lastId);
         }
 
@@ -2055,7 +2055,7 @@ class Builder
     {
         $this->lock = $value;
 
-        if (null !== $this->lock) {
+        if ($this->lock !== null) {
             $this->useWritePdo();
         }
 
@@ -2249,7 +2249,7 @@ class Builder
      */
     public function cursor()
     {
-        if (null === $this->columns) {
+        if ($this->columns === null) {
             $this->columns = ['*'];
         }
 
@@ -2287,7 +2287,7 @@ class Builder
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
         $queryResult = $this->onceWithColumns(
-            null === $key ? [$column] : [$column, $key],
+            $key === null ? [$column] : [$column, $key],
             function () {
                 return $this->processor->processSelect(
                     $this, $this->runSelect()
@@ -2319,7 +2319,7 @@ class Builder
      */
     protected function stripTableForPluck($column)
     {
-        return null === $column ? $column : last(preg_split('~[. ]~', $column));
+        return $column === null ? $column : last(preg_split('~\.| ~', $column));
     }
 
     /**
@@ -2334,7 +2334,7 @@ class Builder
     {
         $results = [];
 
-        if (null === $key) {
+        if ($key === null) {
             foreach ($queryResult as $row) {
                 $results[] = $row->$column;
             }
@@ -2359,7 +2359,7 @@ class Builder
     {
         $results = [];
 
-        if (null === $key) {
+        if ($key === null) {
             foreach ($queryResult as $row) {
                 $results[] = $row[$column];
             }
@@ -2566,7 +2566,7 @@ class Builder
     {
         $original = $this->columns;
 
-        if (null === $original) {
+        if ($original === null) {
             $this->columns = $columns;
         }
 
@@ -2764,7 +2764,7 @@ class Builder
         // If an ID is passed to the method, we will set the where clause to check the
         // ID to let developers to simply and quickly remove a single row from this
         // database without manually specifying the "where" clauses on the query.
-        if (null !== $id) {
+        if ($id !== null) {
             $this->where($this->from.'.id', '=', $id);
         }
 
