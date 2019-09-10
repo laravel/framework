@@ -166,7 +166,7 @@ class TestResponse
             $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
-        if (null !== $uri) {
+        if ($uri !== null) {
             $this->assertLocation($uri);
         }
 
@@ -188,7 +188,7 @@ class TestResponse
 
         $actual = $this->headers->get($headerName);
 
-        if (null !== $value) {
+        if ($value !== null) {
             PHPUnit::assertEquals(
                 $value, $this->headers->get($headerName),
                 "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
@@ -258,7 +258,7 @@ class TestResponse
             "Cookie [{$cookieName}] not present on response."
         );
 
-        if (! $cookie || null === $value) {
+        if (! $cookie || $value === null) {
             return $this;
         }
 
@@ -595,11 +595,11 @@ class TestResponse
      */
     public function assertJsonStructure(array $structure = null, $responseData = null)
     {
-        if (null === $structure) {
+        if ($structure === null) {
             return $this->assertExactJson($this->json());
         }
 
-        if (null === $responseData) {
+        if ($responseData === null) {
             $responseData = $this->decodeResponseJson();
         }
 
@@ -722,7 +722,7 @@ class TestResponse
 
         $errors = $json[$responseKey];
 
-        if (null === $keys && count($errors) > 0) {
+        if ($keys === null && count($errors) > 0) {
             PHPUnit::fail(
                 'Response has unexpected validation errors: '.PHP_EOL.PHP_EOL.
                 json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
@@ -749,7 +749,7 @@ class TestResponse
     {
         $decodedResponse = json_decode($this->getContent(), true);
 
-        if (null === $decodedResponse || $decodedResponse === false) {
+        if ($decodedResponse === null || $decodedResponse === false) {
             if ($this->exception) {
                 throw $this->exception;
             } else {
@@ -801,7 +801,7 @@ class TestResponse
 
         $this->ensureResponseHasView();
 
-        if (null === $value) {
+        if ($value === null) {
             PHPUnit::assertArrayHasKey($key, $this->original->gatherData());
         } elseif ($value instanceof Closure) {
             PHPUnit::assertTrue($value($this->original->gatherData()[$key]));
@@ -888,7 +888,7 @@ class TestResponse
             return $this->assertSessionHasAll($key);
         }
 
-        if (null === $value) {
+        if ($value === null) {
             PHPUnit::assertTrue(
                 $this->session()->has($key),
                 "Session is missing expected key [{$key}]."
@@ -942,7 +942,7 @@ class TestResponse
             return $this;
         }
 
-        if (null === $value) {
+        if ($value === null) {
             PHPUnit::assertTrue(
                 $this->session()->getOldInput($key),
                 "Session is missing expected key [{$key}]."
@@ -999,7 +999,7 @@ class TestResponse
             return $this->assertSessionHasNoErrors();
         }
 
-        if (null === $this->session()->get('errors')) {
+        if ($this->session()->get('errors') === null) {
             PHPUnit::assertTrue(true);
 
             return $this;
@@ -1122,7 +1122,7 @@ class TestResponse
      */
     public function streamedContent()
     {
-        if (null !== $this->streamedContent) {
+        if ($this->streamedContent !== null) {
             return $this->streamedContent;
         }
 

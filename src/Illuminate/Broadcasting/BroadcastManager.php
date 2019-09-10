@@ -110,7 +110,7 @@ class BroadcastManager implements FactoryContract
     {
         $connection = $event instanceof ShouldBroadcastNow ? 'sync' : null;
 
-        if (null === $connection && isset($event->connection)) {
+        if ($connection === null && isset($event->connection)) {
             $connection = $event->connection;
         }
 
@@ -265,7 +265,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        if (null !== $name && $name !== 'null') {
+        if ($name !== null && $name !== 'null') {
             return $this->app['config']["broadcasting.connections.{$name}"];
         }
 

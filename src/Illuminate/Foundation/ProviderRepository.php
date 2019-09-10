@@ -106,7 +106,7 @@ class ProviderRepository
      */
     public function shouldRecompile($manifest, $providers)
     {
-        return null === $manifest || $manifest['providers'] != $providers;
+        return $manifest === null || $manifest['providers'] != $providers;
     }
 
     /**

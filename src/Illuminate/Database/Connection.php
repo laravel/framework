@@ -247,7 +247,7 @@ class Connection implements ConnectionInterface
      */
     public function getSchemaBuilder()
     {
-        if (null === $this->schemaGrammar) {
+        if ($this->schemaGrammar === null) {
             $this->useDefaultSchemaGrammar();
         }
 
@@ -767,7 +767,7 @@ class Connection implements ConnectionInterface
      */
     protected function reconnectIfMissingConnection()
     {
-        if (null === $this->pdo) {
+        if ($this->pdo === null) {
             $this->reconnect();
         }
     }
@@ -895,7 +895,7 @@ class Connection implements ConnectionInterface
      */
     public function getDoctrineConnection()
     {
-        if (null === $this->doctrineConnection) {
+        if ($this->doctrineConnection === null) {
             $driver = $this->getDoctrineDriver();
 
             $this->doctrineConnection = new DoctrineConnection(array_filter([

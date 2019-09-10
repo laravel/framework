@@ -158,15 +158,15 @@ class PostgresGrammar extends Grammar
     {
         $sql = parent::compileForeign($blueprint, $command);
 
-        if (null !== $command->deferrable) {
+        if ($command->deferrable !== null) {
             $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
         }
 
-        if ($command->deferrable && null !== $command->initiallyImmediate) {
+        if ($command->deferrable && $command->initiallyImmediate !== null) {
             $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
         }
 
-        if (null !== $command->notValid) {
+        if ($command->notValid !== null) {
             $sql .= ' not valid';
         }
 
@@ -526,11 +526,11 @@ class PostgresGrammar extends Grammar
      */
     protected function generatableColumn($type, Fluent $column)
     {
-        if (! $column->autoIncrement && null === $column->generatedAs) {
+        if (! $column->autoIncrement && $column->generatedAs === null) {
             return $type;
         }
 
-        if ($column->autoIncrement && null === $column->generatedAs) {
+        if ($column->autoIncrement && $column->generatedAs === null) {
             return with([
                 'integer' => 'serial',
                 'bigint' => 'bigserial',
@@ -888,7 +888,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if (null !== $column->collation) {
+        if ($column->collation !== null) {
             return ' collate '.$this->wrapValue($column->collation);
         }
     }
@@ -914,7 +914,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (null !== $column->default) {
+        if ($column->default !== null) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }

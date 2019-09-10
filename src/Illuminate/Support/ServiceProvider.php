@@ -194,7 +194,7 @@ abstract class ServiceProvider
      */
     public static function pathsToPublish($provider = null, $group = null)
     {
-        if (null !== ($paths = static::pathsForProviderOrGroup($provider, $group))) {
+        if (($paths = static::pathsForProviderOrGroup($provider, $group)) !== null) {
             return $paths;
         }
 

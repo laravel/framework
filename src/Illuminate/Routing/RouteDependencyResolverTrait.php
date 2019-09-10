@@ -46,7 +46,7 @@ trait RouteDependencyResolverTrait
                 $parameter, $parameters
             );
 
-            if (null !== $instance) {
+            if ($instance !== null) {
                 $instanceCount++;
 
                 $this->spliceIntoParameters($parameters, $key, $instance);
@@ -89,9 +89,9 @@ trait RouteDependencyResolverTrait
      */
     protected function alreadyInParameters($class, array $parameters)
     {
-        return null !== Arr::first($parameters, function ($value) use ($class) {
+        return Arr::first($parameters, function ($value) use ($class) {
             return $value instanceof $class;
-        });
+        }) !== null;
     }
 
     /**

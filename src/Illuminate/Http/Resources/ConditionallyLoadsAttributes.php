@@ -32,7 +32,7 @@ trait ConditionallyLoadsAttributes
                 );
             }
 
-            if ($value instanceof self && null === $value->resource) {
+            if ($value instanceof self && $value->resource === null) {
                 $data[$key] = null;
             }
         }

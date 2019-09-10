@@ -157,7 +157,7 @@ class Listener
             "--sleep={$options->sleep}",
             "--tries={$options->maxTries}",
         ], function ($value) {
-            return null !== $value;
+            return $value !== null;
         });
     }
 

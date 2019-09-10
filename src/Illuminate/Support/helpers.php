@@ -39,7 +39,7 @@ if (! function_exists('blank')) {
      */
     function blank($value)
     {
-        if (null === $value) {
+        if ($value === null) {
             return true;
         }
 
@@ -136,13 +136,13 @@ if (! function_exists('data_get')) {
      */
     function data_get($target, $key, $default = null)
     {
-        if (null === $key) {
+        if ($key === null) {
             return $target;
         }
 
         $key = is_array($key) ? $key : explode('.', $key);
 
-        while (null !== ($segment = array_shift($key))) {
+        while (($segment = array_shift($key)) !== null) {
             if ($segment === '*') {
                 if ($target instanceof Collection) {
                     $target = $target->all();
@@ -316,7 +316,7 @@ if (! function_exists('object_get')) {
      */
     function object_get($object, $key, $default = null)
     {
-        if (null === $key || trim($key) === '') {
+        if ($key === null || trim($key) === '') {
             return $object;
         }
 
@@ -342,9 +342,9 @@ if (! function_exists('optional')) {
      */
     function optional($value = null, callable $callback = null)
     {
-        if (null === $callback) {
+        if ($callback === null) {
             return new Optional($value);
-        } elseif (null !== $value) {
+        } elseif ($value !== null) {
             return $callback($value);
         }
     }
@@ -417,7 +417,7 @@ if (! function_exists('tap')) {
      */
     function tap($value, $callback = null)
     {
-        if (null === $callback) {
+        if ($callback === null) {
             return new HigherOrderTapProxy($value);
         }
 
@@ -545,6 +545,6 @@ if (! function_exists('with')) {
      */
     function with($value, callable $callback = null)
     {
-        return null === $callback ? $value : $callback($value);
+        return $callback === null ? $value : $callback($value);
     }
 }
