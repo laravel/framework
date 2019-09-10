@@ -3,7 +3,6 @@
 namespace Illuminate\Validation\Concerns;
 
 use Countable;
-use Exception;
 use DateTime;
 use DateTimeInterface;
 use Egulias\EmailValidator\EmailValidator;
@@ -12,6 +11,7 @@ use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Egulias\EmailValidator\Validation\SpoofCheckValidation;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
