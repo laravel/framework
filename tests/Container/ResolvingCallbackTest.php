@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Container;
 
-use stdClass;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ResolvingCallbackTest extends TestCase
 {

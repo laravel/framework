@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class RedirectController extends Controller
 {

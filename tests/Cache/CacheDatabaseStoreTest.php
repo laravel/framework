@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Cache;
 
 use Closure;
-use stdClass;
 use Exception;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheDatabaseStoreTest extends TestCase
 {

@@ -3,8 +3,8 @@
 namespace Illuminate\Database;
 
 use Exception;
-use PDOException;
 use Illuminate\Support\Str;
+use PDOException;
 
 trait DetectsConcurrencyErrors
 {

@@ -3,33 +3,33 @@
 namespace Illuminate\Tests\Routing;
 
 use DateTime;
-use stdClass;
 use Exception;
-use LogicException;
-use Illuminate\Support\Str;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Route;
-use UnexpectedValueException;
-use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Routing\RouteGroup;
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Auth\Middleware\Authorize;
-use Illuminate\Routing\ResourceRegistrar;
-use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\ResourceRegistrar;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteGroup;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Str;
+use LogicException;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use UnexpectedValueException;
 
 class RoutingRouteTest extends TestCase
 {

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class UsePusherChannelConventionsTest extends TestCase
 {

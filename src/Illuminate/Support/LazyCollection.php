@@ -2,12 +2,12 @@
 
 namespace Illuminate\Support;
 
-use Closure;
-use stdClass;
 use ArrayIterator;
-use IteratorAggregate;
-use Illuminate\Support\Traits\Macroable;
+use Closure;
 use Illuminate\Support\Traits\EnumeratesValues;
+use Illuminate\Support\Traits\Macroable;
+use IteratorAggregate;
+use stdClass;
 
 class LazyCollection implements Enumerable
 {

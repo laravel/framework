@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Validation;
 
 use Illuminate\Http\Request;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Validation\ValidationException;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

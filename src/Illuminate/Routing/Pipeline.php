@@ -3,9 +3,9 @@
 namespace Illuminate\Routing;
 
 use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
 
 /**

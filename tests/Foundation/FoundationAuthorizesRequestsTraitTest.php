@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\Access\Gate;
-use Illuminate\Container\Container;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Auth\Access\Gate;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use PHPUnit\Framework\TestCase;
 
 class FoundationAuthorizesRequestsTraitTest extends TestCase
 {

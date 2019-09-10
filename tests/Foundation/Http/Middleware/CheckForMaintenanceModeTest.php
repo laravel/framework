@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Mockery as m;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Http\Exceptions\MaintenanceModeException;
+use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Http\Request;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CheckForMaintenanceModeTest extends TestCase
 {

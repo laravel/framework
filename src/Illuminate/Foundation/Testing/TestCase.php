@@ -2,16 +2,16 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Mockery;
-use Throwable;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Database\Eloquent\Model;
-use Mockery\Exception\InvalidCountException;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Str;
+use Mockery;
+use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Throwable;
 
 abstract class TestCase extends BaseTestCase
 {

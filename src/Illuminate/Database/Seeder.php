@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\Arr;
-use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 abstract class Seeder
 {

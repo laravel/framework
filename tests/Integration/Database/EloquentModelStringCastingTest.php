@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use stdClass;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Schema\Blueprint;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * @group integration
