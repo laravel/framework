@@ -135,7 +135,7 @@ class SqsQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return string
      */
-    public function getQueue($queue)
+    public function getQueue($queue = null)
     {
         $queue = $queue ?: $this->default;
 
