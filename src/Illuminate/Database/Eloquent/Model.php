@@ -278,7 +278,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         static::$ignoreOnTouch = array_values(array_merge(static::$ignoreOnTouch, $models));
 
         try {
-            call_user_func($callback);
+            $callback();
         } finally {
             static::$ignoreOnTouch = array_values(array_diff(static::$ignoreOnTouch, $models));
         }

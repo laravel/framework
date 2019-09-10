@@ -90,7 +90,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
         try {
             $contents = $this->renderContents();
 
-            $response = isset($callback) ? call_user_func($callback, $this, $contents) : null;
+            $response = isset($callback) ? $callback($this, $contents) : null;
 
             // Once we have the contents of the view, we will flush the sections if we are
             // done rendering all views so that there is nothing left hanging over when

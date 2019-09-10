@@ -936,7 +936,7 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         foreach ($this->items as $key => $item) {
-            if (call_user_func($value, $item, $key)) {
+            if ($value($item, $key)) {
                 return $key;
             }
         }

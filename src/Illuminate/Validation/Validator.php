@@ -286,7 +286,7 @@ class Validator implements ValidatorContract
         // fire them off. This gives the callbacks a chance to perform all kinds
         // of other validation that needs to get wrapped up in this operation.
         foreach ($this->after as $after) {
-            call_user_func($after);
+            $after();
         }
 
         return $this->messages->isEmpty();
@@ -870,7 +870,7 @@ class Validator implements ValidatorContract
     {
         $payload = new Fluent($this->getData());
 
-        if (call_user_func($callback, $payload)) {
+        if ($callback($payload)) {
             foreach ((array) $attribute as $key) {
                 $this->addRules([$key => $rules]);
             }

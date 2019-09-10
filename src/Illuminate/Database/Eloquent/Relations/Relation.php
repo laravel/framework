@@ -87,7 +87,7 @@ abstract class Relation
         // off of the bindings, leaving only the constraints that the developers put
         // as "extra" on the relationships, and not original relation constraints.
         try {
-            return call_user_func($callback);
+            return $callback();
         } finally {
             static::$constraints = $previous;
         }
