@@ -47,7 +47,7 @@ class RouteCompiler
      */
     protected function getOptionalParameters()
     {
-        preg_match_all('/{(\w+?)\?}/', $this->route->uri(), $matches);
+        preg_match_all('/\{(\w+?)\?\}/', $this->route->uri(), $matches);
 
         return isset($matches[1]) ? array_fill_keys($matches[1], null) : [];
     }
