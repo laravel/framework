@@ -1613,15 +1613,7 @@ trait ValidatesAttributes
      */
     public function validateTimezone($attribute, $value)
     {
-        try {
-            new DateTimeZone($value);
-        } catch (Exception $e) {
-            return false;
-        } catch (Throwable $e) {
-            return false;
-        }
-
-        return true;
+        return in_array($value, timezone_identifiers_list(), true);
     }
 
     /**
