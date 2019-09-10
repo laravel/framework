@@ -2,28 +2,28 @@
 
 namespace Illuminate\Validation\Concerns;
 
-use DateTime;
 use Countable;
-use Exception;
-use Throwable;
-use DateTimeZone;
+use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\DNSCheckValidation;
+use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
+use Egulias\EmailValidator\Validation\RFCValidation;
+use Egulias\EmailValidator\Validation\SpoofCheckValidation;
+use Exception;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
-use Egulias\EmailValidator\EmailValidator;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\File\File;
-use Egulias\EmailValidator\Validation\RFCValidation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Egulias\EmailValidator\Validation\DNSCheckValidation;
-use Egulias\EmailValidator\Validation\SpoofCheckValidation;
-use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
-use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
+use Throwable;
 
 trait ValidatesAttributes
 {

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Console;
 
-use RuntimeException;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use RuntimeException;
 
 class ViewClearCommand extends Command
 {

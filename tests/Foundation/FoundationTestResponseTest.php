@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Mockery as m;
-use JsonSerializable;
-use Illuminate\Http\Response;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\View\View;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Model;
-use PHPUnit\Framework\AssertionFailedError;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Http\Response;
+use JsonSerializable;
+use Mockery as m;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase

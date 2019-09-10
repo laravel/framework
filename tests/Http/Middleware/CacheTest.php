@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Http\Middleware;
 
+use Illuminate\Http\Middleware\SetCacheHeaders as Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Http\Middleware\SetCacheHeaders as Cache;
 
 class CacheTest extends TestCase
 {

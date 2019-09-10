@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Queue;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

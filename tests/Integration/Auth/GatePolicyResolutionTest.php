@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Illuminate\Tests\Integration\Auth\Fixtures\Policies\AuthenticationTestUserPolicy;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

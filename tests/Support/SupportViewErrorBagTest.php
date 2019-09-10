@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use PHPUnit\Framework\TestCase;
 
 class SupportViewErrorBagTest extends TestCase
 {

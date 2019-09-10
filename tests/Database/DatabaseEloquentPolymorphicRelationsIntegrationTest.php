@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
 {

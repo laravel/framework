@@ -2,9 +2,9 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
-use Illuminate\Contracts\Support\DeferrableProvider;
 
 class CacheServiceProvider extends ServiceProvider implements DeferrableProvider
 {

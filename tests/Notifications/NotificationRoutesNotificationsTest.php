@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use stdClass;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Notifications\Dispatcher;
+use Illuminate\Notifications\RoutesNotifications;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Notifications\RoutesNotifications;
-use Illuminate\Contracts\Notifications\Dispatcher;
+use stdClass;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {

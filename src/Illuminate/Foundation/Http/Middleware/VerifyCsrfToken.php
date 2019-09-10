@@ -3,12 +3,12 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\InteractsWithTime;
-use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Session\TokenMismatchException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\InteractsWithTime;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class VerifyCsrfToken
 {

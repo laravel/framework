@@ -3,10 +3,10 @@
 namespace Illuminate\Support;
 
 use Countable;
-use JsonSerializable;
-use IteratorAggregate;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use IteratorAggregate;
+use JsonSerializable;
 
 interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {

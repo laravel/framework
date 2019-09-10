@@ -3,14 +3,14 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use Throwable;
-use Illuminate\Support\Carbon;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\DetectsLostConnections;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Queue\Factory as QueueManager;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\Factory as QueueManager;
+use Illuminate\Database\DetectsLostConnections;
+use Illuminate\Support\Carbon;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class Worker
 {

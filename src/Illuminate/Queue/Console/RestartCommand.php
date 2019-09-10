@@ -3,8 +3,8 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Support\InteractsWithTime;
 
 class RestartCommand extends Command
 {

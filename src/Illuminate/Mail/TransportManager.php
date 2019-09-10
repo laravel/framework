@@ -3,18 +3,18 @@
 namespace Illuminate\Mail;
 
 use Aws\Ses\SesClient;
-use Illuminate\Support\Arr;
-use Psr\Log\LoggerInterface;
-use Illuminate\Log\LogManager;
-use Illuminate\Support\Manager;
 use GuzzleHttp\Client as HttpClient;
-use Swift_SmtpTransport as SmtpTransport;
-use Illuminate\Mail\Transport\LogTransport;
-use Illuminate\Mail\Transport\SesTransport;
-use Postmark\Transport as PostmarkTransport;
+use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
+use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\MailgunTransport;
+use Illuminate\Mail\Transport\SesTransport;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Manager;
+use Postmark\Transport as PostmarkTransport;
+use Psr\Log\LoggerInterface;
 use Swift_SendmailTransport as SendmailTransport;
+use Swift_SmtpTransport as SmtpTransport;
 
 class TransportManager extends Manager
 {

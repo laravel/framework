@@ -2,17 +2,17 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
-use Mockery as m;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Auth\RequestGuard;
-use Illuminate\Container\Container;
-use Illuminate\Auth\EloquentUserProvider;
-use Illuminate\Config\Repository as Config;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\RequestGuard;
+use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
+use Illuminate\Http\Request;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class AuthenticateMiddlewareTest extends TestCase
 {

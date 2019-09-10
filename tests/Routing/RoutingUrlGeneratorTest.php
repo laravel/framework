@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\UrlGenerator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 

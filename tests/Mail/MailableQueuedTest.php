@@ -2,20 +2,20 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Mockery as m;
-use Swift_Mailer;
-use Illuminate\Mail\Mailer;
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Foundation\Application;
-use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Foundation\Application;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailer;
+use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Swift_Mailer;
 
 class MailableQueuedTest extends TestCase
 {

@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\ProviderRepository;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Support\ServiceProvider;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class FoundationProviderRepositoryTest extends TestCase
 {

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Throwable;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
+use Throwable;
 
 /**
  * @group integration

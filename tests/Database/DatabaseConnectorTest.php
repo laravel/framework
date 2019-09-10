@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use PDO;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connectors\Connector;
 use Illuminate\Database\Connectors\MySqlConnector;
-use Illuminate\Database\Connectors\SQLiteConnector;
 use Illuminate\Database\Connectors\PostgresConnector;
+use Illuminate\Database\Connectors\SQLiteConnector;
 use Illuminate\Database\Connectors\SqlServerConnector;
+use Mockery as m;
+use PDO;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseConnectorTest extends TestCase
 {

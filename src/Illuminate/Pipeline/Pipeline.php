@@ -4,11 +4,11 @@ namespace Illuminate\Pipeline;
 
 use Closure;
 use Exception;
-use Throwable;
-use RuntimeException;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
+use RuntimeException;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class Pipeline implements PipelineContract
 {

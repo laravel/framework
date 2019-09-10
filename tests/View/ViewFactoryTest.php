@@ -3,23 +3,23 @@
 namespace Illuminate\Tests\View;
 
 use Closure;
-use stdClass;
-use Mockery as m;
 use ErrorException;
-use ReflectionFunction;
-use Illuminate\View\View;
-use Illuminate\View\Factory;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\View\Engine;
-use Illuminate\View\Engines\PhpEngine;
-use Illuminate\View\ViewFinderInterface;
+use Illuminate\Events\Dispatcher;
+use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
-use Illuminate\View\Compilers\CompilerInterface;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\View\Engines\PhpEngine;
+use Illuminate\View\Factory;
+use Illuminate\View\View;
+use Illuminate\View\ViewFinderInterface;
+use InvalidArgumentException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionFunction;
+use stdClass;
 
 class ViewFactoryTest extends TestCase
 {

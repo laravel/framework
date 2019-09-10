@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Testing;
 
 use ArrayAccess;
-use PHPUnit\Util\InvalidArgumentHelper;
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\Constraint\ArraySubset;
+use PHPUnit\Util\InvalidArgumentHelper;
 
 /**
  * @internal This class is not meant to be used or overwritten outside the framework itself.

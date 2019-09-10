@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Mockery as m;
-use Illuminate\Bus\Queueable;
 use Illuminate\Bus\Dispatcher;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\CallQueuedHandler;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Queue\CallQueuedHandler;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Event;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

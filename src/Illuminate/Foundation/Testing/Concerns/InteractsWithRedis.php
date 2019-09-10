@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Exception;
-use Illuminate\Redis\RedisManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Redis\RedisManager;
 
 trait InteractsWithRedis
 {

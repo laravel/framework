@@ -2,9 +2,9 @@
 
 namespace Illuminate\Pipeline;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Contracts\Pipeline\Hub as PipelineHubContract;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\ServiceProvider;
 
 class PipelineServiceProvider extends ServiceProvider implements DeferrableProvider
 {
