@@ -2838,8 +2838,14 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'Africa/Windhoek'], ['foo' => 'Timezone']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => 'africa/windhoek'], ['foo' => 'Timezone']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => 'GMT'], ['foo' => 'Timezone']);
-        $this->assertTrue($v->passes());
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'GB'], ['foo' => 'Timezone']);
+        $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => ['this_is_not_a_timezone']], ['foo' => 'Timezone']);
         $this->assertFalse($v->passes());
