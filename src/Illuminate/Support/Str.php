@@ -199,7 +199,7 @@ class Str
     }
 
     /**
-     * Transliterate a UTF-8 value to ASCII.
+     * Determine if a given string is 7 bit ASCII.
      *
      * @param  string  $value
      * @return bool
