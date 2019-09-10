@@ -152,7 +152,7 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         $models->filter(function ($model) use ($name) {
-            return ! is_null($model) && ! $model->relationLoaded($name);
+            return null !== $model && ! $model->relationLoaded($name);
         })->load($relation);
 
         if (empty($path)) {
@@ -335,7 +335,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function unique($key = null, $strict = false)
     {
-        if (! is_null($key)) {
+        if (null !== $key) {
             return parent::unique($key, $strict);
         }
 
@@ -350,7 +350,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function only($keys)
     {
-        if (is_null($keys)) {
+        if (null === $keys) {
             return new static($this->items);
         }
 
@@ -402,7 +402,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function getDictionary($items = null)
     {
-        $items = is_null($items) ? $this->items : $items;
+        $items = null === $items ? $this->items : $items;
 
         $dictionary = [];
 

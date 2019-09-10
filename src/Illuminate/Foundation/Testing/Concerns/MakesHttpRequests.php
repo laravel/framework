@@ -92,7 +92,7 @@ trait MakesHttpRequests
      */
     public function withoutMiddleware($middleware = null)
     {
-        if (is_null($middleware)) {
+        if (null === $middleware) {
             $this->app->instance('middleware.disable', true);
 
             return $this;
@@ -118,7 +118,7 @@ trait MakesHttpRequests
      */
     public function withMiddleware($middleware = null)
     {
-        if (is_null($middleware)) {
+        if (null === $middleware) {
             unset($this->app['middleware.disable']);
 
             return $this;

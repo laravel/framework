@@ -43,7 +43,7 @@ class MessageSelector
     private function extract($segments, $number)
     {
         foreach ($segments as $part) {
-            if (! is_null($line = $this->extractFromString($part, $number))) {
+            if (null !== ($line = $this->extractFromString($part, $number))) {
                 return $line;
             }
         }
@@ -58,7 +58,7 @@ class MessageSelector
      */
     private function extractFromString($part, $number)
     {
-        preg_match('/^[\{\[]([^\[\]\{\}]*)[\}\]](.*)/s', $part, $matches);
+        preg_match('/^[{\[]([^\[\]{}]*)[}\]](.*)/s', $part, $matches);
 
         if (count($matches) !== 3) {
             return;

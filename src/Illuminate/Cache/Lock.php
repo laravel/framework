@@ -42,7 +42,7 @@ abstract class Lock implements LockContract
      */
     public function __construct($name, $seconds, $owner = null)
     {
-        if (is_null($owner)) {
+        if (null === $owner) {
             $owner = Str::random();
         }
 

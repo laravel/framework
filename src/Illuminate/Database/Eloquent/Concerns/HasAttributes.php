@@ -250,7 +250,7 @@ trait HasAttributes
             // If the value is null, we'll still go ahead and set it in this list of
             // attributes since null is used to represent empty relationships if
             // if it a has one or belongs to type relationships on the models.
-            elseif (is_null($value)) {
+            elseif (null === $value) {
                 $relation = $value;
             }
 
@@ -264,7 +264,7 @@ trait HasAttributes
             // If the relation value has been set, we will set it on this attributes
             // list for returning. If it was not arrayable or null, we'll not set
             // the value on the array because it is some type of invalid value.
-            if (isset($relation) || is_null($value)) {
+            if (isset($relation) || null === $value) {
                 $attributes[$key] = $relation;
             }
 
@@ -360,8 +360,7 @@ trait HasAttributes
         // If the attribute is listed as a date, we will convert it to a DateTime
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
-        if (in_array($key, $this->getDates()) &&
-            ! is_null($value)) {
+        if (null !== $value && in_array($key, $this->getDates())) {
             return $this->asDateTime($value);
         }
 
@@ -415,7 +414,7 @@ trait HasAttributes
         $relation = $this->$method();
 
         if (! $relation instanceof Relation) {
-            if (is_null($relation)) {
+            if ($relation === null) {
                 throw new LogicException(sprintf(
                     '%s::%s must return a relationship instance, but "null" was returned. Was the "return" keyword used?', static::class, $method
                 ));
@@ -477,7 +476,7 @@ trait HasAttributes
      */
     protected function castAttribute($key, $value)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             return $value;
         }
 
@@ -580,7 +579,7 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isJsonCastable($key) && ! is_null($value)) {
+        if (null !== $value && $this->isJsonCastable($key)) {
             $value = $this->castAttributeAsJson($key, $value);
         }
 
@@ -1167,7 +1166,7 @@ trait HasAttributes
 
         if ($current === $original) {
             return true;
-        } elseif (is_null($current)) {
+        } elseif (null === $current) {
             return false;
         } elseif ($this->isDateAttribute($key)) {
             return $this->fromDateTime($current) ===

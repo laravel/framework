@@ -404,7 +404,7 @@ class BelongsToMany extends Relation
             return $this;
         }
 
-        if (is_null($value)) {
+        if (null === $value) {
             throw new InvalidArgumentException('The provided value may not be null.');
         }
 
@@ -434,7 +434,7 @@ class BelongsToMany extends Relation
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (is_null($instance = $this->find($id, $columns))) {
+        if (null === ($instance = $this->find($id, $columns))) {
             $instance = $this->related->newInstance();
         }
 
@@ -449,7 +449,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrNew(array $attributes)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (null === ($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes);
         }
 
@@ -466,7 +466,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrCreate(array $attributes, array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (null === ($instance = $this->where($attributes)->first())) {
             $instance = $this->create($attributes, $joining, $touch);
         }
 
@@ -484,7 +484,7 @@ class BelongsToMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (null === ($instance = $this->where($attributes)->first())) {
             return $this->create($values, $joining, $touch);
         }
 
@@ -540,7 +540,7 @@ class BelongsToMany extends Relation
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
-        } elseif (! is_null($result)) {
+        } elseif (null !== $result) {
             return $result;
         }
 
@@ -570,7 +570,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (null !== ($model = $this->first($columns))) {
             return $model;
         }
 
@@ -584,7 +584,7 @@ class BelongsToMany extends Relation
      */
     public function getResults()
     {
-        return ! is_null($this->parent->{$this->parentKey})
+        return null !== $this->parent->{$this->parentKey}
                 ? $this->get()
                 : $this->related->newCollection();
     }

@@ -89,7 +89,7 @@ class PackageManifest
      */
     protected function getManifest()
     {
-        if (! is_null($this->manifest)) {
+        if (null !== $this->manifest) {
             return $this->manifest;
         }
 

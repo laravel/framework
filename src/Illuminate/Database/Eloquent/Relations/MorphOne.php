@@ -17,7 +17,7 @@ class MorphOne extends MorphOneOrMany
      */
     public function getResults()
     {
-        if (is_null($this->getParentKey())) {
+        if (null === $this->getParentKey()) {
             return $this->getDefaultFor($this->parent);
         }
 

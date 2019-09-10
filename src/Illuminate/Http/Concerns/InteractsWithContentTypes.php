@@ -107,7 +107,7 @@ trait InteractsWithContentTypes
             foreach ($contentTypes as $contentType) {
                 $type = $contentType;
 
-                if (! is_null($mimeType = $this->getMimeType($contentType))) {
+                if (null !== ($mimeType = $this->getMimeType($contentType))) {
                     $type = $mimeType;
                 }
 

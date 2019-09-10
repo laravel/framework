@@ -56,7 +56,7 @@ class RouteBinding
     public static function forModel($container, $class, $callback = null)
     {
         return function ($value) use ($container, $class, $callback) {
-            if (is_null($value)) {
+            if (null === $value) {
                 return;
             }
 

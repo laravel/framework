@@ -300,7 +300,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         $pipeline = $this->client()->pipeline();
 
-        return is_null($callback)
+        return null === $callback
             ? $pipeline
             : tap($pipeline, $callback)->exec();
     }
@@ -315,7 +315,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         $transaction = $this->client()->multi();
 
-        return is_null($callback)
+        return null === $callback
             ? $transaction
             : tap($transaction, $callback)->exec();
     }

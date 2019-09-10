@@ -190,7 +190,7 @@ class Gate implements GateContract
                 $policy, $user, $ability, $arguments
             );
 
-            if (! is_null($result)) {
+            if (null !== $result) {
                 return $result;
             }
 
@@ -362,7 +362,7 @@ class Gate implements GateContract
             $user, $ability, $arguments
         );
 
-        if (is_null($result)) {
+        if (null === $result) {
             $result = $this->callAuthCallback($user, $ability, $arguments);
         }
 
@@ -384,11 +384,11 @@ class Gate implements GateContract
      */
     protected function canBeCalledWithUser($user, $class, $method = null)
     {
-        if (! is_null($user)) {
+        if (null !== $user) {
             return true;
         }
 
-        if (! is_null($method)) {
+        if (null !== $method) {
             return $this->methodAllowsGuests($class, $method);
         }
 
@@ -451,7 +451,7 @@ class Gate implements GateContract
     protected function parameterAllowsGuests($parameter)
     {
         return ($parameter->getClass() && $parameter->allowsNull()) ||
-               ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
+               ($parameter->isDefaultValueAvailable() && null === $parameter->getDefaultValue());
     }
 
     /**
@@ -484,7 +484,7 @@ class Gate implements GateContract
                 continue;
             }
 
-            if (! is_null($result = $before($user, $ability, $arguments))) {
+            if (null !== ($result = $before($user, $ability, $arguments))) {
                 return $result;
             }
         }
@@ -525,7 +525,7 @@ class Gate implements GateContract
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
         if (isset($arguments[0]) &&
-            ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
+            null !== ($policy = $this->getPolicyFor($arguments[0])) &&
             $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
             return $callback;
         }
@@ -650,7 +650,7 @@ class Gate implements GateContract
             // When we receive a non-null result from this before method, we will return it
             // as the "final" results. This will allow developers to override the checks
             // in this policy to return the result for all rules defined in the class.
-            if (! is_null($result)) {
+            if (null !== $result) {
                 return $result;
             }
 

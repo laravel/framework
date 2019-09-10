@@ -180,7 +180,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (is_null($instance = $this->find($id, $columns))) {
+        if (null === ($instance = $this->find($id, $columns))) {
             $instance = $this->related->newInstance();
 
             $this->setForeignAttributesForCreate($instance);
@@ -198,7 +198,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function firstOrNew(array $attributes, array $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (null === ($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes + $values);
 
             $this->setForeignAttributesForCreate($instance);
@@ -216,7 +216,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function firstOrCreate(array $attributes, array $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (null === ($instance = $this->where($attributes)->first())) {
             $instance = $this->create($attributes + $values);
         }
 

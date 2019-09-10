@@ -31,7 +31,7 @@ trait WithFaker
      */
     protected function faker($locale = null)
     {
-        return is_null($locale) ? $this->faker : $this->makeFaker($locale);
+        return null === $locale ? $this->faker : $this->makeFaker($locale);
     }
 
     /**

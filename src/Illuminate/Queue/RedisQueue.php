@@ -190,7 +190,7 @@ class RedisQueue extends Queue implements QueueContract
     {
         $this->migrateExpiredJobs($queue.':delayed', $queue);
 
-        if (! is_null($this->retryAfter)) {
+        if (null !== $this->retryAfter) {
             $this->migrateExpiredJobs($queue.':reserved', $queue);
         }
     }
@@ -229,7 +229,7 @@ class RedisQueue extends Queue implements QueueContract
 
         [$job, $reserved] = $nextJob;
 
-        if (! $job && ! is_null($this->blockFor) && $block &&
+        if (! $job && null !== $this->blockFor && $block &&
             $this->getConnection()->blpop([$queue.':notify'], $this->blockFor)) {
             return $this->retrieveNextJob($queue, false);
         }

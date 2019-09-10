@@ -174,7 +174,7 @@ class Worker
      */
     protected function timeoutForJob($job, WorkerOptions $options)
     {
-        return $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
+        return $job && null !== $job->timeout() ? $job->timeout() : $options->timeout;
     }
 
     /**
@@ -221,7 +221,7 @@ class Worker
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
             $this->stop();
-        } elseif ($options->stopWhenEmpty && is_null($job)) {
+        } elseif ($options->stopWhenEmpty && null === $job) {
             $this->stop();
         }
     }
@@ -261,7 +261,7 @@ class Worker
     {
         try {
             foreach (explode(',', $queue) as $queue) {
-                if (! is_null($job = $connection->pop($queue))) {
+                if (null !== ($job = $connection->pop($queue))) {
                     return $job;
                 }
             }
@@ -389,7 +389,7 @@ class Worker
             // another listener (or this same one). We will re-throw this exception after.
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
                 $job->release(
-                    method_exists($job, 'delaySeconds') && ! is_null($job->delaySeconds())
+                    method_exists($job, 'delaySeconds') && null !== $job->delaySeconds()
                                 ? $job->delaySeconds()
                                 : $options->delay
                 );
@@ -411,7 +411,7 @@ class Worker
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {
-        $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
+        $maxTries = $job->maxTries() ?? $maxTries;
 
         $timeoutAt = $job->timeoutAt();
 
@@ -439,7 +439,7 @@ class Worker
      */
     protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, $e)
     {
-        $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
+        $maxTries = $job->maxTries() ?? $maxTries;
 
         if ($job->timeoutAt() && $job->timeoutAt() <= Carbon::now()->getTimestamp()) {
             $this->failJob($job, $e);

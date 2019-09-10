@@ -159,7 +159,7 @@ class RouteRegistrar
      */
     protected function compileAction($action)
     {
-        if (is_null($action)) {
+        if (null === $action) {
             return $this->attributes;
         }
 

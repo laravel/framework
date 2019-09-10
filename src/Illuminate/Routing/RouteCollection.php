@@ -163,7 +163,7 @@ class RouteCollection implements Countable, IteratorAggregate
         // by the consumer. Otherwise we will check for routes with another verb.
         $route = $this->matchAgainstRoutes($routes, $request);
 
-        if (! is_null($route)) {
+        if (null !== $route) {
             return $route->bind($request);
         }
 
@@ -214,7 +214,7 @@ class RouteCollection implements Countable, IteratorAggregate
         $others = [];
 
         foreach ($methods as $method) {
-            if (! is_null($this->matchAgainstRoutes($this->get($method), $request, false))) {
+            if (null !== $this->matchAgainstRoutes($this->get($method), $request, false)) {
                 $others[] = $method;
             }
         }
@@ -271,7 +271,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function get($method = null)
     {
-        return is_null($method) ? $this->getRoutes() : Arr::get($this->routes, $method, []);
+        return null === $method ? $this->getRoutes() : Arr::get($this->routes, $method, []);
     }
 
     /**
@@ -282,7 +282,7 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function hasNamedRoute($name)
     {
-        return ! is_null($this->getByName($name));
+        return null !== $this->getByName($name);
     }
 
     /**

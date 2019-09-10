@@ -54,7 +54,7 @@ class Grammar extends BaseGrammar
         // can build the query and concatenate all the pieces together as one.
         $original = $query->columns;
 
-        if (is_null($query->columns)) {
+        if (null === $query->columns) {
             $query->columns = ['*'];
         }
 
@@ -88,7 +88,7 @@ class Grammar extends BaseGrammar
             // To compile the query, we'll spin through each component of the query and
             // see if that component exists. If it does we'll just call the compiler
             // function for the component which is responsible for making the SQL.
-            if (isset($query->$component) && ! is_null($query->$component)) {
+            if (isset($query->$component) && null !== $query->$component) {
                 $method = 'compile'.ucfirst($component);
 
                 $sql[$component] = $this->$method($query, $query->$component);
@@ -133,7 +133,7 @@ class Grammar extends BaseGrammar
         // If the query is actually performing an aggregating select, we will let that
         // compiler handle the building of the select clauses, as it will need some
         // more syntax that is best handled by that function to keep things neat.
-        if (! is_null($query->aggregate)) {
+        if (null !== $query->aggregate) {
             return;
         }
 
@@ -170,9 +170,9 @@ class Grammar extends BaseGrammar
         return collect($joins)->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
 
-            $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
+            $nestedJoins = null === $join->joins ? '' : ' '.$this->compileJoins($query, $join->joins);
 
-            $tableAndNestedJoins = is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
+            $tableAndNestedJoins = null === $join->joins ? $table : '('.$table.$nestedJoins.')';
 
             return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
@@ -189,7 +189,7 @@ class Grammar extends BaseGrammar
         // Each type of where clauses has its own compiler function which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
         // and maintainable since each clause has a very small method that it uses.
-        if (is_null($query->wheres)) {
+        if (null === $query->wheres) {
             return '';
         }
 
@@ -1198,7 +1198,7 @@ class Grammar extends BaseGrammar
      */
     protected function wrapJsonPath($value, $delimiter = '->')
     {
-        $value = preg_replace("/([\\\\]+)?\\'/", "\\'", $value);
+        $value = preg_replace("/([\\\\]+)?'/", "\\'", $value);
 
         return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
     }

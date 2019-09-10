@@ -184,7 +184,7 @@ class NotificationSender
 
                 $notification->id = $notificationId;
 
-                if (! is_null($this->locale)) {
+                if (null !== $this->locale) {
                     $notification->locale = $this->locale;
                 }
 

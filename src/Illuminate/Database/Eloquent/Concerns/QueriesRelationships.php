@@ -357,7 +357,7 @@ trait QueriesRelationships
             return $this;
         }
 
-        if (is_null($this->query->columns)) {
+        if (null === $this->query->columns) {
             $this->query->select([$this->query->from.'.*']);
         }
 

@@ -63,7 +63,7 @@ class Str
     {
         $languageSpecific = static::languageSpecificCharsArray($language);
 
-        if (! is_null($languageSpecific)) {
+        if (null !== $languageSpecific) {
             $value = str_replace($languageSpecific[0], $languageSpecific[1], $value);
         }
 

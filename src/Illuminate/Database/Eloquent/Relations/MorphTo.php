@@ -179,7 +179,7 @@ class MorphTo extends BelongsTo
     protected function matchToMorphParents($type, Collection $results)
     {
         foreach ($results as $result) {
-            $ownerKey = ! is_null($this->ownerKey) ? $result->{$this->ownerKey} : $result->getKey();
+            $ownerKey = null !== $this->ownerKey ? $result->{$this->ownerKey} : $result->getKey();
 
             if (isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
@@ -229,7 +229,7 @@ class MorphTo extends BelongsTo
      */
     public function touch()
     {
-        if (! is_null($this->child->{$this->foreignKey})) {
+        if (null !== $this->child->{$this->foreignKey}) {
             parent::touch();
         }
     }

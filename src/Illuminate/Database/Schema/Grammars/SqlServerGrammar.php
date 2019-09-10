@@ -764,7 +764,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->collation)) {
+        if (null !== $column->collation) {
             return ' collate '.$column->collation;
         }
     }
@@ -792,7 +792,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
+        if (null !== $column->default) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }

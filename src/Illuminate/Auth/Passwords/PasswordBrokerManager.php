@@ -61,7 +61,7 @@ class PasswordBrokerManager implements FactoryContract
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config)) {
+        if (null === $config) {
             throw new InvalidArgumentException("Password resetter [{$name}] is not defined.");
         }
 

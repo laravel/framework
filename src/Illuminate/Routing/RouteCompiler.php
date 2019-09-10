@@ -33,7 +33,7 @@ class RouteCompiler
     {
         $optionals = $this->getOptionalParameters();
 
-        $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->route->uri());
+        $uri = preg_replace('/{(\w+?)\?}/', '{$1}', $this->route->uri());
 
         return (
             new SymfonyRoute($uri, $optionals, $this->route->wheres, ['utf8' => true], $this->route->getDomain() ?: '')
@@ -47,7 +47,7 @@ class RouteCompiler
      */
     protected function getOptionalParameters()
     {
-        preg_match_all('/\{(\w+?)\?\}/', $this->route->uri(), $matches);
+        preg_match_all('/{(\w+?)\?}/', $this->route->uri(), $matches);
 
         return isset($matches[1]) ? array_fill_keys($matches[1], null) : [];
     }

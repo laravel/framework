@@ -85,7 +85,7 @@ trait SoftDeletes
 
         $this->{$this->getDeletedAtColumn()} = $time;
 
-        if ($this->timestamps && ! is_null($this->getUpdatedAtColumn())) {
+        if ($this->timestamps && null !== $this->getUpdatedAtColumn()) {
             $this->{$this->getUpdatedAtColumn()} = $time;
 
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
@@ -129,7 +129,7 @@ trait SoftDeletes
      */
     public function trashed()
     {
-        return ! is_null($this->{$this->getDeletedAtColumn()});
+        return null !== $this->{$this->getDeletedAtColumn()};
     }
 
     /**

@@ -49,7 +49,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function setRootControllerNamespace()
     {
-        if (! is_null($this->namespace)) {
+        if (null !== $this->namespace) {
             $this->app[UrlGenerator::class]->setRootControllerNamespace($this->namespace);
         }
     }

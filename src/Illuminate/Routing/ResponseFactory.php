@@ -136,7 +136,7 @@ class ResponseFactory implements FactoryContract
     {
         $response = new StreamedResponse($callback, 200, $headers);
 
-        if (! is_null($name)) {
+        if (null !== $name) {
             $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
                 $disposition,
                 $name,
@@ -160,7 +160,7 @@ class ResponseFactory implements FactoryContract
     {
         $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
-        if (! is_null($name)) {
+        if (null !== $name) {
             return $response->setContentDisposition($disposition, $name, $this->fallbackName($name));
         }
 

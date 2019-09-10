@@ -23,7 +23,7 @@ trait CreatesUserProviders
      */
     public function createUserProvider($provider = null)
     {
-        if (is_null($config = $this->getProviderConfiguration($provider))) {
+        if (null === ($config = $this->getProviderConfiguration($provider))) {
             return;
         }
 

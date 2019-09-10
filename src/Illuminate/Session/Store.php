@@ -97,7 +97,7 @@ class Store implements Session
         if ($data = $this->handler->read($this->getId())) {
             $data = @unserialize($this->prepareForUnserialize($data));
 
-            if ($data !== false && ! is_null($data) && is_array($data)) {
+            if ($data !== false && null !== $data && is_array($data)) {
                 return $data;
             }
         }
@@ -202,7 +202,7 @@ class Store implements Session
     public function has($key)
     {
         return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
-            return is_null($this->get($key));
+            return null === $this->get($key);
         });
     }
 
@@ -240,7 +240,7 @@ class Store implements Session
     {
         $old = $this->getOldInput($key);
 
-        return is_null($key) ? count($old) > 0 : ! is_null($old);
+        return null === $key ? count($old) > 0 : null !== $old;
     }
 
     /**
@@ -293,7 +293,7 @@ class Store implements Session
      */
     public function remember($key, Closure $callback)
     {
-        if (! is_null($value = $this->get($key))) {
+        if (null !== ($value = $this->get($key))) {
             return $value;
         }
 

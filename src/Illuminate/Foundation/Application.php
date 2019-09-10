@@ -976,7 +976,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     protected function normalizeCachePath($key, $default)
     {
-        if (is_null($env = Env::get($key))) {
+        if (null === ($env = Env::get($key))) {
             return $this->bootstrapPath($default);
         }
 
@@ -1220,7 +1220,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getNamespace()
     {
-        if (! is_null($this->namespace)) {
+        if (null !== $this->namespace) {
             return $this->namespace;
         }
 

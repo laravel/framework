@@ -43,7 +43,7 @@ class Collection implements ArrayAccess, Enumerable
             return new static;
         }
 
-        if (is_null($callback)) {
+        if (null === $callback) {
             return new static(range(1, $number));
         }
 
@@ -83,7 +83,7 @@ class Collection implements ArrayAccess, Enumerable
         $items = $this->map(function ($value) use ($callback) {
             return $callback($value);
         })->filter(function ($value) {
-            return ! is_null($value);
+            return null !== $value;
         });
 
         if ($count = $items->count()) {
@@ -101,7 +101,7 @@ class Collection implements ArrayAccess, Enumerable
     {
         $values = (isset($key) ? $this->pluck($key) : $this)
             ->filter(function ($item) {
-                return ! is_null($item);
+                return null !== $item;
             })->sort()->values();
 
         $count = $values->count();
@@ -768,7 +768,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function only($keys)
     {
-        if (is_null($keys)) {
+        if (null === $keys) {
             return new static($this->items);
         }
 
@@ -871,7 +871,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function random($number = null)
     {
-        if (is_null($number)) {
+        if (null === $number) {
             return Arr::random($this->items);
         }
 
@@ -1299,7 +1299,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function offsetSet($key, $value)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             $this->items[] = $value;
         } else {
             $this->items[$key] = $value;

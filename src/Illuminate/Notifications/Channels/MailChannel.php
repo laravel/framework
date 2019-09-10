@@ -93,7 +93,7 @@ class MailChannel
             return $message->view;
         }
 
-        if (property_exists($message, 'theme') && ! is_null($message->theme)) {
+        if (property_exists($message, 'theme') && null !== $message->theme) {
             $this->markdown->theme($message->theme);
         }
 
@@ -138,7 +138,7 @@ class MailChannel
 
         $this->addAttachments($mailMessage, $message);
 
-        if (! is_null($message->priority)) {
+        if (null !== $message->priority) {
             $mailMessage->setPriority($message->priority);
         }
 

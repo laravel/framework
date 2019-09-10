@@ -258,7 +258,7 @@ class Builder
      */
     public function latest($column = null)
     {
-        if (is_null($column)) {
+        if (null === $column) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
@@ -275,7 +275,7 @@ class Builder
      */
     public function oldest($column = null)
     {
-        if (is_null($column)) {
+        if (null === $column) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
@@ -364,7 +364,7 @@ class Builder
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
-        } elseif (! is_null($result)) {
+        } elseif (null !== $result) {
             return $result;
         }
 
@@ -382,7 +382,7 @@ class Builder
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (! is_null($model = $this->find($id, $columns))) {
+        if (null !== ($model = $this->find($id, $columns))) {
             return $model;
         }
 
@@ -398,7 +398,7 @@ class Builder
      */
     public function firstOrNew(array $attributes, array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (null !== ($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -414,7 +414,7 @@ class Builder
      */
     public function firstOrCreate(array $attributes, array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (null !== ($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -447,7 +447,7 @@ class Builder
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (null !== ($model = $this->first($columns))) {
             return $model;
         }
 
@@ -469,7 +469,7 @@ class Builder
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->first($columns))) {
+        if (null !== ($model = $this->first($columns))) {
             return $model;
         }
 
@@ -813,7 +813,7 @@ class Builder
     protected function addUpdatedAtColumn(array $values)
     {
         if (! $this->model->usesTimestamps() ||
-            is_null($this->model->getUpdatedAtColumn())) {
+            null === $this->model->getUpdatedAtColumn()) {
             return $values;
         }
 
@@ -956,7 +956,7 @@ class Builder
         // We will keep track of how many wheres are on the query before running the
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
-        $originalWhereCount = is_null($query->wheres)
+        $originalWhereCount = null === $query->wheres
                     ? 0 : count($query->wheres);
 
         $result = $scope(...array_values($parameters)) ?? $this;

@@ -883,7 +883,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function delete()
     {
-        if (is_null($this->getKeyName())) {
+        if (null === $this->getKeyName()) {
             throw new Exception('No primary key defined on model.');
         }
 
@@ -1192,7 +1192,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function is($model)
     {
-        return ! is_null($model) &&
+        return null !== $model &&
                $this->getKey() === $model->getKey() &&
                $this->getTable() === $model->getTable() &&
                $this->getConnectionName() === $model->getConnectionName();
@@ -1543,7 +1543,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function offsetExists($offset)
     {
-        return ! is_null($this->getAttribute($offset));
+        return null !== $this->getAttribute($offset);
     }
 
     /**

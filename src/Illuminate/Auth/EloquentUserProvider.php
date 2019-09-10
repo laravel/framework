@@ -153,7 +153,7 @@ class EloquentUserProvider implements UserProvider
      */
     protected function newModelQuery($model = null)
     {
-        return is_null($model)
+        return null === $model
                 ? $this->createModel()->newQuery()
                 : $model->newQuery();
     }

@@ -31,7 +31,7 @@ class Arr
      */
     public static function add($array, $key, $value)
     {
-        if (is_null(static::get($array, $key))) {
+        if (null === static::get($array, $key)) {
             static::set($array, $key, $value);
         }
 
@@ -161,7 +161,7 @@ class Arr
      */
     public static function first($array, callable $callback = null, $default = null)
     {
-        if (is_null($callback)) {
+        if (null === $callback) {
             if (empty($array)) {
                 return value($default);
             }
@@ -190,7 +190,7 @@ class Arr
      */
     public static function last($array, callable $callback = null, $default = null)
     {
-        if (is_null($callback)) {
+        if (null === $callback) {
             return empty($array) ? value($default) : end($array);
         }
 
@@ -285,7 +285,7 @@ class Arr
             return value($default);
         }
 
-        if (is_null($key)) {
+        if (null === $key) {
             return $array;
         }
 
@@ -389,7 +389,7 @@ class Arr
             // If the key is "null", we will just append the value to the array and keep
             // looping. Otherwise we will key the array using the value of the key we
             // received from the developer. Then we'll return the final array form.
-            if (is_null($key)) {
+            if (null === $key) {
                 $results[] = $itemValue;
             } else {
                 $itemKey = data_get($item, $key);
@@ -416,7 +416,7 @@ class Arr
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
-        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+        $key = null === $key || is_array($key) ? $key : explode('.', $key);
 
         return [$value, $key];
     }
@@ -431,7 +431,7 @@ class Arr
      */
     public static function prepend($array, $value, $key = null)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             array_unshift($array, $value);
         } else {
             $array = [$key => $value] + $array;
@@ -468,7 +468,7 @@ class Arr
      */
     public static function random($array, $number = null)
     {
-        $requested = is_null($number) ? 1 : $number;
+        $requested = $number ?? 1;
 
         $count = count($array);
 
@@ -478,7 +478,7 @@ class Arr
             );
         }
 
-        if (is_null($number)) {
+        if (null === $number) {
             return $array[array_rand($array)];
         }
 
@@ -509,7 +509,7 @@ class Arr
      */
     public static function set(&$array, $key, $value)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             return $array = $value;
         }
 
@@ -542,7 +542,7 @@ class Arr
      */
     public static function shuffle($array, $seed = null)
     {
-        if (is_null($seed)) {
+        if (null === $seed) {
             shuffle($array);
         } else {
             mt_srand($seed);
@@ -578,6 +578,7 @@ class Arr
                 $value = static::sortRecursive($value);
             }
         }
+        unset($value);
 
         if (static::isAssoc($array)) {
             ksort($array);
@@ -619,7 +620,7 @@ class Arr
      */
     public static function wrap($value)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             return [];
         }
 

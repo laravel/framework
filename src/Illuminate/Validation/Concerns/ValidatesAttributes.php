@@ -193,7 +193,7 @@ trait ValidatesAttributes
         if ($this->isTestingRelativeDateTime($value)) {
             $date = $this->getDateTime($value);
 
-            if (! is_null($date)) {
+            if (null !== $date) {
                 return $date->getTimestamp();
             }
         }
@@ -735,7 +735,7 @@ trait ValidatesAttributes
         if (isset($parameters[2])) {
             [$idColumn, $id] = $this->getUniqueIds($parameters);
 
-            if (! is_null($id)) {
+            if (null !== $id) {
                 $id = stripslashes($id);
             }
         }
@@ -910,7 +910,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (null === $comparedToValue && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
@@ -941,7 +941,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (null === $comparedToValue && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
@@ -972,7 +972,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (null === $comparedToValue && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
@@ -1003,7 +1003,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (null === $comparedToValue && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
@@ -1338,7 +1338,7 @@ trait ValidatesAttributes
      */
     public function validateRequired($attribute, $value)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             return false;
         } elseif (is_string($value) && trim($value) === '') {
             return false;

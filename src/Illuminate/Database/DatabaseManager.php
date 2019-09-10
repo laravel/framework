@@ -148,7 +148,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // If the configuration doesn't exist, we'll throw an exception and bail.
         $connections = $this->app['config']['database.connections'];
 
-        if (is_null($config = Arr::get($connections, $name))) {
+        if (null === ($config = Arr::get($connections, $name))) {
             throw new InvalidArgumentException("Database [{$name}] not configured.");
         }
 

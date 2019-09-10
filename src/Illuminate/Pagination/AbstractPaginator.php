@@ -186,7 +186,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function fragment($fragment = null)
     {
-        if (is_null($fragment)) {
+        if (null === $fragment) {
             return $this->fragment;
         }
 
@@ -204,7 +204,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function appends($key, $value = null)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             return $this;
         }
 

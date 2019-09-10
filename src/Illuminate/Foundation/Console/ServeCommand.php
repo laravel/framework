@@ -99,7 +99,7 @@ class ServeCommand extends Command
      */
     protected function canTryAnotherPort()
     {
-        return is_null($this->input->getOption('port')) &&
+        return null === $this->input->getOption('port') &&
                ($this->input->getOption('tries') > $this->portOffset);
     }
 
