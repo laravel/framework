@@ -66,7 +66,7 @@ class LazyCollection implements Enumerable
             }
         });
 
-        return $callback === null ? $instance : $instance->map($callback);
+        return null === $callback ? $instance : $instance->map($callback);
     }
 
     /**

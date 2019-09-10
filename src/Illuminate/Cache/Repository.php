@@ -411,7 +411,7 @@ class Repository implements ArrayAccess, CacheContract
         // If the item exists in the cache we will just return this immediately
         // and if not we will execute the given Closure and cache the result
         // of that forever so it is available for all subsequent requests.
-        if ($value !== null) {
+        if (null !== $value) {
             return $value;
         }
 
