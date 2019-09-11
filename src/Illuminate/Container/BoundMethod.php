@@ -75,7 +75,7 @@ class BoundMethod
     protected static function callBoundMethod($container, $callback, $default)
     {
         if (! is_array($callback)) {
-            return $default instanceof Closure ? $default() : $default;
+            return value($default);
         }
 
         // Here we need to turn the array callable into a Class@method string we can use to
@@ -87,7 +87,7 @@ class BoundMethod
             return $container->callMethodBinding($method, $callback[0]);
         }
 
-        return $default instanceof Closure ? $default() : $default;
+        return value($default);
     }
 
     /**
