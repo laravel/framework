@@ -285,6 +285,8 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonPath('foobar.foobar_foo', 'foo');
         $response->assertJsonPath('foobar.foobar_bar', 'bar');
 
+        $response->assertJsonPath('foobar.foobar_foo', 'foo')->assertJsonPath('foobar.foobar_bar', 'bar');
+
         $response->assertJsonPath('bars', [
             ['foo' => 'bar 0', 'bar' => 'foo 0'],
             ['foo' => 'bar 1', 'bar' => 'foo 1'],
