@@ -1,6 +1,18 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.0.2...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.0.3...6.x)
+
+### Refactoring
+- Changed imports to Alpha ordering in stubs ([#29954](https://github.com/laravel/framework/pull/29954))
+
+### TODO:
+- Sort imports alphabetically on class generation from stub ([#29951](https://github.com/laravel/framework/pull/29951))
+
+
+## [v6.0.3 (2019-09-10)](https://github.com/laravel/framework/compare/v6.0.2...v6.0.3)
+
+### Reverted
+- Reverted [Wrapped `MySQL` default values in parentheses](https://github.com/laravel/framework/pull/29878) ([#29943](https://github.com/laravel/framework/pull/29943))
 
 ### Refactoring
 - Converted `call_user_func` where appropriate to native calls ([#29932](https://github.com/laravel/framework/pull/29932))
