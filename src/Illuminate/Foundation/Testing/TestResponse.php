@@ -466,7 +466,7 @@ class TestResponse
 
     /**
      * Assert that the expected value exists at the given path in the response.
-     * 
+     *
      * @param  string  $path
      * @param  mixed  $expect
      * @return $this
