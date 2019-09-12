@@ -909,7 +909,7 @@ if (! function_exists('__')) {
         if (is_null($key)) {
             return $key;
         }
-        
+
         return trans($key, $replace, $locale);
     }
 }
