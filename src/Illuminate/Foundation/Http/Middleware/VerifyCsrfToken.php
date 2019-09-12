@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\InteractsWithTime;
@@ -176,6 +177,10 @@ class VerifyCsrfToken
     protected function addCookieToResponse($request, $response)
     {
         $config = config('session');
+
+        if ($response instanceof Responsable) {
+            $response = $response->toResponse($request);
+        }
 
         $response->headers->setCookie(
             new Cookie(
