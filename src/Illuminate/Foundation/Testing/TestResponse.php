@@ -139,16 +139,17 @@ class TestResponse
     /**
      * Assert that the response has the given status code.
      *
-     * @param  int  $status
+     * @param int $status
+     * @param string|null $message
      * @return $this
      */
-    public function assertStatus($status)
+    public function assertStatus($status, $message = null)
     {
         $actual = $this->getStatusCode();
 
         PHPUnit::assertTrue(
             $actual === $status,
-            "Expected status code {$status} but received {$actual}."
+            $message ?? "Expected status code {$status} but received {$actual}."
         );
 
         return $this;

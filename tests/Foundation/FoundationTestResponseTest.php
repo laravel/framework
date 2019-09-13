@@ -211,6 +211,23 @@ class FoundationTestResponseTest extends TestCase
         $response->assertStatus($expectedStatusCode);
     }
 
+    public function testAssertStatusWithCustomMessage()
+    {
+        $statusCode = 500;
+        $expectedStatusCode = 401;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage($msg = "Some custom exception message");
+
+        $baseResponse = tap(new Response, function (Response $response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertStatus($expectedStatusCode, $msg);
+    }
+
     public function testAssertHeader()
     {
         $this->expectException(AssertionFailedError::class);
