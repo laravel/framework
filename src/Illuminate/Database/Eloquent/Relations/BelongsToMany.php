@@ -526,13 +526,14 @@ class BelongsToMany extends Relation
     /**
      * Find a related model by its primary key or throw an exception.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param  mixed   $id
+     * @param  array   $columns
+     * @param  string  $exceptionClass
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findOrFail($id, $columns = ['*'])
+    public function findOrFail($id, $columns = ['*'], $exceptionClass = ModelNotFoundException::class)
     {
         $result = $this->find($id, $columns);
 
@@ -544,7 +545,7 @@ class BelongsToMany extends Relation
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+        throw (new $exceptionClass)->setModel(get_class($this->related), $id);
     }
 
     /**
@@ -563,18 +564,19 @@ class BelongsToMany extends Relation
     /**
      * Execute the query and get the first result or throw an exception.
      *
-     * @param  array  $columns
+     * @param  array   $columns
+     * @param  string  $exceptionClass
      * @return \Illuminate\Database\Eloquent\Model|static
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function firstOrFail($columns = ['*'])
+    public function firstOrFail($columns = ['*'], $exceptionClass = ModelNotFoundException::class)
     {
         if (! is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        throw (new $exceptionClass)->setModel(get_class($this->related));
     }
 
     /**

@@ -309,6 +309,15 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tags()->firstOrFail(['id' => 10]);
     }
 
+    public function testFirstOrFailCustomMethod()
+    {
+        $this->expectException(CustomModelNotFoundException::class);
+
+        $post = Post::create(['title' => Str::random()]);
+
+        $post->tags()->firstOrFail(['id' => 10], CustomModelNotFoundException::class);
+    }
+
     public function testFindMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -333,6 +342,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tags()->attach(Tag::all());
 
         $post->tags()->findOrFail(10);
+    }
+
+    public function testFindOrFailCustomExceptionMethod()
+    {
+        $this->expectException(CustomModelNotFoundException::class);
+
+        $post = Post::create(['title' => Str::random()]);
+
+        Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach(Tag::all());
+
+        $post->tags()->findOrFail(10, ['*'], CustomModelNotFoundException::class);
     }
 
     public function testFindOrNewMethod()
@@ -897,4 +919,9 @@ class TagWithGlobalScope extends Model
             $query->select('tags.id');
         });
     }
+}
+
+class CustomModelNotFoundException extends ModelNotFoundException
+{
+    //
 }

@@ -127,6 +127,17 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         HasOneThroughTestPosition::first()->contract()->firstOrFail();
     }
 
+    public function testFirstOrFailThrowsACustomException()
+    {
+        $this->expectException(CustomModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasOneThroughTestContract].');
+
+        HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
+            ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+
+        HasOneThroughTestPosition::first()->contract()->firstOrFail(['*'], CustomModelNotFoundException::class);
+    }
+
     public function testFindOrFailThrowsAnException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -135,6 +146,16 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
             ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
 
         HasOneThroughTestPosition::first()->contract()->findOrFail(1);
+    }
+
+    public function testFindOrFailThrowsACustomException()
+    {
+        $this->expectException(CustomModelNotFoundException::class);
+
+        HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
+            ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+
+        HasOneThroughTestPosition::first()->contract()->findOrFail(1, ['*'], CustomModelNotFoundException::class);
     }
 
     public function testFirstRetrievesFirstRecord()

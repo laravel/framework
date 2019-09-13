@@ -131,6 +131,17 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::first()->posts()->firstOrFail();
     }
 
+    public function testFirstOrFailThrowsACustomException()
+    {
+        $this->expectException(CustomModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->firstOrFail(['*'], CustomModelNotFoundException::class);
+    }
+
     public function testFindOrFailThrowsAnException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -140,6 +151,17 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                                  ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail(1);
+    }
+
+    public function testFindOrFailThrowsAnCustomException()
+    {
+        $this->expectException(CustomModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrFail(1, ['*'], CustomModelNotFoundException::class);
     }
 
     public function testFirstRetrievesFirstRecord()

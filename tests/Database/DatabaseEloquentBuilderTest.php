@@ -126,6 +126,17 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrFail([1, 2], ['column']);
     }
 
+    public function testFindOrFailMethodThrowsCustomModelNotFoundException()
+    {
+        $this->expectException(CustomModelNotFoundException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->findOrFail('bar', ['column'], CustomModelNotFoundException::class);
+    }
+
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -134,6 +145,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
         $builder->firstOrFail(['column']);
+    }
+
+    public function testFirstOrFailMethodThrowsCustomModelNotFoundException()
+    {
+        $this->expectException(CustomModelNotFoundException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->firstOrFail(['column'], CustomModelNotFoundException::class);
     }
 
     public function testFindWithMany()
@@ -1387,4 +1408,9 @@ class EloquentBuilderTestStubWithoutTimestamp extends Model
     const UPDATED_AT = null;
 
     protected $table = 'table';
+}
+
+class CustomModelNotFoundException extends ModelNotFoundException
+{
+    //
 }
