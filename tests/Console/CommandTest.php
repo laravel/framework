@@ -48,7 +48,9 @@ class CommandTest extends TestCase
     public function testGettingCommandArgumentsAndOptionsByClass()
     {
         $command = new class extends Command {
-            public function handle() {}
+            public function handle()
+            {
+            }
 
             protected function getArguments()
             {
@@ -74,7 +76,7 @@ class CommandTest extends TestCase
             'argument-one' => 'test-first-argument',
             'argument-two' => 'test-second-argument',
             '--option-one' => 'test-first-option',
-            '--option-two' => 'test-second-option'
+            '--option-two' => 'test-second-option',
         ]);
         $output = new NullOutput();
 
