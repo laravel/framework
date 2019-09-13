@@ -268,6 +268,39 @@ class FoundationTestResponseTest extends TestCase
         $response->assertExactJson($resource->jsonSerialize());
     }
 
+    public function testAssertJsonPath()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonPath('0.foo', 'foo 0');
+
+        $response->assertJsonPath('0.foo', 'foo 0');
+        $response->assertJsonPath('0.bar', 'bar 0');
+        $response->assertJsonPath('0.foobar', 'foobar 0');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonPath('foo', 'bar');
+
+        $response->assertJsonPath('foobar.foobar_foo', 'foo');
+        $response->assertJsonPath('foobar.foobar_bar', 'bar');
+
+        $response->assertJsonPath('foobar.foobar_foo', 'foo')->assertJsonPath('foobar.foobar_bar', 'bar');
+
+        $response->assertJsonPath('bars', [
+            ['foo' => 'bar 0', 'bar' => 'foo 0'],
+            ['foo' => 'bar 1', 'bar' => 'foo 1'],
+            ['foo' => 'bar 2', 'bar' => 'foo 2'],
+        ]);
+        $response->assertJsonPath('bars.0', ['foo' => 'bar 0', 'bar' => 'foo 0']);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPath('0.id', 10);
+        $response->assertJsonPath('1.id', 20);
+        $response->assertJsonPath('2.id', 30);
+    }
+
     public function testAssertJsonFragment()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
