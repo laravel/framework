@@ -218,7 +218,7 @@ class FoundationTestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage($msg = "Some custom exception message");
+        $this->expectExceptionMessage($msg = 'Some custom exception message');
 
         $baseResponse = tap(new Response, function (Response $response) use ($statusCode) {
             $response->setStatusCode($statusCode);
