@@ -422,7 +422,9 @@ class Mailable implements MailableContract, Renderable
      */
     public function locale($locale)
     {
-        $this->locale = $locale;
+        // Prevent PendingMail from erasing locale
+        if(!empty($locale))
+            $this->locale = $locale;
 
         return $this;
     }
