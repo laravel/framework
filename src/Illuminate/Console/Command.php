@@ -76,6 +76,13 @@ class Command extends SymfonyCommand
     protected $hidden = false;
 
     /**
+     * The command input validator.
+     *
+     * @var \Illuminate\Contracts\Validation\Validator|null
+     */
+    protected $validator;
+
+    /**
      * The default verbosity of output commands.
      *
      * @var int
@@ -186,10 +193,85 @@ class Command extends SymfonyCommand
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->laravel->call([$this, 'handle']);
+        if ($this->hasValidInput()) {
+            return $this->laravel->call([$this, 'handle']);
+        }
+
+        return $this->displayValidationErrors();
+    }
+
+    /**
+     * Check if the argument and option values are valid.
+     *
+     * @return bool
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function hasValidInput()
+    {
+        if (empty($rules = $this->rules())) {
+            return true;
+        }
+
+        $this->validator = $this->validator ?? $this->laravel->make('validator')->make(
+            array_merge($this->arguments(), $this->options()),
+            $rules,
+            $this->messages(),
+            $this->attributes()
+        );
+
+        return ! $this->validator->fails();
+    }
+
+    /**
+     * Define the rules used for validation of arguments and options.
+     *
+     * @return array
+     */
+    protected function rules()
+    {
+        return [];
+    }
+
+    /**
+     * Get the custom error messages for console command validation.
+     *
+     * @return array
+     */
+    protected function messages()
+    {
+        return [];
+    }
+
+    /**
+     * Get the custom attribute names for console command validation.
+     *
+     * @return array
+     */
+    protected function attributes()
+    {
+        return [];
+    }
+
+    /**
+     * Display the validation error messages for invalid arguments and options.
+     *
+     * @return int
+     */
+    protected function displayValidationErrors()
+    {
+        $this->info('Command input validation failed. Please check the error messages below:');
+
+        foreach ($this->validator->errors()->all() as $error) {
+            $this->error($error);
+        }
+
+        return 1;
     }
 
     /**
