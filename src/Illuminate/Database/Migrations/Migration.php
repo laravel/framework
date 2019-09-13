@@ -2,8 +2,17 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Illuminate\Support\Facades\Schema;
+
 abstract class Migration
 {
+    /**
+     * The database schema.
+     *
+     * @var \Illuminate\Support\Facades\Schema
+     */
+    protected $schema;
+
     /**
      * The name of the database connection to use.
      *
@@ -17,6 +26,16 @@ abstract class Migration
      * @var bool
      */
     public $withinTransaction = true;
+
+    /**
+     * Create a new migration instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->schema = Schema::connection($this->getConnection());
+    }
 
     /**
      * Get the migration connection name.
