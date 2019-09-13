@@ -3,10 +3,10 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Facades\Date;
 
 class ScheduleRunCommand extends Command
 {
