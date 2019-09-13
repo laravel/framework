@@ -32,7 +32,7 @@ class TransportManager extends Manager
         // a developer has available. We will just pass this configured host.
         $transport = new SmtpTransport($config['host'], $config['port']);
 
-        if (!empty($config['encryption'])) {
+        if (! empty($config['encryption'])) {
             $transport->setEncryption($config['encryption']);
         }
 
