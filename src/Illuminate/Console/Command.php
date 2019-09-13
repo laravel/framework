@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -78,7 +79,7 @@ class Command extends SymfonyCommand
     /**
      * The command input validator.
      *
-     * @var \Illuminate\Contracts\Validation\Validator|null
+     * @var Illuminate\Contracts\Validation\Factory|null
      */
     protected $validator;
 
@@ -193,8 +194,6 @@ class Command extends SymfonyCommand
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return mixed
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -209,8 +208,6 @@ class Command extends SymfonyCommand
      * Check if the argument and option values are valid.
      *
      * @return bool
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function hasValidInput()
     {
@@ -218,7 +215,7 @@ class Command extends SymfonyCommand
             return true;
         }
 
-        $this->validator = $this->validator ?? $this->laravel->make('validator')->make(
+        $this->validator = $this->validator ?? $this->makeValidator()->make(
             array_merge($this->arguments(), $this->options()),
             $rules,
             $this->messages(),
@@ -226,6 +223,16 @@ class Command extends SymfonyCommand
         );
 
         return ! $this->validator->fails();
+    }
+
+    /**
+     * Resolve the command input validator.
+     *
+     * @return \Illuminate\Contracts\Validation\Factory
+     */
+    protected function makeValidator()
+    {
+        return $this->laravel->make(ValidatorFactory::class);
     }
 
     /**
