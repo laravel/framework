@@ -9,7 +9,7 @@ abstract class Migration
     /**
      * The database schema.
      *
-     * @var \Illuminate\Support\Facades\Schema
+     * @var \Illuminate\Database\Schema\Builder
      */
     protected $schema;
 
