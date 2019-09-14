@@ -2603,10 +2603,16 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         // Ensure svg images always pass as size is irreleveant
-        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.svg', '', 'image/svg', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_width=1,max_height=1']);
+        $this->assertTrue($v->passes());
+
+        $file = new File(__DIR__.'/fixtures/image.svg', '', 'image/svg', null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => $file], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
     }
 
