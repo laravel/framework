@@ -4,8 +4,9 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayObject;
+use JsonSerializable;
 
-class Optional implements ArrayAccess
+class Optional implements ArrayAccess, JsonSerializable
 {
     use Traits\Macroable {
         __call as macroCall;
@@ -126,5 +127,15 @@ class Optional implements ArrayAccess
         if (is_object($this->value)) {
             return $this->value->{$method}(...$parameters);
         }
+    }
+
+    /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return mixed
+     */
+    public function jsonSerialize()
+    {
+        return $this->value;
     }
 }
