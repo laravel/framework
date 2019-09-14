@@ -458,10 +458,10 @@ class Migrator
     {
         return Collection::make($paths)->flatMap(function ($path) {
             return Str::endsWith($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php');
-        })->filter()->sortBy(function ($file) {
+        })->filter()->values()->keyBy(function ($file) {
             return $this->getMigrationName($file);
-        })->values()->keyBy(function ($file) {
-            return $this->getMigrationName($file);
+        })->sortBy(function ($file, $key) {
+            return $key;
         })->all();
     }
 
