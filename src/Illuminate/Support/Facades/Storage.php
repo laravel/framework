@@ -16,8 +16,7 @@ class Storage extends Facade
      *
      * @param  string|null  $disk
      * @param  array  $config
-     *
-     * @return \Illuminate\Filesystem\Filesystem
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function fake($disk = null, array $config = [])
     {
@@ -39,7 +38,7 @@ class Storage extends Facade
      *
      * @param  string|null  $disk
      * @param  array  $config
-     * @return \Illuminate\Filesystem\Filesystem
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function persistentFake($disk = null, array $config = [])
     {
