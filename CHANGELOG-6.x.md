@@ -60,4 +60,4 @@
 
 ## [v6.0.0 (2019-09-03)](https://github.com/laravel/framework/compare/5.8...v6.0.0)
 
-Check the upgrade guide in the [Official Laravel Documentation](https://laravel.com/docs/6.0/upgrade).
+Check the upgrade guide in the [Official Laravel Upgrade Documentation](https://laravel.com/docs/6.0/upgrade). Also you can see some release notes in the [Official Laravel Release Documentation](https://laravel.com/docs/6.x/releases).
