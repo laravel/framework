@@ -101,12 +101,15 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createController()
     {
-        $controller = Str::studly(class_basename($this->argument('name')));
+        $name = $this->argument('name');
+        $classBaseName = class_basename($name);
+        $classPath = str_replace($classBaseName, '', $name);
+        $controller = Str::studly($classBaseName);
 
         $modelName = $this->qualifyClass($this->getNameInput());
 
         $this->call('make:controller', [
-            'name' => "{$controller}Controller",
+            'name' => "{$classPath}{$controller}Controller",
             '--model' => $this->option('resource') ? $modelName : null,
         ]);
     }
