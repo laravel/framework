@@ -157,6 +157,19 @@ abstract class Facade
     }
 
     /**
+     * Register a binding for the facade accessor on the container.
+     *
+     * @param  string  $concrete
+     * @return void
+     */
+    public static function bindFacadeAccessor($concrete)
+    {
+        if (static::$app) {
+            static::$app->bind(static::getFacadeAccessor(), $concrete);
+        }
+    }
+
+    /**
      * Resolve the facade root instance from the container.
      *
      * @param  object|string  $name
