@@ -74,6 +74,8 @@ class PhpRedisConnector implements Connector
                 );
             }
 
+            /* @var Redis $client */
+
             $this->establishConnection($client, $config);
 
             if (! empty($config['password'])) {
@@ -92,23 +94,32 @@ class PhpRedisConnector implements Connector
                 $client->setOption(Redis::OPT_READ_TIMEOUT, $config['read_timeout']);
             }
             if (! empty($config['serializer'])) {
-                $serializers = [
-                    //Redis::SERIALIZER_NONE
-                    'none' => 0,
-                    //Redis::SERIALIZER_PHP
-                    'php' => 1,
-                    //Redis::SERIALIZER_IGBINARY
-                    'igbinary' => 2,
-                    //Redis::SERIALIZER_MSGPACK
-                    'msgpack' => 3,
-                    //Redis::SERIALIZER_JSON
-                    'json' => 4,
-                ];
+                $serializers = [];
 
-                if (in_array($config['serializer'], $serializers)) {
-                    $client->setOption(Redis::OPT_SERIALIZER, $config['serializer'], true);
-                } elseif (in_array($config['serializer'], array_keys($serializers))) {
-                    $client->setOption(Redis::OPT_SERIALIZER, $serializers[$config['serializer']], true);
+                if (defined('Redis::SERIALIZER_NONE')) {
+                    $serializers['none'] = Redis::SERIALIZER_NONE;
+                }
+
+                if (defined('Redis::SERIALIZER_PHP')) {
+                    $serializers['php'] = Redis::SERIALIZER_PHP;
+                }
+
+                if (defined('Redis::SERIALIZER_IGBINARY')) {
+                    $serializers['igbinary'] = Redis::SERIALIZER_IGBINARY;
+                }
+
+                if (defined('Redis::SERIALIZER_MSGPACK')) {
+                    $serializers['msgpack'] = Redis::SERIALIZER_MSGPACK;
+                }
+
+                if (defined('Redis::SERIALIZER_JSON')) {
+                    $serializers['json'] = Redis::SERIALIZER_JSON;
+                }
+
+                if (in_array($config['serializer'], $serializers, true)) {
+                    $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
+                } elseif (in_array($config['serializer'], array_keys($serializers), true)) {
+                    $client->setOption(Redis::OPT_SERIALIZER, $serializers[$config['serializer']]);
                 } else {
                     throw new \InvalidArgumentException('Wrong serializer configuration for Redis connection');
                 }
