@@ -91,6 +91,28 @@ class PhpRedisConnector implements Connector
             if (! empty($config['read_timeout'])) {
                 $client->setOption(Redis::OPT_READ_TIMEOUT, $config['read_timeout']);
             }
+            if (! empty($config['serializer'])) {
+                $serializers = [
+                    //Redis::SERIALIZER_NONE
+                    'none' => 0,
+                    //Redis::SERIALIZER_PHP
+                    'php' => 1,
+                    //Redis::SERIALIZER_IGBINARY
+                    'igbinary' => 2,
+                    //Redis::SERIALIZER_MSGPACK
+                    'msgpack' => 3,
+                    //Redis::SERIALIZER_JSON
+                    'json' => 4,
+                ];
+
+                if (in_array($config['serializer'], $serializers)) {
+                    $client->setOption(Redis::OPT_SERIALIZER, $config['serializer'], true);
+                } elseif (in_array($config['serializer'], array_keys($serializers))) {
+                    $client->setOption(Redis::OPT_SERIALIZER, $serializers[$config['serializer']], true);
+                } else {
+                    throw new \InvalidArgumentException('Wrong serializer configuration for Redis connection');
+                }
+            }
         });
     }
 
