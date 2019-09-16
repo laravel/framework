@@ -125,7 +125,7 @@ class ConcurrencyLimiter
         return <<<'LUA'
 for index, value in pairs(redis.call('mget', unpack(KEYS))) do
     if not value then
-        redis.call('set', ARGV[1]..index, ARGV[3], "EX", ARGV[2])
+        redis.call('set', KEYS[index], ARGV[3], "EX", ARGV[2])
         return ARGV[1]..index
     end
 end

@@ -48,6 +48,9 @@ trait InteractsWithRedis
         foreach ($this->redisDriverProvider() as $driver) {
             $this->redis[$driver[0]] = new RedisManager($app, $driver[0], [
                 'cluster' => false,
+                'options' => [
+                    'prefix' => 'test_',
+                ],
                 'default' => [
                     'host' => $host,
                     'port' => $port,
