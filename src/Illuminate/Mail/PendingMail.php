@@ -181,6 +181,6 @@ class PendingMail
                 if ($this->locale) {
                     $mailable->locale($this->locale);
                 }
-        });
+            });
     }
 }
