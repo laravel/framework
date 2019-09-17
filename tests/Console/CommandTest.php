@@ -8,6 +8,8 @@ use Illuminate\Console\OutputStyle;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 
 class CommandTest extends TestCase
@@ -41,5 +43,48 @@ class CommandTest extends TestCase
         });
 
         $command->run($input, $output);
+    }
+
+    public function testGettingCommandArgumentsAndOptionsByClass()
+    {
+        $command = new class extends Command {
+            public function handle()
+            {
+            }
+
+            protected function getArguments()
+            {
+                return [
+                    new InputArgument('argument-one', InputArgument::REQUIRED, 'first test argument'),
+                    ['argument-two', InputArgument::OPTIONAL, 'a second test argument'],
+                ];
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                    ['option-two', 't', InputOption::VALUE_REQUIRED, 'second test option'],
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            'argument-one' => 'test-first-argument',
+            'argument-two' => 'test-second-argument',
+            '--option-one' => 'test-first-option',
+            '--option-two' => 'test-second-option',
+        ]);
+        $output = new NullOutput();
+
+        $command->run($input, $output);
+
+        $this->assertEquals('test-first-argument', $command->argument('argument-one'));
+        $this->assertequals('test-second-argument', $command->argument('argument-two'));
+        $this->assertEquals('test-first-option', $command->option('option-one'));
+        $this->assertEquals('test-second-option', $command->option('option-two'));
     }
 }

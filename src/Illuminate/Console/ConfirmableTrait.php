@@ -2,8 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Closure;
-
 trait ConfirmableTrait
 {
     /**
@@ -19,7 +17,7 @@ trait ConfirmableTrait
     {
         $callback = is_null($callback) ? $this->getDefaultConfirmCallback() : $callback;
 
-        $shouldConfirm = $callback instanceof Closure ? $callback() : $callback;
+        $shouldConfirm = value($callback);
 
         if ($shouldConfirm) {
             if ($this->hasOption('force') && $this->option('force')) {

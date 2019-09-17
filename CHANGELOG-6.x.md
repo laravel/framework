@@ -1,6 +1,34 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.0.2...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.0.3...6.x)
+
+### Added
+- Added `TestResponse::assertJsonPath()` method ([#29957](https://github.com/laravel/framework/pull/29957))
+
+### Fixed
+- Fixed `__()` with `null` parameter ([#29967](https://github.com/laravel/framework/pull/29967)) 
+- Fixed modifying `updated_at` column on custom pivot model ([#29970](https://github.com/laravel/framework/pull/29970))
+
+### Changed
+- Make it possible to disable encryption via `0`/`false` ([#29985](https://github.com/laravel/framework/pull/29985))
+
+### Refactoring
+- Changed imports to Alpha ordering in stubs ([#29954](https://github.com/laravel/framework/pull/29954), [#29958](https://github.com/laravel/framework/pull/29958))
+- Used value helper where possible ([#29959](https://github.com/laravel/framework/pull/29959))
+
+### TODO:
+- Sort imports alphabetically on class generation from stub ([#29951](https://github.com/laravel/framework/pull/29951))
+- Convert Responsables to Response objects in VerifyCsrfToken ([#29972](https://github.com/laravel/framework/pull/29972))
+- Allow adding NotFoundHttpException to "allowed" exceptions in tests ([#29975](https://github.com/laravel/framework/pull/29975))
+- Add events to signal when scheduled task runs ([#29888](https://github.com/laravel/framework/pull/29888))
+- Postgresql column precision declaration fix ([#29873](https://github.com/laravel/framework/pull/29873))
+- Allow adding command arguments and options with objects ([#29987](https://github.com/laravel/framework/pull/29987))
+
+
+## [v6.0.3 (2019-09-10)](https://github.com/laravel/framework/compare/v6.0.2...v6.0.3)
+
+### Reverted
+- Reverted [Wrapped `MySQL` default values in parentheses](https://github.com/laravel/framework/pull/29878) ([#29943](https://github.com/laravel/framework/pull/29943))
 
 ### Refactoring
 - Converted `call_user_func` where appropriate to native calls ([#29932](https://github.com/laravel/framework/pull/29932))
@@ -32,4 +60,4 @@
 
 ## [v6.0.0 (2019-09-03)](https://github.com/laravel/framework/compare/5.8...v6.0.0)
 
-Check the upgrade guide in the [Official Laravel Documentation](https://laravel.com/docs/6.0/upgrade).
+Check the upgrade guide in the [Official Laravel Upgrade Documentation](https://laravel.com/docs/6.0/upgrade). Also you can see some release notes in the [Official Laravel Release Documentation](https://laravel.com/docs/6.x/releases).

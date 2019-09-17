@@ -3,8 +3,8 @@
 namespace DummyNamespace;
 
 use DummyFullModelClass;
-use Illuminate\Http\Request;
 use DummyRootNamespaceHttp\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class DummyClass extends Controller
 {

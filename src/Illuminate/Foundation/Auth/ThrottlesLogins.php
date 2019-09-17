@@ -53,7 +53,10 @@ trait ThrottlesLogins
         );
 
         throw ValidationException::withMessages([
-            $this->username() => [Lang::get('auth.throttle', ['seconds' => $seconds])],
+            $this->username() => [Lang::get('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => ceil($seconds / 60),
+            ])],
         ])->status(Response::HTTP_TOO_MANY_REQUESTS);
     }
 

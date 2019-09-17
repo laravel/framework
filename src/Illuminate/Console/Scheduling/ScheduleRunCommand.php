@@ -3,6 +3,9 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Date;
 
 class ScheduleRunCommand extends Command
@@ -43,6 +46,13 @@ class ScheduleRunCommand extends Command
     protected $eventsRan = false;
 
     /**
+     * The event dispatcher.
+     *
+     * @var \Illuminate\Contracts\Notifications\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -58,11 +68,13 @@ class ScheduleRunCommand extends Command
      * Execute the console command.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function handle(Schedule $schedule)
+    public function handle(Schedule $schedule, Dispatcher $dispatcher)
     {
         $this->schedule = $schedule;
+        $this->dispatcher = $dispatcher;
 
         foreach ($this->schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
@@ -108,7 +120,16 @@ class ScheduleRunCommand extends Command
     {
         $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
+        $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
+
+        $start = microtime(true);
+
         $event->run($this->laravel);
+
+        $this->dispatcher->dispatch(new ScheduledTaskFinished(
+            $event,
+            round(microtime(true) - $start, 2)
+        ));
 
         $this->eventsRan = true;
     }

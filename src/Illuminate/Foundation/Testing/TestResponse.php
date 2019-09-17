@@ -465,6 +465,20 @@ class TestResponse
     }
 
     /**
+     * Assert that the expected value exists at the given path in the response.
+     *
+     * @param  string  $path
+     * @param  mixed  $expect
+     * @return $this
+     */
+    public function assertJsonPath($path, $expect)
+    {
+        PHPUnit::assertEquals($expect, $this->json($path));
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data

@@ -70,7 +70,7 @@ abstract class GeneratorCommand extends Command
         // stub files so that it gets the correctly formatted namespace and class name.
         $this->makeDirectory($path);
 
-        $this->files->put($path, $this->buildClass($name));
+        $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
         $this->info($this->type.' created successfully.');
     }
@@ -203,6 +203,25 @@ abstract class GeneratorCommand extends Command
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
 
         return str_replace('DummyClass', $class, $stub);
+    }
+
+    /**
+     * Alphabetically sorts the imports for the given stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function sortImports($stub)
+    {
+        if (preg_match('/(?P<imports>(?:use [^;]+;$\n?)+)/m', $stub, $match)) {
+            $imports = explode("\n", trim($match['imports']));
+
+            sort($imports);
+
+            return str_replace(trim($match['imports']), implode("\n", $imports), $stub);
+        }
+
+        return $stub;
     }
 
     /**
