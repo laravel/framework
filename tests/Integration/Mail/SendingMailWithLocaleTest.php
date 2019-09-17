@@ -69,6 +69,18 @@ class SendingMailWithLocaleTest extends TestCase
         );
     }
 
+    public function testMailIsSentWithLocaleFromMailable()
+    {
+        $mailable = new TestMail();
+        $mailable->locale('ar');
+
+        Mail::to('test@mail.com')->send($mailable);
+
+        $this->assertStringContainsString('esm',
+            app('swift.transport')->messages()[0]->getBody()
+        );
+    }
+
     public function testMailIsSentWithLocaleUpdatedListenersCalled()
     {
         Carbon::setTestNow('2018-04-01');
