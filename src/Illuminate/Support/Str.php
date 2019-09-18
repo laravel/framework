@@ -606,7 +606,7 @@ class Str
     /**
      * Set the callable that will be used to generate UUIDs.
      *
-     * @param  callable
+     * @param  callable  $factory
      * @return void
      */
     public static function createUuidsUsing(callable $factory = null)

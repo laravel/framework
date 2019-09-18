@@ -555,7 +555,7 @@ class Event
      * Get the callback that pings the given URL.
      *
      * @param  string  $url
-     * @return Closure
+     * @return \Closure
      */
     protected function pingCallback($url)
     {
