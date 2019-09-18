@@ -1226,6 +1226,18 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Change an item specified by key.
+     *
+     * @param  mixed $key
+     * @param  callable $callback
+     * @return void
+     */
+    public function change($key, callable $callback)
+    {
+        $this->items[$key] = $callback($this->items[$key]);
+    }
+
+    /**
      * Get an iterator for the items.
      *
      * @return \ArrayIterator
