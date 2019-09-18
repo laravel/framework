@@ -90,8 +90,6 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
     public function testMorphPivotWillTriggerEventsToBeFired()
     {
-        // $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
-        // $user2 = PivotEventsTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);
         $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
         $tag1 = PivotEventsTestTag::forceCreate(['name' => 'Database']);
         $tag2 = PivotEventsTestTag::forceCreate(['name' => 'Filesystem']);
