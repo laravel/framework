@@ -2888,26 +2888,26 @@ class SupportCollectionTest extends TestCase
         $c = $c->pad(-4, 0);
         $this->assertEquals([1, 2, 3, 4, 5], $c->all());
     }
-    
+
     /**
      * @dataProvider collectionClassProvider
      */
     public function testChange($collection)
     {
         $c = new $collection(['b' => ['c1']]);
-        $c->change('b', function($item) {
+        $c->change('b', function ($item) {
             $item[] = 'c2';
             return $item;
         });
         $this->assertEqualsCanonicalizing(['b' => ['c1', 'c2']], $c->all());
     
         $c = new $collection(['b' => []]);
-        $c->change('b.c.d', function($item) {
+        $c->change('b.c.d', function ($item) {
             return 3;
         });
         $this->assertEqualsCanonicalizing(['b' => ['c' => ['d' => 3]]], $c->all());
 	
-        $c->change('b.c.d', function($item) {
+        $c->change('b.c.d', function ($item) {
             return 2 + $item;
         });
         $this->assertEqualsCanonicalizing(['b' => ['c' => ['d' => 5]]], $c->all());
