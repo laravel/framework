@@ -1224,6 +1224,22 @@ class Collection implements ArrayAccess, Enumerable
     {
         return new static(array_pad($this->items, $size, $value));
     }
+    
+    /**
+     * Change an item specified by key.
+     *
+     * @param  mixed $key
+     * @param  callable $callback
+     * @return void
+     */
+    public function change($key, callable $callback)
+    {
+        Arr::set(
+            $this->items,
+            $key,
+            $callback(Arr::get($this->items, $key))
+        );
+    }
 
     /**
      * Get an iterator for the items.
