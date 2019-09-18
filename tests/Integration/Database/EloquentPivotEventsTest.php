@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -32,6 +33,19 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->integer('user_id');
             $table->integer('project_id');
             $table->string('role')->nullable();
+        });
+
+        Schema::create('taggables', function (Blueprint $table) {
+            $table->integer('tag_id');
+            $table->morphs('taggable');
+            $table->unsignedInteger('rank')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('tags', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
         });
 
         // clear event log between requests
@@ -73,6 +87,30 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $project->contributors()->detach($user->id);
         $this->assertEquals([], PivotEventsTestCollaborator::$eventsCalled);
     }
+
+    public function testMorphPivotWillTriggerEventsToBeFired()
+    {
+        // $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
+        // $user2 = PivotEventsTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);
+        $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
+        $tag1 = PivotEventsTestTag::forceCreate(['name' => 'Database']);
+        $tag2 = PivotEventsTestTag::forceCreate(['name' => 'Filesystem']);
+
+        $project->tags()->attach($tag1);
+        $this->assertEquals(['saving', 'creating', 'created', 'saved'], PivotEventsTestTaggable::$eventsCalled);
+
+        PivotEventsTestTaggable::$eventsCalled = [];
+        $project->tags()->sync([$tag2->id]);
+        $this->assertEquals(['deleting', 'deleted', 'saving', 'creating', 'created', 'saved'], PivotEventsTestTaggable::$eventsCalled);
+
+        PivotEventsTestTaggable::$eventsCalled = [];
+        $project->tags()->sync([$tag1->id => ['rank' => 1], $tag2->id => ['rank' => 2]]);
+        $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'updating', 'updated', 'saved'], PivotEventsTestTaggable::$eventsCalled);
+
+        PivotEventsTestTaggable::$eventsCalled = [];
+        $project->tags()->detach($tag1);
+        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestTaggable::$eventsCalled);
+    }
 }
 
 class PivotEventsTestUser extends Model
@@ -97,18 +135,37 @@ class PivotEventsTestProject extends Model
             ->using(PivotEventsTestCollaborator::class)
             ->wherePivot('role', 'contributor');
     }
+
+    public function tags()
+    {
+        return $this->morphToMany(PivotEventsTestTag::class, 'taggable', 'taggables', null, 'tag_id')
+            ->withPivot('rank')
+            ->using(PivotEventsTestTaggable::class)
+            ->withTimestamps();
+    }
 }
 
-class PivotEventsTestCollaborator extends Pivot
+class PivotEventsTestTag extends Model
 {
-    public $table = 'project_users';
+    public $table = 'tags';
 
+    public function users()
+    {
+        return $this->morphedByMany(PivotEventsTestUser::class, 'taggable');
+    }
+
+    public function projects()
+    {
+        return $this->morphedByMany(PivotEventsTestProject::class, 'taggable');
+    }
+}
+
+trait PivotEventsTestTracksEvents
+{
     public static $eventsCalled = [];
 
-    public static function boot()
+    public static function bootPivotEventsTestTracksEvents()
     {
-        parent::boot();
-
         static::creating(function ($model) {
             static::$eventsCalled[] = 'creating';
         });
@@ -141,4 +198,18 @@ class PivotEventsTestCollaborator extends Pivot
             static::$eventsCalled[] = 'deleted';
         });
     }
+}
+
+class PivotEventsTestCollaborator extends Pivot
+{
+    use PivotEventsTestTracksEvents;
+
+    public $table = 'project_users';
+}
+
+class PivotEventsTestTaggable extends MorphPivot
+{
+    use PivotEventsTestTracksEvents;
+
+    public $table = 'taggables';
 }
