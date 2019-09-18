@@ -1224,7 +1224,7 @@ class Collection implements ArrayAccess, Enumerable
     {
         return new static(array_pad($this->items, $size, $value));
     }
-    
+
     /**
      * Change an item specified by key.
      *
