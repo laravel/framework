@@ -1234,7 +1234,11 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function change($key, callable $callback)
     {
-        $this->items[$key] = $callback($this->items[$key]);
+        Arr::set(
+            $this->items,
+            $key, 
+            $callback(Arr::get($this->items, $key))
+        );
     }
 
     /**
