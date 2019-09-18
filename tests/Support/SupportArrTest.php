@@ -487,6 +487,39 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], Arr::pluck($array, ['user', 1], ['user', 0]));
     }
 
+    public function testArrayPluckWithOriginalKeys()
+    {
+        $data = [
+            'post-1' => [
+                'comments' => [
+                    'tags' => [
+                        '#foo', '#bar',
+                    ],
+                ],
+            ],
+            'post-2' => [
+                'comments' => [
+                    'tags' => [
+                        '#baz',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals([
+            'post-1' => [
+                'tags' => [
+                    '#foo', '#bar',
+                ],
+            ],
+            'post-2' => [
+                'tags' => [
+                    '#baz',
+                ],
+            ],
+        ], Arr::pluck($data, 'comments', true));
+    }
+
     public function testArrayPluckWithNestedArrays()
     {
         $array = [
