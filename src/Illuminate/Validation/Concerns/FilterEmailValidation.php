@@ -11,7 +11,7 @@ class FilterEmailValidation implements EmailValidation
      * Returns true if the given email is valid.
      *
      * @param  string  $email
-     * @param  \Egulias\EmailValidator\EmailLexer  EmailLexer
+     * @param  \Egulias\EmailValidator\EmailLexer  $emailLexer
      * @return bool
      */
     public function isValid($email, EmailLexer $emailLexer)
