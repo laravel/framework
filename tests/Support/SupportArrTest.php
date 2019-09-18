@@ -519,6 +519,15 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
     }
 
+    public function testPush()
+    {
+        $array = Arr::push(['one', 'two', 'three', 'four'], 'five');
+        $this->assertEquals(['one', 'two', 'three', 'four', 'five'], $array);
+
+        $array = Arr::push(['one' => 1, 'two' => 2], 3, 'three');
+        $this->assertEquals(['one' => 1, 'two' => 2, 'three' => 3], $array);
+    }
+
     public function testPull()
     {
         $array = ['name' => 'Desk', 'price' => 100];
