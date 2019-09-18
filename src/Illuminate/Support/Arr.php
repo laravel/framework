@@ -374,7 +374,7 @@ class Arr
      *
      * @param  array  $array
      * @param  string|array  $value
-     * @param  string|array|boolean|null  $key
+     * @param  string|array|bool|null  $key
      * @return array
      */
     public static function pluck($array, $value, $key = null)
@@ -387,8 +387,8 @@ class Arr
             $itemValue = data_get($item, $value);
 
             // If the key is "null", we will just append the value to the array and keep
-            // looping. If the key is "true" we will keep the original keys. Otherwise 
-            // we will key the array using the value of the key we received from the 
+            // looping. If the key is "true" we will keep the original keys. Otherwise
+            // we will key the array using the value of the key we received from the
             // developer. Then we'll return the final array form.
             if (is_null($key)) {
                 $results[] = $itemValue;
@@ -412,14 +412,14 @@ class Arr
      * Explode the "value" and "key" arguments passed to "pluck".
      *
      * @param  string|array  $value
-     * @param  string|array|boolean|null  $key
+     * @param  string|array|bool|null  $key
      * @return array
      */
     protected static function explodePluckParameters($value, $key)
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
-        if (!is_null($key) && true !== $key && !is_array($key)) {
+        if (! is_null($key) && true !== $key && ! is_array($key)) {
             $key = explode('.', $key);
         }
 
