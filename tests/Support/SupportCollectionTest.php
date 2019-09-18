@@ -2894,6 +2894,7 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['b' => ['c1']]);
         $c->change('b', function ($item) {
             $item[] = 'c2';
+
             return $item;
         });
         $this->assertEqualsCanonicalizing(['b' => ['c1', 'c2']], $c->all());
