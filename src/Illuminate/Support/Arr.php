@@ -441,6 +441,25 @@ class Arr
     }
 
     /**
+     * Push an item onto the end of an array.
+     *
+     * @param  array  $array
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return array
+     */
+    public static function push($array, $value, $key = null)
+    {
+        if (is_null($key)) {
+            array_push($array, $value);
+        } else {
+            $array = $array + [$key => $value];
+        }
+
+        return $array;
+    }
+
+    /**
      * Get a value from the array, and remove it.
      *
      * @param  array   $array
