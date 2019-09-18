@@ -100,12 +100,11 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Cache all values by enumerating the collection
-     * into a new lazy collection backed by an array.
+     * Eager load all items into a new lazy collection backed by an array.
      *
      * @return static
      */
-    public function cache()
+    public function eager()
     {
         return new static($this->all());
     }

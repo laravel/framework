@@ -8,10 +8,10 @@ use Illuminate\Support\LazyCollection;
 
 class SupportLazyCollectionIsLazyTest extends TestCase
 {
-    public function testCacheEnumeratesOnce()
+    public function testEagerEnumeratesOnce()
     {
         $this->assertEnumeratesOnce(function ($collection) {
-            $collection = $collection->cache();
+            $collection = $collection->eager();
 
             $collection->count();
             $collection->all();

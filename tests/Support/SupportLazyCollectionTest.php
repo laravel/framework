@@ -67,13 +67,13 @@ class SupportLazyCollectionTest extends TestCase
         ], $data->all());
     }
 
-    public function testCache()
+    public function testEager()
     {
         $source = [1, 2, 3, 4, 5];
 
         $data = LazyCollection::make(function () use (&$source) {
             yield from $source;
-        })->cache();
+        })->eager();
 
         $source[] = 6;
 
