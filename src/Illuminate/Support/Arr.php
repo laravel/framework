@@ -328,7 +328,7 @@ class Arr
             $subKeyArray = $array;
 
             if (static::exists($array, $key)) {
-                if($matchAll) {
+                if ($matchAll) {
 					continue;
                 } else {
                     break;
