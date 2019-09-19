@@ -329,7 +329,7 @@ class Arr
 
             if (static::exists($array, $key)) {
                 if ($matchAll) {
-					continue;
+                    continue;
                 } else {
                     break;
                 }
