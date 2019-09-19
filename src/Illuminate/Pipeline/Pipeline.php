@@ -184,11 +184,15 @@ class Pipeline implements PipelineContract
     /**
      * Parse full pipe string to get name and parameters.
      *
-     * @param  string $pipe
+     * @param  string|array $pipe
      * @return array
      */
     protected function parsePipeString($pipe)
     {
+        if (is_array($pipe)) {
+            $pipe = $pipe[0] . ':' . implode(',', array_slice($pipe, 1));
+        }
+
         [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
 
         if (is_string($parameters)) {

@@ -131,6 +131,39 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.parameters']);
     }
 
+    public function testPipelineUsageWithArrayAsPipe()
+    {
+        $parameters = ['one', 'two'];
+
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through([
+                [PipelineTestParameterPipe::class, implode(',', $parameters)],
+            ])
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame('foo', $result);
+        $this->assertEquals($parameters, $_SERVER['__test.pipe.parameters']);
+
+        unset($_SERVER['__test.pipe.parameters']);
+
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through([
+                array_merge([PipelineTestParameterPipe::class], $parameters)
+            ])
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame('foo', $result);
+        $this->assertEquals($parameters, $_SERVER['__test.pipe.parameters']);
+
+        unset($_SERVER['__test.pipe.parameters']);
+    }
+
     public function testPipelineViaChangesTheMethodBeingCalledOnThePipes()
     {
         $pipelineInstance = new Pipeline(new Container);
