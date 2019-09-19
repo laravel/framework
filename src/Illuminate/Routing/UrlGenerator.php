@@ -728,4 +728,17 @@ class UrlGenerator implements UrlGeneratorContract
 
         return $this;
     }
+
+    /**
+     * Set the asset root.
+     *
+     * @param  string  $rootNamespace
+     * @return $this
+     */
+    public function setAssetRoot($root)
+    {
+        $this->assetRoot = $root;
+
+        return $this;
+    }
 }
