@@ -313,9 +313,10 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|array  $keys
+     * @param  bool $matchAll
      * @return bool
      */
-    public static function has($array, $keys)
+    public static function has($array, $keys, $matchAll = true)
     {
         $keys = (array) $keys;
 
@@ -327,7 +328,11 @@ class Arr
             $subKeyArray = $array;
 
             if (static::exists($array, $key)) {
-                continue;
+                if($matchAll) {
+					continue;
+                } else {
+                    break;
+                }
             }
 
             foreach (explode('.', $key) as $segment) {
