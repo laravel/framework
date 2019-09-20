@@ -44,8 +44,7 @@ class HubTest extends TestCase
 
     public function testHubUsesNamedMethod()
     {
-        $hub = new class(new Container) extends Hub
-        {
+        $hub = new class(new Container) extends Hub {
             protected function pipelineNamed($pipeline, $passable)
             {
                 return $pipeline->send($passable)->through(PipelineEmpty::class)->thenReturn();
@@ -73,8 +72,7 @@ class HubTest extends TestCase
     {
         $this->expectException(LogicException::class);
 
-        $hub = new class(new Container) extends Hub
-        {
+        $hub = new class(new Container) extends Hub {
             protected function pipelineNamed($pipeline, $passable)
             {
                 return $pipeline->send($passable)->through(PipelineEmpty::class)->thenReturn();
