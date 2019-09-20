@@ -1133,4 +1133,14 @@ class BelongsToMany extends Relation
     {
         return $this->accessor;
     }
+
+    /**
+     * Get the pivot columns for this relationship.
+     *
+     * @return array
+     */
+    public function getPivotColumns()
+    {
+        return $this->pivotColumns;
+    }
 }
