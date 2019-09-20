@@ -133,6 +133,8 @@ class PipelineTest extends TestCase
 
     public function testPipelineUsageWithArrayAsPipe()
     {
+        $parameters = ['one', 'two'];
+
         $result = (new Pipeline(new Container))
             ->send('foo')
             ->through([
@@ -188,7 +190,7 @@ class PipelineTest extends TestCase
             });
 
         $this->assertSame('foo', $result);
-        $this->assertEquals([PipelineTestParameterPipe::class, null], $_SERVER['__test.pipe.parameters']);
+        $this->assertEquals([null, null], $_SERVER['__test.pipe.parameters']);
 
         unset($_SERVER['__test.pipe.parameters']);
     }
