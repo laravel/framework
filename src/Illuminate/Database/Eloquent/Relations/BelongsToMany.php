@@ -2,12 +2,12 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BelongsToMany extends Relation
 {
@@ -1132,5 +1132,15 @@ class BelongsToMany extends Relation
     public function getPivotAccessor()
     {
         return $this->accessor;
+    }
+
+    /**
+     * Get the pivot columns for this relationship.
+     *
+     * @return array
+     */
+    public function getPivotColumns()
+    {
+        return $this->pivotColumns;
     }
 }
