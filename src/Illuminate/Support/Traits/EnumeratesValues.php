@@ -589,6 +589,32 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items where the given key exists.
+     *
+     * @param  string|array  $key
+     * @return static
+     */
+    public function whereHas($key)
+    {
+        return $this->filter(function ($item) use ($key) {
+            return (new static($item))->has($key);
+        });
+    }
+
+    /**
+     * Filter items where the given key does not exist.
+     *
+     * @param  string|array  $key
+     * @return static
+     */
+    public function whereDoesntHave($key)
+    {
+        return $this->reject(function ($item) use ($key) {
+            return (new static($item))->has($key);
+        });
+    }
+
+    /**
      * Filter the items, removing any items that don't match the given type.
      *
      * @param  string  $type

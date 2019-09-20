@@ -729,6 +729,26 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhereHas($collection)
+    {
+        $c = new $collection([['x' => 1], ['y' => 2], ['x' => 3, 'y' => 4]]);
+        $this->assertEquals([['x' => 1], ['x' => 3, 'y' => 4]], $c->whereHas('x')->values()->all());
+        $this->assertEquals([['x' => 3, 'y' => 4]], $c->whereHas(['x', 'y'])->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereDoesntHave($collection)
+    {
+        $c = new $collection([['x' => 1], ['y' => 2], ['x' => 3, 'y' => 4]]);
+        $this->assertEquals([['y' => 2]], $c->whereDoesntHave('x')->values()->all());
+        $this->assertEquals([['x' => 1], ['y' => 2]], $c->whereDoesntHave(['x', 'y'])->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testFlatten($collection)
     {
         // Flat arrays are unaffected
