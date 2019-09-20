@@ -152,7 +152,7 @@ class PipelineTest extends TestCase
         $result = (new Pipeline(new Container))
             ->send('foo')
             ->through([
-                array_merge([PipelineTestParameterPipe::class], $parameters)
+                array_merge([PipelineTestParameterPipe::class], $parameters),
             ])
             ->then(function ($piped) {
                 return $piped;
@@ -166,7 +166,7 @@ class PipelineTest extends TestCase
         $result = (new Pipeline(new Container))
             ->send('foo')
             ->through([
-                array_merge([PipelineTestParameterPipe::class], $parameters)
+                array_merge([PipelineTestParameterPipe::class], $parameters),
             ])
             ->then(function ($piped) {
                 return $piped;
