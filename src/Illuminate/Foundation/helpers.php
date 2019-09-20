@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Facades\Date;
@@ -604,6 +605,20 @@ if (! function_exists('old')) {
     function old($key = null, $default = null)
     {
         return app('request')->old($key, $default);
+    }
+}
+
+if (! function_exists('pipeline')) {
+    /**
+     * Create a new Pipeline instance.
+     *
+     * @param string|null $passable
+     * @param array $pipeline
+     * @return \Illuminate\Pipeline\Pipeline
+     */
+    function pipeline($passable = null, array $pipeline = [])
+    {
+        return app(Pipeline::class)->send($passable)->through($pipeline);
     }
 }
 
