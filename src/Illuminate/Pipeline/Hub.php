@@ -5,6 +5,7 @@ namespace Illuminate\Pipeline;
 use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Hub as HubContract;
+use LogicException;
 
 class Hub implements HubContract
 {
@@ -67,8 +68,16 @@ class Hub implements HubContract
     {
         $pipeline = $pipeline ?: 'default';
 
-        return call_user_func(
-            $this->pipelines[$pipeline], new Pipeline($this->container), $object
-        );
+        if (isset($this->pipelines[$pipeline])) {
+            return call_user_func(
+                $this->pipelines[$pipeline], new Pipeline($this->container), $object
+            );
+        }
+
+        if (method_exists($this, $method = 'pipeline'.ucfirst($pipeline))) {
+            return $this->$method(new Pipeline($this->container), $object);
+        }
+
+        throw new LogicException("The $pipeline hasn't been registered in the Hub");
     }
 }
