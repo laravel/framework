@@ -5,6 +5,7 @@ namespace Illuminate\Pipeline;
 use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Hub as HubContract;
+use Illuminate\Support\Str;
 use LogicException;
 
 class Hub implements HubContract
@@ -74,7 +75,7 @@ class Hub implements HubContract
             );
         }
 
-        if (method_exists($this, $method = 'pipeline'.ucfirst($pipeline))) {
+        if (method_exists($this, $method = Str::studly('pipeline'.ucfirst($pipeline)))) {
             return $this->$method(new Pipeline($this->container), $object);
         }
 

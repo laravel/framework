@@ -45,7 +45,7 @@ class HubTest extends TestCase
     public function testHubUsesNamedMethod()
     {
         $hub = new class(new Container) extends Hub {
-            protected function pipelineNamed($pipeline, $passable)
+            protected function pipelineFooBar($pipeline, $passable)
             {
                 return $pipeline->send($passable)->through(PipelineEmpty::class)->thenReturn();
             }
@@ -65,7 +65,10 @@ class HubTest extends TestCase
 
         $this->assertEquals('foo', $hub->pipe('foo', 'test-pipeline'));
         $this->assertEquals('foo', $hub->pipe('bar'));
-        $this->assertEquals('baz', $hub->pipe('baz', 'named'));
+        $this->assertEquals('baz', $hub->pipe('baz', 'foo-bar'));
+        $this->assertEquals('baz', $hub->pipe('baz', 'foo_bar'));
+        $this->assertEquals('baz', $hub->pipe('baz', 'fooBar'));
+        $this->assertEquals('baz', $hub->pipe('baz', 'FooBar'));
     }
 
     public function testHubFailsIfPipelineDoesntExists()
