@@ -190,7 +190,7 @@ class Pipeline implements PipelineContract
     protected function parsePipe($pipe)
     {
         if (is_array($pipe)) {
-            return [$pipe[0],  array_slice($pipe, 1 - count($pipe))];
+            return [$pipe[0], array_slice($pipe, 1 - count($pipe))];
         }
 
         [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
