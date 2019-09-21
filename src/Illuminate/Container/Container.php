@@ -1197,6 +1197,17 @@ class Container implements ArrayAccess, ContainerContract
         $this->bindings = [];
         $this->instances = [];
         $this->abstractAliases = [];
+        $this->methodBindings = [];
+        $this->buildStack = [];
+        $this->extenders = [];
+        $this->tags = [];
+        $this->with = [];
+        $this->contextual = [];
+        $this->reboundCallbacks = [];
+        $this->globalResolvingCallbacks = [];
+        $this->globalAfterResolvingCallbacks = [];
+        $this->resolvingCallbacks = [];
+        $this->afterResolvingCallbacks = [];
     }
 
     /**
