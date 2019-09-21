@@ -1201,16 +1201,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         parent::flush();
 
-        $this->buildStack = [];
         $this->loadedProviders = [];
         $this->bootedCallbacks = [];
         $this->bootingCallbacks = [];
+        $this->terminatingCallbacks = [];
         $this->deferredServices = [];
-        $this->reboundCallbacks = [];
         $this->serviceProviders = [];
-        $this->resolvingCallbacks = [];
-        $this->afterResolvingCallbacks = [];
-        $this->globalResolvingCallbacks = [];
     }
 
     /**
