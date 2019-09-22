@@ -4,25 +4,33 @@
 
 ### Added
 - Added `TestResponse::assertJsonPath()` method ([#29957](https://github.com/laravel/framework/pull/29957))
+- Added `hasMacro` \ `getGlobalMacro` \ `hasGlobalMacro` methods to `Eloquent Builder` ([#30008](https://github.com/laravel/framework/pull/30008))
+- Added `Illuminate\Database\Eloquent\Relations\BelongsToMany::getPivotColumns()` method ([#30049](https://github.com/laravel/framework/pull/30049)) 
+- Added `ScheduledTaskFinished` \ `ScheduledTaskStarting` events to signal when scheduled task runs ([#29888](https://github.com/laravel/framework/pull/29888))
 
 ### Fixed
 - Fixed `__()` with `null` parameter ([#29967](https://github.com/laravel/framework/pull/29967)) 
 - Fixed modifying `updated_at` column on custom pivot model ([#29970](https://github.com/laravel/framework/pull/29970))
+- Fixed `Illuminate\Redis\Limiters\ConcurrencyLimiter` ([#30005](https://github.com/laravel/framework/pull/30005))
+- Fixed `VerifyCsrfToken` middleware when response object instance of `Responsable` interface ([#29972](https://github.com/laravel/framework/pull/29972))
+- Fixed Postgresql column creation without optional precision ([#29873](https://github.com/laravel/framework/pull/29873))
 
 ### Changed
 - Make it possible to disable encryption via `0`/`false` ([#29985](https://github.com/laravel/framework/pull/29985))
+- Allowed a symfony file instance in validate dimensions ([#30009](https://github.com/laravel/framework/pull/30009))
+- Create storage fakes with custom configuration ([#29999](https://github.com/laravel/framework/pull/29999))
 
 ### Refactoring
 - Changed imports to Alpha ordering in stubs ([#29954](https://github.com/laravel/framework/pull/29954), [#29958](https://github.com/laravel/framework/pull/29958))
 - Used value helper where possible ([#29959](https://github.com/laravel/framework/pull/29959))
+- Improved readability in `auth.throttle` translation ([#30011](https://github.com/laravel/framework/pull/30011), [#30017](https://github.com/laravel/framework/pull/30017))
 
 ### TODO:
-- Sort imports alphabetically on class generation from stub ([#29951](https://github.com/laravel/framework/pull/29951))
-- Convert Responsables to Response objects in VerifyCsrfToken ([#29972](https://github.com/laravel/framework/pull/29972))
-- Allow adding NotFoundHttpException to "allowed" exceptions in tests ([#29975](https://github.com/laravel/framework/pull/29975))
-- Add events to signal when scheduled task runs ([#29888](https://github.com/laravel/framework/pull/29888))
-- Postgresql column precision declaration fix ([#29873](https://github.com/laravel/framework/pull/29873))
 - Allow adding command arguments and options with objects ([#29987](https://github.com/laravel/framework/pull/29987))
+- Fix Migrations out of order with multiple path with certain filenames ([#29996](https://github.com/laravel/framework/pull/29996))
+- Set locale conditionally ([dd1e0a6](https://github.com/laravel/framework/commit/dd1e0a604713ddae21e6a893e4f605a6777300e8))
+- Sort imports alphabetically on class generation from stub ([#29951](https://github.com/laravel/framework/pull/29951))
+- Allow adding NotFoundHttpException to "allowed" exceptions in tests ([#29975](https://github.com/laravel/framework/pull/29975))
 
 
 ## [v6.0.3 (2019-09-10)](https://github.com/laravel/framework/compare/v6.0.2...v6.0.3)
