@@ -292,6 +292,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  array  $resources
      * @param  array  $options
      * @return void
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function resources(array $resources, array $options = [])
     {
@@ -307,6 +308,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  string  $controller
      * @param  array  $options
      * @return \Illuminate\Routing\PendingResourceRegistration
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function resource($name, $controller, array $options = [])
     {
@@ -327,6 +329,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  array  $resources
      * @param  array  $options
      * @return void
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function apiResources(array $resources, array $options = [])
     {
@@ -342,6 +345,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  string  $controller
      * @param  array  $options
      * @return \Illuminate\Routing\PendingResourceRegistration
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function apiResource($name, $controller, array $options = [])
     {
@@ -591,6 +595,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  string  $name
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function respondWithRoute($name)
     {
@@ -604,6 +609,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function dispatch(Request $request)
     {
@@ -617,6 +623,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function dispatchToRoute(Request $request)
     {
@@ -644,6 +651,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Routing\Route  $route
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function runRoute(Request $request, Route $route)
     {
@@ -664,6 +672,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function runRouteWithinStack(Route $route, Request $request)
     {
