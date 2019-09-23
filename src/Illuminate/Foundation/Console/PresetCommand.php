@@ -114,7 +114,7 @@ class PresetCommand extends Command
     protected function getOptions()
     {
         return [
-            ['option', null, InputOption::VALUE_IS_ARRAY, 'Pass an option to the preset command'],
+            ['option', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Pass an option to the preset command'],
         ];
     }
 }

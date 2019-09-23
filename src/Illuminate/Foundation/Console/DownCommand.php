@@ -84,7 +84,7 @@ class DownCommand extends Command
         return [
             ['message', null, InputOption::VALUE_OPTIONAL, 'The message for the maintenance mode'],
             ['retry', null, InputOption::VALUE_OPTIONAL, 'The number of seconds after which the request may be retried'],
-            ['allow', null, InputOption::VALUE_IS_ARRAY, 'IP or networks allowed to access the application while in maintenance mode'],
+            ['allow', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'IP or networks allowed to access the application while in maintenance mode'],
         ];
     }
 }

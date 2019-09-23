@@ -280,7 +280,7 @@ class VendorPublishCommand extends Command
     {
         return [
             ['provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish'],
-            ['tag', null, InputOption::VALUE_IS_ARRAY, 'One or many tags that have assets you want to publish'],
+            ['tag', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'One or many tags that have assets you want to publish'],
             ['force', null, InputOption::VALUE_NONE, 'Overwrite any existing files'],
             ['all', null, InputOption::VALUE_NONE, 'Publish assets for all service providers without prompt'],
         ];
