@@ -29,8 +29,8 @@ class QueueFake extends QueueManager implements Queue
             return $this->assertPushedTimes($job, $callback);
         }
 
-        PHPUnit::assertTrue(
-            $this->pushed($job, $callback)->count() > 0,
+        PHPUnit::assertNotEmpty(
+            $this->pushed($job, $callback),
             "The expected [{$job}] job was not pushed."
         );
     }
@@ -44,8 +44,8 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function assertPushedTimes($job, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->pushed($job)->count()) === $times,
+        PHPUnit::assertSame(
+            $times, $count = $this->pushed($job)->count(),
             "The expected [{$job}] job was pushed {$count} times instead of {$times} times."
         );
     }
@@ -79,13 +79,13 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertPushedWithChain($job, $expectedChain = [], $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->pushed($job, $callback)->isNotEmpty(),
+        PHPUnit::assertNotEmpty(
+            $this->pushed($job, $callback),
             "The expected [{$job}] job was not pushed."
         );
 
-        PHPUnit::assertTrue(
-            collect($expectedChain)->isNotEmpty(),
+        PHPUnit::assertNotEmpty(
+            $expectedChain,
             'The expected chain can not be empty.'
         );
 
@@ -108,10 +108,10 @@ class QueueFake extends QueueManager implements Queue
             return serialize($job);
         })->all();
 
-        PHPUnit::assertTrue(
+        PHPUnit::assertNotEmpty(
             $this->pushed($job, $callback)->filter(function ($job) use ($chain) {
                 return $job->chained == $chain;
-            })->isNotEmpty(),
+            }),
             'The expected chain was not pushed.'
         );
     }
@@ -134,8 +134,8 @@ class QueueFake extends QueueManager implements Queue
             return $chain->all() === $expectedChain;
         });
 
-        PHPUnit::assertTrue(
-            $matching->isNotEmpty(), 'The expected chain was not pushed.'
+        PHPUnit::assertNotEmpty(
+            $matching, 'The expected chain was not pushed.'
         );
     }
 
@@ -147,8 +147,8 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function isChainOfObjects($chain)
     {
-        return ! collect($chain)->contains(function ($job) {
-            return ! is_object($job);
+        return collect($chain)->every(function ($job) {
+            return is_object($job);
         });
     }
 
@@ -161,8 +161,8 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertNotPushed($job, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->pushed($job, $callback)->count() === 0,
+        PHPUnit::assertEmpty(
+            $this->pushed($job, $callback),
             "The unexpected [{$job}] job was pushed."
         );
     }
