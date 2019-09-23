@@ -5,19 +5,18 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Encryption\Encrypter;
+use Symfony\Component\Console\Input\InputOption;
 
 class KeyGenerateCommand extends Command
 {
     use ConfirmableTrait;
 
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'key:generate
-                    {--show : Display the key instead of modifying files}
-                    {--force : Force the operation to run when in production}';
+    protected $name = 'key:generate';
 
     /**
      * The console command description.
@@ -107,5 +106,18 @@ class KeyGenerateCommand extends Command
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
         return "/^APP_KEY{$escaped}/m";
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['show', null, InputOption::VALUE_NONE, 'Display the key instead of modifying files'],
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+        ];
     }
 }

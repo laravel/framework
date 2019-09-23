@@ -4,17 +4,17 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use InvalidArgumentException;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class PresetCommand extends Command
 {
     /**
-     * The console command signature.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'preset
-                            { type : The preset type (none, bootstrap, vue, react) }
-                            { --option=* : Pass an option to the preset command }';
+    protected $name = 'preset';
 
     /**
      * The console command description.
@@ -92,5 +92,29 @@ class PresetCommand extends Command
 
         $this->info('React scaffolding installed successfully.');
         $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['type', InputArgument::REQUIRED, 'The preset type (none, bootstrap, vue, react)'],
+        ];
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['option', null, InputOption::VALUE_IS_ARRAY, 'Pass an option to the preset command'],
+        ];
     }
 }

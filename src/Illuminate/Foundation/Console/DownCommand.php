@@ -5,19 +5,18 @@ namespace Illuminate\Foundation\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\InteractsWithTime;
+use Symfony\Component\Console\Input\InputOption;
 
 class DownCommand extends Command
 {
     use InteractsWithTime;
 
     /**
-     * The console command signature.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'down {--message= : The message for the maintenance mode}
-                                 {--retry= : The number of seconds after which the request may be retried}
-                                 {--allow=* : IP or networks allowed to access the application while in maintenance mode}';
+    protected $name = 'down';
 
     /**
      * The console command description.
@@ -73,5 +72,19 @@ class DownCommand extends Command
         $retry = $this->option('retry');
 
         return is_numeric($retry) && $retry > 0 ? (int) $retry : null;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['message', null, InputOption::VALUE_OPTIONAL, 'The message for the maintenance mode'],
+            ['retry', null, InputOption::VALUE_OPTIONAL, 'The number of seconds after which the request may be retried'],
+            ['allow', null, InputOption::VALUE_IS_ARRAY, 'IP or networks allowed to access the application while in maintenance mode'],
+        ];
     }
 }

@@ -8,11 +8,11 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 class EventCacheCommand extends Command
 {
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'event:cache';
+    protected $name = 'event:cache';
 
     /**
      * The console command description.

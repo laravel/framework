@@ -5,15 +5,16 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputOption;
 
 class EventListCommand extends Command
 {
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'event:list {--event= : Filter the events by name}';
+    protected $name = 'event:list';
 
     /**
      * The console command description.
@@ -87,5 +88,17 @@ class EventListCommand extends Command
     protected function filteringByEvent()
     {
         return ! empty($this->option('event'));
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['event', null, InputOption::VALUE_OPTIONAL, 'Filter the events by name'],
+        ];
     }
 }

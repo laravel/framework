@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\MountManager;
+use Symfony\Component\Console\Input\InputOption;
 
 class VendorPublishCommand extends Command
 {
@@ -34,14 +35,11 @@ class VendorPublishCommand extends Command
     protected $tags = [];
 
     /**
-     * The console command signature.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'vendor:publish {--force : Overwrite any existing files}
-                    {--all : Publish assets for all service providers without prompt}
-                    {--provider= : The service provider that has assets you want to publish}
-                    {--tag=* : One or many tags that have assets you want to publish}';
+    protected $name = 'vendor:publish';
 
     /**
      * The console command description.
@@ -271,5 +269,20 @@ class VendorPublishCommand extends Command
         $to = str_replace(base_path(), '', realpath($to));
 
         $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['provider', null, InputOption::VALUE_OPTIONAL, 'The service provider that has assets you want to publish'],
+            ['tag', null, InputOption::VALUE_IS_ARRAY, 'One or many tags that have assets you want to publish'],
+            ['force', null, InputOption::VALUE_NONE, 'Overwrite any existing files'],
+            ['all', null, InputOption::VALUE_NONE, 'Publish assets for all service providers without prompt'],
+        ];
     }
 }

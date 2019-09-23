@@ -5,6 +5,8 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class ListenCommand extends Command
 {
@@ -13,15 +15,7 @@ class ListenCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:listen
-                            {connection? : The name of connection}
-                            {--delay=0 : The number of seconds to delay failed jobs}
-                            {--force : Force the worker to run even in maintenance mode}
-                            {--memory=128 : The memory limit in megabytes}
-                            {--queue= : The queue to listen on}
-                            {--sleep=3 : Number of seconds to sleep when no job is available}
-                            {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=1 : Number of times to attempt a job before logging it failed}';
+    protected $name = 'queue:listen';
 
     /**
      * The console command description.
@@ -110,5 +104,35 @@ class ListenCommand extends Command
         $listener->setOutputHandler(function ($type, $line) {
             $this->output->write($line);
         });
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['connection', InputArgument::OPTIONAL, 'The name of connection'],
+        ];
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['delay', null, InputOption::VALUE_OPTIONAL, 'The number of seconds to delay failed jobs', 0],
+            ['memory', null, InputOption::VALUE_OPTIONAL, 'The memory limit in megabytes', 128],
+            ['sleep', null, InputOption::VALUE_OPTIONAL, 'Number of seconds to sleep when no job is available', 3],
+            ['timeout', null, InputOption::VALUE_OPTIONAL, 'The number of seconds a child process can run', 60],
+            ['tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 1],
+            ['queue', null, InputOption::VALUE_OPTIONAL, 'The queue to listen on'],
+            ['force', null, InputOption::VALUE_NONE, 'Force the worker to run even in maintenance mode'],
+        ];
     }
 }

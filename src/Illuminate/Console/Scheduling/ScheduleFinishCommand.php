@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputArgument;
 
 class ScheduleFinishCommand extends Command
 {
@@ -11,7 +12,7 @@ class ScheduleFinishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'schedule:finish {id}';
+    protected $name = 'schedule:finish';
 
     /**
      * The console command description.
@@ -38,5 +39,17 @@ class ScheduleFinishCommand extends Command
         collect($schedule->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');
         })->each->callAfterCallbacks($this->laravel);
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['id', InputArgument::REQUIRED, ''],
+        ];
     }
 }

@@ -3,15 +3,16 @@
 namespace Illuminate\Auth\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputArgument;
 
 class ClearResetsCommand extends Command
 {
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'auth:clear-resets {name? : The name of the password broker}';
+    protected $name = 'auth:clear-resets';
 
     /**
      * The console command description.
@@ -30,5 +31,17 @@ class ClearResetsCommand extends Command
         $this->laravel['auth.password']->broker($this->argument('name'))->getRepository()->deleteExpired();
 
         $this->info('Expired reset tokens cleared!');
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['name', InputArgument::OPTIONAL, 'The name of the password broker'],
+        ];
     }
 }

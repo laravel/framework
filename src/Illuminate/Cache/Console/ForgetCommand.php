@@ -4,6 +4,7 @@ namespace Illuminate\Cache\Console;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputArgument;
 
 class ForgetCommand extends Command
 {
@@ -12,7 +13,7 @@ class ForgetCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'cache:forget {key : The key to remove} {store? : The store to remove the key from}';
+    protected $name = 'cache:forget';
 
     /**
      * The console command description.
@@ -53,5 +54,18 @@ class ForgetCommand extends Command
         );
 
         $this->info('The ['.$this->argument('key').'] key has been removed from the cache.');
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['key', InputArgument::REQUIRED, 'The key to remove'],
+            ['store', InputArgument::OPTIONAL, 'The store to remove the key from'],
+        ];
     }
 }

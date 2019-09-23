@@ -10,11 +10,11 @@ use Symfony\Component\Finder\SplFileInfo;
 class ViewCacheCommand extends Command
 {
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'view:cache';
+    protected $name = 'view:cache';
 
     /**
      * The console command description.

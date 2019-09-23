@@ -4,15 +4,16 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Symfony\Component\Console\Input\InputArgument;
 
 class RetryCommand extends Command
 {
     /**
-     * The console command signature.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'queue:retry {id* : The ID of the failed job or "all" to retry all jobs}';
+    protected $name = 'queue:retry';
 
     /**
      * The console command description.
@@ -89,5 +90,17 @@ class RetryCommand extends Command
         }
 
         return json_encode($payload);
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['id', InputArgument::IS_ARRAY, 'The ID of the failed job or "all" to retry all jobs'],
+        ];
     }
 }

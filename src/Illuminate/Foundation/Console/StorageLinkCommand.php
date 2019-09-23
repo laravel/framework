@@ -7,11 +7,11 @@ use Illuminate\Console\Command;
 class StorageLinkCommand extends Command
 {
     /**
-     * The console command signature.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'storage:link';
+    protected $name = 'storage:link';
 
     /**
      * The console command description.
