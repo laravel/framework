@@ -100,7 +100,7 @@ class RetryCommand extends Command
     protected function getArguments()
     {
         return [
-            ['id', InputArgument::IS_ARRAY, 'The ID of the failed job or "all" to retry all jobs'],
+            ['id', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The ID of the failed job or "all" to retry all jobs'],
         ];
     }
 }
