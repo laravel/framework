@@ -57,8 +57,8 @@ class BusFake implements Dispatcher
             return $this->assertDispatchedTimes($command, $callback);
         }
 
-        PHPUnit::assertTrue(
-            $this->dispatched($command, $callback)->count() > 0,
+        PHPUnit::assertNotEmpty(
+            $this->dispatched($command, $callback),
             "The expected [{$command}] job was not dispatched."
         );
     }
@@ -72,8 +72,8 @@ class BusFake implements Dispatcher
      */
     public function assertDispatchedTimes($command, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->dispatched($command)->count()) === $times,
+        PHPUnit::assertSame(
+            $times, $count = $this->dispatched($command)->count(),
             "The expected [{$command}] job was pushed {$count} times instead of {$times} times."
         );
     }
@@ -87,8 +87,8 @@ class BusFake implements Dispatcher
      */
     public function assertNotDispatched($command, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->dispatched($command, $callback)->count() === 0,
+        PHPUnit::assertEmpty(
+            $this->dispatched($command, $callback),
             "The unexpected [{$command}] job was dispatched."
         );
     }

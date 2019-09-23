@@ -50,8 +50,8 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             return $this->assertSentToTimes($notifiable, $notification, $callback);
         }
 
-        PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() > 0,
+        PHPUnit::assertNotEmpty(
+            $this->sent($notifiable, $notification, $callback),
             "The expected [{$notification}] notification was not sent."
         );
     }
@@ -66,8 +66,8 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      */
     public function assertSentToTimes($notifiable, $notification, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->sent($notifiable, $notification)->count()) === $times,
+        PHPUnit::assertSame(
+            $times, $count = $this->sent($notifiable, $notification)->count(),
             "Expected [{$notification}] to be sent {$times} times, but was sent {$count} times."
         );
     }
@@ -90,8 +90,8 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             return;
         }
 
-        PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() === 0,
+        PHPUnit::assertEmpty(
+            $this->sent($notifiable, $notification, $callback),
             "The unexpected [{$notification}] notification was sent."
         );
     }

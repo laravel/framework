@@ -43,8 +43,8 @@ class MailFake implements Mailer, MailQueue
             $message .= ' Did you mean to use assertQueued() instead?';
         }
 
-        PHPUnit::assertTrue(
-            $this->sent($mailable, $callback)->count() > 0,
+        PHPUnit::assertNotEmpty(
+            $this->sent($mailable, $callback),
             $message
         );
     }
@@ -58,8 +58,8 @@ class MailFake implements Mailer, MailQueue
      */
     protected function assertSentTimes($mailable, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->sent($mailable)->count()) === $times,
+        PHPUnit::assertSame(
+            $times, $count = $this->sent($mailable)->count(),
             "The expected [{$mailable}] mailable was sent {$count} times instead of {$times} times."
         );
     }
@@ -73,8 +73,8 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNotSent($mailable, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->sent($mailable, $callback)->count() === 0,
+        PHPUnit::assertEmpty(
+            $this->sent($mailable, $callback),
             "The unexpected [{$mailable}] mailable was sent."
         );
     }
@@ -102,8 +102,8 @@ class MailFake implements Mailer, MailQueue
             return $this->assertQueuedTimes($mailable, $callback);
         }
 
-        PHPUnit::assertTrue(
-            $this->queued($mailable, $callback)->count() > 0,
+        PHPUnit::assertNotEmpty(
+            $this->queued($mailable, $callback),
             "The expected [{$mailable}] mailable was not queued."
         );
     }
@@ -117,8 +117,8 @@ class MailFake implements Mailer, MailQueue
      */
     protected function assertQueuedTimes($mailable, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->queued($mailable)->count()) === $times,
+        PHPUnit::assertSame(
+            $times, $count = $this->queued($mailable)->count(),
             "The expected [{$mailable}] mailable was queued {$count} times instead of {$times} times."
         );
     }
@@ -132,8 +132,8 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNotQueued($mailable, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->queued($mailable, $callback)->count() === 0,
+        PHPUnit::assertEmpty(
+            $this->queued($mailable, $callback),
             "The unexpected [{$mailable}] mailable was queued."
         );
     }
@@ -178,7 +178,7 @@ class MailFake implements Mailer, MailQueue
      */
     public function hasSent($mailable)
     {
-        return $this->mailablesOf($mailable)->count() > 0;
+        return $this->mailablesOf($mailable)->isNotEmpty();
     }
 
     /**
@@ -211,7 +211,7 @@ class MailFake implements Mailer, MailQueue
      */
     public function hasQueued($mailable)
     {
-        return $this->queuedMailablesOf($mailable)->count() > 0;
+        return $this->queuedMailablesOf($mailable)->isNotEmpty();
     }
 
     /**
