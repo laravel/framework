@@ -217,15 +217,17 @@ class Command extends SymfonyCommand
         }
 
         try {
-            $this->validator = $this->validator ?? $this->makeValidator()->make(
-                array_merge($this->arguments(), $this->options()),
-                $rules,
-                $this->messages(),
-                $this->attributes()
-            );
+            $this->validator = $this->validator ?? $this->makeValidator();
         } catch (BindingResolutionException $e) {
             return true;
         }
+
+        $this->validator->make(
+            array_merge($this->arguments(), $this->options()),
+            $rules,
+            $this->messages(),
+            $this->attributes()
+        );
 
         return ! $this->validator->fails();
     }
