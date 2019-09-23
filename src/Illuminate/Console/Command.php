@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
 use Illuminate\Support\Str;
@@ -79,7 +80,7 @@ class Command extends SymfonyCommand
     /**
      * The command input validator.
      *
-     * @var Illuminate\Contracts\Validation\Factory|null
+     * @var Illuminate\Contracts\Validation\Validator|null
      */
     protected $validator;
 
@@ -215,12 +216,16 @@ class Command extends SymfonyCommand
             return true;
         }
 
-        $this->validator = $this->validator ?? $this->makeValidator()->make(
-            array_merge($this->arguments(), $this->options()),
-            $rules,
-            $this->messages(),
-            $this->attributes()
-        );
+        try {
+            $this->validator = $this->validator ?? $this->makeValidator()->make(
+                array_merge($this->arguments(), $this->options()),
+                $rules,
+                $this->messages(),
+                $this->attributes()
+            );
+        } catch (BindingResolutionException $e) {
+            return true;
+        }
 
         return ! $this->validator->fails();
     }
