@@ -152,6 +152,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection;
 
+        $this->assertEmpty($c);
         $this->assertTrue($c->isEmpty());
     }
 
@@ -162,6 +163,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['foo', 'bar']);
 
+        $this->assertNotEmpty($c);
         $this->assertFalse($c->isEmpty());
         $this->assertTrue($c->isNotEmpty());
     }
@@ -1880,8 +1882,8 @@ class SupportCollectionTest extends TestCase
         $range = $collection::times(5);
 
         $this->assertEquals(['slug-1', 'slug-2'], $two->all());
-        $this->assertTrue($zero->isEmpty());
-        $this->assertTrue($negative->isEmpty());
+        $this->assertEmpty($zero);
+        $this->assertEmpty($negative);
         $this->assertEquals(range(1, 5), $range->all());
     }
 
@@ -2751,8 +2753,8 @@ class SupportCollectionTest extends TestCase
             'b' => true,
             'c' => true,
         ]);
-        $this->assertTrue(
-            $data2->reject()->isEmpty()
+        $this->assertEmpty(
+            $data2->reject()
         );
     }
 
@@ -3681,7 +3683,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->whenEmpty(function ($collection) {
+        $data = $data->whenEmpty(function ($data) {
             return $data->concat(['adam']);
         });
 
