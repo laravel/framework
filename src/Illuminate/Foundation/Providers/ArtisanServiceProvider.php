@@ -29,6 +29,7 @@ use Illuminate\Foundation\Console\ExceptionMakeCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
+use Illuminate\Foundation\Console\LogsClearCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
@@ -88,6 +89,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'EventClear' => 'command.event.clear',
         'EventList' => 'command.event.list',
         'KeyGenerate' => 'command.key.generate',
+        'LogsClear' => 'command.logs.clear',
         'Optimize' => 'command.optimize',
         'OptimizeClear' => 'command.optimize.clear',
         'PackageDiscover' => 'command.package.discover',
@@ -447,6 +449,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.listener.make', function ($app) {
             return new ListenerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerLogsClearCommand()
+    {
+        $this->app->singleton('command.logs.clear', function ($app) {
+            return new LogsClearCommand($app['files']);
         });
     }
 
