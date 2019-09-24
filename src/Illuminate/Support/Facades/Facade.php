@@ -71,7 +71,7 @@ abstract class Facade
     /**
      * Create a fresh mock instance for the given class.
      *
-     * @return \Mockery\Expectation
+     * @return \Mockery\MockInterface
      */
     protected static function createFreshMockInstance()
     {
