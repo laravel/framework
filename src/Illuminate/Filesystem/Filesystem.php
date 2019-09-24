@@ -237,7 +237,7 @@ class Filesystem
     public function copy($path, $target)
     {
         $targetDirectory = dirname($target);
-        
+
         if (! $this->exists($targetDirectory)) {
             $this->makeDirectory($targetDirectory, 0755, true, true);
         }
