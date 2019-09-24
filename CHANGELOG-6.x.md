@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.0.3...6.x)
 
+## [v6.0.4 (2019-09-24)](https://github.com/laravel/framework/compare/v6.0.3...v6.0.4)
+
 ### Added
 - Added `TestResponse::assertJsonPath()` method ([#29957](https://github.com/laravel/framework/pull/29957))
 - Added `hasMacro` \ `getGlobalMacro` \ `hasGlobalMacro` methods to `Eloquent Builder` ([#30008](https://github.com/laravel/framework/pull/30008))
