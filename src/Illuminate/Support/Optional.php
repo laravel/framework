@@ -19,6 +19,14 @@ class Optional implements ArrayAccess
     protected $value;
 
     /**
+     * Default value to be returned in case
+     * the object doesn't exist.
+     *
+     * @var mixed
+     */
+    protected $default = null;
+
+    /**
      * Create a new optional instance.
      *
      * @param  mixed  $value
@@ -38,8 +46,10 @@ class Optional implements ArrayAccess
     public function __get($key)
     {
         if (is_object($this->value)) {
-            return $this->value->{$key} ?? null;
+            return $this->value->{$key} ?? $this->default;
         }
+
+        return $this->default;
     }
 
     /**
@@ -111,6 +121,20 @@ class Optional implements ArrayAccess
     }
 
     /**
+     * Sets the default return value for nonexisting object.
+     *
+     * @param $value
+     *
+     * @return mixed
+     */
+    public function default($value)
+    {
+        $this->default = $value;
+
+        return $this;
+    }
+
+    /**
      * Dynamically pass a method to the underlying object.
      *
      * @param  string  $method
@@ -126,5 +150,7 @@ class Optional implements ArrayAccess
         if (is_object($this->value)) {
             return $this->value->{$method}(...$parameters);
         }
+
+        return $this->default;
     }
 }
