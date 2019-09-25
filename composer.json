@@ -129,7 +129,7 @@
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
         "moontoast/math": "Required to use ordered UUIDs (^1.1).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^3.0).",
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^4.3.4).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^1.2).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
