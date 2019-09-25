@@ -223,7 +223,6 @@ trait ManagesStacks
         }
     }
 
-
     /**
      * Check if content exists in stack section. Remember if not added before.
      *
