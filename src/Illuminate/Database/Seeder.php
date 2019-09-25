@@ -36,6 +36,7 @@ abstract class Seeder
 
         foreach ($classes as $class) {
             $seeder = $this->resolve($class);
+
             $name = get_class($seeder);
 
             if ($silent === false && isset($this->command)) {
