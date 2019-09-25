@@ -76,12 +76,14 @@ class MigrationCreator
      *
      * @throws \InvalidArgumentException
      */
-    protected function ensureMigrationDoesntAlreadyExist($name, $migrationPath)
+    protected function ensureMigrationDoesntAlreadyExist($name, $migrationPath = null)
     {
-        $migrationFiles = $this->files->glob($migrationPath.'/*.php');
+        if (! empty($migrationPath)) {
+            $migrationFiles = $this->files->glob($migrationPath.'/*.php');
 
-        foreach ($migrationFiles as $migrationFile) {
-            $this->files->requireOnce($migrationFile);
+            foreach ($migrationFiles as $migrationFile) {
+                $this->files->requireOnce($migrationFile);
+            }
         }
 
         if (class_exists($className = $this->getClassName($name))) {
