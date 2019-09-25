@@ -37,6 +37,27 @@ trait CompilesStacks
     }
 
     /**
+     * Compile the pushonce statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compilePushonce($expression)
+    {
+        return "<?php \$__env->startPushOnce{$expression}; ?>";
+    }
+
+    /**
+     * Compile the end-pushonce statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndpushonce()
+    {
+        return '<?php $__env->stopPushOnce(); ?>';
+    }
+
+    /**
      * Compile the prepend statements into valid PHP.
      *
      * @param  string  $expression
@@ -55,5 +76,26 @@ trait CompilesStacks
     protected function compileEndprepend()
     {
         return '<?php $__env->stopPrepend(); ?>';
+    }
+
+    /**
+     * Compile the prependonce statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compilePrependonce($expression)
+    {
+        return "<?php \$__env->startPrependOnce{$expression}; ?>";
+    }
+
+    /**
+     * Compile the end-prependonce statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndprependonce()
+    {
+        return '<?php $__env->stopPrependOnce(); ?>';
     }
 }
