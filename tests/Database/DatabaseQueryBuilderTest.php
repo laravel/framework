@@ -3449,6 +3449,16 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+    public function testOrWhere()
+    {
+        $builder = $this->getBuilder();
+        $conditions = [
+            ['a', '=', 1],
+            ['b', '=', 2],
+        ];
+        $this->assertEquals('select * where ("a" = ? or "b" = ?)', $builder->orWhere($conditions)->toSql());
+    }
+
     protected function getBuilder()
     {
         $grammar = new Grammar;
