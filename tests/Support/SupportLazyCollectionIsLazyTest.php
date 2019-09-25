@@ -8,6 +8,16 @@ use stdClass;
 
 class SupportLazyCollectionIsLazyTest extends TestCase
 {
+    public function testEagerEnumeratesOnce()
+    {
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection = $collection->eager();
+
+            $collection->count();
+            $collection->all();
+        });
+    }
+
     public function testChunkIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
