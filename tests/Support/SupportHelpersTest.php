@@ -393,6 +393,24 @@ class SupportHelpersTest extends TestCase
         })->something());
     }
 
+    public function testOptionalDefaultReturnValue()
+    {
+        $this->assertEquals([], optional(null)->default([])->something());
+
+        $this->assertEquals(10, optional(new class {
+            public function something()
+            {
+                return 10;
+            }
+        })->default(5)->something());
+
+        $existingObject = new stdClass;
+        $existingObject->foo = 'bar';
+
+        $this->assertEquals('bar', optional($existingObject)->default('defaultValue')->foo);
+        $this->assertEquals('defaultValue', optional(null)->default('defaultValue')->foo);
+    }
+
     public function testOptionalWithCallback()
     {
         $this->assertNull(optional(null, function () {
