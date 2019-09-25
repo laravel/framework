@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Database\Eloquent\Factory;
 
 abstract class ServiceProvider
 {
@@ -134,6 +135,18 @@ abstract class ServiceProvider
                 $migrator->path($path);
             }
         });
+    }
+
+    /**
+     * Register factories.
+     *
+     * @param string $path
+     * @return void
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function loadFactoriesFrom($path)
+    {
+        $this->app->make(Factory::class)->load($path);
     }
 
     /**
