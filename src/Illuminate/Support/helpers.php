@@ -337,15 +337,15 @@ if (! function_exists('optional')) {
      * Provide access to optional objects.
      *
      * @param  mixed  $value
-     * @param  callable|null  $callback
+     * @param  mixed  $second
      * @return mixed
      */
-    function optional($value = null, callable $callback = null)
+    function optional($value = null, $second = null)
     {
-        if (is_null($callback)) {
-            return new Optional($value);
+        if (! is_callable($second)) {
+            return new Optional($value, $second);
         } elseif (! is_null($value)) {
-            return $callback($value);
+            return $second($value);
         }
     }
 }

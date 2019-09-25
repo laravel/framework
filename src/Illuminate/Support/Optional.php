@@ -19,14 +19,24 @@ class Optional implements ArrayAccess
     protected $value;
 
     /**
+     * Default value to be returned in case
+     * the object doesn't exist.
+     *
+     * @var mixed
+     */
+    protected $default = null;
+
+    /**
      * Create a new optional instance.
      *
      * @param  mixed  $value
+     * @param  mixed  $default
      * @return void
      */
-    public function __construct($value)
+    public function __construct($value, $default = null)
     {
         $this->value = $value;
+        $this->default = $default;
     }
 
     /**
@@ -38,8 +48,10 @@ class Optional implements ArrayAccess
     public function __get($key)
     {
         if (is_object($this->value)) {
-            return $this->value->{$key} ?? null;
+            return $this->value->{$key} ?? $this->default;
         }
+
+        return $this->default;
     }
 
     /**
@@ -126,5 +138,7 @@ class Optional implements ArrayAccess
         if (is_object($this->value)) {
             return $this->value->{$method}(...$parameters);
         }
+
+        return $this->default;
     }
 }
