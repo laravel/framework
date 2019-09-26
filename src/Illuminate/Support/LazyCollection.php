@@ -100,6 +100,16 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Eager load all items into a new lazy collection backed by an array.
+     *
+     * @return static
+     */
+    public function eager()
+    {
+        return new static($this->all());
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback

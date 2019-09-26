@@ -10,7 +10,7 @@ class ValidationAddFailureTest extends TestCase
     /**
      * Making Validator using ValidationValidatorTest.
      *
-     * @return Validator
+     * @return \Illuminate\Validation\Validator
      */
     public function makeValidator()
     {
