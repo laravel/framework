@@ -140,9 +140,8 @@ abstract class ServiceProvider
     /**
      * Register factories.
      *
-     * @param string $path
+     * @param  string  $path
      * @return void
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function loadFactoriesFrom($path)
     {
