@@ -286,6 +286,16 @@ class AuthManager implements FactoryContract
     }
 
     /**
+     * Determines if any guards have already been resolved.
+     *
+     * @return bool
+     */
+    public function hasResolvedGuards()
+    {
+        return count($this->guards) > 0;
+    }
+
+    /**
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
