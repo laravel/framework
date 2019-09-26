@@ -98,9 +98,6 @@ class AuthServiceProvider extends ServiceProvider
                 return;
             }
 
-            // If no guards have been resolved yet we don't need to call setDispatcher
-            // In case 'events' is rebound in another ServiceProvider this makes sure that no guard is initialized
-            // while registering.
             if ($app['auth']->hasResolvedGuards() === false) {
                 return;
             }
