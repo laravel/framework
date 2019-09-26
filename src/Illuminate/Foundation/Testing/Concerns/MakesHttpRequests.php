@@ -12,18 +12,18 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 trait MakesHttpRequests
 {
     /**
-     * Additional cookies for the request.
-     *
-     * @var array
-     */
-    protected $defaultCookies = [];
-
-    /**
      * Additional headers for the request.
      *
      * @var array
      */
     protected $defaultHeaders = [];
+
+    /**
+     * Additional cookies for the request.
+     *
+     * @var array
+     */
+    protected $defaultCookies = [];
 
     /**
      * Additional server variables for the request.
@@ -148,7 +148,7 @@ trait MakesHttpRequests
     /**
      * Define additional cookies to be sent with the request.
      *
-     * @param  array $cookies
+     * @param  array  $cookies
      * @return $this
      */
     public function withCookies(array $cookies)
@@ -161,8 +161,8 @@ trait MakesHttpRequests
     /**
      * Add a cookie to be sent with the request.
      *
-     * @param  string $name
-     * @param  string $value
+     * @param  string  $name
+     * @param  string  $value
      * @return $this
      */
     public function withCookie(string $name, string $value)
