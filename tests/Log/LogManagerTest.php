@@ -9,6 +9,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\LogEntriesHandler;
 use Monolog\Handler\NewRelicHandler;
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger as Monolog;
@@ -162,6 +163,44 @@ class LogManagerTest extends TestCase
         $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
+    }
+
+    public function testLogManagerCreatesMonologHandlerWithProperFormatter()
+    {
+        $config = $this->app->make('config');
+        $config->set('logging.channels.null', [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+            'formatter' => HtmlFormatter::class,
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('null');
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        if (Monolog::API === 1) {
+            $this->assertInstanceOf(NullHandler::class, $handler);
+            $this->assertInstanceOf(HtmlFormatter::class, $handler->getFormatter());
+        } else {
+            $this->assertInstanceOf(NullHandler::class, $handler);
+        }
+
+        $config->set('logging.channels.null2', [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ]);
+
+        $logger = $manager->channel('null2');
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        if (Monolog::API === 1) {
+            $this->assertInstanceOf(NullHandler::class, $handler);
+            $this->assertInstanceOf(LineFormatter::class, $handler->getFormatter());
+        } else {
+            $this->assertInstanceOf(NullHandler::class, $handler);
+        }
     }
 
     public function testLogManagerCreateSingleDriverWithConfiguredFormatter()
