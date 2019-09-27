@@ -29,6 +29,13 @@ class SoftDeletedInDatabase extends Constraint
     protected $data;
 
     /**
+     * The name of the column that indicates soft deletion has occurred.
+     *
+     * @var string
+     */
+    protected $deletedAtColumn;
+
+    /**
      * Create a new constraint instance.
      *
      * @param  \Illuminate\Database\Connection  $database
