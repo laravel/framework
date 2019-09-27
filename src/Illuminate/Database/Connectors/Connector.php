@@ -38,7 +38,7 @@ class Connector
     public function createConnection($dsn, array $config, array $options)
     {
         [$username, $password] = [
-            $config['username'] ?? null, $config['password'] ?? null,
+            $config['username'] ?? null, $this->decryptPassword($config['password'], $config['decrypt_password']) ?? null,
         ];
 
         try {
@@ -50,6 +50,18 @@ class Connector
                 $e, $dsn, $username, $password, $options
             );
         }
+    }
+    
+    /**
+    * Decrypt password is authorized
+    *
+    * @param  string  $password
+    * @param  bool    $decrypt
+    * @return string
+    */
+    protected function decryptPassword($password, $decrypt) 
+    {
+        return ($decrypt) ? decryptString($password) : $password;
     }
 
     /**
