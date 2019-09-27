@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Mockery as m;
@@ -131,13 +132,27 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted(new ProductStub($this->data));
     }
 
-    protected function mockCountBuilder($countResult)
+    public function testAssertSoftDeletedInDatabaseDoesNotFindModelWithCustomColumnResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The table is empty.');
+
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(0, 'trashed_at');
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertSoftDeleted(new CustomProductStub($this->data));
+    }
+
+    protected function mockCountBuilder($countResult, $deletedAtColumn = 'deleted_at')
     {
         $builder = m::mock(Builder::class);
 
         $builder->shouldReceive('where')->with($this->data)->andReturnSelf();
 
-        $builder->shouldReceive('whereNotNull')->with('deleted_at')->andReturnSelf();
+        $builder->shouldReceive('whereNotNull')->with($deletedAtColumn)->andReturnSelf();
 
         $builder->shouldReceive('count')->andReturn($countResult);
 
@@ -156,7 +171,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
 class ProductStub extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'products';
 
     protected $guarded = [];
+}
+
+class CustomProductStub extends ProductStub
+{
+    const DELETED_AT = 'trashed_at';
 }
