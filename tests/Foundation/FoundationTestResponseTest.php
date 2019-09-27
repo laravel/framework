@@ -194,6 +194,54 @@ class FoundationTestResponseTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function testAssertNoContentAsserts204StatusCodeByDefault()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage("Expected status code 204 but received {$statusCode}");
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertNoContent();
+    }
+
+    public function testAssertNoContentAssertsExpectedStatusCode()
+    {
+        $statusCode = 500;
+        $expectedStatusCode = 418;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage("Expected status code {$expectedStatusCode} but received {$statusCode}");
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertNoContent($expectedStatusCode);
+    }
+
+    public function testAssertNoContentAssertsEmptyContent()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Response content is not empty');
+
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setStatusCode(204);
+            $response->setContent('non-empty-response-content');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertNoContent();
+    }
+
     public function testAssertStatus()
     {
         $statusCode = 500;
