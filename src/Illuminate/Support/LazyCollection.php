@@ -252,7 +252,7 @@ class LazyCollection implements Enumerable
     /**
      * Get the items whose keys are not present in the given items.
      *
-     * @param  mixed   $items
+     * @param  mixed  $items
      * @param  callable  $callback
      * @return static
      */
