@@ -218,7 +218,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function eachSpread(callable $callback);
 
     /**
-     * Determine if all items pass the given test.
+     * Determine if all items pass the given truth test.
      *
      * @param  string|callable  $key
      * @param  mixed  $operator
