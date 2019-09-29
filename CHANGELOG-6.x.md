@@ -2,6 +2,18 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.0.4...6.x)
 
+### Added
+- Added `Illuminate\Support\LazyCollection::eager()` method ([#29832](https://github.com/laravel/framework/pull/29832))
+
+### Changed
+- Added runtime information output for seeders ([#30086](https://github.com/laravel/framework/pull/30086))
+
+### TODO:
+- Fix migration class duplicate check ([#30095](https://github.com/laravel/framework/pull/30095))
+- Add methods for sending cookies with test requests ([#30101](https://github.com/laravel/framework/pull/30101))
+- Improved AuthServiceProvider::registerEventRebindHandler() ([#30105](https://github.com/laravel/framework/pull/30105))
+- Add custom deleted_at column name for assertSoftDeleted ([#30111](https://github.com/laravel/framework/pull/30111))
+
 
 ## [v6.0.4 (2019-09-24)](https://github.com/laravel/framework/compare/v6.0.3...v6.0.4)
 
