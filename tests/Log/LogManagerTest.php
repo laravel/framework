@@ -287,4 +287,19 @@ class LogManagerTest extends TestCase
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
+
+    public function testLogMnagerPurgeResolvedChannels()
+    {
+        $manager = new LogManager($this->app);
+
+        $this->assertEmpty($manager->getChannels());
+
+        $manager->channel('single')->getLogger();
+
+        $this->assertCount(1, $manager->getChannels());
+
+        $manager->purge('single');
+
+        $this->assertEmpty($manager->getChannels());
+    }
 }
