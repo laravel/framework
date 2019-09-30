@@ -349,6 +349,25 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonPath('2.id', 30);
     }
 
+    public function testAssertJsonPathStrict()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPath('0.id', 10, true);
+        $response->assertJsonPath('1.id', 20, true);
+        $response->assertJsonPath('2.id', 30, true);
+    }
+
+    public function testAssertJsonPathStrictCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that 10 is identical to \'10\'.');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPath('0.id', '10', true);
+    }
+
     public function testAssertJsonFragment()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
