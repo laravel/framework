@@ -83,6 +83,17 @@ class DurationLimiterTest extends TestCase
         $this->assertEquals([1, 3], $store);
     }
 
+    public function testItReturnsTheCallbackResult()
+    {
+        $limiter = new DurationLimiter($this->redis(), 'key', 1, 1);
+
+        $result = $limiter->block(1, function () {
+            return 'foo';
+        });
+
+        $this->assertEquals('foo', $result);
+    }
+
     private function redis()
     {
         return $this->redis['phpredis']->connection();
