@@ -505,6 +505,23 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items by the given key value pair using strpos comparison, and insensitive case if necessary.
+     * Like as Like database query compair, without "%"
+     * @example My factory string is "Factory - ItIsMyString", $collection->whereStrpos('denomination', 'factory', false)
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  bool $sensitive
+     * @return static
+     */
+    public function whereStrpos($key, $value, $sensitive = true)
+    {
+        if ($sensitive === false) {
+            return $this->where($key, 'strpos_insensitive', strtolower($value));
+        }
+        return $this->where($key, 'strpos', $value);
+    }
+
+    /**
      * Filter items by the given key value pair.
      *
      * @param  string  $key
@@ -866,6 +883,8 @@ trait EnumeratesValues
                 case '>=':  return $retrieved >= $value;
                 case '===': return $retrieved === $value;
                 case '!==': return $retrieved !== $value;
+                case 'strpos_insensitive': return (strpos(strtolower($retrieved), $value) !== false);
+                case 'strpos': return (strpos($retrieved, $value) !== false);
             }
         };
     }

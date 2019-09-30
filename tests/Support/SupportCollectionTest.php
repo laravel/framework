@@ -648,6 +648,32 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhereStrpos($collection)
+    {
+        $c = new $collection([['denomination' => 'my string has factory'], ['denomination' => 'my Factory came back']]);
+
+        $this->assertEquals(
+            [['denomination' => 'my string has factory']],
+            $c->whereStrpos('denomination', 'factory')->values()->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereStrposInsensitiveCase($collection)
+    {
+        $c = new $collection([['denomination' => 'my string has factory'], ['denomination' => 'my Factory came back']]);
+
+        $this->assertEquals(
+            [['denomination' => 'my string has factory'], ['denomination' => 'my Factory came back']],
+            $c->whereStrpos('denomination', 'factory', false)->values()->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhereInstanceOf($collection)
     {
         $c = new $collection([new stdClass, new stdClass, new $collection, new stdClass]);
