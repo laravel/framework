@@ -652,6 +652,43 @@ class TestResponse
     }
 
     /**
+     * Assert that the response JSON contains the expected value at the given key.
+     *
+     * @param  mixed  $expected
+     * @param  string $key
+     * @return $this
+     */
+    public function assertJsonContains($expected, $key)
+    {
+        PHPUnit::assertEquals(
+            $expected,
+            data_get($this->json(), $key),
+            "Failed to assert that the response contained the expected value at key: {$key}"
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response JSON does not contain given value at the given key.
+     *
+     * @param  mixed  $expected
+     * @param  string $key
+     * @return $this
+     */
+    public function assertJsonNotContains($expected, $key)
+    {
+
+        PHPUnit::assertNotEquals(
+            $expected,
+            data_get($this->json(), $key),
+            "Failed to assert that the response does not contain the expected value at key: {$key}"
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response JSON has the expected count of items at the given key.
      *
      * @param  int  $count

@@ -409,6 +409,52 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
+    public function testAssertJsonContains()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonContains('bar', 'foo');
+
+        $response->assertJsonContains('foo', 'foobar.foobar_foo');
+
+        $response->assertJsonContains('foo 0', 'bars.0.bar');
+
+        $response->assertJsonContains([
+            'foobar_foo' => 'foo',
+            'foobar_bar' => 'bar',
+        ], 'foobar');
+    }
+
+    public function testAssertJsonContainsCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertJsonContains('baz', 'foo');
+    }
+
+    public function testAssertJsonNotContains()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonNotContains('baz', 'foo');
+
+        $response->assertJsonNotContains('baz', 'foobar.foobar_foo');
+
+        $response->assertJsonNotContains('baz', 'bars.0.bar');
+    }
+
+
+    public function testAssertJsonNotContainsCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertJsonNotContains('bar', 'foo');
+    }
+
     public function testAssertJsonCount()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
