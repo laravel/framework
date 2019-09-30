@@ -516,7 +516,7 @@ trait EnumeratesValues
     public function whereStrpos($key, $value, $sensitive = true)
     {
         if ($sensitive === false) {
-            return $this->where($key, 'strpos_insensitive', strtolower($value));
+            return $this->where($key, 'stripos', strtolower($value));
         }
         return $this->where($key, 'strpos', $value);
     }
@@ -883,7 +883,7 @@ trait EnumeratesValues
                 case '>=':  return $retrieved >= $value;
                 case '===': return $retrieved === $value;
                 case '!==': return $retrieved !== $value;
-                case 'strpos_insensitive': return (strpos(strtolower($retrieved), $value) !== false);
+                case 'stripos': return (stripos($retrieved, $value) !== false);
                 case 'strpos': return (strpos($retrieved, $value) !== false);
             }
         };
