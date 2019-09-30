@@ -90,6 +90,21 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has the given status code and no content.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function assertNoContent($status = 204)
+    {
+        $this->assertStatus($status);
+
+        PHPUnit::assertEmpty($this->getContent(), 'Response content is not empty.');
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a not found status code.
      *
      * @return $this
