@@ -337,7 +337,7 @@ class LogManagerTest extends TestCase
 
         $this->assertCount(1, $manager->getChannels());
 
-        $manager->purge('single');
+        $manager->forgetChannel('single');
 
         $this->assertEmpty($manager->getChannels());
     }

@@ -99,19 +99,6 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * @param string|null $driver
-     * @return void
-     */
-    public function purge($driver = null)
-    {
-        $driver = $driver ?? $this->getDefaultDriver();
-
-        if (isset($this->channels[$driver])) {
-            unset($this->channels[$driver]);
-        }
-    }
-
-    /**
      * @return array
      */
     public function getChannels()
@@ -477,6 +464,21 @@ class LogManager implements LoggerInterface
         $this->customCreators[$driver] = $callback->bindTo($this, $this);
 
         return $this;
+    }
+
+    /**
+     * Unset the given channel instance.
+     *
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function forgetChannel($driver = null)
+    {
+        $driver = $driver ?? $this->getDefaultDriver();
+
+        if (isset($this->channels[$driver])) {
+            unset($this->channels[$driver]);
+        }
     }
 
     /**
