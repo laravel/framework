@@ -678,7 +678,6 @@ class TestResponse
      */
     public function assertJsonNotContains($expected, $key)
     {
-
         PHPUnit::assertNotEquals(
             $expected,
             data_get($this->json(), $key),

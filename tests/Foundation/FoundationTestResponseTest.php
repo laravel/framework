@@ -445,7 +445,6 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonNotContains('baz', 'bars.0.bar');
     }
 
-
     public function testAssertJsonNotContainsCanFail()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
