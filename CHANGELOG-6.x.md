@@ -1,18 +1,31 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.0.4...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.1.0...6.x)
+
+
+## [v6.1.0 (2019-10-01)](https://github.com/laravel/framework/compare/v6.0.4...v6.1.0)
 
 ### Added
 - Added `Illuminate\Support\LazyCollection::eager()` method ([#29832](https://github.com/laravel/framework/pull/29832))
+- Added `purge()` and `getChannels()` methods to `Illuminate\Log\LogManager` ([#30132](https://github.com/laravel/framework/pull/30132), [a52a0dd](https://github.com/laravel/framework/commit/a52a0dd239262f31edfaefe9a99213cccefc2f36))
+- Added `Illuminate\Foundation\Testing\TestResponse::assertNoContent()` method ([#30125](https://github.com/laravel/framework/pull/30125))
+- Added `InteractsWithQueue` to `SendQueueNotifications` ([#30140](https://github.com/laravel/framework/pull/30140))
+- Added `SendQueueNotifications::retryUntil()` method ([#30141](https://github.com/laravel/framework/pull/30141))
+- Added methods for sending cookies with test requests ([#30101](https://github.com/laravel/framework/pull/30101))
+- Added support of job middleware for queued notifications ([#30070](https://github.com/laravel/framework/pull/30070))
+
+### Fixed
+- Fixed migration class duplicate check in `make:migration` command ([#30095](https://github.com/laravel/framework/pull/30095))
+- Fixed monolog v2 handler preparation ([#30123](https://github.com/laravel/framework/pull/30123))
+- Fixed return of callback value for DurationLimiter ([#30143](https://github.com/laravel/framework/pull/30143))
 
 ### Changed
 - Added runtime information output for seeders ([#30086](https://github.com/laravel/framework/pull/30086))
+- Added strict parameter to `Illuminate\Foundation\Testing\TestResponse::assertJsonPath()` ([#30142](https://github.com/laravel/framework/pull/30142))
+- Added `deletedAtColumn` optional parameter to `Foundation\Testing\Concerns\InteractsWithDatabase::assertSoftDeleted()` ([#30111](https://github.com/laravel/framework/pull/30111))
 
-### TODO:
-- Fix migration class duplicate check ([#30095](https://github.com/laravel/framework/pull/30095))
-- Add methods for sending cookies with test requests ([#30101](https://github.com/laravel/framework/pull/30101))
-- Improved AuthServiceProvider::registerEventRebindHandler() ([#30105](https://github.com/laravel/framework/pull/30105))
-- Add custom deleted_at column name for assertSoftDeleted ([#30111](https://github.com/laravel/framework/pull/30111))
+### Improved
+- Improved `AuthServiceProvider::registerEventRebindHandler()` in case if guard is not initialized ([#30105](https://github.com/laravel/framework/pull/30105))
 
 
 ## [v6.0.4 (2019-09-24)](https://github.com/laravel/framework/compare/v6.0.3...v6.0.4)
