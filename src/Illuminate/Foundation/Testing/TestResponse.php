@@ -484,11 +484,16 @@ class TestResponse
      *
      * @param  string  $path
      * @param  mixed  $expect
+     * @param  bool  $strict
      * @return $this
      */
-    public function assertJsonPath($path, $expect)
+    public function assertJsonPath($path, $expect, $strict = false)
     {
-        PHPUnit::assertEquals($expect, $this->json($path));
+        if ($strict) {
+            PHPUnit::assertSame($expect, $this->json($path));
+        } else {
+            PHPUnit::assertEquals($expect, $this->json($path));
+        }
 
         return $this;
     }
