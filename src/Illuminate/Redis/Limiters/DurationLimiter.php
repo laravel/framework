@@ -87,7 +87,7 @@ class DurationLimiter
         }
 
         if (is_callable($callback)) {
-            $callback();
+            return $callback();
         }
 
         return true;
