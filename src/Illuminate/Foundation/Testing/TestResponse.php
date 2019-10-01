@@ -655,7 +655,7 @@ class TestResponse
      * Assert that the response JSON contains the expected value at the given key.
      *
      * @param  mixed  $expected
-     * @param  string $key
+     * @param  string  $key
      * @return $this
      */
     public function assertJsonContains($expected, $key)
