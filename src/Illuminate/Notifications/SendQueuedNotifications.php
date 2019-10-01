@@ -112,6 +112,20 @@ class SendQueuedNotifications implements ShouldQueue
     }
 
     /**
+     * Get the expiration for the notification.
+     *
+     * @return mixed
+     */
+    public function retryUntil()
+    {
+        if (! method_exists($this->notification, 'retryUntil') && ! isset($this->notification->timeoutAt)) {
+            return;
+        }
+
+        return $this->notification->timeoutAt ?? $this->notification->retryUntil();
+    }
+
+    /**
      * Prepare the instance for cloning.
      *
      * @return void
