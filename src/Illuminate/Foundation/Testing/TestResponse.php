@@ -499,6 +499,18 @@ class TestResponse
     }
 
     /**
+     * Assert that the expected value exists at the given path in the response.
+     *
+     * @param  string  $path
+     * @param  mixed  $expect
+     * @return $this
+     */
+    public function assertJsonPathStrict($path, $expect)
+    {
+        return $this->assertJsonPath($path, $expect, true);
+    }
+
+    /**
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data
