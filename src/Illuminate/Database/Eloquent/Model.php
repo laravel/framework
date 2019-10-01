@@ -56,7 +56,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     protected $passwordKey = 'password';
 
-
     /**
      * The "type" of the primary key ID.
      *
