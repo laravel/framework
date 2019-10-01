@@ -193,9 +193,7 @@ class SQLiteGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $values = collect($values)->reject(function ($value, $column) {
-            return $this->isJsonSelector($column) && is_bool($value);
-        })->map(function ($value) {
+        $values = collect($values)->map(function ($value) {
             return is_array($value) ? json_encode($value) : $value;
         })->all();
 
