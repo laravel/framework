@@ -121,16 +121,6 @@ trait Queueable
     }
 
     /**
-     * Get the middleware the job should be dispatched through.
-     *
-     * @return array
-     */
-    public function middleware()
-    {
-        return $this->middleware ?: [];
-    }
-
-    /**
      * Specify the middleware the job should be dispatched through.
      *
      * @param  array|object  $middleware

@@ -141,17 +141,10 @@ class CallQueuedHandlerTestJob
     }
 }
 
-class CallQueuedHandlerTestJobWithMiddleware
+/** This exists to test that middleware can also be defined in base classes */
+abstract class AbstractCallQueuedHandlerTestJobWithMiddleware
 {
-    use InteractsWithQueue, Queueable;
-
-    public static $handled = false;
     public static $middlewareCommand;
-
-    public function handle()
-    {
-        static::$handled = true;
-    }
 
     public function middleware()
     {
@@ -159,12 +152,24 @@ class CallQueuedHandlerTestJobWithMiddleware
             new class {
                 public function handle($command, $next)
                 {
-                    CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = $command;
+                    AbstractCallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = $command;
 
                     return $next($command);
                 }
             },
         ];
+    }
+}
+
+class CallQueuedHandlerTestJobWithMiddleware extends AbstractCallQueuedHandlerTestJobWithMiddleware
+{
+    use InteractsWithQueue, Queueable;
+
+    public static $handled = false;
+
+    public function handle()
+    {
+        static::$handled = true;
     }
 }
 
