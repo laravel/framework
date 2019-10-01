@@ -673,7 +673,7 @@ class TestResponse
      * Assert that the response JSON does not contain given value at the given key.
      *
      * @param  mixed  $expected
-     * @param  string $key
+     * @param  string  $key
      * @return $this
      */
     public function assertJsonNotContains($expected, $key)
