@@ -117,7 +117,7 @@ class EloquentUserProvider implements UserProvider
         $query = $this->newModelQuery();
 
         foreach ($credentials as $key => $value) {
-            if (Str::contains($key, 'password')) {
+            if (Str::contains($key, $query->getModel()->getPasswordKeyName())) {
                 continue;
             }
 
