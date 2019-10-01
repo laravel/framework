@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Auth;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Database\Eloquent\Model;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -83,6 +84,9 @@ class AuthEloquentUserProviderTest extends TestCase
         $provider = $this->getProviderMock();
         $mock = m::mock(stdClass::class);
         $mock->shouldReceive('newQuery')->once()->andReturn($mock);
+        $model = m::mock(Model::class);
+        $mock->shouldReceive('getModel')->andReturn($model);
+        $model->shouldReceive('getPasswordKeyName')->andReturn('password');
         $mock->shouldReceive('where')->once()->with('username', 'dayle');
         $mock->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
         $mock->shouldReceive('first')->once()->andReturn('bar');
