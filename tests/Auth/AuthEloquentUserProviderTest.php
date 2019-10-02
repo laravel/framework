@@ -86,7 +86,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $mock->shouldReceive('newQuery')->once()->andReturn($mock);
         $model = m::mock(Model::class);
         $mock->shouldReceive('getModel')->andReturn($model);
-        $model->shouldReceive('getPasswordKeyName')->andReturn('password');
+        $model->shouldReceive('getPasswordName')->andReturn('password');
         $mock->shouldReceive('where')->once()->with('username', 'dayle');
         $mock->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
         $mock->shouldReceive('first')->once()->andReturn('bar');
@@ -103,6 +103,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $provider = new EloquentUserProvider($hasher, 'foo');
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $user->shouldReceive('getPasswordName')->once()->andReturn('password');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertTrue($result);

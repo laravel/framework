@@ -131,4 +131,14 @@ class GenericUser implements UserContract
     {
         unset($this->attributes[$key]);
     }
+
+    /**
+     * Get the column name for the "password".
+     *
+     * @return string
+     */
+    public function getPasswordName()
+    {
+        return 'password';
+    }
 }

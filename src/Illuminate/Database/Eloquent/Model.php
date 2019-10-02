@@ -50,13 +50,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     protected $primaryKey = 'id';
 
     /**
-     * The password key for the model.
-     *
-     * @var string
-     */
-    protected $passwordKey = 'password';
-
-    /**
      * The "type" of the primary key ID.
      *
      * @var string
@@ -1333,29 +1326,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function setKeyName($key)
     {
         $this->primaryKey = $key;
-
-        return $this;
-    }
-
-    /**
-     * Get the password key for the model.
-     *
-     * @return string
-     */
-    public function getPasswordKeyName()
-    {
-        return $this->passwordKey;
-    }
-
-    /**
-     * Set the password key for the model.
-     *
-     * @param  string  $key
-     * @return $this
-     */
-    public function setPasswordKeyName($key)
-    {
-        $this->passwordKey = $key;
 
         return $this;
     }

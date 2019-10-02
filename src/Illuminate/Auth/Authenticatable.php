@@ -12,6 +12,13 @@ trait Authenticatable
     protected $rememberTokenName = 'remember_token';
 
     /**
+     * The column name of the "password".
+     *
+     * @var string
+     */
+    protected $passwordName = 'password';
+
+    /**
      * Get the name of the unique identifier for the user.
      *
      * @return string
@@ -74,5 +81,15 @@ trait Authenticatable
     public function getRememberTokenName()
     {
         return $this->rememberTokenName;
+    }
+    
+    /**
+     * Get the column name for the "password".
+     *
+     * @return string
+     */
+    public function getPasswordName()
+    {
+        return $this->passwordName;
     }
 }
