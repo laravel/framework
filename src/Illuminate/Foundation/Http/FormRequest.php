@@ -185,7 +185,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function validated()
     {
-        return $this->validator->validated();
+        return $this->getValidatorInstance()->validated();
     }
 
     /**
