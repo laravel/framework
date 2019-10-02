@@ -43,7 +43,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
         return $model ? $this->replaceModel($stub, $model) : $stub;
     }
-    
+
     /**
      * Replace the model for the given stub.
      *
