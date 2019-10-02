@@ -4,7 +4,7 @@ namespace DummyNamespace;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 use NamespacedDummyModel;
-use NamespacedDummyUserModel;
+use Illuminate\Foundation\Auth\User;
 
 class DummyClass
 {
@@ -13,10 +13,10 @@ class DummyClass
     /**
      * Determine whether the user can view any DocDummyPluralModel.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \Illuminate\Foundation\Auth\User  $user
      * @return mixed
      */
-    public function viewAny(DummyUser $user)
+    public function viewAny(User $user)
     {
         //
     }
@@ -24,11 +24,11 @@ class DummyClass
     /**
      * Determine whether the user can view the DocDummyModel.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \Illuminate\Foundation\Auth\User  $user
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function view(DummyUser $user, DummyModel $dummyModel)
+    public function view(User $user, DummyModel $dummyModel)
     {
         //
     }
@@ -36,10 +36,10 @@ class DummyClass
     /**
      * Determine whether the user can create DocDummyPluralModel.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \Illuminate\Foundation\Auth\User  $user
      * @return mixed
      */
-    public function create(DummyUser $user)
+    public function create(User $user)
     {
         //
     }
@@ -47,11 +47,11 @@ class DummyClass
     /**
      * Determine whether the user can update the DocDummyModel.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \Illuminate\Foundation\Auth\User  $user
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function update(DummyUser $user, DummyModel $dummyModel)
+    public function update(User $user, DummyModel $dummyModel)
     {
         //
     }
@@ -59,11 +59,11 @@ class DummyClass
     /**
      * Determine whether the user can delete the DocDummyModel.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \Illuminate\Foundation\Auth\User  $user
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function delete(DummyUser $user, DummyModel $dummyModel)
+    public function delete(User $user, DummyModel $dummyModel)
     {
         //
     }
@@ -71,11 +71,11 @@ class DummyClass
     /**
      * Determine whether the user can restore the DocDummyModel.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \Illuminate\Foundation\Auth\User  $user
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function restore(DummyUser $user, DummyModel $dummyModel)
+    public function restore(User $user, DummyModel $dummyModel)
     {
         //
     }
@@ -83,11 +83,11 @@ class DummyClass
     /**
      * Determine whether the user can permanently delete the DocDummyModel.
      *
-     * @param  \NamespacedDummyUserModel  $user
+     * @param  \Illuminate\Foundation\Auth\User  $user
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function forceDelete(DummyUser $user, DummyModel $dummyModel)
+    public function forceDelete(User $user, DummyModel $dummyModel)
     {
         //
     }
