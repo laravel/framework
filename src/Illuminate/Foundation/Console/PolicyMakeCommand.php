@@ -37,36 +37,13 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $stub = $this->replaceUserNamespace(
-            parent::buildClass($name)
-        );
+        $stub = parent::buildClass($name);
 
         $model = $this->option('model');
 
         return $model ? $this->replaceModel($stub, $model) : $stub;
     }
-
-    /**
-     * Replace the User model namespace.
-     *
-     * @param  string  $stub
-     * @return string
-     */
-    protected function replaceUserNamespace($stub)
-    {
-        $model = $this->userProviderModel();
-
-        if (! $model) {
-            return $stub;
-        }
-
-        return str_replace(
-            $this->rootNamespace().'User',
-            $model,
-            $stub
-        );
-    }
-
+    
     /**
      * Replace the model for the given stub.
      *
@@ -92,8 +69,6 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $model = class_basename(trim($model, '\\'));
 
-        $dummyUser = class_basename($this->userProviderModel());
-
         $dummyModel = Str::camel($model) === 'user' ? 'model' : $model;
 
         $stub = str_replace('DocDummyModel', Str::snake($dummyModel, ' '), $stub);
@@ -101,8 +76,6 @@ class PolicyMakeCommand extends GeneratorCommand
         $stub = str_replace('DummyModel', $model, $stub);
 
         $stub = str_replace('dummyModel', Str::camel($dummyModel), $stub);
-
-        $stub = str_replace('DummyUser', $dummyUser, $stub);
 
         return str_replace('DocDummyPluralModel', Str::snake(Str::pluralStudly($dummyModel), ' '), $stub);
     }
