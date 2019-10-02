@@ -82,7 +82,7 @@ trait Authenticatable
     {
         return $this->rememberTokenName;
     }
-    
+
     /**
      * Get the column name for the "password".
      *
