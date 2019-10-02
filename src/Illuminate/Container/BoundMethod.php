@@ -136,6 +136,8 @@ class BoundMethod
     {
         if (is_string($callback) && strpos($callback, '::') !== false) {
             $callback = explode('::', $callback);
+        } elseif (is_object($callback) && ! $callback instanceof Closure) {
+            $callback = [$callback, '__invoke'];
         }
 
         return is_array($callback)
