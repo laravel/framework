@@ -76,6 +76,7 @@ class HasInDatabase extends Constraint
     protected function getAdditionalInfo($table)
     {
         $query = $this->database->table($table);
+
         $results = $query->limit($this->show)->get();
 
         if ($results->isEmpty()) {
