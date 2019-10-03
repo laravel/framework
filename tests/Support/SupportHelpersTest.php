@@ -309,7 +309,8 @@ class SupportHelpersTest extends TestCase
         ], $data);
     }
 
-    public function dataUnsetTestDataProvider() {
+    public function dataUnsetTestDataProvider()
+    {
         return [
             // dataset 0
             [
@@ -318,7 +319,7 @@ class SupportHelpersTest extends TestCase
                     'foo' => [
                         'bar' => 'boom',
                         'baz' => 'noop',
-                    ]
+                    ],
                 ],
             ],
             // dataset 1
@@ -329,7 +330,7 @@ class SupportHelpersTest extends TestCase
                         'bar' => 'boom',
                         'baz' => 'noop',
                     ],
-                    'baz' => []
+                    'baz' => [],
                 ],
             ],
             // dataset 2
@@ -341,9 +342,9 @@ class SupportHelpersTest extends TestCase
                     'baz' => [
                         'bar' => [
                             'boom' => ['kaboom' => 'boom'],
-                            'buz' => ['kaboom' => 'noop']
-                        ]
-                    ]
+                            'buz' => ['kaboom' => 'noop'],
+                        ],
+                    ],
                 ],
             ],
             // dataset 3
@@ -356,9 +357,9 @@ class SupportHelpersTest extends TestCase
                     'baz' => [
                         'bar' => [
                             'boom' => ['kaboom' => 'boom'],
-                            'buz' => ['kaboom' => 'noop']
-                        ]
-                    ]
+                            'buz' => ['kaboom' => 'noop'],
+                        ],
+                    ],
                 ],
             ],
             // dataset 4
@@ -370,7 +371,7 @@ class SupportHelpersTest extends TestCase
                         'baz' => 'noop',
                     ],
                     'baz' => [
-                    ]
+                    ],
                 ],
             ],
             // dataset 5
@@ -384,9 +385,9 @@ class SupportHelpersTest extends TestCase
                     'baz' => [
                         'bar' => [
                             'boom' => [],
-                            'buz' => ['kaboom' => 'noop']
-                        ]
-                    ]
+                            'buz' => ['kaboom' => 'noop'],
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -407,9 +408,9 @@ class SupportHelpersTest extends TestCase
             'baz' => [
                 'bar' => [
                     'boom' => ['kaboom' => 'boom'],
-                    'buz' => ['kaboom' => 'noop']
-                ]
-            ]
+                    'buz' => ['kaboom' => 'noop'],
+                ],
+            ],
         ];
 
         $this->assertEquals(
@@ -424,12 +425,12 @@ class SupportHelpersTest extends TestCase
             'foo' => [
                 'bar' => [
                     'baz' => ['kaboom' => 'boom'],
-                    'buz' => ['kaboom' => 'boom']
+                    'buz' => ['kaboom' => 'boom'],
                 ],
                 'baz' => [
                     'baz' => ['kaboom' => 'boom'],
-                    'buz' => ['kaboom' => 'boom']
-                ]
+                    'buz' => ['kaboom' => 'boom'],
+                ],
             ],
         ];
 
@@ -437,11 +438,11 @@ class SupportHelpersTest extends TestCase
             [
                 'foo' => [
                     'bar' => [
-                        'buz' => ['kaboom' => 'boom']
+                        'buz' => ['kaboom' => 'boom'],
                     ],
                     'baz' => [
-                        'buz' => ['kaboom' => 'boom']
-                    ]
+                        'buz' => ['kaboom' => 'boom'],
+                    ],
                 ],
             ],
             data_unset($data, 'foo.*.baz')

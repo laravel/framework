@@ -234,7 +234,7 @@ if (! function_exists('data_set')) {
     }
 }
 
-if (!function_exists('data_unset')) {
+if (! function_exists('data_unset')) {
     /**
      * Unset an item on an array or object using dot notation.
      *
@@ -247,7 +247,7 @@ if (!function_exists('data_unset')) {
         $segments = is_array($key) ? $key : explode('.', $key);
 
         if (($segment = array_shift($segments)) === '*') {
-            if (!Arr::accessible($target)) {
+            if (! Arr::accessible($target)) {
                 $target = [];
             }
 
@@ -262,7 +262,7 @@ if (!function_exists('data_unset')) {
             }
         } elseif (Arr::accessible($target)) {
             if ($segments) {
-                if (!Arr::exists($target, $segment)) {
+                if (! Arr::exists($target, $segment)) {
                     $target[$segment] = [];
                 }
 
@@ -272,7 +272,7 @@ if (!function_exists('data_unset')) {
             }
         } elseif (is_object($target)) {
             if ($segments) {
-                if (!isset($target->{$segment})) {
+                if (! isset($target->{$segment})) {
                     $target->{$segment} = [];
                 }
 
