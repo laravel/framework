@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Carbon\CarbonInterface;
+use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -78,6 +79,42 @@ trait HasAttributes
      * @var array
      */
     protected static $mutatorCache = [];
+    
+    /**
+     * Mutators that are applied when retrieving an attribute.
+     *
+     * @var array
+     */
+    protected static $getMutators = [];
+    
+    /**
+     * Mutators that are applied when setting an attribute.
+     *
+     * @var array
+     */
+    protected static $setMutators = [];
+    
+    /**
+     * Register a new "get" mutator on the class.
+     *
+     * @param string $key
+     * @param \Closure $mutator
+     */
+    public static function registerGetMutator($key, Closure $mutator)
+    {
+        static::$getMutators[static::class][$key] = $mutator;
+    }
+    
+    /**
+     * Register a new "set" mutator on the class.
+     *
+     * @param string $key
+     * @param \Closure $mutator
+     */
+    public static function registerSetMutator($key, Closure $mutator)
+    {
+        static::$setMutators[static::class][$key] = $mutator;
+    }
 
     /**
      * Convert the model's attributes to an array.
@@ -439,7 +476,18 @@ trait HasAttributes
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.Str::studly($key).'Attribute');
+        if (isset(static::$getMutators[static::class][$key])) {
+            return true;
+        }
+    
+        if (method_exists($this, $method = 'get'.Str::studly($key).'Attribute')) {
+            static::registerGetMutator($key, function($key) use ($method) {
+                return $this->{$method}($key);
+            });
+            return true;
+        }
+        
+        return false;
     }
 
     /**
@@ -448,10 +496,18 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
+     *
+     * @throws \LogicException
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{'get'.Str::studly($key).'Attribute'}($value);
+        if (!$this->hasGetMutator($key)) {
+            throw new LogicException(sprintf(
+                'There is no mutator registered for getting %s::$%s.', static::class, $key
+            ));
+        }
+        
+        return static::$getMutators[static::class][$key]->call($this, $value);
     }
 
     /**
@@ -604,7 +660,18 @@ trait HasAttributes
      */
     public function hasSetMutator($key)
     {
-        return method_exists($this, 'set'.Str::studly($key).'Attribute');
+        if (isset(static::$setMutators[static::class][$key])) {
+            return true;
+        }
+    
+        if (method_exists($this, $method = 'set'.Str::studly($key).'Attribute')) {
+            static::registerSetMutator($key, function($key) use ($method) {
+                return $this->{$method}($key);
+            });
+            return true;
+        }
+    
+        return false;
     }
 
     /**
@@ -613,10 +680,18 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
+     *
+     * @throws \LogicException
      */
     protected function setMutatedAttributeValue($key, $value)
     {
-        return $this->{'set'.Str::studly($key).'Attribute'}($value);
+        if (!$this->hasSetMutator($key)) {
+            throw new LogicException(sprintf(
+                'There is no mutator registered for setting %s::$%s.', static::class, $key
+            ));
+        }
+        
+        return static::$setMutators[static::class][$key]->call($this, $value);
     }
 
     /**
@@ -1233,9 +1308,26 @@ trait HasAttributes
      */
     public static function cacheMutatedAttributes($class)
     {
-        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(function ($match) {
-            return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
-        })->all();
+        static::registerAllGetMutatorMethods($class);
+        
+        static::$mutatorCache[$class] = array_keys(static::$getMutators[static::class] ?? []);
+    }
+    
+    /**
+     * Register all get*Attribute methods.
+     *
+     * @param string $class
+     */
+    protected static function registerAllGetMutatorMethods($class)
+    {
+        collect(static::getMutatorMethods($class))
+            ->each(function($matches) {
+                [$method, $attribute] = $matches;
+                $key = lcfirst(static::$snakeAttributes ? Str::snake($attribute) : $attribute);
+                static::registerGetMutator($key, function($key) use ($method) {
+                    return $this->{$method}($key);
+                });
+            });
     }
 
     /**
@@ -1248,6 +1340,6 @@ trait HasAttributes
     {
         preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches);
 
-        return $matches[1];
+        return $matches;
     }
 }
