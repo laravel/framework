@@ -79,21 +79,21 @@ trait HasAttributes
      * @var array
      */
     protected static $mutatorCache = [];
-    
+
     /**
      * Mutators that are applied when retrieving an attribute.
      *
      * @var array
      */
     protected static $getMutators = [];
-    
+
     /**
      * Mutators that are applied when setting an attribute.
      *
      * @var array
      */
     protected static $setMutators = [];
-    
+
     /**
      * Register a new "get" mutator on the class.
      *
@@ -104,7 +104,7 @@ trait HasAttributes
     {
         static::$getMutators[static::class][$key] = $mutator;
     }
-    
+
     /**
      * Register a new "set" mutator on the class.
      *
@@ -479,14 +479,15 @@ trait HasAttributes
         if (isset(static::$getMutators[static::class][$key])) {
             return true;
         }
-    
+
         if (method_exists($this, $method = 'get'.Str::studly($key).'Attribute')) {
-            static::registerGetMutator($key, function($key) use ($method) {
+            static::registerGetMutator($key, function ($key) use ($method) {
                 return $this->{$method}($key);
             });
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -501,12 +502,12 @@ trait HasAttributes
      */
     protected function mutateAttribute($key, $value)
     {
-        if (!$this->hasGetMutator($key)) {
+        if (! $this->hasGetMutator($key)) {
             throw new LogicException(sprintf(
                 'There is no mutator registered for getting %s::$%s.', static::class, $key
             ));
         }
-        
+
         return static::$getMutators[static::class][$key]->call($this, $value, $key);
     }
 
@@ -663,14 +664,15 @@ trait HasAttributes
         if (isset(static::$setMutators[static::class][$key])) {
             return true;
         }
-    
+
         if (method_exists($this, $method = 'set'.Str::studly($key).'Attribute')) {
-            static::registerSetMutator($key, function($key) use ($method) {
+            static::registerSetMutator($key, function ($key) use ($method) {
                 return $this->{$method}($key);
             });
+
             return true;
         }
-    
+
         return false;
     }
 
@@ -685,12 +687,12 @@ trait HasAttributes
      */
     protected function setMutatedAttributeValue($key, $value)
     {
-        if (!$this->hasSetMutator($key)) {
+        if (! $this->hasSetMutator($key)) {
             throw new LogicException(sprintf(
                 'There is no mutator registered for setting %s::$%s.', static::class, $key
             ));
         }
-        
+
         return static::$setMutators[static::class][$key]->call($this, $value, $key);
     }
 
