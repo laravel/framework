@@ -476,19 +476,8 @@ trait HasAttributes
      */
     public function hasGetMutator($key)
     {
-        if (isset(static::$getMutators[static::class][$key])) {
-            return true;
-        }
-
-        if (method_exists($this, $method = 'get'.Str::studly($key).'Attribute')) {
-            static::registerAccessor($key, function ($key) use ($method) {
-                return $this->{$method}($key);
-            });
-
-            return true;
-        }
-
-        return false;
+        return isset(static::$getMutators[static::class][$key])
+            || method_exists($this, 'get'.Str::studly($key).'Attribute');
     }
 
     /**
@@ -497,15 +486,11 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
-     *
-     * @throws \LogicException
      */
     protected function mutateAttribute($key, $value)
     {
-        if (! $this->hasGetMutator($key)) {
-            throw new LogicException(sprintf(
-                'There is no mutator registered for getting %s::$%s.', static::class, $key
-            ));
+        if (method_exists($this, $method = 'get'.Str::studly($key).'Attribute')) {
+            return $this->{$method}($value);
         }
 
         return static::$getMutators[static::class][$key]->call($this, $value, $key);
@@ -661,19 +646,8 @@ trait HasAttributes
      */
     public function hasSetMutator($key)
     {
-        if (isset(static::$setMutators[static::class][$key])) {
-            return true;
-        }
-
-        if (method_exists($this, $method = 'set'.Str::studly($key).'Attribute')) {
-            static::registerMutator($key, function ($key) use ($method) {
-                return $this->{$method}($key);
-            });
-
-            return true;
-        }
-
-        return false;
+        return isset(static::$setMutators[static::class][$key])
+            || method_exists($this, 'set'.Str::studly($key).'Attribute');
     }
 
     /**
@@ -682,17 +656,13 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
-     *
-     * @throws \LogicException
      */
     protected function setMutatedAttributeValue($key, $value)
     {
-        if (! $this->hasSetMutator($key)) {
-            throw new LogicException(sprintf(
-                'There is no mutator registered for setting %s::$%s.', static::class, $key
-            ));
+        if (method_exists($this, $method = 'set'.Str::studly($key).'Attribute')) {
+            return $this->{$method}($value);
         }
-
+    
         return static::$setMutators[static::class][$key]->call($this, $value, $key);
     }
 
