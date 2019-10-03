@@ -234,6 +234,66 @@ if (! function_exists('data_set')) {
     }
 }
 
+if (!function_exists('data_unset')) {
+    /**
+     * Unset an item on an array or object using dot notation.
+     *
+     * @param mixed $target
+     * @param string|array $key
+     * @return mixed
+     */
+    function data_unset(&$target, $key)
+    {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*') {
+            if (!Arr::accessible($target)) {
+                $target = [];
+            }
+
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    data_unset($inner, $segments);
+                }
+            } else {
+                foreach ($target as $key => $_) {
+                    unset($target[$key]);
+                }
+            }
+        } elseif (Arr::accessible($target)) {
+            if ($segments) {
+                if (!Arr::exists($target, $segment)) {
+                    $target[$segment] = [];
+                }
+
+                data_unset($target[$segment], $segments);
+            } else {
+                unset($target[$segment]);
+            }
+        } elseif (is_object($target)) {
+            if ($segments) {
+                if (!isset($target->{$segment})) {
+                    $target->{$segment} = [];
+                }
+
+                data_unset($target->{$segment}, $segments);
+            } else {
+                unset($target->{$segment});
+            }
+        } else {
+            $target = [];
+
+            if ($segments) {
+                data_unset($target[$segment], $segments);
+            } else {
+                unset($target[$segment]);
+            }
+        }
+
+        return $target;
+    }
+}
+
 if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.

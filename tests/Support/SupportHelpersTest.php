@@ -309,6 +309,191 @@ class SupportHelpersTest extends TestCase
         ], $data);
     }
 
+    public function dataUnsetTestDataProvider() {
+        return [
+            // dataset 0
+            [
+                'baz',
+                [
+                    'foo' => [
+                        'bar' => 'boom',
+                        'baz' => 'noop',
+                    ]
+                ],
+            ],
+            // dataset 1
+            [
+                'baz.bar',
+                [
+                    'foo' => [
+                        'bar' => 'boom',
+                        'baz' => 'noop',
+                    ],
+                    'baz' => []
+                ],
+            ],
+            // dataset 2
+            [
+                'foo.*',
+                [
+                    'foo' => [
+                    ],
+                    'baz' => [
+                        'bar' => [
+                            'boom' => ['kaboom' => 'boom'],
+                            'buz' => ['kaboom' => 'noop']
+                        ]
+                    ]
+                ],
+            ],
+            // dataset 3
+            [
+                'foo.bar',
+                [
+                    'foo' => [
+                        'baz' => 'noop',
+                    ],
+                    'baz' => [
+                        'bar' => [
+                            'boom' => ['kaboom' => 'boom'],
+                            'buz' => ['kaboom' => 'noop']
+                        ]
+                    ]
+                ],
+            ],
+            // dataset 4
+            [
+                'baz.bar',
+                [
+                    'foo' => [
+                        'bar' => 'boom',
+                        'baz' => 'noop',
+                    ],
+                    'baz' => [
+                    ]
+                ],
+            ],
+            // dataset 5
+            [
+                'baz.bar.boom.kaboom',
+                [
+                    'foo' => [
+                        'bar' => 'boom',
+                        'baz' => 'noop',
+                    ],
+                    'baz' => [
+                        'bar' => [
+                            'boom' => [],
+                            'buz' => ['kaboom' => 'noop']
+                        ]
+                    ]
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataUnsetTestDataProvider
+     * @param string $expression
+     * @param array $expected
+     */
+    public function testDataUnset($expression, array $expected)
+    {
+        $data = [
+            'foo' => [
+                'bar' => 'boom',
+                'baz' => 'noop',
+            ],
+            'baz' => [
+                'bar' => [
+                    'boom' => ['kaboom' => 'boom'],
+                    'buz' => ['kaboom' => 'noop']
+                ]
+            ]
+        ];
+
+        $this->assertEquals(
+            $expected,
+            data_unset($data, $expression)
+        );
+    }
+
+    public function testDataUnsetWithStar()
+    {
+        $data = [
+            'foo' => [
+                'bar' => [
+                    'baz' => ['kaboom' => 'boom'],
+                    'buz' => ['kaboom' => 'boom']
+                ],
+                'baz' => [
+                    'baz' => ['kaboom' => 'boom'],
+                    'buz' => ['kaboom' => 'boom']
+                ]
+            ],
+        ];
+
+        $this->assertEquals(
+            [
+                'foo' => [
+                    'bar' => [
+                        'buz' => ['kaboom' => 'boom']
+                    ],
+                    'baz' => [
+                        'buz' => ['kaboom' => 'boom']
+                    ]
+                ],
+            ],
+            data_unset($data, 'foo.*.baz')
+        );
+
+        $this->assertEquals(
+            [
+                'foo' => [],
+            ],
+            data_unset($data, 'foo.*')
+        );
+    }
+
+    public function testDataUnsetWithDoubleStar()
+    {
+        $data = [
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'First', 'text' => 'Hi'],
+                        (object) ['name' => 'Second', 'text' => 'Hello'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'Third', 'text' => 'Nice to meet you'],
+                        (object) ['name' => 'Fourth', 'text' => 'Wag1'],
+                    ],
+                ],
+            ],
+        ];
+
+        data_unset($data, 'posts.*.comments.*.name');
+
+        $this->assertEquals([
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['text' => 'Hi'],
+                        (object) ['text' => 'Hello'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['text' => 'Nice to meet you'],
+                        (object) ['text' => 'Wag1'],
+                    ],
+                ],
+            ],
+        ], $data);
+    }
+
     public function testHead()
     {
         $array = ['a', 'b', 'c'];
