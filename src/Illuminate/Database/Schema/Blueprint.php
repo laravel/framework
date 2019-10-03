@@ -1181,6 +1181,17 @@ class Blueprint
     }
 
     /**
+     * Create a new multipolygon column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function multiPolygonZ($column)
+    {
+        return $this->addColumn('multipolygonz', $column);
+    }
+
+    /**
      * Create a new generated, computed column on the table.
      *
      * @param  string  $column
