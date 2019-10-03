@@ -93,6 +93,8 @@ class MigrateMakeCommand extends BaseCommand
         // make sure that the migrations are registered by the class loaders.
         $this->writeMigration($name, $table, $create);
 
+        $this->line('<info>Dumping Composer autoload</info>');
+
         $this->composer->dumpAutoloads();
     }
 
