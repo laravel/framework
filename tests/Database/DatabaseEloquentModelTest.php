@@ -2237,7 +2237,6 @@ class EloquentModelGetMutatorsStub extends Model
     public static function resetMutatorCache()
     {
         static::$mutatorCache = [];
-        static::$getMutators = [];
     }
 
     public function getFirstNameAttribute()
