@@ -1504,11 +1504,11 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDynamicallyDefinedMutatedAttributes()
     {
-        EloquentModelDynamicMutatorsStub::registerGetMutator('get_snake', function ($value) {
+        EloquentModelDynamicMutatorsStub::registerAccessor('get_snake', function ($value) {
             return 'snake-cased attribute';
         });
 
-        EloquentModelDynamicMutatorsStub::registerSetMutator('set_snake', function ($value) {
+        EloquentModelDynamicMutatorsStub::registerMutator('set_snake', function ($value) {
             $this->attributes['set_snake'] = 'snake-cased attribute';
         });
 
@@ -1521,11 +1521,11 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelDynamicMutatorsStub::resetMutators();
         EloquentModelDynamicMutatorsStub::$snakeAttributes = false;
 
-        EloquentModelDynamicMutatorsStub::registerGetMutator('getCamel', function ($value) {
+        EloquentModelDynamicMutatorsStub::registerAccessor('getCamel', function ($value) {
             return 'camel-cased attribute';
         });
 
-        EloquentModelDynamicMutatorsStub::registerSetMutator('setCamel', function ($value) {
+        EloquentModelDynamicMutatorsStub::registerMutator('setCamel', function ($value) {
             $this->attributes['setCamel'] = 'camel-cased attribute';
         });
 

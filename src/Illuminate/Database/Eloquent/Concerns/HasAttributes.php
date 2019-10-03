@@ -81,7 +81,7 @@ trait HasAttributes
     protected static $mutatorCache = [];
 
     /**
-     * Mutators that are applied when retrieving an attribute.
+     * "Accessors" - or mutators that are applied when retrieving an attribute.
      *
      * @var array
      */
@@ -98,11 +98,11 @@ trait HasAttributes
      * Register a new "get" mutator on the class.
      *
      * @param string $key
-     * @param \Closure $mutator
+     * @param \Closure $accessor
      */
-    public static function registerGetMutator($key, Closure $mutator)
+    public static function registerAccessor($key, Closure $accessor)
     {
-        static::$getMutators[static::class][$key] = $mutator;
+        static::$getMutators[static::class][$key] = $accessor;
     }
 
     /**
@@ -111,7 +111,7 @@ trait HasAttributes
      * @param string $key
      * @param \Closure $mutator
      */
-    public static function registerSetMutator($key, Closure $mutator)
+    public static function registerMutator($key, Closure $mutator)
     {
         static::$setMutators[static::class][$key] = $mutator;
     }
@@ -481,7 +481,7 @@ trait HasAttributes
         }
 
         if (method_exists($this, $method = 'get'.Str::studly($key).'Attribute')) {
-            static::registerGetMutator($key, function ($key) use ($method) {
+            static::registerAccessor($key, function ($key) use ($method) {
                 return $this->{$method}($key);
             });
 
@@ -666,7 +666,7 @@ trait HasAttributes
         }
 
         if (method_exists($this, $method = 'set'.Str::studly($key).'Attribute')) {
-            static::registerSetMutator($key, function ($key) use ($method) {
+            static::registerMutator($key, function ($key) use ($method) {
                 return $this->{$method}($key);
             });
 
