@@ -50,6 +50,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
+        
+        EloquentModelDynamicMutatorsStub::resetMutators();
     }
 
     public function testAttributeManipulation()
@@ -1499,6 +1501,40 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelGetMutatorsStub::$snakeAttributes = false;
         $this->assertEquals(['firstName', 'middleName', 'lastName'], $model->getMutatedAttributes());
     }
+    
+    public function testDynamicallyDefinedMutatedAttributes()
+    {
+        EloquentModelDynamicMutatorsStub::registerGetMutator('get_snake', function($value) {
+            return 'snake-cased attribute';
+        });
+    
+        EloquentModelDynamicMutatorsStub::registerSetMutator('set_snake', function($value) {
+            $this->attributes['set_snake'] = 'snake-cased attribute';
+        });
+    
+        $model = new EloquentModelDynamicMutatorsStub;
+        $model->set_snake = 'foo';
+        
+        $this->assertEquals('snake-cased attribute', $model->get_snake);
+        $this->assertEquals('snake-cased attribute', $model->getAttributes()['set_snake']);
+        
+        EloquentModelDynamicMutatorsStub::resetMutators();
+        EloquentModelDynamicMutatorsStub::$snakeAttributes = false;
+    
+        EloquentModelDynamicMutatorsStub::registerGetMutator('getCamel', function($value) {
+            return 'camel-cased attribute';
+        });
+    
+        EloquentModelDynamicMutatorsStub::registerSetMutator('setCamel', function($value) {
+            $this->attributes['setCamel'] = 'camel-cased attribute';
+        });
+    
+        $model = new EloquentModelDynamicMutatorsStub;
+        $model->setCamel = 'foo';
+    
+        $this->assertEquals('camel-cased attribute', $model->getCamel);
+        $this->assertEquals('camel-cased attribute', $model->getAttributes()['setCamel']);
+    }
 
     public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
     {
@@ -2272,6 +2308,16 @@ class EloquentModelGetMutatorsStub extends Model
     public function doNotGetFourthInvalidAttributeEither()
     {
         //
+    }
+}
+
+class EloquentModelDynamicMutatorsStub extends Model
+{
+    public static function resetMutators()
+    {
+        static::$mutatorCache = [];
+        static::$getMutators = [];
+        static::$setMutators = [];
     }
 }
 

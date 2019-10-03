@@ -507,7 +507,7 @@ trait HasAttributes
             ));
         }
         
-        return static::$getMutators[static::class][$key]->call($this, $value);
+        return static::$getMutators[static::class][$key]->call($this, $value, $key);
     }
 
     /**
@@ -691,7 +691,7 @@ trait HasAttributes
             ));
         }
         
-        return static::$setMutators[static::class][$key]->call($this, $value);
+        return static::$setMutators[static::class][$key]->call($this, $value, $key);
     }
 
     /**
