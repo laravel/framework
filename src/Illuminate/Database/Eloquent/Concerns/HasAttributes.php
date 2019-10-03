@@ -1308,26 +1308,13 @@ trait HasAttributes
      */
     public static function cacheMutatedAttributes($class)
     {
-        static::registerAllGetMutatorMethods($class);
-        
-        static::$mutatorCache[$class] = array_keys(static::$getMutators[static::class] ?? []);
-    }
-    
-    /**
-     * Register all get*Attribute methods.
-     *
-     * @param string $class
-     */
-    protected static function registerAllGetMutatorMethods($class)
-    {
-        collect(static::getMutatorMethods($class))
-            ->each(function($matches) {
-                [$method, $attribute] = $matches;
-                $key = lcfirst(static::$snakeAttributes ? Str::snake($attribute) : $attribute);
-                static::registerGetMutator($key, function($key) use ($method) {
-                    return $this->{$method}($key);
-                });
-            });
+        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))
+            ->map(function ($match) {
+                return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
+            })
+            ->merge(array_keys(static::$getMutators[static::class] ?? []))
+            ->unique()
+            ->all();
     }
 
     /**
@@ -1340,6 +1327,6 @@ trait HasAttributes
     {
         preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches);
 
-        return $matches;
+        return $matches[1];
     }
 }
