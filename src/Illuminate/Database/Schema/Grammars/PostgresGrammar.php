@@ -869,6 +869,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a spatial MultiPolygonZ type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeMultiPolygonZ(Fluent $column)
+    {
+        return $this->formatPostGisType('multipolygonz');
+    }
+
+    /**
      * Format the column definition for a PostGIS spatial type.
      *
      * @param  string  $type
