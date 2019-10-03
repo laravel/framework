@@ -1536,6 +1536,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('camel-cased attribute', $model->getAttributes()['setCamel']);
     }
 
+    public function testClassMutatorsAndAccessorsTakePrecedence()
+    {
+        EloquentModelDynamicMutatorsStub::registerAccessor('class_accessor', function ($value) {
+            return 'via dynamic accessor';
+        });
+
+        EloquentModelDynamicMutatorsStub::registerMutator('class_mutator', function ($value) {
+            $this->attributes['class_mutator'] = 'via dynamic mutator';
+        });
+
+        $model = new EloquentModelDynamicMutatorsStub;
+        $model->class_mutator = 'foo';
+
+        $this->assertEquals('via class accessor', $model->class_accessor);
+        $this->assertEquals('via class mutator', $model->getAttributes()['class_mutator']);
+    }
+
     public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
     {
         $model = new EloquentModelStub;
@@ -2318,6 +2335,16 @@ class EloquentModelDynamicMutatorsStub extends Model
         static::$mutatorCache = [];
         static::$getMutators = [];
         static::$setMutators = [];
+    }
+
+    protected function getClassAccessorAttribute()
+    {
+        return 'via class accessor';
+    }
+
+    protected function setClassMutatorAttribute()
+    {
+        $this->attributes['class_mutator'] = 'via class mutator';
     }
 }
 

@@ -95,25 +95,25 @@ trait HasAttributes
     protected static $setMutators = [];
 
     /**
-     * Register a new "get" mutator on the class.
+     * Register a new "get" mutator (or accessor) on the class.
      *
-     * @param string $key
+     * @param string   $attribute
      * @param \Closure $accessor
      */
-    public static function registerAccessor($key, Closure $accessor)
+    public static function registerAccessor($attribute, Closure $accessor)
     {
-        static::$getMutators[static::class][$key] = $accessor;
+        static::$getMutators[static::class][$attribute] = $accessor;
     }
 
     /**
      * Register a new "set" mutator on the class.
      *
-     * @param string $key
+     * @param string   $attribute
      * @param \Closure $mutator
      */
-    public static function registerMutator($key, Closure $mutator)
+    public static function registerMutator($attribute, Closure $mutator)
     {
-        static::$setMutators[static::class][$key] = $mutator;
+        static::$setMutators[static::class][$attribute] = $mutator;
     }
 
     /**
@@ -662,7 +662,7 @@ trait HasAttributes
         if (method_exists($this, $method = 'set'.Str::studly($key).'Attribute')) {
             return $this->{$method}($value);
         }
-    
+
         return static::$setMutators[static::class][$key]->call($this, $value, $key);
     }
 
