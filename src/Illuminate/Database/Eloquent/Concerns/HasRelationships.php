@@ -719,7 +719,8 @@ trait HasRelationships
     {
         return tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
-                $instance->setConnection($this->connection);
+                $connection = config('database.default');
+                $instance->setConnection($connection);
             }
         });
     }
