@@ -5,7 +5,13 @@ namespace Illuminate\Foundation\Testing;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Foundation\Testing\DatabaseMigratable;
+use Illuminate\Contracts\Foundation\Testing\DatabaseRefreshable;
+use Illuminate\Contracts\Foundation\Testing\DatabaseTransactable;
+use Illuminate\Contracts\Foundation\Testing\Fakeable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Foundation\Testing\WithoutEvents as WithoutEventsContract;
+use Illuminate\Contracts\Foundation\Testing\WithoutMiddleware as WithoutMiddlewareContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
 use Mockery;
@@ -79,7 +85,7 @@ abstract class TestCase extends BaseTestCase
             $this->refreshApplication();
         }
 
-        $this->setUpTraits();
+        $this->setUpTestHelpers();
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             $callback();
@@ -103,39 +109,37 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Boot the testing helper traits.
+     * Boot the testing helper methods.
      *
-     * @return array
+     * @return $this
      */
-    protected function setUpTraits()
+    protected function setUpTestHelpers()
     {
-        $uses = array_flip(class_uses_recursive(static::class));
-
-        if (isset($uses[RefreshDatabase::class])) {
+        if ($this instanceof DatabaseRefreshable) {
             $this->refreshDatabase();
         }
 
-        if (isset($uses[DatabaseMigrations::class])) {
+        if ($this instanceof DatabaseMigratable) {
             $this->runDatabaseMigrations();
         }
 
-        if (isset($uses[DatabaseTransactions::class])) {
+        if ($this instanceof DatabaseTransactable) {
             $this->beginDatabaseTransaction();
         }
 
-        if (isset($uses[WithoutMiddleware::class])) {
+        if ($this instanceof WithoutMiddlewareContract) {
             $this->disableMiddlewareForAllTests();
         }
 
-        if (isset($uses[WithoutEvents::class])) {
+        if ($this instanceof WithoutEventsContract) {
             $this->disableEventsForAllTests();
         }
 
-        if (isset($uses[WithFaker::class])) {
-            $this->setUpFaker();
+        if ($this instanceof Fakeable) {
+            $this->doSetUpFaker();
         }
 
-        return $uses;
+        return $this;
     }
 
     /**

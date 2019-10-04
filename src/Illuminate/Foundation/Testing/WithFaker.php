@@ -16,11 +16,23 @@ trait WithFaker
     /**
      * Setup up the Faker instance.
      *
+     * @return $this
+     */
+    public function doSetUpFaker()
+    {
+        $this->faker = $this->makeFaker();
+
+        return $this;
+    }
+
+    /**
+     * Setup up the Faker instance.
+     *
      * @return void
      */
     protected function setUpFaker()
     {
-        $this->faker = $this->makeFaker();
+        $this->doSetUpFaker();
     }
 
     /**
