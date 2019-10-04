@@ -21,7 +21,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function registerPolicies()
     {
-        foreach ($this->policies as $key => $value) {
+        foreach ($this->policies() as $key => $value) {
             Gate::policy($key, $value);
         }
     }
