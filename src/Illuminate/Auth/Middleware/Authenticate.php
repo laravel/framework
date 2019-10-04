@@ -64,6 +64,20 @@ class Authenticate
             }
         }
 
+        $this->unauthenticated($request, $guards);
+    }
+
+    /**
+     * Handle an unauthenticated user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $guards
+     * @return void
+     *
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
+    protected function unauthenticated($request, array $guards)
+    {
         throw new AuthenticationException(
             'Unauthenticated.', $guards, $this->redirectTo($request)
         );
