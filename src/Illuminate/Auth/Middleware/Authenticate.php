@@ -68,7 +68,7 @@ class Authenticate
     }
 
     /**
-     * Handle unauthenticated user.
+     * Handle an unauthenticated user.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $guards
