@@ -162,11 +162,16 @@ trait ManagesTransactions
      * Commit the active database transaction.
      *
      * @return void
+     * @throws TransactionException
      */
     public function commit()
     {
         if ($this->transactions == 1) {
             $this->getPdo()->commit();
+        }
+
+        if ($this->transactions == 0) {
+            throw new TransactionException('Cannot commit. No transaction active.');
         }
 
         $this->transactions = max(0, $this->transactions - 1);

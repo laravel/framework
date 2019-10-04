@@ -6,6 +6,7 @@ use DateTime;
 use ErrorException;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Concerns\TransactionException;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
@@ -204,6 +205,19 @@ class DatabaseConnectionTest extends TestCase
         $connection->expects($this->any())->method('getName')->willReturn('name');
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
+        $connection->commit();
+    }
+
+    public function testCommitMethodThrowsOnMissingTransaction()
+    {
+        $this->expectException(TransactionException::class);
+        $this->expectExceptionMessage('Cannot commit. No transaction active.');
+
+        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $connection = $this->getMockConnection(['getName'], $pdo);
+        $connection->expects($this->any())->method('getName')->willReturn('name');
+        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldNotReceive('dispatch')->with(m::type(TransactionCommitted::class));
         $connection->commit();
     }
 
