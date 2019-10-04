@@ -1280,6 +1280,28 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that the current logged in user's password matches the given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function validatePassword($attribute, $value, $parameters)
+    {
+        $auth = $this->container->make('auth');
+        $hasher = $this->container->make('hash');
+
+        $guard = $auth->guard(Arr::first($parameters));
+
+        if ($guard->guest()) {
+            return false;
+        }
+
+        return $hasher->check($value, $guard->user()->getAuthPassword());
+    }
+
+    /**
      * Validate that an attribute exists even if not filled.
      *
      * @param  string  $attribute
