@@ -90,6 +90,21 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has the given status code and no content.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function assertNoContent($status = 204)
+    {
+        $this->assertStatus($status);
+
+        PHPUnit::assertEmpty($this->getContent(), 'Response content is not empty.');
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a not found status code.
      *
      * @return $this
@@ -469,11 +484,16 @@ class TestResponse
      *
      * @param  string  $path
      * @param  mixed  $expect
+     * @param  bool  $strict
      * @return $this
      */
-    public function assertJsonPath($path, $expect)
+    public function assertJsonPath($path, $expect, $strict = false)
     {
-        PHPUnit::assertEquals($expect, $this->json($path));
+        if ($strict) {
+            PHPUnit::assertSame($expect, $this->json($path));
+        } else {
+            PHPUnit::assertEquals($expect, $this->json($path));
+        }
 
         return $this;
     }
