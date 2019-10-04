@@ -201,10 +201,13 @@ class DatabaseConnectionTest extends TestCase
     public function testCommittedFiresEventsIfSet()
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo->expects($this->once())->method('beginTransaction');
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->expects($this->any())->method('getName')->willReturn('name');
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionBeginning::class));
+        $connection->beginTransaction();
         $connection->commit();
     }
 
