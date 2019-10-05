@@ -2278,19 +2278,20 @@ class EloquentModelGetMutatorsStub extends Model
 class EloquentModelCastingStub extends Model
 {
     protected $casts = [
-        'intAttribute' => 'int',
-        'floatAttribute' => 'float',
-        'stringAttribute' => 'string',
-        'boolAttribute' => 'bool',
-        'booleanAttribute' => 'boolean',
-        'objectAttribute' => 'object',
-        'arrayAttribute' => 'array',
         'jsonAttribute' => 'json',
         'collectionAttribute' => 'collection',
         'dateAttribute' => 'date',
-        'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
     ];
+
+    protected ?int $intAttribute;
+    protected ?float $floatAttribute;
+    protected ?string $stringAttribute;
+    protected ?bool $boolAttribute;
+    protected ?bool $booleanAttribute;
+    protected ?object $objectAttribute;
+    protected ?array $arrayAttribute;
+    protected ?DateTime $datetimeAttribute;
 
     public function jsonAttributeValue()
     {

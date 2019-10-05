@@ -13,6 +13,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use LogicException;
+use ReflectionClass;
 
 trait HasAttributes
 {
@@ -919,11 +920,29 @@ trait HasAttributes
      */
     public function getCasts()
     {
+        $casts = array_merge($this->getPropertyCasts(), $this->casts);
+
         if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+            return array_merge([$this->getKeyName() => $this->getKeyType()], $casts);
         }
 
-        return $this->casts;
+        return $casts;
+    }
+
+    /**
+     * Get a list of properties with their types
+     */
+    protected function getPropertyCasts()
+    {
+        $reflection = new ReflectionClass($this);
+
+        $casts = collect($reflection->getProperties())
+            ->where('class', get_class($this))
+            ->filter(fn($prop) => $prop->hasType())
+            ->mapWithKeys(fn($prop) => [$prop->getName() => strtolower($prop->getType()->getName())])
+            ->all();
+
+        return $casts;
     }
 
     /**
