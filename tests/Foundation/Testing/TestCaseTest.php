@@ -86,11 +86,31 @@ class TestCaseTest extends PHPUnitTestCase
             ->getMock();
     }
 
-    public function testSetUpTestHelpersWithClassUsingTraits()
+    /**
+     * @return TestCaseWithTraits|MockInterface
+     */
+    private function setUpTestCaseWithTraits()
+    {
+        return m::mock(TestCaseWithTraits::class)
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldReceive('refreshDatabase')
+            ->getMock()
+            ->shouldReceive('runDatabaseMigrations')
+            ->getMock()
+            ->shouldReceive('disableMiddlewareForAllTests')
+            ->getMock()
+            ->shouldReceive('disableEventsForAllTests')
+            ->getMock()
+            ->shouldReceive('doSetUpFaker')
+            ->getMock();
+    }
+
+    public function testSetUpTraitsWithClassUsingTraits()
     {
         $testCase = $this->setUpTestCaseWithInterfaceAndTraits();
 
-        $testCase->runSetUpTestHelpers();
+        $testCase->runSetUpTraits();
 
         $this
             ->assertShouldHaveReceived($testCase, 'refreshDatabase')
@@ -100,20 +120,20 @@ class TestCaseTest extends PHPUnitTestCase
             ->assertShouldHaveReceived($testCase, 'doSetUpFaker');
     }
 
-    public function testSetUpTestHelpersWithClassUsingDatabaseTransactionTrait()
+    public function testSetUpTraitsWithClassUsingDatabaseTransactionTrait()
     {
         $testCase = $this->setUpTestCaseWithDatabaseTransactionsInterfaceAndTrait();
 
-        $testCase->runSetUpTestHelpers();
+        $testCase->runSetUpTraits();
 
         $this->assertShouldHaveReceived($testCase, 'beginDatabaseTransaction');
     }
 
-    public function testSetUpTestHelpersWithClassUsingNoTraits()
+    public function testSetUpTraitsWithClassUsingNoTraits()
     {
         $testCase = $this->setUpTestCaseWithoutHelpers();
 
-        $testCase->runSetUpTestHelpers();
+        $testCase->runSetUpTraits();
 
         $this
             ->assertShouldNotHaveReceived($testCase, 'refreshDatabase')
@@ -124,11 +144,11 @@ class TestCaseTest extends PHPUnitTestCase
             ->assertShouldNotHaveReceived($testCase, 'beginDatabaseTransaction');
     }
 
-    public function testSetUpTestHelpersWithImplementedMethods()
+    public function testSetUpTraitsWithImplementedMethods()
     {
         $testCase = $this->setUpTestCaseWithImplementedMethods();
 
-        $testCase->runSetUpTestHelpers();
+        $testCase->runSetUpTraits();
 
         $this
             ->assertShouldHaveReceived($testCase, 'refreshDatabase')
@@ -137,6 +157,20 @@ class TestCaseTest extends PHPUnitTestCase
             ->assertShouldHaveReceived($testCase, 'disableEventsForAllTests')
             ->assertShouldHaveReceived($testCase, 'doSetUpFaker')
             ->assertShouldHaveReceived($testCase, 'beginDatabaseTransaction');
+    }
+
+    public function testSetUpTraitsWithTraits()
+    {
+        $testCase = $this->setUpTestCaseWithTraits();
+
+        $testCase->runSetUpTraits();
+
+        $this
+            ->assertShouldHaveReceived($testCase, 'refreshDatabase')
+            ->assertShouldHaveReceived($testCase, 'runDatabaseMigrations')
+            ->assertShouldHaveReceived($testCase, 'disableMiddlewareForAllTests')
+            ->assertShouldHaveReceived($testCase, 'disableEventsForAllTests')
+            ->assertShouldHaveReceived($testCase, 'doSetUpFaker');
     }
 
     private function assertShouldHaveReceived(MockInterface $testCase, $method)
@@ -179,9 +213,9 @@ class TestCaseWithInterfacesAndTraits extends TestCase implements
     use WithoutEvents;
     use WithFaker;
 
-    public function runSetUpTestHelpers()
+    public function runSetUpTraits()
     {
-        $this->setUpTestHelpers();
+        $this->setUpTraits();
     }
 
     public function createApplication()
@@ -193,9 +227,9 @@ class TestCaseWithDatabaseTransactionsInterfaceAndTrait extends TestCase impleme
 {
     use DatabaseTransactions;
 
-    public function runSetUpTestHelpers()
+    public function runSetUpTraits()
     {
-        $this->setUpTestHelpers();
+        $this->setUpTraits();
     }
 
     public function createApplication()
@@ -205,9 +239,9 @@ class TestCaseWithDatabaseTransactionsInterfaceAndTrait extends TestCase impleme
 
 class TestCaseWithoutHelpers extends TestCase
 {
-    public function runSetUpTestHelpers()
+    public function runSetUpTraits()
     {
-        $this->setUpTestHelpers();
+        $this->setUpTraits();
     }
 
     public function createApplication()
@@ -223,9 +257,9 @@ class TestCaseWithImplementedMethods extends TestCase implements
     WithoutEventsContract,
     WithoutMiddlewareContract
 {
-    public function runSetUpTestHelpers()
+    public function runSetUpTraits()
     {
-        $this->setUpTestHelpers();
+        $this->setUpTraits();
     }
 
     public function createApplication()
@@ -253,6 +287,24 @@ class TestCaseWithImplementedMethods extends TestCase implements
     }
 
     public function beginDatabaseTransaction()
+    {
+    }
+}
+
+class TestCaseWithTraits extends TestCase
+{
+    use RefreshDatabase;
+    use DatabaseMigrations;
+    use WithoutMiddleware;
+    use WithoutEvents;
+    use WithFaker;
+
+    public function runSetUpTraits()
+    {
+        $this->setUpTraits();
+    }
+
+    public function createApplication()
     {
     }
 }

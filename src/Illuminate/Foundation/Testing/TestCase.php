@@ -85,7 +85,7 @@ abstract class TestCase extends BaseTestCase
             $this->refreshApplication();
         }
 
-        $this->setUpTestHelpers();
+        $this->setUpTraits();
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             $callback();
@@ -113,29 +113,31 @@ abstract class TestCase extends BaseTestCase
      *
      * @return $this
      */
-    protected function setUpTestHelpers()
+    protected function setUpTraits()
     {
-        if ($this instanceof DatabaseRefreshable) {
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if ($this instanceof DatabaseRefreshable || isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();
         }
 
-        if ($this instanceof DatabaseMigratable) {
+        if ($this instanceof DatabaseMigratable || isset($uses[DatabaseMigrations::class])) {
             $this->runDatabaseMigrations();
         }
 
-        if ($this instanceof DatabaseTransactable) {
+        if ($this instanceof DatabaseTransactable || isset($uses[DatabaseTransactions::class])) {
             $this->beginDatabaseTransaction();
         }
 
-        if ($this instanceof WithoutMiddlewareContract) {
+        if ($this instanceof WithoutMiddlewareContract || isset($uses[WithoutMiddleware::class])) {
             $this->disableMiddlewareForAllTests();
         }
 
-        if ($this instanceof WithoutEventsContract) {
+        if ($this instanceof WithoutEventsContract || isset($uses[WithoutEvents::class])) {
             $this->disableEventsForAllTests();
         }
 
-        if ($this instanceof Fakeable) {
+        if ($this instanceof Fakeable || isset($uses[WithFaker::class])) {
             $this->doSetUpFaker();
         }
 
