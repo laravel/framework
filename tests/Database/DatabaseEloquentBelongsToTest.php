@@ -182,6 +182,8 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->related->shouldReceive('getKeyType')->andReturn($keyType);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
+        $this->related->shouldReceive('qualifyColumn')->with('id')->andReturn('relation.id');
+        $this->related->shouldReceive('qualifyColumn')->with('foreign_key')->andReturn('relation.foreign_key');
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $parent = $parent ?: new EloquentBelongsToModelStub;
 
