@@ -5,6 +5,12 @@ namespace Illuminate\Foundation\Testing;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Foundation\Testing\DatabaseMigratable;
+use Illuminate\Contracts\Foundation\Testing\DatabaseRefreshable;
+use Illuminate\Contracts\Foundation\Testing\DatabaseTransactable;
+use Illuminate\Contracts\Foundation\Testing\Fakeable;
+use Illuminate\Contracts\Foundation\Testing\WithoutEvents as WithoutEventsContract;
+use Illuminate\Contracts\Foundation\Testing\WithoutMiddleware as WithoutMiddlewareContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
@@ -111,28 +117,28 @@ abstract class TestCase extends BaseTestCase
     {
         $uses = array_flip(class_uses_recursive(static::class));
 
-        if (isset($uses[RefreshDatabase::class])) {
+        if ($this instanceof DatabaseRefreshable || isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();
         }
 
-        if (isset($uses[DatabaseMigrations::class])) {
+        if ($this instanceof DatabaseMigratable || isset($uses[DatabaseMigrations::class])) {
             $this->runDatabaseMigrations();
         }
 
-        if (isset($uses[DatabaseTransactions::class])) {
+        if ($this instanceof DatabaseTransactable || isset($uses[DatabaseTransactions::class])) {
             $this->beginDatabaseTransaction();
         }
 
-        if (isset($uses[WithoutMiddleware::class])) {
+        if ($this instanceof WithoutMiddlewareContract || isset($uses[WithoutMiddleware::class])) {
             $this->disableMiddlewareForAllTests();
         }
 
-        if (isset($uses[WithoutEvents::class])) {
+        if ($this instanceof WithoutEventsContract || isset($uses[WithoutEvents::class])) {
             $this->disableEventsForAllTests();
         }
 
-        if (isset($uses[WithFaker::class])) {
-            $this->setUpFaker();
+        if ($this instanceof Fakeable || isset($uses[WithFaker::class])) {
+            $this->doSetUpFaker();
         }
 
         return $uses;
