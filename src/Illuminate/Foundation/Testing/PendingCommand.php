@@ -193,15 +193,9 @@ class PendingCommand
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldIgnoreMissing();
 
-        foreach ($this->test->expectedOutput as $i => $output) {
-            $mock->shouldReceive('doWrite')
-                ->once()
-                ->ordered()
-                ->with($output, Mockery::any())
-                ->andReturnUsing(function () use ($i) {
-                    unset($this->test->expectedOutput[$i]);
-                });
-        }
+        $mock->shouldReceive('doWrite')->andReturnUsing(function ($output) {
+            $this->test->actualOutput[] = $output;
+        });
 
         return $mock;
     }

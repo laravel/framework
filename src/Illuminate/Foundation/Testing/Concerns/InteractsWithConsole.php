@@ -24,6 +24,13 @@ trait InteractsWithConsole
     public $expectedOutput = [];
 
     /**
+     * All of the actual output lines.
+     *
+     * @var array
+     */
+    public $actualOutput = [];
+
+    /**
      * All of the expected questions.
      *
      * @var array
@@ -48,8 +55,15 @@ trait InteractsWithConsole
                 $this->fail('Question "'.Arr::first($this->expectedQuestions)[0].'" was not asked.');
             }
 
-            if (count($this->expectedOutput)) {
-                $this->fail('Output "'.Arr::first($this->expectedOutput).'" was not printed.');
+            $assertedOutput = collect($this->actualOutput)->diff(collect($this->actualOutput)->diff($this->expectedOutput));
+            if ($assertedOutput->values()->toArray() !== $this->expectedOutput) {
+                $missingOutput = collect($this->expectedOutput)->diff($this->actualOutput)->unique();
+                $missingString = $missingOutput->isEmpty()
+                    ? "Output given in wrong order:\n" . collect($this->expectedOutput)->join("\n")
+                    : "Expected output missing:\n" . $missingOutput->join("\n");
+                $actualString = count($this->actualOutput) === 0 ? 'No output was given.' : "Actual output was:\n" . join("\n", $this->actualOutput);
+
+                $this->fail("{$missingString}\n\n{$actualString}");
             }
         });
 
