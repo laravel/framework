@@ -2,6 +2,18 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.1.0...6.x)
 
+### Added
+- Added support for callable objects in `Container::call()` ([#30156](https://github.com/laravel/framework/pull/30156))
+
+### TODO:
+- Remove unnecessary param passed to updatePackageArray method ([#30155](https://github.com/laravel/framework/pull/30155))
+- Add optional connection name to DatabaseUserProvider ([#30154](https://github.com/laravel/framework/pull/30154))
+- Add multipolygonz type for postgreSQL ([#30173](https://github.com/laravel/framework/pull/30173))
+- Apply limit to database rather than collection ([#30148](https://github.com/laravel/framework/pull/30148))
+- Allow to use scoped macro in nested queries ([#30127](https://github.com/laravel/framework/pull/30127))
+- Added array to json conversion for sqlite ([#30133](https://github.com/laravel/framework/pull/30133))
+- Add "unauthenticated" method in auth middleware ([#30177](https://github.com/laravel/framework/pull/30177))
+
 
 ## [v6.1.0 (2019-10-01)](https://github.com/laravel/framework/compare/v6.0.4...v6.1.0)
 
