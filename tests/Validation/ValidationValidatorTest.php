@@ -2650,17 +2650,30 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=2/3']);
         $this->assertTrue($v->passes());
 
-        // Ensure svg images always pass as size is irreleveant
-        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
+        // Ensure svg images always pass as size is irreleveant (image/svg+xml)
+        $svgXmlUploadedFile = new UploadedFile(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_width=1,max_height=1']);
+        $v = new Validator($trans, ['x' => $svgXmlUploadedFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
 
-        $file = new File(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
+        $svgXmlFile = new File(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans, ['x' => $file], ['x' => 'dimensions:max_width=1,max_height=1']);
+        $v = new Validator($trans, ['x' => $svgXmlFile], ['x' => 'dimensions:max_width=1,max_height=1']);
+        $this->assertTrue($v->passes());
+
+        // Ensure svg images always pass as size is irreleveant (image/svg)
+        $svgUploadedFile = new UploadedFile(__DIR__.'/fixtures/image2.svg', '', 'image/svg', null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => $svgUploadedFile], ['x' => 'dimensions:max_width=1,max_height=1']);
+        $this->assertTrue($v->passes());
+
+        $svgFile = new File(__DIR__.'/fixtures/image2.svg', '', 'image/svg', null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => $svgFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
     }
 
