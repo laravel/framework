@@ -335,8 +335,7 @@ class SqlServerGrammar extends Grammar
     public function compileDropAllViews()
     {
         return "DECLARE @sql NVARCHAR(MAX) = N'';
-            SELECT @sql += 'DROP VIEW ' + QUOTENAME(OBJECT_SCHEMA_NAME(object_id))
-                + '.' + QUOTENAME(name) + ';'
+            SELECT @sql += 'DROP VIEW ' + QUOTENAME(OBJECT_SCHEMA_NAME(object_id)) + '.' + QUOTENAME(name) + ';'
             FROM sys.views;
 
             EXEC sp_executesql @sql;";
