@@ -20,6 +20,7 @@ use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -201,6 +202,10 @@ class FilesystemAdapter implements CloudFilesystemContract
         if ($contents instanceof File ||
             $contents instanceof UploadedFile) {
             return $this->putFile($path, $contents, $options);
+        }
+
+        if ($contents instanceof StreamInterface) {
+            return $this->driver->putStream($path, $contents->detach(), $options);
         }
 
         return is_resource($contents)
