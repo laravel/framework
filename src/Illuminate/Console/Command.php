@@ -229,7 +229,7 @@ class Command extends SymfonyCommand
             $this->attributes()
         );
 
-        return !$this->validator->fails();
+        return ! $this->validator->fails();
     }
 
     /**
