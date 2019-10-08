@@ -217,19 +217,19 @@ class Command extends SymfonyCommand
         }
 
         try {
-            $this->validator = $this->validator ?? $this->makeValidator();
+            $factory = $this->getValidationFactory();
         } catch (BindingResolutionException $e) {
             return true;
         }
 
-        $this->validator->make(
+        $this->validator = $factory->make(
             array_merge($this->arguments(), $this->options()),
             $rules,
             $this->messages(),
             $this->attributes()
         );
 
-        return ! $this->validator->fails();
+        return !$this->validator->fails();
     }
 
     /**
@@ -237,7 +237,7 @@ class Command extends SymfonyCommand
      *
      * @return \Illuminate\Contracts\Validation\Factory
      */
-    protected function makeValidator()
+    protected function getValidationFactory()
     {
         return $this->laravel->make(ValidatorFactory::class);
     }
