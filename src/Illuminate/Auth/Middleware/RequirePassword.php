@@ -52,7 +52,7 @@ class RequirePassword
      */
     protected function shouldConfirmPassword($request)
     {
-        $confirmedAt = strtotime('now') - $request->session()->get('auth.password_confirmed_at', 0);
+        $confirmedAt = time() - $request->session()->get('auth.password_confirmed_at', 0);
 
         return $confirmedAt > config('auth.password_timeout', 10800);
     }

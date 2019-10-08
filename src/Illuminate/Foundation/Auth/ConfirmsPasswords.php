@@ -41,7 +41,7 @@ trait ConfirmsPasswords
      */
     protected function resetPasswordConfirmationTimeout(Request $request)
     {
-        $request->session()->put('auth.password_confirmed_at', strtotime('now'));
+        $request->session()->put('auth.password_confirmed_at', time());
     }
 
     /**
