@@ -328,6 +328,21 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the command to drow all views.
+     *
+     * @return string
+     */
+    public function compileDropAllViews()
+    {
+        return "DECLARE @sql NVARCHAR(MAX) = N'';
+            SELECT @sql += 'DROP VIEW ' + QUOTENAME(OBJECT_SCHEMA_NAME(object_id))
+                + '.' + QUOTENAME(name) + ';'
+            FROM sys.views;
+
+            EXEC sp_executesql @sql;";
+    }
+
+    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column
