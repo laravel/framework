@@ -5,6 +5,9 @@ namespace Illuminate\Tests\Validation;
 use DateTime;
 use DateTimeImmutable;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
@@ -689,11 +692,11 @@ class ValidationValidatorTest extends TestCase
     public function testValidatePassword()
     {
         // Fails when user is not logged in.
-        $auth = m::mock(\Illuminate\Contracts\Auth\Guard::class);
+        $auth = m::mock(Guard::class);
         $auth->shouldReceive('guard')->andReturn($auth);
         $auth->shouldReceive('guest')->andReturn(true);
 
-        $hasher = m::mock(\Illuminate\Contracts\Hashing\Hasher::class);
+        $hasher = m::mock(Hasher::class);
 
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('auth')->andReturn($auth);
@@ -708,15 +711,15 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         // Fails when password is incorrect.
-        $user = m::mock(\Illuminate\Contracts\Auth\Authenticatable::class);
+        $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword');
 
-        $auth = m::mock(\Illuminate\Contracts\Auth\Guard::class);
+        $auth = m::mock(Guard::class);
         $auth->shouldReceive('guard')->andReturn($auth);
         $auth->shouldReceive('guest')->andReturn(false);
         $auth->shouldReceive('user')->andReturn($user);
 
-        $hasher = m::mock(\Illuminate\Contracts\Hashing\Hasher::class);
+        $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->andReturn(false);
 
         $container = m::mock(Container::class);
@@ -732,15 +735,15 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         // Succeeds when password is correct.
-        $user = m::mock(\Illuminate\Contracts\Auth\Authenticatable::class);
+        $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword');
 
-        $auth = m::mock(\Illuminate\Contracts\Auth\Guard::class);
+        $auth = m::mock(Guard::class);
         $auth->shouldReceive('guard')->andReturn($auth);
         $auth->shouldReceive('guest')->andReturn(false);
         $auth->shouldReceive('user')->andReturn($user);
 
-        $hasher = m::mock(\Illuminate\Contracts\Hashing\Hasher::class);
+        $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->andReturn(true);
 
         $container = m::mock(Container::class);
@@ -756,15 +759,15 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         // We can use a specific guard.
-        $user = m::mock(\Illuminate\Contracts\Auth\Authenticatable::class);
+        $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword');
 
-        $auth = m::mock(\Illuminate\Contracts\Auth\Guard::class);
+        $auth = m::mock(Guard::class);
         $auth->shouldReceive('guard')->with('custom')->andReturn($auth);
         $auth->shouldReceive('guest')->andReturn(false);
         $auth->shouldReceive('user')->andReturn($user);
 
-        $hasher = m::mock(\Illuminate\Contracts\Hashing\Hasher::class);
+        $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->andReturn(true);
 
         $container = m::mock(Container::class);
