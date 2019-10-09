@@ -50,7 +50,7 @@ class RequirePassword
                 $this->urlGenerator->route($redirectToRoute ?? 'password.confirm')
             );
         }
-        
+
         if (config('auth.password_timeout_reset', false)) {
             $request->session()->put('auth.password_confirmed_at', time());
         }
