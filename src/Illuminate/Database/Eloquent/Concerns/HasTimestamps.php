@@ -123,4 +123,24 @@ trait HasTimestamps
     {
         return static::UPDATED_AT;
     }
+
+    /**
+     * Get the value of the "created at" column.
+     *
+     * @return mixed
+     */
+    public function getCreatedAt()
+    {
+        return $this->getAttribute($this->getCreatedAtColumn());
+    }
+
+    /**
+     * Get the value of the "updated at" column.
+     *
+     * @return mixed
+     */
+    public function getUpdatedAt()
+    {
+        return $this->getAttribute($this->getUpdatedAtColumn());
+    }
 }
