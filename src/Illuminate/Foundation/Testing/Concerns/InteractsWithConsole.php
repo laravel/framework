@@ -59,8 +59,8 @@ trait InteractsWithConsole
             if ($assertedOutput->values()->toArray() !== $this->expectedOutput) {
                 $missingOutput = collect($this->expectedOutput)->diff($this->actualOutput)->unique();
                 $missingString = $missingOutput->isEmpty()
-                    ? "Output printed in wrong order:\n" . collect($this->expectedOutput)->join("\n")
-                    : "Expected output was not printed:\n" . $missingOutput->join("\n");
+                    ? "Output printed in wrong order:\n".collect($this->expectedOutput)->join("\n")
+                    : "Expected output was not printed:\n".$missingOutput->join("\n");
                 $actualString = count($this->actualOutput) === 0 ? 'No output was printed.' : "Actual output was:\n" . join("\n", $this->actualOutput);
 
                 $this->fail("{$missingString}\n\n{$actualString}");
