@@ -3,26 +3,36 @@
 namespace Illuminate\Auth\Middleware;
 
 use Closure;
-use Illuminate\Routing\Redirector;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
 
 class RequirePassword
 {
     /**
-     * The Redirector instance.
+     * The response factory instance.
      *
-     * @var \Illuminate\Routing\Redirector
+     * @var \Illuminate\Contracts\Routing\ResponseFactory
      */
-    protected $redirector;
+    protected $responseFactory;
+
+    /**
+     * The URL generator instance.
+     *
+     * @var \Illuminate\Contracts\Routing\UrlGenerator
+     */
+    protected $urlGenerator;
 
     /**
      * Create a new middleware instance.
      *
-     * @param  \Illuminate\Routing\Redirector  $redirector
+     * @param  \Illuminate\Contracts\Routing\ResponseFactory  $responseFactory
+     * @param  \Illuminate\Contracts\Routing\UrlGenerator  $urlGenerator
      * @return void
      */
-    public function __construct(Redirector $redirector)
+    public function __construct(ResponseFactory $responseFactory, UrlGenerator $urlGenerator)
     {
-        $this->redirector = $redirector;
+        $this->responseFactory = $responseFactory;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -36,8 +46,8 @@ class RequirePassword
     public function handle($request, Closure $next, $redirectToRoute = null)
     {
         if ($this->shouldConfirmPassword($request)) {
-            return $this->redirector->guest(
-                $this->redirector->getUrlGenerator()->route($redirectToRoute ?? 'password.confirm')
+            return $this->responseFactory->redirectGuest(
+                $this->urlGenerator->route($redirectToRoute ?? 'password.confirm')
             );
         }
 
