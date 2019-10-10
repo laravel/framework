@@ -624,6 +624,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('insertUsing')->once()->with(['bar'], 'baz')->andReturn('foo');
 
         $this->assertSame('foo', $builder->insertUsing(['bar'], 'baz'));
+
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('raw')->once()->with('bar')->andReturn('foo');
+
+        $this->assertSame('foo', $builder->raw('bar'));
     }
 
     public function testQueryScopes()
