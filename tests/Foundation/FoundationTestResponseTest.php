@@ -336,11 +336,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonPath('foobar.foobar_foo', 'foo')->assertJsonPath('foobar.foobar_bar', 'bar');
 
         $response->assertJsonPath('bars', [
-            ['foo' => 'bar 0', 'bar' => 'foo 0'],
-            ['foo' => 'bar 1', 'bar' => 'foo 1'],
-            ['foo' => 'bar 2', 'bar' => 'foo 2'],
+            ['bar' => 'foo 0', 'foo' => 'bar 0'],
+            ['bar' => 'foo 1', 'foo' => 'bar 1'],
+            ['bar' => 'foo 2', 'foo' => 'bar 2'],
         ]);
-        $response->assertJsonPath('bars.0', ['foo' => 'bar 0', 'bar' => 'foo 0']);
+        $response->assertJsonPath('bars.0', ['bar' => 'foo 0', 'foo' => 'bar 0']);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
@@ -349,23 +349,14 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonPath('2.id', 30);
     }
 
-    public function testAssertJsonPathStrict()
-    {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
-
-        $response->assertJsonPath('0.id', 10, true);
-        $response->assertJsonPath('1.id', 20, true);
-        $response->assertJsonPath('2.id', 30, true);
-    }
-
-    public function testAssertJsonPathStrictCanFail()
+    public function testAssertJsonPathCanFail()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that 10 is identical to \'10\'.');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
-        $response->assertJsonPath('0.id', '10', true);
+        $response->assertJsonPath('0.id', '10');
     }
 
     public function testAssertJsonFragment()
