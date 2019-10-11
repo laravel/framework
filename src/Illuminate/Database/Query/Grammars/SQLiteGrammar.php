@@ -39,11 +39,11 @@ class SQLiteGrammar extends Grammar
                 if (preg_match('/^[\'"]*(.*?)[\'"]*$/', $part, $matches)) {
                     $part = $matches[1];
                 }
-                $compileParts[] = $this->wrap(new Expression('"' . $part . '"'));
+                $compileParts[] = $this->wrap(new Expression('"'.$part.'"'));
             }
         }
 
-        return implode(' || ', $compileParts) . ' as ' . $this->wrap($as);
+        return implode(' || ', $compileParts).' as '.$this->wrap($as);
     }
 
     /**

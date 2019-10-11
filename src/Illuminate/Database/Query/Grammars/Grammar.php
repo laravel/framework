@@ -167,7 +167,7 @@ class Grammar extends BaseGrammar
             $columns[] = $this->compileConcat($parts, $as);
         }
 
-        return ', ' . implode(', ', $columns);
+        return ', '.implode(', ', $columns);
     }
 
     /**
@@ -189,11 +189,11 @@ class Grammar extends BaseGrammar
                 if (preg_match('/^[\'"]*(.*?)[\'"]*$/', $part, $matches)) {
                     $part = $matches[1];
                 }
-                $compileParts[] = $this->wrap(new Expression('"' . $part . '"'));
+                $compileParts[] = $this->wrap(new Expression('"'.$part.'"'));
             }
         }
 
-        return 'concat(' . implode(', ', $compileParts) . ') as ' . $this->wrap($as);
+        return 'concat('.implode(', ', $compileParts).') as '.$this->wrap($as);
     }
 
     /**
