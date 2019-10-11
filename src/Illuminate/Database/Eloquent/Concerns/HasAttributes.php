@@ -692,10 +692,6 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        if (! \is_string($value)) {
-            $value = \json_encode($value);
-        }
-
         return json_decode($value, ! $asObject);
     }
 
@@ -965,6 +961,12 @@ trait HasAttributes
      */
     public function getOriginal($key = null, $default = null)
     {
+        // Casts of type array are already processed, so return value in this case
+        if ($this->hasCast($key)
+            && $this->getCastType($key) === 'array') {
+            return Arr::get($this->original, $key, $default);
+        }
+
         return $this->getValue($key, Arr::get($this->original, $key, $default));
     }
 
