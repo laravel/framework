@@ -208,6 +208,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
     }
 
+    public function testKebabWithWeirdWhitespaces()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebab("\v  Laravel \n\t   Php \r \n \v     Framework   "));
+        $this->assertSame('--laravel-php-framework--', Str::kebab(' _ Laravel  Php Framework    _    '));
+        $this->assertSame('/-laravel-php-framework-?', Str::kebab(' / Laravel  Php Framework    ?    '));
+    }
+
     public function testKebabWithNumbers()
     {
         $this->assertSame('laravel6-php-frame-work', Str::kebab('laravel6 php FrameWork'));
@@ -249,9 +256,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('i-am.the-nested.member', Str::kebab('i_am.the_nested.member'));
     }
 
-    public function testKebabWithWildChars()
+    public function testKebabWithWildCards()
     {
         $this->assertSame('i-am.*.last-member', Str::kebab('iAm.*.lastMember'));
+    }
+
+    public function testKebabWithStrangeChars()
+    {
+        $this->assertSame('all-the-strange-chars-like:-(!@#$%^&*)-remain-unchanged',
+               Str::kebab('All the strangeCharsLike:   (!@#$%^&*) remain unchanged'));
     }
 
     public function testKebabWithMultibyte()
@@ -261,8 +274,83 @@ class SupportStrTest extends TestCase
 
     public function testKebabWithMultibyteCaps()
     {
+        $this->assertSame('łu-kasz.żą-dełko', Str::kebab('ŁuKasz.ŻąDełko'));
         $this->assertSame('łukasz-żądełko', Str::kebab('ŁukaszŻądełko'));
-        $this->assertSame('łukasz.żądełko', Str::kebab('Łukasz.Żądełko'));
+    }
+
+    public function testKebabIdenFromStudly()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebabIden('LaravelPhpFramework'));
+    }
+
+    public function testKebabIdenWithNumbers()
+    {
+        $this->assertSame('laravel6-php-frame-work', Str::kebabIden('laravel6 php FrameWork'));
+        $this->assertSame('laravel6-php-framework', Str::kebabIden('laravel6PHPFramework'));
+    }
+
+    public function testKebabIdenWithWeirdWhitespaces()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebabIden("\v  Laravel \n\t   Php \r \n \v     Framework   "));
+        $this->assertSame('--laravel-php-framework--', Str::kebabIden(' _ Laravel  Php Framework    _    '));
+        $this->assertSame('--laravel-php-framework--', Str::kebabIden(' / Laravel  Php Framework    ?    '));
+    }
+
+    public function testKebabIdenFromCamel()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebabIden('laravelPhpFramework'));
+    }
+
+    public function testKebabIdenFromSnake()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebabIden('laravel_php_framework'));
+    }
+
+    public function testKebabIdenFromSnakeCaps()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebabIden('Laravel_Php_Framework'));
+    }
+
+    public function testKebabIdenFromUrl()
+    {
+        $this->assertSame('http---hello-world-org', Str::kebabIden('http://HelloWorld.org'));
+    }
+
+    public function testKebabIdenFromCamelNestedMember()
+    {
+        $this->assertSame('i-am-the-nested-member', Str::kebabIden('iAm.theNested.member'));
+    }
+
+    public function testKebabIdenFromStudlyNestedMember()
+    {
+        $this->assertSame('i-am-the-nested-member', Str::kebabIden('IAm.TheNested.Member'));
+    }
+
+    public function testKebabIdenFromSnakeNestedMember()
+    {
+        $this->assertSame('i-am-the-nested-member', Str::kebabIden('i_am.the_nested.member'));
+    }
+
+    public function testKebabIdenWithWildCards()
+    {
+        $this->assertSame('i-am---last-member', Str::kebabIden('iAm.*.lastMember'));
+    }
+
+    public function testKebabIdenWithStrangeChars()
+    {
+        $this->assertSame('all-the-strange-chars-like-------------get-replaced',
+               Str::kebabIden('All the strangeCharsLike:   (!@#$%^&*) get/replaced'));
+    }
+
+    public function testKebabIdenWithMultibyte()
+    {
+        $this->assertSame('malmö-jönköping', Str::kebabIden('Malmö Jönköping'));
+    }
+
+    public function testKebabIdenWithMultibyteCaps()
+    {
+        $this->assertSame('łu-kasz-żą-dełko', Str::kebabIden('ŁuKasz.ŻąDełko'));
+        $this->assertSame('łukasz-żądełko', Str::kebabIden('ŁukaszŻądełko'));
     }
 
     public function testLower()
@@ -357,6 +445,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
     }
 
+    public function testSnakeWithWeirdWhitespaces()
+    {
+        $this->assertSame('laravel_php_framework', Str::snake("\v  Laravel \n\t   Php \r \n \v     Framework   "));
+        $this->assertSame('__laravel_php_framework__', Str::snake(' - Laravel  Php Framework    -    '));
+        $this->assertSame('/_laravel_php_framework_?', Str::snake(' / Laravel  Php Framework    ?    '));
+    }
+
     public function testSnakeWithNumbers()
     {
         $this->assertSame('laravel6_php_frame_work', Str::snake('laravel6 php FrameWork'));
@@ -408,10 +503,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('i_am.*.last_member', Str::snake('iAm.*.lastMember'));
     }
 
-    public function testSnakeWithWildChars()
+    public function testSnakeWithStrangeChars()
     {
-        $this->assertSame('some_of_the_chars_like:_(!@#$%^&*)_remain_unchanged',
-               Str::snake('Some of theCharsLike:   (!@#$%^&*) remain unchanged'));
+        $this->assertSame('all_the_strange_chars_like:_(!@#$%^&*)_remain_unchanged',
+               Str::snake('All the strangeCharsLike:   (!@#$%^&*) remain unchanged'));
     }
 
     public function testSnakeWithMultibyte()
@@ -421,7 +516,97 @@ class SupportStrTest extends TestCase
 
     public function testSnakeWithMultibyteCaps()
     {
+        $this->assertSame('łukasz.żądełko', Str::snake('Łukasz.Żądełko'));
         $this->assertSame('łukasz_żądełko', Str::snake('ŁukaszŻądełko'));
+    }
+
+    public function testSnakeIden()
+    {
+        $this->assertSame('laravel_php_framework', Str::snakeIden('LaravelPHPFramework'));
+        $this->assertSame('laravel_php_framework', Str::snakeIden('LaravelPhpFramework'));
+        $this->assertSame('laravel php framework', Str::snakeIden('LaravelPhpFramework', ' '));
+        $this->assertSame('laravel_php_framework', Str::snakeIden('Laravel Php Framework'));
+        $this->assertSame('laravel_php_framework', Str::snakeIden('Laravel    Php      Framework   '));
+        // ensure cache keys don't overlap
+        $this->assertSame('laravel__php__framework', Str::snakeIden('LaravelPhpFramework', '__'));
+        $this->assertSame('laravel_php_framework_', Str::snakeIden('LaravelPhpFramework_', '_'));
+        $this->assertSame('laravel_php_framework', Str::snakeIden('laravel php Framework'));
+        $this->assertSame('laravel_php_frame_work', Str::snakeIden('laravel php FrameWork'));
+    }
+
+    public function testSnakeIdenWithNumbers()
+    {
+        $this->assertSame('laravel6_php_frame_work', Str::snakeIden('laravel6 php FrameWork'));
+        $this->assertSame('laravel6_php_framework', Str::snakeIden('laravel6PHPFramework'));
+    }
+
+    public function testSnakeIdenWithWeirdWhitespaces()
+    {
+        $this->assertSame('laravel_php_framework', Str::snakeIden("\v  Laravel \n\t   Php \r \n \v     Framework   "));
+        $this->assertSame('__laravel_php_framework__', Str::snakeIden(' - Laravel  Php Framework    _    '));
+        $this->assertSame('__laravel_php_framework__', Str::snakeIden(' / Laravel  Php Framework    ?    '));
+    }
+
+    public function testSnakeIdenFromCamel()
+    {
+        $this->assertSame('laravel_php_framework', Str::snakeIden('laravelPhpFramework'));
+    }
+
+    public function testSnakeIdenFromKebab()
+    {
+        $this->assertSame('laravel_php_framework', Str::snakeIden('laravel-php-framework'));
+    }
+
+    public function testSnakeIdenFromSnakeCaps()
+    {
+        $this->assertSame('laravel_php_framework', Str::snakeIden('Laravel_Php_Framework'));
+    }
+
+    public function testSnakeIdenFromKebabCaps()
+    {
+        $this->assertSame('laravel_php_framework', Str::snakeIden('Laravel-Php-Framework'));
+    }
+
+    public function testSnakeIdenFromUrl()
+    {
+        $this->assertSame('http___hello_world_org', Str::snakeIden('http://HelloWorld.org'));
+    }
+
+    public function testSnakeIdenFromCamelNestedMember()
+    {
+        $this->assertSame('i_am_the_nested_member', Str::snakeIden('iAm.theNested.member'));
+    }
+
+    public function testSnakeIdenFromStudlyNestedMember()
+    {
+        $this->assertSame('i_am_the_nested_member', Str::snakeIden('IAm.TheNested.Member'));
+    }
+
+    public function testSnakeIdenFromKebabNestedMember()
+    {
+        $this->assertSame('i_am_the_nested_member', Str::snakeIden('i-am.the-nested.member'));
+    }
+
+    public function testSnakeIdenWithWildCard()
+    {
+        $this->assertSame('i_am___last_member', Str::snakeIden('iAm.*.lastMember'));
+    }
+
+    public function testSnakeIdenWithStrangeChars()
+    {
+        $this->assertSame('all_the_strange_chars_like_____________get_replaced',
+               Str::snakeIden('All the strangeCharsLike:   (!@#$%^&*) get/replaced'));
+    }
+
+    public function testSnakeIdenWithMultibyte()
+    {
+        $this->assertSame('malmö_jönköping', Str::snakeIden('Malmö Jönköping'));
+    }
+
+    public function testSnakeIdenWithMultibyteCaps()
+    {
+        $this->assertSame('łu_kasz_żą_dełko', Str::snakeIden('ŁuKasz.ŻąDełko'));
+        $this->assertSame('łukasz_żądełko', Str::snakeIden('ŁukaszŻądełko'));
     }
 
     public function testStudly()

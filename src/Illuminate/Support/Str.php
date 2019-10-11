@@ -20,6 +20,13 @@ class Str
     protected static $snakeCache = [];
 
     /**
+     * The cache of snake-cased words.
+     *
+     * @var array
+     */
+    protected static $snakeIdenCache = [];
+
+    /**
      * The cache of camel-cased words.
      *
      * @var array
@@ -207,6 +214,47 @@ class Str
         return false;
     }
 
+    //
+    // Different methods of converting arbitrary strings to char-delimited.
+    //
+    // - DELIM_ORIG
+    //
+    //   Backward compatible. It only replaces spaces and '-'/'_' with
+    //   $delimiter char and separates pairs of mixed or upper case letters
+    //   like 'aA' or 'AA' using the $delimiter ('aA' becomes 'a_A', 'AA' becomes
+    //   'A_A', but 'Aa' is left unchanged).
+    //
+    // - DELIM_IDEN
+    //
+    //   May be used to generate identifiers such as variable or attribute
+    //   names. It replaces all non-[:alnum:] characters with $delimiter and
+    //   tries keep together sequences of upper letters such as 'PHP'.
+    //   For example, 'LaravelPHPFramework' turns into 'Laravel_PHP_Framework'
+    //   (the DELIM_ORIG method would generate 'Laravel_P_H_P_Framework').
+    //
+    // Both methods squash multiple whitespaces and replace them whith a single
+    // $delimiter.
+    //
+    const DELIM_ORIG = 0;
+    const DELIM_IDEN = 1;
+
+    //
+    // '%' in the $delimParams[*]['replace'] will be substituted with the value
+    // of $delimiter argument (see delimited() below).
+    //
+    protected static $delimParams = [
+        self::DELIM_ORIG => [
+            'pattern' => '/(?:(?:\s+|[_-])|(?:([[:alnum:]])(?=[[:upper:]])))/u',
+            'replace' => '$1%',
+        ],
+        self::DELIM_IDEN => [
+            'pattern' => '/(?:\s+|[^[:alnum:]])|'.
+                         '(?:([[:lower:][:digit:]])(?=[[:upper:]]))|'.
+                         '(?:([[:upper:]])(?=[[:upper:]][[:lower:]]))/u',
+            'replace' => '$1$2%',
+        ],
+    ];
+
     /**
      * Convert a string to kebab case.
      *
@@ -216,6 +264,18 @@ class Str
     public static function kebab($value)
     {
         return static::snake($value, '-');
+    }
+
+    /**
+     * Convert a string to kebab case identifier.
+     *
+     * @param  string  $value
+     * @param  string  $delimiter
+     * @return string
+     */
+    public static function kebabIden($value, $delimiter = '-')
+    {
+        return static::snakeIden($value, $delimiter);
     }
 
     /**
@@ -490,19 +550,76 @@ class Str
      */
     public static function snake($value, $delimiter = '_')
     {
+        if (ctype_lower($value)) {
+            // no need to do anything (processing/cacheing)
+            return $value;
+        }
+
         $key = $value;
 
         if (isset(static::$snakeCache[$key][$delimiter])) {
             return static::$snakeCache[$key][$delimiter];
         }
 
-        if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
-
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
-        }
+        $value = static::lowerDelimited($value, $delimiter, static::DELIM_ORIG);
 
         return static::$snakeCache[$key][$delimiter] = $value;
+    }
+
+    /**
+     * Convert a string to snake case identifier.
+     *
+     * @param  string  $value
+     * @param  string  $delimiter
+     * @return string
+     */
+    public static function snakeIden($value, $delimiter = '_')
+    {
+        if (ctype_lower($value)) {
+            // no need to do anything (processing/cacheing)
+            return $value;
+        }
+
+        $key = $value;
+
+        if (isset(static::$snakeIdenCache[$key][$delimiter])) {
+            return static::$snakeIdenCache[$key][$delimiter];
+        }
+
+        $value = static::lowerDelimited($value, $delimiter, static::DELIM_IDEN);
+
+        return static::$snakeIdenCache[$key][$delimiter] = $value;
+    }
+
+    /*
+     * Returns words delimited with $delimiter, with camelCase words separated.
+     *
+     * @param string $value
+     * @param string $delimiter
+     * @param int $method one of the DELIM_xxxx constants
+     *
+     * @return string
+     */
+    protected static function delimited($value, $delimiter, $method)
+    {
+        $pattern = static::$delimParams[$method]['pattern'];
+        $replace = str_replace('%', $delimiter, static::$delimParams[$method]['replace']);
+
+        return preg_replace($pattern, $replace, trim($value));
+    }
+
+    /**
+     * Workhorse for snake() and kebab().
+     *
+     * @param string $value
+     * @param string $delimiter
+     * @param int $method one of the DELIM_xxxx constants
+     *
+     * @return string
+     */
+    protected static function lowerDelimited($value, $delimiter, $method)
+    {
+        return static::lower(static::delimited($value, $delimiter, $method));
     }
 
     /**
