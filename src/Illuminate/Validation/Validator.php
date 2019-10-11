@@ -2,18 +2,18 @@
 
 namespace Illuminate\Validation;
 
-use RuntimeException;
 use BadMethodCallException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Fluent;
-use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\ImplicitRule;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Fluent;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Validator implements ValidatorContract
 {
@@ -385,17 +385,21 @@ class Validator implements ValidatorContract
         // If we have made it this far we will make sure the attribute is validatable and if it is
         // we will call the validation method with the attribute. If a method returns false the
         // attribute is invalid and we will add a failure message for this failing attribute.
-        $validatable = $this->isValidatable($rule, $attribute, $value);
+        if (!$this->isValidatable($rule, $attribute, $value)) {
+            return null;
+        }
 
-        if ($rule instanceof RuleContract) {
-            return $validatable
-                    ? $this->validateUsingCustomRule($attribute, $value, $rule)
-                    : null;
+        if (is_a($rule, RuleContract::class, true)) {
+            if (is_string($rule)) {
+                $rule = app($rule, $this->parseNamedParameters($parameters));
+            }
+
+            return $this->validateUsingCustomRule($attribute, $value, $rule);
         }
 
         $method = "validate{$rule}";
 
-        if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
+        if (! $this->$method($attribute, $value, $parameters, $this)) {
             $this->addFailure($attribute, $rule, $parameters);
         }
     }
