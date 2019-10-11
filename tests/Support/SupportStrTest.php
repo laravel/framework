@@ -206,6 +206,9 @@ class SupportStrTest extends TestCase
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
+        $this->assertSame('laravel-php-framework', Str::kebab('Laravel_Php_Framework'));
+        $this->assertSame('laravel-php-framework', Str::kebab('laravel_php_framework'));
+        $this->assertSame('--laravel---php-framework', Str::kebab('  :_laravel  _  Php_framework  '));
     }
 
     public function testLower()
@@ -298,6 +301,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
+        // test with numbers
+        $this->assertSame('laravel6_php_frame_work', Str::snake('laravel6 php FrameWork'));
+        $this->assertSame('laravel6_p_h_p_framework', Str::snake('laravel6PHPFramework'));
+        // test from kebab case
+        $this->assertSame('laravel_php__framework', Str::snake('laravel-php--framework'));
+        // test mixed whitespace and non-whitespace delimiters
+        $this->assertSame('https___www_example_org', Str::snake('https://www.example.org'));
+        $this->assertSame('laravel__p_h_p___framework', Str::snake('laravel: PHP// framework'));
+        $this->assertSame('__laravel__p_h____p_framework____', Str::snake(' --Laravel__PH --  PFramework / /  '));
+        // test with unusual whitespaces
+        $this->assertSame('___laravel__p_h_____p_framework____', Str::snake(" \v -\r-Laravel__PH -\n- \n PFramework /\t\r/"));
+        // test multibyte
+        $this->assertSame('__malmö_jönköping', Str::snake('  --Malmö Jönköping    '));
     }
 
     public function testStudly()

@@ -490,17 +490,19 @@ class Str
      */
     public static function snake($value, $delimiter = '_')
     {
+        if (ctype_lower($value)) {
+            // no need to do anything (processing/cacheing)
+            return $value;
+        }
+
         $key = $value;
 
         if (isset(static::$snakeCache[$key][$delimiter])) {
             return static::$snakeCache[$key][$delimiter];
         }
 
-        if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
-
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
-        }
+        $pattern = '/(?:(?:\s+|[^[:alnum:]])|([[:alnum:]])(?=[A-Z]))/u';
+        $value = static::lower(preg_replace($pattern, '$1'.$delimiter, trim($value)));
 
         return static::$snakeCache[$key][$delimiter] = $value;
     }
