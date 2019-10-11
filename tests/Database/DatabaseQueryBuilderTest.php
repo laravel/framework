@@ -3465,6 +3465,50 @@ SQL;
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+    public function testSelectConcatOnSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->from('test');
+        $builder->selectConcat(['test_field_1', ' ', 'test_field_2'], 'concat_test');
+        $this->assertSame('select *, "test_field_1" || " " || "test_field_2" as "concat_test" from "test"', $builder->toSql());
+
+        $builder->selectConcat(['"test_field_1"', ' ', 'test_field_2'], 'concat_test');
+        $this->assertSame('select *, "test_field_1" || " " || "test_field_2" as "concat_test" from "test"', $builder->toSql());
+    }
+
+    public function testSelectConcatOnMySQL()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('test');
+        $builder->selectConcat(['test_field_1', ' ', 'test_field_2'], 'concat_test');
+        $this->assertSame('select *, concat(`test_field_1`, " ", `test_field_2`) as `concat_test` from `test`', $builder->toSql());
+
+        $builder->selectConcat(['"test_field_1"', ' ', 'test_field_2'], 'concat_test');
+        $this->assertSame('select *, concat("test_field_1", " ", `test_field_2`) as `concat_test` from `test`', $builder->toSql());
+    }
+
+    public function testSelectConcatOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->from('test');
+        $builder->selectConcat(['test_field_1', ' ', 'test_field_2'], 'concat_test');
+        $this->assertSame('select *, concat("test_field_1", " ", "test_field_2") as "concat_test" from "test"', $builder->toSql());
+
+        $builder->selectConcat(['"test_field_1"', ' ', 'test_field_2'], 'concat_test');
+        $this->assertSame('select *, concat("test_field_1", " ", "test_field_2") as "concat_test" from "test"', $builder->toSql());
+    }
+
+    public function testSelectConcatOnSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('test');
+        $builder->selectConcat(['test_field_1', ' ', 'test_field_2'], 'concat_test');
+        $this->assertSame('select *, concat([test_field_1], " ", [test_field_2]) as [concat_test] from [test]', $builder->toSql());
+
+        $builder->selectConcat(['"test_field_1"', ' ', 'test_field_2'], 'concat_test');
+        $this->assertSame('select *, concat("test_field_1", " ", [test_field_2]) as [concat_test] from [test]', $builder->toSql());
+    }
+
     protected function getBuilder()
     {
         $grammar = new Grammar;
