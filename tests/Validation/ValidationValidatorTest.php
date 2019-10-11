@@ -4743,6 +4743,43 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    public function testRulesCanBeGivenAsFQNs()
+    {
+        $rule = new class(new ContainerConcreteStub, 0) implements Rule {
+            protected $number;
+
+            public function __construct(ContainerConcreteStub $serviceAssertion, int $number)
+            {
+                $this->number = $number;
+            }
+
+            public function passes($attribute, $value)
+            {
+                return $value === $this->number;
+            }
+
+            public function message()
+            {
+                return ":attribute must be {$this->number}.";
+            }
+        };
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator(
+            $trans,
+            ['a' => 5],
+            ['a' => ['required', get_class($rule).':number=5']]
+        );
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(
+            $trans,
+            ['a' => 4],
+            ['a' => ['required', get_class($rule).':number=5']]
+        );
+        $this->assertFalse($validator->passes());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
@@ -4754,4 +4791,8 @@ class ValidationValidatorTest extends TestCase
             new ArrayLoader, 'en'
         );
     }
+}
+
+class ContainerConcreteStub
+{
 }
