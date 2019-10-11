@@ -1940,6 +1940,44 @@ class DatabaseEloquentModelTest extends TestCase
             Model::isIgnoringTouch(EloquentModelWithoutTimestamps::class)
         );
     }
+
+    public function testGetOriginalCastsAttributes()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->intAttribute = '1';
+        $model->floatAttribute = '0.1234';
+        $model->stringAttribute = 432;
+        $model->boolAttribute = '1';
+        $model->booleanAttribute = '0';
+
+        $model->syncOriginal();
+
+        $model->intAttribute = 2;
+        $model->floatAttribute = 0.443;
+        $model->stringAttribute = '12';
+        $model->boolAttribute = true;
+        $model->booleanAttribute = false;
+
+        $this->assertIsInt($model->getOriginal('intAttribute'));
+        $this->assertEquals(1, $model->getOriginal('intAttribute'));
+        $this->assertEquals(2, $model->intAttribute);
+
+        $this->assertIsFloat($model->getOriginal('floatAttribute'));
+        $this->assertEquals(0.1234, $model->getOriginal('floatAttribute'));
+        $this->assertEquals(0.443, $model->floatAttribute);
+
+        $this->assertIsString($model->getOriginal('stringAttribute'));
+        $this->assertEquals('432', $model->getOriginal('stringAttribute'));
+        $this->assertEquals('12', $model->stringAttribute);
+
+        $this->assertIsBool($model->getOriginal('boolAttribute'));
+        $this->assertTrue($model->getOriginal('boolAttribute'));
+        $this->assertTrue($model->boolAttribute);
+
+        $this->assertIsBool($model->getOriginal('booleanAttribute'));
+        $this->assertFalse($model->getOriginal('booleanAttribute'));
+        $this->assertFalse($model->booleanAttribute);
+    }
 }
 
 class EloquentTestObserverStub
