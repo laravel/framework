@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -18,6 +19,32 @@ class SQLiteGrammar extends Grammar
         'like', 'not like', 'ilike',
         '&', '|', '<<', '>>',
     ];
+
+    /**
+     * Compiles a single CONCAT value.
+     *
+     * @param array $parts The concatenation parts.
+     * @param string $as The alias to return the entire concatenation as.
+     * @return string
+     */
+    protected function compileConcat(array $parts, string $as)
+    {
+        $compileParts = [];
+
+        foreach ($parts as $part) {
+            if (preg_match('/^[a-z_@#][a-z0-9@$#_]*$/', $part)) {
+                $compileParts[] = $this->wrap($part);
+            } else {
+                // Removes quotes from quoted strings
+                if (preg_match('/^[\'"]*(.*?)[\'"]*$/', $part, $matches)) {
+                    $part = $matches[1];
+                }
+                $compileParts[] = $this->wrap(new Expression('"' . $part . '"'));
+            }
+        }
+
+        return implode(' || ', $compileParts) . ' as ' . $this->wrap($as);
+    }
 
     /**
      * Wrap a union subquery in parentheses.

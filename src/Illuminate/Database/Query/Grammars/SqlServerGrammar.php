@@ -64,7 +64,13 @@ class SqlServerGrammar extends Grammar
             $select .= 'top '.$query->limit.' ';
         }
 
-        return $select.$this->columnize($columns);
+        $select .= $this->columnize($columns);
+
+        if (count($query->concats)) {
+            $select .= $this->compileConcats($query);
+        }
+
+        return $select;
     }
 
     /**

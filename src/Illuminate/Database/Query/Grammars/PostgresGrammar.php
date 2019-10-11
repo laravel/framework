@@ -109,7 +109,13 @@ class PostgresGrammar extends Grammar
             $select = 'select ';
         }
 
-        return $select.$this->columnize($columns);
+        $select .= $this->columnize($columns);
+
+        if (count($query->concats)) {
+            $select .= $this->compileConcats($query);
+        }
+
+        return $select;
     }
 
     /**

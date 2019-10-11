@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -143,7 +144,56 @@ class Grammar extends BaseGrammar
             $select = 'select ';
         }
 
-        return $select.$this->columnize($columns);
+        $select .= $this->columnize($columns);
+
+        if (count($query->concats)) {
+            $select .= $this->compileConcats($query);
+        }
+
+        return $select;
+    }
+
+    /**
+     * Compiles concatenations as aliases and adds them to the "select" portion of the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileConcats(Builder $query)
+    {
+        $columns = [];
+
+        foreach ($query->concats as $as => $parts) {
+            $columns[] = $this->compileConcat($parts, $as);
+        }
+
+        return ', ' . implode(', ', $columns);
+    }
+
+    /**
+     * Compiles a single CONCAT value.
+     *
+     * @param array $parts The concatenation parts.
+     * @param string $as The alias to return the entire concatenation as.
+     * @return string
+     */
+    protected function compileConcat(array $parts, string $as)
+    {
+        $compileParts = [];
+
+        foreach ($parts as $part) {
+            if (preg_match('/^[a-z_@#][a-z0-9@$#_]*$/', $part)) {
+                $compileParts[] = $this->wrap($part);
+            } else {
+                // Removes quotes from quoted strings
+                if (preg_match('/^[\'"]*(.*?)[\'"]*$/', $part, $matches)) {
+                    $part = $matches[1];
+                }
+                $compileParts[] = $this->wrap(new Expression('"' . $part . '"'));
+            }
+        }
+
+        return 'concat(' . implode(', ', $compileParts) . ') as ' . $this->wrap($as);
     }
 
     /**
