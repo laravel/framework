@@ -203,9 +203,66 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::is([], 'test'));
     }
 
-    public function testKebab()
+    public function testKebab() // testKebabFromStudly
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
+    }
+
+    public function testKebabWithNumbers()
+    {
+        $this->assertSame('laravel6-php-frame-work', Str::kebab('laravel6 php FrameWork'));
+        $this->assertSame('laravel6-p-h-p-framework', Str::kebab('laravel6PHPFramework'));
+    }
+
+    public function testKebabFromCamel()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebab('laravelPhpFramework'));
+    }
+
+    public function testKebabFromSnake()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebab('laravel_php_framework'));
+    }
+
+    public function testKebabFromSnakeCaps()
+    {
+        $this->assertSame('laravel-php-framework', Str::kebab('Laravel_Php_Framework'));
+    }
+
+    public function testKebabFromUrl()
+    {
+        $this->assertSame('http://hello-world.org', Str::kebab('http://HelloWorld.org'));
+    }
+
+    public function testKebabFromCamelNestedMember()
+    {
+        $this->assertSame('i-am.the-nested.member', Str::kebab('iAm.theNested.member'));
+    }
+
+    public function testKebabFromStudlyNestedMember()
+    {
+        $this->assertSame('i-am.the-nested.member', Str::kebab('IAm.TheNested.Member'));
+    }
+
+    public function testKebabFromSnakeNestedMember()
+    {
+        $this->assertSame('i-am.the-nested.member', Str::kebab('i_am.the_nested.member'));
+    }
+
+    public function testKebabWithWildChars()
+    {
+        $this->assertSame('i-am.*.last-member', Str::kebab('iAm.*.lastMember'));
+    }
+
+    public function testKebabWithMultibyte()
+    {
+        $this->assertSame('malmö-jönköping', Str::kebab('Malmö Jönköping'));
+    }
+
+    public function testKebabWithMultibyteCaps()
+    {
+        $this->assertSame('łukasz-żądełko', Str::kebab('ŁukaszŻądełko'));
+        $this->assertSame('łukasz.żądełko', Str::kebab('Łukasz.Żądełko'));
     }
 
     public function testLower()
@@ -298,6 +355,73 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
+    }
+
+    public function testSnakeWithNumbers()
+    {
+        $this->assertSame('laravel6_php_frame_work', Str::snake('laravel6 php FrameWork'));
+        $this->assertSame('laravel6_p_h_p_framework', Str::snake('laravel6PHPFramework'));
+    }
+
+    public function testSnakeFromCamel()
+    {
+        $this->assertSame('laravel_php_framework', Str::snake('laravelPhpFramework'));
+    }
+
+    public function testSnakeFromKebab()
+    {
+        $this->assertSame('laravel_php_framework', Str::snake('laravel-php-framework'));
+    }
+
+    public function testSnakeFromSnakeCaps()
+    {
+        $this->assertSame('laravel_php_framework', Str::snake('Laravel_Php_Framework'));
+    }
+
+    public function testSnakeFromKebabCaps()
+    {
+        $this->assertSame('laravel_php_framework', Str::snake('Laravel-Php-Framework'));
+    }
+
+    public function testSnakeFromUrl()
+    {
+        $this->assertSame('http://hello_world.org', Str::snake('http://HelloWorld.org'));
+    }
+
+    public function testSnakeFromCamelNestedMember()
+    {
+        $this->assertSame('i_am.the_nested.member', Str::snake('iAm.theNested.member'));
+    }
+
+    public function testSnakeFromStudlyNestedMember()
+    {
+        $this->assertSame('i_am.the_nested.member', Str::snake('IAm.TheNested.Member'));
+    }
+
+    public function testSnakeFromKebabNestedMember()
+    {
+        $this->assertSame('i_am.the_nested.member', Str::snake('i-am.the-nested.member'));
+    }
+
+    public function testSnakeWithWildCard()
+    {
+        $this->assertSame('i_am.*.last_member', Str::snake('iAm.*.lastMember'));
+    }
+
+    public function testSnakeWithWildChars()
+    {
+        $this->assertSame('some_of_the_chars_like:_(!@#$%^&*)_remain_unchanged',
+               Str::snake('Some of theCharsLike:   (!@#$%^&*) remain unchanged'));
+    }
+
+    public function testSnakeWithMultibyte()
+    {
+        $this->assertSame('malmö_jönköping', Str::snake('Malmö Jönköping'));
+    }
+
+    public function testSnakeWithMultibyteCaps()
+    {
+        $this->assertSame('łukasz_żądełko', Str::snake('ŁukaszŻądełko'));
     }
 
     public function testStudly()
