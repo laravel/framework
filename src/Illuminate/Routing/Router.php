@@ -879,12 +879,17 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  string  $group
      * @param  string  $middleware
+     * @param  string|null   $alias
      * @return $this
      */
-    public function prependMiddlewareToGroup($group, $middleware)
+    public function prependMiddlewareToGroup($group, $middleware, $alias = null)
     {
         if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
             array_unshift($this->middlewareGroups[$group], $middleware);
+        }
+        
+        if (! is_null($alias)) {
+            $this->middleware[$alias] = $middleware;
         }
 
         return $this;
@@ -897,9 +902,10 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  string  $group
      * @param  string  $middleware
+     * @param  string|null   $alias
      * @return $this
      */
-    public function pushMiddlewareToGroup($group, $middleware)
+    public function pushMiddlewareToGroup($group, $middleware, $alias = null)
     {
         if (! array_key_exists($group, $this->middlewareGroups)) {
             $this->middlewareGroups[$group] = [];
@@ -907,6 +913,10 @@ class Router implements BindingRegistrar, RegistrarContract
 
         if (! in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
+        }
+        
+        if (! is_null($alias)) {
+            $this->middleware[$alias] = $middleware;
         }
 
         return $this;
