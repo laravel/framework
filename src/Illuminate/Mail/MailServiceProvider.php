@@ -11,7 +11,7 @@ use Swift_Mailer;
 
 class MailServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    $globalAddressTypes = ['from', 'reply_to', 'to'];
+    protected $globalAddressTypes = ['from', 'reply_to', 'to'];
     
     /**
      * Register the service provider.
