@@ -668,6 +668,25 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateNotFilled()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['name' => 'not_filled']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ''], ['name' => 'not_filled']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => 1], []]], ['foo.*.id' => 'not_filled']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => '']]], ['foo.*.id' => 'not_filled']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => null]]], ['foo.*.id' => 'not_filled']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidationStopsAtFailedPresenceCheck()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -895,6 +895,22 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the given attribute is not filled if it is present.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    public function validateNotFilled($attribute, $value)
+    {
+        if (Arr::has($this->data, $attribute)) {
+            return ! $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute is greater than another attribute.
      *
      * @param  string  $attribute
