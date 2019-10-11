@@ -692,7 +692,7 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        if (!\is_string($value)) {
+        if (! \is_string($value)) {
             $value = \json_encode($value);
         }
 
@@ -1231,7 +1231,8 @@ trait HasAttributes
         return $matches[1];
     }
 
-    private function getValue($key, $value) {
+    private function getValue($key, $value)
+    {
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
         // retrieval from the model to a form that is more useful for usage.
