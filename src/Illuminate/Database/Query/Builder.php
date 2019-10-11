@@ -78,6 +78,13 @@ class Builder
     public $columns;
 
     /**
+     * The aliased concatenation columns.
+     *
+     * @var array
+     */
+    public $concats = [];
+
+    /**
      * Indicates if the query returns distinct results.
      *
      * Occasionally contains the columns that should be distinct.
@@ -372,6 +379,20 @@ class Builder
                 $this->columns[] = $column;
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Adds a concatenated column as an alias.
+     *
+     * @param  array $parts The concatenation parts.
+     * @param  string $as The name of the alias for the compiled concatenation.
+     * @return $this
+     */
+    public function selectConcat(array $parts, string $as)
+    {
+        $this->concats[$as] = $parts;
 
         return $this;
     }
