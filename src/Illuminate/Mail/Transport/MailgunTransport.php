@@ -141,7 +141,7 @@ class MailgunTransport extends Transport
      */
     protected function getMessageId($response)
     {
-        return object_get(
+        return data_get(
             json_decode($response->getBody()->getContents()), 'id'
         );
     }
