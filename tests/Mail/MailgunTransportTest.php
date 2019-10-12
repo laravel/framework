@@ -22,7 +22,7 @@ class MailgunTransportTest extends TestCase
         // Generate a messageId for our mock to return to ensure that the post-sent message
         // has X-Mailgun-Message-ID in its headers
         $messageId = Str::random(32);
-        $sendRawEmailMock = new sendRawEmailMock($messageId);
+        $sendEmailMock = new sendEmailMock($messageId);
         $client->expects($this->once())
             ->method('request')
             ->with(
@@ -30,7 +30,7 @@ class MailgunTransportTest extends TestCase
                 'https://api.mailgun.net/v3/barDomain/messages.mime',
                 $this->payload($message)
             )
-            ->willReturn($sendRawEmailMock);
+            ->willReturn($sendEmailMock);
 
         $transport->send($message);
         $this->assertEquals($messageId, $message->getHeaders()->get('X-Mailgun-Message-ID')->getFieldBody());
@@ -58,7 +58,7 @@ class MailgunTransportTest extends TestCase
     }
 }
 
-class sendRawEmailMock
+class sendEmailMock
 {
     protected $messageId;
 
