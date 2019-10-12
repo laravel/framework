@@ -27,7 +27,7 @@ class MailgunTransportTest extends TestCase
             ->method('request')
             ->with(
                 'POST',
-                "https://api.mailgun.net/v3/barDomain/messages.mime",
+                'https://api.mailgun.net/v3/barDomain/messages.mime',
                 $this->payload($message)
             )
             ->willReturn($sendRawEmailMock);
@@ -75,7 +75,7 @@ class sendRawEmailMock
     public function getContents()
     {
         return json_encode([
-            "id" => $this->messageId,
+            'id' => $this->messageId,
         ]);
     }
 }
