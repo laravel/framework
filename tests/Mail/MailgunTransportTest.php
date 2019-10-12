@@ -33,6 +33,7 @@ class MailgunTransportTest extends TestCase
             ->willReturn($sendEmailMock);
 
         $transport->send($message);
+
         $this->assertEquals($messageId, $message->getHeaders()->get('X-Mailgun-Message-ID')->getFieldBody());
     }
 
