@@ -41,15 +41,6 @@ class SupportHelpersTest extends TestCase
         }));
     }
 
-    public function testObjectGet()
-    {
-        $class = new stdClass;
-        $class->name = new stdClass;
-        $class->name->first = 'Taylor';
-
-        $this->assertSame('Taylor', object_get($class, 'name.first'));
-    }
-
     public function testDataGet()
     {
         $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
