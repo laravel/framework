@@ -243,6 +243,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertSame('/', $url->route('plain', [], false));
         $this->assertSame('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
+        $this->assertSame('/', $url->route('plain', ['foo' => null], false));
         $this->assertSame('http://www.foo.com/foo/bar', $url->route('foo'));
         $this->assertSame('/foo/bar', $url->route('foo', [], false));
         $this->assertSame('/foo/bar?foo=bar', $url->route('foo', ['foo' => 'bar'], false));
@@ -269,6 +270,111 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));
         $this->assertSame('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф'], false));
         $this->assertSame('http://en.example.com/foo', $url->route('defaults'));
+    }
+
+    public function testUrlGenerationRequiresPassingOfRequiredParametersWhenOtherParametersPresent()
+    {
+        $this->expectException(UrlGenerationException::class);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}', ['as' => 'foo']);
+        $routes->add($route);
+
+        $url->route('foo', ['other' => 'baz']);
+    }
+
+    public function testUrlGenerationRequiresNamedParameterNotToBeNull()
+    {
+        $this->expectException(UrlGenerationException::class);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}', ['as' => 'foo']);
+        $routes->add($route);
+
+        $url->route('foo', ['one' => null]);
+    }
+
+    public function testUrlGenerationRequiresNamedParameterNotToBeEmptyString()
+    {
+        $this->expectException(UrlGenerationException::class);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}', ['as' => 'foo']);
+        $routes->add($route);
+
+        $url->route('foo', ['one' => '']);
+    }
+
+    public function testUrlGenerationRequiresNamedParameterNotToBeFalse()
+    {
+        $this->expectException(UrlGenerationException::class);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}', ['as' => 'foo']);
+        $routes->add($route);
+
+        $url->route('foo', ['one' => false]);
+    }
+
+    public function testUrlGenerationRequiresNamedParameterNotToBeNullWhenPassedUnkeyed()
+    {
+        $this->expectException(UrlGenerationException::class);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}', ['as' => 'foo']);
+        $routes->add($route);
+
+        $url->route('foo', [null]);
+    }
+
+    public function testUrlGenerationRequiresNamedParameterNotToBeEmptyStringWhenPassedUnkeyed()
+    {
+        $this->expectException(UrlGenerationException::class);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}', ['as' => 'foo']);
+        $routes->add($route);
+
+        $url->route('foo', ['']);
+    }
+
+    public function testUrlGenerationRequiresNamedParameterNotToBeFalseWhenPassedUnkeyed()
+    {
+        $this->expectException(UrlGenerationException::class);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}', ['as' => 'foo']);
+        $routes->add($route);
+
+        $url->route('foo', [false]);
     }
 
     public function testFluentRouteNameDefinitions()
