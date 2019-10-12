@@ -200,12 +200,12 @@ class RouteUrlGenerator
             // Reset only the numeric keys...
             $parameters = array_merge($parameters);
 
-            return (empty($parameters) && ! Str::endsWith($match[0], '?}'))
-                        ? $match[0]
-                        : Arr::pull($parameters, 0);
+            $value = Arr::pull($parameters, 0);
+
+            return (string) $value !== '' ? $value : $match[0];
         }, $path);
 
-        return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
+        return trim(preg_replace('/\{[^}]*\?\}/', '', $path), '/');
     }
 
     /**
@@ -218,13 +218,13 @@ class RouteUrlGenerator
     protected function replaceNamedParameters($path, &$parameters)
     {
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
-            if (isset($parameters[$m[1]])) {
-                return Arr::pull($parameters, $m[1]);
-            } elseif (isset($this->defaultParameters[$m[1]])) {
-                return $this->defaultParameters[$m[1]];
+            $value = Arr::pull($parameters, $m[1]);
+
+            if ((string) $value === '') {
+                $value = $this->defaultParameters[$m[1]] ?? null;
             }
 
-            return $m[0];
+            return (string) $value !== '' ? $value : $m[0];
         }, $path);
     }
 
