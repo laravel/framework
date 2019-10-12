@@ -4,7 +4,6 @@ namespace Illuminate\Routing;
 
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class RouteUrlGenerator
 {
@@ -87,7 +86,7 @@ class RouteUrlGenerator
             $route
         ), $parameters);
 
-        if (preg_match('/\{.*?\}/', $uri)) {
+        if (preg_match('/{.*?}/', $uri)) {
             throw UrlGenerationException::forMissingParameters($route);
         }
 
@@ -196,7 +195,7 @@ class RouteUrlGenerator
     {
         $path = $this->replaceNamedParameters($path, $parameters);
 
-        $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
+        $path = preg_replace_callback('/{.*?}/', function ($match) use (&$parameters) {
             // Reset only the numeric keys...
             $parameters = array_merge($parameters);
 
@@ -205,7 +204,7 @@ class RouteUrlGenerator
             return (string) $value !== '' ? $value : $match[0];
         }, $path);
 
-        return trim(preg_replace('/\{[^}]*\?\}/', '', $path), '/');
+        return trim(preg_replace('/{[^}]*\?}/', '', $path), '/');
     }
 
     /**
@@ -217,7 +216,7 @@ class RouteUrlGenerator
      */
     protected function replaceNamedParameters($path, &$parameters)
     {
-        return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
+        return preg_replace_callback('/{(.*?)\??}/', function ($m) use (&$parameters) {
             $value = Arr::pull($parameters, $m[1]);
 
             if ((string) $value === '') {
