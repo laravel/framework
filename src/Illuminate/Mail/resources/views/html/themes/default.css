@@ -3,7 +3,8 @@
 body,
 body *:not(html):not(style):not(br):not(tr):not(code) {
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
     position: relative;
 }
 
@@ -79,7 +80,7 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #EDF2F7;
+    background-color: #edf2f7;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -111,7 +112,7 @@ img {
 /* Logo */
 
 .logo {
-    color: #CBD5E0;
+    color: #cbd5e0;
     fill: currentColor;
     height: 75px;
     width: 75px;
@@ -123,9 +124,9 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #EDF2F7;
-    border-bottom: 1px solid #EDF2F7;
-    border-top: 1px solid #EDF2F7;
+    background-color: #edf2f7;
+    border-bottom: 1px solid #edf2f7;
+    border-top: 1px solid #edf2f7;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -233,40 +234,40 @@ img {
 
 .button-blue,
 .button-primary {
-    background-color: #2D3748;
-    border-bottom: 8px solid #2D3748;
-    border-left: 18px solid #2D3748;
-    border-right: 18px solid #2D3748;
-    border-top: 8px solid #2D3748;
+    background-color: #2d3748;
+    border-bottom: 8px solid #2d3748;
+    border-left: 18px solid #2d3748;
+    border-right: 18px solid #2d3748;
+    border-top: 8px solid #2d3748;
 }
 
 .button-green,
 .button-success {
-    background-color: #48BB78;
-    border-bottom: 8px solid #48BB78;
-    border-left: 18px solid #48BB78;
-    border-right: 18px solid #48BB78;
-    border-top: 8px solid #48BB78;
+    background-color: #48bb78;
+    border-bottom: 8px solid #48bb78;
+    border-left: 18px solid #48bb78;
+    border-right: 18px solid #48bb78;
+    border-top: 8px solid #48bb78;
 }
 
 .button-red,
 .button-error {
-    background-color: #E53E3E;
-    border-bottom: 8px solid #E53E3E;
-    border-left: 18px solid #E53E3E;
-    border-right: 18px solid #E53E3E;
-    border-top: 8px solid #E53E3E;
+    background-color: #e53e3e;
+    border-bottom: 8px solid #e53e3e;
+    border-left: 18px solid #e53e3e;
+    border-right: 18px solid #e53e3e;
+    border-top: 8px solid #e53e3e;
 }
 
 /* Panels */
 
 .panel {
-    border-left: #2D3748 solid 4px;
+    border-left: #2d3748 solid 4px;
     margin: 21px 0;
 }
 
 .panel-content {
-    background-color: #EDF2F7;
+    background-color: #edf2f7;
     color: #718096;
     padding: 16px;
 }
