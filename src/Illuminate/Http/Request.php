@@ -83,7 +83,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the root URL for the application.
      *
      * @return string
-     */VerifyEmail
+     */
     public function root()
     {
         return rtrim($this->getSchemeAndHttpHost().$this->getBaseUrl(), '/');
@@ -697,15 +697,5 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         return Arr::get($this->all(), $key, function () use ($key) {
             return $this->route($key);
         });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __clone()
-    {
-        parent::__clone();
-
-        $this->headers = clone $this->headers;
     }
 }
