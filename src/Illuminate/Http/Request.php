@@ -700,7 +700,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __clone()
     {
