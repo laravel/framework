@@ -1956,7 +1956,7 @@ class DatabaseEloquentModelTest extends TestCase
         $stdClass->json_key = 'json_value';
         $model->objectAttribute = $stdClass;
         $array = [
-            'foo' => 'bar'
+            'foo' => 'bar',
         ];
         $model->arrayAttribute = $array;
         $model->jsonAttribute = $array;
@@ -1970,10 +1970,10 @@ class DatabaseEloquentModelTest extends TestCase
         $model->booleanAttribute = false;
         $model->objectAttribute = $stdClass;
         $model->arrayAttribute = [
-            'foo' => 'bar2'
+            'foo' => 'bar2',
         ];
         $model->jsonAttribute = [
-            'foo' => 'bar2'
+            'foo' => 'bar2',
         ];
 
         $this->assertIsInt($model->getOriginal('intAttribute'));
