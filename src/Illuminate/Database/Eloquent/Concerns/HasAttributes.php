@@ -961,12 +961,6 @@ trait HasAttributes
      */
     public function getOriginal($key = null, $default = null)
     {
-        // Casts of type array are already processed, so return value in this case
-        if ($this->hasCast($key)
-            && $this->getCastType($key) === 'array') {
-            return Arr::get($this->original, $key, $default);
-        }
-
         return $this->getValue($key, Arr::get($this->original, $key, $default));
     }
 
@@ -1145,22 +1139,20 @@ trait HasAttributes
             return false;
         }
 
+        $attribute = $this->getAttribute($key);
         $original = $this->getOriginal($key);
 
-        if ($current === $original) {
+        if ($attribute === $original) {
             return true;
-        } elseif (is_null($current)) {
+        } elseif (is_null($attribute)) {
             return false;
         } elseif ($this->isDateAttribute($key)) {
-            return $this->fromDateTime($current) ===
+            return $this->fromDateTime($attribute) ===
                    $this->fromDateTime($original);
-        } elseif ($this->hasCast($key)) {
-            return $this->castAttribute($key, $current) ===
-                   $this->castAttribute($key, $original);
         }
 
-        return is_numeric($current) && is_numeric($original)
-                && strcmp((string) $current, (string) $original) === 0;
+        return is_numeric($attribute) && is_numeric($original)
+                && strcmp((string) $attribute, (string) $original) === 0;
     }
 
     /**
