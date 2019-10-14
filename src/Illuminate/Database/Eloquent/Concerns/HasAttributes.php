@@ -315,11 +315,10 @@ trait HasAttributes
             return;
         }
 
-        // If the attribute exists in the attribute array or has a "get" mutator we will
+        // If the attribute exists in the attribute array we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
-            $this->hasGetMutator($key)) {
+        if (array_key_exists($key, $this->attributes)) {
             return $this->getAttributeValue($key);
         }
 
@@ -341,31 +340,7 @@ trait HasAttributes
      */
     public function getAttributeValue($key)
     {
-        $value = $this->getAttributeFromArray($key);
-
-        // If the attribute has a get mutator, we will call that then return what
-        // it returns as the value, which is useful for transforming values on
-        // retrieval from the model to a form that is more useful for usage.
-        if ($this->hasGetMutator($key)) {
-            return $this->mutateAttribute($key, $value);
-        }
-
-        // If the attribute exists within the cast array, we will convert it to
-        // an appropriate native PHP type dependant upon the associated value
-        // given with the key in the pair. Dayle made this comment line up.
-        if ($this->hasCast($key)) {
-            return $this->castAttribute($key, $value);
-        }
-
-        // If the attribute is listed as a date, we will convert it to a DateTime
-        // instance on retrieval, which makes it quite convenient to work with
-        // date fields without having to create a mutator for each property.
-        if (in_array($key, $this->getDates()) &&
-            ! is_null($value)) {
-            return $this->asDateTime($value);
-        }
-
-        return $value;
+        return $this->getValue($key, $this->getAttributeFromArray($key));
     }
 
     /**
@@ -985,7 +960,11 @@ trait HasAttributes
      */
     public function getOriginal($key = null, $default = null)
     {
-        return Arr::get($this->original, $key, $default);
+        if (! $key) {
+            return;
+        }
+
+        return $this->getValue($key, Arr::get($this->original, $key, $default));
     }
 
     /**
@@ -1163,22 +1142,20 @@ trait HasAttributes
             return false;
         }
 
+        $attribute = $this->getAttribute($key);
         $original = $this->getOriginal($key);
 
-        if ($current === $original) {
+        if ($attribute === $original) {
             return true;
-        } elseif (is_null($current)) {
+        } elseif (is_null($attribute)) {
             return false;
         } elseif ($this->isDateAttribute($key)) {
-            return $this->fromDateTime($current) ===
+            return $this->fromDateTime($attribute) ===
                    $this->fromDateTime($original);
-        } elseif ($this->hasCast($key)) {
-            return $this->castAttribute($key, $current) ===
-                   $this->castAttribute($key, $original);
         }
 
-        return is_numeric($current) && is_numeric($original)
-                && strcmp((string) $current, (string) $original) === 0;
+        return is_numeric($attribute) && is_numeric($original)
+                && strcmp((string) $attribute, (string) $original) === 0;
     }
 
     /**
@@ -1249,5 +1226,39 @@ trait HasAttributes
         preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches);
 
         return $matches[1];
+    }
+
+    /**
+     * Get the plain value (no relation) of a model respecting the models mutator, casts and dates property
+     *
+     * @param  string  $key
+     * @param  mixed $value
+     * @return mixed|array
+     */
+    private function getValue($key, $value)
+    {
+        // If the attribute has a get mutator, we will call that then return what
+        // it returns as the value, which is useful for transforming values on
+        // retrieval from the model to a form that is more useful for usage.
+        if ($this->hasGetMutator($key)) {
+            return $this->mutateAttribute($key, $value);
+        }
+
+        // If the attribute exists within the cast array, we will convert it to
+        // an appropriate native PHP type dependant upon the associated value
+        // given with the key in the pair. Dayle made this comment line up.
+        if ($this->hasCast($key)) {
+            return $this->castAttribute($key, $value);
+        }
+
+        // If the attribute is listed as a date, we will convert it to a DateTime
+        // instance on retrieval, which makes it quite convenient to work with
+        // date fields without having to create a mutator for each property.
+        if ($value !== null
+            && \in_array($key, $this->getDates(), false)) {
+            return $this->asDateTime($value);
+        }
+
+        return $value;
     }
 }

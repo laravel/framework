@@ -1940,6 +1940,77 @@ class DatabaseEloquentModelTest extends TestCase
             Model::isIgnoringTouch(EloquentModelWithoutTimestamps::class)
         );
     }
+
+    /**
+     * Test that the getOriginal method on an Eloquent model also uses the casts array.
+     *
+     * @param void
+     * @return void
+     */
+    public function testGetOriginalCastsAttributes()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->intAttribute = '1';
+        $model->floatAttribute = '0.1234';
+        $model->stringAttribute = 432;
+        $model->boolAttribute = '1';
+        $model->booleanAttribute = '0';
+        $stdClass = new stdClass;
+        $stdClass->json_key = 'json_value';
+        $model->objectAttribute = $stdClass;
+        $array = [
+            'foo' => 'bar',
+        ];
+        $model->arrayAttribute = $array;
+        $model->jsonAttribute = $array;
+
+        $model->syncOriginal();
+
+        $model->intAttribute = 2;
+        $model->floatAttribute = 0.443;
+        $model->stringAttribute = '12';
+        $model->boolAttribute = true;
+        $model->booleanAttribute = false;
+        $model->objectAttribute = $stdClass;
+        $model->arrayAttribute = [
+            'foo' => 'bar2',
+        ];
+        $model->jsonAttribute = [
+            'foo' => 'bar2',
+        ];
+
+        $this->assertIsInt($model->getOriginal('intAttribute'));
+        $this->assertEquals(1, $model->getOriginal('intAttribute'));
+        $this->assertEquals(2, $model->intAttribute);
+        $this->assertEquals(2, $model->getAttribute('intAttribute'));
+
+        $this->assertIsFloat($model->getOriginal('floatAttribute'));
+        $this->assertEquals(0.1234, $model->getOriginal('floatAttribute'));
+        $this->assertEquals(0.443, $model->floatAttribute);
+
+        $this->assertIsString($model->getOriginal('stringAttribute'));
+        $this->assertEquals('432', $model->getOriginal('stringAttribute'));
+        $this->assertEquals('12', $model->stringAttribute);
+
+        $this->assertIsBool($model->getOriginal('boolAttribute'));
+        $this->assertTrue($model->getOriginal('boolAttribute'));
+        $this->assertTrue($model->boolAttribute);
+
+        $this->assertIsBool($model->getOriginal('booleanAttribute'));
+        $this->assertFalse($model->getOriginal('booleanAttribute'));
+        $this->assertFalse($model->booleanAttribute);
+
+        $this->assertEquals($stdClass, $model->getOriginal('objectAttribute'));
+        $this->assertEquals($model->getAttribute('objectAttribute'), $model->getOriginal('objectAttribute'));
+
+        $this->assertEquals($array, $model->getOriginal('arrayAttribute'));
+        $this->assertEquals(['foo' => 'bar'], $model->getOriginal('arrayAttribute'));
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('arrayAttribute'));
+
+        $this->assertEquals($array, $model->getOriginal('jsonAttribute'));
+        $this->assertEquals(['foo' => 'bar'], $model->getOriginal('jsonAttribute'));
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('jsonAttribute'));
+    }
 }
 
 class EloquentTestObserverStub
