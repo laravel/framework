@@ -102,7 +102,7 @@ trait ResetsPasswords
      */
     protected function resetPassword($user, $password)
     {
-        $user->password = Hash::make($password);
+        $this->setUserPassword($user, $password);
 
         $user->setRememberToken(Str::random(60));
 
@@ -111,6 +111,18 @@ trait ResetsPasswords
         event(new PasswordReset($user));
 
         $this->guard()->login($user);
+    }
+
+    /**
+     * Set the user's password.
+     *
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @param  string  $password
+     * @return void
+     */
+    protected function setUserPassword($user, $password)
+    {
+        $user->password = Hash::make($password);
     }
 
     /**

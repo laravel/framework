@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use GuzzleHttp\Psr7\Stream;
 use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemAdapter;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -26,6 +28,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
         $filesystem->deleteDir(basename($this->tempDir));
+        m::close();
     }
 
     public function testResponse()
@@ -217,5 +220,18 @@ class FilesystemAdapterTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->writeStream('file.txt', 'foo bar');
+    }
+
+    public function testPutWithStreamInterface()
+    {
+        file_put_contents($this->tempDir.'/foo.txt', 'some-data');
+        $spy = m::spy($this->filesystem);
+
+        $filesystemAdapter = new FilesystemAdapter($spy);
+        $stream = new Stream(fopen($this->tempDir.'/foo.txt', 'r'));
+        $filesystemAdapter->put('bar.txt', $stream);
+
+        $spy->shouldHaveReceived('putStream');
+        $this->assertEquals('some-data', $filesystemAdapter->get('bar.txt'));
     }
 }
