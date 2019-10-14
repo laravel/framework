@@ -83,7 +83,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the root URL for the application.
      *
      * @return string
-     */VerifyEmail
+     */
     public function root()
     {
         return rtrim($this->getSchemeAndHttpHost().$this->getBaseUrl(), '/');
