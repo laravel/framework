@@ -3012,6 +3012,16 @@ class Builder
     }
 
     /**
+     * Die and dump the current SQL and bindings using Ignition.
+     *
+     * @return void
+     */
+    public function ddd()
+    {
+        ddd($this->toSql(), $this->getBindings());
+    }
+
+    /**
      * Handle dynamic method calls into the method.
      *
      * @param  string  $method
