@@ -1094,7 +1094,7 @@ class Builder
 
                 [$name, $constraints] = Str::contains($name, ':')
                             ? $this->createSelectWithConstraint($name)
-                            : [$name, function () {
+                            : [$name, static function () {
                                 //
                             }];
             }
@@ -1118,7 +1118,7 @@ class Builder
      */
     protected function createSelectWithConstraint($name)
     {
-        return [explode(':', $name)[0], function ($query) use ($name) {
+        return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(explode(',', explode(':', $name)[1]));
         }];
     }
@@ -1141,7 +1141,7 @@ class Builder
             $progress[] = $segment;
 
             if (! isset($results[$last = implode('.', $progress)])) {
-                $results[$last] = function () {
+                $results[$last] = static function () {
                     //
                 };
             }
