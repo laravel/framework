@@ -35,11 +35,7 @@ class SQLiteGrammar extends Grammar
             if (preg_match('/^[a-z_@#][a-z0-9@$#_]*$/', $part)) {
                 $compileParts[] = $this->wrap($part);
             } else {
-                // Removes quotes from quoted strings
-                if (preg_match('/^[\'"]*(.*?)[\'"]*$/', $part, $matches)) {
-                    $part = $matches[1];
-                }
-                $compileParts[] = $this->wrap(new Expression('"'.$part.'"'));
+                $compileParts[] = $this->wrap(new Expression('"'.trim($part, '\'"').'"'));
             }
         }
 
