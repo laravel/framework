@@ -199,7 +199,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $this->assertStringContainsString('hola',
             app('swift.transport')->messages()[1]->getBody()
         );
-        $this->assertStringContainsString('hi',
+        $this->assertStringContainsString('hello',
             app('swift.transport')->messages()[2]->getBody()
         );
     }
