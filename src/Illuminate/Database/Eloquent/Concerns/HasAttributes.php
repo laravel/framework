@@ -1229,7 +1229,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the plain value (no relation) of a model respecting the models mutator, casts and dates property
+     * Get the plain value (no relation) of a model respecting the models mutator, casts and dates property.
      *
      * @param  string  $key
      * @param  mixed $value
