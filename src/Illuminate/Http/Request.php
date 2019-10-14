@@ -698,14 +698,4 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->route($key);
         });
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __clone()
-    {
-        parent::__clone();
-
-        $this->headers = clone $this->headers;
-    }
 }
