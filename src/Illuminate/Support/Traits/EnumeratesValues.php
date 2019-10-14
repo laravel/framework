@@ -149,6 +149,25 @@ trait EnumeratesValues
     }
 
     /**
+     * Dump the items and end the script using Ignition.
+     *
+     * @param  mixed  ...$args
+     * @return void
+     */
+    public function ddd(...$args)
+    {
+        $items = (new static(func_get_args()))->push($this);
+
+        $last = $items->pop();
+
+        $items->each(function ($item) {
+            VarDumper::dump($item);
+        });
+
+        ddd($last);
+    }
+
+    /**
      * Dump the items.
      *
      * @return $this
