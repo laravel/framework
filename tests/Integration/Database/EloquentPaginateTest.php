@@ -27,6 +27,13 @@ class EloquentPaginateTest extends DatabaseTestCase
             $table->increments('id');
             $table->timestamps();
         });
+
+        Schema::create('costs', function ($table) {
+            $table->increments('id');
+            $table->unsignedInteger('user_id')->nullable();
+            $table->integer('cost');
+            $table->timestamps();
+        });
     }
 
     public function testPaginationOnTopOfColumns()
@@ -102,6 +109,22 @@ class EloquentPaginateTest extends DatabaseTestCase
         $this->assertEquals(5, $query->count());
         $this->assertEquals(5, $query->paginate()->total());
     }
+
+    public function testPaginationWithHavingConstraints()
+    {
+        for ($i = 1; $i <= 2; $i++) {
+            $user = User::create();
+            for ($j = 1; $j <= 3; $j++) {
+                Cost::create([
+                   'cost' => $i,
+                   'user_id' => $user->id,
+                ]);
+            }
+        }
+
+        $query = Cost::selectSub('sum(cost)', 'total')->having('total', '>', 3)->groupBy('user_id')->paginate();
+        $this->assertEquals(1, $query->count());
+    }
 }
 
 class Post extends Model
@@ -110,6 +133,11 @@ class Post extends Model
 }
 
 class User extends Model
+{
+    protected $guarded = [];
+}
+
+class Cost extends Model
 {
     protected $guarded = [];
 }

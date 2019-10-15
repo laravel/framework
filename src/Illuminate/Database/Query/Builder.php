@@ -2223,7 +2223,7 @@ class Builder
 
         return $this->cloneWithout($without)
                     ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
-                    ->setAggregate('count', $this->withoutSelectAliases($columns))
+                    ->setAggregate('count', $this->withoutSelectAliases($columns), $this->havings ? $this->aliasesColumns() : [])
                     ->get()->all();
     }
 
@@ -2239,6 +2239,24 @@ class Builder
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
                     ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
+    }
+
+    /**
+     * Get columns that have aliases.
+     *
+     * @return array
+     */
+    protected function aliasesColumns()
+    {
+        $aliasesColumns = [];
+
+        foreach ($this->columns as $column) {
+            if ($column instanceof Expression) {
+                $aliasesColumns[] = $column->getValue();
+            }
+        }
+
+        return $aliasesColumns;
     }
 
     /**
@@ -2537,11 +2555,12 @@ class Builder
      *
      * @param  string  $function
      * @param  array  $columns
+     * @param  array  $aliasesColumns
      * @return $this
      */
-    protected function setAggregate($function, $columns)
+    protected function setAggregate($function, $columns, $aliasesColumns = [])
     {
-        $this->aggregate = compact('function', 'columns');
+        $this->aggregate = compact('function', 'columns', 'aliasesColumns');
 
         if (empty($this->groups)) {
             $this->orders = null;

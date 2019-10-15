@@ -118,7 +118,15 @@ class Grammar extends BaseGrammar
             $column = 'distinct '.$column;
         }
 
-        return 'select '.$aggregate['function'].'('.$column.') as aggregate';
+        $aggregateStatement = 'select '.$aggregate['function'].'('.$column.') as aggregate';
+
+        if (! empty($aggregate['aliasesColumns'])) {
+            foreach ($aggregate['aliasesColumns'] as $aliasesColumn) {
+                $aggregateStatement .= ','.$aliasesColumn;
+            }
+        }
+
+        return $aggregateStatement;
     }
 
     /**
