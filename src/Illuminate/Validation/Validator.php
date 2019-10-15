@@ -391,7 +391,7 @@ class Validator implements ValidatorContract
 
         if (is_a($rule, RuleContract::class, true)) {
             if (is_string($rule)) {
-                $rule = app($rule, $this->parseNamedParameters($parameters));
+                $rule = $this->container->make($rule, $this->parseNamedParameters($parameters));
             }
 
             return $this->validateUsingCustomRule($attribute, $value, $rule);

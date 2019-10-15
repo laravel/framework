@@ -4745,7 +4745,7 @@ class ValidationValidatorTest extends TestCase
 
     public function testRulesCanBeGivenAsFQNs()
     {
-        $rule = new class(new ContainerConcreteStub, 0) implements Rule {
+        $rule = new class(new ContainerConcreteStub, 5) implements Rule {
             protected $number;
 
             public function __construct(ContainerConcreteStub $serviceAssertion, int $number)
@@ -4764,19 +4764,25 @@ class ValidationValidatorTest extends TestCase
             }
         };
 
+        $ruleClass = get_class($rule);
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->twice()->with(ucfirst($ruleClass), ['number' => '5'])->andReturn($rule);
+
         $trans = $this->getIlluminateArrayTranslator();
         $validator = new Validator(
             $trans,
             ['a' => 5],
-            ['a' => ['required', get_class($rule).':number=5']]
+            ['a' => ['required', $ruleClass.':number=5']]
         );
+        $validator->setContainer($container);
         $this->assertTrue($validator->passes());
 
         $validator = new Validator(
             $trans,
             ['a' => 4],
-            ['a' => ['required', get_class($rule).':number=5']]
+            ['a' => ['required', $ruleClass.':number=5']]
         );
+        $validator->setContainer($container);
         $this->assertFalse($validator->passes());
     }
 
