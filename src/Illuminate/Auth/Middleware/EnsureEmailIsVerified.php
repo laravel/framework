@@ -22,7 +22,7 @@ class EnsureEmailIsVerified
             ($request->user() instanceof MustVerifyEmail &&
             ! $request->user()->hasVerifiedEmail())) {
             return $request->expectsJson()
-                    ? abort(403, 'Your email address is not verified.')
+                    ? abort(403, trans('auth.unverified'))
                     : Redirect::route($redirectToRoute ?: 'verification.notice');
         }
 
