@@ -328,7 +328,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile the command to drow all views.
+     * Compile the command to drop all views.
      *
      * @return string
      */
