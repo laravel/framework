@@ -320,10 +320,25 @@ class SqlServerGrammar extends Grammar
     public function compileDropAllForeignKeys()
     {
         return "DECLARE @sql NVARCHAR(MAX) = N'';
-            SELECT @sql += 'ALTER TABLE ' + QUOTENAME(OBJECT_NAME(parent_object_id)) 
+            SELECT @sql += 'ALTER TABLE '
+                + QUOTENAME(OBJECT_SCHEMA_NAME(parent_object_id)) + '.' + + QUOTENAME(OBJECT_NAME(parent_object_id))
                 + ' DROP CONSTRAINT ' + QUOTENAME(name) + ';'
             FROM sys.foreign_keys;
-            
+
+            EXEC sp_executesql @sql;";
+    }
+
+    /**
+     * Compile the command to drop all views.
+     *
+     * @return string
+     */
+    public function compileDropAllViews()
+    {
+        return "DECLARE @sql NVARCHAR(MAX) = N'';
+            SELECT @sql += 'DROP VIEW ' + QUOTENAME(OBJECT_SCHEMA_NAME(object_id)) + '.' + QUOTENAME(name) + ';'
+            FROM sys.views;
+
             EXEC sp_executesql @sql;";
     }
 

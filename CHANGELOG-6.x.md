@@ -1,18 +1,29 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.1.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.2.0...6.x)
+
+## [v6.2.0 (2019-10-08)](https://github.com/laravel/framework/compare/v6.1.0...v6.2.0)
 
 ### Added
 - Added support for callable objects in `Container::call()` ([#30156](https://github.com/laravel/framework/pull/30156))
+- Add multipolygonz type for postgreSQL ([#30173](https://github.com/laravel/framework/pull/30173))
+- Add "unauthenticated" method in auth middleware ([#30177](https://github.com/laravel/framework/pull/30177))
+- Add partialMock shorthand ([#30202](https://github.com/laravel/framework/pull/30202))
+- Allow Storage::put to accept a Psr StreamInterface ([#30179](https://github.com/laravel/framework/pull/30179))
+- Implement new password rule and password confirmation ([#30214](https://github.com/laravel/framework/pull/30214))
 
-### TODO:
+### Changed
 - Remove unnecessary param passed to updatePackageArray method ([#30155](https://github.com/laravel/framework/pull/30155))
 - Add optional connection name to DatabaseUserProvider ([#30154](https://github.com/laravel/framework/pull/30154))
-- Add multipolygonz type for postgreSQL ([#30173](https://github.com/laravel/framework/pull/30173))
+- Remove brackets arround URL php artisan serve ([#30168](https://github.com/laravel/framework/pull/30168))
 - Apply limit to database rather than collection ([#30148](https://github.com/laravel/framework/pull/30148))
 - Allow to use scoped macro in nested queries ([#30127](https://github.com/laravel/framework/pull/30127))
 - Added array to json conversion for sqlite ([#30133](https://github.com/laravel/framework/pull/30133))
-- Add "unauthenticated" method in auth middleware ([#30177](https://github.com/laravel/framework/pull/30177))
+- Use the `policies()` method instead of the property policies ([#30189](https://github.com/laravel/framework/pull/30189))
+- Split hasValidSignature method ([#30208](https://github.com/laravel/framework/pull/30208))
+
+### Fixed
+- `validateDimensions()` handle `image/svg` MIME ([#30204](https://github.com/laravel/framework/pull/30204))
 
 
 ## [v6.1.0 (2019-10-01)](https://github.com/laravel/framework/compare/v6.0.4...v6.1.0)
