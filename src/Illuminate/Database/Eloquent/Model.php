@@ -876,13 +876,15 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
     /**
      * Delete the model from the database.
-     *
+     * @param  array  $attributes
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function delete()
+    public function delete(array $attributes = [])
     {
+        $this->fill($attributes)->save();
+        
         if (is_null($this->getKeyName())) {
             throw new Exception('No primary key defined on model.');
         }
