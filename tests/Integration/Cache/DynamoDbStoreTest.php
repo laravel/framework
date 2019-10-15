@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * @group integration
