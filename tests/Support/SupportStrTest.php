@@ -46,6 +46,57 @@ class SupportStrTest extends TestCase
         $this->assertSame('ae oe ue Ae Oe Ue', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
     }
 
+    public function testFormat()
+    {
+        $this->assertEquals('Steve Lacey', Str::format('{} {}', ['Steve', 'Lacey']));
+        $this->assertEquals('Steve Lacey', Str::format('{} {1}', ['Steve', 'Lacey']));
+        $this->assertEquals('Steve Lacey', Str::format('{1} {}', ['Lacey', 'Steve']));
+        $this->assertEquals('Steve Lacey', Str::format('{1} {0}', ['Lacey', 'Steve']));
+        $this->assertEquals('Steve Lacey', Str::format('{a} {b}', ['a' => 'Steve', 'b' => 'Lacey']));
+    }
+
+    public function testFormatEscapeBraces()
+    {
+        $this->assertEquals('{1} {0}', Str::format('{{1}} {{0}}', ['Lacey', 'Steve']));
+        $this->assertEquals('\Steve \Lacey', Str::format('\{1} \{0}', ['Lacey', 'Steve']));
+        $this->assertEquals('\{1\} \{0\}', Str::format('\{1\} \{0\}', ['Lacey', 'Steve']));
+    }
+
+    public function testFormatNoticeOnUndefinedOffset0()
+    {
+        $this->assertEquals('Steve ', @Str::format('{a} {}', ['a' => 'Steve']));
+
+        $this->expectNotice();
+        $this->expectExceptionMessage('Undefined offset: 0');
+
+        Str::format('{a} {}', ['a' => 'Steve']);
+    }
+
+    public function testFormatNoticeOnUndefinedOffset1()
+    {
+        $this->assertEquals(' Steve', @Str::format('{1} {a}', ['a' => 'Steve']));
+
+        $this->expectNotice();
+        $this->expectExceptionMessage('Undefined offset: 1');
+
+        Str::format('{1} {a}', ['a' => 'Steve']);
+    }
+
+    public function testFormatNoticeOnUndefinedStringOffset()
+    {
+        $this->assertEquals(' Steve', @Str::format('{b} {a}', ['a' => 'Steve']));
+
+        $this->expectNotice();
+        $this->expectExceptionMessage('Undefined index: b');
+
+        Str::format('{b} {a}', ['a' => 'Steve']);
+    }
+
+    public function testFormatNull()
+    {
+        $this->assertEquals('', Str::format('{}', [null]));
+    }
+
     public function testStartsWith()
     {
         $this->assertTrue(Str::startsWith('jason', 'jas'));
