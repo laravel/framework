@@ -4,6 +4,7 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
+use Illuminate\Support\Str;
 use Redis;
 use RedisCluster;
 
@@ -403,6 +404,71 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         foreach ($this->client->_masters() as [$host, $port]) {
             tap(new Redis)->connect($host, $port)->flushDb();
         }
+    }
+
+    /**
+     * @param int      $cursor
+     * @param string   $pattern
+     * @param int|null $count
+     *
+     * @return array|bool
+     */
+    public function scan(&$cursor, $pattern = '', $count = null)
+    {
+        $parameters = array_filter([$count]);
+
+        $ret = $this->client->scan($cursor, $this->applyPrefix($pattern), ...$parameters);
+        $prefix = $this->applyPrefix('');
+        array_walk($ret, function (&$key) use ($prefix) {
+            $key = Str::replaceFirst($prefix, '', $key);
+        });
+
+        return $ret;
+    }
+
+    /**
+     * @param string      $key
+     * @param int         $cursor
+     * @param string|null $pattern
+     * @param int|null    $count
+     *
+     * @return array
+     */
+    public function hScan($key, &$cursor, $pattern = null, $count = null)
+    {
+        $parameters = array_filter([$pattern, $count]);
+
+        return $this->client->hScan($key, $cursor, ...$parameters);
+    }
+
+    /**
+     * @param string      $key
+     * @param int         $cursor
+     * @param string|null $pattern
+     * @param int|null    $count
+     *
+     * @return array|bool
+     */
+    public function zScan($key, &$cursor, $pattern = null, $count = null)
+    {
+        $parameters = array_filter([$pattern, $count]);
+
+        return $this->client->zScan($key, $cursor, ...$parameters);
+    }
+
+    /**
+     * @param string      $key
+     * @param int         $cursor
+     * @param string|null $pattern
+     * @param int|null    $count
+     *
+     * @return array|bool
+     */
+    public function sScan($key, &$cursor, $pattern = null, $count = null)
+    {
+        $parameters = array_filter([$pattern, $count]);
+
+        return $this->client->sScan($key, $cursor, ...$parameters);
     }
 
     /**

@@ -547,6 +547,130 @@ class RedisConnectionTest extends TestCase
         );
     }
 
+    public function testScan()
+    {
+        foreach ($this->connections() as $connector => $redis) {
+            $targetKeys = [];
+            $targetKeysWithPrefix = [];
+            $targetHashFields = [];
+            $targetSetMembers = [];
+            $targetSortSetMembers = [];
+
+            for ($i = 0; $i < 100; $i++) {
+                $redis->set('scan_'.$i, $i);
+                $targetKeys[] = 'scan_'.$i;
+                $targetKeysWithPrefix[] = 'test_scan_'.$i;
+                $redis->hSet('hash', 'scan_'.$i, $i);
+                $targetHashFields['scan_'.$i] = $i;
+                $redis->sAdd('set', 'scan_'.$i);
+                $targetSetMembers[] = 'scan_'.$i;
+                $redis->zAdd('zset', $i, 'scan_'.$i);
+                $targetSortSetMembers['scan_'.$i] = $i;
+            }
+
+            for ($i = 0; $i < 10; $i++) {
+                $redis->set('noise_'.$i, $i);
+                $redis->hSet('hash', 'noise_'.$i, $i);
+                $redis->sAdd('set', 'noise_'.$i);
+                $redis->zAdd('zset', $i, 'noise_'.$i);
+            }
+
+            $matchedKeys = [];
+            $matchedHashFields = [];
+            $matchedSetMembers = [];
+            $matchedSortSetMembers = [];
+
+            if ($connector === 'predis') {
+                $scanCursor = 0;
+                do {
+                    $ret = $redis->scan($scanCursor, ['MATCH' => 'test_scan_*']);
+                    $scanCursor = $ret[0];
+                    $matchedKeys = array_merge($matchedKeys, $ret[1]);
+                } while ($scanCursor);
+
+                $hScanCursor = 0;
+                do {
+                    $ret = $redis->hScan('hash', $hScanCursor, ['MATCH' => 'scan_*', 'COUNT' => 10]);
+                    $hScanCursor = $ret[0];
+                    $matchedHashFields = array_merge($matchedHashFields, $ret[1]);
+                } while ($hScanCursor);
+
+                $sScanCursor = 0;
+                do {
+                    $ret = $redis->sScan('set', $sScanCursor, ['MATCH' => 'scan_*', 'COUNT' => 10]);
+                    $sScanCursor = $ret[0];
+                    $matchedSetMembers = array_merge($matchedSetMembers, $ret[1]);
+                } while ($sScanCursor);
+
+                $zScanCursor = 0;
+                do {
+                    $ret = $redis->zScan('zset', $zScanCursor, ['MATCH' => 'scan_*', 'COUNT' => 10]);
+                    $zScanCursor = $ret[0];
+                    $matchedSortSetMembers = array_merge($matchedSortSetMembers, $ret[1]);
+                } while ($zScanCursor);
+            } else {
+                $scanCursor = null;
+                do {
+                    $keys = $redis->scan($scanCursor, 'scan_*', 10);
+                    if ($keys !== false) {
+                        $matchedKeys = array_merge($matchedKeys, $keys);
+                    }
+                } while ($scanCursor > 0);
+
+                $hScanCursor = null;
+                do {
+                    $keys = $redis->hScan('hash', $hScanCursor, 'scan_*');
+                    if ($keys !== false) {
+                        $matchedHashFields = array_merge($matchedHashFields, $keys);
+                    }
+                } while ($hScanCursor);
+
+                $sScanCursor = null;
+                do {
+                    $members = $redis->sScan('set', $sScanCursor, 'scan_*');
+                    if ($members !== false) {
+                        $matchedSetMembers = array_merge($matchedSetMembers, $members);
+                    }
+                } while ($sScanCursor);
+
+                $zScanCursor = null;
+                do {
+                    $members = $redis->zScan('zset', $zScanCursor, 'scan_*');
+                    if ($members !== false) {
+                        $matchedSortSetMembers = array_merge($matchedSortSetMembers, $members);
+                    }
+                } while ($zScanCursor);
+            }
+
+            $this->assertCount(100, $matchedKeys);
+            sort($matchedKeys);
+            sort($targetKeysWithPrefix);
+            sort($targetKeys);
+            if ($connector === 'predis') {
+                $this->assertEquals($targetKeysWithPrefix, $matchedKeys);
+            } else {
+                $this->assertEquals($targetKeys, $matchedKeys);
+            }
+
+            $this->assertCount(100, $matchedHashFields);
+            ksort($matchedHashFields);
+            ksort($targetHashFields);
+            $this->assertEquals($targetHashFields, $matchedHashFields);
+
+            $this->assertCount(100, $matchedSetMembers);
+            sort($matchedSetMembers);
+            sort($targetSetMembers);
+            $this->assertEquals($targetSetMembers, $matchedSetMembers);
+
+            $this->assertCount(100, $matchedSortSetMembers);
+            ksort($matchedSortSetMembers);
+            ksort($targetSortSetMembers);
+            $this->assertEquals($targetSortSetMembers, $matchedSortSetMembers);
+
+            $redis->flushall();
+        }
+    }
+
     public function connections()
     {
         $connections = [
