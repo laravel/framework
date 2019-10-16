@@ -1,6 +1,31 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.2.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.3.0...6.x)
+
+### TODO:
+- Add autocomplete support for the Queue-Facade ([#30300](https://github.com/laravel/framework/pull/30300))
+
+
+## [v6.3.0 (2019-10-16)](https://github.com/laravel/framework/compare/v6.2.0...v6.3.0)
+
+### Added
+- Added ability to override `setUserPassword` on password reset ([#30218](https://github.com/laravel/framework/pull/30218))
+- Added firing `deleting` \ `deleted` events in `MorphPivot` ([#30229](https://github.com/laravel/framework/pull/30229))
+- Added locking mechanism for the array cache driver ([#30253](https://github.com/laravel/framework/pull/30253))
+- Added `dropAllViews` functionality to the SQL Server builder ([#30222](https://github.com/laravel/framework/pull/30222))
+
+### Optimization
+- Optimize eager loading memory handling ([#30248](https://github.com/laravel/framework/pull/30248))
+
+### Fixed
+- Fixed extra `?` for empty query string in `RouteUrlGenerator::getRouteQueryString()` ([#30280](https://github.com/laravel/framework/pull/30280))
+
+### Changed
+- Updated list of URI schemes for `Url` validator ([#30220](https://github.com/laravel/framework/pull/30220))
+- Added schema name when dropping all FKs in SQL Server ([#30221](https://github.com/laravel/framework/pull/30221))
+- Used contracts in `RequirePassword` middleware ([#30215](https://github.com/laravel/framework/pull/30215))
+- Added ability to return array in `receivesBroadcastNotificationsOn` if `channelName` is array ([#30242](https://github.com/laravel/framework/pull/30242), [2faadcd](https://github.com/laravel/framework/commit/2faadcd288cdc86cf7a1a3644e68e5e0ce641a8b))
+
 
 ## [v6.2.0 (2019-10-08)](https://github.com/laravel/framework/compare/v6.1.0...v6.2.0)
 
