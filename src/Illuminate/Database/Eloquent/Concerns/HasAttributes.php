@@ -396,7 +396,7 @@ trait HasAttributes
 
         // If the "attribute" exists as a method on the model, we will just assume
         // it is a relationship and will load and return results from the query
-        // and hydrate the relationship's value on the "relationships" array.
+        // and hydrate the relationship's value on the "relations" array.
         if (method_exists($this, $key)) {
             return $this->getRelationshipFromMethod($key);
         }
