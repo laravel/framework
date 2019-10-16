@@ -198,7 +198,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testApplyMultipleScopes()
     {
-        $result = DB::table('posts')->apply(new PostFrom2017Scope, function (Builder $builder){
+        $result = DB::table('posts')->apply(new PostFrom2017Scope, function (Builder $builder) {
             $builder->select('title');
         })->get();
 
