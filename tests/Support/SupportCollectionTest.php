@@ -3665,7 +3665,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->when('adam')->concat(['adam']);
+        $data = $data->when(true)->concat(['adam']);
 
         $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
 
