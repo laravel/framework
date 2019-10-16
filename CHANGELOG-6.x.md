@@ -6,7 +6,7 @@
 - Add autocomplete support for the Queue-Facade ([#30300](https://github.com/laravel/framework/pull/30300))
 
 
-## [v6.3.0 (2019-10-16)](https://github.com/laravel/framework/compare/v6.2.0...v6.3.0)
+## [v6.3.0 (2019-10-15)](https://github.com/laravel/framework/compare/v6.2.0...v6.3.0)
 
 ### Added
 - Added ability to override `setUserPassword` on password reset ([#30218](https://github.com/laravel/framework/pull/30218))
