@@ -497,9 +497,8 @@ class Str
         }
 
         if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
-
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
+            $pattern = '/(?:(?:\s+|[_-])|(?:([[:alnum:]])(?=[[:upper:]])))/u';
+            $value = static::lower(preg_replace($pattern, '$1'.$delimiter, trim($value)));
         }
 
         return static::$snakeCache[$key][$delimiter] = $value;

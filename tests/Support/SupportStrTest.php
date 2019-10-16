@@ -205,7 +205,39 @@ class SupportStrTest extends TestCase
 
     public function testKebab()
     {
+        // from StudlyCase
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
+        // weird whitespaces
+        $this->assertSame('laravel-php-framework', Str::kebab("\v  Laravel \n\t   Php \r \n \v     Framework   "));
+        $this->assertSame('--laravel-php-framework--', Str::kebab(' _ Laravel  Php Framework    _    '));
+        $this->assertSame('/-laravel-php-framework-?', Str::kebab(' / Laravel  Php Framework    ?    '));
+        // numbers
+        $this->assertSame('laravel6-php-frame-work', Str::kebab('laravel6 php FrameWork'));
+        $this->assertSame('laravel6-p-h-p-framework', Str::kebab('laravel6PHPFramework'));
+        // from camelCase
+        $this->assertSame('laravel-php-framework', Str::kebab('laravelPhpFramework'));
+        // from snake_case
+        $this->assertSame('laravel-php-framework', Str::kebab('laravel_php_framework'));
+        // from Snake_Caps
+        $this->assertSame('laravel-php-framework', Str::kebab('Laravel_Php_Framework'));
+        // from Url
+        $this->assertSame('http://hello-world.org', Str::kebab('http://HelloWorld.org'));
+        // from camelCase.nestedMember
+        $this->assertSame('i-am.the-nested.member', Str::kebab('iAm.theNested.member'));
+        // from StudlyCase.NestedMember
+        $this->assertSame('i-am.the-nested.member', Str::kebab('IAm.TheNested.Member'));
+        // from snake_case.nested_member
+        $this->assertSame('i-am.the-nested.member', Str::kebab('i_am.the_nested.member'));
+        // from string with wildcards (I've seen this somewhere in laravel/framework)
+        $this->assertSame('i-am.*.last-member', Str::kebab('iAm.*.lastMember'));
+        // from string with strange characters
+        $this->assertSame('all-the-strange-chars-like:-(!@#$%^&*)-remain-unchanged',
+               Str::kebab('All the strangeCharsLike:   (!@#$%^&*) remain unchanged'));
+        // from string with multibyte
+        $this->assertSame('malmö-jönköping', Str::kebab('Malmö Jönköping'));
+        // from string with multibyte caps
+        $this->assertSame('łu-kasz.żą-dełko', Str::kebab('ŁuKasz.ŻąDełko'));
+        $this->assertSame('łukasz-żądełko', Str::kebab('ŁukaszŻądełko'));
     }
 
     public function testLower()
@@ -298,6 +330,39 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
+        // with weird whitespaces
+        $this->assertSame('laravel_php_framework', Str::snake("\v  Laravel \n\t   Php \r \n \v     Framework   "));
+        $this->assertSame('__laravel_php_framework__', Str::snake(' - Laravel  Php Framework    -    '));
+        $this->assertSame('/_laravel_php_framework_?', Str::snake(' / Laravel  Php Framework    ?    '));
+        // with numbers
+        $this->assertSame('laravel6_php_frame_work', Str::snake('laravel6 php FrameWork'));
+        $this->assertSame('laravel6_p_h_p_framework', Str::snake('laravel6PHPFramework'));
+        // from camelCase
+        $this->assertSame('laravel_php_framework', Str::snake('laravelPhpFramework'));
+        // from kebab case
+        $this->assertSame('laravel_php_framework', Str::snake('laravel-php-framework'));
+        // from snake caps
+        $this->assertSame('laravel_php_framework', Str::snake('Laravel_Php_Framework'));
+        // from kebab caps
+        $this->assertSame('laravel_php_framework', Str::snake('Laravel-Php-Framework'));
+        // from Url
+        $this->assertSame('http://hello_world.org', Str::snake('http://HelloWorld.org'));
+        // from camelCase.nestedMember
+        $this->assertSame('i_am.the_nested.member', Str::snake('iAm.theNested.member'));
+        // from StudlyCase.NestedMember
+        $this->assertSame('i_am.the_nested.member', Str::snake('IAm.TheNested.Member'));
+        // from kebab-case.nested-member
+        $this->assertSame('i_am.the_nested.member', Str::snake('i-am.the-nested.member'));
+        // from strings with wildcards (I've seen this somewhere in laravel/framework)
+        $this->assertSame('i_am.*.last_member', Str::snake('iAm.*.lastMember'));
+        // with strange characters
+        $this->assertSame('all_the_strange_chars_like:_(!@#$%^&*)_remain_unchanged',
+               Str::snake('All the strangeCharsLike:   (!@#$%^&*) remain unchanged'));
+        // with multibyte strings
+        $this->assertSame('malmö_jönköping', Str::snake('Malmö Jönköping'));
+        // with multibyte caps
+        $this->assertSame('łukasz.żądełko', Str::snake('Łukasz.Żądełko'));
+        $this->assertSame('łukasz_żądełko', Str::snake('ŁukaszŻądełko'));
     }
 
     public function testStudly()
