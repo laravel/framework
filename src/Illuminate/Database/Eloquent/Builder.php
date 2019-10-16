@@ -360,6 +360,8 @@ class Builder
     {
         $result = $this->find($id, $columns);
 
+        $id = $id instanceof Arrayable ? $id->toArray() : $id;
+
         if (is_array($id)) {
             if (count($result) === count(array_unique($id))) {
                 return $result;
