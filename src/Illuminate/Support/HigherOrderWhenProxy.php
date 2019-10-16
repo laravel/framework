@@ -1,15 +1,15 @@
 <?php
 
-namespace Illuminate\Database;
+namespace Illuminate\Support;
 
 class HigherOrderWhenProxy
 {
     /**
-     * The builder being operated on.
+     * The resource being operated on.
      *
      * @var mixed
      */
-    protected $builder;
+    protected $resource;
 
     /**
      * The condition for the query.
@@ -21,17 +21,17 @@ class HigherOrderWhenProxy
     /**
      * Create a new proxy instance.
      *
-     * @param  mixed  $builder
+     * @param  mixed  $resource
      * @param  mixed  $condition
      */
-    public function __construct($builder, $condition)
+    public function __construct($resource, $condition)
     {
-        $this->builder = $builder;
+        $this->resource = $resource;
         $this->condition = $condition;
     }
 
     /**
-     * Proxy the call onto the query builder.
+     * Proxy the call onto the resource.
      *
      * @param  string  $method
      * @param  array  $parameters
@@ -40,9 +40,9 @@ class HigherOrderWhenProxy
     public function __call($method, $parameters)
     {
         if ($this->condition) {
-            return $this->builder->{$method}(...$parameters);
+            return $this->resource->{$method}(...$parameters);
         }
 
-        return $this->builder;
+        return $this->resource;
     }
 }

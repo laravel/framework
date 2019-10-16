@@ -3,9 +3,9 @@
 namespace Illuminate\Database\Concerns;
 
 use Illuminate\Container\Container;
-use Illuminate\Database\HigherOrderWhenProxy;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\HigherOrderWhenProxy;
 
 trait BuildsQueries
 {

@@ -3661,6 +3661,24 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhenHigherOrderProxy($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->when('adam')->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
+
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->when(false)->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhenDefault($collection)
     {
         $data = new $collection(['michael', 'tom']);
@@ -3692,6 +3710,24 @@ class SupportCollectionTest extends TestCase
         $data = $data->whenEmpty(function ($data) {
             return $data->concat(['adam']);
         });
+
+        $this->assertSame(['adam'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhenEmptyHigherOrderProxy($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->whenEmpty()->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom'], $data->toArray());
+
+        $data = new $collection;
+
+        $data = $data->whenEmpty()->concat(['adam']);
 
         $this->assertSame(['adam'], $data->toArray());
     }
@@ -3737,6 +3773,24 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhenNotEmptyHigherOrderProxy($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->whenNotEmpty()->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
+
+        $data = new $collection;
+
+        $data = $data->whenNotEmpty()->concat(['adam']);
+
+        $this->assertSame([], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhenNotEmptyDefault($collection)
     {
         $data = new $collection(['michael', 'tom']);
@@ -3768,6 +3822,24 @@ class SupportCollectionTest extends TestCase
         $data = $data->unless(true, function ($data) {
             return $data->concat(['caleb']);
         });
+
+        $this->assertSame(['michael', 'tom'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUnlessHigherOrderProxy($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->unless(false)->concat(['caleb']);
+
+        $this->assertSame(['michael', 'tom', 'caleb'], $data->toArray());
+
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->unless(true)->concat(['caleb']);
 
         $this->assertSame(['michael', 'tom'], $data->toArray());
     }
@@ -3813,6 +3885,24 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testUnlessEmptyHigherOrderProxy($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->unlessEmpty()->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
+
+        $data = new $collection;
+
+        $data = $data->unlessEmpty()->concat(['adam']);
+
+        $this->assertSame([], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testUnlessEmptyDefault($collection)
     {
         $data = new $collection(['michael', 'tom']);
@@ -3844,6 +3934,24 @@ class SupportCollectionTest extends TestCase
         $data = $data->unlessNotEmpty(function ($data) {
             return $data->concat(['adam']);
         });
+
+        $this->assertSame(['adam'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUnlessNotEmptyHigherOrderProxy($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->unlessNotEmpty()->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom'], $data->toArray());
+
+        $data = new $collection;
+
+        $data = $data->unlessNotEmpty()->concat(['adam']);
 
         $this->assertSame(['adam'], $data->toArray());
     }
