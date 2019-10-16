@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -166,5 +167,66 @@ class QueryBuilderTest extends DatabaseTestCase
             (object) ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.'],
             (object) ['title' => 'Bar Post', 'content' => 'Lorem Ipsum.'],
         ]);
+    }
+
+    public function testWhereWithApply()
+    {
+        $result = DB::table('posts')->apply(function (Builder $builder) {
+            $builder->where('title', 'Foo Post');
+        })->get();
+
+        $this->assertCount(1, $result);
+        $this->assertSame('Foo Post', $result->first()->title);
+        $this->assertSame('2017-11-12 13:14:15', $result->first()->created_at);
+    }
+
+    public function testGroupByWithApply()
+    {
+        $result = DB::table('posts')->apply(function (Builder $builder) {
+            $builder->groupBy('content');
+        })->get();
+
+        $this->assertCount(1, $result);
+    }
+
+    public function testApplyInvokableScope()
+    {
+        $result = DB::table('posts')->apply(new PostFrom2017Scope)->get();
+
+        $this->assertCount(1, $result);
+    }
+
+    public function testApplyMultipleScopes()
+    {
+        $result = DB::table('posts')->apply(new PostFrom2017Scope, function (Builder $builder){
+            $builder->select('title');
+        })->get();
+
+        $this->assertCount(1, $result);
+        $this->assertObjectNotHasAttribute('created_at', $result->first());
+    }
+
+    public function testApplyMultipleScopesWithArray()
+    {
+        $closure = function (Builder $builder) {
+            $builder->select('title');
+        };
+
+        $another = function (Builder $builder) {
+            $builder->addSelect('id');
+        };
+
+        $result = DB::table('posts')->apply([new PostFrom2017Scope, $closure, $another])->get();
+
+        $this->assertCount(1, $result);
+        $this->assertObjectNotHasAttribute('created_at', $result->first());
+    }
+}
+
+class PostFrom2017Scope
+{
+    public function __invoke(Builder $builder)
+    {
+        $builder->whereBetween('created_at', ['2017-01-01', '2017-12-31']);
     }
 }

@@ -1831,6 +1831,25 @@ class Builder
     }
 
     /**
+     * Run a callback against the query.
+     *
+     * @param  mixed  $callback
+     * @return $this
+     */
+    public function apply(...$callbacks)
+    {
+        $callbacks = is_array($callbacks[0]) ? $callbacks[0] : $callbacks;
+
+        foreach ($callbacks as $callback) {
+            if (is_callable($callback)) {
+                $callback($this);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a descending "order by" clause to the query.
      *
      * @param  string  $column
