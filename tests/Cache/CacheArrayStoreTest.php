@@ -34,7 +34,7 @@ class CacheArrayStoreTest extends TestCase
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
-    public function testItemsCanExpire(): void
+    public function testItemsCanExpire()
     {
         Carbon::setTestNow(Carbon::now());
         $store = new ArrayStore;
@@ -72,6 +72,19 @@ class CacheArrayStoreTest extends TestCase
         $result = $store->increment('foo');
         $this->assertEquals(1, $result);
         $this->assertEquals(1, $store->get('foo'));
+    }
+
+    public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = new ArrayStore;
+
+        $store->put('foo', 999, 10);
+        Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
+        $result = $store->increment('foo');
+
+        $this->assertEquals(1, $result);
+        Carbon::setTestNow(null);
     }
 
     public function testValuesCanBeDecremented()

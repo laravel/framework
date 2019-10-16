@@ -75,15 +75,16 @@ class ArrayStore extends TaggableStore implements LockProvider
      */
     public function increment($key, $value = 1)
     {
-        if (! isset($this->storage[$key])) {
-            $this->forever($key, $value);
+        if ($existing = $this->get($key)) {
+            $incremented = ((int) $existing) + $value;
+            $this->storage[$key]['value'] = serialize($incremented);
 
-            return $this->storage[$key]['value'];
+            return $incremented;
         }
 
-        $this->storage[$key]['value'] = ((int) $this->storage[$key]['value']) + $value;
+        $this->forever($key, $value);
 
-        return $this->storage[$key]['value'];
+        return $value;
     }
 
     /**
