@@ -220,6 +220,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testWhenHigherOrderProxy()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when('truthy')->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+        $this->assertEquals([0 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(0)->where('email', 'foo');
+        $this->assertSame('select * from "users"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testUnlessCallback()
     {
         $callback = function ($query, $condition) {
@@ -277,6 +290,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->unless('truthy', $callback, $default)->where('email', 'foo');
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
         $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
+    }
+
+    public function testUnlessHigherOrderProxy()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->unless(0)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+        $this->assertEquals([0 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->unless('truthy')->where('email', 'foo');
+        $this->assertSame('select * from "users"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testTapCallback()
