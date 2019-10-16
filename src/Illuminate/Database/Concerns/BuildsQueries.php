@@ -5,6 +5,7 @@ namespace Illuminate\Database\Concerns;
 use Illuminate\Container\Container;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\HigherOrderWhenProxy;
 
 trait BuildsQueries
 {
@@ -147,12 +148,16 @@ trait BuildsQueries
      * Apply the callback's query changes if the given "value" is true.
      *
      * @param  mixed  $value
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  callable|null  $default
      * @return mixed|$this
      */
-    public function when($value, $callback, $default = null)
+    public function when($value, $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return new HigherOrderWhenProxy($this, $value);
+        }
+
         if ($value) {
             return $callback($this, $value) ?: $this;
         } elseif ($default) {
@@ -177,12 +182,16 @@ trait BuildsQueries
      * Apply the callback's query changes if the given "value" is false.
      *
      * @param  mixed  $value
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  callable|null  $default
      * @return mixed|$this
      */
-    public function unless($value, $callback, $default = null)
+    public function unless($value, $callback = null, $default = null)
     {
+        if (is_null($callback)) {
+            return new HigherOrderWhenProxy($this, ! $value);
+        }
+
         if (! $value) {
             return $callback($this, $value) ?: $this;
         } elseif ($default) {
