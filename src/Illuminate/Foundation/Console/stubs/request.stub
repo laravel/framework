@@ -11,7 +11,7 @@ class DummyClass extends FormRequest
      *
      * @return bool
      */
-    public function authorize ()
+    public function authorize()
     {
         return false;
     }
@@ -21,7 +21,7 @@ class DummyClass extends FormRequest
      *
      * @return array
      */
-    public function rules ()
+    public function rules()
     {
         switch ($this->method()) {
             case 'POST':
@@ -39,7 +39,7 @@ class DummyClass extends FormRequest
      * 
      * @return array
      */
-    public function createRules ()
+    public function createRules()
     {
         return [];
     }
@@ -49,7 +49,7 @@ class DummyClass extends FormRequest
      *
      * @return array
      */
-    public function updateRules ()
+    public function updateRules()
     {
         return [];
     }
