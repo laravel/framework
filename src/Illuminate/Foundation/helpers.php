@@ -506,6 +506,52 @@ if (! function_exists('factory')) {
     }
 }
 
+if (! function_exists('factoryRelation')) {
+    /**
+     * Returns a value for the given relationship key from a created model factory builder for a given class and name.
+     *
+     * @param  dynamic  class|[class,name]|class,deferred|class,deferred,relationshipKey
+     * @return mixed
+     */
+    function factoryRelation()
+    {
+        $factory = app(EloquentFactory::class);
+
+        $arguments = func_get_args();
+
+        list($class, $name, $deferred, $relationshipKey) = [$arguments[0], 'default', true, null];
+
+        if (is_array($arguments[0])) {
+            if (count($arguments[0]) === 1) {
+                $arguments[0] = \Illuminate\Support\Arr::flatten($arguments[0]);
+            }
+            list($class, $name) = $arguments[0];
+        }
+
+        $deferred = isset($arguments[1]) && is_bool($arguments[1])? $arguments[1] : true;
+
+        if (isset($arguments[1]) && is_string($arguments[1])) {
+            $relationshipKey = $arguments[1];
+        } elseif (isset($arguments[2]) && is_string($arguments[2])) {
+            $relationshipKey = $arguments[2];
+        }
+
+        if (is_null($relationshipKey)) {
+            $model = (new $class);
+            $relationshipKey = ($model)->getKeyName();
+            unset($model);
+        }
+
+        if ($deferred) {
+            return function () use ($factory, $class, $name, $relationshipKey) {
+                return $factory->of($class, $name)->create()->{$relationshipKey};
+            };
+        }
+
+        return $factory->of($class, $name)->create()->{$relationshipKey};
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
