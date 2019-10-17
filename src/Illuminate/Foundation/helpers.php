@@ -519,16 +519,16 @@ if (! function_exists('factoryRelation')) {
 
         $arguments = func_get_args();
 
-        list($class, $name, $deferred, $relationshipKey) = [$arguments[0], 'default', true, null];
+        [$class, $name, $relationshipKey] = [$arguments[0], 'default', null];
 
         if (is_array($arguments[0])) {
             if (count($arguments[0]) === 1) {
                 $arguments[0] = \Illuminate\Support\Arr::flatten($arguments[0]);
             }
-            list($class, $name) = $arguments[0];
+            [$class, $name] = $arguments[0];
         }
 
-        $deferred = isset($arguments[1]) && is_bool($arguments[1])? $arguments[1] : true;
+        $deferred = isset($arguments[1]) && is_bool($arguments[1]) ? $arguments[1] : true;
 
         if (isset($arguments[1]) && is_string($arguments[1])) {
             $relationshipKey = $arguments[1];
