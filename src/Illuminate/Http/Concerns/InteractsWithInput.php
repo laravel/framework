@@ -92,6 +92,19 @@ trait InteractsWithInput
     }
 
     /**
+     * Determine if the request contains a given input item key.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        return ! $this->has($keys);
+    }
+
+    /**
      * Determine if the request contains any of the given inputs.
      *
      * @param  string|array  $keys
