@@ -176,7 +176,7 @@ class RouteCollection implements Countable, IteratorAggregate
             return $this->getRouteForMethods($request, $others);
         }
 
-        throw new NotFoundHttpException;
+        throw new NotFoundHttpException("Route not found.");
     }
 
     /**
