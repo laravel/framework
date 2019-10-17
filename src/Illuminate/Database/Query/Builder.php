@@ -311,8 +311,6 @@ class Builder
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
      * @return array
-     *
-     * @throws \InvalidArgumentException
      */
     protected function createSub($query)
     {
@@ -540,8 +538,6 @@ class Builder
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
-     *
-     * @throws \InvalidArgumentException
      */
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
     {
@@ -585,8 +581,6 @@ class Builder
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
-     *
-     * @throws \InvalidArgumentException
      */
     public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
     {
@@ -2673,8 +2667,6 @@ class Builder
      * @param  array  $columns
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @return int
-     *
-     * @throws \InvalidArgumentException
      */
     public function insertUsing(array $columns, $query)
     {
