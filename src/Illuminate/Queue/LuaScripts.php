@@ -93,6 +93,34 @@ LUA;
     }
 
     /**
+     * Get the Lua script for requeuing reserved jobs.
+     *
+     * KEYS[1] - The "delayed" queue we release jobs onto, for example: queues:foo:delayed
+     * KEYS[2] - The queue the jobs are currently on, for example: queues:foo:reserved
+     * ARGV[1] - The raw payload of the job to add to the "delayed" queue
+     * ARGV[2] - The UNIX timestamp at which the job should become available
+     *
+     * @return string
+     */
+    public static function requeue()
+    {
+        return <<<'LUA'
+local reserved = false
+
+-- Remove the job from the current queue...
+redis.call('zrem', KEYS[2], ARGV[1])
+
+-- Add the job onto the "delayed" queue...
+reserved = cjson.decode(ARGV[1])
+reserved['attempts'] = reserved['attempts'] - 1
+reserved = cjson.encode(reserved)
+redis.call('zadd', KEYS[1], ARGV[2], reserved)
+
+return true
+LUA;
+    }
+
+    /**
      * Get the Lua script to migrate expired jobs back onto the queue.
      *
      * KEYS[1] - The queue we are removing jobs from, for example: queues:foo:reserved

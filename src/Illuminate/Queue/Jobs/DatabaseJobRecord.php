@@ -39,6 +39,18 @@ class DatabaseJobRecord
     }
 
     /**
+     * Decrement the number of times the job has been attempted.
+     *
+     * @return int
+     */
+    public function decrement()
+    {
+        $this->record->attempts--;
+
+        return $this->record->attempts;
+    }
+
+    /**
      * Update the "reserved at" timestamp of the job.
      *
      * @return int
