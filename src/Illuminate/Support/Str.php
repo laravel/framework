@@ -13,20 +13,6 @@ class Str
     use Macroable;
 
     /**
-     * The cache of camel-cased words.
-     *
-     * @var array
-     */
-    protected static $camelCache = [];
-
-    /**
-     * The cache of human-readable words.
-     *
-     * @var array
-     */
-    protected static $humanCache = [];
-
-    /**
      * The cache of snake-cased words.
      *
      * @var array
@@ -34,11 +20,26 @@ class Str
     protected static $snakeCache = [];
 
     /**
+     * The cache of camel-cased words.
+     *
+     * @var array
+     */
+    protected static $camelCache = [];
+
+
+    /**
      * The cache of studly-cased words.
      *
      * @var array
      */
     protected static $studlyCache = [];
+
+    /**
+     * The cache of human-readable words.
+     *
+     * @var array
+     */
+    protected static $humanCache = [];
 
     /**
      * The callback that should be used to generate UUIDs.
