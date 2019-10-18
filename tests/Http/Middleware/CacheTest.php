@@ -95,7 +95,7 @@ class CacheTest extends TestCase
         $this->assertSame($time, $response->getLastModified()->getTimestamp());
     }
 
-    public function testLastModifiedStringDate() 
+    public function testLastModifiedStringDate()
     {
         $birthdate = '1973-04-09 10:10:10';
         $response = (new Cache)->handle(new Request, function () {
