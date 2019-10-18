@@ -85,6 +85,21 @@ class UrlSigningTest extends TestCase
         $this->assertIsString($url = URL::signedRoute('foo', $model));
         $this->assertSame('routable', $this->get($url)->original);
     }
+
+    public function testSignedUrlMiddlewareWithRelativePath()
+    {
+        Route::get('/foo/ipsum', function () {
+            return 'works';
+        })->name('foo')->middleware('signed:relative');
+
+        $this->assertEquals(
+            'works',
+            $this->get(url('https://fake.test'.URL::signedRoute('foo', [], null, false)))->original
+        );
+
+        $response = $this->get('/foo/ipsum');
+        $response->assertStatus(403);
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable

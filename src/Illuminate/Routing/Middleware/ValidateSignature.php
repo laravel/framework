@@ -12,13 +12,15 @@ class ValidateSignature
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
+     * @param  \string|\null $relative Should be the word "relative" or null.
      * @return \Illuminate\Http\Response
      *
      * @throws \Illuminate\Routing\Exceptions\InvalidSignatureException
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $relative = null)
     {
-        if ($request->hasValidSignature()) {
+        // Consumers of the middleware can use the syntax "signed:relative".
+        if ($request->hasValidSignature($relative !== 'relative')) {
             return $next($request);
         }
 
