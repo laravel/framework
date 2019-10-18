@@ -342,22 +342,9 @@ class Builder
             return [$query, []];
         } else {
             throw new InvalidArgumentException(
-                'The subquery must be an instance of Closure or Builder, or a string.'
+                'A subquery must be a query builder instance, a Closure, or a string.'
             );
         }
-    }
-
-    /**
-     * Determine if the value is a query builder instance or a closure.
-     *
-     * @param  mixed  $value
-     * @return bool
-     */
-    protected function isQueryable($value)
-    {
-        return $value instanceof self ||
-               $value instanceof EloquentBuilder ||
-               $value instanceof Closure;
     }
 
     /**
@@ -2960,6 +2947,19 @@ class Builder
         $this->useWritePdo = true;
 
         return $this;
+    }
+
+    /**
+     * Determine if the value is a query builder instance or a Closure.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isQueryable($value)
+    {
+        return $value instanceof self ||
+               $value instanceof EloquentBuilder ||
+               $value instanceof Closure;
     }
 
     /**
