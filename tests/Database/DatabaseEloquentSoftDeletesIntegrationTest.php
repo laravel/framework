@@ -238,10 +238,12 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->createUsers();
 
         $result = SoftDeletesTestUser::findOrNew(1);
-        $this->assertNull($result->id);
+        $this->assertEquals(1, $result->id);
+        $this->assertNull($result->email);
 
         $result = SoftDeletesTestUser::withTrashed()->findOrNew(1);
         $this->assertEquals(1, $result->id);
+        $this->assertEquals('taylorotwell@gmail.com', $result->email);
     }
 
     public function testFirstOrCreate()

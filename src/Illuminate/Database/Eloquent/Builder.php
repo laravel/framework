@@ -386,7 +386,7 @@ class Builder
             return $model;
         }
 
-        return $this->newModelInstance();
+        return $this->newModelInstance([$this->model->getKeyName() => $id]);
     }
 
     /**

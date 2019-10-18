@@ -435,7 +435,7 @@ class BelongsToMany extends Relation
     public function findOrNew($id, $columns = ['*'])
     {
         if (is_null($instance = $this->find($id, $columns))) {
-            $instance = $this->related->newInstance();
+            $instance = $this->related->newInstance([$this->related->getKeyName() => $id]);
         }
 
         return $instance;

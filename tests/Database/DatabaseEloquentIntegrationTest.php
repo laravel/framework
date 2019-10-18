@@ -355,6 +355,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $user1 = EloquentTestUser::on('second_connection')->findOrNew(1);
         $user2 = EloquentTestUser::on('second_connection')->findOrNew(2);
+        $this->assertEquals(1, $user1->id);
+        $this->assertEquals(2, $user2->id);
         $this->assertFalse($user1->exists);
         $this->assertTrue($user2->exists);
         $this->assertSame('second_connection', $user1->getConnectionName());
