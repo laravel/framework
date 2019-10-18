@@ -5,9 +5,9 @@ namespace Illuminate\Tests\Http\Middleware;
 use Illuminate\Http\Middleware\SetCacheHeaders as Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Carbon;
 
 class CacheTest extends TestCase
 {
@@ -86,7 +86,7 @@ class CacheTest extends TestCase
 
     public function testLastModifiedUnixTime()
     {
-        $time=time();
+        $time = time();
 
         $response = (new Cache)->handle(new Request, function () {
             return new Response('some content');
@@ -95,13 +95,13 @@ class CacheTest extends TestCase
         $this->assertSame($time, $response->getLastModified()->getTimestamp());
     }
 
-    public function testLastModifiedStringDate() {
-        $birthdate='1973-04-09 10:10:10';
+    public function testLastModifiedStringDate() 
+    {
+        $birthdate = '1973-04-09 10:10:10';
         $response = (new Cache)->handle(new Request, function () {
             return new Response('some content');
         }, "last_modified=$birthdate");
 
         $this->assertSame(Carbon::parse($birthdate)->timestamp, $response->getLastModified()->getTimestamp());
     }
-
 }
