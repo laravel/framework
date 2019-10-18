@@ -82,4 +82,25 @@ class CacheTest extends TestCase
             return new Response('some content');
         }, 'invalid');
     }
+    
+    public function testLastModifiedUnixTime()
+    {
+        $time=time();
+
+        $response = (new Cache)->handle(new Request, function () {
+            return new Response('some content');
+        }, "last_modified=$time");
+
+        $this->assertSame($time, $response->getLastModified()->getTimestamp());
+    }
+
+    public function testLastModifiedStringDate() {
+        $birthdate='1973-04-09 10:10:10';
+        $response = (new Cache)->handle(new Request, function () {
+            return new Response('some content');
+        }, "last_modified=$birthdate");
+
+        $this->assertSame(Carbon::parse($birthdate)->timestamp, $response->getLastModified()->getTimestamp());
+    }
+
 }
