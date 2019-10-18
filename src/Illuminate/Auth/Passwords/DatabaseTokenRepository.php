@@ -156,7 +156,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function recentlyCreated(CanResetPasswordContract $user)
     {
-        $record = (array)$this->getTable()->where(
+        $record = (array) $this->getTable()->where(
             'email', $user->getEmailForPasswordReset()
         )->first();
 
