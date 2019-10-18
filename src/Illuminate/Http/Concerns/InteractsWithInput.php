@@ -92,7 +92,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the request contains a given input item key.
+     * Determine if the request is missing a given input item key.
      *
      * @param  string|array  $key
      * @return bool
