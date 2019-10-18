@@ -26,7 +26,6 @@ class Str
      */
     protected static $camelCache = [];
 
-
     /**
      * The cache of studly-cased words.
      *
