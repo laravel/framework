@@ -35,6 +35,13 @@ interface PasswordBroker
     const INVALID_TOKEN = 'passwords.token';
 
     /**
+     * Constant representing the wait before password reset link resending.
+     *
+     * @var string
+     */
+    const RESEND_TIMEOUT = 'passwords.timeout';
+
+    /**
      * Send a password reset link to a user.
      *
      * @param  array  $credentials
