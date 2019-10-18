@@ -190,7 +190,7 @@ class Str
             return static::$humanCache[$key];
         }
 
-        $value = Str::snake($value);
+        $value = static::snake($value);
 
         $value = str_replace(['-', '_'], ' ', $value);
 
