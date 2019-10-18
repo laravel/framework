@@ -46,6 +46,13 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     protected $expires;
 
     /**
+     * Minimum number of seconds before re-redefining the token.
+     *
+     * @var int
+     */
+    protected $timeout;
+
+    /**
      * Create a new token repository instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -53,15 +60,17 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  string  $table
      * @param  string  $hashKey
      * @param  int  $expires
+     * @param  int $timeout
      * @return void
      */
     public function __construct(ConnectionInterface $connection, HasherContract $hasher,
-                                $table, $hashKey, $expires = 60)
+                                $table, $hashKey, $expires = 60, $timeout = 60)
     {
         $this->table = $table;
         $this->hasher = $hasher;
         $this->hashKey = $hashKey;
         $this->expires = $expires * 60;
+        $this->timeout = $timeout;
         $this->connection = $connection;
     }
 
@@ -137,6 +146,32 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     protected function tokenExpired($createdAt)
     {
         return Carbon::parse($createdAt)->addSeconds($this->expires)->isPast();
+    }
+
+    /**
+     * Determine if a token record exists and was recently created.
+     *
+     * @param \Illuminate\Contracts\Auth\CanResetPassword $user
+     * @return bool
+     */
+    public function recentlyCreated(CanResetPasswordContract $user)
+    {
+        $record = (array) $this->getTable()->where(
+            'email', $user->getEmailForPasswordReset()
+        )->first();
+
+        return $record && $this->tokenRecentlyCreated($record['created_at']);
+    }
+
+    /**
+     * Determine if the token was recently created.
+     *
+     * @param string $createdAt
+     * @return bool
+     */
+    protected function tokenRecentlyCreated($createdAt)
+    {
+        return Carbon::parse($createdAt)->addSeconds($this->timeout)->isFuture();
     }
 
     /**
