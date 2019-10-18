@@ -194,7 +194,7 @@ class Str
 
         $value = str_replace(['-', '_'], ' ', $value);
 
-        return static::$humanCache[$key] = static::title($value);
+        return static::$humanCache[$key] = static::ucfirst($value);
     }
 
     /**

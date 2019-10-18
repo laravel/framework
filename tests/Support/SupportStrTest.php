@@ -307,11 +307,11 @@ class SupportStrTest extends TestCase
 
     public function testHuman()
     {
-        $this->assertSame('Taylor Otwell', Str::human('taylor otwell'));
-        $this->assertSame('Taylor Otwell', Str::human('taylor-otwell'));
-        $this->assertSame('Taylor Otwell', Str::human('taylor_otwell'));
-        $this->assertSame('Taylor Otwell', Str::human('taylorOtwell'));
-        $this->assertSame('Taylor Otwell', Str::human('TaylorOtwell'));
+        $this->assertSame('Taylor otwell', Str::human('taylor otwell'));
+        $this->assertSame('Taylor otwell', Str::human('taylor-otwell'));
+        $this->assertSame('Taylor otwell', Str::human('taylor_otwell'));
+        $this->assertSame('Taylor otwell', Str::human('taylorOtwell'));
+        $this->assertSame('Taylor otwell', Str::human('TaylorOtwell'));
     }
 
     public function testStudly()
