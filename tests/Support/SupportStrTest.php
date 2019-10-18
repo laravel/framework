@@ -305,6 +305,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
+    public function testHuman()
+    {
+        $this->assertSame('Taylor Otwell', Str::human('taylor otwell'));
+        $this->assertSame('Taylor Otwell', Str::human('taylor-otwell'));
+        $this->assertSame('Taylor Otwell', Str::human('taylor_otwell'));
+        $this->assertSame('Taylor Otwell', Str::human('taylorOtwell'));
+        $this->assertSame('Taylor Otwell', Str::human('TaylorOtwell'));
+    }
+
     public function testStudly()
     {
         $this->assertSame('LaravelPHPFramework', Str::studly('laravel_p_h_p_framework'));

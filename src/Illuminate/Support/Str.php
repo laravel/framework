@@ -13,18 +13,25 @@ class Str
     use Macroable;
 
     /**
-     * The cache of snake-cased words.
-     *
-     * @var array
-     */
-    protected static $snakeCache = [];
-
-    /**
      * The cache of camel-cased words.
      *
      * @var array
      */
     protected static $camelCache = [];
+
+    /**
+     * The cache of human-readable words.
+     *
+     * @var array
+     */
+    protected static $humanCache = [];
+
+    /**
+     * The cache of snake-cased words.
+     *
+     * @var array
+     */
+    protected static $snakeCache = [];
 
     /**
      * The cache of studly-cased words.
@@ -167,6 +174,29 @@ class Str
         $quoted = preg_quote($cap, '/');
 
         return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
+    }
+
+    /**
+     * Make a string human readable.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function human($value)
+    {
+        $key = $value;
+
+        if (isset(static::$humanCache[$key])) {
+            return static::$humanCache[$key];
+        }
+
+        $value = Str::snake($value);
+
+        $value = str_replace(['-', '_'], ' ', $value);
+
+        $value = static::title($value);
+
+        return static::$humanCache[$key] = $value;
     }
 
     /**
