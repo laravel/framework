@@ -31,6 +31,18 @@ class SetCacheHeaders
         if (isset($options['etag']) && $options['etag'] === true) {
             $options['etag'] = md5($response->getContent());
         }
+        
+        if (isset($options['last_modified']))
+		{
+			if (is_numeric($options['last_modified'])) 
+			{
+                $options['last_modified']=new \DateTime('@'.$options['last_modified']);
+			}
+			else
+			{
+                $options['last_modified']=new \DateTime($options['last_modified']);						
+			}
+        }        
 
         $response->setCache($options);
         $response->isNotModified($request);
