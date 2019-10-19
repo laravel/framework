@@ -29,6 +29,16 @@ class NullFailedJobProvider implements FailedJobProviderInterface
     }
 
     /**
+     * Get a list of ids from all the failed jobs.
+     *
+     * @return array
+     */
+    public function ids()
+    {
+        return [];
+    }
+
+    /**
      * Get a single failed job.
      *
      * @param  mixed  $id

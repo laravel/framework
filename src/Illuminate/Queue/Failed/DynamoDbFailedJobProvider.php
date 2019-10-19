@@ -111,6 +111,29 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     }
 
     /**
+     * Get a list of ids from all the failed jobs.
+     *
+     * @return array
+     */
+    public function ids()
+    {
+        $results = $this->dynamo->query([
+            'TableName' => $this->table,
+            'Select' => 'SPECIFIC_ATTRIBUTES',
+            'ProjectionExpression' => 'uuid',
+            'KeyConditionExpression' => 'application = :application',
+            'ExpressionAttributeValues' => [
+                ':application' => ['S' => $this->applicationName],
+            ],
+            'ScanIndexForward' => false,
+        ]);
+
+        return collect($results['Items'])->map(function ($result) {
+            return $result['uuid']['S'];
+        })->all();
+    }
+
+    /**
      * Get a single failed job.
      *
      * @param  mixed  $id
