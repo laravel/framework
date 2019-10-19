@@ -1112,7 +1112,7 @@ trait HasAttributes
         $dirty = [];
 
         foreach ($this->getAttributes() as $key => $value) {
-            if (! $this->originalIsEquivalent($key, $value)) {
+            if (! $this->originalIsEquivalent($key)) {
                 $dirty[$key] = $value;
             }
         }
@@ -1134,10 +1134,9 @@ trait HasAttributes
      * Determine if the new and old values for a given key are equivalent.
      *
      * @param  string $key
-     * @param  mixed  $current
      * @return bool
      */
-    public function originalIsEquivalent($key, $current)
+    public function originalIsEquivalent($key)
     {
         if (! array_key_exists($key, $this->original)) {
             return false;
