@@ -43,6 +43,15 @@ class QueueRedisJobTest extends TestCase
         $job->release(1);
     }
 
+    public function testRequeueProperlyReleasesJobOntoRedis()
+    {
+        $job = $this->getJob();
+        $job->getRedisQueue()->shouldReceive('deleteAndRequeue')->once()
+            ->with('default', $job, 1);
+
+        $job->requeue(1);
+    }
+
     protected function getJob()
     {
         return new RedisJob(
