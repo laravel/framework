@@ -78,6 +78,16 @@ class Pipeline implements PipelineContract
     }
 
     /**
+     * Get the array of pipes.
+     *
+     * @return array
+     */
+    protected function pipes()
+    {
+        return $this->pipes;
+    }
+
+    /**
      * Set the method to call on the pipes.
      *
      * @param  string  $method
@@ -99,7 +109,7 @@ class Pipeline implements PipelineContract
     public function then(Closure $destination)
     {
         $pipeline = array_reduce(
-            array_reverse($this->pipes), $this->carry(), $this->prepareDestination($destination)
+            array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
         );
 
         return $pipeline($this->passable);
