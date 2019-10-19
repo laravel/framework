@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 
 class RetryCommand extends Command
 {
