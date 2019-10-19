@@ -91,7 +91,7 @@ class EloquentModelStringCastingTest extends TestCase
         $this->assertSame('[]', $model->getOriginal('json_attributes'));
         $this->assertSame([], $model->getAttribute('json_attributes'));
 
-        $this->assertSame('[]', $model->getOriginal('object_attributes'));
+        $this->assertSame('{}', $model->getOriginal('object_attributes'));
         $this->assertSame([], $model->getAttribute('object_attributes'));
     }
 
