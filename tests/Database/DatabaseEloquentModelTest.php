@@ -1653,6 +1653,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('1969-07-20 00:00:00', $arr['dateAttribute']);
     }
 
+    public function testModelEmptyObjectAttributeCastingReturnsEmptyObjectJson()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->objectAttribute = [];
+        $this->assertSame('{}', $model->objectAttributeValue());
+    }
+
     public function testModelAttributeCastingPreservesNull()
     {
         $model = new EloquentModelCastingStub;
@@ -2295,6 +2302,11 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    public function objectAttributeValue()
+    {
+        return $this->attributes['objectAttribute'];
     }
 }
 
