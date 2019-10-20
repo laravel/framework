@@ -90,7 +90,7 @@ trait HasAttributes
         // to a DateTime / Carbon instance. This is so we will get some consistent
         // formatting while accessing attributes vs. arraying / JSONing a model.
         $attributes = $this->addDateAttributesToArray(
-            $attributes = $this->getArrayableAttributes()
+            $attributes = $this->getArrayableItems($this->attributes)
         );
 
         $attributes = $this->addMutatedAttributesToArray(
@@ -205,16 +205,6 @@ trait HasAttributes
     }
 
     /**
-     * Get an attribute array of all arrayable attributes.
-     *
-     * @return array
-     */
-    protected function getArrayableAttributes()
-    {
-        return $this->getArrayableItems($this->attributes);
-    }
-
-    /**
      * Get all of the appendable values that are arrayable.
      *
      * @return array
@@ -239,7 +229,7 @@ trait HasAttributes
     {
         $attributes = [];
 
-        foreach ($this->getArrayableRelations() as $key => $value) {
+        foreach ($this->getArrayableItems($this->relations) as $key => $value) {
             // If the values implements the Arrayable interface we can just call this
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
@@ -272,16 +262,6 @@ trait HasAttributes
         }
 
         return $attributes;
-    }
-
-    /**
-     * Get an attribute array of all arrayable relations.
-     *
-     * @return array
-     */
-    protected function getArrayableRelations()
-    {
-        return $this->getArrayableItems($this->relations);
     }
 
     /**
@@ -341,7 +321,7 @@ trait HasAttributes
      */
     public function getAttributeValue($key)
     {
-        $value = $this->getAttributeFromArray($key);
+        $value = $this->attributes[$key] ?? null;
 
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
@@ -366,17 +346,6 @@ trait HasAttributes
         }
 
         return $value;
-    }
-
-    /**
-     * Get an attribute from the $attributes array.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    protected function getAttributeFromArray($key)
-    {
-        return $this->attributes[$key] ?? null;
     }
 
     /**
@@ -504,12 +473,12 @@ trait HasAttributes
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
             case 'date':
-                return $this->asDate($value);
+                return $this->asDateTime($value)->startOfDay();
             case 'datetime':
             case 'custom_datetime':
                 return $this->asDateTime($value);
             case 'timestamp':
-                return $this->asTimestamp($value);
+                return $this->asDateTime($value)->getTimestamp();
             default:
                 return $value;
         }
@@ -642,7 +611,7 @@ trait HasAttributes
     {
         [$key, $path] = explode('->', $key, 2);
 
-        $this->attributes[$key] = $this->asJson($this->getArrayAttributeWithValue(
+        $this->attributes[$key] = json_encode($this->getArrayAttributeWithValue(
             $path, $key, $value
         ));
 
@@ -685,7 +654,7 @@ trait HasAttributes
      */
     protected function castAttributeAsJson($key, $value)
     {
-        $value = $this->asJson($value);
+        $value = json_encode($value);
 
         if ($value === false) {
             throw JsonEncodingException::forAttribute(
@@ -694,17 +663,6 @@ trait HasAttributes
         }
 
         return $value;
-    }
-
-    /**
-     * Encode the given value as JSON.
-     *
-     * @param  mixed  $value
-     * @return string
-     */
-    protected function asJson($value)
-    {
-        return json_encode($value);
     }
 
     /**
@@ -749,17 +707,6 @@ trait HasAttributes
     protected function asDecimal($value, $decimals)
     {
         return number_format($value, $decimals, '.', '');
-    }
-
-    /**
-     * Return a timestamp as DateTime object with time set to 00:00:00.
-     *
-     * @param  mixed  $value
-     * @return \Illuminate\Support\Carbon
-     */
-    protected function asDate($value)
-    {
-        return $this->asDateTime($value)->startOfDay();
     }
 
     /**
@@ -835,17 +782,6 @@ trait HasAttributes
         return empty($value) ? $value : $this->asDateTime($value)->format(
             $this->getDateFormat()
         );
-    }
-
-    /**
-     * Return a timestamp as unix timestamp.
-     *
-     * @param  mixed  $value
-     * @return int
-     */
-    protected function asTimestamp($value)
-    {
-        return $this->asDateTime($value)->getTimestamp();
     }
 
     /**
