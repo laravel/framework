@@ -965,7 +965,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function newModelQuery()
     {
         return $this->newEloquentBuilder(
-            $this->newBaseQueryBuilder()
+            $this->getConnection()->query()
         )->setModel($this);
     }
 
@@ -1039,16 +1039,6 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function newEloquentBuilder($query)
     {
         return new Builder($query);
-    }
-
-    /**
-     * Get a new query builder instance for the connection.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    protected function newBaseQueryBuilder()
-    {
-        return $this->getConnection()->query();
     }
 
     /**
