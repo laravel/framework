@@ -27,7 +27,6 @@ use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use stdClass;
 
 class DatabaseEloquentModelTest extends TestCase
@@ -796,23 +795,6 @@ class DatabaseEloquentModelTest extends TestCase
         $array = $model->toArray();
 
         $this->assertEquals(['name' => 'Taylor'], $array);
-    }
-
-    public function testGetArrayableRelationsFunctionExcludeHiddenRelationships()
-    {
-        $model = new EloquentModelStub;
-
-        $class = new ReflectionClass($model);
-        $method = $class->getMethod('getArrayableRelations');
-        $method->setAccessible(true);
-
-        $model->setRelation('foo', ['bar']);
-        $model->setRelation('bam', ['boom']);
-        $model->setHidden(['foo']);
-
-        $array = $method->invokeArgs($model, []);
-
-        $this->assertSame(['bam' => ['boom']], $array);
     }
 
     public function testToArraySnakeAttributes()
