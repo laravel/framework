@@ -2,8 +2,12 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.3.0...6.x)
 
+### Added
+- Added `missing()` method to `Request` class ([#30320](https://github.com/laravel/framework/pull/30320))
+
 ### TODO:
-- Add autocomplete support for the Queue-Facade ([#30300](https://github.com/laravel/framework/pull/30300))
+- Improvements on subqueries ([#30307](https://github.com/laravel/framework/pull/30307), [3f3b621](https://github.com/laravel/framework/commit/3f3b6214cc3353156a490d88fc8f0c148da400d5))
+- Use exit code [1] when migration table not found ([#30321](https://github.com/laravel/framework/pull/30321))
 
 
 ## [v6.3.0 (2019-10-15)](https://github.com/laravel/framework/compare/v6.2.0...v6.3.0)
