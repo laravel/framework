@@ -586,7 +586,7 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         $command = $client->getCommand('putObject', array_merge([
             'Bucket' => $adapter->getBucket(),
-            'Key' => $adapter->getPathPrefix() . $path,
+            'Key' => $adapter->getPathPrefix().$path,
         ], $options));
 
         return (string) $client->createPresignedRequest(
