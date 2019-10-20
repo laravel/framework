@@ -754,12 +754,12 @@ class DatabaseEloquentModelTest extends TestCase
         $model->age = null;
         $model->password = 'password1';
         $model->setHidden(['password']);
-        $model->setRelation('names', new BaseCollection([
+        $model->setRelation('names', new Collection([
             new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
         ]));
         $model->setRelation('partner', new EloquentModelStub(['name' => 'abby']));
         $model->setRelation('group', null);
-        $model->setRelation('multi', new BaseCollection);
+        $model->setRelation('multi', new Collection);
         $array = $model->toArray();
 
         $this->assertIsArray($array);
@@ -844,7 +844,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->setRelation('barz', $relatedModel);
 
-        $model->setVisible(['barz.baz']);
+        $model->setVisible(['foo', 'barz', 'barz.baz']);
         $array = $model->toArray();
 
         $this->assertEquals(['foo' => 'foo', 'barz' => ['bar' => 'bar', 'baz' => 'baz']], $array);
@@ -853,7 +853,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testToArraySnakeAttributes()
     {
         $model = new EloquentModelStub;
-        $model->setRelation('namesList', new BaseCollection([
+        $model->setRelation('namesList', new Collection([
             new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
         ]));
         $array = $model->toArray();
@@ -862,7 +862,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('boom', $array['names_list'][1]['bam']);
 
         $model = new EloquentModelCamelStub;
-        $model->setRelation('namesList', new BaseCollection([
+        $model->setRelation('namesList', new Collection([
             new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
         ]));
         $array = $model->toArray();
