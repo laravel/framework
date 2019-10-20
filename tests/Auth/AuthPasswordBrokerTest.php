@@ -124,3 +124,16 @@ class AuthPasswordBrokerTest extends TestCase
         ];
     }
 }
+
+// Before 7.x we have to check the existence of a new method. In 7.x, this code must be removed.
+
+namespace Illuminate\Auth\Passwords;
+
+function method_exists($object, $method_name)
+{
+    if ($method_name == 'recentlyCreated') {
+        return true;
+    }
+
+    return \method_exists($object, $method_name);
+}
