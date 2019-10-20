@@ -239,11 +239,17 @@ trait HasAttributes
     {
         $attributes = [];
 
+        // Get visibility directives that should be set on the relations.
+		$nestedVisible = $this->getNestedVisibilityDirectives($this->getVisible());
+		$nestedHidden = $this->getNestedVisibilityDirectives($this->getHidden());
+
         foreach ($this->getArrayableRelations() as $key => $value) {
-            // If the values implements the Arrayable interface we can just call this
+            // If the values implements the Arrayable interface we will pass the
+            // nested visibility rules to the model or collection and call the
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
             if ($value instanceof Arrayable) {
+                $this->setNestedVisibilities($value, $nestedVisible[$key] ?? [], $nestedHidden[$key] ?? []);
                 $relation = $value->toArray();
             }
 
@@ -282,6 +288,40 @@ trait HasAttributes
     protected function getArrayableRelations()
     {
         return $this->getArrayableItems($this->relations);
+    }
+
+    /**
+     * Get visibility directives for relations.
+     *
+     * @return array
+     */
+    protected function getNestedVisibilityDirectives($directives)
+    {
+        // Put the directives in an array keyed by relation name and with the
+        // values containing an array that can be directly used in makeHidden
+        // and makeVisible methods.
+		$relationDirectives = [];
+
+		foreach ($directives as $key) {
+			$expandedKey = explode('.', $key, 2);
+
+			if (isset($expandedKey[1])) {
+				$relationDirectives[$expandedKey[0]][] = $expandedKey[1];
+			}
+		}
+
+		return $relationDirectives;
+    }
+
+    /**
+     * Set visibility directives on the relation.
+     *
+     * @return array
+     */
+    protected function setNestedVisibilities($value, $visible, $hidden)
+    {
+		$value->makeVisible($visible);
+		$value->makeHidden($hidden);
     }
 
     /**
