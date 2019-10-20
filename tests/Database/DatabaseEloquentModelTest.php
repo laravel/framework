@@ -815,6 +815,41 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(['bam' => ['boom']], $array);
     }
 
+    public function testNestedHiddenTricklesToRelationships()
+    {
+        $model = new EloquentModelStub;
+        $model->foo = 'foo';
+
+        $relatedModel = new EloquentModelStub;
+        $relatedModel->bar = 'bar';
+        $relatedModel->baz = 'baz';
+
+        $model->setRelation('barz', $relatedModel);
+
+        $model->setHidden(['barz.bar']);
+        $array = $model->toArray();
+
+        $this->assertEquals(['foo' => 'foo', 'barz' => ['baz' => 'baz']], $array);
+    }
+
+    public function testNestedVisibleTricklesToRelationships()
+    {
+        $model = new EloquentModelStub;
+        $model->foo = 'foo';
+
+        $relatedModel = new EloquentModelStub;
+        $relatedModel->bar = 'bar';
+        $relatedModel->baz = 'baz';
+        $relatedModel->setHidden(['baz']);
+
+        $model->setRelation('barz', $relatedModel);
+
+        $model->setVisible(['barz.baz']);
+        $array = $model->toArray();
+
+        $this->assertEquals(['foo' => 'foo', 'barz' => ['bar' => 'bar', 'baz' => 'baz']], $array);
+    }
+
     public function testToArraySnakeAttributes()
     {
         $model = new EloquentModelStub;
