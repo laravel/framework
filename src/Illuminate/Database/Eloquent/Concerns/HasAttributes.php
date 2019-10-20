@@ -240,8 +240,8 @@ trait HasAttributes
         $attributes = [];
 
         // Get visibility directives that should be set on the relations.
-		$nestedVisible = $this->getNestedVisibilityDirectives($this->getVisible());
-		$nestedHidden = $this->getNestedVisibilityDirectives($this->getHidden());
+        $nestedVisible = $this->getNestedVisibilityDirectives($this->getVisible());
+        $nestedHidden = $this->getNestedVisibilityDirectives($this->getHidden());
 
         foreach ($this->getArrayableRelations() as $key => $value) {
             // If the values implements the Arrayable interface we will pass the
@@ -300,17 +300,17 @@ trait HasAttributes
         // Put the directives in an array keyed by relation name and with the
         // values containing an array that can be directly used in makeHidden
         // and makeVisible methods.
-		$relationDirectives = [];
+        $relationDirectives = [];
 
-		foreach ($directives as $key) {
-			$expandedKey = explode('.', $key, 2);
+        foreach ($directives as $key) {
+            $expandedKey = explode('.', $key, 2);
 
-			if (isset($expandedKey[1])) {
-				$relationDirectives[$expandedKey[0]][] = $expandedKey[1];
-			}
-		}
+            if (isset($expandedKey[1])) {
+                $relationDirectives[$expandedKey[0]][] = $expandedKey[1];
+            }
+        }
 
-		return $relationDirectives;
+        return $relationDirectives;
     }
 
     /**
@@ -320,8 +320,8 @@ trait HasAttributes
      */
     protected function setNestedVisibilities($value, $visible, $hidden)
     {
-		$value->makeVisible($visible);
-		$value->makeHidden($hidden);
+        $value->makeVisible($visible);
+        $value->makeHidden($hidden);
     }
 
     /**
