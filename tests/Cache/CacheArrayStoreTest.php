@@ -194,31 +194,4 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertTrue($wannabeOwner->acquire());
     }
-
-    public function testItemsAreSerializedAndDeserialized()
-    {
-        $store = new ArrayStore();
-
-        $store->put('foo', new SerializableChecker(), 10);
-        $unserialized = $store->get('foo');
-
-        $this->assertTrue($unserialized->wasSerialized);
-    }
-}
-
-use Serializable;
-
-class SerializableChecker implements Serializable
-{
-    public $wasSerialized = false;
-
-    public function serialize()
-    {
-        return serialize('');
-    }
-
-    public function unserialize($serialized)
-    {
-        $this->wasSerialized = true;
-    }
 }

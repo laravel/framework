@@ -45,7 +45,7 @@ class ArrayStore extends TaggableStore implements LockProvider
             return;
         }
 
-        return unserialize($item['value']);
+        return $item['value'];
     }
 
     /**
@@ -59,7 +59,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function put($key, $value, $seconds)
     {
         $this->storage[$key] = [
-            'value' => serialize($value),
+            'value' => $value,
             'expiresAt' => $this->calculateExpiration($seconds),
         ];
 
@@ -77,7 +77,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     {
         if ($existing = $this->get($key)) {
             $incremented = ((int) $existing) + $value;
-            $this->storage[$key]['value'] = serialize($incremented);
+            $this->storage[$key]['value'] = $incremented;
 
             return $incremented;
         }
