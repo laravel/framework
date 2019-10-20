@@ -505,7 +505,7 @@ class BelongsToMany extends Relation
     public function find($id, $columns = ['*'])
     {
         return is_array($id) ? $this->findMany($id, $columns) : $this->where(
-            $this->getRelated()->getQualifiedKeyName(), '=', $id
+            $this->getRelated()->getQualifiedKeyName(), '=', $this->parseId($id)
         )->first($columns);
     }
 
@@ -519,7 +519,7 @@ class BelongsToMany extends Relation
     public function findMany($ids, $columns = ['*'])
     {
         return empty($ids) ? $this->getRelated()->newCollection() : $this->whereIn(
-            $this->getRelated()->getQualifiedKeyName(), $ids
+            $this->getRelated()->getQualifiedKeyName(), $this->parseIds($ids)
         )->get($columns);
     }
 
