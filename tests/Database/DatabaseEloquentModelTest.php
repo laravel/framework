@@ -27,7 +27,6 @@ use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use stdClass;
 
 class DatabaseEloquentModelTest extends TestCase
