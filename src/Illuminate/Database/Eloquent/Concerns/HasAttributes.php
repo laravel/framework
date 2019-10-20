@@ -685,7 +685,8 @@ trait HasAttributes
      */
     protected function castAttributeAsJson($key, $value)
     {
-        $value = $this->asJson($value);
+        $asObject = $this->hasCast($key, ['object']);
+        $value = $this->asJson($value, $asObject);
 
         if ($value === false) {
             throw JsonEncodingException::forAttribute(
@@ -700,11 +701,12 @@ trait HasAttributes
      * Encode the given value as JSON.
      *
      * @param  mixed  $value
+     * @param  bool  $asObject
      * @return string
      */
-    protected function asJson($value)
+    protected function asJson($value, $asObject = false)
     {
-        return json_encode($value);
+        return json_encode($value, $asObject ? JSON_FORCE_OBJECT : null);
     }
 
     /**
