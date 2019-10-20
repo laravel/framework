@@ -545,6 +545,57 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Get a presigned URL to allow upload of a file at the given path.
+     *
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function presignedUrl($path, $expiration, array $options = [])
+    {
+        $adapter = $this->driver->getAdapter();
+
+        if ($adapter instanceof CachedAdapter) {
+            $adapter = $adapter->getAdapter();
+        }
+
+        if (method_exists($adapter, 'getPresignedUrl')) {
+            return $adapter->getPresignedUrl($path, $expiration, $options);
+        } elseif ($adapter instanceof AwsS3Adapter) {
+            return $this->getAwsPresignedUrl($adapter, $path, $expiration, $options);
+        } else {
+            throw new RuntimeException('This driver does not support creating presigned URLs.');
+        }
+    }
+
+    /**
+     * Get a presigned URL to allow upload of a file at the given path.
+     *
+     * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getAwsPresignedUrl($adapter, $path, $expiration, $options)
+    {
+        $client = $adapter->getClient();
+
+        $command = $client->getCommand('putObject', array_merge([
+            'Bucket' => $adapter->getBucket(),
+            'Key' => $adapter->getPathPrefix() . $path,
+        ], $options));
+
+        return (string) $client->createPresignedRequest(
+            $command,
+            $expiration
+        )->getUri();
+    }
+
+    /**
      * Concatenate a path to a URL.
      *
      * @param  string $url
