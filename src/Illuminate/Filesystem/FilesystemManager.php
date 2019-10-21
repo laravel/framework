@@ -112,6 +112,7 @@ class FilesystemManager implements FactoryContract
     protected function resolve($name)
     {
         $config = $this->getConfig($name);
+
         $name = $config['driver'] ?? $name;
 
         if (isset($this->customCreators[$name])) {
