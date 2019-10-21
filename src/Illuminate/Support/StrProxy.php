@@ -3,7 +3,7 @@
 namespace Illuminate\Support;
 
 /**
- * Class StrProxy
+ * Class StrProxy.
  *
  * @method \Illuminate\Support\StrProxy after(string $search)
  * @method \Illuminate\Support\StrProxy ascii(string $language = 'en')
