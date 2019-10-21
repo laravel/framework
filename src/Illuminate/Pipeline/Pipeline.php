@@ -78,16 +78,6 @@ class Pipeline implements PipelineContract
     }
 
     /**
-     * Get the array of pipes.
-     *
-     * @return array
-     */
-    protected function pipes()
-    {
-        return $this->pipes;
-    }
-
-    /**
      * Set the method to call on the pipes.
      *
      * @param  string  $method
@@ -206,6 +196,16 @@ class Pipeline implements PipelineContract
         }
 
         return [$name, $parameters];
+    }
+
+    /**
+     * Get the array of configured pipes.
+     *
+     * @return array
+     */
+    protected function pipes()
+    {
+        return $this->pipes;
     }
 
     /**
