@@ -147,6 +147,22 @@ class FoundationTestResponseTest extends TestCase
         $response->assertOk();
     }
 
+    public function testAssertCreated()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] does not match expected 201 status code.');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertCreated();
+    }
+
     public function testAssertNotFound()
     {
         $statusCode = 500;
