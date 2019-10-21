@@ -55,6 +55,16 @@ class PasswordBroker implements PasswordBrokerContract
             return static::INVALID_USER;
         }
 
+        // Before 7.x we have to check the existence of a new method.
+        // In 7.x, this code must be removed.
+        if (method_exists($this->tokens, 'recentlyCreated')) {
+            // An attacker can make a lot of password reset requests,
+            // which will lead to spam in user's mailbox.
+            if ($this->tokens->recentlyCreated($user)) {
+                return static::RESEND_TIMEOUT;
+            }
+        }
+
         // Once we have the reset token, we are ready to send the message out to this
         // user with a link to reset their password. We will then redirect back to
         // the current URI having nothing set in the session to indicate errors.

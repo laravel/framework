@@ -95,7 +95,10 @@ class PasswordBrokerManager implements FactoryContract
             $this->app['hash'],
             $config['table'],
             $key,
-            $config['expire']
+            $config['expire'],
+            // Before 7.x this element in the configuration may not exist.
+            // In 7.x, this check must be removed.
+            $config['timeout'] ?? 0
         );
     }
 
