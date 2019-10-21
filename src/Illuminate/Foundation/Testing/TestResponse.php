@@ -169,6 +169,23 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has a 429 Too Many Requests status code.
+     *
+     * @return $this
+     */
+    public function assertTooManyRequests()
+    {
+        $actual = $this->getStatusCode();
+
+        PHPUnit::assertTrue(
+            429 === $actual,
+            'Response status code ['.$actual.'] does not match expected 429 Too Many Requests status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
