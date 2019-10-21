@@ -55,8 +55,7 @@ class PasswordBroker implements PasswordBrokerContract
             return static::INVALID_USER;
         }
 
-        if (method_exists($this->tokens, 'recentlyCreatedToken') &&
-            $this->tokens->recentlyCreatedToken($user)) {
+        if ($this->tokens->recentlyCreatedToken($user)) {
             return static::RESET_THROTTLED;
         }
 

@@ -32,7 +32,6 @@ class AuthPasswordBrokerTest extends TestCase
     public function testIfTokenIsRecentlyCreated()
     {
         $mocks = $this->getMocks();
-        $mocks['tokens'] = m::mock(TestTokenRepositoryInterface::class);
         $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(true);
@@ -65,6 +64,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks = $this->getMocks();
         $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
+        $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(false);
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
@@ -123,12 +123,4 @@ class AuthPasswordBrokerTest extends TestCase
             'view'   => 'resetLinkView',
         ];
     }
-}
-
-// Before 7.x we have to check the existence of a new method. In 7.x, this code must be moved to
-// Illuminate\Auth\Passwords\TokenRepositoryInterface
-
-interface TestTokenRepositoryInterface extends TokenRepositoryInterface
-{
-    public function recentlyCreatedToken(CanResetPassword $user);
 }
