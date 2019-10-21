@@ -306,6 +306,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
+        // prevent breaking changes
+        $this->assertSame('foo-bar', Str::snake('foo-bar'));
+        $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
+        $this->assertSame('foo__bar', Str::snake('Foo_Bar'));
+        $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
     public function testStudly()

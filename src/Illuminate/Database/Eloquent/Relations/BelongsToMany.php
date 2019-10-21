@@ -510,7 +510,7 @@ class BelongsToMany extends Relation
         }
 
         return $this->where(
-            $this->getRelated()->getQualifiedKeyName(), '=', $id
+            $this->getRelated()->getQualifiedKeyName(), '=', $this->parseId($id)
         )->first($columns);
     }
 
@@ -530,7 +530,7 @@ class BelongsToMany extends Relation
         }
 
         return $this->whereIn(
-            $this->getRelated()->getQualifiedKeyName(), $ids
+            $this->getRelated()->getQualifiedKeyName(), $this->parseIds($ids)
         )->get($columns);
     }
 

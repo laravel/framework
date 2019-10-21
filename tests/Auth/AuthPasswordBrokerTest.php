@@ -29,6 +29,18 @@ class AuthPasswordBrokerTest extends TestCase
         $this->assertEquals(PasswordBrokerContract::INVALID_USER, $broker->sendResetLink(['credentials']));
     }
 
+    public function testIfTokenIsRecentlyCreated()
+    {
+        $mocks = $this->getMocks();
+        $mocks['tokens'] = m::mock(TestTokenRepositoryInterface::class);
+        $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
+        $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(true);
+        $user->shouldReceive('sendPasswordResetNotification')->with('token');
+
+        $this->assertEquals(PasswordBrokerContract::RESET_THROTTLED, $broker->sendResetLink(['foo']));
+    }
+
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
     {
         $this->expectException(UnexpectedValueException::class);
@@ -54,12 +66,9 @@ class AuthPasswordBrokerTest extends TestCase
         $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
-        $callback = function () {
-            //
-        };
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
-        $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $callback));
+        $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo']));
     }
 
     public function testRedirectIsReturnedByResetWhenUserCredentialsInvalid()
@@ -114,4 +123,12 @@ class AuthPasswordBrokerTest extends TestCase
             'view'   => 'resetLinkView',
         ];
     }
+}
+
+// Before 7.x we have to check the existence of a new method. In 7.x, this code must be moved to
+// Illuminate\Auth\Passwords\TokenRepositoryInterface
+
+interface TestTokenRepositoryInterface extends TokenRepositoryInterface
+{
+    public function recentlyCreatedToken(CanResetPassword $user);
 }
