@@ -35,11 +35,11 @@ interface PasswordBroker
     const INVALID_TOKEN = 'passwords.token';
 
     /**
-     * Constant representing the wait before password reset link resending.
+     * Constant representing a throttled reset attempt.
      *
      * @var string
      */
-    const RESEND_TIMEOUT = 'passwords.timeout';
+    const RESET_THROTTLED = 'passwords.throttled';
 
     /**
      * Send a password reset link to a user.

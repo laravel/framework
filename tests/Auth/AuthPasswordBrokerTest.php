@@ -35,10 +35,10 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens'] = m::mock(TestTokenRepositoryInterface::class);
         $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
-        $mocks['tokens']->shouldReceive('recentlyCreated')->once()->with($user)->andReturn(true);
+        $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(true);
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
-        $this->assertEquals(PasswordBrokerContract::RESEND_TIMEOUT, $broker->sendResetLink(['foo']));
+        $this->assertEquals(PasswordBrokerContract::RESET_THROTTLED, $broker->sendResetLink(['foo']));
     }
 
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
@@ -130,5 +130,5 @@ class AuthPasswordBrokerTest extends TestCase
 
 interface TestTokenRepositoryInterface extends TokenRepositoryInterface
 {
-    public function recentlyCreated(CanResetPassword $user);
+    public function recentlyCreatedToken(CanResetPassword $user);
 }

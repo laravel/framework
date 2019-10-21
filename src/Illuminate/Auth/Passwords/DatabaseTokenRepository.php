@@ -50,7 +50,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      *
      * @var int
      */
-    protected $timeout;
+    protected $throttle;
 
     /**
      * Create a new token repository instance.
@@ -60,18 +60,19 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  string  $table
      * @param  string  $hashKey
      * @param  int  $expires
-     * @param  int $timeout
+     * @param  int  $throttle
      * @return void
      */
     public function __construct(ConnectionInterface $connection, HasherContract $hasher,
-                                $table, $hashKey, $expires = 60, $timeout = 60)
+                                $table, $hashKey, $expires = 60,
+                                $throttle = 60)
     {
         $this->table = $table;
         $this->hasher = $hasher;
         $this->hashKey = $hashKey;
         $this->expires = $expires * 60;
-        $this->timeout = $timeout;
         $this->connection = $connection;
+        $this->throttle = $throttle;
     }
 
     /**
@@ -149,12 +150,12 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     }
 
     /**
-     * Determine if a token record exists and was recently created.
+     * Determine if the given user recently created a password reset token.
      *
-     * @param \Illuminate\Contracts\Auth\CanResetPassword $user
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return bool
      */
-    public function recentlyCreated(CanResetPasswordContract $user)
+    public function recentlyCreatedToken(CanResetPasswordContract $user)
     {
         $record = (array) $this->getTable()->where(
             'email', $user->getEmailForPasswordReset()
@@ -166,12 +167,18 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Determine if the token was recently created.
      *
-     * @param string $createdAt
+     * @param  string  $createdAt
      * @return bool
      */
     protected function tokenRecentlyCreated($createdAt)
     {
-        return Carbon::parse($createdAt)->addSeconds($this->timeout)->isFuture();
+        if ($this->throttle <= 0) {
+            return false;
+        }
+
+        return Carbon::parse($createdAt)->addSeconds(
+            $this->throttle
+        )->isFuture();
     }
 
     /**

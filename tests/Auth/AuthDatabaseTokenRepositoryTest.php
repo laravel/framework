@@ -107,7 +107,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $user = m::mock(CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
 
-        $this->assertFalse($repo->recentlyCreated($user));
+        $this->assertFalse($repo->recentlyCreatedToken($user));
     }
 
     public function testRecentlyCreatedReturnsTrueIfRecordIsRecentlyCreated()
@@ -120,7 +120,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $user = m::mock(CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
 
-        $this->assertTrue($repo->recentlyCreated($user));
+        $this->assertTrue($repo->recentlyCreatedToken($user));
     }
 
     public function testRecentlyCreatedReturnsFalseIfValidRecordExists()
@@ -133,7 +133,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $user = m::mock(CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
 
-        $this->assertFalse($repo->recentlyCreated($user));
+        $this->assertFalse($repo->recentlyCreatedToken($user));
     }
 
     public function testDeleteMethodDeletesByToken()

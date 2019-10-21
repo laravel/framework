@@ -96,9 +96,7 @@ class PasswordBrokerManager implements FactoryContract
             $config['table'],
             $key,
             $config['expire'],
-            // Before 7.x this element in the configuration may not exist.
-            // In 7.x, this check must be removed.
-            $config['timeout'] ?? 0
+            $config['throttle'] ?? 0
         );
     }
 
