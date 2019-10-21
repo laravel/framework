@@ -263,6 +263,16 @@ class Str
     }
 
     /**
+     * Get a string proxy for the text passed.
+     *
+     * @return \Illuminate\Support\StrProxy
+     */
+    public static function make(string $text = ''): StrProxy
+    {
+        return new StrProxy($text);
+    }
+
+    /**
      * Limit the number of words in a string.
      *
      * @param  string  $value

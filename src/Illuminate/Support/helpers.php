@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
+use Illuminate\Support\StrProxy;
 
 if (! function_exists('append_config')) {
     /**
@@ -404,6 +405,19 @@ if (! function_exists('retry')) {
 
             goto beginning;
         }
+    }
+}
+
+if (! function_exists('str')) {
+    /**
+     * Create a String object from the given value.
+     *
+     * @param  string  $text
+     * @return \Illuminate\Support\StrProxy
+     */
+    function str($text = '')
+    {
+        return new StrProxy($text);
     }
 }
 
