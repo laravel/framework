@@ -117,7 +117,7 @@ class AuthPasswordBrokerTest extends TestCase
     protected function getMocks()
     {
         return [
-            'tokens' => m::mock(TokenRepositoryInterface::class),
+            'tokens' => m::mock(TestTokenRepositoryInterface::class),
             'users'  => m::mock(UserProvider::class),
             'mailer' => m::mock(Mailer::class),
             'view'   => 'resetLinkView',
@@ -125,15 +125,10 @@ class AuthPasswordBrokerTest extends TestCase
     }
 }
 
-// Before 7.x we have to check the existence of a new method. In 7.x, this code must be removed.
+// Before 7.x we have to check the existence of a new method. In 7.x, this code must be moved to
+// Illuminate\Auth\Passwords\TokenRepositoryInterface
 
-namespace Illuminate\Auth\Passwords;
-
-function method_exists($object, $method_name)
+interface TestTokenRepositoryInterface extends TokenRepositoryInterface
 {
-    if ($method_name == 'recentlyCreated') {
-        return true;
-    }
-
-    return \method_exists($object, $method_name);
+    public function recentlyCreated(CanResetPassword $user);
 }
