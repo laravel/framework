@@ -46,7 +46,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     protected $expires;
 
     /**
-     * Minimum number of seconds before re-redefining the token.
+     * Minimum number of seconds before redefining the token.
      *
      * @var int
      */
