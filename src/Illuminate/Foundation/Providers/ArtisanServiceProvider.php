@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use App\Console\Commands\AuthMakeCommand;
+use Illuminate\Auth\Console\AuthMakeCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
@@ -187,7 +187,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
             return new AuthMakeCommand;
         });
     }
-    
+
     /**
      * Register the command.
      *
