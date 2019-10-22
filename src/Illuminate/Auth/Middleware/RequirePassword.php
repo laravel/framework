@@ -46,6 +46,10 @@ class RequirePassword
     public function handle($request, Closure $next, $redirectToRoute = null)
     {
         if ($this->shouldConfirmPassword($request)) {
+            if ($request->expectsJson()) {
+                abort(423, 'Password confirmation required.');
+            }
+
             return $this->responseFactory->redirectGuest(
                 $this->urlGenerator->route($redirectToRoute ?? 'password.confirm')
             );
