@@ -442,8 +442,10 @@ class Dispatcher implements DispatcherContract
      */
     protected function handlerWantsToBeQueued($class, $arguments)
     {
-        if (method_exists($class, 'shouldQueue')) {
-            return $this->container->make($class)->shouldQueue($arguments[0]);
+        $instance = $this->container->make($class);
+
+        if (method_exists($instance, 'shouldQueue')) {
+            return $instance->shouldQueue($arguments[0]);
         }
 
         return true;
