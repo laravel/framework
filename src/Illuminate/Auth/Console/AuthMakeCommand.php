@@ -35,9 +35,11 @@ class AuthMakeCommand extends Command
             throw new InvalidArgumentException('Invalid preset.');
         }
 
+        $composer = $this->findComposer();
+
         $this->info('Running this command will install laravel/ui package.');
         $this->confirm('Would you like to proceed?');
-        $this->callSilent('composer require laravel/ui --dev');
+        $this->callSilent($composer.' require laravel/ui --dev');
 
         if ($this->option('auth')){
             $this->callSilent('php artisan ui '.$this->argument('scaffold').' --auth');
@@ -47,5 +49,19 @@ class AuthMakeCommand extends Command
             $this->callSilent('php artisan ui '.$this->argument('scaffold'));
             $this->info(ucfirst($this->argument('scaffold')).' scaffolding successfully installed.'); 
         }
+    }
+
+    /**
+     * Get the composer command for the environment.
+     *
+     * @return string
+     */
+    protected function findComposer()
+    {
+        $composerPath = getcwd().'/composer.phar';
+        if (file_exists($composerPath)) {
+            return '"'.PHP_BINARY.'" '.$composerPath;
+        }
+        return 'composer';
     }
 }
