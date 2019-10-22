@@ -21,7 +21,7 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
-        $viewFactory->shouldReceive('make')->with('mail::themes.default')->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail::themes.default', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
         $result = $markdown->render('view', []);
@@ -37,7 +37,7 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
-        $viewFactory->shouldReceive('make')->with('mail::themes.yaz')->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail::themes.yaz', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
         $result = $markdown->render('view', []);
