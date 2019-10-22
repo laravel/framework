@@ -13,7 +13,8 @@ class EventListCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'event:list {--event= : Filter the events by name}';
+    protected $signature = 'event:list {--event= : Filter the events by name}
+        {--sort : Sort the event listeners by name instead of execution order}';
 
     /**
      * The console command description.
@@ -58,6 +59,10 @@ class EventListCommand extends Command
         }
 
         return collect($events)->map(function ($listeners, $event) {
+            if ($this->option('sort')) {
+                sort($listeners);
+            }
+
             return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
         })->sortBy('Event')->values()->toArray();
     }
