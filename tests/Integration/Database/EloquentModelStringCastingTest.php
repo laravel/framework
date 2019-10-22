@@ -65,11 +65,11 @@ class EloquentModelStringCastingTest extends TestCase
             'json_attributes' => ['json_key'=>'json_value'],
             'object_attributes' => ['json_key'=>'json_value'],
         ]);
-        $this->assertSame(['key1'=>'value1'], $model->getOriginal('array_attributes'));
-        $this->assertSame(['key1'=>'value1'], $model->getAttribute('array_attributes'));
+        $this->assertSame(['key1' => 'value1'], $model->getOriginal('array_attributes'));
+        $this->assertSame(['key1' => 'value1'], $model->getAttribute('array_attributes'));
 
-        $this->assertSame(['json_key'=>'json_value'], $model->getOriginal('json_attributes'));
-        $this->assertSame(['json_key'=>'json_value'], $model->getAttribute('json_attributes'));
+        $this->assertSame(['json_key' => 'json_value'], $model->getOriginal('json_attributes'));
+        $this->assertSame(['json_key' => 'json_value'], $model->getAttribute('json_attributes'));
 
         $stdClass = new stdClass;
         $stdClass->json_key = 'json_value';
