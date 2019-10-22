@@ -130,7 +130,7 @@ class TestResponse
     {
         PHPUnit::assertTrue(
             $this->isNotFound(),
-            'Response status code ['.$this->getStatusCode().'] is not a not found status code.'
+            'Response status code ['.$this->getStatusCode().'] is not a 404 not found status code.'
         );
 
         return $this;
@@ -145,7 +145,7 @@ class TestResponse
     {
         PHPUnit::assertTrue(
             $this->isForbidden(),
-            'Response status code ['.$this->getStatusCode().'] is not a forbidden status code.'
+            'Response status code ['.$this->getStatusCode().'] is not a 403 forbidden status code.'
         );
 
         return $this;
@@ -162,7 +162,7 @@ class TestResponse
 
         PHPUnit::assertTrue(
             401 === $actual,
-            'Response status code ['.$actual.'] is not an unauthorized status code.'
+            'Response status code ['.$actual.'] is not a 401 unauthorized status code.'
         );
 
         return $this;
