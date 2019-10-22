@@ -168,7 +168,7 @@ class FoundationTestResponseTest extends TestCase
         $statusCode = 500;
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a not found status code.');
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a 404 not found status code.');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -184,7 +184,7 @@ class FoundationTestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a forbidden status code.');
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a 403 forbidden status code.');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -200,7 +200,7 @@ class FoundationTestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not an unauthorized status code.');
+        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a 401 unauthorized status code.');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
