@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
+use RuntimeException;
 
 trait RefreshDatabase
 {
@@ -13,6 +14,10 @@ trait RefreshDatabase
      */
     public function refreshDatabase()
     {
+        $env = config('app.env');
+        if($env === 'prod' || $env === 'production'){
+            throw new RuntimeException('Application In Production! Using RefreshDatabase will delete your data.');
+        }
         $this->usingInMemoryDatabase()
                         ? $this->refreshInMemoryDatabase()
                         : $this->refreshTestDatabase();
