@@ -198,7 +198,13 @@ class CacheManager implements FactoryContract
 
         $connection = $config['connection'] ?? 'default';
 
-        return $this->repository(new RedisStore($redis, $this->getPrefix($config), $connection));
+        if (isset($config['serializer']) && $config['serializer'] === 'igbinary') {
+            $store = new RedisStoreIgbinary($redis, $this->getPrefix($config), $connection);
+        } else {
+            $store = new RedisStore($redis, $this->getPrefix($config), $connection);
+        }
+
+        return $this->repository($store);
     }
 
     /**
