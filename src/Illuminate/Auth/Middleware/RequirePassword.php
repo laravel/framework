@@ -47,7 +47,9 @@ class RequirePassword
     {
         if ($this->shouldConfirmPassword($request)) {
             if ($request->expectsJson()) {
-                abort(423, 'Password confirmation required.');
+                return $this->responseFactory->json([
+                    'message' => 'Password confirmation required.'
+                ], 423);
             }
 
             return $this->responseFactory->redirectGuest(
