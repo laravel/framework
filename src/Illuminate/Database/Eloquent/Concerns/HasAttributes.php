@@ -295,7 +295,7 @@ trait HasAttributes
      *
      * @return array
      */
-    protected function getNestedVisibilityDirectives($directives)
+    protected function getNestedVisibilityDirectives(array $directives)
     {
         // Put the directives in an array keyed by relation name and with the
         // values containing an array that can be directly used in makeHidden
