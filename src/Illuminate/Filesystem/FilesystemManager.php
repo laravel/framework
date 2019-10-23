@@ -113,7 +113,11 @@ class FilesystemManager implements FactoryContract
     {
         $config = $this->getConfig($name);
 
-        $name = $config['driver'] ?? $name;
+        if (empty($config['driver'])) {
+            throw new InvalidArgumentException("Disk [{$name}] does not have a configured driver.");
+        }
+
+        $name = $config['driver'];
 
         if (isset($this->customCreators[$name])) {
             return $this->callCustomCreator($config);
