@@ -15,7 +15,7 @@ trait RefreshDatabase
     public function refreshDatabase()
     {
         $env = config('app.env');
-        if ($env === 'prod' || $env === 'production') {
+        if ($this->app->isProduction()) {
             throw new RuntimeException('Application In Production! Using RefreshDatabase will delete your data.');
         }
         $this->usingInMemoryDatabase()
