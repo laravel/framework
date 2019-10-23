@@ -707,6 +707,7 @@ trait HasAttributes
     protected function asJson($value)
     {
         $asObject = func_num_args() > 1 ? func_get_arg(1) : false;
+
         return json_encode($value, $asObject ? JSON_FORCE_OBJECT : null);
     }
 
