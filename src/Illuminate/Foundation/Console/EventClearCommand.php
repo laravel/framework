@@ -52,6 +52,6 @@ class EventClearCommand extends Command
     {
         $this->files->delete($this->laravel->getCachedEventsPath());
 
-        $this->info('Cached events cleared!');
+        $this->info('Events cache cleared!');
     }
 }
