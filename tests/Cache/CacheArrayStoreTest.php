@@ -122,7 +122,7 @@ class CacheArrayStoreTest extends TestCase
         $this->assertEmpty($store->getPrefix());
     }
 
-    public function testCannotAquireLockTwice()
+    public function testCannotAcquireLockTwice()
     {
         $store = new ArrayStore;
         $lock = $store->lock('foo', 10);
@@ -131,7 +131,7 @@ class CacheArrayStoreTest extends TestCase
         $this->assertFalse($lock->acquire());
     }
 
-    public function testCanAquireLockAgainAfterExpiry()
+    public function testCanAcquireLockAgainAfterExpiry()
     {
         Carbon::setTestNow(Carbon::now());
         $store = new ArrayStore;
