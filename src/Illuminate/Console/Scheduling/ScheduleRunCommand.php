@@ -49,7 +49,7 @@ class ScheduleRunCommand extends Command
     /**
      * The event dispatcher.
      *
-     * @var \Illuminate\Contracts\Notifications\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $dispatcher;
 
