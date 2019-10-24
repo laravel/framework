@@ -1981,7 +1981,7 @@ class DatabaseEloquentModelTest extends TestCase
             'foo' => 'bar2',
         ];
         $model->collectionAttribute = collect([
-            'foo' => 'bar2'
+            'foo' => 'bar2',
         ]);
 
         $this->assertIsInt($model->getOriginal('intAttribute'));
