@@ -186,6 +186,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileString($value)
     {
+        // Strip all comments first. They could contain @verbatim, @php or other
+        // tokens that would otherwise be processed before a comment is removed.
+        $value = $this->compileComments($value);
+
         if (strpos($value, '@verbatim') !== false) {
             $value = $this->storeVerbatimBlocks($value);
         }
