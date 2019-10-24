@@ -1961,8 +1961,10 @@ class DatabaseEloquentModelTest extends TestCase
         $array = [
             'foo' => 'bar',
         ];
+        $collection = collect($array);
         $model->arrayAttribute = $array;
         $model->jsonAttribute = $array;
+        $model->collectionAttribute = $collection;
 
         $model->syncOriginal();
 
@@ -1978,6 +1980,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->jsonAttribute = [
             'foo' => 'bar2',
         ];
+        $model->collectionAttribute = collect([
+            'foo' => 'bar2'
+        ]);
 
         $this->assertIsInt($model->getOriginal('intAttribute'));
         $this->assertEquals(1, $model->getOriginal('intAttribute'));
@@ -2010,6 +2015,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals($array, $model->getOriginal('jsonAttribute'));
         $this->assertEquals(['foo' => 'bar'], $model->getOriginal('jsonAttribute'));
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('jsonAttribute'));
+
+        $this->assertEquals(['foo' => 'bar'], $model->getOriginal('collectionAttribute')->toArray());
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
     }
 }
 
