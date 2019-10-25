@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Input\InputOption;
 
 class EventGenerateCommand extends Command
 {
@@ -14,7 +13,7 @@ class EventGenerateCommand extends Command
      *
      * @var string
      */
-    protected $name = 'event:generate';
+    protected $signature = 'event:generate {--queued: Indicates the generated event listener(s) should be queued}';
 
     /**
      * The console command description.
@@ -75,12 +74,5 @@ class EventGenerateCommand extends Command
                 ['name' => $listener, '--event' => $event, '--queued' => $this->option('queued')]
             ));
         }
-    }
-
-    protected function getOptions()
-    {
-        return [
-            ['queued', null, InputOption::VALUE_NONE, 'Indicates the generated event listener(s) should be queued'],
-        ];
     }
 }
