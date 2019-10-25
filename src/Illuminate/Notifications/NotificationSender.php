@@ -184,9 +184,7 @@ class NotificationSender
 
                 $notification->id = $notificationId;
 
-                if (! is_null($this->locale)) {
-                    $notification->locale = $this->locale;
-                }
+                $notification->locale = $this->preferredLocale($notifiable, $notification);
 
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
