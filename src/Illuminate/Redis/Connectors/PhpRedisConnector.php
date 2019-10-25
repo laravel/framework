@@ -81,7 +81,7 @@ class PhpRedisConnector implements Connector
             }
 
             if (isset($config['database'])) {
-                $client->select(intval($config['database']));
+                $client->select((int) $config['database']);
             }
 
             if (! empty($config['prefix'])) {
