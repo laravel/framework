@@ -4569,6 +4569,40 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('name must be taylor', $v->errors()->get('name')[0]);
         $this->assertSame('name must be a first name', $v->errors()->get('name')[1]);
         $this->assertSame('validation.string', $v->errors()->get('name')[2]);
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['number' => 4],
+            ['number' => [new class(18, 20) implements Rule {
+                private $min;
+
+                private $max;
+
+                public function __construct($min, $max)
+                {
+                    $this->min = $min;
+                    $this->max = $max;
+                }
+
+                public function passes($attribute, $value)
+                {
+                    return $value > $this->min && $value < $this->max;
+                }
+
+                public function message()
+                {
+                    return 'The :attribute must be between :min and :max.';
+                }
+
+                public function replace($message, $attribute)
+                {
+                    return str_replace([':min', ':max'], [$this->min, $this->max], $message);
+                }
+            }]]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertSame('The number must be between 18 and 20.', $v->errors()->get('number')[0]);
     }
 
     public function testImplicitCustomValidationObjects()

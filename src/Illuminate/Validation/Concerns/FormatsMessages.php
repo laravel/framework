@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Concerns;
 
 use Closure;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -194,14 +195,23 @@ trait FormatsMessages
     /**
      * Replace all error message place-holders with actual values.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param  string               $message
+     * @param  string               $attribute
+     * @param  string|RuleContract  $rule
+     * @param  array                $parameters
+     *
      * @return string
      */
     public function makeReplacements($message, $attribute, $rule, $parameters)
     {
+        if ($rule instanceof RuleContract) {
+            if (method_exists($rule, 'replace')) {
+                $message = $rule->replace($message, $attribute);
+            }
+
+            $rule = get_class($rule);
+        }
+
         $message = $this->replaceAttributePlaceholder(
             $message, $this->getDisplayableAttribute($attribute)
         );

@@ -576,7 +576,7 @@ class Validator implements ValidatorContract
 
             foreach ($messages as $message) {
                 $this->messages->add($attribute, $this->makeReplacements(
-                    $message, $attribute, get_class($rule), []
+                    $message, $attribute, $rule, []
                 ));
             }
         }
