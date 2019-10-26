@@ -102,7 +102,7 @@ class DatabaseState
     {
         return array_merge(
             $this->app['migrator']->paths(),
-            [$this->app->databasePath() . DIRECTORY_SEPARATOR . 'migrations']
+            [$this->app->databasePath().DIRECTORY_SEPARATOR.'migrations']
         );
     }
 }
