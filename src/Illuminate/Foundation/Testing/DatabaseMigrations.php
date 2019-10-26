@@ -20,7 +20,7 @@ trait DatabaseMigrations
         $this->beforeApplicationDestroyed(function () {
             $this->artisan('migrate:rollback');
 
-            RefreshDatabaseState::$migrated = false;
+            (new DatabaseState($this->app))->markAsMigrated(false);
         });
     }
 }

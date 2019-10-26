@@ -49,18 +49,30 @@ trait RefreshDatabase
      */
     protected function refreshTestDatabase()
     {
-        if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh', [
-                '--drop-views' => $this->shouldDropViews(),
-                '--drop-types' => $this->shouldDropTypes(),
-            ]);
+        $databaseState = new DatabaseState($this->app);
 
-            $this->app[Kernel::class]->setArtisan(null);
+        if ($databaseState->needsRefresh()) {
+            $this->refreshDatabaseMigrations();
 
-            RefreshDatabaseState::$migrated = true;
+            $databaseState->markAsMigrated();
         }
 
         $this->beginDatabaseTransaction();
+    }
+
+    /**
+     * Refresh the database state by executing the migrate:fresh artisan command.
+     *
+     * @return void
+     */
+    protected function refreshDatabaseMigrations(): void
+    {
+        $this->artisan('migrate:fresh', [
+            '--drop-views' => $this->shouldDropViews(),
+            '--drop-types' => $this->shouldDropTypes(),
+        ]);
+
+        $this->app[Kernel::class]->setArtisan(null);
     }
 
     /**
