@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
+ * @property-read HigherOrderBuilderProxy $each
  * @property-read HigherOrderBuilderProxy $orWhere
  *
  * @mixin \Illuminate\Database\Query\Builder
@@ -73,6 +74,15 @@ class Builder
     protected $passthru = [
         'insert', 'insertOrIgnore', 'insertGetId', 'insertUsing', 'getBindings', 'toSql', 'dump', 'dd',
         'exists', 'doesntExist', 'count', 'min', 'max', 'avg', 'average', 'sum', 'getConnection',
+    ];
+
+    /**
+     * The methods that can be proxied.
+     *
+     * @var array
+     */
+    protected static $proxies = [
+        'each', 'orWhere',
     ];
 
     /**
@@ -1306,7 +1316,7 @@ class Builder
      */
     public function __get($key)
     {
-        if ($key === 'orWhere') {
+        if (in_array($key, static::$proxies)) {
             return new HigherOrderBuilderProxy($this, $key);
         }
 

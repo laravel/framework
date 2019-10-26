@@ -705,6 +705,27 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "table" where "one" = ? or ("two" = ?) or ("three" = ?)', $query->toSql());
     }
 
+    public function testHigherOrderEachWithDefaultChunkSize()
+    {
+        $defaultChunkSize = 1000;
+        $builder = m::mock(Builder::class.'[forPage,get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $assertor = m::mock(stdClass::class);
+        $assertor->shouldReceive('doSomething')->times($defaultChunkSize);
+
+        $chunk1 = Collection::make(range(1, $defaultChunkSize))->map(function () use ($assertor) {
+            return $assertor;
+        });
+        $chunk2 = Collection::make([]);
+
+        $builder->shouldReceive('forPage')->once()->with(1, $defaultChunkSize)->andReturnSelf();
+        $builder->shouldReceive('forPage')->once()->with(2, $defaultChunkSize)->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $builder->each->doSomething();
+    }
+
     public function testSimpleWhere()
     {
         $builder = $this->getBuilder();
