@@ -31,7 +31,7 @@ class Filesystem
      */
     public function missing($path)
     {
-        return !$this->exists($path);
+        return ! $this->exists($path);
     }
 
     /**
