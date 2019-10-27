@@ -2,6 +2,18 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.4.0...6.x)
 
+### Added
+- Added `ScheduledTaskSkipped` event when a scheduled command was filtered from running ([#30407](https://github.com/laravel/framework/pull/30407))
+- Added `Login timeout expired` to `DetectsLostConnections` ([#30362](https://github.com/laravel/framework/pull/30362))
+
+### Changed
+- Make `vendor:publish` command more informative ([#30408](https://github.com/laravel/framework/pull/30408), [65d040d](https://github.com/laravel/framework/commit/65d040d44f1cef3830748ec59c0056bc2418dca6))
+- Accepted underscores URL in the `URL` validator ([#30417](https://github.com/laravel/framework/pull/30417))
+- Updated `artisan down` output to be consistent with `artisan up` ([#30422](https://github.com/laravel/framework/pull/30422))
+
+### TODO:
+- Fixes Lumen loadViewsFrom issue retrieving view config before the component is loaded ([#30404](https://github.com/laravel/framework/pull/30404))
+
 
 ## [v6.4.0 (2019-10-23)](https://github.com/laravel/framework/compare/v6.3.0...v6.4.0)
 
