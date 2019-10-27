@@ -80,8 +80,8 @@ class PhpRedisConnector implements Connector
                 $client->auth($config['password']);
             }
 
-            if (! empty($config['database'])) {
-                $client->select($config['database']);
+            if (isset($config['database'])) {
+                $client->select((int) $config['database']);
             }
 
             if (! empty($config['prefix'])) {
