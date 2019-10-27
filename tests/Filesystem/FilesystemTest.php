@@ -132,6 +132,12 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
     }
 
+    public function testMissingFile()
+    {
+        $files = new Filesystem;
+        $this->assertTrue($files->missing($this->tempDir.'/file.txt'));
+    }
+
     public function testDeleteDirectory()
     {
         mkdir($this->tempDir.'/foo');
