@@ -627,6 +627,30 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertFalse($url->hasValidSignature($request, false));
     }
+    
+    public function testSignedUrlWithARouteParameterNamedSignature()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/{signature}', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $request = Request::create($url->signedRoute('foo', ['signature' => 'boom']));
+
+        $this->assertTrue($url->hasValidSignature($request));
+
+        $request = Request::create($url->signedRoute('foo', [ 'signature' => 'boom']).'?tempered=true');
+
+        $this->assertFalse($url->hasValidSignature($request));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
