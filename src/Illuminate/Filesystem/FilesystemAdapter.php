@@ -104,7 +104,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function missing($path)
     {
-        return !$this->exists($path);
+        return ! $this->exists($path);
     }
 
     /**
