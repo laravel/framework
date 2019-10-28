@@ -80,6 +80,80 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame([1, 2, 3, 4, 5], $data->all());
     }
 
+    public function testRemember()
+    {
+        $source = [1, 2, 3, 4];
+
+        $collection = LazyCollection::make(function () use (&$source) {
+            yield from $source;
+        })->remember();
+
+        $this->assertSame([1, 2, 3, 4], $collection->all());
+
+        $source = [];
+
+        $this->assertSame([1, 2, 3, 4], $collection->all());
+    }
+
+    public function testRememberWithTwoRunners()
+    {
+        $source = [1, 2, 3, 4];
+
+        $collection = LazyCollection::make(function () use (&$source) {
+            yield from $source;
+        })->remember();
+
+        $a = $collection->getIterator();
+        $b = $collection->getIterator();
+
+        $this->assertEquals(1, $a->current());
+        $this->assertEquals(1, $b->current());
+
+        $b->next();
+
+        $this->assertEquals(1, $a->current());
+        $this->assertEquals(2, $b->current());
+
+        $b->next();
+
+        $this->assertEquals(1, $a->current());
+        $this->assertEquals(3, $b->current());
+
+        $a->next();
+
+        $this->assertEquals(2, $a->current());
+        $this->assertEquals(3, $b->current());
+
+        $a->next();
+
+        $this->assertEquals(3, $a->current());
+        $this->assertEquals(3, $b->current());
+
+        $a->next();
+
+        $this->assertEquals(4, $a->current());
+        $this->assertEquals(3, $b->current());
+
+        $b->next();
+
+        $this->assertEquals(4, $a->current());
+        $this->assertEquals(4, $b->current());
+    }
+
+    public function testRememberWithDuplicateKeys()
+    {
+        $collection = LazyCollection::make(function () {
+            yield 'key' => 1;
+            yield 'key' => 2;
+        })->remember();
+
+        $results = $collection->map(function ($value, $key) {
+            return [$key, $value];
+        })->values()->all();
+
+        $this->assertSame([['key', 1], ['key', 2]], $results);
+    }
+
     public function testTapEach()
     {
         $data = LazyCollection::times(10);
