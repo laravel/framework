@@ -351,14 +351,32 @@ class Builder
      * Find a model by column, operator and value.
      *
      * @param  string  $column
-     * @param  string  $operator
-     * @param  mixed  $value
+     * @param  string|null  $operatorOrValue
+     * @param  mixed|null  $valueOrColumns
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function findBy($column, $operator, $value, $columns = ['*'])
+    public function findBy($column, $operatorOrValue = null, $valueOrColumns = null, array $columns = ['*'])
     {
-        return $this->where($column, $operator, $value)->first($columns);
+        $args = func_get_args();
+
+        if (count($args) < 2) {
+            return;
+        }
+
+        if (count($args) == 2) {
+            return $this->where($column, $operatorOrValue)->first();
+        }
+
+        if (count($args) == 3) {
+            if (is_array($args[2])) {
+                return $this->where($column, $operatorOrValue)->first($valueOrColumns);
+            } else {
+                return $this->where($column, $operatorOrValue, $valueOrColumns)->first();
+            }
+        }
+
+        return $this->where($column, $operatorOrValue, $valueOrColumns)->first($columns);
     }
 
     /**
