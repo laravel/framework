@@ -420,6 +420,24 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get an item from the collection by key, if key doesn't exist put default value to the collection.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function ensure($key, $default = null)
+    {
+        if ($this->offsetExists($key)) {
+            return $this->items[$key];
+        }
+
+        $value = value($default);
+        $this->offsetSet($key, $value);
+        return $value;
+    }
+
+    /**
      * Group an associative array by a field or using a callback.
      *
      * @param  array|callable|string  $groupBy
