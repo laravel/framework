@@ -619,7 +619,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` tinyint(1) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` tinyint(1) unsigned not null', $statements[0]);
     }
 
     public function testAddingEnum()
