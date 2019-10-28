@@ -644,7 +644,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Do not use [signature] as a parameter name when creating a signed route.');
+        $this->expectExceptionMessage('reserved');
 
         Request::create($url->signedRoute('foo', ['signature' => 'bar']));
     }
