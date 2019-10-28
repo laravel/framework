@@ -315,10 +315,18 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  bool  $absolute
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true)
     {
         $parameters = $this->formatParameters($parameters);
+
+        if(array_key_exists('signature', $parameters)) {
+            throw new InvalidArgumentException(
+                'Do not use [signature] as a parameter name when creating a signed route.'
+            );
+        }
 
         if ($expiration) {
             $parameters = $parameters + ['expires' => $this->availableAt($expiration)];

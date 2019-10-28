@@ -8,6 +8,7 @@ use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -626,6 +627,26 @@ class RoutingUrlGeneratorTest extends TestCase
         $request = Request::create($url->signedRoute('foo', [], null, false).'?tempered=true');
 
         $this->assertFalse($url->hasValidSignature($request, false));
+    }
+
+    public function testSignedUrlParameterCannotBeNamedSignature() {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/{signature}', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Do not use [signature] as a parameter name when creating a signed route.');
+
+        Request::create($url->signedRoute('foo', ['signature' => 'bar']));
     }
 }
 
