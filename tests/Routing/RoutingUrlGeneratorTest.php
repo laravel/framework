@@ -629,7 +629,8 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertFalse($url->hasValidSignature($request, false));
     }
 
-    public function testSignedUrlParameterCannotBeNamedSignature() {
+    public function testSignedUrlParameterCannotBeNamedSignature()
+    {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com/')
