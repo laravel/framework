@@ -841,7 +841,9 @@ class Blueprint
      */
     public function boolean($column)
     {
-        return $this->addColumn('boolean', $column);
+        return $this->addColumn('boolean', $column, [
+            'unsigned' => true,
+        ]);
     }
 
     /**
