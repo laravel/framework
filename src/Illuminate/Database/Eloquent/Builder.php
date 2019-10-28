@@ -348,6 +348,20 @@ class Builder
     }
 
     /**
+     * Find a model by column, operator and value.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function findBy($column, $operator, $value, $columns = ['*'])
+    {
+        return $this->where($column, $operator, $value)->first($columns);
+    }
+
+    /**
      * Find a model by its primary key or throw an exception.
      *
      * @param  mixed  $id
