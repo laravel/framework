@@ -343,6 +343,30 @@ class Arr
     }
 
     /**
+     * Check if an item or items are filled in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function filled($array, $keys)
+    {
+        if (! static::has($array, $keys)) {
+            return false;
+        }
+
+        foreach ((array) $keys as $key) {
+            $needle = static::get($array, $key);
+
+            if (empty($needle)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Determines if an array is associative.
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
