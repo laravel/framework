@@ -482,15 +482,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         $user = $this->user();
 
-        // If we have an event dispatcher instance, we can fire off the logout event
-        // so any further processing can be done. This allows the developer to be
-        // listening for anytime a user signs out of this application manually.
         $this->clearUserDataFromStorage();
 
         if (! is_null($this->user) && ! empty($user->getRememberToken())) {
             $this->cycleRememberToken($user);
         }
 
+        // If we have an event dispatcher instance, we can fire off the logout event
+        // so any further processing can be done. This allows the developer to be
+        // listening for anytime a user signs out of this application manually.
         if (isset($this->events)) {
             $this->events->dispatch(new Events\Logout($this->name, $user));
         }
@@ -540,11 +540,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         $user = $this->user();
 
+        $this->clearUserDataFromStorage();
+
         // If we have an event dispatcher instance, we can fire off the logout event
         // so any further processing can be done. This allows the developer to be
         // listening for anytime a user signs out of this application manually.
-        $this->clearUserDataFromStorage();
-
         if (isset($this->events)) {
             $this->events->dispatch(new Events\CurrentDeviceLogout($this->name, $user));
         }

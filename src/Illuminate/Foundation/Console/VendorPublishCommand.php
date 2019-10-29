@@ -157,8 +157,18 @@ class VendorPublishCommand extends Command
      */
     protected function publishTag($tag)
     {
+        $published = false;
+
         foreach ($this->pathsToPublish($tag) as $from => $to) {
             $this->publishItem($from, $to);
+
+            $published = true;
+        }
+
+        if ($published) {
+            $this->info('Publishing complete.');
+        } else {
+            $this->error('Unable to locate publishable resources.');
         }
     }
 

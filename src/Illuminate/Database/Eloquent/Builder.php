@@ -72,7 +72,7 @@ class Builder
      */
     protected $passthru = [
         'insert', 'insertOrIgnore', 'insertGetId', 'insertUsing', 'getBindings', 'toSql', 'dump', 'dd',
-        'exists', 'doesntExist', 'count', 'min', 'max', 'avg', 'average', 'sum', 'getConnection',
+        'exists', 'doesntExist', 'count', 'min', 'max', 'avg', 'average', 'sum', 'getConnection', 'raw',
     ];
 
     /**
@@ -104,7 +104,7 @@ class Builder
      * Create and return an un-saved model instance.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function make(array $attributes = [])
     {
@@ -359,6 +359,8 @@ class Builder
     public function findOrFail($id, $columns = ['*'])
     {
         $result = $this->find($id, $columns);
+
+        $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
             if (count($result) === count(array_unique($id))) {
@@ -1094,7 +1096,7 @@ class Builder
 
                 [$name, $constraints] = Str::contains($name, ':')
                             ? $this->createSelectWithConstraint($name)
-                            : [$name, function () {
+                            : [$name, static function () {
                                 //
                             }];
             }
@@ -1118,7 +1120,7 @@ class Builder
      */
     protected function createSelectWithConstraint($name)
     {
-        return [explode(':', $name)[0], function ($query) use ($name) {
+        return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(explode(',', explode(':', $name)[1]));
         }];
     }
@@ -1141,7 +1143,7 @@ class Builder
             $progress[] = $segment;
 
             if (! isset($results[$last = implode('.', $progress)])) {
-                $results[$last] = function () {
+                $results[$last] = static function () {
                     //
                 };
             }

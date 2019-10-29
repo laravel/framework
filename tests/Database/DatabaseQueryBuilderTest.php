@@ -1658,6 +1658,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $expected .= 'inner join (select * from "contacts" where "name" = ?) as "sub2" on "users"."id" = "sub2"."user_id"';
         $this->assertEquals($expected, $builder->toSql());
         $this->assertEquals(['foo', 1, 'bar'], $builder->getRawBindings()['join']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->from('users')->joinSub(['foo'], 'sub', 'users.id', '=', 'sub.id');
     }
 
     public function testJoinSubWithPrefix()
@@ -1673,6 +1677,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('users')->leftJoinSub($this->getBuilder()->from('contacts'), 'sub', 'users.id', '=', 'sub.id');
         $this->assertSame('select * from "users" left join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
+
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->from('users')->leftJoinSub(['foo'], 'sub', 'users.id', '=', 'sub.id');
     }
 
     public function testRightJoinSub()
@@ -1680,6 +1688,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('users')->rightJoinSub($this->getBuilder()->from('contacts'), 'sub', 'users.id', '=', 'sub.id');
         $this->assertSame('select * from "users" right join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
+
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->from('users')->rightJoinSub(['foo'], 'sub', 'users.id', '=', 'sub.id');
     }
 
     public function testRawExpressionsInSelect()
@@ -1915,6 +1927,13 @@ class DatabaseQueryBuilderTest extends TestCase
         );
 
         $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingInvalidSubquery()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->from('table1')->insertUsing(['foo'], ['bar']);
     }
 
     public function testInsertOrIgnoreMethod()
@@ -2461,6 +2480,22 @@ class DatabaseQueryBuilderTest extends TestCase
         ]);
     }
 
+    public function testSQLiteUpdateWrappingJsonArray()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = ?, "group_id" = 45, "created_at" = ?', [
+                json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
+                new DateTime('2019-08-06'),
+            ]);
+
+        $builder->from('users')->update([
+            'options' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
+            'group_id' => new Raw('45'),
+            'created_at' => new DateTime('2019-08-06'),
+        ]);
+    }
+
     public function testMySqlWrappingJsonWithString()
     {
         $builder = $this->getMySqlBuilder();
@@ -2853,6 +2888,10 @@ SQL;
         $builder->selectSub($subBuilder, 'sub');
         $this->assertEquals($expectedSql, $builder->toSql());
         $this->assertEquals($expectedBindings, $builder->getBindings());
+
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getPostgresBuilder();
+        $builder->selectSub(['foo'], 'sub');
     }
 
     public function testSqlServerWhereDate()
@@ -3405,6 +3444,10 @@ SQL;
         }, 'sessions')->where('bar', '<', '10');
         $this->assertSame('select * from (select max(last_seen_at) as last_seen_at from "user_sessions" where "foo" = ?) as "sessions" where "bar" < ?', $builder->toSql());
         $this->assertEquals(['1', '10'], $builder->getBindings());
+
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->fromSub(['invalid'], 'sessions')->where('bar', '<', '10');
     }
 
     public function testFromSubWithPrefix()
@@ -3425,6 +3468,10 @@ SQL;
             $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions');
         }, 'sessions');
         $this->assertSame('select * from (select max(last_seen_at) as last_seen_at from "user_sessions") as "sessions"', $builder->toSql());
+
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->fromSub(['invalid'], 'sessions');
     }
 
     public function testFromRaw()

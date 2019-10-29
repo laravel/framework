@@ -42,7 +42,7 @@ class SupportStrTest extends TestCase
 
     public function testStringAsciiWithSpecificLocale()
     {
-        $this->assertSame('h H sht Sht a A ia yo', Str::ascii('х Х щ Щ ъ Ъ ия йо', 'bg'));
+        $this->assertSame('h H sht Sht a A ia yo', Str::ascii('х Х щ Щ ъ Ъ иа йо', 'bg'));
         $this->assertSame('ae oe ue Ae Oe Ue', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
     }
 
@@ -54,6 +54,11 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith('jason', ['day', 'jas']));
         $this->assertFalse(Str::startsWith('jason', 'day'));
         $this->assertFalse(Str::startsWith('jason', ['day']));
+        $this->assertFalse(Str::startsWith('jason', null));
+        $this->assertFalse(Str::startsWith('jason', [null]));
+        $this->assertFalse(Str::startsWith('0123', [null]));
+        $this->assertTrue(Str::startsWith('0123', 0));
+        $this->assertFalse(Str::startsWith('jason', 'J'));
         $this->assertFalse(Str::startsWith('jason', ''));
         $this->assertFalse(Str::startsWith('7', ' 7'));
         $this->assertTrue(Str::startsWith('7a', '7'));
@@ -79,6 +84,9 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::endsWith('jason', 'no'));
         $this->assertFalse(Str::endsWith('jason', ['no']));
         $this->assertFalse(Str::endsWith('jason', ''));
+        $this->assertFalse(Str::endsWith('jason', [null]));
+        $this->assertFalse(Str::endsWith('jason', null));
+        $this->assertFalse(Str::endsWith('jason', 'N'));
         $this->assertFalse(Str::endsWith('7', ' 7'));
         $this->assertTrue(Str::endsWith('a7', '7'));
         $this->assertTrue(Str::endsWith('a7', 7));
@@ -298,6 +306,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
+        // prevent breaking changes
+        $this->assertSame('foo-bar', Str::snake('foo-bar'));
+        $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
+        $this->assertSame('foo__bar', Str::snake('Foo_Bar'));
+        $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
     public function testStudly()

@@ -90,6 +90,23 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has a 201 status code.
+     *
+     * @return $this
+     */
+    public function assertCreated()
+    {
+        $actual = $this->getStatusCode();
+
+        PHPUnit::assertTrue(
+            201 === $actual,
+            'Response status code ['.$actual.'] does not match expected 201 status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code and no content.
      *
      * @param  int  $status

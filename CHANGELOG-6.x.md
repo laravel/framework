@@ -1,6 +1,77 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.1.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.4.0...6.x)
+
+
+## [v6.4.0 (2019-10-23)](https://github.com/laravel/framework/compare/v6.3.0...v6.4.0)
+
+### Added
+- Added `missing()` method to `Request` class ([#30320](https://github.com/laravel/framework/pull/30320))
+- Added `Pipeline::pipes()` method ([#30346](https://github.com/laravel/framework/pull/30346))
+- Added `TestResponse::assertCreated()` method ([#30368](https://github.com/laravel/framework/pull/30368)) 
+
+### Changed
+- Added `connection is no longer usable` to `DetectsLostConnections` ([#30362](https://github.com/laravel/framework/pull/30362))
+- Implemented parse ID on find method for many to many relation ([#30359](https://github.com/laravel/framework/pull/30359))
+- Improvements on subqueries ([#30307](https://github.com/laravel/framework/pull/30307), [3f3b621](https://github.com/laravel/framework/commit/3f3b6214cc3353156a490d88fc8f0c148da400d5))
+- Pass mail data to theme css in `Markdown::render()` method ([#30376](https://github.com/laravel/framework/pull/30376))
+- Handle ajax requests in RequirePassword middleware ([#30390](https://github.com/laravel/framework/pull/30390), [331c354](https://github.com/laravel/framework/commit/331c354e586a5a27a9edc9b9a49d23aa872e4b32))
+
+### Fixed
+- Fixed `retry()` with `$times` value less then 1 ([#30356](https://github.com/laravel/framework/pull/30356))
+- Fixed `last_modified` option in `SetCacheHeader` ([#30335](https://github.com/laravel/framework/pull/30335))
+- Fixed the Filesystem manager's exception on unsupported driver ([#30331](https://github.com/laravel/framework/pull/30331), [#30369](https://github.com/laravel/framework/pull/30369))
+- Fixed `shouldQueue()` check for bound event listeners ([#30378](https://github.com/laravel/framework/pull/30378))
+- Used exit code `1` when migration table not found ([#30321](https://github.com/laravel/framework/pull/30321))
+- Alleviate breaking change introduced by password confirm feature ([#30389](https://github.com/laravel/framework/pull/30389))
+
+### Security:
+- Password Reset Security fix ([23041e9](https://github.com/laravel/framework/commit/23041e99833630d93cc7672bd7087eaa350c3a59), [a934160](https://github.com/laravel/framework/commit/a9341609705e2f8febcd356cdfa33391ec6538c7))
+
+
+## [v6.3.0 (2019-10-15)](https://github.com/laravel/framework/compare/v6.2.0...v6.3.0)
+
+### Added
+- Added ability to override `setUserPassword` on password reset ([#30218](https://github.com/laravel/framework/pull/30218))
+- Added firing `deleting` \ `deleted` events in `MorphPivot` ([#30229](https://github.com/laravel/framework/pull/30229))
+- Added locking mechanism for the array cache driver ([#30253](https://github.com/laravel/framework/pull/30253))
+- Added `dropAllViews` functionality to the SQL Server builder ([#30222](https://github.com/laravel/framework/pull/30222))
+
+### Optimization
+- Optimize eager loading memory handling ([#30248](https://github.com/laravel/framework/pull/30248))
+
+### Fixed
+- Fixed extra `?` for empty query string in `RouteUrlGenerator::getRouteQueryString()` ([#30280](https://github.com/laravel/framework/pull/30280))
+
+### Changed
+- Updated list of URI schemes for `Url` validator ([#30220](https://github.com/laravel/framework/pull/30220))
+- Added schema name when dropping all FKs in SQL Server ([#30221](https://github.com/laravel/framework/pull/30221))
+- Used contracts in `RequirePassword` middleware ([#30215](https://github.com/laravel/framework/pull/30215))
+- Added ability to return array in `receivesBroadcastNotificationsOn` if `channelName` is array ([#30242](https://github.com/laravel/framework/pull/30242), [2faadcd](https://github.com/laravel/framework/commit/2faadcd288cdc86cf7a1a3644e68e5e0ce641a8b))
+
+
+## [v6.2.0 (2019-10-08)](https://github.com/laravel/framework/compare/v6.1.0...v6.2.0)
+
+### Added
+- Added support for callable objects in `Container::call()` ([#30156](https://github.com/laravel/framework/pull/30156))
+- Add multipolygonz type for postgreSQL ([#30173](https://github.com/laravel/framework/pull/30173))
+- Add "unauthenticated" method in auth middleware ([#30177](https://github.com/laravel/framework/pull/30177))
+- Add partialMock shorthand ([#30202](https://github.com/laravel/framework/pull/30202))
+- Allow Storage::put to accept a Psr StreamInterface ([#30179](https://github.com/laravel/framework/pull/30179))
+- Implement new password rule and password confirmation ([#30214](https://github.com/laravel/framework/pull/30214))
+
+### Changed
+- Remove unnecessary param passed to updatePackageArray method ([#30155](https://github.com/laravel/framework/pull/30155))
+- Add optional connection name to DatabaseUserProvider ([#30154](https://github.com/laravel/framework/pull/30154))
+- Remove brackets arround URL php artisan serve ([#30168](https://github.com/laravel/framework/pull/30168))
+- Apply limit to database rather than collection ([#30148](https://github.com/laravel/framework/pull/30148))
+- Allow to use scoped macro in nested queries ([#30127](https://github.com/laravel/framework/pull/30127))
+- Added array to json conversion for sqlite ([#30133](https://github.com/laravel/framework/pull/30133))
+- Use the `policies()` method instead of the property policies ([#30189](https://github.com/laravel/framework/pull/30189))
+- Split hasValidSignature method ([#30208](https://github.com/laravel/framework/pull/30208))
+
+### Fixed
+- `validateDimensions()` handle `image/svg` MIME ([#30204](https://github.com/laravel/framework/pull/30204))
 
 
 ## [v6.1.0 (2019-10-01)](https://github.com/laravel/framework/compare/v6.0.4...v6.1.0)
