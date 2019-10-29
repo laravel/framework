@@ -435,6 +435,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
                     : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
+        $this->directive('unless'.$name, function ($expression) use ($name) {
+            return $expression !== ''
+                ? "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
+                : "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+        });
+
         $this->directive('else'.$name, function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
