@@ -815,4 +815,26 @@ class SupportArrTest extends TestCase
         $this->assertEquals([$obj], Arr::wrap($obj));
         $this->assertSame($obj, Arr::wrap($obj)[0]);
     }
+
+    public function testFilled()
+    {
+        $data = [
+            'one' => 1,
+            'two' => '',
+            'three' => null,
+            'foo' => [
+                'one' => 1,
+                'two' => '',
+                'three' => null,
+            ],
+        ];
+
+        $this->assertTrue(Arr::filled($data, 'one'));
+        $this->assertFalse(Arr::filled($data, 'two'));
+        $this->assertFalse(Arr::filled($data, 'three'));
+
+        $this->assertTrue(Arr::filled($data, 'foo.one'));
+        $this->assertFalse(Arr::filled($data, 'foo.two'));
+        $this->assertFalse(Arr::filled($data, 'foo.three'));
+    }
 }
