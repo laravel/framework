@@ -1149,17 +1149,26 @@ trait HasAttributes
         $attribute = $this->getAttribute($key);
         $original = $this->getOriginal($key);
 
+        // If both values are equal, return
         if ($attribute === $original) {
             return true;
-        } elseif (is_null($attribute)) {
-            return false;
-        } elseif ($this->isDateAttribute($key)) {
-            return $this->fromDateTime($attribute) ===
-                   $this->fromDateTime($original);
         }
 
-        return is_numeric($attribute) && is_numeric($original)
-                && strcmp((string) $attribute, (string) $original) === 0;
+        // If the attribute is a date, compare it by datetime format
+        if ($this->isDateAttribute($key)) {
+            return $this->fromDateTime($attribute) === $this->fromDateTime($original);
+        }
+
+        // If the original or attribute is an object, compare it by string
+        if (is_object($attribute)
+            || is_object($original)) {
+            $attributeAsString = is_object($attribute) ? json_encode($attribute) : $attribute;
+            $originalAsString = is_object($original) ? json_encode($original) : $original;
+            return $attributeAsString === $originalAsString;
+        }
+
+        // If comparison in all circumstances failed, return false
+        return false;
     }
 
     /**

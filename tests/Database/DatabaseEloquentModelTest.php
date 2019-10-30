@@ -2019,6 +2019,85 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $model->getOriginal('collectionAttribute')->toArray());
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
     }
+
+    /**
+     * Test that the HasAttributes->originalIsEquivalent method correctly compares the original and newly set attributes
+     *
+     * @param void
+     * @return void
+     */
+    public function testOriginalIsEquivalent()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $model->intAttribute = 1;
+        $model->floatAttribute = 0.1234;
+        $model->stringAttribute = '432';
+        $model->boolAttribute = true;
+        $model->booleanAttribute = false;
+        $model->dateAttribute = '2017-03-18';
+        $model->datetimeAttribute = '2017-03-23 22:17:00';
+        $model->timestampAttribute = '1969-07-20 22:56:00';
+        $stdClass = new stdClass;
+        $stdClass->json_key = 'json_value';
+        $model->objectAttribute = $stdClass;
+        $array = [
+            'foo' => 'bar',
+        ];
+        $collection = collect($array);
+        $model->arrayAttribute = $array;
+        $model->jsonAttribute = $array;
+        $model->collectionAttribute = $collection;
+        $model->syncOriginal();
+
+        // When synced all attributes should be the equivalent
+        $this->assertTrue($model->originalIsEquivalent('intAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('floatAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('stringAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('boolAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('booleanAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('objectAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('arrayAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('jsonAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('collectionAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('dateAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('datetimeAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('timestampAttribute'));
+
+        // When setting values with wrong type, but attributes are casted, the values should be equivalent
+        $model->intAttribute = '1';
+        $this->assertTrue($model->originalIsEquivalent('intAttribute'));
+        $model->floatAttribute = '0.1234';
+        $this->assertTrue($model->originalIsEquivalent('floatAttribute'));
+        $model->stringAttribute = 432;
+        $this->assertTrue($model->originalIsEquivalent('stringAttribute'));
+        $model->boolAttribute = 1;
+        $this->assertTrue($model->originalIsEquivalent('boolAttribute'));
+        $model->boolAttribute = '1';
+        $this->assertTrue($model->originalIsEquivalent('boolAttribute'));
+        $model->booleanAttribute = 0;
+        $this->assertTrue($model->originalIsEquivalent('booleanAttribute'));
+        $model->booleanAttribute = '0';
+        $this->assertTrue($model->originalIsEquivalent('booleanAttribute'));
+        $model->dateAttribute = new Carbon('2017-03-18');
+        $this->assertTrue($model->originalIsEquivalent('dateAttribute'));
+        $model->datetimeAttribute = new Carbon('2017-03-23 22:17:00');
+        $this->assertTrue($model->originalIsEquivalent('datetimeAttribute'));
+        $model->timestampAttribute = new Carbon('1969-07-20 22:56:00');
+        $this->assertTrue($model->originalIsEquivalent('timestampAttribute'));
+
+        // When setting value with wrong type, but attribute are NOT casted, values should not be equivalent
+        $model->uncastedIntAttribute = 1;
+        $model->uncastedFloatAttribute = 0.1234;
+        $model->uncastedStringAttribute = '432';
+        $model->syncOriginal();
+        $model->uncastedIntAttribute = '1';
+        $model->uncastedFloatAttribute = '0.1234';
+        $model->uncastedStringAttribute = 432;
+        $this->assertFalse($model->originalIsEquivalent('uncastedIntAttribute'));
+        $this->assertFalse($model->originalIsEquivalent('uncastedFloatAttribute'));
+        $this->assertFalse($model->originalIsEquivalent('uncastedStringAttribute'));
+    }
 }
 
 class EloquentTestObserverStub
