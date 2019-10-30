@@ -1149,7 +1149,6 @@ trait HasAttributes
         $attribute = $this->getAttribute($key);
         $original = $this->getOriginal($key);
 
-        // If both values are equal, return
         if ($attribute === $original) {
             return true;
         }

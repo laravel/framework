@@ -2025,6 +2025,7 @@ class DatabaseEloquentModelTest extends TestCase
      *
      * @param void
      * @return void
+     * @throws Exception
      */
     public function testOriginalIsEquivalent()
     {
