@@ -78,7 +78,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDirtyAttributes()
     {
-        $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
+        $model = new EloquentModelStub(['foo' => 1, 'bar' => 2, 'baz' => 3]);
         $model->syncOriginal();
         $model->foo = 1;
         $model->bar = 20;
@@ -118,7 +118,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testCleanAttributes()
     {
-        $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
+        $model = new EloquentModelStub(['foo' => 1, 'bar' => 2, 'baz' => 3]);
         $model->syncOriginal();
         $model->foo = 1;
         $model->bar = 20;
@@ -2089,6 +2089,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->originalIsEquivalent('timestampAttribute'));
 
         // When setting value with wrong type, but attribute are NOT casted, values should not be equivalent
+        // but for sakes of backward compatibility values are considered equivalent
         $model->uncastedIntAttribute = 1;
         $model->uncastedFloatAttribute = 0.1234;
         $model->uncastedStringAttribute = '432';
@@ -2096,9 +2097,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->uncastedIntAttribute = '1';
         $model->uncastedFloatAttribute = '0.1234';
         $model->uncastedStringAttribute = 432;
-        $this->assertFalse($model->originalIsEquivalent('uncastedIntAttribute'));
-        $this->assertFalse($model->originalIsEquivalent('uncastedFloatAttribute'));
-        $this->assertFalse($model->originalIsEquivalent('uncastedStringAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('uncastedIntAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('uncastedFloatAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('uncastedStringAttribute'));
     }
 }
 

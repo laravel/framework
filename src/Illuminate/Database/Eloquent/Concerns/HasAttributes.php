@@ -1167,8 +1167,9 @@ trait HasAttributes
             return $attributeAsString === $originalAsString;
         }
 
-        // If comparison in all circumstances failed, return false
-        return false;
+        // If comparison in all circumstances failed, return false or when numeric a non-strict type comparison
+        return is_numeric($attribute) && is_numeric($original)
+            && strcmp((string) $attribute, (string) $original) === 0;
     }
 
     /**
