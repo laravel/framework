@@ -1668,7 +1668,7 @@ class Builder
     /**
      * Add a "group by" clause to the query.
      *
-     * @param  array  ...$groups
+     * @param  array|string  ...$groups
      * @return $this
      */
     public function groupBy(...$groups)
