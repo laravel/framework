@@ -2021,7 +2021,8 @@ class DatabaseEloquentModelTest extends TestCase
     }
 
     /**
-     * Test that the HasAttributes->originalIsEquivalent method correctly compares the original and newly set attributes
+     * Test that the HasAttributes->originalIsEquivalent method correctly compares
+     * the original and newly set attributes.
      *
      * @param void
      * @return void

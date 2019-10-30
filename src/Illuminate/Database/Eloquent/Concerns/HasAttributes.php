@@ -1163,6 +1163,7 @@ trait HasAttributes
             || is_object($original)) {
             $attributeAsString = is_object($attribute) ? json_encode($attribute) : $attribute;
             $originalAsString = is_object($original) ? json_encode($original) : $original;
+
             return $attributeAsString === $originalAsString;
         }
 
