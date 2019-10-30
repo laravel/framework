@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use PDO;
-use Mockery as m;
-use ReflectionProperty;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use InvalidArgumentException;
+use Mockery as m;
+use PDO;
+use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 class DatabaseConnectionFactoryTest extends TestCase
 {

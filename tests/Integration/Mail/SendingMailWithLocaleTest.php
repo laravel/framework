@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Mockery as m;
-use Illuminate\Mail\Mailable;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Mail\Mailable;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -63,6 +63,18 @@ class SendingMailWithLocaleTest extends TestCase
     public function testMailIsSentWithSelectedLocale()
     {
         Mail::to('test@mail.com')->locale('ar')->send(new TestMail);
+
+        $this->assertStringContainsString('esm',
+            app('swift.transport')->messages()[0]->getBody()
+        );
+    }
+
+    public function testMailIsSentWithLocaleFromMailable()
+    {
+        $mailable = new TestMail();
+        $mailable->locale('ar');
+
+        Mail::to('test@mail.com')->send($mailable);
 
         $this->assertStringContainsString('esm',
             app('swift.transport')->messages()[0]->getBody()

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Support;
 
-use Closure;
-use stdClass;
 use ArrayIterator;
-use IteratorAggregate;
-use Illuminate\Support\Traits\Macroable;
+use Closure;
 use Illuminate\Support\Traits\EnumeratesValues;
+use Illuminate\Support\Traits\Macroable;
+use IteratorAggregate;
+use stdClass;
 
 class LazyCollection implements Enumerable
 {
@@ -97,6 +97,16 @@ class LazyCollection implements Enumerable
         }
 
         return iterator_to_array($this->getIterator());
+    }
+
+    /**
+     * Eager load all items into a new lazy collection backed by an array.
+     *
+     * @return static
+     */
+    public function eager()
+    {
+        return new static($this->all());
     }
 
     /**
@@ -227,7 +237,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Get the items whose keys and values are not present in the given items.
+     * Get the items whose keys and values are not present in the given items, using the callback.
      *
      * @param  mixed  $items
      * @param  callable  $callback
@@ -250,9 +260,9 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Get the items whose keys are not present in the given items.
+     * Get the items whose keys are not present in the given items, using the callback.
      *
-     * @param  mixed   $items
+     * @param  mixed  $items
      * @param  callable  $callback
      * @return static
      */

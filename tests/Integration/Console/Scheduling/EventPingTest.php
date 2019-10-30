@@ -2,17 +2,17 @@
 
 namespace Illuminate\Tests\Integration\Console\Scheduling;
 
-use Mockery as m;
-use GuzzleHttp\HandlerStack;
-use Orchestra\Testbench\TestCase;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Console\Scheduling\Event;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

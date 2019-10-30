@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Tests\Integration\Support\Fixtures\NullableManager;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Tests\Integration\Support\Fixtures\NullableManager;
 
 class ManagerTest extends TestCase
 {

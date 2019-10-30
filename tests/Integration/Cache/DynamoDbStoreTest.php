@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * @group integration
@@ -59,7 +59,7 @@ class DynamoDbStoreTest extends TestCase
         $this->assertEquals(0, Cache::driver('dynamodb')->get('counter'));
     }
 
-    public function testLocksCanBeAquired()
+    public function testLocksCanBeAcquired()
     {
         Cache::driver('dynamodb')->lock('lock', 10)->get(function () {
             $this->assertFalse(Cache::driver('dynamodb')->lock('lock', 10)->get());

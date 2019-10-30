@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\UrlGenerator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class RoutingUrlGeneratorTest extends TestCase
 {
@@ -258,6 +258,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
         $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
         $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional'));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional', ['baz' => null]));
         $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', 'taylor'));
         $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', ['taylor']));
         $this->assertSame('http://www.foo.com/foo/bar/taylor?breeze', $url->route('optional', ['taylor', 'breeze']));
@@ -566,7 +567,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRouteNotDefinedException()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RouteNotFoundException::class);
         $this->expectExceptionMessage('Route [not_exists_route] not defined.');
 
         $url = new UrlGenerator(

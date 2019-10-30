@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Mockery as m;
-use Illuminate\Support\Arr;
-use UnexpectedValueException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Auth\Passwords\PasswordBroker;
-use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
+use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Support\Arr;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 class AuthPasswordBrokerTest extends TestCase
 {
@@ -27,6 +27,17 @@ class AuthPasswordBrokerTest extends TestCase
         $broker->expects($this->once())->method('getUser')->willReturn(null);
 
         $this->assertEquals(PasswordBrokerContract::INVALID_USER, $broker->sendResetLink(['credentials']));
+    }
+
+    public function testIfTokenIsRecentlyCreated()
+    {
+        $mocks = $this->getMocks();
+        $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
+        $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(true);
+        $user->shouldReceive('sendPasswordResetNotification')->with('token');
+
+        $this->assertEquals(PasswordBrokerContract::RESET_THROTTLED, $broker->sendResetLink(['foo']));
     }
 
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
@@ -53,13 +64,11 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks = $this->getMocks();
         $broker = $this->getMockBuilder(PasswordBroker::class)->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
+        $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(false);
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
-        $callback = function () {
-            //
-        };
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
-        $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $callback));
+        $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo']));
     }
 
     public function testRedirectIsReturnedByResetWhenUserCredentialsInvalid()

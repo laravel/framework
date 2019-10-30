@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use stdClass;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Bootstrap\RegisterFacades;
+use Illuminate\Foundation\Events\LocaleUpdated;
+use Illuminate\Support\ServiceProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Foundation\Bootstrap\RegisterFacades;
+use stdClass;
 
 class FoundationApplicationTest extends TestCase
 {
@@ -342,6 +342,89 @@ class FoundationApplicationTest extends TestCase
 
         $this->assertSame('Laravel\\One\\', $app1->getNamespace());
         $this->assertSame('Laravel\\Two\\', $app2->getNamespace());
+    }
+
+    public function testCachePathsResolveToBootstrapCacheDirectory()
+    {
+        $app = new Application('/base/path');
+
+        $this->assertSame('/base/path/bootstrap/cache/services.php', $app->getCachedServicesPath());
+        $this->assertSame('/base/path/bootstrap/cache/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/base/path/bootstrap/cache/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/base/path/bootstrap/cache/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('/base/path/bootstrap/cache/events.php', $app->getCachedEventsPath());
+    }
+
+    public function testEnvPathsAreUsedForCachePathsWhenSpecified()
+    {
+        $app = new Application('/base/path');
+        $_SERVER['APP_SERVICES_CACHE'] = '/absolute/path/services.php';
+        $_SERVER['APP_PACKAGES_CACHE'] = '/absolute/path/packages.php';
+        $_SERVER['APP_CONFIG_CACHE'] = '/absolute/path/config.php';
+        $_SERVER['APP_ROUTES_CACHE'] = '/absolute/path/routes.php';
+        $_SERVER['APP_EVENTS_CACHE'] = '/absolute/path/events.php';
+
+        $this->assertSame('/absolute/path/services.php', $app->getCachedServicesPath());
+        $this->assertSame('/absolute/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/absolute/path/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/absolute/path/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('/absolute/path/events.php', $app->getCachedEventsPath());
+
+        unset(
+            $_SERVER['APP_SERVICES_CACHE'],
+            $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CONFIG_CACHE'],
+            $_SERVER['APP_ROUTES_CACHE'],
+            $_SERVER['APP_EVENTS_CACHE']
+        );
+    }
+
+    public function testEnvPathsAreUsedAndMadeAbsoluteForCachePathsWhenSpecifiedAsRelative()
+    {
+        $app = new Application('/base/path');
+        $_SERVER['APP_SERVICES_CACHE'] = 'relative/path/services.php';
+        $_SERVER['APP_PACKAGES_CACHE'] = 'relative/path/packages.php';
+        $_SERVER['APP_CONFIG_CACHE'] = 'relative/path/config.php';
+        $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
+        $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
+
+        $this->assertSame('/base/path/relative/path/services.php', $app->getCachedServicesPath());
+        $this->assertSame('/base/path/relative/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/base/path/relative/path/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/base/path/relative/path/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('/base/path/relative/path/events.php', $app->getCachedEventsPath());
+
+        unset(
+            $_SERVER['APP_SERVICES_CACHE'],
+            $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CONFIG_CACHE'],
+            $_SERVER['APP_ROUTES_CACHE'],
+            $_SERVER['APP_EVENTS_CACHE']
+        );
+    }
+
+    public function testEnvPathsAreUsedAndMadeAbsoluteForCachePathsWhenSpecifiedAsRelativeWithNullBasePath()
+    {
+        $app = new Application();
+        $_SERVER['APP_SERVICES_CACHE'] = 'relative/path/services.php';
+        $_SERVER['APP_PACKAGES_CACHE'] = 'relative/path/packages.php';
+        $_SERVER['APP_CONFIG_CACHE'] = 'relative/path/config.php';
+        $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
+        $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
+
+        $this->assertSame('/relative/path/services.php', $app->getCachedServicesPath());
+        $this->assertSame('/relative/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/relative/path/config.php', $app->getCachedConfigPath());
+        $this->assertSame('/relative/path/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('/relative/path/events.php', $app->getCachedEventsPath());
+
+        unset(
+            $_SERVER['APP_SERVICES_CACHE'],
+            $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CONFIG_CACHE'],
+            $_SERVER['APP_ROUTES_CACHE'],
+            $_SERVER['APP_EVENTS_CACHE']
+        );
     }
 }
 

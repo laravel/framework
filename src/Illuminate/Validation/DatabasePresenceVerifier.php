@@ -3,8 +3,8 @@
 namespace Illuminate\Validation;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Support\Str;
 
 class DatabasePresenceVerifier implements PresenceVerifierInterface
 {

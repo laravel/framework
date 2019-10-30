@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 
 /**
  * @group integration

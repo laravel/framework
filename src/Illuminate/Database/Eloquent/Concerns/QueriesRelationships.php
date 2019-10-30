@@ -3,13 +3,13 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
-use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 trait QueriesRelationships
 {
@@ -387,6 +387,10 @@ trait QueriesRelationships
             $query->callScope($constraints);
 
             $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
+
+            $query->orders = null;
+
+            $query->setBindings([], 'order');
 
             if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];

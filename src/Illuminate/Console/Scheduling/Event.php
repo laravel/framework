@@ -4,16 +4,16 @@ namespace Illuminate\Console\Scheduling;
 
 use Closure;
 use Cron\CronExpression;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Contracts\Mail\Mailer;
-use Symfony\Component\Process\Process;
-use Illuminate\Support\Traits\Macroable;
 use GuzzleHttp\Exception\TransferException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Traits\Macroable;
+use Symfony\Component\Process\Process;
 
 class Event
 {
@@ -555,7 +555,7 @@ class Event
      * Get the callback that pings the given URL.
      *
      * @param  string  $url
-     * @return Closure
+     * @return \Closure
      */
     protected function pingCallback($url)
     {

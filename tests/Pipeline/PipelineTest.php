@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Pipeline;
 
-use RuntimeException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
+use Illuminate\Pipeline\Pipeline;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PipelineTest extends TestCase
 {

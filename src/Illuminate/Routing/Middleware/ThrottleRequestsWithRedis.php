@@ -3,8 +3,8 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
-use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Redis\Limiters\DurationLimiter;
 
 class ThrottleRequestsWithRedis extends ThrottleRequests
 {

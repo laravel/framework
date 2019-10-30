@@ -3,10 +3,10 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
-use LogicException;
-use RuntimeException;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
+use LogicException;
+use RuntimeException;
 
 class Builder
 {

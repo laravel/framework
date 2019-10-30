@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\View;
 
-use Mockery as m;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
+use InvalidArgumentException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class ViewBladeCompilerTest extends TestCase
 {

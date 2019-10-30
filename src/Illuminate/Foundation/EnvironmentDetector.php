@@ -31,7 +31,7 @@ class EnvironmentDetector
      */
     protected function detectWebEnvironment(Closure $callback)
     {
-        return call_user_func($callback);
+        return $callback();
     }
 
     /**

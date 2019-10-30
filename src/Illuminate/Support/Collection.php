@@ -2,11 +2,11 @@
 
 namespace Illuminate\Support;
 
-use stdClass;
 use ArrayAccess;
 use ArrayIterator;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\EnumeratesValues;
+use Illuminate\Support\Traits\Macroable;
+use stdClass;
 
 class Collection implements ArrayAccess, Enumerable
 {
@@ -208,7 +208,7 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get the items in the collection that are not present in the given items.
+     * Get the items in the collection that are not present in the given items, using the callback.
      *
      * @param  mixed  $items
      * @param  callable  $callback
@@ -231,7 +231,7 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get the items in the collection whose keys and values are not present in the given items.
+     * Get the items in the collection whose keys and values are not present in the given items, using the callback.
      *
      * @param  mixed  $items
      * @param  callable  $callback
@@ -254,9 +254,9 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get the items in the collection whose keys are not present in the given items.
+     * Get the items in the collection whose keys are not present in the given items, using the callback.
      *
-     * @param  mixed   $items
+     * @param  mixed  $items
      * @param  callable  $callback
      * @return static
      */
@@ -936,7 +936,7 @@ class Collection implements ArrayAccess, Enumerable
         }
 
         foreach ($this->items as $key => $item) {
-            if (call_user_func($value, $item, $key)) {
+            if ($value($item, $key)) {
                 return $key;
             }
         }

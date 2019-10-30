@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Redis;
 
-use Throwable;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Limiters\DurationLimiter;
+use PHPUnit\Framework\TestCase;
+use Throwable;
 
 /**
  * @group redislimiters
@@ -81,6 +81,17 @@ class DurationLimiterTest extends TestCase
         });
 
         $this->assertEquals([1, 3], $store);
+    }
+
+    public function testItReturnsTheCallbackResult()
+    {
+        $limiter = new DurationLimiter($this->redis(), 'key', 1, 1);
+
+        $result = $limiter->block(1, function () {
+            return 'foo';
+        });
+
+        $this->assertEquals('foo', $result);
     }
 
     private function redis()

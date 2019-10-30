@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Validation\Rule;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Validation\Rules\In;
 use Illuminate\Tests\Validation\fixtures\Values;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\In;
+use PHPUnit\Framework\TestCase;
 
 class ValidationInRuleTest extends TestCase
 {

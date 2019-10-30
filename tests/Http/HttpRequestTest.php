@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Http;
 
-use Mockery as m;
-use RuntimeException;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Http\UploadedFile;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends TestCase
 {
@@ -298,6 +298,31 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
         $this->assertTrue($request->has('foo.bar'));
         $this->assertTrue($request->has('foo.baz'));
+    }
+
+    public function testMissingMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+        $this->assertFalse($request->missing('name'));
+        $this->assertFalse($request->missing('age'));
+        $this->assertFalse($request->missing('city'));
+        $this->assertTrue($request->missing('foo'));
+        $this->assertTrue($request->missing('name', 'email'));
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
+        $this->assertFalse($request->missing('name'));
+        $this->assertFalse($request->missing('name', 'email'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar', 'bar']]);
+        $this->assertFalse($request->missing('foo'));
+
+        $request = Request::create('/', 'GET', ['foo' => '', 'bar' => null]);
+        $this->assertFalse($request->missing('foo'));
+        $this->assertFalse($request->missing('bar'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
+        $this->assertFalse($request->missing('foo.bar'));
+        $this->assertFalse($request->missing('foo.baz'));
     }
 
     public function testHasAnyMethod()

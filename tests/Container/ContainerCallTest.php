@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Container;
 
 use Closure;
-use stdClass;
-use ReflectionException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
+use ReflectionException;
+use stdClass;
 
 class ContainerCallTest extends TestCase
 {
@@ -158,6 +158,15 @@ class ContainerCallTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertSame('taylor', $result[1]);
     }
+
+    public function testCallWithCallableObject()
+    {
+        $container = new Container;
+        $callable = new ContainerCallCallableStub;
+        $result = $container->call($callable);
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result[0]);
+        $this->assertSame('jeffrey', $result[1]);
+    }
 }
 
 class ContainerTestCallStub
@@ -191,6 +200,14 @@ function containerTestInject(ContainerCallConcreteStub $stub, $default = 'taylor
 class ContainerStaticMethodStub
 {
     public static function inject(ContainerCallConcreteStub $stub, $default = 'taylor')
+    {
+        return func_get_args();
+    }
+}
+
+class ContainerCallCallableStub
+{
+    public function __invoke(ContainerCallConcreteStub $stub, $default = 'jeffrey')
     {
         return func_get_args();
     }

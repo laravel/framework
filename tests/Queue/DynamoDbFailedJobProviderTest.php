@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Exception;
-use Mockery as m;
-use DateTimeInterface;
-use Carbon\CarbonImmutable;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Aws\DynamoDb\DynamoDbClient;
+use Carbon\CarbonImmutable;
+use DateTimeInterface;
+use Exception;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DynamoDbFailedJobProviderTest extends TestCase
 {

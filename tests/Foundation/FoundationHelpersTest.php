@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use stdClass;
 use Exception;
-use Mockery as m;
-use Illuminate\Support\Str;
-use Illuminate\Foundation\Mix;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Mix;
+use Illuminate\Support\Str;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class FoundationHelpersTest extends TestCase
 {

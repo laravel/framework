@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use SplFileInfo;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Application;
-use Illuminate\Filesystem\FilesystemManager;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use SplFileInfo;
 
 class FilesystemTest extends TestCase
 {

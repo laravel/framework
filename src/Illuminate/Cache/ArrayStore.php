@@ -2,9 +2,10 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\InteractsWithTime;
 
-class ArrayStore extends TaggableStore
+class ArrayStore extends TaggableStore implements LockProvider
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
@@ -14,6 +15,13 @@ class ArrayStore extends TaggableStore
      * @var array
      */
     protected $storage = [];
+
+    /**
+     * The array of locks.
+     *
+     * @var array
+     */
+    public $locks = [];
 
     /**
      * Retrieve an item from the cache by key.
@@ -67,15 +75,15 @@ class ArrayStore extends TaggableStore
      */
     public function increment($key, $value = 1)
     {
-        if (! isset($this->storage[$key])) {
-            $this->forever($key, $value);
-
-            return $this->storage[$key]['value'];
+        if ($existing = $this->get($key)) {
+            return tap(((int) $existing) + $value, function ($incremented) use ($key) {
+                $this->storage[$key]['value'] = $incremented;
+            });
         }
 
-        $this->storage[$key]['value'] = ((int) $this->storage[$key]['value']) + $value;
+        $this->forever($key, $value);
 
-        return $this->storage[$key]['value'];
+        return $value;
     }
 
     /**
@@ -161,5 +169,30 @@ class ArrayStore extends TaggableStore
     protected function toTimestamp($seconds)
     {
         return $seconds > 0 ? $this->availableAt($seconds) : 0;
+    }
+
+    /**
+     * Get a lock instance.
+     *
+     * @param  string $name
+     * @param  int $seconds
+     * @param  string|null $owner
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function lock($name, $seconds = 0, $owner = null)
+    {
+        return new ArrayLock($this, $name, $seconds, $owner);
+    }
+
+    /**
+     * Restore a lock instance using the owner identifier.
+     *
+     * @param  string  $name
+     * @param  string  $owner
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function restoreLock($name, $owner)
+    {
+        return $this->lock($name, 0, $owner);
     }
 }

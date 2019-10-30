@@ -2,12 +2,22 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\LazyCollection;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class SupportLazyCollectionIsLazyTest extends TestCase
 {
+    public function testEagerEnumeratesOnce()
+    {
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection = $collection->eager();
+
+            $collection->count();
+            $collection->all();
+        });
+    }
+
     public function testChunkIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

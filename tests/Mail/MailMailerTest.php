@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Mail;
 
-use stdClass;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Mail\Mailer;
+use Illuminate\Support\HtmlString;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 use Swift_Mailer;
 use Swift_Message;
-use Swift_Transport;
-use Illuminate\Mail\Mailer;
 use Swift_Mime_SimpleMessage;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\HtmlString;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Mail\Events\MessageSent;
-use Illuminate\Mail\Events\MessageSending;
-use Illuminate\Contracts\Events\Dispatcher;
+use Swift_Transport;
 
 class MailMailerTest extends TestCase
 {

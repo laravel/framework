@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Mockery as m;
 use BadMethodCallException;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class RouteRegistrarTest extends TestCase
 {

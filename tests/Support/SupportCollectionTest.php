@@ -2,22 +2,22 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
-use Exception;
 use ArrayAccess;
-use ArrayObject;
-use Mockery as m;
 use ArrayIterator;
+use ArrayObject;
 use CachingIterator;
-use ReflectionClass;
-use JsonSerializable;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\LazyCollection;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
+use InvalidArgumentException;
+use JsonSerializable;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 
 class SupportCollectionTest extends TestCase
 {

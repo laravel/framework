@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Routing\Exceptions\UrlGenerationException;
 
 class RouteUrlGenerator
 {
@@ -277,7 +277,9 @@ class RouteUrlGenerator
             );
         }
 
-        return '?'.trim($query, '&');
+        $query = trim($query, '&');
+
+        return $query === '' ? '' : "?{$query}";
     }
 
     /**

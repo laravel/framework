@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Monolog\Logger;
-use Psr\Log\NullLogger;
-use Psr\Log\LoggerInterface;
-use Orchestra\Testbench\TestCase;
-use Monolog\Handler\StreamHandler;
 use Illuminate\Mail\Transport\LogTransport;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Orchestra\Testbench\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class MailLogTransportTest extends TestCase
 {

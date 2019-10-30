@@ -2,18 +2,20 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Arrayable;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\Question\Question;
 
 class Command extends SymfonyCommand
 {
@@ -154,11 +156,19 @@ class Command extends SymfonyCommand
         // set them all on the base command instance. This specifies what can get
         // passed into these commands as "parameters" to control the execution.
         foreach ($this->getArguments() as $arguments) {
-            call_user_func_array([$this, 'addArgument'], $arguments);
+            if ($arguments instanceof InputArgument) {
+                $this->getDefinition()->addArgument($arguments);
+            } else {
+                call_user_func_array([$this, 'addArgument'], $arguments);
+            }
         }
 
         foreach ($this->getOptions() as $options) {
-            call_user_func_array([$this, 'addOption'], $options);
+            if ($options instanceof InputOption) {
+                $this->getDefinition()->addOption($options);
+            } else {
+                call_user_func_array([$this, 'addOption'], $options);
+            }
         }
     }
 
@@ -245,7 +255,7 @@ class Command extends SymfonyCommand
             return $this->getApplication()->find($command);
         }
 
-        $command = new $command;
+        $command = $this->laravel->make($command);
 
         if ($command instanceof SymfonyCommand) {
             $command->setApplication($this->getApplication());

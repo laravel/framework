@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Auth;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use PHPUnit\Framework\TestCase;
 
 class AuthHandlesAuthorizationTest extends TestCase
 {

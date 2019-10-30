@@ -2,11 +2,11 @@
 
 namespace Illuminate\Redis\Connectors;
 
-use Predis\Client;
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Redis\Connector;
-use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Redis\Connections\PredisConnection;
+use Illuminate\Support\Arr;
+use Predis\Client;
 
 /**
  * @deprecated Predis is no longer maintained by its original author

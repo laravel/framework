@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase
 {
@@ -65,6 +65,19 @@ class SupportLazyCollectionTest extends TestCase
             'b' => 2,
             'c' => 3,
         ], $data->all());
+    }
+
+    public function testEager()
+    {
+        $source = [1, 2, 3, 4, 5];
+
+        $data = LazyCollection::make(function () use (&$source) {
+            yield from $source;
+        })->eager();
+
+        $source[] = 6;
+
+        $this->assertSame([1, 2, 3, 4, 5], $data->all());
     }
 
     public function testTapEach()

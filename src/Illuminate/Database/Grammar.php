@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Traits\Macroable;
 
 abstract class Grammar
 {
@@ -83,9 +83,7 @@ abstract class Grammar
             $segments[1] = $this->tablePrefix.$segments[1];
         }
 
-        return $this->wrap(
-            $segments[0]).' as '.$this->wrapValue($segments[1]
-        );
+        return $this->wrap($segments[0]).' as '.$this->wrapValue($segments[1]);
     }
 
     /**

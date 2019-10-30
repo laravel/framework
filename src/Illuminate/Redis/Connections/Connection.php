@@ -5,8 +5,8 @@ namespace Illuminate\Redis\Connections;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Redis\Events\CommandExecuted;
-use Illuminate\Redis\Limiters\DurationLimiterBuilder;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
+use Illuminate\Redis\Limiters\DurationLimiterBuilder;
 
 abstract class Connection
 {

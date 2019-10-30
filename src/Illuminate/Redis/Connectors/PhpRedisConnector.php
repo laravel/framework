@@ -2,14 +2,14 @@
 
 namespace Illuminate\Redis\Connectors;
 
+use Illuminate\Contracts\Redis\Connector;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Redis as RedisFacade;
+use LogicException;
 use Redis;
 use RedisCluster;
-use LogicException;
-use Illuminate\Support\Arr;
-use Illuminate\Contracts\Redis\Connector;
-use Illuminate\Redis\Connections\PhpRedisConnection;
-use Illuminate\Support\Facades\Redis as RedisFacade;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 
 class PhpRedisConnector implements Connector
 {

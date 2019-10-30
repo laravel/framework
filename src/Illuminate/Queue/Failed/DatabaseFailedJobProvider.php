@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Failed;
 
-use Illuminate\Support\Facades\Date;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Support\Facades\Date;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface
 {

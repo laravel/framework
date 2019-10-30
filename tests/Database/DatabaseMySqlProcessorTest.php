@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlProcessorTest extends TestCase
 {

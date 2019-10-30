@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Database\Query\Builder;
 
 class SQLiteGrammar extends Grammar
 {
@@ -193,6 +193,10 @@ class SQLiteGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
+        $values = collect($values)->map(function ($value) {
+            return is_array($value) ? json_encode($value) : $value;
+        })->all();
+
         $cleanBindings = Arr::except($bindings, 'select');
 
         return array_values(

@@ -3,22 +3,22 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
-use RuntimeException;
 use DateTimeInterface;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\LazyCollection;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\ConnectionInterface;
-use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use RuntimeException;
 
 class Builder
 {
@@ -228,11 +228,7 @@ class Builder
         $columns = is_array($columns) ? $columns : func_get_args();
 
         foreach ($columns as $as => $column) {
-            if (is_string($as) && (
-                $column instanceof self ||
-                $column instanceof EloquentBuilder ||
-                $column instanceof Closure
-            )) {
+            if (is_string($as) && $this->isQueryable($column)) {
                 $this->selectSub($column, $as);
             } else {
                 $this->columns[] = $column;
@@ -335,6 +331,8 @@ class Builder
      *
      * @param  mixed  $query
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function parseSub($query)
     {
@@ -343,7 +341,9 @@ class Builder
         } elseif (is_string($query)) {
             return [$query, []];
         } else {
-            throw new InvalidArgumentException;
+            throw new InvalidArgumentException(
+                'A subquery must be a query builder instance, a Closure, or a string.'
+            );
         }
     }
 
@@ -358,11 +358,7 @@ class Builder
         $columns = is_array($column) ? $column : func_get_args();
 
         foreach ($columns as $as => $column) {
-            if (is_string($as) && (
-                $column instanceof self ||
-                $column instanceof EloquentBuilder ||
-                $column instanceof Closure
-            )) {
+            if (is_string($as) && $this->isQueryable($column)) {
                 if (is_null($this->columns)) {
                     $this->select($this->from.'.*');
                 }
@@ -403,9 +399,7 @@ class Builder
      */
     public function from($table, $as = null)
     {
-        if ($table instanceof self ||
-            $table instanceof EloquentBuilder ||
-            $table instanceof Closure) {
+        if ($this->isQueryable($table)) {
             return $this->fromSub($table, $as);
         }
 
@@ -433,7 +427,7 @@ class Builder
         // is trying to build a join with a complex "on" clause containing more than
         // one condition, so we'll add the join and call a Closure with the query.
         if ($first instanceof Closure) {
-            call_user_func($first, $join);
+            $first($join);
 
             $this->joins[] = $join;
 
@@ -890,9 +884,7 @@ class Builder
         // If the value is a query builder instance we will assume the developer wants to
         // look for any values that exists within this given query. So we will add the
         // query accordingly so that this query is properly executed when it is run.
-        if ($values instanceof self ||
-            $values instanceof EloquentBuilder ||
-            $values instanceof Closure) {
+        if ($this->isQueryable($values)) {
             [$query, $bindings] = $this->createSub($values);
 
             $values = [new Expression($query)];
@@ -1026,13 +1018,13 @@ class Builder
     /**
      * Add a "where not null" clause to the query.
      *
-     * @param  string  $column
+     * @param  string|array  $columns
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereNotNull($column, $boolean = 'and')
+    public function whereNotNull($columns, $boolean = 'and')
     {
-        return $this->whereNull($column, $boolean, true);
+        return $this->whereNull($columns, $boolean, true);
     }
 
     /**
@@ -1806,9 +1798,7 @@ class Builder
      */
     public function orderBy($column, $direction = 'asc')
     {
-        if ($column instanceof self ||
-            $column instanceof EloquentBuilder ||
-            $column instanceof Closure) {
+        if ($this->isQueryable($column)) {
             [$query, $bindings] = $this->createSub($column);
 
             $column = new Expression('('.$query.')');
@@ -2957,6 +2947,19 @@ class Builder
         $this->useWritePdo = true;
 
         return $this;
+    }
+
+    /**
+     * Determine if the value is a query builder instance or a Closure.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isQueryable($value)
+    {
+        return $value instanceof self ||
+               $value instanceof EloquentBuilder ||
+               $value instanceof Closure;
     }
 
     /**

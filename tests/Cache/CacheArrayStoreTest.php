@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cache\ArrayStore;
 
 class CacheArrayStoreTest extends TestCase
 {
@@ -34,7 +34,7 @@ class CacheArrayStoreTest extends TestCase
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
-    public function testItemsCanExpire(): void
+    public function testItemsCanExpire()
     {
         Carbon::setTestNow(Carbon::now());
         $store = new ArrayStore;
@@ -74,6 +74,19 @@ class CacheArrayStoreTest extends TestCase
         $this->assertEquals(1, $store->get('foo'));
     }
 
+    public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = new ArrayStore;
+
+        $store->put('foo', 999, 10);
+        Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
+        $result = $store->increment('foo');
+
+        $this->assertEquals(1, $result);
+        Carbon::setTestNow(null);
+    }
+
     public function testValuesCanBeDecremented()
     {
         $store = new ArrayStore;
@@ -107,5 +120,78 @@ class CacheArrayStoreTest extends TestCase
     {
         $store = new ArrayStore;
         $this->assertEmpty($store->getPrefix());
+    }
+
+    public function testCannotAcquireLockTwice()
+    {
+        $store = new ArrayStore;
+        $lock = $store->lock('foo', 10);
+
+        $this->assertTrue($lock->acquire());
+        $this->assertFalse($lock->acquire());
+    }
+
+    public function testCanAcquireLockAgainAfterExpiry()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = new ArrayStore;
+        $lock = $store->lock('foo', 10);
+        $lock->acquire();
+        Carbon::setTestNow(Carbon::now()->addSeconds(10));
+
+        $this->assertTrue($lock->acquire());
+    }
+
+    public function testLockExpirationLowerBoundary()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = new ArrayStore;
+        $lock = $store->lock('foo', 10);
+        $lock->acquire();
+        Carbon::setTestNow(Carbon::now()->addSeconds(10)->subMicrosecond());
+
+        $this->assertFalse($lock->acquire());
+    }
+
+    public function testLockWithNoExpirationNeverExpires()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = new ArrayStore;
+        $lock = $store->lock('foo');
+        $lock->acquire();
+        Carbon::setTestNow(Carbon::now()->addYears(100));
+
+        $this->assertFalse($lock->acquire());
+    }
+
+    public function testCanAcquireLockAfterRelease()
+    {
+        $store = new ArrayStore;
+        $lock = $store->lock('foo', 10);
+        $lock->acquire();
+
+        $this->assertTrue($lock->release());
+        $this->assertTrue($lock->acquire());
+    }
+
+    public function testAnotherOwnerCannotReleaseLock()
+    {
+        $store = new ArrayStore;
+        $owner = $store->lock('foo', 10);
+        $wannabeOwner = $store->lock('foo', 10);
+        $owner->acquire();
+
+        $this->assertFalse($wannabeOwner->release());
+    }
+
+    public function testAnotherOwnerCanForceReleaseALock()
+    {
+        $store = new ArrayStore;
+        $owner = $store->lock('foo', 10);
+        $wannabeOwner = $store->lock('foo', 10);
+        $owner->acquire();
+        $wannabeOwner->forceRelease();
+
+        $this->assertTrue($wannabeOwner->acquire());
     }
 }

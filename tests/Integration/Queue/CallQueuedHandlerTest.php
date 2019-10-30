@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Mockery as m;
-use Illuminate\Bus\Queueable;
 use Illuminate\Bus\Dispatcher;
-use Orchestra\Testbench\TestCase;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\CallQueuedHandler;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Queue\CallQueuedHandler;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Event;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -141,17 +141,10 @@ class CallQueuedHandlerTestJob
     }
 }
 
-class CallQueuedHandlerTestJobWithMiddleware
+/** This exists to test that middleware can also be defined in base classes */
+abstract class AbstractCallQueuedHandlerTestJobWithMiddleware
 {
-    use InteractsWithQueue, Queueable;
-
-    public static $handled = false;
     public static $middlewareCommand;
-
-    public function handle()
-    {
-        static::$handled = true;
-    }
 
     public function middleware()
     {
@@ -159,12 +152,24 @@ class CallQueuedHandlerTestJobWithMiddleware
             new class {
                 public function handle($command, $next)
                 {
-                    CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = $command;
+                    AbstractCallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = $command;
 
                     return $next($command);
                 }
             },
         ];
+    }
+}
+
+class CallQueuedHandlerTestJobWithMiddleware extends AbstractCallQueuedHandlerTestJobWithMiddleware
+{
+    use InteractsWithQueue, Queueable;
+
+    public static $handled = false;
+
+    public function handle()
+    {
+        static::$handled = true;
     }
 }
 

@@ -2,26 +2,26 @@
 
 namespace Illuminate\Tests\Database;
 
-use PDO;
 use DateTime;
-use Exception;
-use Mockery as m;
-use PDOException;
-use PDOStatement;
 use ErrorException;
-use ReflectionClass;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
-use Illuminate\Database\QueryException;
-use Illuminate\Database\Schema\Builder;
+use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Builder;
+use Mockery as m;
+use PDO;
+use PDOException;
+use PDOStatement;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class DatabaseConnectionTest extends TestCase
 {

@@ -3,11 +3,11 @@
 namespace Illuminate\Auth\Passwords;
 
 use Closure;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Support\Arr;
 use UnexpectedValueException;
-use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 class PasswordBroker implements PasswordBrokerContract
 {
@@ -53,6 +53,10 @@ class PasswordBroker implements PasswordBrokerContract
 
         if (is_null($user)) {
             return static::INVALID_USER;
+        }
+
+        if ($this->tokens->recentlyCreatedToken($user)) {
+            return static::RESET_THROTTLED;
         }
 
         // Once we have the reset token, we are ready to send the message out to this

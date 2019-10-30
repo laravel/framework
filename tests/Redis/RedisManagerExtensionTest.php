@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Illuminate\Contracts\Redis\Connector;
+use Illuminate\Foundation\Application;
+use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Redis\RedisManager;
-use Illuminate\Foundation\Application;
-use Illuminate\Contracts\Redis\Connector;
 
 class RedisManagerExtensionTest extends TestCase
 {

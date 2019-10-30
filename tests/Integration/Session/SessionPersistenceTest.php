@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Session;
 
-use Mockery;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Response;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\TokenMismatchException;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Mockery;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

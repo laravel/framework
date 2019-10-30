@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Swift_Message;
 use Aws\Ses\SesClient;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
-use Illuminate\Mail\TransportManager;
 use Illuminate\Mail\Transport\SesTransport;
+use Illuminate\Mail\TransportManager;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
+use Swift_Message;
 
 class MailSesTransportTest extends TestCase
 {

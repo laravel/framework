@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Messages\MailMessage;
+use PHPUnit\Framework\TestCase;
 
 class NotificationMailMessageTest extends TestCase
 {

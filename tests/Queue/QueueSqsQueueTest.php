@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Queue;
 
 use Aws\Result;
-use Mockery as m;
 use Aws\Sqs\SqsClient;
+use Illuminate\Container\Container;
+use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Carbon;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Container\Container;
 
 class QueueSqsQueueTest extends TestCase
 {

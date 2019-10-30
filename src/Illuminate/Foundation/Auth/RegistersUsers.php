@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Events\Registered;
 
 trait RegistersUsers
 {
@@ -30,7 +30,9 @@ trait RegistersUsers
     {
         $this->validator($request->all())->validate();
 
-        $user = $this->create($request->all());
+        event(new Registered($user = $this->create($request->all())));
+
+        $this->guard()->login($user);
 
         return $this->registered($request, $user)
                         ?: redirect($this->redirectPath());
@@ -55,8 +57,6 @@ trait RegistersUsers
      */
     protected function registered(Request $request, $user)
     {
-        event(new Registered($user));
-
-        $this->guard()->login($user);
+        //
     }
 }

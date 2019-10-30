@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -206,6 +206,34 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
     }
 
+    public function testCustomPivotClassUpdatesTimestamps()
+    {
+        Carbon::setTestNow('2017-10-10 10:10:10');
+
+        $post = Post::create(['title' => Str::random()]);
+        $tag = TagWithCustomPivot::create(['name' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            [
+                'post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty',
+                'created_at' => '1507630210',
+                'updated_at' => '1507630210',
+            ],
+        ]);
+
+        Carbon::setTestNow('2017-10-10 10:10:20'); // +10 seconds
+
+        $this->assertEquals(
+            1,
+            $post->tagsWithCustomExtraPivot()->updateExistingPivot($tag->id, ['flag' => 'exclude'])
+        );
+        foreach ($post->tagsWithCustomExtraPivot as $tag) {
+            $this->assertSame('exclude', $tag->pivot->flag);
+            $this->assertEquals('1507630210', $tag->pivot->getAttributes()['created_at']);
+            $this->assertEquals('1507630220', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+        }
+    }
+
     public function testAttachMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -319,12 +347,16 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tags()->attach(Tag::all());
 
         $this->assertEquals($tag2->name, $post->tags()->find($tag2->id)->name);
+        $this->assertCount(0, $post->tags()->findMany([]));
         $this->assertCount(2, $post->tags()->findMany([$tag->id, $tag2->id]));
+        $this->assertCount(0, $post->tags()->findMany(new Collection()));
+        $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
     }
 
     public function testFindOrFailMethod()
     {
         $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10');
 
         $post = Post::create(['title' => Str::random()]);
 
@@ -333,6 +365,34 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tags()->attach(Tag::all());
 
         $post->tags()->findOrFail(10);
+    }
+
+    public function testFindOrFailMethodWithMany()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11');
+
+        $post = Post::create(['title' => Str::random()]);
+
+        Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach(Tag::all());
+
+        $post->tags()->findOrFail([10, 11]);
+    }
+
+    public function testFindOrFailMethodWithManyUsingCollection()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11');
+
+        $post = Post::create(['title' => Str::random()]);
+
+        Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach(Tag::all());
+
+        $post->tags()->findOrFail(new Collection([10, 11]));
     }
 
     public function testFindOrNewMethod()

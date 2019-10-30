@@ -3,10 +3,10 @@
 namespace Illuminate\Support;
 
 use Countable;
-use JsonSerializable;
-use IteratorAggregate;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use IteratorAggregate;
+use JsonSerializable;
 
 interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
@@ -159,7 +159,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function diffAssoc($items);
 
     /**
-     * Get the items whose keys and values are not present in the given items.
+     * Get the items whose keys and values are not present in the given items, using the callback.
      *
      * @param  mixed  $items
      * @param  callable  $callback
@@ -176,9 +176,9 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function diffKeys($items);
 
     /**
-     * Get the items whose keys are not present in the given items.
+     * Get the items whose keys are not present in the given items, using the callback.
      *
-     * @param  mixed   $items
+     * @param  mixed  $items
      * @param  callable  $callback
      * @return static
      */
@@ -218,7 +218,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function eachSpread(callable $callback);
 
     /**
-     * Determine if all items pass the given test.
+     * Determine if all items pass the given truth test.
      *
      * @param  string|callable  $key
      * @param  mixed  $operator

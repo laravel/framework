@@ -3,8 +3,8 @@
 namespace Illuminate\Support;
 
 use Closure;
-use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
+use InvalidArgumentException;
 
 abstract class Manager
 {
