@@ -813,7 +813,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function push($value)
     {
-        $this->items[] = $value;
+        $this->offsetSet(null, $value);
 
         return $this;
     }
