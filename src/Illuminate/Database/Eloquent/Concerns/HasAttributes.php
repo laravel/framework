@@ -1161,7 +1161,7 @@ trait HasAttributes
         // If the original or attribute is an object, compare it non-strict
         if (is_object($attribute)
             || is_object($original)) {
-            return $attributeAsString == $originalAsString;
+            return $attribute == $original;
         }
 
         // If comparison in all circumstances failed, return false or when numeric a non-strict type comparison
