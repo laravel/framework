@@ -643,7 +643,7 @@ class RoutableInterfaceStub implements UrlRoutable
         return 'key';
     }
 
-    public function resolveRouteBinding($routeKey)
+    public function resolveRouteBinding($routeKey, $field = null)
     {
         //
     }
