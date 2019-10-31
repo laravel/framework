@@ -97,6 +97,17 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Determine if a file or directory is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function missing($path)
+    {
+        return ! $this->exists($path);
+    }
+
+    /**
      * Get the full path for the file at the given "short" path.
      *
      * @param  string  $path
