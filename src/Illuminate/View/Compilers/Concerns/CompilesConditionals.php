@@ -196,7 +196,7 @@ trait CompilesConditionals
      */
     protected function compileEndBlank()
     {
-        return "<?php endif; ?>";
+        return '<?php endif; ?>';
     }
 
     /**
