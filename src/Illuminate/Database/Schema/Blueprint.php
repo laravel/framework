@@ -539,7 +539,7 @@ class Blueprint
     }
 
     /**
-     * Create a new auto-incrementing big integer (8-byte) column on the table.
+     * Create a new auto-incrementing integer (4-byte) column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
