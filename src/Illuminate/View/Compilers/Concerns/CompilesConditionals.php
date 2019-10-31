@@ -179,6 +179,27 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the blank statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileBlank($expression)
+    {
+        return "<?php if(blank{$expression}): ?>";
+    }
+
+    /**
+     * Compile the end-blank statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndBlank()
+    {
+        return "<?php endif; ?>";
+    }
+
+    /**
      * Compile the switch statements into valid PHP.
      *
      * @param  string  $expression
