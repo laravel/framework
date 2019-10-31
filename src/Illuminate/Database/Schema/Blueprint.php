@@ -528,7 +528,18 @@ class Blueprint
     }
 
     /**
-     * Create a new auto-incrementing integer (4-byte) column on the table.
+     * Create a new auto-incrementing big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function id($column = 'id')
+    {
+        return $this->bigIncrements($column);
+    }
+
+    /**
+     * Create a new auto-incrementing big integer (8-byte) column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
@@ -777,6 +788,24 @@ class Blueprint
     public function unsignedBigInteger($column, $autoIncrement = false)
     {
         return $this->bigInteger($column, $autoIncrement, true);
+    }
+
+    /**
+     * Create a new unsigned big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignId($column)
+    {
+        $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
+            'type' => 'bigInteger',
+            'name' => $column,
+            'autoIncrement' => false,
+            'unsigned' => true,
+        ]);
+
+        return $column;
     }
 
     /**
