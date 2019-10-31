@@ -120,6 +120,27 @@ class Arr
 
         return $results;
     }
+    /**
+     * Flatten a multi-dimensional associative array with custom deparator.
+     *
+     * @param  array   $array
+     * @param  array   $separator
+     * @return array
+     */
+    public static function deepFlatten($array, $separator = '.')
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value) && ! empty($value)) {
+                $results = array_merge($results, static::deepFlatten($value, $key.$separator));
+            } else {
+                $results[$key] = $value;
+            }
+        }
+
+        return $results;
+    }
 
     /**
      * Get all of the given array except for a specified array of keys.
