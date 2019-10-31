@@ -417,6 +417,7 @@ class Str
     {
         if (count($pieces) > 2) {
             $lastElement = array_pop($pieces);
+            
             return implode($glue, $pieces).(rtrim($glue).' '.ltrim($lastGlue)).$lastElement;
         } else {
             return implode(is_null($lastGlue) ? $glue : $lastGlue, $pieces);
