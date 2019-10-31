@@ -1825,6 +1825,40 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($results);
     }
 
+    public function testExistsWithCallback()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 1]]);
+        $results = $builder->from('users')->exists(function () {
+            return 123;
+        });
+        $this->assertSame(123, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 0]]);
+        $results = $builder->from('users')->exists(function () {
+            throw new RuntimeException();
+        });
+        $this->assertFalse($results);
+    }
+
+    public function testDoesntExistsWithCallback()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 0]]);
+        $results = $builder->from('users')->doesntExist(function () {
+            return 123;
+        });
+        $this->assertSame(123, $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 1]]);
+        $results = $builder->from('users')->doesntExist(function () {
+            throw new RuntimeException();
+        });
+        $this->assertFalse($results);
+    }
+
     public function testAggregateResetFollowedByGet()
     {
         $builder = $this->getBuilder();

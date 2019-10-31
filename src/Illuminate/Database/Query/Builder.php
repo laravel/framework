@@ -2376,13 +2376,16 @@ class Builder
     /**
      * Determine if any rows exist for the current query.
      *
-     * @return bool
+     * @param  \Closure $callback
+     * @return bool|mixed
      */
-    public function exists()
+    public function exists(Closure $callback = null)
     {
         $results = $this->connection->select(
             $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
         );
+
+        $exists = false;
 
         // If the results has rows, we will get the row and see if the exists column is a
         // boolean true. If there is no results for this query we will return false as
@@ -2390,20 +2393,23 @@ class Builder
         if (isset($results[0])) {
             $results = (array) $results[0];
 
-            return (bool) $results['exists'];
+            $exists = (bool) $results['exists'];
         }
 
-        return false;
+        return $exists && $callback ? $callback() : $exists;
     }
 
     /**
      * Determine if no rows exist for the current query.
      *
-     * @return bool
+     * @param  \Closure $callback
+     * @return bool|mixed
      */
-    public function doesntExist()
+    public function doesntExist(Closure $callback = null)
     {
-        return ! $this->exists();
+        $doesntExist = ! $this->exists();
+
+        return $doesntExist && $callback ? $callback() : $doesntExist;
     }
 
     /**
