@@ -2421,7 +2421,7 @@ class Builder
      * Execute the given callback if rows exist for the current query.
      *
      * @param  \Closure $callback
-     * @return bool|mixed
+     * @return mixed
      */
     public function doesntExistOr(Closure $callback)
     {
