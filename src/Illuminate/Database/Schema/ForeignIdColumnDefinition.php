@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Schema;
 
 use Illuminate\Support\Str;
-use Illuminate\Database\Schema\Blueprint;
 
 class ForeignIdColumnDefinition extends ColumnDefinition
 {
