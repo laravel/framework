@@ -406,6 +406,24 @@ class Str
     }
 
     /**
+     * Join array elements with a glue string except for the last element, which can be joined with an additional glue (the Oxford comma way).
+     *
+     * @param  string  $glue
+     * @param  array  $pieces
+     * @param  string|null  $lastGlue
+     * @return string
+     */
+    public static function implodeForHumans($glue , $pieces, $lastGlue = null)
+    {
+        if(count($pieces) > 2){
+            $lastElement = array_pop($pieces);
+            return implode($glue, $pieces) . (rtrim($glue) . ' ' . ltrim($lastGlue)) . $lastElement;
+        }else{
+            return implode(is_null($lastGlue) ? $glue : $lastGlue, $pieces);
+        }
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $value
