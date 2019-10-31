@@ -2376,16 +2376,13 @@ class Builder
     /**
      * Determine if any rows exist for the current query.
      *
-     * @param  \Closure $callback
-     * @return bool|mixed
+     * @return bool
      */
-    public function exists(Closure $callback = null)
+    public function exists()
     {
         $results = $this->connection->select(
             $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
         );
-
-        $exists = false;
 
         // If the results has rows, we will get the row and see if the exists column is a
         // boolean true. If there is no results for this query we will return false as
@@ -2393,23 +2390,42 @@ class Builder
         if (isset($results[0])) {
             $results = (array) $results[0];
 
-            $exists = (bool) $results['exists'];
+            return (bool) $results['exists'];
         }
 
-        return $exists && $callback ? $callback() : $exists;
+        return false;
     }
 
     /**
      * Determine if no rows exist for the current query.
      *
+     * @return bool
+     */
+    public function doesntExist()
+    {
+        return ! $this->exists();
+    }
+
+    /**
+     * Execute the given callback if no rows exist for the current query.
+     *
+     * @param  \Closure $callback
+     * @return mixed
+     */
+    public function existsOr(Closure $callback)
+    {
+        return $this->exists() ? true : $callback();
+    }
+
+    /**
+     * Execute the given callback if rows exist for the current query.
+     *
      * @param  \Closure $callback
      * @return bool|mixed
      */
-    public function doesntExist(Closure $callback = null)
+    public function doesntExistOr(Closure $callback)
     {
-        $doesntExist = ! $this->exists();
-
-        return $doesntExist && $callback ? $callback() : $doesntExist;
+        return $this->doesntExist() ? true : $callback();
     }
 
     /**
