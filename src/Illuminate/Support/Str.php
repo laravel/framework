@@ -413,12 +413,12 @@ class Str
      * @param  string|null  $lastGlue
      * @return string
      */
-    public static function implodeForHumans($glue , $pieces, $lastGlue = null)
+    public static function implodeForHumans($glue, $pieces, $lastGlue = null)
     {
-        if(count($pieces) > 2){
+        if (count($pieces) > 2) {
             $lastElement = array_pop($pieces);
-            return implode($glue, $pieces) . (rtrim($glue) . ' ' . ltrim($lastGlue)) . $lastElement;
-        }else{
+            return implode($glue, $pieces).(rtrim($glue).' '.ltrim($lastGlue)).$lastElement;
+        } else {
             return implode(is_null($lastGlue) ? $glue : $lastGlue, $pieces);
         }
     }
