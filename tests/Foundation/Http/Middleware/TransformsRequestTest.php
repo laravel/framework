@@ -10,6 +10,23 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TransformsRequestTest extends TestCase
 {
+    public function testTransformKeyOncePerKeyWhenMethodIsGet()
+    {
+        $middleware = new TruncateKey;
+        $symfonyRequest = new SymfonyRequest([
+            '123' => 'bar',
+            'abc' => 'baz',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('bar', $request->get('12'));
+            $this->assertSame('baz', $request->get('ab'));
+            $this->assertNull($request->get('123'));
+        });
+    }
+
     public function testTransformOncePerKeyWhenMethodIsGet()
     {
         $middleware = new TruncateInput;
@@ -131,5 +148,13 @@ class TruncateInput extends TransformsRequest
     protected function transform($key, $value)
     {
         return substr($value, 0, -1);
+    }
+}
+
+class TruncateKey extends TransformsRequest
+{
+    protected function transformKey($key)
+    {
+        return substr($key, 0, -1);
     }
 }

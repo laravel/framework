@@ -58,9 +58,21 @@ class TransformsRequest
      */
     protected function cleanArray(array $data, $keyPrefix = '')
     {
-        return collect($data)->map(function ($value, $key) use ($keyPrefix) {
-            return $this->cleanValue($keyPrefix.$key, $value);
+        return collect($data)->mapWithKeys(function ($value, $key) use ($keyPrefix) {
+            return [$this->cleanKey($key, $keyPrefix) => $this->cleanValue($keyPrefix.$key, $value)];
         })->all();
+    }
+
+    /**
+     * Clean the given key.
+     *
+     * @param  string  $key
+     * @param  string  $keyPrefix
+     * @return mixed
+     */
+    protected function cleanKey($key, $keyPrefix = '')
+    {
+        return $this->transformKey($key, $keyPrefix);
     }
 
     /**
@@ -77,6 +89,18 @@ class TransformsRequest
         }
 
         return $this->transform($key, $value);
+    }
+
+     /**
+     * Transform the given key.
+     *
+     * @param  string  $key
+     * @param  string  $keyPrefix
+     * @return string
+     */
+    protected function transformKey($key, $keyPrefix = '')
+    {
+        return $key;
     }
 
     /**
