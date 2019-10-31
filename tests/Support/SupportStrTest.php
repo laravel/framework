@@ -286,6 +286,20 @@ class SupportStrTest extends TestCase
         $this->assertSame('Malmö Jönköping', Str::replaceLast('', 'yyy', 'Malmö Jönköping'));
     }
 
+    public function testImplodeForHumans()
+    {
+        $this->assertSame('', Str::implodeForHumans(', ', []));
+        $this->assertSame('cats', Str::implodeForHumans(', ', ['cats']));
+        $this->assertSame('cats, dogs', Str::implodeForHumans(', ', ['cats', 'dogs']));
+        $this->assertSame('cats, dogs, cows', Str::implodeForHumans(', ', ['cats', 'dogs', 'cows']));
+        $this->assertSame('', Str::implodeForHumans(', ', [], ' and '));
+        $this->assertSame('cats', Str::implodeForHumans(', ', ['cats'], ' and '));
+        $this->assertSame('cats and dogs', Str::implodeForHumans(', ', ['cats', 'dogs'], ' and '));
+        $this->assertSame('cats, dogs, and cows', Str::implodeForHumans(', ', ['cats', 'dogs', 'cows'], ' and '));
+        // Test for multibyte string support
+        $this->assertSame('Malmö, Jönköping, or Klaus', Str::implodeForHumans(', ', ['Malmö', 'Jönköping', 'Klaus'], ' or '));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
