@@ -158,6 +158,18 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(1, $connection->transactionLevel());
     }
 
+    public function testBeginTransactionMethodReconnectsMissingConnection()
+    {
+        $connection = $this->getMockConnection();
+        $connection->setReconnector(function ($connection) {
+            $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+            $connection->setPdo($pdo);
+        });
+        $connection->disconnect();
+        $connection->beginTransaction();
+        $this->assertEquals(1, $connection->transactionLevel());
+    }
+
     public function testBeginTransactionMethodNeverRetriesIfWithinTransaction()
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
