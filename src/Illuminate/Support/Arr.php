@@ -120,11 +120,12 @@ class Arr
 
         return $results;
     }
+
     /**
-     * Flatten a multi-dimensional associative array with custom deparator.
+     * Flatten a multi-dimensional associative array with custom separator.
      *
      * @param  array   $array
-     * @param  array   $separator
+     * @param  string   $separator
      * @return array
      */
     public static function deepFlatten($array, $separator = '.')

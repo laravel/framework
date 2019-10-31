@@ -113,6 +113,30 @@ class SupportArrTest extends TestCase
         $this->assertEquals($array, ['name' => 'taylor', 'languages.php' => true]);
     }
 
+    public function testDeepFlatten()
+    {
+        $array = Arr::deepFlatten(['foo' => ['bar' => 'baz']]);
+        $this->assertEquals(['foo.bar' => 'baz'], $array);
+
+        $array = Arr::deepFlatten([]);
+        $this->assertEquals([], $array);
+
+        $array = Arr::deepFlatten(['foo' => []]);
+        $this->assertEquals(['foo' => []], $array);
+
+        $array = Arr::deepFlatten(['foo' => ['bar' => []]]);
+        $this->assertEquals(['foo.bar' => []], $array);
+
+        $array = Arr::deepFlatten(['foo' => ['bar' => []]], '/');
+        $this->assertEquals(['foo/bar' => []], $array);
+
+        $array = Arr::deepFlatten(['name' => 'taylor', 'languages' => ['php' => true]]);
+        $this->assertEquals($array, ['name' => 'taylor', 'languages.php' => true]);
+
+        $array = Arr::deepFlatten(['name' => 'taylor', 'languages' => ['php' => true]], '_');
+        $this->assertEquals($array, ['name' => 'taylor', 'languages_php' => true]);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
