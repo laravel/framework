@@ -91,7 +91,7 @@ class TransformsRequest
         return $this->transform($key, $value);
     }
 
-     /**
+    /**
      * Transform the given key.
      *
      * @param  string  $key
