@@ -3,9 +3,12 @@
 namespace Illuminate\Foundation\Bus;
 
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Traits\ForwardsCalls;
 
 class PendingDispatch
 {
+    use ForwardsCalls;
+
     /**
      * The job.
      *
@@ -25,79 +28,15 @@ class PendingDispatch
     }
 
     /**
-     * Set the desired connection for the job.
+     * Dynamically proxy method calls to the underlying job.
      *
-     * @param  string|null  $connection
-     * @return $this
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
      */
-    public function onConnection($connection)
+    public function __call($method, $parameters)
     {
-        $this->job->onConnection($connection);
-
-        return $this;
-    }
-
-    /**
-     * Set the desired queue for the job.
-     *
-     * @param  string|null  $queue
-     * @return $this
-     */
-    public function onQueue($queue)
-    {
-        $this->job->onQueue($queue);
-
-        return $this;
-    }
-
-    /**
-     * Set the desired connection for the chain.
-     *
-     * @param  string|null  $connection
-     * @return $this
-     */
-    public function allOnConnection($connection)
-    {
-        $this->job->allOnConnection($connection);
-
-        return $this;
-    }
-
-    /**
-     * Set the desired queue for the chain.
-     *
-     * @param  string|null  $queue
-     * @return $this
-     */
-    public function allOnQueue($queue)
-    {
-        $this->job->allOnQueue($queue);
-
-        return $this;
-    }
-
-    /**
-     * Set the desired delay for the job.
-     *
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
-     * @return $this
-     */
-    public function delay($delay)
-    {
-        $this->job->delay($delay);
-
-        return $this;
-    }
-
-    /**
-     * Set the jobs that should run if this job is successful.
-     *
-     * @param  array  $chain
-     * @return $this
-     */
-    public function chain($chain)
-    {
-        $this->job->chain($chain);
+        $this->forwardCallTo($this->job, $method, $parameters);
 
         return $this;
     }
