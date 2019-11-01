@@ -2836,6 +2836,51 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $c->prepend(0, 'zero')->all());
     }
 
+    public function testPushWithOneItem()
+    {
+        $expected = [
+            0 => 4,
+            1 => 5,
+            2 => 6,
+            3 => ['a', 'b', 'c'],
+            4 => ['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe'],
+            5 => 'Jonny from Laroe',
+        ];
+
+        $data = new Collection([4, 5, 6]);
+        $data->push(['a', 'b', 'c']);
+        $data->push(['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe']);
+        $actual = $data->push('Jonny from Laroe')->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testPushWithMultipleItems()
+    {
+        $expected = [
+            0 => 4,
+            1 => 5,
+            2 => 6,
+            3 => 'Jonny',
+            4 => 'from',
+            5 => 'Laroe',
+            6 => 'Jonny',
+            7 => 'from',
+            8 => 'Laroe',
+            9 => 'a',
+            10 => 'b',
+            11 => 'c',
+        ];
+
+        $data = new Collection([4, 5, 6]);
+        $data->push('Jonny', 'from', 'Laroe');
+        $data->push(...[11 => 'Jonny', 12 => 'from', 13 => 'Laroe']);
+        $data->push(...collect(['a', 'b', 'c']));
+        $actual = $data->push(...[])->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
