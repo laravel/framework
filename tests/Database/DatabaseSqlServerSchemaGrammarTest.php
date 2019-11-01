@@ -318,7 +318,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $foreignId = $blueprint->foreignId('foo');
-        $blueprint->foreignId('company_id')->constrain();
+        $blueprint->foreignId('company_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
