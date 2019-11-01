@@ -1269,6 +1269,17 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Create a new Collection.
+     *
+     * @param  mixed  $items
+     * @return \Illuminate\Support\Collection
+     */
+    public function newCollection($items = [])
+    {
+        return new static($items);
+    }
+
+    /**
      * Determine if an item exists at an offset.
      *
      * @param  mixed  $key
