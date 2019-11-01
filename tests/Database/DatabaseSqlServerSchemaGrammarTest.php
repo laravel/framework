@@ -296,6 +296,33 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add "id" int identity primary key not null', $statements[0]);
     }
 
+    public function testAddingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->id();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "id" bigint identity primary key not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "foo" bigint identity primary key not null', $statements[0]);
+    }
+
+    public function testAddingForeignID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "foo" bigint not null', $statements[0]);
+    }
+
     public function testAddingBigIncrementingID()
     {
         $blueprint = new Blueprint('users');
