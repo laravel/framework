@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -317,11 +318,18 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testAddingForeignID()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->foreignId('foo');
+        $foreignId = $blueprint->foreignId('foo');
+        $blueprint->foreignId('company_id')->constrain();
+        $blueprint->foreignId('team_id')->references('id')->on('teams');
+
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" bigint not null', $statements[0]);
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+        $this->assertSame([
+            'alter table "users" add column "foo" bigint not null, add column "company_id" bigint not null, add column "team_id" bigint not null',
+            'alter table "users" add constraint "users_company_id_foreign" foreign key ("company_id") references "companies" ("id")',
+            'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
+        ], $statements);
     }
 
     public function testAddingBigIncrementingID()

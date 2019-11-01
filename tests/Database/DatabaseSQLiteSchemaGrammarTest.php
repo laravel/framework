@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\SqliteSchemaManager;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -301,11 +302,18 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignID()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->foreignId('foo');
+        $foreignId = $blueprint->foreignId('foo');
+        $blueprint->foreignId('company_id')->constrain();
+        $blueprint->foreignId('team_id')->references('id')->on('teams');
+
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer not null', $statements[0]);
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+        $this->assertSame([
+            'alter table "users" add column "foo" integer not null',
+            'alter table "users" add column "company_id" integer not null',
+            'alter table "users" add column "team_id" integer not null',
+        ], $statements);
     }
 
     public function testAddingBigIncrementingID()
