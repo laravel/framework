@@ -110,6 +110,44 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Cache values as they're enumerated.
+     *
+     * @return static
+     */
+    public function remember()
+    {
+        $iterator = $this->getIterator();
+
+        $iteratorIndex = 0;
+
+        $cache = [];
+
+        return new static(function () use ($iterator, &$iteratorIndex, &$cache) {
+            for ($index = 0; true; $index++) {
+                if (array_key_exists($index, $cache)) {
+                    yield $cache[$index][0] => $cache[$index][1];
+
+                    continue;
+                }
+
+                if ($iteratorIndex < $index) {
+                    $iterator->next();
+
+                    $iteratorIndex++;
+                }
+
+                if (! $iterator->valid()) {
+                    break;
+                }
+
+                $cache[$index] = [$iterator->key(), $iterator->current()];
+
+                yield $cache[$index][0] => $cache[$index][1];
+            }
+        });
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback
