@@ -32,7 +32,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      *
      * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
-    public function constrain()
+    public function constrained()
     {
         return $this->references('id')->on(Str::plural(Str::before($this->name, '_id')));
     }
