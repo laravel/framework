@@ -2407,6 +2407,28 @@ class Builder
     }
 
     /**
+     * Execute the given callback if no rows exist for the current query.
+     *
+     * @param  \Closure $callback
+     * @return mixed
+     */
+    public function existsOr(Closure $callback)
+    {
+        return $this->exists() ? true : $callback();
+    }
+
+    /**
+     * Execute the given callback if rows exist for the current query.
+     *
+     * @param  \Closure $callback
+     * @return mixed
+     */
+    public function doesntExistOr(Closure $callback)
+    {
+        return $this->doesntExist() ? true : $callback();
+    }
+
+    /**
      * Retrieve the "count" result of the query.
      *
      * @param  string  $columns
