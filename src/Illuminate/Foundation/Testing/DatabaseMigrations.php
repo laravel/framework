@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
-
 trait DatabaseMigrations
 {
+    use MigratesDatabase;
+
     /**
      * Define hooks to migrate the database before and after each test.
      *
@@ -13,9 +13,7 @@ trait DatabaseMigrations
      */
     public function runDatabaseMigrations()
     {
-        $this->artisan('migrate:fresh');
-
-        $this->app[Kernel::class]->setArtisan(null);
+        $this->migrateTestDatabase();
 
         $this->beforeApplicationDestroyed(function () {
             $this->artisan('migrate:rollback');

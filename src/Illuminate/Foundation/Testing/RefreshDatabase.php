@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
-
 trait RefreshDatabase
 {
+    use MigratesDatabase;
+
     /**
      * Define hooks to migrate the database before and after each test.
      *
@@ -37,9 +37,7 @@ trait RefreshDatabase
      */
     protected function refreshInMemoryDatabase()
     {
-        $this->artisan('migrate');
-
-        $this->app[Kernel::class]->setArtisan(null);
+        $this->migrateTestDatabase();
     }
 
     /**
@@ -50,12 +48,7 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh', [
-                '--drop-views' => $this->shouldDropViews(),
-                '--drop-types' => $this->shouldDropTypes(),
-            ]);
-
-            $this->app[Kernel::class]->setArtisan(null);
+            $this->migrateTestDatabase();
 
             RefreshDatabaseState::$migrated = true;
         }
@@ -103,27 +96,5 @@ trait RefreshDatabase
     {
         return property_exists($this, 'connectionsToTransact')
                             ? $this->connectionsToTransact : [null];
-    }
-
-    /**
-     * Determine if views should be dropped when refreshing the database.
-     *
-     * @return bool
-     */
-    protected function shouldDropViews()
-    {
-        return property_exists($this, 'dropViews')
-                            ? $this->dropViews : false;
-    }
-
-    /**
-     * Determine if types should be dropped when refreshing the database.
-     *
-     * @return bool
-     */
-    protected function shouldDropTypes()
-    {
-        return property_exists($this, 'dropTypes')
-                            ? $this->dropTypes : false;
     }
 }
