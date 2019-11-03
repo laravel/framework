@@ -382,11 +382,24 @@ class Migrator
 
         $callback = function () use ($migration, $method) {
             if (method_exists($migration, $method)) {
+                $defaultConnectionName = $this->resolver->getDefaultConnection();
+
+                // Use connection defined in migration as default connection, as
+                // a result, we can use different data sources when we run the
+                // migration.
+                $this->resolver->setDefaultConnection(
+                    $this->resolveConnectionName(
+                        $migration->getConnection()
+                    )
+                );
+
                 $this->fireMigrationEvent(new MigrationStarted($migration, $method));
 
                 $migration->{$method}();
 
                 $this->fireMigrationEvent(new MigrationEnded($migration, $method));
+
+                $this->resolver->setDefaultConnection($defaultConnectionName);
             }
         };
 
