@@ -538,6 +538,17 @@ class Migrator
     }
 
     /**
+     * Resolve the database connection name.
+     *
+     * @param  string  $connection
+     * @return string
+     */
+    protected function resolveConnectionName($connection)
+    {
+        return $connection ?: $this->connection;
+    }
+
+    /**
      * Resolve the database connection instance.
      *
      * @param  string  $connection
@@ -545,7 +556,9 @@ class Migrator
      */
     public function resolveConnection($connection)
     {
-        return $this->resolver->connection($connection ?: $this->connection);
+        return $this->resolver->connection(
+            $this->resolveConnectionName($connection)
+        );
     }
 
     /**
