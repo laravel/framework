@@ -3,9 +3,8 @@
 namespace Illuminate\Filesystem;
 
 use Illuminate\Contracts\Cache\Repository;
-use League\Flysystem\Cached\Storage\AbstractCache;
 
-class Cache extends AbstractCache
+class Cache
 {
     /**
      * The cache repository implementation.
