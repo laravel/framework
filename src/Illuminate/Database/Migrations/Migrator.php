@@ -382,16 +382,16 @@ class Migrator
 
         $callback = function () use ($migration, $method) {
             if (method_exists($migration, $method)) {
-                $defaultConnectionName = $this->resolver->getDefaultConnection();
+                if ($runInConnection = $migration->getConnection()) {
+                    $defaultConnectionName = $this->resolver->getDefaultConnection();
 
-                // Use connection defined in migration as default connection, as
-                // a result, we can use different data sources when we run the
-                // migration.
-                $this->resolver->setDefaultConnection(
-                    $this->resolveConnectionName(
+                    // Use connection defined in migration as default connection, as
+                    // a result, we can use different data sources when we run the
+                    // migration.
+                    $this->resolver->setDefaultConnection(
                         $migration->getConnection()
-                    )
-                );
+                    );
+                }
 
                 $this->fireMigrationEvent(new MigrationStarted($migration, $method));
 
@@ -399,7 +399,9 @@ class Migrator
 
                 $this->fireMigrationEvent(new MigrationEnded($migration, $method));
 
-                $this->resolver->setDefaultConnection($defaultConnectionName);
+                if (isset($defaultConnectionName)) {
+                    $this->resolver->setDefaultConnection($defaultConnectionName);
+                }
             }
         };
 
