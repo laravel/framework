@@ -111,12 +111,13 @@ class Str
             return $subject;
         }
 
-        $rpos = mb_strrpos($subject, $search);
-        if ($rpos === false) {
+        $pos = mb_strrpos($subject, $search);
+
+        if ($pos === false) {
             return $subject;
         }
 
-        return static::substr($subject, 0, $rpos);
+        return static::substr($subject, 0, $pos);
     }
 
     /**
