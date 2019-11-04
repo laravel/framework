@@ -41,7 +41,7 @@ class Str
     protected static $uuidFactory;
 
     /**
-     * Return the remainder of a string after a given value.
+     * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
@@ -50,6 +50,18 @@ class Str
     public static function after($subject, $search)
     {
         return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+    }
+
+    /**
+     * Return the remainder of a string after the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function afterLast($subject, $search)
+    {
+        return $search === '' ? $subject : array_reverse(explode($search, $subject))[0];
     }
 
     /**
@@ -75,7 +87,7 @@ class Str
     }
 
     /**
-     * Get the portion of a string before a given value.
+     * Get the portion of a string before the first occurrence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
@@ -84,6 +96,28 @@ class Str
     public static function before($subject, $search)
     {
         return $search === '' ? $subject : explode($search, $subject)[0];
+    }
+
+    /**
+     * Get the portion of a string before the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function beforeLast($subject, $search)
+    {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $pos = mb_strrpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return static::substr($subject, 0, $pos);
     }
 
     /**
