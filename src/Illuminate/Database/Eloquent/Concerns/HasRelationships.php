@@ -795,6 +795,18 @@ trait HasRelationships
     }
 
     /**
+     * Unset all relations on the model.
+     *
+     * @return $this
+     */
+    public function unsetRelations()
+    {
+        $this->relations = [];
+
+        return $this;
+    }
+
+    /**
      * Get the relationships that are touched on save.
      *
      * @return array

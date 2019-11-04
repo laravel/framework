@@ -37,6 +37,17 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertFalse($parent->relationLoaded('foo'));
     }
 
+    public function testUnsetExistingRelations()
+    {
+        $parent = new EloquentRelationResetModelStub;
+        $relation = new EloquentRelationResetModelStub;
+        $parent->setRelation('foo', $relation);
+        $parent->setRelation('bar', $relation);
+        $parent->unsetRelations();
+        $this->assertFalse($parent->relationLoaded('foo'));
+        $this->assertFalse($parent->relationLoaded('bar'));
+    }
+
     public function testTouchMethodUpdatesRelatedTimestamps()
     {
         $builder = m::mock(Builder::class);
