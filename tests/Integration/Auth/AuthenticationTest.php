@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Illuminate\Validation\UnauthorizedException;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -209,6 +210,14 @@ class AuthenticationTest extends TestCase
 
             return true;
         });
+    }
+
+    /**
+     * @expectedException UnauthorizedException
+     */
+    public function testExceptionThrowsAtLoggingOutOtherDevicesUnauthorized()
+    {
+        $this->app['auth']->logoutOtherDevices('password');
     }
 
     public function testLoggingInOutViaAttemptRemembering()
