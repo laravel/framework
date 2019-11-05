@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TrimStringsTest extends TestCase
@@ -22,10 +22,10 @@ class TrimStringsTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertEquals('123', $request->get('abc'));
-            $this->assertEquals('456', $request->get('xyz'));
-            $this->assertEquals('  789  ', $request->get('foo'));
-            $this->assertEquals('  010  ', $request->get('bar'));
+            $this->assertSame('123', $request->get('abc'));
+            $this->assertSame('456', $request->get('xyz'));
+            $this->assertSame('  789  ', $request->get('foo'));
+            $this->assertSame('  010  ', $request->get('bar'));
         });
     }
 }

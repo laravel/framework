@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Container;
 
-use stdClass;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ContainerExtendTest extends TestCase
 {
@@ -16,7 +16,7 @@ class ContainerExtendTest extends TestCase
             return $old.'bar';
         });
 
-        $this->assertEquals('foobar', $container->make('foo'));
+        $this->assertSame('foobar', $container->make('foo'));
 
         $container = new Container;
 
@@ -31,7 +31,7 @@ class ContainerExtendTest extends TestCase
 
         $result = $container->make('foo');
 
-        $this->assertEquals('taylor', $result->name);
+        $this->assertSame('taylor', $result->name);
         $this->assertEquals(26, $result->age);
         $this->assertSame($result, $container->make('foo'));
     }
@@ -60,9 +60,9 @@ class ContainerExtendTest extends TestCase
             return $obj;
         });
 
-        $this->assertEquals('foo', $container->make('foo')->foo);
-        $this->assertEquals('baz', $container->make('foo')->bar);
-        $this->assertEquals('foo', $container->make('foo')->baz);
+        $this->assertSame('foo', $container->make('foo')->foo);
+        $this->assertSame('baz', $container->make('foo')->bar);
+        $this->assertSame('foo', $container->make('foo')->baz);
     }
 
     public function testExtendIsLazyInitialized()
@@ -89,7 +89,7 @@ class ContainerExtendTest extends TestCase
         });
         $container['foo'] = 'foo';
 
-        $this->assertEquals('foobar', $container->make('foo'));
+        $this->assertSame('foobar', $container->make('foo'));
     }
 
     public function testExtendInstanceRebindingCallback()
@@ -145,7 +145,7 @@ class ContainerExtendTest extends TestCase
             return $value.' extended';
         });
 
-        $this->assertEquals('some value extended', $container->make('something'));
+        $this->assertSame('some value extended', $container->make('something'));
     }
 
     public function testMultipleExtends()
@@ -159,7 +159,7 @@ class ContainerExtendTest extends TestCase
             return $old.'baz';
         });
 
-        $this->assertEquals('foobarbaz', $container->make('foo'));
+        $this->assertSame('foobarbaz', $container->make('foo'));
     }
 
     public function testUnsetExtend()
@@ -185,7 +185,7 @@ class ContainerExtendTest extends TestCase
             return 'foo';
         });
 
-        $this->assertEquals('foo', $container->make('foo'));
+        $this->assertSame('foo', $container->make('foo'));
     }
 }
 

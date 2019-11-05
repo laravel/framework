@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
 
@@ -220,17 +220,21 @@ trait InteractsWithPivotTable
      */
     protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch)
     {
-        $updated = $this->getCurrentlyAttachedPivots()
+        $pivot = $this->getCurrentlyAttachedPivots()
                     ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
                     ->where($this->relatedPivotKey, $this->parseId($id))
-                    ->first()
-                    ->fill($attributes)
-                    ->isDirty();
+                    ->first();
 
-        $this->newPivot([
+        $updated = $pivot ? $pivot->fill($attributes)->isDirty() : false;
+
+        $pivot = $this->newPivot([
             $this->foreignPivotKey => $this->parent->{$this->parentKey},
             $this->relatedPivotKey => $this->parseId($id),
-        ], true)->fill($attributes)->save();
+        ], true);
+
+        $pivot->timestamps = in_array($this->updatedAt(), $this->pivotColumns);
+
+        $pivot->fill($attributes)->save();
 
         if ($touch) {
             $this->touchIfTouching();
@@ -403,7 +407,7 @@ trait InteractsWithPivotTable
      * @param  string  $column
      * @return bool
      */
-    protected function hasPivotColumn($column)
+    public function hasPivotColumn($column)
     {
         return in_array($column, $this->pivotColumns);
     }

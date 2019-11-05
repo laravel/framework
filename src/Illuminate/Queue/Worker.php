@@ -3,14 +3,14 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use Throwable;
-use Illuminate\Support\Carbon;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\DetectsLostConnections;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Queue\Factory as QueueManager;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\Factory as QueueManager;
+use Illuminate\Database\DetectsLostConnections;
+use Illuminate\Support\Carbon;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class Worker
 {
@@ -151,9 +151,11 @@ class Worker
         // process if it is running too long because it has frozen. This uses the async
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options) {
-            $this->markJobAsFailedIfWillExceedMaxAttempts(
-                $job->getConnectionName(), $job, (int) $options->maxTries, $this->maxAttemptsExceededException($job)
-            );
+            if ($job) {
+                $this->markJobAsFailedIfWillExceedMaxAttempts(
+                    $job->getConnectionName(), $job, (int) $options->maxTries, $this->maxAttemptsExceededException($job)
+                );
+            }
 
             $this->kill(1);
         });

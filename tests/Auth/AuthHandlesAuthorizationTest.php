@@ -2,30 +2,30 @@
 
 namespace Illuminate\Tests\Auth;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use PHPUnit\Framework\TestCase;
 
 class AuthHandlesAuthorizationTest extends TestCase
 {
     use HandlesAuthorization;
 
-    public function test_allow_method()
+    public function testAllowMethod()
     {
         $response = $this->allow('some message', 'some_code');
 
         $this->assertTrue($response->allowed());
         $this->assertFalse($response->denied());
-        $this->assertEquals('some message', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('some message', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 
-    public function test_deny_method()
+    public function testDenyMethod()
     {
         $response = $this->deny('some message', 'some_code');
 
         $this->assertTrue($response->denied());
         $this->assertFalse($response->allowed());
-        $this->assertEquals('some message', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('some message', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 }

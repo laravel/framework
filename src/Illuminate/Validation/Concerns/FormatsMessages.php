@@ -54,7 +54,7 @@ trait FormatsMessages
         // messages out of the translator service for this validation rule.
         $key = "validation.{$lowerRule}";
 
-        if ($key != ($value = $this->translator->trans($key))) {
+        if ($key != ($value = $this->translator->get($key))) {
             return $value;
         }
 
@@ -113,7 +113,7 @@ trait FormatsMessages
      */
     protected function getCustomMessageFromTranslator($key)
     {
-        if (($message = $this->translator->trans($key)) !== $key) {
+        if (($message = $this->translator->get($key)) !== $key) {
             return $message;
         }
 
@@ -125,7 +125,7 @@ trait FormatsMessages
         );
 
         return $this->getWildcardCustomMessages(Arr::dot(
-            (array) $this->translator->trans('validation.custom')
+            (array) $this->translator->get('validation.custom')
         ), $shortKey, $key);
     }
 
@@ -166,7 +166,7 @@ trait FormatsMessages
 
         $key = "validation.{$lowerRule}.{$type}";
 
-        return $this->translator->trans($key);
+        return $this->translator->get($key);
     }
 
     /**
@@ -264,7 +264,7 @@ trait FormatsMessages
      */
     protected function getAttributeFromTranslations($name)
     {
-        return Arr::get($this->translator->trans('validation.attributes'), $name);
+        return Arr::get($this->translator->get('validation.attributes'), $name);
     }
 
     /**
@@ -316,8 +316,12 @@ trait FormatsMessages
 
         $key = "validation.values.{$attribute}.{$value}";
 
-        if (($line = $this->translator->trans($key)) !== $key) {
+        if (($line = $this->translator->get($key)) !== $key) {
             return $line;
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
         }
 
         return $value;

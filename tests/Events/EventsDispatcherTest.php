@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Events;
 
 use Exception;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\CallQueuedListener;
+use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Events\CallQueuedListener;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -27,7 +27,7 @@ class EventsDispatcherTest extends TestCase
             $_SERVER['__event.test'] = $foo;
         });
         $d->dispatch('foo', ['bar']);
-        $this->assertEquals('bar', $_SERVER['__event.test']);
+        $this->assertSame('bar', $_SERVER['__event.test']);
     }
 
     public function testHaltingEventExecution()
@@ -74,7 +74,7 @@ class EventsDispatcherTest extends TestCase
 
         $this->assertFalse(isset($_SERVER['__event.test']));
         $d->flush('update');
-        $this->assertEquals('taylor', $_SERVER['__event.test']);
+        $this->assertSame('taylor', $_SERVER['__event.test']);
     }
 
     public function testQueuedEventsCanBeForgotten()
@@ -88,7 +88,7 @@ class EventsDispatcherTest extends TestCase
 
         $d->forgetPushed();
         $d->flush('update');
-        $this->assertEquals('unset', $_SERVER['__event.test']);
+        $this->assertSame('unset', $_SERVER['__event.test']);
     }
 
     public function testWildcardListeners()
@@ -106,7 +106,7 @@ class EventsDispatcherTest extends TestCase
         });
         $d->dispatch('foo.bar');
 
-        $this->assertEquals('wildcard', $_SERVER['__event.test']);
+        $this->assertSame('wildcard', $_SERVER['__event.test']);
     }
 
     public function testWildcardListenersCacheFlushing()
@@ -117,13 +117,13 @@ class EventsDispatcherTest extends TestCase
             $_SERVER['__event.test'] = 'cached_wildcard';
         });
         $d->dispatch('foo.bar');
-        $this->assertEquals('cached_wildcard', $_SERVER['__event.test']);
+        $this->assertSame('cached_wildcard', $_SERVER['__event.test']);
 
         $d->listen('foo.*', function () {
             $_SERVER['__event.test'] = 'new_wildcard';
         });
         $d->dispatch('foo.bar');
-        $this->assertEquals('new_wildcard', $_SERVER['__event.test']);
+        $this->assertSame('new_wildcard', $_SERVER['__event.test']);
     }
 
     public function testListenersCanBeRemoved()
@@ -178,15 +178,15 @@ class EventsDispatcherTest extends TestCase
     {
         $d = new Dispatcher;
         $d->listen('foo.*', function ($event, $data) {
-            $this->assertEquals('foo.bar', $event);
+            $this->assertSame('foo.bar', $event);
             $this->assertEquals(['first', 'second'], $data);
         });
         $d->dispatch('foo.bar', ['first', 'second']);
 
         $d = new Dispatcher;
         $d->listen('foo.bar', function ($first, $second) {
-            $this->assertEquals('first', $first);
-            $this->assertEquals('second', $second);
+            $this->assertSame('first', $first);
+            $this->assertSame('second', $second);
         });
         $d->dispatch('foo.bar', ['first', 'second']);
     }

@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToGlobalScopesTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -36,7 +36,7 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($post)->save();
     }
 
-    public function test_with_global_scopes()
+    public function testWithGlobalScopes()
     {
         $comments = Comment::with('commentable')->get();
 
@@ -44,7 +44,7 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         $this->assertNull($comments[1]->commentable);
     }
 
-    public function test_without_global_scope()
+    public function testWithoutGlobalScope()
     {
         $comments = Comment::with(['commentable' => function ($query) {
             $query->withoutGlobalScopes([SoftDeletingScope::class]);
@@ -54,7 +54,7 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         $this->assertNotNull($comments[1]->commentable);
     }
 
-    public function test_without_global_scopes()
+    public function testWithoutGlobalScopes()
     {
         $comments = Comment::with(['commentable' => function ($query) {
             $query->withoutGlobalScopes();
@@ -64,7 +64,7 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         $this->assertNotNull($comments[1]->commentable);
     }
 
-    public function test_lazy_loading()
+    public function testLazyLoading()
     {
         $comment = Comment::latest('id')->first();
         $post = $comment->commentable()->withoutGlobalScopes()->first();

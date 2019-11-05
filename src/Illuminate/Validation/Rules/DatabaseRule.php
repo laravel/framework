@@ -50,7 +50,7 @@ trait DatabaseRule
     /**
      * Set a "where" constraint on the query.
      *
-     * @param  string|\Closure  $column
+     * @param  \Closure|string  $column
      * @param  array|string|null  $value
      * @return $this
      */

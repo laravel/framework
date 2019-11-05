@@ -28,18 +28,18 @@ interface PasswordBroker
     const INVALID_USER = 'passwords.user';
 
     /**
-     * Constant representing an invalid password.
-     *
-     * @var string
-     */
-    const INVALID_PASSWORD = 'passwords.password';
-
-    /**
      * Constant representing an invalid token.
      *
      * @var string
      */
     const INVALID_TOKEN = 'passwords.token';
+
+    /**
+     * Constant representing a throttled reset attempt.
+     *
+     * @var string
+     */
+    const RESET_THROTTLED = 'passwords.throttled';
 
     /**
      * Send a password reset link to a user.
@@ -57,20 +57,4 @@ interface PasswordBroker
      * @return mixed
      */
     public function reset(array $credentials, Closure $callback);
-
-    /**
-     * Set a custom password validator.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function validator(Closure $callback);
-
-    /**
-     * Determine if the passwords match for the request.
-     *
-     * @param  array  $credentials
-     * @return bool
-     */
-    public function validateNewPassword(array $credentials);
 }

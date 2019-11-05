@@ -3,10 +3,10 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Dotenv\Dotenv;
-use Illuminate\Support\Env;
 use Dotenv\Exception\InvalidFileException;
-use Symfony\Component\Console\Input\ArgvInput;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Env;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 class LoadEnvironmentVariables

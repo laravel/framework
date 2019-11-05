@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Env;
-use Illuminate\Support\Optional;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Optional;
 
 if (! function_exists('append_config')) {
     /**
@@ -384,19 +384,17 @@ if (! function_exists('retry')) {
     function retry($times, callable $callback, $sleep = 0, $when = null)
     {
         $attempts = 0;
-        $times--;
 
         beginning:
         $attempts++;
+        $times--;
 
         try {
             return $callback($attempts);
         } catch (Exception $e) {
-            if (! $times || ($when && ! $when($e))) {
+            if ($times < 1 || ($when && ! $when($e))) {
                 throw $e;
             }
-
-            $times--;
 
             if ($sleep) {
                 usleep($sleep * 1000);

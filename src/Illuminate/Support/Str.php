@@ -2,11 +2,11 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Traits\Macroable;
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
+use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
-use Illuminate\Support\Traits\Macroable;
-use Ramsey\Uuid\Generator\CombGenerator;
-use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 
 class Str
 {
@@ -34,7 +34,14 @@ class Str
     protected static $studlyCache = [];
 
     /**
-     * Return the remainder of a string after a given value.
+     * The callback that should be used to generate UUIDs.
+     *
+     * @var callable
+     */
+    protected static $uuidFactory;
+
+    /**
+     * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
@@ -43,6 +50,18 @@ class Str
     public static function after($subject, $search)
     {
         return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+    }
+
+    /**
+     * Return the remainder of a string after the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function afterLast($subject, $search)
+    {
+        return $search === '' ? $subject : array_reverse(explode($search, $subject))[0];
     }
 
     /**
@@ -68,7 +87,7 @@ class Str
     }
 
     /**
-     * Get the portion of a string before a given value.
+     * Get the portion of a string before the first occurrence of a given value.
      *
      * @param  string  $subject
      * @param  string  $search
@@ -77,6 +96,28 @@ class Str
     public static function before($subject, $search)
     {
         return $search === '' ? $subject : explode($search, $subject)[0];
+    }
+
+    /**
+     * Get the portion of a string before the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function beforeLast($subject, $search)
+    {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $pos = mb_strrpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return static::substr($subject, 0, $pos);
     }
 
     /**
@@ -566,7 +607,9 @@ class Str
      */
     public static function uuid()
     {
-        return Uuid::uuid4();
+        return static::$uuidFactory
+                    ? call_user_func(static::$uuidFactory)
+                    : Uuid::uuid4();
     }
 
     /**
@@ -576,7 +619,11 @@ class Str
      */
     public static function orderedUuid()
     {
-        $factory = new UuidFactory;
+        if (static::$uuidFactory) {
+            return call_user_func(static::$uuidFactory);
+        }
+
+        $factory = new UuidFactory();
 
         $factory->setRandomGenerator(new CombGenerator(
             $factory->getRandomGenerator(),
@@ -588,6 +635,27 @@ class Str
         ));
 
         return $factory->uuid4();
+    }
+
+    /**
+     * Set the callable that will be used to generate UUIDs.
+     *
+     * @param  callable  $factory
+     * @return void
+     */
+    public static function createUuidsUsing(callable $factory = null)
+    {
+        static::$uuidFactory = $factory;
+    }
+
+    /**
+     * Indicate that UUIDs should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createUuidsNormally()
+    {
+        static::$uuidFactory = null;
     }
 
     /**
@@ -618,38 +686,38 @@ class Str
             '7'    => ['⁷', '₇', '۷', '７'],
             '8'    => ['⁸', '₈', '۸', '８'],
             '9'    => ['⁹', '₉', '۹', '９'],
-            'a'    => ['à', 'á', 'ả', 'ã', 'ạ', 'ă', 'ắ', 'ằ', 'ẳ', 'ẵ', 'ặ', 'â', 'ấ', 'ầ', 'ẩ', 'ẫ', 'ậ', 'ā', 'ą', 'å', 'α', 'ά', 'ἀ', 'ἁ', 'ἂ', 'ἃ', 'ἄ', 'ἅ', 'ἆ', 'ἇ', 'ᾀ', 'ᾁ', 'ᾂ', 'ᾃ', 'ᾄ', 'ᾅ', 'ᾆ', 'ᾇ', 'ὰ', 'ά', 'ᾰ', 'ᾱ', 'ᾲ', 'ᾳ', 'ᾴ', 'ᾶ', 'ᾷ', 'а', 'أ', 'အ', 'ာ', 'ါ', 'ǻ', 'ǎ', 'ª', 'ა', 'अ', 'ا', 'ａ', 'ä'],
-            'b'    => ['б', 'β', 'ب', 'ဗ', 'ბ', 'ｂ'],
+            'a'    => ['à', 'á', 'ả', 'ã', 'ạ', 'ă', 'ắ', 'ằ', 'ẳ', 'ẵ', 'ặ', 'â', 'ấ', 'ầ', 'ẩ', 'ẫ', 'ậ', 'ā', 'ą', 'å', 'α', 'ά', 'ἀ', 'ἁ', 'ἂ', 'ἃ', 'ἄ', 'ἅ', 'ἆ', 'ἇ', 'ᾀ', 'ᾁ', 'ᾂ', 'ᾃ', 'ᾄ', 'ᾅ', 'ᾆ', 'ᾇ', 'ὰ', 'ά', 'ᾰ', 'ᾱ', 'ᾲ', 'ᾳ', 'ᾴ', 'ᾶ', 'ᾷ', 'а', 'أ', 'အ', 'ာ', 'ါ', 'ǻ', 'ǎ', 'ª', 'ა', 'अ', 'ا', 'ａ', 'ä', 'א'],
+            'b'    => ['б', 'β', 'ب', 'ဗ', 'ბ', 'ｂ', 'ב'],
             'c'    => ['ç', 'ć', 'č', 'ĉ', 'ċ', 'ｃ'],
-            'd'    => ['ď', 'ð', 'đ', 'ƌ', 'ȡ', 'ɖ', 'ɗ', 'ᵭ', 'ᶁ', 'ᶑ', 'д', 'δ', 'د', 'ض', 'ဍ', 'ဒ', 'დ', 'ｄ'],
+            'd'    => ['ď', 'ð', 'đ', 'ƌ', 'ȡ', 'ɖ', 'ɗ', 'ᵭ', 'ᶁ', 'ᶑ', 'д', 'δ', 'د', 'ض', 'ဍ', 'ဒ', 'დ', 'ｄ', 'ד'],
             'e'    => ['é', 'è', 'ẻ', 'ẽ', 'ẹ', 'ê', 'ế', 'ề', 'ể', 'ễ', 'ệ', 'ë', 'ē', 'ę', 'ě', 'ĕ', 'ė', 'ε', 'έ', 'ἐ', 'ἑ', 'ἒ', 'ἓ', 'ἔ', 'ἕ', 'ὲ', 'έ', 'е', 'ё', 'э', 'є', 'ə', 'ဧ', 'ေ', 'ဲ', 'ე', 'ए', 'إ', 'ئ', 'ｅ'],
-            'f'    => ['ф', 'φ', 'ف', 'ƒ', 'ფ', 'ｆ'],
-            'g'    => ['ĝ', 'ğ', 'ġ', 'ģ', 'г', 'ґ', 'γ', 'ဂ', 'გ', 'گ', 'ｇ'],
-            'h'    => ['ĥ', 'ħ', 'η', 'ή', 'ح', 'ه', 'ဟ', 'ှ', 'ჰ', 'ｈ'],
-            'i'    => ['í', 'ì', 'ỉ', 'ĩ', 'ị', 'î', 'ï', 'ī', 'ĭ', 'į', 'ı', 'ι', 'ί', 'ϊ', 'ΐ', 'ἰ', 'ἱ', 'ἲ', 'ἳ', 'ἴ', 'ἵ', 'ἶ', 'ἷ', 'ὶ', 'ί', 'ῐ', 'ῑ', 'ῒ', 'ΐ', 'ῖ', 'ῗ', 'і', 'ї', 'и', 'ဣ', 'ိ', 'ီ', 'ည်', 'ǐ', 'ი', 'इ', 'ی', 'ｉ'],
+            'f'    => ['ф', 'φ', 'ف', 'ƒ', 'ფ', 'ｆ', 'פ', 'ף'],
+            'g'    => ['ĝ', 'ğ', 'ġ', 'ģ', 'г', 'ґ', 'γ', 'ဂ', 'გ', 'گ', 'ｇ', 'ג'],
+            'h'    => ['ĥ', 'ħ', 'η', 'ή', 'ح', 'ه', 'ဟ', 'ှ', 'ჰ', 'ｈ', 'ה'],
+            'i'    => ['í', 'ì', 'ỉ', 'ĩ', 'ị', 'î', 'ï', 'ī', 'ĭ', 'į', 'ı', 'ι', 'ί', 'ϊ', 'ΐ', 'ἰ', 'ἱ', 'ἲ', 'ἳ', 'ἴ', 'ἵ', 'ἶ', 'ἷ', 'ὶ', 'ί', 'ῐ', 'ῑ', 'ῒ', 'ΐ', 'ῖ', 'ῗ', 'і', 'ї', 'и', 'ဣ', 'ိ', 'ီ', 'ည်', 'ǐ', 'ი', 'इ', 'ی', 'ｉ', 'י'],
             'j'    => ['ĵ', 'ј', 'Ј', 'ჯ', 'ج', 'ｊ'],
-            'k'    => ['ķ', 'ĸ', 'к', 'κ', 'Ķ', 'ق', 'ك', 'က', 'კ', 'ქ', 'ک', 'ｋ'],
-            'l'    => ['ł', 'ľ', 'ĺ', 'ļ', 'ŀ', 'л', 'λ', 'ل', 'လ', 'ლ', 'ｌ'],
-            'm'    => ['м', 'μ', 'م', 'မ', 'მ', 'ｍ'],
-            'n'    => ['ñ', 'ń', 'ň', 'ņ', 'ŉ', 'ŋ', 'ν', 'н', 'ن', 'န', 'ნ', 'ｎ'],
+            'k'    => ['ķ', 'ĸ', 'к', 'κ', 'Ķ', 'ق', 'ك', 'က', 'კ', 'ქ', 'ک', 'ｋ', 'ק'],
+            'l'    => ['ł', 'ľ', 'ĺ', 'ļ', 'ŀ', 'л', 'λ', 'ل', 'လ', 'ლ', 'ｌ', 'ל'],
+            'm'    => ['м', 'μ', 'م', 'မ', 'მ', 'ｍ', 'מ', 'ם'],
+            'n'    => ['ñ', 'ń', 'ň', 'ņ', 'ŉ', 'ŋ', 'ν', 'н', 'ن', 'န', 'ნ', 'ｎ', 'נ'],
             'o'    => ['ó', 'ò', 'ỏ', 'õ', 'ọ', 'ô', 'ố', 'ồ', 'ổ', 'ỗ', 'ộ', 'ơ', 'ớ', 'ờ', 'ở', 'ỡ', 'ợ', 'ø', 'ō', 'ő', 'ŏ', 'ο', 'ὀ', 'ὁ', 'ὂ', 'ὃ', 'ὄ', 'ὅ', 'ὸ', 'ό', 'о', 'و', 'ို', 'ǒ', 'ǿ', 'º', 'ო', 'ओ', 'ｏ', 'ö'],
-            'p'    => ['п', 'π', 'ပ', 'პ', 'پ', 'ｐ'],
+            'p'    => ['п', 'π', 'ပ', 'პ', 'پ', 'ｐ', 'פ', 'ף'],
             'q'    => ['ყ', 'ｑ'],
-            'r'    => ['ŕ', 'ř', 'ŗ', 'р', 'ρ', 'ر', 'რ', 'ｒ'],
-            's'    => ['ś', 'š', 'ş', 'с', 'σ', 'ș', 'ς', 'س', 'ص', 'စ', 'ſ', 'ს', 'ｓ'],
-            't'    => ['ť', 'ţ', 'т', 'τ', 'ț', 'ت', 'ط', 'ဋ', 'တ', 'ŧ', 'თ', 'ტ', 'ｔ'],
+            'r'    => ['ŕ', 'ř', 'ŗ', 'р', 'ρ', 'ر', 'რ', 'ｒ', 'ר'],
+            's'    => ['ś', 'š', 'ş', 'с', 'σ', 'ș', 'ς', 'س', 'ص', 'စ', 'ſ', 'ს', 'ｓ', 'ס'],
+            't'    => ['ť', 'ţ', 'т', 'τ', 'ț', 'ت', 'ط', 'ဋ', 'တ', 'ŧ', 'თ', 'ტ', 'ｔ', 'ת'],
             'u'    => ['ú', 'ù', 'ủ', 'ũ', 'ụ', 'ư', 'ứ', 'ừ', 'ử', 'ữ', 'ự', 'û', 'ū', 'ů', 'ű', 'ŭ', 'ų', 'µ', 'у', 'ဉ', 'ု', 'ူ', 'ǔ', 'ǖ', 'ǘ', 'ǚ', 'ǜ', 'უ', 'उ', 'ｕ', 'ў', 'ü'],
-            'v'    => ['в', 'ვ', 'ϐ', 'ｖ'],
+            'v'    => ['в', 'ვ', 'ϐ', 'ｖ', 'ו'],
             'w'    => ['ŵ', 'ω', 'ώ', 'ဝ', 'ွ', 'ｗ'],
             'x'    => ['χ', 'ξ', 'ｘ'],
             'y'    => ['ý', 'ỳ', 'ỷ', 'ỹ', 'ỵ', 'ÿ', 'ŷ', 'й', 'ы', 'υ', 'ϋ', 'ύ', 'ΰ', 'ي', 'ယ', 'ｙ'],
-            'z'    => ['ź', 'ž', 'ż', 'з', 'ζ', 'ز', 'ဇ', 'ზ', 'ｚ'],
+            'z'    => ['ź', 'ž', 'ż', 'з', 'ζ', 'ز', 'ဇ', 'ზ', 'ｚ', 'ז'],
             'aa'   => ['ع', 'आ', 'آ'],
             'ae'   => ['æ', 'ǽ'],
             'ai'   => ['ऐ'],
             'ch'   => ['ч', 'ჩ', 'ჭ', 'چ'],
             'dj'   => ['ђ', 'đ'],
-            'dz'   => ['џ', 'ძ'],
+            'dz'   => ['џ', 'ძ', 'דז'],
             'ei'   => ['ऍ'],
             'gh'   => ['غ', 'ღ'],
             'ii'   => ['ई'],
@@ -661,7 +729,7 @@ class Str
             'oi'   => ['ऑ'],
             'oii'  => ['ऒ'],
             'ps'   => ['ψ'],
-            'sh'   => ['ш', 'შ', 'ش'],
+            'sh'   => ['ш', 'შ', 'ش', 'ש'],
             'shch' => ['щ'],
             'ss'   => ['ß'],
             'sx'   => ['ŝ'],
@@ -712,13 +780,13 @@ class Str
             'Nj'   => ['Њ'],
             'Oe'   => ['Œ'],
             'Ps'   => ['Ψ'],
-            'Sh'   => ['Ш'],
+            'Sh'   => ['Ш', 'ש'],
             'Shch' => ['Щ'],
             'Ss'   => ['ẞ'],
-            'Th'   => ['Þ', 'Θ'],
+            'Th'   => ['Þ', 'Θ', 'ת'],
             'Ts'   => ['Ц'],
-            'Ya'   => ['Я'],
-            'Yu'   => ['Ю'],
+            'Ya'   => ['Я', 'יא'],
+            'Yu'   => ['Ю', 'יו'],
             'Zh'   => ['Ж'],
             ' '    => ["\xC2\xA0", "\xE2\x80\x80", "\xE2\x80\x81", "\xE2\x80\x82", "\xE2\x80\x83", "\xE2\x80\x84", "\xE2\x80\x85", "\xE2\x80\x86", "\xE2\x80\x87", "\xE2\x80\x88", "\xE2\x80\x89", "\xE2\x80\x8A", "\xE2\x80\xAF", "\xE2\x81\x9F", "\xE3\x80\x80", "\xEF\xBE\xA0"],
         ];
@@ -751,6 +819,12 @@ class Str
                 'de' => [
                     ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
                     ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
+                ],
+                'he' => [
+                    ['א', 'ב', 'ג', 'ד', 'ה', 'ו'],
+                    ['ז', 'ח', 'ט', 'י', 'כ', 'ל'],
+                    ['מ', 'נ', 'ס', 'ע', 'פ', 'צ'],
+                    ['ק', 'ר', 'ש', 'ת', 'ן', 'ץ', 'ך', 'ם', 'ף'],
                 ],
                 'ro' => [
                     ['ă', 'â', 'î', 'ș', 'ț', 'Ă', 'Â', 'Î', 'Ș', 'Ț'],

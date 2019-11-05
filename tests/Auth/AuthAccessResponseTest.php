@@ -2,71 +2,71 @@
 
 namespace Illuminate\Tests\Auth;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Response;
+use PHPUnit\Framework\TestCase;
 
 class AuthAccessResponseTest extends TestCase
 {
-    public function test_allow_method()
+    public function testAllowMethod()
     {
         $response = Response::allow('some message', 'some_code');
 
         $this->assertTrue($response->allowed());
         $this->assertFalse($response->denied());
-        $this->assertEquals('some message', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('some message', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 
-    public function test_deny_method()
+    public function testDenyMethod()
     {
         $response = Response::deny('some message', 'some_code');
 
         $this->assertTrue($response->denied());
         $this->assertFalse($response->allowed());
-        $this->assertEquals('some message', $response->message());
-        $this->assertEquals('some_code', $response->code());
+        $this->assertSame('some message', $response->message());
+        $this->assertSame('some_code', $response->code());
     }
 
-    public function test_deny_method_with_no_message_returns_null()
+    public function testDenyMethodWithNoMessageReturnsNull()
     {
         $response = Response::deny();
 
         $this->assertNull($response->message());
     }
 
-    public function test_authorize_method_throws_authorization_exception_when_response_denied()
+    public function testAuthorizeMethodThrowsAuthorizationExceptionWhenResponseDenied()
     {
         $response = Response::deny('Some message.', 'some_code');
 
         try {
             $response->authorize();
         } catch (AuthorizationException $e) {
-            $this->assertEquals('Some message.', $e->getMessage());
-            $this->assertEquals('some_code', $e->getCode());
+            $this->assertSame('Some message.', $e->getMessage());
+            $this->assertSame('some_code', $e->getCode());
             $this->assertEquals($response, $e->response());
         }
     }
 
-    public function test_authorize_method_throws_authorization_exception_with_default_message()
+    public function testAuthorizeMethodThrowsAuthorizationExceptionWithDefaultMessage()
     {
         $response = Response::deny();
 
         try {
             $response->authorize();
         } catch (AuthorizationException $e) {
-            $this->assertEquals('This action is unauthorized.', $e->getMessage());
+            $this->assertSame('This action is unauthorized.', $e->getMessage());
         }
     }
 
-    public function test_throw_if_needed_doesnt_throw_authorization_exception_when_response_allowed()
+    public function testThrowIfNeededDoesntThrowAuthorizationExceptionWhenResponseAllowed()
     {
         $response = Response::allow('Some message.', 'some_code');
 
         $this->assertEquals($response, $response->authorize());
     }
 
-    public function test_casting_to_string_returns_message()
+    public function testCastingToStringReturnsMessage()
     {
         $response = new Response(true, 'some data');
         $this->assertSame('some data', (string) $response);
@@ -75,7 +75,7 @@ class AuthAccessResponseTest extends TestCase
         $this->assertSame('', (string) $response);
     }
 
-    public function test_response_to_array_method()
+    public function testResponseToArrayMethod()
     {
         $response = new Response(false, 'Not allowed.', 'some_code');
 

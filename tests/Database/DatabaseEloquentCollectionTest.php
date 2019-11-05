@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use LogicException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
+use LogicException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
@@ -159,7 +159,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $c = $this->getMockBuilder(Collection::class)->setMethods(['first'])->setConstructorArgs([['foo']])->getMock();
         $mockItem = m::mock(stdClass::class);
-        $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
+        $c->expects($this->once())->method('first')->willReturn($mockItem);
         $mockItem->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($mockItem);
         $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);
         $mockItem->shouldReceive('eagerLoadRelations')->once()->with(['foo'])->andReturn(['results']);

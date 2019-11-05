@@ -2,11 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\LazyCollection;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 {
@@ -75,7 +76,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedData();
         $posts = HasManyThroughTestCountry::first()->posts;
 
-        $this->assertEquals('A title', $posts[0]->title);
+        $this->assertSame('A title', $posts[0]->title);
         $this->assertCount(2, $posts);
     }
 
@@ -85,7 +86,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedDefaultData();
 
         $posts = HasManyThroughDefaultTestCountry::first()->posts;
-        $this->assertEquals('A title', $posts[0]->title);
+        $this->assertSame('A title', $posts[0]->title);
         $this->assertCount(2, $posts);
 
         $this->resetDefault();
@@ -96,7 +97,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedData();
         $posts = HasManyThroughIntermediateTestCountry::first()->posts;
 
-        $this->assertEquals('A title', $posts[0]->title);
+        $this->assertSame('A title', $posts[0]->title);
         $this->assertCount(2, $posts);
     }
 
@@ -105,7 +106,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedData();
         $posts = HasManyThroughIntermediateTestCountry::with('posts')->first()->posts;
 
-        $this->assertEquals('A title', $posts[0]->title);
+        $this->assertSame('A title', $posts[0]->title);
         $this->assertCount(2, $posts);
     }
 
@@ -147,7 +148,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $post = HasManyThroughTestCountry::first()->posts()->first();
 
         $this->assertNotNull($post);
-        $this->assertEquals('A title', $post->title);
+        $this->assertSame('A title', $post->title);
     }
 
     public function testAllColumnsAreRetrievedByDefault()
@@ -224,6 +225,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
         $posts = $country->posts()->cursor();
 
+        $this->assertInstanceOf(LazyCollection::class, $posts);
+
         foreach ($posts as $post) {
             $this->assertEquals([
                 'id',
@@ -263,7 +266,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
         $posts = HasManyThroughSoftDeletesTestCountry::first()->posts;
 
-        $this->assertEquals('A title', $posts[0]->title);
+        $this->assertSame('A title', $posts[0]->title);
         $this->assertCount(2, $posts);
     }
 
@@ -272,8 +275,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedData();
         $country = HasManyThroughSoftDeletesTestCountry::with('posts')->first();
 
-        $this->assertEquals('us', $country->shortname);
-        $this->assertEquals('A title', $country->posts[0]->title);
+        $this->assertSame('us', $country->shortname);
+        $this->assertSame('A title', $country->posts[0]->title);
         $this->assertCount(2, $country->posts);
     }
 

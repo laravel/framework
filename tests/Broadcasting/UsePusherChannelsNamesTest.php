@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class UsePusherChannelConventionsTest extends TestCase
 {
@@ -97,13 +97,16 @@ class FakeBroadcasterUsingPusherChannelsNames extends Broadcaster
 
     public function auth($request)
     {
+        //
     }
 
     public function validAuthenticationResponse($request, $result)
     {
+        //
     }
 
     public function broadcast(array $channels, $event, array $payload = [])
     {
+        //
     }
 }

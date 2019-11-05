@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use BadMethodCallException;
-use Illuminate\Queue\QueueManager;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Queue\QueueManager;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class QueueFake extends QueueManager implements Queue
@@ -229,7 +229,9 @@ class QueueFake extends QueueManager implements Queue
      */
     public function size($queue = null)
     {
-        return count($this->jobs);
+        return collect($this->jobs)->flatten(1)->filter(function ($job) use ($queue) {
+            return $job['queue'] === $queue;
+        })->count();
     }
 
     /**

@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Validation;
 
-use Illuminate\Validation\Validator;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Translation\Translator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Translation\ArrayLoader;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
+use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Validator;
 
 class ValidatorTest extends DatabaseTestCase
 {

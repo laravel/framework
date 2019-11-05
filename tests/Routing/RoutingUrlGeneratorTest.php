@@ -2,57 +2,58 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\UrlGenerator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Routing\RouteCollection;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class RoutingUrlGeneratorTest extends TestCase
 {
     public function testBasicGeneration()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
         );
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->to('foo/bar'));
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar', [], true));
-        $this->assertEquals('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', ['baz', 'boom'], true));
-        $this->assertEquals('https://www.foo.com/foo/bar/baz?foo=bar', $url->to('foo/bar?foo=bar', ['baz'], true));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->to('foo/bar'));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->to('foo/bar', [], true));
+        $this->assertSame('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', ['baz', 'boom'], true));
+        $this->assertSame('https://www.foo.com/foo/bar/baz?foo=bar', $url->to('foo/bar?foo=bar', ['baz'], true));
 
         /*
          * Test HTTPS request URL generation...
          */
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            $request = Request::create('https://www.foo.com/')
+            new RouteCollection,
+            Request::create('https://www.foo.com/')
         );
 
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->to('foo/bar'));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->to('foo/bar'));
 
         /*
          * Test asset URL generation...
          */
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/index.php/')
+            new RouteCollection,
+            Request::create('http://www.foo.com/index.php/')
         );
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
     public function testBasicGenerationWithHostFormatting()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
@@ -62,8 +63,8 @@ class RoutingUrlGeneratorTest extends TestCase
             return str_replace('foo.com', 'foo.org', $host);
         });
 
-        $this->assertEquals('http://www.foo.org/foo/bar', $url->to('foo/bar'));
-        $this->assertEquals('/named-route', $url->route('plain', [], false));
+        $this->assertSame('http://www.foo.org/foo/bar', $url->to('foo/bar'));
+        $this->assertSame('/named-route', $url->route('plain', [], false));
     }
 
     public function testBasicGenerationWithRequestBaseUrlWithSubfolder()
@@ -81,8 +82,8 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar/subfolder', ['as' => 'foobar']);
         $routes->add($route);
 
-        $this->assertEquals('/subfolder', $request->getBaseUrl());
-        $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
+        $this->assertSame('/subfolder', $request->getBaseUrl());
+        $this->assertSame('/foo/bar/subfolder', $url->route('foobar', [], false));
     }
 
     public function testBasicGenerationWithRequestBaseUrlWithSubfolderAndFileSuffix()
@@ -100,9 +101,9 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar/subfolder', ['as' => 'foobar']);
         $routes->add($route);
 
-        $this->assertEquals('/subfolder', $request->getBasePath());
-        $this->assertEquals('/subfolder/index.php', $request->getBaseUrl());
-        $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
+        $this->assertSame('/subfolder', $request->getBasePath());
+        $this->assertSame('/subfolder/index.php', $request->getBaseUrl());
+        $this->assertSame('/foo/bar/subfolder', $url->route('foobar', [], false));
     }
 
     public function testBasicGenerationWithRequestBaseUrlWithFileSuffix()
@@ -120,16 +121,16 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar/subfolder', ['as' => 'foobar']);
         $routes->add($route);
 
-        $this->assertEquals('', $request->getBasePath());
-        $this->assertEquals('/other.php', $request->getBaseUrl());
-        $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
+        $this->assertSame('', $request->getBasePath());
+        $this->assertSame('/other.php', $request->getBaseUrl());
+        $this->assertSame('/foo/bar/subfolder', $url->route('foobar', [], false));
     }
 
     public function testBasicGenerationWithPathFormatting()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
@@ -139,15 +140,15 @@ class RoutingUrlGeneratorTest extends TestCase
             return '/something'.$path;
         });
 
-        $this->assertEquals('http://www.foo.com/something/foo/bar', $url->to('foo/bar'));
-        $this->assertEquals('/something/named-route', $url->route('plain', [], false));
+        $this->assertSame('http://www.foo.com/something/foo/bar', $url->to('foo/bar'));
+        $this->assertSame('/something/named-route', $url->route('plain', [], false));
     }
 
     public function testUrlFormattersShouldReceiveTargetRoute()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://abc.com/')
+            Request::create('http://abc.com/')
         );
 
         $namedRoute = new Route(['GET'], '/bar', ['as' => 'plain', 'root' => 'bar.com', 'path' => 'foo']);
@@ -161,15 +162,15 @@ class RoutingUrlGeneratorTest extends TestCase
             return $route ? '/'.$route->getAction('path') : $path;
         });
 
-        $this->assertEquals('http://abc.com/foo/bar', $url->to('foo/bar'));
-        $this->assertEquals('http://bar.com/foo', $url->route('plain'));
+        $this->assertSame('http://abc.com/foo/bar', $url->to('foo/bar'));
+        $this->assertSame('http://bar.com/foo', $url->route('plain'));
     }
 
     public function testBasicRouteGeneration()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         /*
@@ -194,6 +195,12 @@ class RoutingUrlGeneratorTest extends TestCase
          * Single Parameter...
          */
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'foobar']);
+        $routes->add($route);
+
+        /*
+         * Optional parameter
+         */
+        $route = new Route(['GET'], 'foo/bar/{baz?}', ['as' => 'optional']);
         $routes->add($route);
 
         /*
@@ -235,34 +242,42 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
-        $this->assertEquals('/', $url->route('plain', [], false));
-        $this->assertEquals('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
-        $this->assertEquals('/foo/bar', $url->route('foo', [], false));
-        $this->assertEquals('/foo/bar?foo=bar', $url->route('foo', ['foo' => 'bar'], false));
-        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall']));
-        $this->assertEquals('http://www.foo.com/foo/bar/otwell/breeze/taylor?fly=wall', $url->route('bar', ['boom' => 'taylor', 'baz' => 'otwell', 'fly' => 'wall']));
-        $this->assertEquals('http://www.foo.com/foo/bar/2', $url->route('foobar', 2));
-        $this->assertEquals('http://www.foo.com/foo/bar/taylor', $url->route('foobar', 'taylor'));
-        $this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall'], false));
-        $this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz'));
-        $this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
-        $this->assertEquals('http://www.foo.com/foo/bam', $url->action(['foo', 'bar']));
-        $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
-        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
-        $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
-        $this->assertEquals('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', ['baz' => 'åαф']));
-        $this->assertEquals('/foo/bar#derp', $url->route('fragment', [], false));
-        $this->assertEquals('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));
-        $this->assertEquals('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф'], false));
-        $this->assertEquals('http://en.example.com/foo', $url->route('defaults'));
+        $this->assertSame('/', $url->route('plain', [], false));
+        $this->assertSame('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('foo'));
+        $this->assertSame('/foo/bar', $url->route('foo', [], false));
+        $this->assertSame('/foo/bar?foo=bar', $url->route('foo', ['foo' => 'bar'], false));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall']));
+        $this->assertSame('http://www.foo.com/foo/bar/otwell/breeze/taylor?fly=wall', $url->route('bar', ['boom' => 'taylor', 'baz' => 'otwell', 'fly' => 'wall']));
+        $this->assertSame('http://www.foo.com/foo/bar/2', $url->route('foobar', 2));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('foobar', 'taylor'));
+        $this->assertSame('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall'], false));
+        $this->assertSame('https://www.foo.com/foo/baz', $url->route('baz'));
+        $this->assertSame('http://www.foo.com/foo/bam', $url->action('foo@bar'));
+        $this->assertSame('http://www.foo.com/foo/bam', $url->action(['foo', 'bar']));
+        $this->assertSame('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional'));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional', ['baz' => null]));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', 'taylor'));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', ['taylor']));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor?breeze', $url->route('optional', ['taylor', 'breeze']));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor?wall=woz', $url->route('optional', ['wall' => 'woz', 'taylor']));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor?wall=woz&breeze', $url->route('optional', ['wall' => 'woz', 'breeze', 'baz' => 'taylor']));
+        $this->assertSame('http://www.foo.com/foo/bar?wall=woz', $url->route('optional', ['wall' => 'woz']));
+        $this->assertSame('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', ['baz' => 'åαф']));
+        $this->assertSame('/foo/bar#derp', $url->route('fragment', [], false));
+        $this->assertSame('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));
+        $this->assertSame('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф'], false));
+        $this->assertSame('http://en.example.com/foo', $url->route('defaults'));
     }
 
     public function testFluentRouteNameDefinitions()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         /*
@@ -273,14 +288,14 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
         $routes->refreshNameLookups();
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('foo'));
     }
 
     public function testControllerRoutesWithADefaultNamespace()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $url->setRootControllerNamespace('namespace');
@@ -297,16 +312,16 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/invoke', ['controller' => 'namespace\InvokableActionStub']);
         $routes->add($route);
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
-        $this->assertEquals('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
-        $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->action('foo@bar'));
+        $this->assertSame('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
+        $this->assertSame('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
     }
 
     public function testControllerRoutesOutsideOfDefaultNamespace()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $url->setRootControllerNamespace('namespace');
@@ -317,15 +332,15 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'invokable/namespace', ['controller' => '\root\namespace\InvokableActionStub']);
         $routes->add($route);
 
-        $this->assertEquals('http://www.foo.com/root/namespace', $url->action('\root\namespace@foo'));
-        $this->assertEquals('http://www.foo.com/invokable/namespace', $url->action('\root\namespace\InvokableActionStub'));
+        $this->assertSame('http://www.foo.com/root/namespace', $url->action('\root\namespace@foo'));
+        $this->assertSame('http://www.foo.com/invokable/namespace', $url->action('\root\namespace\InvokableActionStub'));
     }
 
     public function testRoutableInterfaceRouting()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $route = new Route(['GET'], 'foo/{bar}', ['as' => 'routable']);
@@ -334,14 +349,14 @@ class RoutingUrlGeneratorTest extends TestCase
         $model = new RoutableInterfaceStub;
         $model->key = 'routable';
 
-        $this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
+        $this->assertSame('/foo/routable', $url->route('routable', [$model], false));
     }
 
     public function testRoutableInterfaceRoutingWithSingleParameter()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $route = new Route(['GET'], 'foo/{bar}', ['as' => 'routable']);
@@ -350,14 +365,14 @@ class RoutingUrlGeneratorTest extends TestCase
         $model = new RoutableInterfaceStub;
         $model->key = 'routable';
 
-        $this->assertEquals('/foo/routable', $url->route('routable', $model, false));
+        $this->assertSame('/foo/routable', $url->route('routable', $model, false));
     }
 
     public function testRoutesMaintainRequestScheme()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('https://www.foo.com/')
+            Request::create('https://www.foo.com/')
         );
 
         /*
@@ -366,14 +381,14 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo']);
         $routes->add($route);
 
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->route('foo'));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->route('foo'));
     }
 
     public function testHttpOnlyRoutes()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('https://www.foo.com/')
+            Request::create('https://www.foo.com/')
         );
 
         /*
@@ -382,14 +397,14 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'http']);
         $routes->add($route);
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('foo'));
     }
 
     public function testRoutesWithDomains()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
@@ -401,16 +416,16 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
-        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
-        $this->assertEquals('http://sub.taylor.com/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
-        $this->assertEquals('/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell'], false));
+        $this->assertSame('http://sub.foo.com/foo/bar', $url->route('foo'));
+        $this->assertSame('http://sub.taylor.com/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
+        $this->assertSame('/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell'], false));
     }
 
     public function testRoutesWithDomainsAndPorts()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com:8080/')
+            Request::create('http://www.foo.com:8080/')
         );
 
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
@@ -422,8 +437,8 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
-        $this->assertEquals('http://sub.foo.com:8080/foo/bar', $url->route('foo'));
-        $this->assertEquals('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
+        $this->assertSame('http://sub.foo.com:8080/foo/bar', $url->route('foo'));
+        $this->assertSame('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
     }
 
     public function testRoutesWithDomainsStripsProtocols()
@@ -433,33 +448,33 @@ class RoutingUrlGeneratorTest extends TestCase
          */
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'http://sub.foo.com']);
         $routes->add($route);
 
-        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
+        $this->assertSame('http://sub.foo.com/foo/bar', $url->route('foo'));
 
         /*
          * https:// Route
          */
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('https://www.foo.com/')
+            Request::create('https://www.foo.com/')
         );
 
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'https://sub.foo.com']);
         $routes->add($route);
 
-        $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('foo'));
+        $this->assertSame('https://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
     public function testHttpsRoutesWithDomains()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('https://foo.com/')
+            Request::create('https://foo.com/')
         );
 
         /*
@@ -468,7 +483,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'baz', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
-        $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz'));
+        $this->assertSame('https://sub.foo.com/foo/bar', $url->route('baz'));
     }
 
     public function testRoutesWithDomainsThroughProxy()
@@ -477,13 +492,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_PORT' => '80'])
+            Request::create('http://www.foo.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_PORT' => '80'])
         );
 
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
-        $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
+        $this->assertSame('http://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
@@ -492,7 +507,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com:8080/')
+            Request::create('http://www.foo.com:8080/')
         );
 
         $route = new Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {
@@ -500,50 +515,50 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
-        $this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
+        $this->assertSame('http://www.foo.com:8080/foo', $url->route('foo'));
     }
 
     public function testForceRootUrl()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $url->forceRootUrl('https://www.bar.com');
-        $this->assertEquals('http://www.bar.com/foo/bar', $url->to('foo/bar'));
+        $this->assertSame('http://www.bar.com/foo/bar', $url->to('foo/bar'));
 
         // Ensure trailing slash is trimmed from root URL as UrlGenerator already handles this
         $url->forceRootUrl('http://www.foo.com/');
-        $this->assertEquals('http://www.foo.com/bar', $url->to('/bar'));
+        $this->assertSame('http://www.foo.com/bar', $url->to('/bar'));
 
         /*
          * Route Based...
          */
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            Request::create('http://www.foo.com/')
         );
 
         $url->forceScheme('https');
         $route = new Route(['GET'], '/foo', ['as' => 'plain']);
         $routes->add($route);
 
-        $this->assertEquals('https://www.foo.com/foo', $url->route('plain'));
+        $this->assertSame('https://www.foo.com/foo', $url->route('plain'));
 
         $url->forceRootUrl('https://www.bar.com');
-        $this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
+        $this->assertSame('https://www.bar.com/foo', $url->route('plain'));
     }
 
     public function testPrevious()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
         );
 
         $url->getRequest()->headers->set('referer', 'http://www.bar.com/');
-        $this->assertEquals('http://www.bar.com/', $url->previous());
+        $this->assertSame('http://www.bar.com/', $url->previous());
 
         $url->getRequest()->headers->remove('referer');
         $this->assertEquals($url->to('/'), $url->previous());
@@ -553,12 +568,12 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRouteNotDefinedException()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RouteNotFoundException::class);
         $this->expectExceptionMessage('Route [not_exists_route] not defined.');
 
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
         );
 
         $url->route('not_exists_route');
@@ -612,6 +627,27 @@ class RoutingUrlGeneratorTest extends TestCase
         $request = Request::create($url->signedRoute('foo', [], null, false).'?tempered=true');
 
         $this->assertFalse($url->hasValidSignature($request, false));
+    }
+
+    public function testSignedUrlParameterCannotBeNamedSignature()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/{signature}', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('reserved');
+
+        Request::create($url->signedRoute('foo', ['signature' => 'bar']));
     }
 }
 

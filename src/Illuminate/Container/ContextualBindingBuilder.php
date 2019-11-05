@@ -2,9 +2,9 @@
 
 namespace Illuminate\Container;
 
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
+use Illuminate\Support\Arr;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
 {

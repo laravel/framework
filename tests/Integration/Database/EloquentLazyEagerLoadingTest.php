@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Database\EloquentLazyEagerLoadingTest;
 
 use DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -32,7 +32,7 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
         });
     }
 
-    public function test_it_basic()
+    public function testItBasic()
     {
         $one = Model1::create();
         $one->twos()->create();

@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Pipeline;
 
-use RuntimeException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Pipeline\Pipeline;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PipelineTest extends TestCase
 {
@@ -25,9 +24,9 @@ class PipelineTest extends TestCase
                         return $piped;
                     });
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.two']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $_SERVER['__test.pipe.two']);
 
         unset($_SERVER['__test.pipe.one']);
         unset($_SERVER['__test.pipe.two']);
@@ -42,8 +41,8 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -59,27 +58,10 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
-    }
-
-    public function testPipelineUsageWithResponsableObjects()
-    {
-        $result = (new Pipeline(new Container))
-            ->send('foo')
-            ->through([new PipelineTestPipeResponsable])
-            ->then(
-                function ($piped) {
-                    return $piped;
-                }
-            );
-
-        $this->assertEquals('bar', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.responsable']);
-
-        unset($_SERVER['__test.pipe.responsable']);
     }
 
     public function testPipelineUsageWithCallable()
@@ -99,7 +81,17 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+
+        $result = (new Pipeline(new Container))
+            ->send('bar')
+            ->through($function)
+            ->thenReturn();
+
+        $this->assertEquals('bar', $result);
         $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
@@ -116,8 +108,8 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -133,7 +125,7 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
         $this->assertEquals($parameters, $_SERVER['__test.pipe.parameters']);
 
         unset($_SERVER['__test.pipe.parameters']);
@@ -148,7 +140,7 @@ class PipelineTest extends TestCase
             ->then(function ($piped) {
                 return $piped;
             });
-        $this->assertEquals('data', $result);
+        $this->assertSame('data', $result);
     }
 
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
@@ -170,8 +162,8 @@ class PipelineTest extends TestCase
                     ->through([PipelineTestPipeOne::class])
                     ->thenReturn();
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -192,14 +184,6 @@ class PipelineTestPipeOne
     }
 }
 
-class PipeResponsable implements Responsable
-{
-    public function toResponse($request)
-    {
-        return 'bar';
-    }
-}
-
 class PipelineTestPipeTwo
 {
     public function __invoke($piped, $next)
@@ -207,16 +191,6 @@ class PipelineTestPipeTwo
         $_SERVER['__test.pipe.one'] = $piped;
 
         return $next($piped);
-    }
-}
-
-class PipelineTestPipeResponsable
-{
-    public function handle($piped, $next)
-    {
-        $_SERVER['__test.pipe.responsable'] = $piped;
-
-        return new PipeResponsable;
     }
 }
 

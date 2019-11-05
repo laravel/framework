@@ -4,13 +4,11 @@ namespace Illuminate\Pipeline;
 
 use Closure;
 use Exception;
-use Throwable;
-use RuntimeException;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Support\Responsable;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
+use RuntimeException;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class Pipeline implements PipelineContract
 {
@@ -101,7 +99,7 @@ class Pipeline implements PipelineContract
     public function then(Closure $destination)
     {
         $pipeline = array_reduce(
-            array_reverse($this->pipes), $this->carry(), $this->prepareDestination($destination)
+            array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
         );
 
         return $pipeline($this->passable);
@@ -169,13 +167,11 @@ class Pipeline implements PipelineContract
                         $parameters = [$passable, $stack];
                     }
 
-                    $response = method_exists($pipe, $this->method)
+                    $carry = method_exists($pipe, $this->method)
                                     ? $pipe->{$this->method}(...$parameters)
                                     : $pipe(...$parameters);
 
-                    return $response instanceof Responsable
-                                ? $response->toResponse($this->getContainer()->make(Request::class))
-                                : $response;
+                    return $this->handleCarry($carry);
                 } catch (Exception $e) {
                     return $this->handleException($passable, $e);
                 } catch (Throwable $e) {
@@ -203,6 +199,16 @@ class Pipeline implements PipelineContract
     }
 
     /**
+     * Get the array of configured pipes.
+     *
+     * @return array
+     */
+    protected function pipes()
+    {
+        return $this->pipes;
+    }
+
+    /**
      * Get the container instance.
      *
      * @return \Illuminate\Contracts\Container\Container
@@ -219,6 +225,17 @@ class Pipeline implements PipelineContract
     }
 
     /**
+     * Handles the value returned from each pipe before passing it to the next.
+     *
+     * @param  mixed $carry
+     * @return mixed
+     */
+    protected function handleCarry($carry)
+    {
+        return $carry;
+    }
+
+    /**
      * Handle the given exception.
      *
      * @param  mixed  $passable
@@ -229,6 +246,6 @@ class Pipeline implements PipelineContract
      */
     protected function handleException($passable, Exception $e)
     {
-        throw $e; // actually handled in the Routing Pipeline
+        throw $e;
     }
 }

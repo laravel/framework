@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Database\SchemaTest;
 
 use Doctrine\DBAL\Types\Type;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
@@ -15,7 +15,7 @@ use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
  */
 class SchemaBuilderTest extends DatabaseTestCase
 {
-    public function test_drop_all_tables()
+    public function testDropAllTables()
     {
         Schema::create('table', function (Blueprint $table) {
             $table->increments('id');
@@ -30,7 +30,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(true);
     }
 
-    public function test_drop_all_views()
+    public function testDropAllViews()
     {
         DB::statement('create view "view"("id") as select 1');
 
@@ -41,7 +41,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(true);
     }
 
-    public function test_register_custom_doctrine_type()
+    public function testRegisterCustomDoctrineType()
     {
         Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
@@ -66,7 +66,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $blueprint->build($this->getConnection(), new SQLiteGrammar());
 
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertEquals('tinyinteger', Schema::getColumnType('test', 'test_column'));
+        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
         $this->assertEquals($expected, $statements);
     }
 }

@@ -111,7 +111,7 @@ class Response implements Arrayable
      *
      * @return \Illuminate\Auth\Access\Response
      *
-     * @throws AuthorizationException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function authorize()
     {

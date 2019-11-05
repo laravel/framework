@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\View\Compilers\CompilerInterface;
+use Illuminate\View\Engines\CompilerEngine;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\View\Engines\CompilerEngine;
-use Illuminate\View\Compilers\CompilerInterface;
 
 class ViewCompilerEngineTest extends TestCase
 {
@@ -22,7 +22,7 @@ class ViewCompilerEngineTest extends TestCase
         $engine->getCompiler()->shouldReceive('compile')->once()->with(__DIR__.'/fixtures/foo.php');
         $results = $engine->get(__DIR__.'/fixtures/foo.php');
 
-        $this->assertEquals('Hello World
+        $this->assertSame('Hello World
 ', $results);
     }
 
@@ -34,7 +34,7 @@ class ViewCompilerEngineTest extends TestCase
         $engine->getCompiler()->shouldReceive('compile')->never();
         $results = $engine->get(__DIR__.'/fixtures/foo.php');
 
-        $this->assertEquals('Hello World
+        $this->assertSame('Hello World
 ', $results);
     }
 

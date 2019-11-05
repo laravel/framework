@@ -2,17 +2,17 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use LogicException;
-use DateTimeInterface;
 use Carbon\CarbonInterface;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Date;
+use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
+use LogicException;
 
 trait HasAttributes
 {
@@ -376,9 +376,7 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        if (isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
+        return $this->attributes[$key] ?? null;
     }
 
     /**
@@ -629,7 +627,7 @@ trait HasAttributes
      */
     protected function isDateAttribute($key)
     {
-        return in_array($key, $this->getDates()) ||
+        return in_array($key, $this->getDates(), true) ||
                                     $this->isDateCastable($key);
     }
 

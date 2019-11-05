@@ -3,16 +3,16 @@
 namespace Illuminate\Foundation\Testing;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Traits\Tappable;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Foundation\Testing\Assert as PHPUnit;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * @mixin \Illuminate\Http\Response
@@ -85,6 +85,38 @@ class TestResponse
             $this->isOk(),
             'Response status code ['.$this->getStatusCode().'] does not match expected 200 status code.'
         );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has a 201 status code.
+     *
+     * @return $this
+     */
+    public function assertCreated()
+    {
+        $actual = $this->getStatusCode();
+
+        PHPUnit::assertTrue(
+            201 === $actual,
+            'Response status code ['.$actual.'] does not match expected 201 status code.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has the given status code and no content.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function assertNoContent($status = 204)
+    {
+        $this->assertStatus($status);
+
+        PHPUnit::assertEmpty($this->getContent(), 'Response content is not empty.');
 
         return $this;
     }
@@ -465,6 +497,25 @@ class TestResponse
     }
 
     /**
+     * Assert that the expected value exists at the given path in the response.
+     *
+     * @param  string  $path
+     * @param  mixed  $expect
+     * @param  bool  $strict
+     * @return $this
+     */
+    public function assertJsonPath($path, $expect, $strict = false)
+    {
+        if ($strict) {
+            PHPUnit::assertSame($expect, $this->json($path));
+        } else {
+            PHPUnit::assertEquals($expect, $this->json($path));
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data
@@ -676,15 +727,21 @@ class TestResponse
             );
 
             if (! is_int($key)) {
+                $hasError = false;
+
                 foreach (Arr::wrap($jsonErrors[$key]) as $jsonErrorMessage) {
                     if (Str::contains($jsonErrorMessage, $value)) {
-                        return $this;
+                        $hasError = true;
+
+                        break;
                     }
                 }
 
-                PHPUnit::fail(
-                    "Failed to find a validation error in the response for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
-                );
+                if (! $hasError) {
+                    PHPUnit::fail(
+                        "Failed to find a validation error in the response for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
+                    );
+                }
             }
         }
 
@@ -910,6 +967,41 @@ class TestResponse
             } else {
                 $this->assertSessionHas($key, $value);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the session has a given value in the flashed input array.
+     *
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function assertSessionHasInput($key, $value = null)
+    {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                if (is_int($k)) {
+                    $this->assertSessionHasInput($v);
+                } else {
+                    $this->assertSessionHasInput($k, $v);
+                }
+            }
+
+            return $this;
+        }
+
+        if (is_null($value)) {
+            PHPUnit::assertTrue(
+                $this->session()->getOldInput($key),
+                "Session is missing expected key [{$key}]."
+            );
+        } elseif ($value instanceof Closure) {
+            PHPUnit::assertTrue($value($this->session()->getOldInput($key)));
+        } else {
+            PHPUnit::assertEquals($value, $this->session()->getOldInput($key));
         }
 
         return $this;

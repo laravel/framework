@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
 use ArrayAccess;
+use Illuminate\Support\Facades\Facade;
 use Mockery as m;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Facades\Facade;
+use stdClass;
 
 class SupportFacadeTest extends TestCase
 {
@@ -28,7 +28,7 @@ class SupportFacadeTest extends TestCase
         $app->setAttributes(['foo' => $mock = m::mock(stdClass::class)]);
         $mock->shouldReceive('bar')->once()->andReturn('baz');
         FacadeStub::setFacadeApplication($app);
-        $this->assertEquals('baz', FacadeStub::bar());
+        $this->assertSame('baz', FacadeStub::bar());
     }
 
     public function testShouldReceiveReturnsAMockeryMock()
@@ -38,7 +38,7 @@ class SupportFacadeTest extends TestCase
         FacadeStub::setFacadeApplication($app);
 
         $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
-        $this->assertEquals('baz', $app['foo']->foo('bar'));
+        $this->assertSame('baz', $app['foo']->foo('bar'));
     }
 
     public function testSpyReturnsAMockerySpy()
@@ -61,14 +61,14 @@ class SupportFacadeTest extends TestCase
 
         $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
         $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo2')->once()->with('bar2')->andReturn('baz2')->getMock());
-        $this->assertEquals('baz', $app['foo']->foo('bar'));
-        $this->assertEquals('baz2', $app['foo']->foo2('bar2'));
+        $this->assertSame('baz', $app['foo']->foo('bar'));
+        $this->assertSame('baz2', $app['foo']->foo2('bar2'));
     }
 
     public function testCanBeMockedWithoutUnderlyingInstance()
     {
         FacadeStub::shouldReceive('foo')->once()->andReturn('bar');
-        $this->assertEquals('bar', FacadeStub::foo());
+        $this->assertSame('bar', FacadeStub::foo());
     }
 }
 

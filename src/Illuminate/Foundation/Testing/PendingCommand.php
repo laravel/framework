@@ -2,13 +2,13 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Mockery;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
-use Symfony\Component\Console\Input\ArrayInput;
-use PHPUnit\Framework\TestCase as PHPUnitTestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class PendingCommand
 {
@@ -165,6 +165,7 @@ class PendingCommand
 
         foreach ($this->test->expectedQuestions as $i => $question) {
             $mock->shouldReceive('askQuestion')
+                ->once()
                 ->ordered()
                 ->with(Mockery::on(function ($argument) use ($question) {
                     return $argument->getQuestion() == $question[0];
@@ -194,6 +195,7 @@ class PendingCommand
 
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')
+                ->once()
                 ->ordered()
                 ->with($output, Mockery::any())
                 ->andReturnUsing(function () use ($i) {

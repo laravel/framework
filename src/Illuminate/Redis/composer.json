@@ -16,13 +16,16 @@
     "require": {
         "php": "^7.2",
         "illuminate/contracts": "^6.0",
-        "illuminate/support": "^6.0",
-        "predis/predis": "^1.0"
+        "illuminate/support": "^6.0"
     },
     "autoload": {
         "psr-4": {
             "Illuminate\\Redis\\": ""
         }
+    },
+    "suggest": {
+        "ext-redis": "Required to use the phpredis connector.",
+        "predis/predis": "Required to use the predis connector (^1.0)."
     },
     "extra": {
         "branch-alias": {

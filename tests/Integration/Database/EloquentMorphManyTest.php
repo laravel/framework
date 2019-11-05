@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphManyTest;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -35,13 +35,26 @@ class EloquentMorphManyTest extends DatabaseTestCase
         Carbon::setTestNow(null);
     }
 
-    public function test_update_model_with_default_withCount()
+    public function testUpdateModelWithDefaultWithCount()
     {
         $post = Post::create(['title' => Str::random()]);
 
         $post->update(['title' => 'new name']);
 
-        $this->assertEquals('new name', $post->title);
+        $this->assertSame('new name', $post->title);
+    }
+
+    public function test_self_referencing_existence_query()
+    {
+        $post = Post::create(['title' => 'foo']);
+
+        $comment = tap((new Comment(['name' => 'foo']))->commentable()->associate($post))->save();
+
+        (new Comment(['name' => 'bar']))->commentable()->associate($comment)->save();
+
+        $comments = Comment::has('replies')->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
     }
 }
 
@@ -67,5 +80,10 @@ class Comment extends Model
     public function commentable()
     {
         return $this->morphTo();
+    }
+
+    public function replies()
+    {
+        return $this->morphMany(self::class, 'commentable');
     }
 }

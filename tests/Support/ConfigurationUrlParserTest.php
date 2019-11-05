@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\ConfigurationUrlParser;
+use PHPUnit\Framework\TestCase;
 
 class ConfigurationUrlParserTest extends TestCase
 {
@@ -23,7 +23,7 @@ class ConfigurationUrlParserTest extends TestCase
             'postgres' => 'pgsql',
             'postgresql' => 'pgsql',
             'sqlite3' => 'sqlite',
-        ], \Illuminate\Support\ConfigurationUrlParser::getDriverAliases());
+        ], ConfigurationUrlParser::getDriverAliases());
 
         ConfigurationUrlParser::addDriverAlias('some-particular-alias', 'mysql');
 

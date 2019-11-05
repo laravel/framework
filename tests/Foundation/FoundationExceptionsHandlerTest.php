@@ -2,29 +2,29 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use stdClass;
 use Exception;
-use Mockery as m;
-use RuntimeException;
-use Illuminate\Http\Request;
-use Psr\Log\LoggerInterface;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\MessageBag;
-use Illuminate\Container\Container;
-use Illuminate\Validation\Validator;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Routing\ResponseFactory;
 use Illuminate\Config\Repository as Config;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Foundation\Exceptions\Handler;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\ResponseFactory;
+use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
+use stdClass;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {

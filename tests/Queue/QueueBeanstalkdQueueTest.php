@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Illuminate\Container\Container;
+use Illuminate\Queue\BeanstalkdQueue;
+use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Mockery as m;
 use Pheanstalk\Job;
 use Pheanstalk\Pheanstalk;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Queue\BeanstalkdQueue;
-use Illuminate\Queue\Jobs\BeanstalkdJob;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {

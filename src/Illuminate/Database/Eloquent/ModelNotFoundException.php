@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use RuntimeException;
 use Illuminate\Support\Arr;
+use RuntimeException;
 
 class ModelNotFoundException extends RuntimeException
 {

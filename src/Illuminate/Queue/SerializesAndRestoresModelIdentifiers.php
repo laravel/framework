@@ -2,12 +2,12 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Contracts\Queue\QueueableCollection;
-use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 trait SerializesAndRestoresModelIdentifiers
 {
@@ -84,8 +84,8 @@ trait SerializesAndRestoresModelIdentifiers
 
         return new $collectionClass(
             collect($value->id)->map(function ($id) use ($collection) {
-                return $collection[$id];
-            })
+                return $collection[$id] ?? null;
+            })->filter()
         );
     }
 

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @group integration
@@ -38,7 +38,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         PivotEventsTestCollaborator::$eventsCalled = [];
     }
 
-    public function test_pivot_will_trigger_events_to_be_fired()
+    public function testPivotWillTriggerEventsToBeFired()
     {
         $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
         $user2 = PivotEventsTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);
@@ -60,7 +60,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
     }
 
-    public function test_pivot_with_pivot_criteria_trigger_events_to_be_fired_on_create_update_none_on_detach()
+    public function testPivotWithPivotCriteriaTriggerEventsToBeFiredOnCreateUpdateNoneOnDetach()
     {
         $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
         $user2 = PivotEventsTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Redis\Connections;
 
-use Redis;
 use Closure;
-use RedisCluster;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
+use Redis;
+use RedisCluster;
 
 /**
  * @mixin \Redis
@@ -52,7 +52,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Determine if the given keys exist.
      *
-     * @param  dynamic  $keys
+     * @param  mixed  $keys
      * @return int
      */
     public function exists(...$keys)
@@ -99,8 +99,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Get the value of the given hash fields.
      *
      * @param  string  $key
-     * @param  dynamic  $dictionary
-     * @return int
+     * @param  mixed  $dictionary
+     * @return array
      */
     public function hmget($key, ...$dictionary)
     {
@@ -115,7 +115,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Set the given hash fields to their respective values.
      *
      * @param  string  $key
-     * @param  dynamic  $dictionary
+     * @param  mixed  $dictionary
      * @return int
      */
     public function hmset($key, ...$dictionary)
@@ -149,7 +149,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @param  string  $key
      * @param  int  $count
-     * @param  $value  $value
+     * @param  mixed  $value
      * @return int|false
      */
     public function lrem($key, $count, $value)
@@ -160,7 +160,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Removes and returns the first element of the list stored at key.
      *
-     * @param  dynamic  $arguments
+     * @param  mixed  $arguments
      * @return array|null
      */
     public function blpop(...$arguments)
@@ -173,7 +173,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Removes and returns the last element of the list stored at key.
      *
-     * @param  dynamic  $arguments
+     * @param  mixed  $arguments
      * @return array|null
      */
     public function brpop(...$arguments)
@@ -199,7 +199,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Add one or more members to a sorted set or update its score if it already exists.
      *
      * @param  string  $key
-     * @param  dynamic  $dictionary
+     * @param  mixed  $dictionary
      * @return int
      */
     public function zadd($key, ...$dictionary)
@@ -223,7 +223,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  mixed  $min
      * @param  mixed  $max
      * @param  array  $options
-     * @return int
+     * @return array
      */
     public function zrangebyscore($key, $min, $max, $options = [])
     {
@@ -244,7 +244,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  mixed  $min
      * @param  mixed  $max
      * @param  array  $options
-     * @return int
+     * @return array
      */
     public function zrevrangebyscore($key, $min, $max, $options = [])
     {
@@ -268,7 +268,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zinterstore($output, $keys, $options = [])
     {
-        return $this->command('zInter', [$output, $keys,
+        return $this->command('zinterstore', [$output, $keys,
             $options['weights'] ?? null,
             $options['aggregate'] ?? 'sum',
         ]);
@@ -284,7 +284,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zunionstore($output, $keys, $options = [])
     {
-        return $this->command('zUnion', [$output, $keys,
+        return $this->command('zunionstore', [$output, $keys,
             $options['weights'] ?? null,
             $options['aggregate'] ?? 'sum',
         ]);

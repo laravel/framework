@@ -2,9 +2,9 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use LogicException;
-use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
+use InvalidArgumentException;
+use LogicException;
 
 class CallbackEvent extends Event
 {
@@ -90,7 +90,7 @@ class CallbackEvent extends Event
      */
     protected function removeMutex()
     {
-        if ($this->description) {
+        if ($this->description && $this->withoutOverlapping) {
             $this->mutex->forget($this);
         }
     }

@@ -2,22 +2,22 @@
 
 namespace Illuminate\Tests\Integration\Session;
 
-use Mockery;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Response;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\TokenMismatchException;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Mockery;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
 class SessionPersistenceTest extends TestCase
 {
-    public function test_session_is_persisted_even_if_exception_is_thrown_from_route()
+    public function testSessionIsPersistedEvenIfExceptionIsThrownFromRoute()
     {
         $handler = new FakeNullSessionHandler;
         $this->assertFalse($handler->written);
@@ -30,7 +30,7 @@ class SessionPersistenceTest extends TestCase
             throw new TokenMismatchException;
         })->middleware('web');
 
-        $response = $this->get('/');
+        $this->get('/');
         $this->assertTrue($handler->written);
     }
 

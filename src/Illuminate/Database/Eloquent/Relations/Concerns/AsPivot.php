@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 trait AsPivot
 {
@@ -203,7 +203,7 @@ trait AsPivot
     /**
      * Determine if the pivot model or given attributes has timestamp attributes.
      *
-     * @param  $attributes  array|null
+     * @param  array|null  $attributes
      * @return bool
      */
     public function hasTimestampAttributes($attributes = null)
