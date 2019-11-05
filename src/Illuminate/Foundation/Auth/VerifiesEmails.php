@@ -17,8 +17,9 @@ trait VerifiesEmails
      */
     public function redirect()
     {
-        if($this->redirectRoute() !== false)
+        if ($this->redirectRoute() !== false) {
             return redirect()->route($this->redirectRoute());
+        }
 
         return redirect($this->redirectPath());
     }
