@@ -2,6 +2,16 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.4.1...6.x)
 
+### Added
+- Added `LazyCollection::remember()` method ([#30443](https://github.com/laravel/framework/pull/30443))
+
+### Changed
+- Added reconnect if missing connection when beginning transaction ([#30474](https://github.com/laravel/framework/pull/30474))
+
+### TODO
+- Set Redis cluster prefix with PhpRedis ([#30461](https://github.com/laravel/framework/pull/30461))
+- Added `unless` condition to Blade custom `if` directives ([#30492](https://github.com/laravel/framework/pull/30492))
+
 
 ## [v6.4.1 (2019-10-29)](https://github.com/laravel/framework/compare/v6.4.0...v6.4.1)
 
