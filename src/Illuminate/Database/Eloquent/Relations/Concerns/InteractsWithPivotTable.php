@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletable;
 use Illuminate\Support\Collection as BaseCollection;
 
 trait InteractsWithPivotTable
@@ -273,10 +274,30 @@ trait InteractsWithPivotTable
      */
     protected function attachUsingCustomClass($id, array $attributes)
     {
-        $records = $this->formatAttachRecords(
-            $this->parseIds($id), $attributes
-        );
+        $idsToAttach = $this->parseIds($id);
 
+        //check if pivot model uses soft deleting
+        if(is_subclass_of($this->using, SoftDeletable::class)) {
+            // find all, already attached pivots including trashed
+            $pivots = $this->withTrashed()->whereIn(
+                $this->getRelated()->getQualifiedKeyName(), $idsToAttach
+            )->get();
+            /** @var Pivot $pivot */
+            $alreadyAttachedIds = [];
+            // restore all found trashed pivots
+            foreach ($pivots as $pivot) {
+                $alreadyAttachedIds[] = $pivot->getKey();
+                $this->updateExistingPivot($pivot->getKey(), $attributes, true);
+                if ($pivot->trashed()) {
+                    $pivot->restore();
+                }
+            }
+            // remove all already attached ids from the list of ids to attach
+            $idsToAttach = array_diff($idsToAttach, $alreadyAttachedIds);
+        }
+        $records = $this->formatAttachRecords(
+            $idsToAttach, $attributes
+        );
         foreach ($records as $record) {
             $this->newPivot($record, false)->save();
         }
