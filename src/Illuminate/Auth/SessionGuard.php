@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use RuntimeException;
+use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Traits\Macroable;
@@ -543,7 +544,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function logoutOtherDevices($password, $attribute = 'password')
     {
         if (! $this->user()) {
-            return;
+            throw new UnauthorizedException();
         }
 
         $result = tap($this->user()->forceFill([
