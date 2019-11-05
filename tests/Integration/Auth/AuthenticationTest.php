@@ -212,11 +212,9 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    /**
-     * @expectedException UnauthorizedException
-     */
     public function testExceptionThrowsAtLoggingOutOtherDevicesUnauthorized()
     {
+        $this->expectExceptionObject(new UnauthorizedException());
         $this->app['auth']->logoutOtherDevices('password');
     }
 
