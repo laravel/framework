@@ -17,4 +17,18 @@ trait RedirectsUsers
 
         return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
     }
+
+    /**
+     * Get the post register / login redirect route.
+     *
+     * @return string
+     */
+    public function redirectRoute()
+    {
+        if (method_exists($this, 'redirectRoute')) {
+            return $this->redirectRoute();
+        }
+
+        return property_exists($this, 'redirectRoute') ? $this->redirectRoute : false;
+    }
 }

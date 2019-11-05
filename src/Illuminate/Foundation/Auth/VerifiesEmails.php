@@ -11,6 +11,19 @@ trait VerifiesEmails
     use RedirectsUsers;
 
     /**
+     * Redirect to path or route.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function redirect()
+    {
+        if($this->redirectRoute() !== false)
+            return redirect()->route($this->redirectRoute());
+
+        return redirect($this->redirectPath());
+    }
+
+    /**
      * Show the email verification notice.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -19,7 +32,7 @@ trait VerifiesEmails
     public function show(Request $request)
     {
         return $request->user()->hasVerifiedEmail()
-                        ? redirect($this->redirectPath())
+                        ? $this->redirect()
                         : view('auth.verify');
     }
 
@@ -41,14 +54,14 @@ trait VerifiesEmails
         }
 
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect($this->redirectPath());
+            return $this->redirect();
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
 
-        return redirect($this->redirectPath())->with('verified', true);
+        return $this->redirect()->with('verified', true);
     }
 
     /**
@@ -60,7 +73,7 @@ trait VerifiesEmails
     public function resend(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect($this->redirectPath());
+            return $this->redirect();
         }
 
         $request->user()->sendEmailVerificationNotification();
