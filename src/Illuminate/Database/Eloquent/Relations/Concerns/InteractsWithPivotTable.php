@@ -278,23 +278,19 @@ trait InteractsWithPivotTable
 
         //check if pivot model uses soft deleting
         if(is_subclass_of($this->using, SoftDeletable::class)) {
-            // find all, already attached pivots including trashed
-            $pivots = $this->withTrashed()->whereIn(
-                $this->getRelated()->getQualifiedKeyName(), $idsToAttach
-            )->get();
-            /** @var Pivot $pivot */
-            $alreadyAttachedIds = [];
-            // restore all found trashed pivots
+            // find the trashed pivots
+            $pivots = $this->newPivotQuery()->onlyTrashed()->whereIn($this->getRelatedPivotKeyName(), $idsToAttach)->get();
+            $restoredIds = [];
+            // restore the trashed pivots
             foreach ($pivots as $pivot) {
-                $alreadyAttachedIds[] = $pivot->getKey();
                 $this->updateExistingPivot($pivot->getKey(), $attributes, true);
-                if ($pivot->trashed()) {
-                    $pivot->restore();
-                }
+                $pivot->restore();
+                $restoredIds[] = $pivot->getKey();
             }
-            // remove all already attached ids from the list of ids to attach
-            $idsToAttach = array_diff($idsToAttach, $alreadyAttachedIds);
+            // remove all restored ids from the list of ids to attach
+            $idsToAttach = array_diff($idsToAttach, $restoredIds);
         }
+
         $records = $this->formatAttachRecords(
             $idsToAttach, $attributes
         );
@@ -496,10 +492,12 @@ trait InteractsWithPivotTable
     protected function getCurrentlyAttachedPivots()
     {
         return $this->currentlyAttached ?: $this->newPivotQuery()->get()->map(function ($record) {
-            $class = $this->using ? $this->using : Pivot::class;
-
-            $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
-
+            if($this->using) {
+                $pivot = $record;
+            }
+            else{
+                $pivot = Pivot::fromRawAttributes($this->parent, (array)$record, $this->getTable(), true);
+            }
             return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
         });
     }
@@ -538,7 +536,12 @@ trait InteractsWithPivotTable
      */
     public function newPivotStatement()
     {
-        return $this->query->getQuery()->newQuery()->from($this->table);
+        if($this->using){
+            return ($this->using)::query();
+        }
+        else{
+            $this->query->getQuery()->newQuery()->from($this->table);
+        }
     }
 
     /**

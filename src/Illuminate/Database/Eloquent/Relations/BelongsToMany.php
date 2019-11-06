@@ -120,11 +120,11 @@ class BelongsToMany extends Relation
     protected $accessor = 'pivot';
 
     /**
-     * Instance of a pivot model if supplied in the constructor
+     * Name of the pivot table
      *
-     * @var Pivot
+     * @var string
      */
-    protected $pivotModel;
+    protected $pivotTable;
 
     /**
      * Instance of the pivot query used to query the m:n relationship
@@ -221,7 +221,7 @@ class BelongsToMany extends Relation
         $key = $baseTable.'.'.$this->relatedKey;
 
         if($this->using){
-            $query->joinSub($this->pivotQuery, $this->pivotModel->getTable(), $key, '=', $this->getQualifiedRelatedPivotKeyName());
+            $query->joinSub($this->pivotQuery, $this->pivotTable, $key, '=', $this->getQualifiedRelatedPivotKeyName());
         }
         else{
             $query->join($this->table, $key, '=', $this->getQualifiedRelatedPivotKeyName());
@@ -341,8 +341,8 @@ class BelongsToMany extends Relation
     public function using($class)
     {
         $this->using = $class;
-        $this->pivotModel = new $class;
-        $this->pivotQuery = $this->pivotModel->newQuery();
+        $this->pivotTable = (new $class)->getTable();
+        $this->pivotQuery = $this->newPivotStatement();
 
         return $this;
     }
