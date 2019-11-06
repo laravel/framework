@@ -256,7 +256,7 @@ trait FormatsMessages
         return str_replace('_', ' ', Str::snake($attribute));
     }
 
-   /**
+    /**
      * Get the given attribute from the attribute translations.
      *
      * @param  string  $name
