@@ -2,8 +2,6 @@
 
 namespace Illuminate\Container;
 
-// Utility functions pulled from Illuminate\Support to remove the need to pull in all of Support
-// when using the container standalone.
 class Util
 {
     /**
