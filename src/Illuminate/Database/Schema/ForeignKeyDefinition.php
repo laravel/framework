@@ -14,13 +14,5 @@ use Illuminate\Support\Fluent;
  */
 class ForeignKeyDefinition extends Fluent
 {
-    /**
-     * Indicate that deletes should cascade.
-     *
-     * @return $this
-     */
-    public function cascadeOnDelete()
-    {
-        return $this->onDelete('cascade');
-    }
+    //
 }
