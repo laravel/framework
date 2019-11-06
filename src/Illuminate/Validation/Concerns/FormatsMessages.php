@@ -256,7 +256,7 @@ trait FormatsMessages
         return str_replace('_', ' ', Str::snake($attribute));
     }
 
-    /**
+   /**
      * Get the given attribute from the attribute translations.
      *
      * @param  string  $name
@@ -264,7 +264,37 @@ trait FormatsMessages
      */
     protected function getAttributeFromTranslations($name)
     {
-        return Arr::get($this->translator->get('validation.attributes'), $name);
+        if ($translatedName = Arr::get($this->translator->get('validation.attributes'), $name)) {
+            return $translatedName;
+        }
+
+        // If an exact match was not found for the key, we will collapse all of these
+        // attributes and loop through them and try to find a wildcard match for the
+        // given key. Otherwise, we will simply return the key's value back out.
+        $shortKey = preg_replace('/^validation\.attributes\./', '', $name);
+
+        return $this->getWildcardCustomAttributes(Arr::dot(
+            (array) $this->translator->get('validation.attributes')
+        ), $shortKey, $name);
+    }
+
+    /**
+     * Check the given attributes for a wildcard key.
+     *
+     * @param  array  $messages
+     * @param  string  $search
+     * @param  string  $default
+     * @return string
+     */
+    protected function getWildcardCustomAttributes($attributes, $search, $default)
+    {
+        foreach ($attributes as $key => $attribute) {
+            if ($search === $key || (Str::contains($key, ['*']) && Str::is($key, $search))) {
+                return $attribute;
+            }
+        }
+
+        return $default;
     }
 
     /**
