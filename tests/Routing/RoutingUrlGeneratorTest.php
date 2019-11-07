@@ -518,6 +518,23 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com:8080/foo', $url->route('foo'));
     }
 
+    public function testUrlGenerationForControllersRequiresPassingOfRequiredParametersWhenUnrelatedParametersArePresent()
+    {
+        $this->expectException(UrlGenerationException::class);
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com:8080/')
+        );
+
+        $route = new Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $url->route('foo', ['unrelated' => 'present']);
+    }
+
     public function testForceRootUrl()
     {
         $url = new UrlGenerator(
