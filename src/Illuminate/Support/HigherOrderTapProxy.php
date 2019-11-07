@@ -33,6 +33,6 @@ class HigherOrderTapProxy
     {
         $this->target->{$method}(...$parameters);
 
-        return $this->target;
+        return new self($this->target);
     }
 }
