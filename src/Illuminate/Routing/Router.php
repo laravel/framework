@@ -1165,8 +1165,7 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         // Password Confirmation Routes...
-        if ($options['confirm'] ??
-            class_exists($this->prependGroupNamespace('Auth\ConfirmPasswordController'))) {
+        if ($options['confirm'] ?? false) {
             $this->confirmPassword();
         }
 
