@@ -167,9 +167,9 @@ class BoundMethod
 
             unset($parameters[$parameter->getClass()->name]);
         } elseif ($parameter->getClass()) {
-            $target = is_array($callback) ? get_class($callback[0]) : NULL;
+            $target = is_array($callback) ? get_class($callback[0]) : null;
 
-            $dependencies[] = $container->makeFor($parameter->getClass()->name, [], $target);
+            $dependencies[] = $container->makeFor($parameter->getClass()->name, $target);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }
@@ -183,7 +183,7 @@ class BoundMethod
      */
     protected static function getCallableSign($callback)
     {
-        return self::hasCallableSign($callback, '@')  ? '@'  : (
+        return self::hasCallableSign($callback, '@') ? '@' : (
                self::hasCallableSign($callback, '::') ? '::' : '');
     }
 

@@ -334,12 +334,12 @@ interface IContainerContextWorkerStub
 
 class ContainerContextWorkerInstance implements IContainerContextWorkerStub
 {
-  static $calls = 0;
+    public static $calls = 0;
 
-  public function work()
-  {
-    static::$calls++;
-  }
+    public function work()
+    {
+        static::$calls++;
+    }
 }
 
 class ContainerTestContextWithHandleMethod

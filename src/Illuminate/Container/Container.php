@@ -630,19 +630,19 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Resolve the given type from the container for a specific parent
+     * Resolve the given type from the container for a specific parent.
      *
      * @param  string  $abstract
+     * @param  string  $target
      * @param  array  $parameters
-     * @param  string|NULL  $target
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function makeFor($abstract, array $parameters = [], $target)
+    public function makeFor($abstract, $target, array $parameters = [])
     {
         $this->buildStack[] = $target;
-        
+
         return $this->make($abstract, $parameters);
     }
 
