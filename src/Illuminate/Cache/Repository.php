@@ -504,7 +504,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Get the default cache time.
      *
-     * @return int
+     * @return int|null
      */
     public function getDefaultCacheTime()
     {
