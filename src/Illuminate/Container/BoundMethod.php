@@ -23,8 +23,8 @@ class BoundMethod
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null)
     {
-        if (static::isCallableWithAtSign($callback) || $defaultMethod) {
-            return static::callClass($container, $callback, $parameters, $defaultMethod);
+        if (($sign = static::getCallableSign($callback)) || $defaultMethod) {
+            return static::callClass($container, $callback, $parameters, $defaultMethod, $sign ?: '@');
         }
 
         return static::callBoundMethod($container, $callback, function () use ($container, $callback, $parameters) {
@@ -41,19 +41,19 @@ class BoundMethod
      * @param  string  $target
      * @param  array  $parameters
      * @param  string|null  $defaultMethod
+     * @param  string $sign
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
+    protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null, $sign = '@')
     {
-        $segments = explode('@', $target);
+        $segments = explode($sign, $target);
 
         // We will assume an @ sign is used to delimit the class name from the method
         // name. We will split on this @ sign and then build a callable array that
         // we can pass right back into the "call" method for dependency binding.
-        $method = count($segments) === 2
-                        ? $segments[1] : $defaultMethod;
+        $method = count($segments) === 2 ? $segments[1] : $defaultMethod;
 
         if (is_null($method)) {
             throw new InvalidArgumentException('Method not provided.');
@@ -118,7 +118,7 @@ class BoundMethod
         $dependencies = [];
 
         foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
-            static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
+            static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies, $callback);
         }
 
         return array_merge($dependencies, $parameters);
@@ -152,10 +152,11 @@ class BoundMethod
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
      * @param  array  $dependencies
+     * @param  callable|string $callback
      * @return void
      */
     protected static function addDependencyForCallParameter($container, $parameter,
-                                                            array &$parameters, &$dependencies)
+                                                            array &$parameters, &$dependencies, $callback)
     {
         if (array_key_exists($parameter->name, $parameters)) {
             $dependencies[] = $parameters[$parameter->name];
@@ -166,7 +167,9 @@ class BoundMethod
 
             unset($parameters[$parameter->getClass()->name]);
         } elseif ($parameter->getClass()) {
-            $dependencies[] = $container->make($parameter->getClass()->name);
+            $target = is_array($callback) ? get_class($callback[0]) : NULL;
+
+            $dependencies[] = $container->makeFor($parameter->getClass()->name, [], $target);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }
@@ -178,8 +181,20 @@ class BoundMethod
      * @param  mixed  $callback
      * @return bool
      */
-    protected static function isCallableWithAtSign($callback)
+    protected static function getCallableSign($callback)
     {
-        return is_string($callback) && strpos($callback, '@') !== false;
+        return self::hasCallableSign($callback, '@')  ? '@'  : (
+               self::hasCallableSign($callback, '::') ? '::' : '');
+    }
+
+    /**
+     * Determine if the given string is in Class@method syntax.
+     *
+     * @param  mixed  $callback
+     * @return bool
+     */
+    protected static function hasCallableSign($callback, $sign)
+    {
+        return is_string($callback) && strpos($callback, $sign) !== false;
     }
 }

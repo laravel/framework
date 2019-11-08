@@ -231,6 +231,23 @@ class ContextualBindingTest extends TestCase
         );
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->implTwo->impl);
     }
+
+    public function testContextualBindingWorksForJobHandleMethod()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextWithHandleMethod::class)
+                  ->needs(IContainerContextWorkerStub::class)
+                  ->give(ContainerContextWorkerInstance::class);
+
+        $instance = $container->make(ContainerTestContextWithHandleMethod::class);
+
+        $this->assertEquals(ContainerContextWorkerInstance::$calls, 0);
+
+        $container->call([$instance, 'handle']);
+
+        $this->assertEquals(ContainerContextWorkerInstance::$calls, 1);
+    }
 }
 
 interface IContainerContextContractStub
@@ -307,5 +324,28 @@ class ContainerTestContextWithOptionalInnerDependency
     public function __construct(ContainerTestContextInjectOne $inner = null)
     {
         $this->inner = $inner;
+    }
+}
+
+interface IContainerContextWorkerStub
+{
+    public function work();
+}
+
+class ContainerContextWorkerInstance implements IContainerContextWorkerStub
+{
+  static $calls = 0;
+
+  public function work()
+  {
+    static::$calls++;
+  }
+}
+
+class ContainerTestContextWithHandleMethod
+{
+    public function handle(IContainerContextWorkerStub $impl)
+    {
+        $impl->work();
     }
 }
