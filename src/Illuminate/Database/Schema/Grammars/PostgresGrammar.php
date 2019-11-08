@@ -888,14 +888,14 @@ class PostgresGrammar extends Grammar
      */
     private function formatPostGisType(string $type, Fluent $column)
     {
-        if ( is_null($column->geography)) {
-            if ( is_null($column->projection)) {
+        if (is_null($column->geography)) {
+            if (is_null($column->projection)) {
                 return "geometry($type)";
             } else {
                 return "geometry($type, $projection)";
             }
         } else {
-            return "geography($type, " . ( is_null($column->projection) ? '4326' : $column->projection) . ")";
+            return "geography($type, ".( is_null($column->projection) ? '4326' : $column->projection).')';
         }
     }
 
