@@ -895,7 +895,7 @@ class PostgresGrammar extends Grammar
                 return "geometry($type, $projection)";
             }
         } else {
-            return "geography($type, ".( is_null($column->projection) ? '4326' : $column->projection).')';
+            return "geography($type, ".(is_null($column->projection) ? '4326' : $column->projection).')';
         }
     }
 
