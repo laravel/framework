@@ -907,7 +907,7 @@ class PostgresGrammar extends Grammar
             return "geometry($type)";
         }
 
-        return "geometry($type, $projection)";
+        return "geometry($type, $column->projection)";
     }
 
     /**
