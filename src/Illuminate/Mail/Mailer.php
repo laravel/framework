@@ -298,7 +298,7 @@ class Mailer implements MailerContract, MailQueueContract
             if (! isset($view[1])) {
                 throw new BadFunctionCallException('There should be a 2nd item for "plain" in the "view" array.');
             }
-            
+
             return [$view[0], $view[1], null];
         }
 
