@@ -776,6 +776,27 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('appended', $array['appendable']);
     }
 
+    public function testToArrayDateAttributes()
+    {
+        $model = new EloquentDateModelStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+
+        $model->setCreatedAt(Carbon::now());
+        $this->assertSame(['created_at' => Carbon::now()->format('Y-m-d H:i:s')], $model->toArray());
+
+        $model->setCreatedAt(0);
+        $this->assertSame(['created_at' => '1970-01-01 00:00:00'], $model->toArray());
+
+        $model->setCreatedAt(null);
+        $this->assertSame(['created_at' => null], $model->toArray());
+
+        $model->setCreatedAt(false);
+        $this->assertSame(['created_at' => false], $model->toArray());
+
+        $model->setCreatedAt('');
+        $this->assertSame(['created_at' => ''], $model->toArray());
+    }
+
     public function testVisibleCreatesArrayWhitelist()
     {
         $model = new EloquentModelStub;
