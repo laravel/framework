@@ -109,7 +109,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the view at the given path.
      *
-     * @param  string  $path
+     * @param  string|null  $path
      * @return void
      */
     public function compile($path = null)
@@ -326,7 +326,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileExtensions($value)
     {
         foreach ($this->extensions as $compiler) {
-            $value = call_user_func($compiler, $value, $this);
+            $value = $compiler($value, $this);
         }
 
         return $value;
@@ -435,6 +435,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
                     : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
+        $this->directive('unless'.$name, function ($expression) use ($name) {
+            return $expression !== ''
+                ? "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
+                : "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+        });
+
         $this->directive('else'.$name, function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
@@ -462,7 +468,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a component alias directive.
      *
      * @param  string  $path
-     * @param  string  $alias
+     * @param  string|null  $alias
      * @return void
      */
     public function component($path, $alias = null)
@@ -484,7 +490,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an include alias directive.
      *
      * @param  string  $path
-     * @param  string  $alias
+     * @param  string|null  $alias
      * @return void
      */
     public function include($path, $alias = null)

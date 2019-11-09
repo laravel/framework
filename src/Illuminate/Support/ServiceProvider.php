@@ -3,6 +3,8 @@
 namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
+use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 
 abstract class ServiceProvider
@@ -58,9 +60,11 @@ abstract class ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        $config = $this->app['config']->get($key, []);
-
-        $this->app['config']->set($key, array_merge(require $path, $config));
+        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
+            $this->app['config']->set($key, array_merge(
+                require $path, $this->app['config']->get($key, [])
+            ));
+        }
     }
 
     /**
@@ -71,7 +75,7 @@ abstract class ServiceProvider
      */
     protected function loadRoutesFrom($path)
     {
-        if (! $this->app->routesAreCached()) {
+        if (! ($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
             require $path;
         }
     }
@@ -85,15 +89,17 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
+        $view = $this->app['view'];
+
         if (is_array($this->app->config['view']['paths'])) {
             foreach ($this->app->config['view']['paths'] as $viewPath) {
                 if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
-                    $this->app['view']->addNamespace($namespace, $appPath);
+                    $view->addNamespace($namespace, $appPath);
                 }
             }
         }
 
-        $this->app['view']->addNamespace($namespace, $path);
+        $view->addNamespace($namespace, $path);
     }
 
     /**
@@ -147,10 +153,8 @@ abstract class ServiceProvider
 
         static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
 
-        if (! is_null($groups)) {
-            foreach ((array) $groups as $group) {
-                $this->addPublishGroup($group, $paths);
-            }
+        foreach ((array) $groups as $group) {
+            $this->addPublishGroup($group, $paths);
         }
     }
 

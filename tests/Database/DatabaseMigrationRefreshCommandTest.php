@@ -2,17 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Database\Migrations\Migrator;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
+use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
+use Illuminate\Foundation\Application;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationRefreshCommandTest extends TestCase
 {
@@ -23,7 +22,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
     public function testRefreshCommandCallsCommandsWithProperArguments()
     {
-        $command = new RefreshCommand($migrator = m::mock(Migrator::class));
+        $command = new RefreshCommand();
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
         $console = m::mock(ConsoleApplication::class)->makePartial();
@@ -46,7 +45,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
     public function testRefreshCommandCallsCommandsWithStep()
     {
-        $command = new RefreshCommand($migrator = m::mock(Migrator::class));
+        $command = new RefreshCommand();
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
         $console = m::mock(ConsoleApplication::class)->makePartial();

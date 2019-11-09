@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Support\Arr;
-use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
 abstract class Seeder
 {
@@ -35,11 +35,23 @@ abstract class Seeder
         $classes = Arr::wrap($class);
 
         foreach ($classes as $class) {
+            $seeder = $this->resolve($class);
+
+            $name = get_class($seeder);
+
             if ($silent === false && isset($this->command)) {
-                $this->command->getOutput()->writeln("<info>Seeding:</info> $class");
+                $this->command->getOutput()->writeln("<comment>Seeding:</comment> {$name}");
             }
 
-            $this->resolve($class)->__invoke();
+            $startTime = microtime(true);
+
+            $seeder->__invoke();
+
+            $runTime = round(microtime(true) - $startTime, 2);
+
+            if ($silent === false && isset($this->command)) {
+                $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime} seconds)");
+            }
         }
 
         return $this;

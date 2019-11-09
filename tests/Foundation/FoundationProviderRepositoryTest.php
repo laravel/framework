@@ -2,13 +2,14 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\ProviderRepository;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Support\ServiceProvider;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
@@ -81,10 +82,21 @@ class FoundationProviderRepositoryTest extends TestCase
     public function testWriteManifestStoresToProperLocation()
     {
         $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files = m::mock(Filesystem::class), __DIR__.'/services.php');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
+        $files->shouldReceive('replace')->once()->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
 
         $result = $repo->writeManifest(['foo']);
 
         $this->assertEquals(['foo', 'when' => []], $result);
+    }
+
+    public function testWriteManifestThrowsExceptionIfManifestDirDoesntExist()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageRegExp('/^The (.*) directory must be present and writable.$/');
+
+        $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files = m::mock(Filesystem::class), __DIR__.'/cache/services.php');
+        $files->shouldReceive('replace')->never();
+
+        $repo->writeManifest(['foo']);
     }
 }

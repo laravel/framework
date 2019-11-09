@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Foundation\EnvironmentDetector;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\EnvironmentDetector;
 
 class FoundationEnvironmentDetectorTest extends TestCase
 {
@@ -20,7 +20,7 @@ class FoundationEnvironmentDetectorTest extends TestCase
         $result = $env->detect(function () {
             return 'foobar';
         });
-        $this->assertEquals('foobar', $result);
+        $this->assertSame('foobar', $result);
     }
 
     public function testConsoleEnvironmentDetection()
@@ -30,6 +30,26 @@ class FoundationEnvironmentDetectorTest extends TestCase
         $result = $env->detect(function () {
             return 'foobar';
         }, ['--env=local']);
-        $this->assertEquals('local', $result);
+        $this->assertSame('local', $result);
+    }
+
+    public function testConsoleEnvironmentDetectionSeparatedWithSpace()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--env', 'local']);
+        $this->assertSame('local', $result);
+    }
+
+    public function testConsoleEnvironmentDetectionWithNoValue()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--env']);
+        $this->assertSame('foobar', $result);
     }
 }

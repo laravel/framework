@@ -2,17 +2,17 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
-use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\MigrationsStarted;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Events\MigrationStarted;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class Migrator
 {
@@ -71,7 +71,7 @@ class Migrator
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
     public function __construct(MigrationRepositoryInterface $repository,
@@ -94,8 +94,6 @@ class Migrator
      */
     public function run($paths = [], array $options = [])
     {
-        $this->notes = [];
-
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
@@ -194,14 +192,18 @@ class Migrator
 
         $this->note("<comment>Migrating:</comment> {$name}");
 
+        $startTime = microtime(true);
+
         $this->runMigration($migration, 'up');
+
+        $runTime = round(microtime(true) - $startTime, 2);
 
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
         // in the application. A migration repository keeps the migrate order.
         $this->repository->log($name, $batch);
 
-        $this->note("<info>Migrated:</info>  {$name}");
+        $this->note("<info>Migrated:</info>  {$name} ({$runTime} seconds)");
     }
 
     /**
@@ -213,8 +215,6 @@ class Migrator
      */
     public function rollback($paths = [], array $options = [])
     {
-        $this->notes = [];
-
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
@@ -294,8 +294,6 @@ class Migrator
      */
     public function reset($paths = [], $pretend = false)
     {
-        $this->notes = [];
-
         // Next, we will reverse the migration list so we can run them back in the
         // correct order for resetting this database. This will allow us to get
         // the database back into its "empty" state ready for the migrations.
@@ -355,14 +353,18 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
+        $startTime = microtime(true);
+
         $this->runMigration($instance, 'down');
+
+        $runTime = round(microtime(true) - $startTime, 2);
 
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
         // by the application then will be able to fire by any later operation.
         $this->repository->delete($migration);
 
-        $this->note("<info>Rolled back:</info>  {$name}");
+        $this->note("<info>Rolled back:</info>  {$name} ({$runTime} seconds)");
     }
 
     /**
@@ -456,10 +458,10 @@ class Migrator
     {
         return Collection::make($paths)->flatMap(function ($path) {
             return Str::endsWith($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php');
-        })->filter()->sortBy(function ($file) {
+        })->filter()->values()->keyBy(function ($file) {
             return $this->getMigrationName($file);
-        })->values()->keyBy(function ($file) {
-            return $this->getMigrationName($file);
+        })->sortBy(function ($file, $key) {
+            return $key;
         })->all();
     }
 

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
 {
@@ -27,7 +27,7 @@ class CacheRedisStoreTest extends TestCase
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
         $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(serialize('foo'));
-        $this->assertEquals('foo', $redis->get('foo'));
+        $this->assertSame('foo', $redis->get('foo'));
     }
 
     public function testRedisMultipleValuesAreReturned()
@@ -44,9 +44,9 @@ class CacheRedisStoreTest extends TestCase
 
         $results = $redis->many(['foo', 'fizz', 'norf', 'null']);
 
-        $this->assertEquals('bar', $results['foo']);
-        $this->assertEquals('buzz', $results['fizz']);
-        $this->assertEquals('quz', $results['norf']);
+        $this->assertSame('bar', $results['foo']);
+        $this->assertSame('buzz', $results['fizz']);
+        $this->assertSame('quz', $results['norf']);
         $this->assertNull($results['null']);
     }
 
@@ -141,9 +141,9 @@ class CacheRedisStoreTest extends TestCase
     public function testGetAndSetPrefix()
     {
         $redis = $this->getRedis();
-        $this->assertEquals('prefix:', $redis->getPrefix());
+        $this->assertSame('prefix:', $redis->getPrefix());
         $redis->setPrefix('foo');
-        $this->assertEquals('foo:', $redis->getPrefix());
+        $this->assertSame('foo:', $redis->getPrefix());
         $redis->setPrefix(null);
         $this->assertEmpty($redis->getPrefix());
     }

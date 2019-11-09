@@ -38,7 +38,7 @@ trait InteractsWithQueue
     /**
      * Fail the job from the queue.
      *
-     * @param  \Throwable  $exception
+     * @param  \Throwable|null  $exception
      * @return void
      */
     public function fail($exception = null)

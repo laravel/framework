@@ -45,4 +45,25 @@ trait CompilesComponents
     {
         return '<?php $__env->endSlot(); ?>';
     }
+
+    /**
+     * Compile the component-first statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileComponentFirst($expression)
+    {
+        return "<?php \$__env->startComponentFirst{$expression}; ?>";
+    }
+
+    /**
+     * Compile the end-component-first statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndComponentFirst()
+    {
+        return $this->compileEndComponent();
+    }
 }

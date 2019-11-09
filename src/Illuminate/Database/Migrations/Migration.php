@@ -7,7 +7,7 @@ abstract class Migration
     /**
      * The name of the database connection to use.
      *
-     * @var string
+     * @var string|null
      */
     protected $connection;
 
@@ -21,7 +21,7 @@ abstract class Migration
     /**
      * Get the migration connection name.
      *
-     * @return string
+     * @return string|null
      */
     public function getConnection()
     {

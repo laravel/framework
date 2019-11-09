@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\SendQueuedNotifications;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class NotificationSendQueuedNotificationTest extends TestCase
 {

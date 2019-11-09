@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Mockery;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcherContract;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
+use Mockery;
 
 trait MocksApplicationServices
 {
@@ -98,7 +98,7 @@ trait MocksApplicationServices
     {
         $mock = Mockery::mock(EventsDispatcherContract::class)->shouldIgnoreMissing();
 
-        $mock->shouldReceive('dispatch')->andReturnUsing(function ($called) {
+        $mock->shouldReceive('dispatch', 'until')->andReturnUsing(function ($called) {
             $this->firedEvents[] = $called;
         });
 

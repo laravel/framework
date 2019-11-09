@@ -2,15 +2,15 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
+use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
-use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
-use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 
-class NotificationFake implements NotificationFactory, NotificationDispatcher
+class NotificationFake implements NotificationDispatcher, NotificationFactory
 {
     use Macroable;
 
@@ -193,9 +193,10 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
+     * @param  array|null  $channels
      * @return void
      */
-    public function sendNow($notifiables, $notification)
+    public function sendNow($notifiables, $notification, array $channels = null)
     {
         if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
             $notifiables = [$notifiables];
@@ -208,7 +209,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
 
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $notification,
-                'channels' => $notification->via($notifiable),
+                'channels' => $channels ?: $notification->via($notifiable),
                 'notifiable' => $notifiable,
                 'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
                     if ($notifiable instanceof HasLocalePreference) {

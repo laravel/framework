@@ -2,14 +2,15 @@
 
 namespace Illuminate\Tests\Support;
 
-use DateTime;
-use Carbon\Factory;
 use Carbon\CarbonImmutable;
-use InvalidArgumentException;
+use Carbon\Factory;
+use CustomDateClass;
+use DateTime;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\DateFactory;
 use Illuminate\Support\Facades\Date;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
 class DateFacadeTest extends TestCase
 {
@@ -56,10 +57,6 @@ class DateFacadeTest extends TestCase
 
     public function testCarbonImmutable()
     {
-        if (! class_exists(CarbonImmutable::class)) {
-            $this->markTestSkipped('Test for Carbon 2 only');
-        }
-
         DateFactory::use(CarbonImmutable::class);
         $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
         DateFactory::use(Carbon::class);
@@ -80,8 +77,8 @@ class DateFacadeTest extends TestCase
         DateFactory::use(Carbon::class);
         $this->assertSame('en', Date::now()->locale);
         include_once __DIR__.'/fixtures/CustomDateClass.php';
-        DateFactory::use(\CustomDateClass::class);
-        $this->assertInstanceOf(\CustomDateClass::class, Date::now());
+        DateFactory::use(CustomDateClass::class);
+        $this->assertInstanceOf(CustomDateClass::class, Date::now());
         $this->assertInstanceOf(Carbon::class, Date::now()->getOriginal());
         DateFactory::use(Carbon::class);
     }

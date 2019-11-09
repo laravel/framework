@@ -2,9 +2,9 @@
 
 namespace Illuminate\Mail;
 
-use Parsedown;
-use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Support\HtmlString;
+use Parsedown;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class Markdown
@@ -61,7 +61,7 @@ class Markdown
         )->make($view, $data)->render();
 
         return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
-            $contents, $this->view->make('mail::themes.'.$this->theme)->render()
+            $contents, $this->view->make('mail::themes.'.$this->theme, $data)->render()
         ));
     }
 

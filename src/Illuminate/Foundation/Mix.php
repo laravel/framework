@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation;
 
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class Mix
 {
@@ -63,6 +63,6 @@ class Mix
             }
         }
 
-        return new HtmlString($manifestDirectory.$manifest[$path]);
+        return new HtmlString(app('config')->get('app.mix_url').$manifestDirectory.$manifest[$path]);
     }
 }

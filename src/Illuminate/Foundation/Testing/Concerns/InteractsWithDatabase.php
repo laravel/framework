@@ -2,11 +2,12 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
-use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
+use Illuminate\Support\Arr;
+use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
 trait InteractsWithDatabase
 {
@@ -15,7 +16,7 @@ trait InteractsWithDatabase
      *
      * @param  string  $table
      * @param  array  $data
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
@@ -32,7 +33,7 @@ trait InteractsWithDatabase
      *
      * @param  string  $table
      * @param  array  $data
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseMissing($table, array $data, $connection = null)
@@ -49,22 +50,35 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has been deleted.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Model  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
-     * @param  string  $connection
+     * @param  string|null  $connection
+     * @param  string|null  $deletedAtColumn
      * @return $this
      */
-    protected function assertSoftDeleted($table, array $data = [], $connection = null)
+    protected function assertSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
     {
-        if ($table instanceof Model) {
-            return $this->assertSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
+        if ($this->isSoftDeletableModel($table)) {
+            return $this->assertSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName(), $table->getDeletedAtColumn());
         }
 
         $this->assertThat(
-            $table, new SoftDeletedInDatabase($this->getConnection($connection), $data)
+            $table, new SoftDeletedInDatabase($this->getConnection($connection), $data, $deletedAtColumn)
         );
 
         return $this;
+    }
+
+    /**
+     * Determine if the argument is a soft deletable model.
+     *
+     * @param  mixed  $model
+     * @return bool
+     */
+    protected function isSoftDeletableModel($model)
+    {
+        return $model instanceof Model
+            && in_array(SoftDeletes::class, class_uses_recursive($model));
     }
 
     /**

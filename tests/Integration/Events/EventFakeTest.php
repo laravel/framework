@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Events;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
 class EventFakeTest extends TestCase
 {
@@ -123,7 +123,7 @@ class EventFakeTest extends TestCase
             $this->fail('should not be called');
         });
 
-        $this->assertEquals('two', Event::until('test'));
+        $this->assertSame('two', Event::until('test'));
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }

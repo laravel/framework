@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
 use Exception;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Mockery as m;
 use Pheanstalk\Job;
 use Pheanstalk\Pheanstalk;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Jobs\BeanstalkdJob;
-use Illuminate\Contracts\Events\Dispatcher;
+use stdClass;
 
 class QueueBeanstalkdJobTest extends TestCase
 {

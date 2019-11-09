@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Container;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use PHPUnit\Framework\TestCase;
 
 class ContextualBindingTest extends TestCase
 {
@@ -209,6 +209,28 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
     }
+
+    public function testContextualBindingWorksForNestedOptionalDependencies()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectTwoInstances::class)->needs(ContainerTestContextInjectTwo::class)->give(function () {
+            return new ContainerTestContextInjectTwo(new ContainerContextImplementationStubTwo);
+        });
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectTwoInstances::class);
+        $this->assertInstanceOf(
+            ContainerTestContextWithOptionalInnerDependency::class,
+            $resolvedInstance->implOne
+        );
+        $this->assertNull($resolvedInstance->implOne->inner);
+
+        $this->assertInstanceOf(
+            ContainerTestContextInjectTwo::class,
+            $resolvedInstance->implTwo
+        );
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->implTwo->impl);
+    }
 }
 
 interface IContainerContextContractStub
@@ -263,5 +285,27 @@ class ContainerTestContextInjectThree
     public function __construct(IContainerContextContractStub $impl)
     {
         $this->impl = $impl;
+    }
+}
+
+class ContainerTestContextInjectTwoInstances
+{
+    public $implOne;
+    public $implTwo;
+
+    public function __construct(ContainerTestContextWithOptionalInnerDependency $implOne, ContainerTestContextInjectTwo $implTwo)
+    {
+        $this->implOne = $implOne;
+        $this->implTwo = $implTwo;
+    }
+}
+
+class ContainerTestContextWithOptionalInnerDependency
+{
+    public $inner;
+
+    public function __construct(ContainerTestContextInjectOne $inner = null)
+    {
+        $this->inner = $inner;
     }
 }

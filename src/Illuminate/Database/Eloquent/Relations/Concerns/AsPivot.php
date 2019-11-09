@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 trait AsPivot
 {
@@ -203,7 +203,7 @@ trait AsPivot
     /**
      * Determine if the pivot model or given attributes has timestamp attributes.
      *
-     * @param  $attributes  array|null
+     * @param  array|null  $attributes
      * @return bool
      */
     public function hasTimestampAttributes($attributes = null)
@@ -256,7 +256,7 @@ trait AsPivot
     /**
      * Get a new query to restore one or more models by their queueable IDs.
      *
-     * @param  array<int>  $ids
+     * @param  int[]|string[]|string  $ids
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function newQueryForRestoration($ids)
@@ -279,7 +279,7 @@ trait AsPivot
     /**
      * Get a new query to restore multiple models by their queueable IDs.
      *
-     * @param  array|int  $ids
+     * @param  int[]|string[]  $ids
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function newQueryForCollectionRestoration(array $ids)

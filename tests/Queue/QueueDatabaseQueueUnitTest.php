@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
-use Mockery as m;
-use ReflectionClass;
-use Illuminate\Queue\Queue;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\Queue;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
@@ -20,10 +20,10 @@ class QueueDatabaseQueueUnitTest extends TestCase
     public function testPushProperlyPushesJobOntoDatabase()
     {
         $queue = $this->getMockBuilder(DatabaseQueue::class)->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
-        $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
+        $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
-            $this->assertEquals('default', $array['queue']);
+            $this->assertSame('default', $array['queue']);
             $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
@@ -40,10 +40,10 @@ class QueueDatabaseQueueUnitTest extends TestCase
             ['currentTime'])->setConstructorArgs(
             [$database = m::mock(Connection::class), 'table', 'default']
         )->getMock();
-        $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
+        $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
-            $this->assertEquals('default', $array['queue']);
+            $this->assertSame('default', $array['queue']);
             $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'delay' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
@@ -90,8 +90,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = m::mock(Connection::class);
         $queue = $this->getMockBuilder(DatabaseQueue::class)->setMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
-        $queue->expects($this->any())->method('currentTime')->will($this->returnValue('created'));
-        $queue->expects($this->any())->method('availableAt')->will($this->returnValue('available'));
+        $queue->expects($this->any())->method('currentTime')->willReturn('created');
+        $queue->expects($this->any())->method('availableAt')->willReturn('available');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[

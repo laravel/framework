@@ -50,7 +50,7 @@ trait DatabaseRule
     /**
      * Set a "where" constraint on the query.
      *
-     * @param  string|\Closure  $column
+     * @param  \Closure|string  $column
      * @param  array|string|null  $value
      * @return $this
      */
@@ -62,6 +62,10 @@ trait DatabaseRule
 
         if ($column instanceof Closure) {
             return $this->using($column);
+        }
+
+        if (is_null($value)) {
+            return $this->whereNull($column);
         }
 
         $this->wheres[] = compact('column', 'value');
@@ -166,7 +170,7 @@ trait DatabaseRule
     protected function formatWheres()
     {
         return collect($this->wheres)->map(function ($where) {
-            return $where['column'].','.$where['value'];
+            return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
         })->implode(',');
     }
 }

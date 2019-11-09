@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Log;
 
-use Mockery as m;
-use RuntimeException;
-use Illuminate\Log\Logger;
-use Monolog\Logger as Monolog;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Events\MessageLogged;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Log\Logger;
+use Mockery as m;
+use Monolog\Logger as Monolog;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class LogLoggerTest extends TestCase
 {
@@ -39,10 +39,10 @@ class LogLoggerTest extends TestCase
 
         $writer->error('foo');
         $this->assertTrue(isset($_SERVER['__log.level']));
-        $this->assertEquals('error', $_SERVER['__log.level']);
+        $this->assertSame('error', $_SERVER['__log.level']);
         unset($_SERVER['__log.level']);
         $this->assertTrue(isset($_SERVER['__log.message']));
-        $this->assertEquals('foo', $_SERVER['__log.message']);
+        $this->assertSame('foo', $_SERVER['__log.message']);
         unset($_SERVER['__log.message']);
         $this->assertTrue(isset($_SERVER['__log.context']));
         $this->assertEquals([], $_SERVER['__log.context']);
@@ -54,7 +54,7 @@ class LogLoggerTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Events dispatcher has not been set.');
 
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer = new Logger(m::mock(Monolog::class));
         $writer->listen(function () {
             //
         });
@@ -62,7 +62,7 @@ class LogLoggerTest extends TestCase
 
     public function testListenShortcut()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class), $events = m::mock(DispatcherContract::class));
+        $writer = new Logger(m::mock(Monolog::class), $events = m::mock(DispatcherContract::class));
 
         $callback = function () {
             return 'success';

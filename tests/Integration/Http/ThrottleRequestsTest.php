@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Throwable;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
+use Throwable;
 
 /**
  * @group integration
@@ -25,7 +25,7 @@ class ThrottleRequestsTest extends TestCase
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
-    public function test_lock_opens_immediately_after_decay()
+    public function testLockOpensImmediatelyAfterDecay()
     {
         Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
 
@@ -34,12 +34,12 @@ class ThrottleRequestsTest extends TestCase
         })->middleware(ThrottleRequests::class.':2,1');
 
         $response = $this->withoutExceptionHandling()->get('/');
-        $this->assertEquals('yes', $response->getContent());
+        $this->assertSame('yes', $response->getContent());
         $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
         $this->assertEquals(1, $response->headers->get('X-RateLimit-Remaining'));
 
         $response = $this->withoutExceptionHandling()->get('/');
-        $this->assertEquals('yes', $response->getContent());
+        $this->assertSame('yes', $response->getContent());
         $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
         $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
 

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelLoadCountTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -31,7 +31,7 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
             $table->unsignedInteger('base_model_id');
         });
 
-        Schema::create('deleted_relateds', function (Blueprint $table) {
+        Schema::create('deleted_related', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('base_model_id');
             $table->softDeletes();

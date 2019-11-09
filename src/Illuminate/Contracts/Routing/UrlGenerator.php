@@ -24,7 +24,7 @@ interface UrlGenerator
      *
      * @param  string  $path
      * @param  mixed  $extra
-     * @param  bool  $secure
+     * @param  bool|null  $secure
      * @return string
      */
     public function to($path, $extra = [], $secure = null);
@@ -42,7 +42,7 @@ interface UrlGenerator
      * Generate the URL to an application asset.
      *
      * @param  string  $path
-     * @param  bool    $secure
+     * @param  bool|null  $secure
      * @return string
      */
     public function asset($path, $secure = null);

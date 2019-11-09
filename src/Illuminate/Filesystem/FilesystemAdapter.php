@@ -2,31 +2,32 @@
 
 namespace Illuminate\Filesystem;
 
-use RuntimeException;
-use Illuminate\Http\File;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Collection;
-use League\Flysystem\AdapterInterface;
-use PHPUnit\Framework\Assert as PHPUnit;
-use League\Flysystem\FileExistsException;
-use League\Flysystem\FilesystemInterface;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\Cached\CachedAdapter;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\Adapter\Local as LocalAdapter;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
-use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\FileExistsException as ContractFileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
+use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
+use Illuminate\Http\File;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use League\Flysystem\Adapter\Local as LocalAdapter;
+use League\Flysystem\AdapterInterface;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Cached\CachedAdapter;
+use League\Flysystem\FileExistsException;
+use League\Flysystem\FileNotFoundException;
+use League\Flysystem\FilesystemInterface;
+use PHPUnit\Framework\Assert as PHPUnit;
+use Psr\Http\Message\StreamInterface;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * @mixin \League\Flysystem\FilesystemInterface
  */
-class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
+class FilesystemAdapter implements CloudFilesystemContract
 {
     /**
      * The Flysystem filesystem implementation.
@@ -96,6 +97,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Determine if a file or directory is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function missing($path)
+    {
+        return ! $this->exists($path);
+    }
+
+    /**
      * Get the full path for the file at the given "short" path.
      *
      * @param  string  $path
@@ -139,7 +151,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         $filename = $name ?? basename($path);
 
         $disposition = $response->headers->makeDisposition(
-            $disposition, $filename, Str::ascii($filename)
+            $disposition, $filename, $this->fallbackName($filename)
         );
 
         $response->headers->replace($headers + [
@@ -171,6 +183,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Convert the string to ASCII characters that are equivalent to the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function fallbackName($name)
+    {
+        return str_replace('%', '', Str::ascii($name));
+    }
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path
@@ -190,6 +213,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         if ($contents instanceof File ||
             $contents instanceof UploadedFile) {
             return $this->putFile($path, $contents, $options);
+        }
+
+        if ($contents instanceof StreamInterface) {
+            return $this->driver->putStream($path, $contents->detach(), $options);
         }
 
         return is_resource($contents)

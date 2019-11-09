@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -20,7 +20,7 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         $app['config']->set('app.debug', 'true');
     }
 
-    public function test_mail_is_sent()
+    public function testMailIsSent()
     {
         $notifiable = (new AnonymousNotifiable)
             ->route('testchannel', 'enzo')
@@ -36,7 +36,7 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         ], $_SERVER['__notifiable.route']);
     }
 
-    public function test_faking()
+    public function testFaking()
     {
         $fake = NotificationFacade::fake();
 

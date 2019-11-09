@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Mockery as m;
-use Illuminate\Mail\Message;
-use Illuminate\Mail\Markdown;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Notifications\Notification;
+use Illuminate\Mail\Markdown;
+use Illuminate\Mail\Message;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Schema;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -66,7 +66,7 @@ class SendingMailNotificationsTest extends TestCase
         });
     }
 
-    public function test_mail_is_sent()
+    public function testMailIsSent()
     {
         $notification = new TestMailNotification;
 
@@ -109,7 +109,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_to_named_address()
+    public function testMailIsSentToNamedAddress()
     {
         $notification = new TestMailNotification;
 
@@ -153,7 +153,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_with_subject()
+    public function testMailIsSentWithSubject()
     {
         $notification = new TestMailNotificationWithSubject;
 
@@ -186,7 +186,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_to_multiple_adresses()
+    public function testMailIsSentToMultipleAdresses()
     {
         $notification = new TestMailNotificationWithSubject;
 
@@ -219,7 +219,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_using_mailable()
+    public function testMailIsSentUsingMailable()
     {
         $notification = new TestMailNotificationWithMailable;
 

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentWithCountTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -36,7 +36,7 @@ class EloquentWithCountTest extends DatabaseTestCase
         });
     }
 
-    public function test_it_basic()
+    public function testItBasic()
     {
         $one = Model1::create();
         $two = $one->twos()->Create();
@@ -53,7 +53,7 @@ class EloquentWithCountTest extends DatabaseTestCase
         ], $results->get()->toArray());
     }
 
-    public function test_global_scopes()
+    public function testGlobalScopes()
     {
         $one = Model1::create();
         $one->fours()->create();
@@ -63,6 +63,16 @@ class EloquentWithCountTest extends DatabaseTestCase
 
         $result = Model1::withCount('allFours')->first();
         $this->assertEquals(1, $result->all_fours_count);
+    }
+
+    public function testSortingScopes()
+    {
+        $one = Model1::create();
+        $one->twos()->create();
+
+        $result = Model1::withCount('twos')->toSql();
+
+        $this->assertEquals('select "one".*, (select count(*) from "two" where "one"."id" = "two"."one_id") as "twos_count" from "one"', $result);
     }
 }
 
@@ -94,6 +104,15 @@ class Model2 extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
     protected $withCount = ['threes'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('app', function ($builder) {
+            $builder->latest();
+        });
+    }
 
     public function threes()
     {

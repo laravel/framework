@@ -795,7 +795,7 @@ class MimeType
     /**
      * Get the MIME type for a given extension or return all mimes.
      *
-     * @param  string  $extension
+     * @param  string|null  $extension
      * @return string|array
      */
     public static function get($extension = null)

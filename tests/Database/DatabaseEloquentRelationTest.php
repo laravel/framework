@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use Mockery as m;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
@@ -244,7 +244,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $relation = new EloquentRelationStub($model->newQuery(), $model);
 
         $result = $relation->foo();
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
     }
 }
 

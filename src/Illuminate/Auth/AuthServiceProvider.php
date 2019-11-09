@@ -3,9 +3,9 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Auth\Access\Gate;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -95,6 +95,10 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->app->rebinding('events', function ($app, $dispatcher) {
             if (! $app->resolved('auth')) {
+                return;
+            }
+
+            if ($app['auth']->hasResolvedGuards() === false) {
                 return;
             }
 

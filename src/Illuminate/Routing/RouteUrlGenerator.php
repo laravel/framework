@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Routing\Exceptions\UrlGenerationException;
 
 class RouteUrlGenerator
 {
@@ -197,9 +197,12 @@ class RouteUrlGenerator
         $path = $this->replaceNamedParameters($path, $parameters);
 
         $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
+            // Reset only the numeric keys...
+            $parameters = array_merge($parameters);
+
             return (empty($parameters) && ! Str::endsWith($match[0], '?}'))
                         ? $match[0]
-                        : array_shift($parameters);
+                        : Arr::pull($parameters, 0);
         }, $path);
 
         return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');
@@ -274,7 +277,9 @@ class RouteUrlGenerator
             );
         }
 
-        return '?'.trim($query, '&');
+        $query = trim($query, '&');
+
+        return $query === '' ? '' : "?{$query}";
     }
 
     /**

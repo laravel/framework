@@ -51,7 +51,7 @@ class TaggedCache extends Repository
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function increment($key, $value = 1)
@@ -63,7 +63,7 @@ class TaggedCache extends Repository
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function decrement($key, $value = 1)

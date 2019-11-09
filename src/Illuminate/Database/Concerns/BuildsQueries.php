@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Concerns;
 
 use Illuminate\Container\Container;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 trait BuildsQueries
 {
@@ -148,7 +148,7 @@ trait BuildsQueries
      *
      * @param  mixed  $value
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return mixed|$this
      */
     public function when($value, $callback, $default = null)
@@ -178,7 +178,7 @@ trait BuildsQueries
      *
      * @param  mixed  $value
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return mixed|$this
      */
     public function unless($value, $callback, $default = null)

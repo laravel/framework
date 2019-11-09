@@ -16,19 +16,22 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "illuminate/session": "5.9.*",
-        "illuminate/support": "5.9.*",
-        "symfony/http-foundation": "^4.2",
-        "symfony/http-kernel": "^4.2"
+        "illuminate/session": "^7.0",
+        "illuminate/support": "^7.0",
+        "symfony/http-foundation": "^4.3.4",
+        "symfony/http-kernel": "^4.3.4"
     },
     "autoload": {
         "psr-4": {
             "Illuminate\\Http\\": ""
         }
     },
+    "suggest": {
+        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image()."
+    },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.9-dev"
+            "dev-master": "7.0-dev"
         }
     },
     "config": {

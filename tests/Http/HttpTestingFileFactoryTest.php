@@ -2,13 +2,17 @@
 
 namespace Illuminate\Tests\Http;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Http\Testing\FileFactory;
+use PHPUnit\Framework\TestCase;
 
 class HttpTestingFileFactoryTest extends TestCase
 {
     public function testImagePng()
     {
+        if (! function_exists('imagepng')) {
+            $this->markTestSkipped('The extension gd is missing from your system or was compiled without PNG support.');
+        }
+
         $image = (new FileFactory)->image('test.png', 15, 20);
 
         $info = getimagesize($image->getRealPath());
@@ -20,6 +24,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
+        if (! function_exists('imagejpeg')) {
+            $this->markTestSkipped('The extension gd is missing from your system or was compiled without JPEG support.');
+        }
+
         $image = (new FileFactory)->image('test.jpeg', 15, 20);
 
         $info = getimagesize($image->getRealPath());

@@ -40,7 +40,7 @@ class RedisTaggedCache extends TaggedCache
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function increment($key, $value = 1)
@@ -54,7 +54,7 @@ class RedisTaggedCache extends TaggedCache
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function decrement($key, $value = 1)
@@ -68,7 +68,7 @@ class RedisTaggedCache extends TaggedCache
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)

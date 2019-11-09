@@ -39,8 +39,8 @@ interface MessageBag extends Arrayable
     /**
      * Get the first message from the bag for a given key.
      *
-     * @param  string  $key
-     * @param  string  $format
+     * @param  string|null  $key
+     * @param  string|null  $format
      * @return string
      */
     public function first($key = null, $format = null);
@@ -49,7 +49,7 @@ interface MessageBag extends Arrayable
      * Get all of the messages from the bag for a given key.
      *
      * @param  string  $key
-     * @param  string  $format
+     * @param  string|null  $format
      * @return array
      */
     public function get($key, $format = null);
@@ -57,7 +57,7 @@ interface MessageBag extends Arrayable
     /**
      * Get all of the messages for every key in the bag.
      *
-     * @param  string  $format
+     * @param  string|null  $format
      * @return array
      */
     public function all($format = null);

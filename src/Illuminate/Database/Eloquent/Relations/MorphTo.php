@@ -3,9 +3,9 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use BadMethodCallException;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class MorphTo extends BelongsTo
 {
@@ -36,6 +36,13 @@ class MorphTo extends BelongsTo
      * @var array
      */
     protected $macroBuffer = [];
+
+    /**
+     * A map of relations to load for each individual morph type.
+     *
+     * @var array
+     */
+    protected $morphableEagerLoads = [];
 
     /**
      * Create a new morph to relationship instance.
@@ -111,9 +118,14 @@ class MorphTo extends BelongsTo
 
         $query = $this->replayMacros($instance->newQuery())
                             ->mergeConstraintsFrom($this->getQuery())
-                            ->with($this->getQuery()->getEagerLoads());
+                            ->with(array_merge(
+                                $this->getQuery()->getEagerLoads(),
+                                (array) ($this->morphableEagerLoads[get_class($instance)] ?? [])
+                            ));
 
-        return $query->whereIn(
+        $whereIn = $this->whereInMethod($instance, $ownerKey);
+
+        return $query->{$whereIn}(
             $instance->getTable().'.'.$ownerKey, $this->gatherKeysByType($type)
         )->get();
     }
@@ -126,9 +138,7 @@ class MorphTo extends BelongsTo
      */
     protected function gatherKeysByType($type)
     {
-        return collect($this->dictionary[$type])->map(function ($models) {
-            return head($models)->{$this->foreignKey};
-        })->values()->unique()->all();
+        return array_keys($this->dictionary[$type]);
     }
 
     /**
@@ -251,6 +261,21 @@ class MorphTo extends BelongsTo
     public function getDictionary()
     {
         return $this->dictionary;
+    }
+
+    /**
+     * Specify which relations to load for a given morph type.
+     *
+     * @param  array  $with
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function morphWith(array $with)
+    {
+        $this->morphableEagerLoads = array_merge(
+            $this->morphableEagerLoads, $with
+        );
+
+        return $this;
     }
 
     /**

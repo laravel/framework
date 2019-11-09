@@ -36,7 +36,7 @@ trait FileHelpers
     /**
      * Get a filename for the file.
      *
-     * @param  string  $path
+     * @param  string|null  $path
      * @return string
      */
     public function hashName($path = null)

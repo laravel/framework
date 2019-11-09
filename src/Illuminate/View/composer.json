@@ -16,12 +16,12 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "illuminate/container": "5.9.*",
-        "illuminate/contracts": "5.9.*",
-        "illuminate/events": "5.9.*",
-        "illuminate/filesystem": "5.9.*",
-        "illuminate/support": "5.9.*",
-        "symfony/debug": "^4.2"
+        "illuminate/container": "^7.0",
+        "illuminate/contracts": "^7.0",
+        "illuminate/events": "^7.0",
+        "illuminate/filesystem": "^7.0",
+        "illuminate/support": "^7.0",
+        "symfony/debug": "^4.3.4"
     },
     "autoload": {
         "psr-4": {
@@ -30,7 +30,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.9-dev"
+            "dev-master": "7.0-dev"
         }
     },
     "config": {

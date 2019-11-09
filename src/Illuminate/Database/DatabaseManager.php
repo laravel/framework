@@ -2,11 +2,12 @@
 
 namespace Illuminate\Database;
 
-use PDO;
+use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Database\Connectors\ConnectionFactory;
+use PDO;
 
 /**
  * @mixin \Illuminate\Database\Connection
@@ -68,7 +69,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get a database connection instance.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Database\Connection
      */
     public function connection($name = null)
@@ -185,7 +186,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * Prepare the read / write mode for database connection instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
-     * @param  string  $type
+     * @param  string|null  $type
      * @return \Illuminate\Database\Connection
      */
     protected function setPdoForType(Connection $connection, $type = null)
@@ -202,7 +203,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Disconnect from the given database and remove from local cache.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return void
      */
     public function purge($name = null)
@@ -217,7 +218,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Disconnect from the given database.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return void
      */
     public function disconnect($name = null)
@@ -230,7 +231,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Reconnect to the given database.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Database\Connection
      */
     public function reconnect($name = null)

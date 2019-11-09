@@ -1,16 +1,306 @@
 # Release Notes for 5.8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v5.8.17...5.8)
+## [Unreleased](https://github.com/laravel/framework/compare/v5.8.35...5.8)
+
+
+## [v5.8.35 (2019-09-03)](https://github.com/laravel/framework/compare/v5.8.34...v5.8.35)
+
+### Added
+- Added support of `NOT RLIKE` SQL operator ([#29788](https://github.com/laravel/framework/pull/29788))
+- Added hebrew letters to `Str:slug` language array ([#29838](https://github.com/laravel/framework/pull/29838), [ba772d6](https://github.com/laravel/framework/commit/ba772d643b88a4646c1161f5325e52de81d7a709))
+- Added support of `php7.4` ([#29842](https://github.com/laravel/framework/pull/29842))
+
+### Fixed
+- Fixed self-referencing `MorphOneOrMany` existence queries ([#29765](https://github.com/laravel/framework/pull/29765))
+- Fixed `QueueFake::size()` method ([#29761](https://github.com/laravel/framework/pull/29761), [ddaf6e6](https://github.com/laravel/framework/commit/ddaf6e63326263a9bb3732e887a2bf8b2381caa1))
+
+### Changed
+- Added note that the GD extension is required for generating images ([#29770](https://github.com/laravel/framework/pull/29770), [#29831](https://github.com/laravel/framework/pull/29831))
+- Changed `monolog/monolog` version to `^1.12` ([#29837](https://github.com/laravel/framework/pull/29837))
+
+
+## [v5.8.34 (2019-08-27)](https://github.com/laravel/framework/compare/v5.8.33...v5.8.34)
+
+### Fixed
+- Fixed `MailMessage::render()` if `view` method was used ([#29698](https://github.com/laravel/framework/pull/29698))
+- Fixed setting of numeric values as model attribute ([#29714](https://github.com/laravel/framework/pull/29714)) 
+- Fixed mocking of events `until` method in `MocksApplicationServices` ([#29708](https://github.com/laravel/framework/pull/29708))
+- Fixed: Use custom attributes in lt/lte/gt/gte rules messages ([#29716](https://github.com/laravel/framework/pull/29716))
+
+### Changed:
+- Changed applying of Aws Instance Profile ([#29738](https://github.com/laravel/framework/pull/29738))
+
+
+## [v5.8.33 (2019-08-20)](https://github.com/laravel/framework/compare/v5.8.32...v5.8.33)
+
+### Added
+- Added `ValidatesWhenResolvedTrait::passedValidation()` callback ([#29549](https://github.com/laravel/framework/pull/29549))
+- Implement new types for email validation support ([#29589](https://github.com/laravel/framework/pull/29589))
+- Added Redis 5 support ([#29606](https://github.com/laravel/framework/pull/29606))
+- Added `insertOrIgnore` support ([#29639](https://github.com/laravel/framework/pull/29639), [46d7e96](https://github.com/laravel/framework/commit/46d7e96ab3ab59339ef0ea8802963b2db84f9ab3), [#29645](https://github.com/laravel/framework/pull/29645))
+- Allowed to override the existing `Whoops` handler.([#29564](https://github.com/laravel/framework/pull/29564))
+
+### Fixed
+- Fixed non-displayable boolean values in validation messages ([#29560](https://github.com/laravel/framework/pull/29560))
+- Avoid undefined index errors when using AWS IAM ([#29565](https://github.com/laravel/framework/pull/29565))
+- Fixed exception message in the `ProviderRepository::writeManifest()` ([#29568](https://github.com/laravel/framework/pull/29568))
+- Fixed invalid link expiry count in ResetPassword ([#29579](https://github.com/laravel/framework/pull/29579))
+- Fixed command testing of `output` and `questions` expectations ([#29580](https://github.com/laravel/framework/pull/29580))
+- Added ignoring of classes which are not instantiable during event discovery ([#29587](https://github.com/laravel/framework/pull/29587))
+- Used real classname for seeders in the output ([#29601](https://github.com/laravel/framework/pull/29601))
+
+### Refactoring
+- Simplified `isset()` ([#29581](https://github.com/laravel/framework/pull/29581))
+
+
+## [v5.8.32 (2019-08-13)](https://github.com/laravel/framework/compare/v5.8.31...v5.8.32)
+
+### Fixed
+- Fixed top level wildcard validation for `distinct` validator ([#29499](https://github.com/laravel/framework/pull/29499))
+- Fixed resolving of columns with schema references in Postgres ([#29448](https://github.com/laravel/framework/pull/29448))
+- Only remove the event mutex if it was created ([#29526](https://github.com/laravel/framework/pull/29526))
+- Fixed restoring serialized collection with deleted models ([#29533](https://github.com/laravel/framework/pull/29533), [74b62bb](https://github.com/laravel/framework/commit/74b62bbbb32674dfa167e2812231bf302454e67f))
+
+
+## [v5.8.31 (2019-08-06)](https://github.com/laravel/framework/compare/v5.8.30...v5.8.31)
+
+### Fixed
+- Fixed FatalThrowableError in `updateExistingPivot()` when pivot is non-existent ([#29362](https://github.com/laravel/framework/pull/29362))
+- Fixed worker timeout handler when there is no job processing ([#29366](https://github.com/laravel/framework/pull/29366))
+- Fixed `assertJsonValidationErrors()` with muliple messages ([#29380](https://github.com/laravel/framework/pull/29380))
+- Fixed UPDATE queries with alias ([#29405](https://github.com/laravel/framework/pull/29405))
+
+### Changed
+- `Illuminate\Cache\ArrayStore::forget()` returns false on missing key ([#29427](https://github.com/laravel/framework/pull/29427))
+- Allow chaining on `QueryBuilder::dump()` method ([#29437](https://github.com/laravel/framework/pull/29437))
+- Change visibility to public for `hasPivotColumn()` method ([#29367](https://github.com/laravel/framework/pull/29367))
+- Added line break for plain text mails ([#29408](https://github.com/laravel/framework/pull/29408))
+- Use `date_create` to prevent date validator warnings ([#29342](https://github.com/laravel/framework/pull/29342), [#29389](https://github.com/laravel/framework/pull/29389))
+
+
+## [v5.8.30 (2019-07-30)](https://github.com/laravel/framework/compare/v5.8.29...v5.8.30)
+
+### Added
+- Added `MakesHttpRequests::option()` and `MakesHttpRequests::optionJson()` methods ([#29258](https://github.com/laravel/framework/pull/29258))
+- Added `Blueprint::uuidMorphs()` and `Blueprint::nullableUuidMorphs()` methods ([#29289](https://github.com/laravel/framework/pull/29289))
+- Added `MailgunTransport::getEndpoint()` and `MailgunTransport::setEndpoint()` methods ([#29312](https://github.com/laravel/framework/pull/29312))
+- Added `WEBP` to image validation rule ([#29309](https://github.com/laravel/framework/pull/29309))
+- Added `TestResponse::assertSessionHasInput()` method ([#29327](https://github.com/laravel/framework/pull/29327))
+- Added support for custom redis driver ([#29275](https://github.com/laravel/framework/pull/29275))
+- Added Postgres support for `collation()` on columns ([#29213](https://github.com/laravel/framework/pull/29213))
+
+### Fixed
+- Fixed collections with JsonSerializable items and mixed values ([#29205](https://github.com/laravel/framework/pull/29205))
+- Fixed MySQL Schema Grammar `$modifiers` order ([#29265](https://github.com/laravel/framework/pull/29265))
+- Fixed UPDATE query bindings on PostgreSQL ([#29272](https://github.com/laravel/framework/pull/29272))
+- Fixed default theme for Markdown mails ([#29274](https://github.com/laravel/framework/pull/29274))
+- Fixed UPDATE queries with alias on SQLite ([#29276](https://github.com/laravel/framework/pull/29276))
+- Fixed UPDATE and DELETE queries with join bindings on PostgreSQL ([#29306](https://github.com/laravel/framework/pull/29306))
+- Fixed support of `DateTime` objects and `int` values in `orWhereDay()`, `orWhereMonth()`, `orWhereYear()` methods in the `Builder` ([#29317](https://github.com/laravel/framework/pull/29317))
+- Fixed DELETE queries with joins on PostgreSQL ([#29313](https://github.com/laravel/framework/pull/29313))
+- Prevented a job from firing if job marked as deleted ([#29204](https://github.com/laravel/framework/pull/29204), [1003c27](https://github.com/laravel/framework/commit/1003c27b73f11472c1ebdb9238b839aefddfb048))
+- Fixed model deserializing with custom `Model::newCollection()` ([#29196](https://github.com/laravel/framework/pull/29196))
+
+### Reverted
+- Reverted: [Added possibility for `WithFaker::makeFaker()` use local `app.faker_locale` config](https://github.com/laravel/framework/pull/29123) ([#29250](https://github.com/laravel/framework/pull/29250))
+
+### Changed
+- Allocate memory for error handling to allow handling memory exhaustion limits ([#29226](https://github.com/laravel/framework/pull/29226))
+- Teardown test suite after using fail() method ([#29267](https://github.com/laravel/framework/pull/29267))
+
+
+## [v5.8.29 (2019-07-16)](https://github.com/laravel/framework/compare/v5.8.28...v5.8.29)
+
+### Added
+- Added possibility for `WithFaker::makeFaker()` use local `app.faker_locale` config ([#29123](https://github.com/laravel/framework/pull/29123))
+- Added ability to set theme for mail notifications ([#29132](https://github.com/laravel/framework/pull/29132))
+- Added runtime for each migration to output ([#29149](https://github.com/laravel/framework/pull/29149))
+- Added possibility for `whereNull` and `whereNotNull` to accept array columns argument ([#29154](https://github.com/laravel/framework/pull/29154))
+- Allowed `Console\Scheduling\ManagesFrequencies::hourlyAt()` to accept array of integers ([#29173](https://github.com/laravel/framework/pull/29173))
+
+### Performance
+- Improved eager loading performance for MorphTo relation ([#29129](https://github.com/laravel/framework/pull/29129))
+
+### Fixed
+- Fixed `Builder::whereDay()` and `Builder::whereMonth()` with raw expressions
+- Fixed DELETE queries with alias on SQLite ([#29164](https://github.com/laravel/framework/pull/29164))
+- Fixed queue jobs using SerializesModels losing order of passed in collections ([#29136](https://github.com/laravel/framework/pull/29136))
+- Fixed conditional binding for nested optional dependencies ([#29180](https://github.com/laravel/framework/pull/29180))
+- Fixed: validator not failing on custom rule when message is null ([#29174](https://github.com/laravel/framework/pull/29174))
+- Fixed DELETE query bindings ([#29165](https://github.com/laravel/framework/pull/29165))
+
+
+## [v5.8.28 (2019-07-09)](https://github.com/laravel/framework/compare/v5.8.27...v5.8.28)
+
+### Added
+- Make TestResponse tappable ([#29033](https://github.com/laravel/framework/pull/29033))
+- Added `Support\Collection::mergeRecursive()` method ([#29084](https://github.com/laravel/framework/pull/29084))
+- Added `Support\Collection::replace()` and `Support\Collection::replaceRecursive()` methods ([#29088](https://github.com/laravel/framework/pull/29088))
+- Added `Session\Store::only()` method ([#29107](https://github.com/laravel/framework/pull/29107))
+
+### Fixed
+- Fixed cache repository setMultiple with an iterator ([#29039](https://github.com/laravel/framework/pull/29039))
+- Fixed cache repository getMultiple implementation ([#29047](https://github.com/laravel/framework/pull/29047))
+
+### Reverted
+- Reverted [Fixed: app.stub for jquery components loading](https://github.com/laravel/framework/pull/29001) ([#29109](https://github.com/laravel/framework/pull/29109))
+
+### Changed
+- Fail job immediately after it timeouts if it wont be retried ([#29024](https://github.com/laravel/framework/pull/29024))
+
+
+## [v5.8.27 (2019-07-02)](https://github.com/laravel/framework/compare/v5.8.26...v5.8.27)
+
+### Added
+- Let `mix` helper use `app.mix_url` config ([#28952](https://github.com/laravel/framework/pull/28952))
+- Added `RedisManager::setDriver()` method ([#28985](https://github.com/laravel/framework/pull/28985))
+- Added `whereHasMorph()` and corresponding methods to work with `MorphTo` relations ([#28928](https://github.com/laravel/framework/pull/28928))
+
+### Fixed
+- Fixed: Changing a database field to binary include `collation` ([#28975](https://github.com/laravel/framework/pull/28975))
+- Fixed [app.stub for jquery components loading](https://github.com/laravel/framework/issues/28984) ([#29001](https://github.com/laravel/framework/pull/29001))
+- Fixed equivalent for greek letter theta in `Str::ascii()` ([#28999](https://github.com/laravel/framework/pull/28999))
+
+### Changed
+- Prevented `TestResponse::dump()` and `TestResponse::dumpHeaders()` methods from ending execution of the script ([#28960](https://github.com/laravel/framework/pull/28960))
+- Allowed `TestResponse::dump()` and `TestResponse::dumpHeaders()` methods chaining ([#28967](https://github.com/laravel/framework/pull/28967))
+- Allowed to `NotificationFake` accept custom channels ([#28969](https://github.com/laravel/framework/pull/28969))
+- Replace contents of service manifest atomically ([#28973](https://github.com/laravel/framework/pull/28973))
+- Pass down the `serverVersion` database connection option to Doctrine DBAL connection ([#28964](https://github.com/laravel/framework/pull/28964), [1b55b28](https://github.com/laravel/framework/commit/1b55b289788d5c49187481e421d949fe409a27c1))
+- Replace `self::` with `static::` in the `Relation::getMorphedModel()` ([#28974](https://github.com/laravel/framework/pull/28974))
+- Set a message for `SuspiciousOperationException` ([#29000](https://github.com/laravel/framework/pull/29000))
+- Storing Mailgun Message-ID in the headers after sending ([#28994](https://github.com/laravel/framework/pull/28994))
+
+
+## [v5.8.26 (2019-06-25)](https://github.com/laravel/framework/compare/v5.8.25...v5.8.26)
+
+### Reverted
+- Reverted: [Let `mix` helper use `app.asset_url`](https://github.com/laravel/framework/pull/28905) ([#28950](https://github.com/laravel/framework/pull/28950))
+
+
+## [v5.8.25 (2019-06-25)](https://github.com/laravel/framework/compare/v5.8.24...v5.8.25)
+
+### Added
+- Added `json` option to `route:list` command ([#28894](https://github.com/laravel/framework/pull/28894))
+
+### Fixed
+- Fixed columns parameter on paginate method ([#28937](https://github.com/laravel/framework/pull/28937))
+- Prevent event cache from firing multiple times the same event(s) ([#28904](https://github.com/laravel/framework/pull/28904))
+- Fixed `TestResponse::assertJsonMissingValidationErrors()` on empty response ([#28595](https://github.com/laravel/framework/pull/28595), [#28913](https://github.com/laravel/framework/pull/28913))
+- Fixed percentage sign in filename fallback in the `FilesystemAdapter::response()` ([#28947](https://github.com/laravel/framework/pull/28947))
+
+### Changed
+- Allow `TestResponse::assertViewHas()` to see all data ([#28893](https://github.com/laravel/framework/pull/28893))
+- Let `mix` helper use `app.asset_url` ([#28905](https://github.com/laravel/framework/pull/28905))
+
+
+## [v5.8.24 (2019-06-19)](https://github.com/laravel/framework/compare/v5.8.23...v5.8.24)
+
+### Added
+- Added possibility to assert that the session contains a given piece of data using a closure in `TestResponse::assertSessionHas()` ([#28837](https://github.com/laravel/framework/pull/28837))
+- Added `TestResponse::assertUnauthorized()` ([#28851](https://github.com/laravel/framework/pull/28851))
+- Allowed to define port in `ServeCommand` via `SERVER_PORT` env variable ([#28849](https://github.com/laravel/framework/pull/28849), [6a18e73](https://github.com/laravel/framework/commit/6a18e73f63f46b6aa5ab6faceb9eb5060c64fc15))
+- Allowed console environment argument to be separated with a space ([#28869](https://github.com/laravel/framework/pull/28869))
+- Added `@endcomponentFirst` directive ([#28884](https://github.com/laravel/framework/pull/28884))
+- Added optional parameter `$when` to `retry` helper ([85c0801](https://github.com/laravel/framework/commit/85c08016c424f6c8e45f08282523f8785eda9673))
+
+### Fixed
+- Fixed `Builder::dump()` and `Builder::dd()` with global scopes ([#28858](https://github.com/laravel/framework/pull/28858))
+
+### Reverted
+- Reverted: [Automatically bind the viewAny method to the index controller action](https://github.com/laravel/framework/pull/28820) ([#28865](https://github.com/laravel/framework/pull/28865))
+
+### Changed
+- Handle `SuspiciousOperationException` in router as `NotFoundHttpException` ([#28866](https://github.com/laravel/framework/pull/28866))
+
+
+## [v5.8.23 (2019-06-14)](https://github.com/laravel/framework/compare/v5.8.22...v5.8.23)
+
+### Fixed
+- Fixed strict comparison in redis configuration Parsing. ([#28830](https://github.com/laravel/framework/pull/28830))
+
+### Changed
+- Improved support for arrays on `TestResponse::assertJsonValidationErrors()` ([2970dab](https://github.com/laravel/framework/commit/2970dab3944e3b37578fa193503aae4217c62e59))
+
+
+## [v5.8.22 (2019-06-12)](https://github.com/laravel/framework/compare/v5.8.21...v5.8.22)
+
+### Added
+- Added `@componentFirst` directive ([#28783](https://github.com/laravel/framework/pull/28783))
+- Added support for typed eager loads ([#28647](https://github.com/laravel/framework/pull/28647), [d72e3cd](https://github.com/laravel/framework/commit/d72e3cd5be14dba654837466564018403839a5e9))
+- Added `Related` and `Recommended` to Pluralizer ([#28749](https://github.com/laravel/framework/pull/28749))
+- Added `Str::containsAll()` method ([#28806](https://github.com/laravel/framework/pull/28806))
+- Added: error handling for maintenance mode commands ([#28765](https://github.com/laravel/framework/pull/28765), [9e20849](https://github.com/laravel/framework/commit/9e20849e5cca7b98ebf0eee2b563b532ff6fe704))
+- Added message value assertion to `TestResponse::assertJsonValidationErrors()` ([#28787](https://github.com/laravel/framework/pull/28787))
+- Added: Automatically bind the viewAny method to the index controller action ([#28820](https://github.com/laravel/framework/pull/28820))
+
+### Fixed
+- Fixed database rules with where clauses ([#28748](https://github.com/laravel/framework/pull/28748))
+- Fixed: MorphTo Relation ignores parent $timestamp when touching ([#28670](https://github.com/laravel/framework/pull/28670))
+- Fixed: Sql Server issue during `dropAllTables` when foreign key constraints exist ([#28750](https://github.com/laravel/framework/pull/28750), [#28770](https://github.com/laravel/framework/pull/28770))
+- Fixed `Model::getConnectionName()` when `Model::cursor()` used ([#28804](https://github.com/laravel/framework/pull/28804))
+
+### Changed
+- Made `force` an optional feature when using `ConfirmableTrait`. ([#28742](https://github.com/laravel/framework/pull/28742))
+- Suggest resolution when no relationship value is returned in the `Model::getRelationshipFromMethod()` ([#28762](https://github.com/laravel/framework/pull/28762))
+
+
+## [v5.8.21 (2019-06-05)](https://github.com/laravel/framework/compare/v5.8.20...v5.8.21)
+
+### Fixed
+- Fixed redis cluster connection parsing ([2bcb405](https://github.com/laravel/framework/commit/2bcb405ddc9ed69355513de5f2396dc658fd004d))
+
+
+## [v5.8.20 (2019-06-04)](https://github.com/laravel/framework/compare/v5.8.19...v5.8.20)
+
+### Added
+- Added `viewAny()` to dummy policy class ([#28654](https://github.com/laravel/framework/pull/28654), [#28671](https://github.com/laravel/framework/pull/28671))
+- Added `fullpath` option to `make:migration` command ([#28669](https://github.com/laravel/framework/pull/28669))
+
+### Performance improvement
+- Improve performance for `Arr::collapse()` ([#28662](https://github.com/laravel/framework/pull/28662), [#28676](https://github.com/laravel/framework/pull/28676))
+
+### Fixed
+- Fixed `artisan cache:clear` command with a redis cluster using the Predis library ([#28706](https://github.com/laravel/framework/pull/28706))
+
+
+## [v5.8.19 (2019-05-28)](https://github.com/laravel/framework/compare/v5.8.18...v5.8.19)
+
+### Added
+- Added optional `DYNAMODB_ENDPOINT` env variable to configure endpoint for DynamoDB ([#28600](https://github.com/laravel/framework/pull/28600))
+- Added `Illuminate\Foundation\Application::isProduction()` method ([#28602](https://github.com/laravel/framework/pull/28602))
+- Allowed exception reporting in `rescue()` to be disabled ([#28617](https://github.com/laravel/framework/pull/28617))
+- Allowed to parse Url in Redis configuration ([#28612](https://github.com/laravel/framework/pull/28612), [f4cfb32](https://github.com/laravel/framework/commit/f4cfb3287b358b41735072895a485f8e68c1c7f0))
+- Allowed setting additional (`sourceip` and `localdomain`) smtp config options ([#28631](https://github.com/laravel/framework/pull/28631), [435c05b](https://github.com/laravel/framework/commit/435c05b96a241d3d5e37ce524de9ea134714a9be))
+
+### Fixed
+- Fixed Eloquent UPDATE queries with alias ([#28607](https://github.com/laravel/framework/pull/28607))
+- Fixed `Illuminate\Cache\DynamoDbStore::forever()` ([#28618](https://github.com/laravel/framework/pull/28618))
+- Fixed `event:list` command, when using a combination of manually registering events and event auto discovering ([#28624](https://github.com/laravel/framework/pull/28624))
+
+### Performance improvement
+- Improve performance for `Arr::flatten()` ([#28614](https://github.com/laravel/framework/pull/28614))
+
+### Changed
+- Added `id` to `ModelNotFoundException` exception in `ImplicitRouteBinding` ([#28588](https://github.com/laravel/framework/pull/28588))
+
+
+## [v5.8.18 (2019-05-21)](https://github.com/laravel/framework/compare/v5.8.17...v5.8.18)
 
 ### Added
 - Added `html` as a new valid extension for views ([#28541](https://github.com/laravel/framework/pull/28541))
+- Added: provide notification callback `withSwiftMessage` in `MailMessage` ([#28535](https://github.com/laravel/framework/pull/28535))
 
-### TODO:
-- Provide notification callback with Swift message ([#28535](https://github.com/laravel/framework/pull/28535))
-- Small feature\fix in case of broken\edited cache ([#28536](https://github.com/laravel/framework/pull/28536))
-- MailFake::failures() returns an empty array ([#28538](https://github.com/laravel/framework/pull/28538))
-- Fix exception: The filename fallback must only contain ASCII characters ([#28551](https://github.com/laravel/framework/pull/28551))
-- BusFake::pipeThrough() returns $this ([#28564](https://github.com/laravel/framework/pull/28564))
+### Fixed
+- Fixed `Illuminate\Cache\FileStore::getPayload()` in case of broken cache ([#28536](https://github.com/laravel/framework/pull/28536))
+- Fixed exception: `The filename fallback must only contain ASCII characters` in the `Illuminate\Filesystem\FilesystemAdapter::response()` ([#28551](https://github.com/laravel/framework/pull/28551))
+
+### Changed
+- Make `Support\Testing\Fakes\MailFake::failures()` returns an empty array ([#28538](https://github.com/laravel/framework/pull/28538))
+- Make `Support\Testing\Fakes\BusFake::pipeThrough()` returns `$this` ([#28564](https://github.com/laravel/framework/pull/28564))
+
+### Refactoring
+- Cleanup html ([#28583](https://github.com/laravel/framework/pull/28583))
 
 
 ## [v5.8.17 (2019-05-14)](https://github.com/laravel/framework/compare/v5.8.16...v5.8.17)

@@ -880,6 +880,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a spatial MultiPolygonZ type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeMultiPolygonZ(Fluent $column)
+    {
+        return $this->formatPostGisType('multipolygonz');
+    }
+
+    /**
      * Format the column definition for a PostGIS spatial type.
      *
      * @param  string  $type
@@ -897,6 +908,20 @@ class PostgresGrammar extends Grammar
         }
 
         return "geometry($type, $projection)";
+    }
+
+    /**
+     * Get the SQL for a collation column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCollate(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->collation)) {
+            return ' collate '.$this->wrapValue($column->collation);
+        }
     }
 
     /**

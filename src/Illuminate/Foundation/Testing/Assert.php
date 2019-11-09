@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Testing;
 
 use ArrayAccess;
-use PHPUnit\Util\InvalidArgumentHelper;
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\Constraint\ArraySubset;
+use PHPUnit\Util\InvalidArgumentHelper;
 
 /**
  * @internal This class is not meant to be used or overwritten outside the framework itself.
@@ -17,8 +17,8 @@ abstract class Assert extends PHPUnit
      *
      * This method was taken over from PHPUnit where it was deprecated. See link for more info.
      *
-     * @param  array|\ArrayAccess  $subset
-     * @param  array|\ArrayAccess  $array
+     * @param  \ArrayAccess|array  $subset
+     * @param  \ArrayAccess|array  $array
      * @param  bool  $checkForObjectIdentity
      * @param  string  $message
      * @return void

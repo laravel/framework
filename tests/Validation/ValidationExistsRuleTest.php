@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Validation;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Validation\Validator;
-use Illuminate\Translation\Translator;
-use Illuminate\Translation\ArrayLoader;
-use Illuminate\Validation\Rules\Exists;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Validator;
+use PHPUnit\Framework\TestCase;
 
 class ValidationExistsRuleTest extends TestCase
 {
@@ -37,11 +37,11 @@ class ValidationExistsRuleTest extends TestCase
     {
         $rule = new Exists('table');
         $rule->where('foo', 'bar');
-        $this->assertEquals('exists:table,NULL,foo,bar', (string) $rule);
+        $this->assertSame('exists:table,NULL,foo,"bar"', (string) $rule);
 
         $rule = new Exists('table', 'column');
         $rule->where('foo', 'bar');
-        $this->assertEquals('exists:table,column,foo,bar', (string) $rule);
+        $this->assertSame('exists:table,column,foo,"bar"', (string) $rule);
     }
 
     public function testItChoosesValidRecordsUsingWhereInRule()

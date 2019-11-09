@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
 use Illuminate\Routing\Route;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\RouteCollection;
+use PHPUnit\Framework\TestCase;
 
 class RouteCollectionTest extends TestCase
 {
@@ -188,6 +188,42 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->add($routesByName['bar_create']);
 
         $this->assertSame($routesByName, $this->routeCollection->getRoutesByName());
+    }
+
+    public function testRouteCollectionCanGetRoutesByMethod()
+    {
+        $routes = [
+            'foo_index' => new Route('GET', 'foo/index', [
+                'uses' => 'FooController@index',
+                'as' => 'foo_index',
+            ]),
+            'foo_show' => new Route('GET', 'foo/show', [
+                'uses' => 'FooController@show',
+                'as' => 'foo_show',
+            ]),
+            'bar_create' => new Route('POST', 'bar', [
+                'uses' => 'BarController@create',
+                'as' => 'bar_create',
+            ]),
+        ];
+
+        $this->routeCollection->add($routes['foo_index']);
+        $this->routeCollection->add($routes['foo_show']);
+        $this->routeCollection->add($routes['bar_create']);
+
+        $this->assertSame([
+            'GET' => [
+                'foo/index' => $routes['foo_index'],
+                'foo/show' => $routes['foo_show'],
+            ],
+            'HEAD' => [
+                'foo/index' => $routes['foo_index'],
+                'foo/show' => $routes['foo_show'],
+            ],
+            'POST' => [
+                'bar' => $routes['bar_create'],
+            ],
+        ], $this->routeCollection->getRoutesByMethod());
     }
 
     public function testRouteCollectionCleansUpOverwrittenRoutes()

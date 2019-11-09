@@ -36,7 +36,7 @@ interface Session
     /**
      * Save the session data to storage.
      *
-     * @return bool
+     * @return void
      */
     public function save();
 

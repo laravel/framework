@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Http\UploadedFile;
+use PHPUnit\Framework\TestCase;
 
 class HttpUploadedFileTest extends TestCase
 {
@@ -18,6 +18,6 @@ class HttpUploadedFileTest extends TestCase
             true
         );
 
-        $this->assertEquals('This is a story about something that happened long ago when your grandfather was a child.', trim($file->get()));
+        $this->assertSame('This is a story about something that happened long ago when your grandfather was a child.', trim($file->get()));
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToTest extends TestCase
 {
@@ -63,17 +63,6 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertSame($newModel, $relation->getResults());
 
         $this->assertSame('taylor', $newModel->username);
-    }
-
-    public function testUpdateMethodRetrievesModelAndUpdates()
-    {
-        $relation = $this->getRelation();
-        $mock = m::mock(Model::class);
-        $mock->shouldReceive('fill')->once()->with(['attributes'])->andReturn($mock);
-        $mock->shouldReceive('save')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('first')->once()->andReturn($mock);
-
-        $this->assertTrue($relation->update(['attributes']));
     }
 
     public function testEagerConstraintsAreProperlyAdded()

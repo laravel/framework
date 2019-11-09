@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * @group integration
@@ -20,13 +20,13 @@ class DynamoDbStoreTest extends TestCase
         }
     }
 
-    public function test_items_can_be_stored_and_retrieved()
+    public function testItemsCanBeStoredAndRetrieved()
     {
         Cache::driver('dynamodb')->put('name', 'Taylor', 10);
-        $this->assertEquals('Taylor', Cache::driver('dynamodb')->get('name'));
+        $this->assertSame('Taylor', Cache::driver('dynamodb')->get('name'));
 
         Cache::driver('dynamodb')->put(['name' => 'Abigail', 'age' => 28], 10);
-        $this->assertEquals('Abigail', Cache::driver('dynamodb')->get('name'));
+        $this->assertSame('Abigail', Cache::driver('dynamodb')->get('name'));
         $this->assertEquals(28, Cache::driver('dynamodb')->get('age'));
 
         $this->assertEquals([
@@ -39,7 +39,7 @@ class DynamoDbStoreTest extends TestCase
         $this->assertNull(Cache::driver('dynamodb')->get('name'));
     }
 
-    public function test_items_can_be_atomically_added()
+    public function testItemsCanBeAtomicallyAdded()
     {
         $key = Str::random(6);
 
@@ -47,7 +47,7 @@ class DynamoDbStoreTest extends TestCase
         $this->assertFalse(Cache::driver('dynamodb')->add($key, 'Taylor', 10));
     }
 
-    public function test_items_can_be_incremented_and_decremented()
+    public function testItemsCanBeIncrementedAndDecremented()
     {
         Cache::driver('dynamodb')->put('counter', 0, 10);
         Cache::driver('dynamodb')->increment('counter');
@@ -59,7 +59,7 @@ class DynamoDbStoreTest extends TestCase
         $this->assertEquals(0, Cache::driver('dynamodb')->get('counter'));
     }
 
-    public function test_locks_can_be_aquired()
+    public function testLocksCanBeAcquired()
     {
         Cache::driver('dynamodb')->lock('lock', 10)->get(function () {
             $this->assertFalse(Cache::driver('dynamodb')->lock('lock', 10)->get());
@@ -82,6 +82,7 @@ class DynamoDbStoreTest extends TestCase
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => 'us-east-1',
             'table' => env('DYNAMODB_CACHE_TABLE', 'laravel_test'),
+            'endpoint' => env('DYNAMODB_ENDPOINT'),
         ]);
     }
 }

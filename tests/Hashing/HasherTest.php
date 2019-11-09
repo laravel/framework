@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Hashing;
 
-use RuntimeException;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Hashing\Argon2IdHasher;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
-use Illuminate\Hashing\Argon2IdHasher;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class HasherTest extends TestCase
 {

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Translation;
 
-use RuntimeException;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Filesystem\Filesystem;
+use RuntimeException;
 
 class FileLoader implements Loader
 {
@@ -54,7 +54,7 @@ class FileLoader implements Loader
      *
      * @param  string  $locale
      * @param  string  $group
-     * @param  string  $namespace
+     * @param  string|null  $namespace
      * @return array
      */
     public function load($locale, $group, $namespace = null)

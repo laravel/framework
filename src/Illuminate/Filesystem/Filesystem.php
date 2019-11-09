@@ -4,9 +4,9 @@ namespace Illuminate\Filesystem;
 
 use ErrorException;
 use FilesystemIterator;
-use Symfony\Component\Finder\Finder;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Traits\Macroable;
+use Symfony\Component\Finder\Finder;
 
 class Filesystem
 {
@@ -21,6 +21,17 @@ class Filesystem
     public function exists($path)
     {
         return file_exists($path);
+    }
+
+    /**
+     * Determine if a file or directory is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function missing($path)
+    {
+        return ! $this->exists($path);
     }
 
     /**
@@ -178,7 +189,7 @@ class Filesystem
      * Get or set UNIX mode of a file or directory.
      *
      * @param  string  $path
-     * @param  int  $mode
+     * @param  int|null  $mode
      * @return mixed
      */
     public function chmod($path, $mode = null)
@@ -488,7 +499,7 @@ class Filesystem
      *
      * @param  string  $directory
      * @param  string  $destination
-     * @param  int     $options
+     * @param  int|null  $options
      * @return bool
      */
     public function copyDirectory($directory, $destination, $options = null)
