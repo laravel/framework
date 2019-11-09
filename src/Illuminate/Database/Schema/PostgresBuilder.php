@@ -104,12 +104,8 @@ class PostgresBuilder extends Builder
      */
     public function getAllTables()
     {
-        if (! is_array($schema = $this->connection->getConfig('schema'))) {
-            $schema = [$schema];
-        }
-
         return $this->connection->select(
-            $this->grammar->compileGetAllTables($schema)
+            $this->grammar->compileGetAllTables((array)$this->connection->getConfig('schema'))
         );
     }
 
@@ -120,12 +116,8 @@ class PostgresBuilder extends Builder
      */
     protected function getAllViews()
     {
-        if (! is_array($schema = $this->connection->getConfig('schema'))) {
-            $schema = [$schema];
-        }
-
         return $this->connection->select(
-            $this->grammar->compileGetAllViews($schema)
+            $this->grammar->compileGetAllViews((array)$this->connection->getConfig('schema'))
         );
     }
 
