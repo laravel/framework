@@ -888,7 +888,6 @@ class PostgresGrammar extends Grammar
      */
     private function formatPostGisType(string $type, Fluent $column)
     {
-
         if ($column->isGeometry !== null) {
             return "geometry($type".($column->projection === null ? '' : ", $column->projection").')';
         }
