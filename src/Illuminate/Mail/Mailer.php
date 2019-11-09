@@ -295,7 +295,7 @@ class Mailer implements MailerContract, MailQueueContract
         // both a "pretty" and "plain" view were provided, so we will return this
         // array as is, since it should contain both views with numerical keys.
         if (is_array($view) && isset($view[0])) {
-            if (!isset($view[1])) {
+            if (! isset($view[1])) {
                 throw new BadFunctionCallException('There should be a 2nd item for "plain" in the "view" array.');
             }
             return [$view[0], $view[1], null];
