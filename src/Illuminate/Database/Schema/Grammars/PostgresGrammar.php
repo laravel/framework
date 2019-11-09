@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Fluent;
 
 class PostgresGrammar extends Grammar
 {
@@ -19,7 +19,7 @@ class PostgresGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = ['Increment', 'Nullable', 'Default'];
+    protected $modifiers = ['Collate', 'Increment', 'Nullable', 'Default'];
 
     /**
      * The columns available as serials.
@@ -200,7 +200,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all tables.
      *
-     * @param  string  $tables
+     * @param  array  $tables
      * @return string
      */
     public function compileDropAllTables($tables)
@@ -211,7 +211,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all views.
      *
-     * @param  string  $views
+     * @param  array  $views
      * @return string
      */
     public function compileDropAllViews($views)
@@ -685,7 +685,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return "time($column->precision) without time zone";
+        return 'time'.(is_null($column->precision) ? '' : "($column->precision)").' without time zone';
     }
 
     /**
@@ -696,7 +696,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return "time($column->precision) with time zone";
+        return 'time'.(is_null($column->precision) ? '' : "($column->precision)").' with time zone';
     }
 
     /**
@@ -707,7 +707,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $columnType = "timestamp($column->precision) without time zone";
+        $columnType = 'timestamp'.(is_null($column->precision) ? '' : "($column->precision)").' without time zone';
 
         return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
@@ -720,7 +720,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        $columnType = "timestamp($column->precision) with time zone";
+        $columnType = 'timestamp'.(is_null($column->precision) ? '' : "($column->precision)").' with time zone';
 
         return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
@@ -788,7 +788,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeGeometry(Fluent $column)
     {
-        return $this->formatPostGisType('geometry');
+        return $this->formatPostGisType('geometry', $column);
     }
 
     /**
@@ -799,7 +799,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typePoint(Fluent $column)
     {
-        return $this->formatPostGisType('point');
+        return $this->formatPostGisType('point', $column);
     }
 
     /**
@@ -810,7 +810,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeLineString(Fluent $column)
     {
-        return $this->formatPostGisType('linestring');
+        return $this->formatPostGisType('linestring', $column);
     }
 
     /**
@@ -821,7 +821,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typePolygon(Fluent $column)
     {
-        return $this->formatPostGisType('polygon');
+        return $this->formatPostGisType('polygon', $column);
     }
 
     /**
@@ -832,7 +832,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeGeometryCollection(Fluent $column)
     {
-        return $this->formatPostGisType('geometrycollection');
+        return $this->formatPostGisType('geometrycollection', $column);
     }
 
     /**
@@ -843,7 +843,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeMultiPoint(Fluent $column)
     {
-        return $this->formatPostGisType('multipoint');
+        return $this->formatPostGisType('multipoint', $column);
     }
 
     /**
@@ -854,7 +854,7 @@ class PostgresGrammar extends Grammar
      */
     public function typeMultiLineString(Fluent $column)
     {
-        return $this->formatPostGisType('multilinestring');
+        return $this->formatPostGisType('multilinestring', $column);
     }
 
     /**
@@ -865,18 +865,52 @@ class PostgresGrammar extends Grammar
      */
     protected function typeMultiPolygon(Fluent $column)
     {
-        return $this->formatPostGisType('multipolygon');
+        return $this->formatPostGisType('multipolygon', $column);
+    }
+
+    /**
+     * Create the column definition for a spatial MultiPolygonZ type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeMultiPolygonZ(Fluent $column)
+    {
+        return $this->formatPostGisType('multipolygonz', $column);
     }
 
     /**
      * Format the column definition for a PostGIS spatial type.
      *
      * @param  string  $type
+     * @param  Fluent  $column
      * @return string
      */
-    private function formatPostGisType(string $type)
+    private function formatPostGisType(string $type, Fluent $column)
     {
-        return "geography($type, 4326)";
+        if ($column->geography !== null) {
+            return "geography($type, ".($column->projection === null ? '4326' : $column->projection).')';
+        }
+
+        if ($column->projection === null) {
+            return "geometry($type)";
+        }
+
+        return "geometry($type, $projection)";
+    }
+
+    /**
+     * Get the SQL for a collation column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCollate(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->collation)) {
+            return ' collate '.$this->wrapValue($column->collation);
+        }
     }
 
     /**
