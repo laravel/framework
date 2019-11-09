@@ -531,7 +531,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @param  array  $extra
      * @return int
      */
-    public function increment($column, $amount = 1, array $extra = [])
+    public static function increment($column, $amount = 1, array $extra = [])
     {
         return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
     }
@@ -544,7 +544,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      * @param  array  $extra
      * @return int
      */
-    public function decrement($column, $amount = 1, array $extra = [])
+    public static function decrement($column, $amount = 1, array $extra = [])
     {
         return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
     }
