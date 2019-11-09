@@ -127,6 +127,10 @@ trait HasAttributes
                 continue;
             }
 
+            if (empty($attributes[$key]) && ! is_numeric($attributes[$key])) {
+                continue;
+            }
+
             $attributes[$key] = $this->serializeDate(
                 $this->asDateTime($attributes[$key])
             );
