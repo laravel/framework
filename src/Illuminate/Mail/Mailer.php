@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+use BadFunctionCallException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
@@ -282,6 +283,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @return array
      *
      * @throws \InvalidArgumentException
+     * @throws BadFunctionCallException
      */
     protected function parseView($view)
     {
@@ -292,7 +294,10 @@ class Mailer implements MailerContract, MailQueueContract
         // If the given view is an array with numeric keys, we will just assume that
         // both a "pretty" and "plain" view were provided, so we will return this
         // array as is, since it should contain both views with numerical keys.
-        if (is_array($view) && isset($view[0]) && isset($view[1])) {
+        if (is_array($view) && isset($view[0])) {
+            if (!isset($view[1])) {
+                throw new BadFunctionCallException('There should be a 2nd item for "plain" in the "view" array.');
+            }
             return [$view[0], $view[1], null];
         }
 
