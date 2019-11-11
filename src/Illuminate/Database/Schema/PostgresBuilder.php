@@ -30,7 +30,7 @@ class PostgresBuilder extends Builder
     {
         $tables = [];
 
-        $excludedTables = $this->connection->getConfig('excluded_drop_tables') ?? ['spatial_ref_sys'];
+        $excludedTables = $this->connection->getConfig('dont_drop') ?? ['spatial_ref_sys'];
 
         foreach ($this->getAllTables() as $row) {
             $row = (array) $row;
