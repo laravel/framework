@@ -288,7 +288,11 @@ class CacheManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["cache.stores.{$name}"];
+        if (! is_null($name)) {
+            return $this->app['config']["cache.stores.{$name}"];
+        }
+
+        return ['driver' => 'null'];
     }
 
     /**
