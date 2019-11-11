@@ -39,7 +39,7 @@ class ImplicitRouteBinding
 
             $instance = $container->make($parameter->getClass()->name);
 
-           if (count($chunks = explode('__from__', $parameterName)) > 1) {
+            if (count($chunks = explode('__from__', $parameterName)) > 1) {
                 $parentName = $chunks[1];
                 $parentParameter = $route->parameters()[$parentName] ?? $parentName;
 
