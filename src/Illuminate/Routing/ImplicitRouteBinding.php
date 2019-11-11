@@ -109,7 +109,7 @@ class ImplicitRouteBinding
     protected static function findNestedParameter($name, $parameters)
     {
         return array_filter($parameters, function ($parameterName) use ($name) {
-            return strpos($parameterName, $name . '__from__') !== false;
+            return strpos($parameterName, $name.'__from__') !== false;
         }, ARRAY_FILTER_USE_KEY);
     }
 }
