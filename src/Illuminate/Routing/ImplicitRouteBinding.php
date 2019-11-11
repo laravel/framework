@@ -24,7 +24,7 @@ class ImplicitRouteBinding
 
         foreach ($signatureParameters as $parameter) {
             if (! $parameterName = static::getParameterName($parameter->name, $parameters)) {
-                if (!static::isNestedParameter($parameter->name, $parameters)) {
+                if (! static::isNestedParameter($parameter->name, $parameters)) {
                     continue;
                 }
 
@@ -39,17 +39,16 @@ class ImplicitRouteBinding
 
             $instance = $container->make($parameter->getClass()->name);
 
-            if (count($chunks = explode('__from__', $parameterName)) > 1)
-            {
+           if (count($chunks = explode('__from__', $parameterName)) > 1) {
                 $parentName = $chunks[1];
                 $parentParameter = $route->parameters()[$parentName] ?? $parentName;
 
                 $model = $instance->where($instance->getRouteKeyName(), $parameterValue)
-                    ->whereHas($parentName, function($query) use ($parentParameter) {
+                    ->whereHas($parentName, function ($query) use ($parentParameter) {
                         $query->where($parentParameter->getRouteKeyName(), $parentParameter->getRouteKey());
                     })
                     ->first();
-            } else if (! $model = $instance->resolveRouteBinding($parameterValue)) {
+            } elseif (! $model = $instance->resolveRouteBinding($parameterValue)) {
                 throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
             }
 
@@ -76,7 +75,7 @@ class ImplicitRouteBinding
     }
 
     /**
-     * Check if parameter is nested
+     * Check if parameter is nested.
      *
      * @param string $name
      * @return bool
@@ -87,7 +86,7 @@ class ImplicitRouteBinding
     }
 
     /**
-     * Get nested parameter name
+     * Get nested parameter name.
      *
      * @param string $name
      * @param array $parameters
@@ -101,7 +100,7 @@ class ImplicitRouteBinding
     }
 
     /**
-     * Find parameter
+     * Find parameter.
      *
      * @param string $name
      * @param array $parameters
