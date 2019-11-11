@@ -233,7 +233,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to retrieve all table names.
      *
-     * @param  string|array  $schema Either a string or an array
+     * @param  string|array  $schema
      * @return string
      */
     public function compileGetAllTables($schema)
