@@ -2,6 +2,11 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.5.0...6.x)
 
+### Added
+- Added `includeUnless` directive ([#30538](https://github.com/laravel/framework/pull/30538))
+
+### Changed
+-  Remove `illuminate/support` dependency from `Container` package  ([#30518](https://github.com/laravel/framework/pull/30518), [#30528](https://github.com/laravel/framework/pull/30528))
 
 
 ## [v6.5.0 (2019-11-05)](https://github.com/laravel/framework/compare/v6.4.1...v6.5.0)
