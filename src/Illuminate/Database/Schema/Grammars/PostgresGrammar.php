@@ -233,23 +233,23 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to retrieve all table names.
      *
-     * @param  array  $schema
+     * @param  string|array  $schema Either a string or an array
      * @return string
      */
     public function compileGetAllTables($schema)
     {
-        return "select tablename from pg_catalog.pg_tables where schemaname in ('".implode("','", $schema)."')";
+        return "select tablename from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $schema)."')";
     }
 
     /**
      * Compile the SQL needed to retrieve all view names.
      *
-     * @param  array  $schema
+     * @param  string|array  $schema
      * @return string
      */
     public function compileGetAllViews($schema)
     {
-        return "select viewname from pg_catalog.pg_views where schemaname in ('".implode("','", $schema)."')";
+        return "select viewname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $schema)."')";
     }
 
     /**
