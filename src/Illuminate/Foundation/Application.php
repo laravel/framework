@@ -304,7 +304,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $appPath = $this->appPath ?: $this->basePath.DIRECTORY_SEPARATOR.'app';
 
-        return $appPath.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $appPath.($path ? $this->append($path) : $path);
     }
 
     /**
@@ -321,7 +321,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         return $this;
     }
-
+    /**
+     * Get the append path with of without slash.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function append($path)
+    {
+        return ($path[0] === DIRECTORY_SEPARATOR ? $path : DIRECTORY_SEPARATOR.$path);
+    }
     /**
      * Get the base path of the Laravel installation.
      *
@@ -330,7 +339,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function basePath($path = '')
     {
-        return $this->basePath.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->basePath.($path ? $this->append($path) : $path);
     }
 
     /**
@@ -341,7 +350,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function bootstrapPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path ? $this->append($path) : $path);
     }
 
     /**
@@ -352,7 +361,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function configPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path ? $this->append($path) : $path);
     }
 
     /**
@@ -363,7 +372,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function databasePath($path = '')
     {
-        return ($this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return ($this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database').($path ? $this->append($path) : $path);
     }
 
     /**
@@ -434,7 +443,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function resourcePath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path ? $this->append($path) : $path);
     }
 
     /**
