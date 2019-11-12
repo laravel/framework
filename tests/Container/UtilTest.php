@@ -10,7 +10,7 @@ class UtilTest extends TestCase
     public function testUnwrapIfClosure()
     {
         $this->assertSame('foo', Util::unwrapIfClosure('foo'));
-        $this->assertSame('foo', UtiL::unwrapIfClosure(function () {
+        $this->assertSame('foo', Util::unwrapIfClosure(function () {
             return 'foo';
         }));
     }

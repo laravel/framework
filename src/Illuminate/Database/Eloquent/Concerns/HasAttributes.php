@@ -1156,6 +1156,9 @@ trait HasAttributes
         } elseif ($this->isDateAttribute($key)) {
             return $this->fromDateTime($attribute) ===
                    $this->fromDateTime($original);
+        } elseif ($this->hasCast($key, ['object', 'collection'])) {
+            return $this->castAttribute($key, $attribute) ==
+                $this->castAttribute($key, $original);
         }
 
         return is_numeric($attribute) && is_numeric($original)

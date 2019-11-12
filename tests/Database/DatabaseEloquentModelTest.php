@@ -116,6 +116,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('datetimeAttribute'));
     }
 
+    public function testDirtyOnCastedObjects()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'objectAttribute'     => '["one", "two", "three"]',
+            'collectionAttribute' => '["one", "two", "three"]',
+        ]);
+        $model->syncOriginal();
+
+        $model->objectAttribute = ['one', 'two', 'three'];
+        $model->collectionAttribute = ['one', 'two', 'three'];
+
+        $this->assertFalse($model->isDirty());
+        $this->assertFalse($model->isDirty('objectAttribute'));
+        $this->assertFalse($model->isDirty('collectionAttribute'));
+    }
+
     public function testCleanAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
