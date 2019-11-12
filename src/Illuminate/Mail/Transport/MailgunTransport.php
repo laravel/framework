@@ -62,6 +62,7 @@ class MailgunTransport extends Transport
 
         $to = $this->getTo($message);
 
+        $bcc = $message->getBcc();
         $message->setBcc([]);
 
         $response = $this->client->request(
@@ -74,6 +75,7 @@ class MailgunTransport extends Transport
             'X-Mailgun-Message-ID', $this->getMessageId($response)
         );
 
+        $message->setBcc($bcc);
         $this->sendPerformed($message);
 
         return $this->numberOfRecipients($message);
