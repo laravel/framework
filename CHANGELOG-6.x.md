@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.5.1...6.x)
 
 
-## [v6.5.0 (2019-11-12)](https://github.com/laravel/framework/compare/v6.5.0...v6.5.1)
+## [v6.5.1 (2019-11-12)](https://github.com/laravel/framework/compare/v6.5.0...v6.5.1)
 
 ### Added
 - Added `includeUnless` directive ([#30538](https://github.com/laravel/framework/pull/30538))
