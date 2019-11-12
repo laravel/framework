@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support question
+    url: https://laravel.com/docs/contributions#support-questions
+    about: 'This repository is only for reporting bugs. If you need help using the library, click:'
+  - name: Documentation issue
+    url: https://github.com/laravel/docs
+    about: For documentation issues, open a pull request at the laravel/docs repository
