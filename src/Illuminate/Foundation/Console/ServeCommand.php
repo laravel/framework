@@ -77,7 +77,21 @@ class ServeCommand extends Command
      */
     protected function host()
     {
+        if ($this->input->getOption('lan')) {
+            return $this->lanHost();
+        }
+
         return $this->input->getOption('host');
+    }
+
+    /**
+     * Get the LAN host for the command.
+     *
+     * @return string
+     */
+    protected function lanHost(): string
+    {
+        return explode(PHP_EOL, shell_exec('ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk \'{print $2}\''))[0];
     }
 
     /**
@@ -116,6 +130,8 @@ class ServeCommand extends Command
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
 
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
+
+            ['lan', null, InputOption::VALUE_NONE, 'Use the LAN host'],
         ];
     }
 }
