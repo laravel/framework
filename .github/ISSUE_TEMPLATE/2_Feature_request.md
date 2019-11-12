@@ -1,5 +1,5 @@
 ---
-name: "💡 Feature Request"
+name: "Feature Request"
 about: 'For ideas or feature requests, see: https://github.com/laravel/ideas/issues'
 
 ---
