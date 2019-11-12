@@ -1,12 +1,21 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.5.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.5.1...6.x)
+
+
+## [v6.5.0 (2019-11-12)](https://github.com/laravel/framework/compare/v6.5.0...v6.5.1)
 
 ### Added
 - Added `includeUnless` directive ([#30538](https://github.com/laravel/framework/pull/30538))
 
+### Fixed
+- Fixed default value for $count in `PhpRedisConnection::spop()` method ([#30546](https://github.com/laravel/framework/pull/30546))
+- Fixed breaking compatibility with multi-schema postgres ([#30562](https://github.com/laravel/framework/pull/30562), [6460d2b](https://github.com/laravel/framework/commit/6460d2b1bd89f470a76f5c2c3bddd390fe430e0f))
+- Fixed `Model::isDirty()` with `colelction` \ `object` casts ([#30565](https://github.com/laravel/framework/pull/30565))
+- Fixed `bcc` in `MailgunTransport::send()` ([#30569](https://github.com/laravel/framework/pull/30569))
+
 ### Changed
--  Remove `illuminate/support` dependency from `Container` package  ([#30518](https://github.com/laravel/framework/pull/30518), [#30528](https://github.com/laravel/framework/pull/30528))
+- Remove `illuminate/support` dependency from `Container` package  ([#30518](https://github.com/laravel/framework/pull/30518), [#30528](https://github.com/laravel/framework/pull/30528))
 
 
 ## [v6.5.0 (2019-11-05)](https://github.com/laravel/framework/compare/v6.4.1...v6.5.0)
