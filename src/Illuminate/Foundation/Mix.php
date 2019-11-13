@@ -36,7 +36,7 @@ class Mix
                 return new HtmlString(Str::after($url, ':').$path);
             }
 
-            return new HtmlString("//localhost:8080{$path}");
+            return new HtmlString($path);
         }
 
         $manifestPath = public_path($manifestDirectory.'/mix-manifest.json');
