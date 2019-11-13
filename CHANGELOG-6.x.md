@@ -6,7 +6,7 @@
 ## [v6.5.1 (2019-11-12)](https://github.com/laravel/framework/compare/v6.5.0...v6.5.1)
 
 ### Added
-- Added `includeUnless` directive ([#30538](https://github.com/laravel/framework/pull/30538))
+- Added `includeUnless` Blade directive ([#30538](https://github.com/laravel/framework/pull/30538))
 
 ### Fixed
 - Fixed default value for $count in `PhpRedisConnection::spop()` method ([#30546](https://github.com/laravel/framework/pull/30546))
