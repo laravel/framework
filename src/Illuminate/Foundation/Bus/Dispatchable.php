@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Bus;
 
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Fluent;
 
 trait Dispatchable
 {
