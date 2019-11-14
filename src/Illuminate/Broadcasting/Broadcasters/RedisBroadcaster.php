@@ -54,6 +54,8 @@ class RedisBroadcaster extends Broadcaster
             throw new AccessDeniedHttpException;
         }
 
+        $channelName = str_replace(config('redis.options.prefix', ''), '', $channelName);
+
         return parent::verifyUserCanAccessChannel(
             $request, $channelName
         );
