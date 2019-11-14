@@ -1,12 +1,21 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.5.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.5.1...6.x)
+
+
+## [v6.5.1 (2019-11-12)](https://github.com/laravel/framework/compare/v6.5.0...v6.5.1)
 
 ### Added
-- Added `includeUnless` directive ([#30538](https://github.com/laravel/framework/pull/30538))
+- Added `includeUnless` Blade directive ([#30538](https://github.com/laravel/framework/pull/30538))
+
+### Fixed
+- Fixed default value for $count in `PhpRedisConnection::spop()` method ([#30546](https://github.com/laravel/framework/pull/30546))
+- Fixed breaking compatibility with multi-schema postgres ([#30562](https://github.com/laravel/framework/pull/30562), [6460d2b](https://github.com/laravel/framework/commit/6460d2b1bd89f470a76f5c2c3bddd390fe430e0f))
+- Fixed `Model::isDirty()` with `collection` / `object` casts ([#30565](https://github.com/laravel/framework/pull/30565))
+- Fixed `bcc` in `MailgunTransport::send()` ([#30569](https://github.com/laravel/framework/pull/30569))
 
 ### Changed
--  Remove `illuminate/support` dependency from `Container` package  ([#30518](https://github.com/laravel/framework/pull/30518), [#30528](https://github.com/laravel/framework/pull/30528))
+- Remove `illuminate/support` dependency from `Container` package  ([#30518](https://github.com/laravel/framework/pull/30518), [#30528](https://github.com/laravel/framework/pull/30528))
 
 
 ## [v6.5.0 (2019-11-05)](https://github.com/laravel/framework/compare/v6.4.1...v6.5.0)
@@ -70,7 +79,7 @@
 
 ### Added
 - Added ability to override `setUserPassword` on password reset ([#30218](https://github.com/laravel/framework/pull/30218))
-- Added firing `deleting` \ `deleted` events in `MorphPivot` ([#30229](https://github.com/laravel/framework/pull/30229))
+- Added firing `deleting` / `deleted` events in `MorphPivot` ([#30229](https://github.com/laravel/framework/pull/30229))
 - Added locking mechanism for the array cache driver ([#30253](https://github.com/laravel/framework/pull/30253))
 - Added `dropAllViews` functionality to the SQL Server builder ([#30222](https://github.com/laravel/framework/pull/30222))
 
@@ -140,10 +149,10 @@
 
 ### Added
 - Added `TestResponse::assertJsonPath()` method ([#29957](https://github.com/laravel/framework/pull/29957))
-- Added `hasMacro` \ `getGlobalMacro` \ `hasGlobalMacro` methods to `Eloquent Builder` ([#30008](https://github.com/laravel/framework/pull/30008))
+- Added `hasMacro` / `getGlobalMacro` / `hasGlobalMacro` methods to `Eloquent Builder` ([#30008](https://github.com/laravel/framework/pull/30008))
 - Added `Illuminate\Database\Eloquent\Relations\BelongsToMany::getPivotColumns()` method ([#30049](https://github.com/laravel/framework/pull/30049)) 
-- Added `ScheduledTaskFinished` \ `ScheduledTaskStarting` events to signal when scheduled task runs ([#29888](https://github.com/laravel/framework/pull/29888))
-- Allowing adding command arguments and options with `InputArgument` \ `InputOption` objects ([#29987](https://github.com/laravel/framework/pull/29987))
+- Added `ScheduledTaskFinished` / `ScheduledTaskStarting` events to signal when scheduled task runs ([#29888](https://github.com/laravel/framework/pull/29888))
+- Allowing adding command arguments and options with `InputArgument` / `InputOption` objects ([#29987](https://github.com/laravel/framework/pull/29987))
 
 ### Fixed
 - Fixed `__()` with `null` parameter ([#29967](https://github.com/laravel/framework/pull/29967)) 
@@ -155,7 +164,7 @@
 - Fixed adding `NotFoundHttpException` to "allowed" exceptions in tests ([#29975](https://github.com/laravel/framework/pull/29975))
 
 ### Changed
-- Make it possible to disable encryption via `0`/`false` ([#29985](https://github.com/laravel/framework/pull/29985))
+- Make it possible to disable encryption via `0` / `false` ([#29985](https://github.com/laravel/framework/pull/29985))
 - Allowed a symfony file instance in validate dimensions ([#30009](https://github.com/laravel/framework/pull/30009))
 - Create storage fakes with custom configuration ([#29999](https://github.com/laravel/framework/pull/29999))
 - Set locale in `PendingMail` only if locale present conditionally ([dd1e0a6](https://github.com/laravel/framework/commit/dd1e0a604713ddae21e6a893e4f605a6777300e8))

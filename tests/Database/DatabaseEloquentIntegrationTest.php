@@ -776,6 +776,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
     }
 
+    public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverCursorRequest()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+        foreach (EloquentTestUser::first()->friends()->cursor() as $result) {
+            $this->assertSame('abigailotwell@gmail.com', $result->email);
+            $this->assertEquals($user->id, $result->pivot->user_id);
+            $this->assertEquals($friend->id, $result->pivot->friend_id);
+        }
+    }
+
     public function testBasicHasManyEagerLoading()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
