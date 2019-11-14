@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Migrations;
 
 use Illuminate\Console\OutputStyle;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
@@ -445,7 +446,7 @@ class Migrator
     {
         $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
 
-        return new $class;
+        return Container::getInstance()->make($class);
     }
 
     /**
