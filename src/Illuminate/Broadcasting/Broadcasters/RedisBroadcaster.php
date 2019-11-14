@@ -47,14 +47,13 @@ class RedisBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
-        $channelName = $this->normalizeChannelName($request->channel_name);
+        $channelName = str_replace(config('database.redis.options.prefix', ''), '', $request->channel_name);
+        $channelName = $this->normalizeChannelName($channelName);
 
         if ($this->isGuardedChannel($request->channel_name) &&
             ! $this->retrieveUser($request, $channelName)) {
             throw new AccessDeniedHttpException;
         }
-
-        $channelName = str_replace(config('redis.options.prefix', ''), '', $channelName);
 
         return parent::verifyUserCanAccessChannel(
             $request, $channelName
