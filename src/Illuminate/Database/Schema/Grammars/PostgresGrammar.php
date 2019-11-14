@@ -883,7 +883,7 @@ class PostgresGrammar extends Grammar
      * Format the column definition for a PostGIS spatial type.
      *
      * @param  string  $type
-     * @param  Fluent  $column
+     * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     private function formatPostGisType(string $type, Fluent $column)
