@@ -889,10 +889,10 @@ class PostgresGrammar extends Grammar
     private function formatPostGisType(string $type, Fluent $column)
     {
         if ($column->isGeometry !== null) {
-            return "geometry($type".($column->projection === null ? '' : ", $column->projection").')';
+            return sprintf('geometry(%s%s)', $type, $column->projection === null ? '' : ", {$column->projection}");
         }
 
-        return "geography($type, ".($column->projection ?? '4326').')';
+        return sprintf('geography(%s, %s)', $type, $column->projection ?? '4326');
     }
 
     /**
