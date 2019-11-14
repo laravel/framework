@@ -183,14 +183,26 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
             $this->fireModelEvent('booting', false);
 
+            static::booting();
             static::boot();
+            static::booted();
 
             $this->fireModelEvent('booted', false);
         }
     }
 
     /**
-     * The "booting" method of the model.
+     * Perform any actions required before the model boots.
+     *
+     * @return void
+     */
+    protected static function booting()
+    {
+        //
+    }
+
+    /**
+     * Bootstrap the model and its traits.
      *
      * @return void
      */
@@ -241,6 +253,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         foreach (static::$traitInitializers[static::class] as $method) {
             $this->{$method}();
         }
+    }
+
+    /**
+     * Perform any actions required after the model boots.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        //
     }
 
     /**
