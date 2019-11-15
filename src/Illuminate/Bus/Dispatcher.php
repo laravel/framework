@@ -145,7 +145,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchToQueue($command)
     {
-        $connection = $command->connection ?? null;
+        $connection = $command->connection ?? (method_exists($command, 'getConnection') ? $command->getConnection() : null);
 
         $queue = call_user_func($this->queueResolver, $connection);
 
@@ -169,12 +169,14 @@ class Dispatcher implements QueueingDispatcher
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        if (isset($command->queue, $command->delay)) {
-            return $queue->laterOn($command->queue, $command->delay, $command);
+        $queueName = $command->queue ?? (method_exists($command, 'getQueue') ? $command->getQueue() : null);
+        
+        if (isset($queueName, $command->delay)) {
+            return $queue->laterOn($queueName, $command->delay, $command);
         }
 
-        if (isset($command->queue)) {
-            return $queue->pushOn($command->queue, $command);
+        if (isset($queueName)) {
+            return $queue->pushOn($queueName, $command);
         }
 
         if (isset($command->delay)) {
