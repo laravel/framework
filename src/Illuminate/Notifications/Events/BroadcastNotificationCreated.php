@@ -112,6 +112,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
 
     /**
      * Get the name of the notification being broadcast.
+     
      * @return string
      */
     public function broadcastAs()
