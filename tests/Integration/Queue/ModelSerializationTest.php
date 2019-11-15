@@ -276,7 +276,7 @@ class ModelSerializationTest extends TestCase
             $this->markTestSkipped('Typed properties are only available from PHP 7.4 and up.');
         }
 
-        require_once(__DIR__.'/typed-properties.php');
+        require_once __DIR__.'/typed-properties.php';
 
         $user = ModelSerializationTestUser::create([
             'email' => 'mohamed@laravel.com',
