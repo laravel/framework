@@ -274,7 +274,7 @@ class Arr
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  \ArrayAccess|array|mixed  $array
      * @param  string|int|null  $key
      * @param  mixed   $default
      * @return mixed
@@ -311,7 +311,7 @@ class Arr
     /**
      * Check if an item or items exist in an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array  $array
+     * @param  \ArrayAccess|array|mixed $array
      * @param  string|array  $keys
      * @return bool
      */
@@ -364,7 +364,7 @@ class Arr
      * @param  array|string  $keys
      * @return array
      */
-    public static function only($array, $keys)
+    public static function only(array $array, $keys)
     {
         return array_intersect_key($array, array_flip((array) $keys));
     }
@@ -443,12 +443,12 @@ class Arr
     /**
      * Get a value from the array, and remove it.
      *
-     * @param  array   $array
+     * @param  \ArrayAccess|array  $array
      * @param  string  $key
      * @param  mixed   $default
      * @return mixed
      */
-    public static function pull(&$array, $key, $default = null)
+    public static function pull(&$array, string $key, $default = null)
     {
         $value = static::get($array, $key, $default);
 
@@ -466,7 +466,7 @@ class Arr
      *
      * @throws \InvalidArgumentException
      */
-    public static function random($array, $number = null)
+    public static function random(array $array, $number = null)
     {
         $requested = is_null($number) ? 1 : $number;
 
@@ -502,9 +502,9 @@ class Arr
      *
      * If no key is given to the method, the entire array will be replaced.
      *
-     * @param  array   $array
+     * @param  \ArrayAccess|array|mixed  $array
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return array
      */
     public static function set(&$array, $key, $value)
@@ -540,7 +540,7 @@ class Arr
      * @param  int|null  $seed
      * @return array
      */
-    public static function shuffle($array, $seed = null)
+    public static function shuffle(array $array, ?int $seed = null)
     {
         if (is_null($seed)) {
             shuffle($array);
@@ -556,7 +556,7 @@ class Arr
     /**
      * Sort the array using the given callback or "dot" notation.
      *
-     * @param  array  $array
+     * @param  \ArrayAccess|array|mixed  $array
      * @param  callable|string|null  $callback
      * @return array
      */
@@ -571,7 +571,7 @@ class Arr
      * @param  array  $array
      * @return array
      */
-    public static function sortRecursive($array)
+    public static function sortRecursive(array $array)
     {
         foreach ($array as &$value) {
             if (is_array($value)) {
@@ -591,7 +591,7 @@ class Arr
     /**
      * Convert the array into a query string.
      *
-     * @param  array  $array
+     * @param  array|mixed  $array
      * @return string
      */
     public static function query($array)
@@ -606,7 +606,7 @@ class Arr
      * @param  callable  $callback
      * @return array
      */
-    public static function where($array, callable $callback)
+    public static function where(array $array, callable $callback)
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
