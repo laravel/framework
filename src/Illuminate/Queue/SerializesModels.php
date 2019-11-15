@@ -11,11 +11,11 @@ trait SerializesModels
     use SerializesAndRestoresModelIdentifiers;
 
     /**
-     * A list of serialized model identifiers.
+     * The list of serialized model identifiers.
      *
      * @var array
      */
-    protected $identifiers = [];
+    protected $modelIdentifiers = [];
 
     /**
      * Prepare the instance for serialization.
@@ -27,7 +27,7 @@ trait SerializesModels
         $properties = (new ReflectionClass($this))->getProperties();
 
         foreach ($properties as $property) {
-            if ($property->getName() === 'identifiers') {
+            if ($property->getName() === 'modelIdentifiers') {
                 continue;
             }
 
@@ -36,9 +36,9 @@ trait SerializesModels
             );
 
             if ($serializedValue instanceof ModelIdentifier) {
-                $this->identifiers[$property->getName()] = $serializedValue;
+                $this->modelIdentifiers[$property->getName()] = $serializedValue;
 
-                // Set an empty instance of the model or collection to support typed properties...
+                // Empty instance of the model or collection to support typed properties...
                 $property->setValue($this, new $value);
             } else {
                 $property->setValue($this, $value);
@@ -58,12 +58,12 @@ trait SerializesModels
     public function __wakeup()
     {
         foreach ((new ReflectionClass($this))->getProperties() as $property) {
-            if ($property->isStatic() || $property->getName() === 'identifiers') {
+            if ($property->isStatic() || $property->getName() === 'modelIdentifiers') {
                 continue;
             }
 
-            if (isset($this->identifiers[$property->getName()])) {
-                $value = $this->identifiers[$property->getName()];
+            if (isset($this->modelIdentifiers[$property->getName()])) {
+                $value = $this->modelIdentifiers[$property->getName()];
             } else {
                 $value = $this->getPropertyValue($property);
             }
