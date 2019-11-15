@@ -3,10 +3,10 @@
 namespace Illuminate\Auth;
 
 use Closure;
-use Illuminate\Contracts\Auth\Factory as FactoryContract;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use InvalidArgumentException;
 
-class AuthManager implements FactoryContract
+class AuthManager implements AuthFactory
 {
     use CreatesUserProviders;
 

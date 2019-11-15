@@ -4,7 +4,7 @@ namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\Auth\Factory as Auth;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 
 class Authenticate
 {
@@ -21,7 +21,7 @@ class Authenticate
      * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @return void
      */
-    public function __construct(Auth $auth)
+    public function __construct(AuthFactory $auth)
     {
         $this->auth = $auth;
     }
