@@ -170,7 +170,7 @@ class Dispatcher implements QueueingDispatcher
     protected function pushCommandToQueue($queue, $command)
     {
         $queueName = $command->queue ?? (method_exists($command, 'getQueue') ? $command->getQueue() : null);
-        
+
         if (isset($queueName, $command->delay)) {
             return $queue->laterOn($queueName, $command->delay, $command);
         }
