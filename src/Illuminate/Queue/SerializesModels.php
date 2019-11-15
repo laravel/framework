@@ -2,12 +2,20 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Contracts\Database\ModelIdentifier;
 use ReflectionClass;
 use ReflectionProperty;
 
 trait SerializesModels
 {
     use SerializesAndRestoresModelIdentifiers;
+
+    /**
+     * The list of serialized model identifiers.
+     *
+     * @var array
+     */
+    protected $modelIdentifiers = [];
 
     /**
      * Prepare the instance for serialization.
@@ -19,9 +27,22 @@ trait SerializesModels
         $properties = (new ReflectionClass($this))->getProperties();
 
         foreach ($properties as $property) {
-            $property->setValue($this, $this->getSerializedPropertyValue(
-                $this->getPropertyValue($property)
-            ));
+            if ($property->getName() === 'modelIdentifiers') {
+                continue;
+            }
+
+            $serializedValue = $this->getSerializedPropertyValue(
+                $value = $this->getPropertyValue($property)
+            );
+
+            if ($serializedValue instanceof ModelIdentifier) {
+                $this->modelIdentifiers[$property->getName()] = $serializedValue;
+
+                // Empty instance of the model or collection to support typed properties...
+                $property->setValue($this, new $value);
+            } else {
+                $property->setValue($this, $value);
+            }
         }
 
         return array_values(array_filter(array_map(function ($p) {
@@ -37,12 +58,18 @@ trait SerializesModels
     public function __wakeup()
     {
         foreach ((new ReflectionClass($this))->getProperties() as $property) {
-            if ($property->isStatic()) {
+            if ($property->isStatic() || $property->getName() === 'modelIdentifiers') {
                 continue;
             }
 
+            if (isset($this->modelIdentifiers[$property->getName()])) {
+                $value = $this->modelIdentifiers[$property->getName()];
+            } else {
+                $value = $this->getPropertyValue($property);
+            }
+
             $property->setValue($this, $this->getRestoredPropertyValue(
-                $this->getPropertyValue($property)
+                $value
             ));
         }
     }
