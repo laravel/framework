@@ -304,6 +304,16 @@ class ModelSerializationTest extends TestCase
         $this->assertSame('testbench', $unSerialized->users[1]->getConnectionName());
         $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
     }
+
+    public function test_model_serialization_structure(){
+        $user = ModelSerializationTestUser::create([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $serialized = serialize(new ModelSerializationTestClass($user));
+
+        $this->assertEquals('O:62:"Illuminate\Tests\Integration\Queue\ModelSerializationTestClass":1:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\Tests\Integration\Queue\ModelSerializationTestUser";s:2:"id";i:'.$user->id.';s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}}', $serialized);
+    }
 }
 
 class ModelSerializationTestUser extends Model
