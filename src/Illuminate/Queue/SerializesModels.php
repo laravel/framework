@@ -58,6 +58,8 @@ trait SerializesModels
 
         $properties = (new ReflectionClass($this))->getProperties();
 
+        $class = get_class($this);
+
         foreach ($properties as $property) {
             if ($property->isStatic()) {
                 continue;
@@ -66,7 +68,7 @@ trait SerializesModels
             $name = $property->getName();
 
             if ($property->isPrivate()) {
-                $name = "\0A\0{$name}";
+                $name = "\0{$class}\0{$name}";
             } elseif ($property->isProtected()) {
                 $name = "\0*\0{$name}";
             }
@@ -87,6 +89,8 @@ trait SerializesModels
     {
         $properties = (new ReflectionClass($this))->getProperties();
 
+        $class = get_class($this);
+
         foreach ($properties as $property) {
             if ($property->isStatic()) {
                 continue;
@@ -95,7 +99,7 @@ trait SerializesModels
             $name = $property->getName();
 
             if ($property->isPrivate()) {
-                $name = "\0A\0{$name}";
+                $name = "\0{$class}\0{$name}";
             } elseif ($property->isProtected()) {
                 $name = "\0*\0{$name}";
             }
