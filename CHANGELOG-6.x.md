@@ -2,6 +2,17 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.5.1...6.x)
 
+### Added
+- Allowed model serialization on jobs for typed properties ([#30604](https://github.com/laravel/framework/pull/30604))
+
+### Refactoring
+- Improved `PostgresGrammar::formatPostGisType()` method readability ([#30593](https://github.com/laravel/framework/pull/30593))
+
+### TODO
+- Override BelongsToMany::cursor() to hydrate pivot relations ([#30580](https://github.com/laravel/framework/pull/30580))
+- Added support for separation between geometry and geography types ([#30545](https://github.com/laravel/framework/pull/30545))
+- RedisBroadcaster - Ignore Redis Prefix When Verifying Channel Access ([#30597](https://github.com/laravel/framework/pull/30597), [d77ce36](https://github.com/laravel/framework/commit/d77ce36917510d5a6800dd4116a4e18b7bf720b3))
+
 
 ## [v6.5.1 (2019-11-12)](https://github.com/laravel/framework/compare/v6.5.0...v6.5.1)
 
