@@ -22,7 +22,6 @@
         "illuminate/pipeline": "^7.0",
         "illuminate/session": "^7.0",
         "illuminate/support": "^7.0",
-        "symfony/debug": "^5.0",
         "symfony/http-foundation": "^5.0",
         "symfony/http-kernel": "^5.0",
         "symfony/routing": "^5.0"
