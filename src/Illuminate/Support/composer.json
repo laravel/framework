@@ -19,7 +19,7 @@
         "ext-mbstring": "*",
         "doctrine/inflector": "^1.1",
         "illuminate/contracts": "^7.0",
-        "nesbot/carbon": "^2.0",
+        "nesbot/carbon": "^2.17",
         "voku/portable-ascii": "^1.2.3"
     },
     "conflict": {
