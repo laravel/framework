@@ -2,7 +2,7 @@
 
 namespace Illuminate\Contracts\Debug;
 
-use Exception;
+use Throwable;
 
 interface ExceptionHandler
 {
