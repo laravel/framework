@@ -311,10 +311,10 @@ class ModelSerializationTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
-        $serialized = serialize(new ModelSerializationAccessibleTestClass($user, $user, $user));
+        $serialized = serialize(new ModelSerializationParentAccessibleTestClass($user, $user, $user));
 
         $this->assertEquals(
-            'O:72:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationAccessibleTestClass":3:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}s:79:"'."\0".'Illuminate\\Tests\\Integration\\Queue\\ModelSerializationAccessibleTestClass'."\0".'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}s:79:"'."\0".'Illuminate\\Tests\\Integration\\Queue\\ModelSerializationAccessibleTestClass'."\0".'user3";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}}', $serialized
+            'O:78:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationParentAccessibleTestClass":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}s:8:"' . "\0" . '*' . "\0" . 'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}}', $serialized
         );
     }
 }
@@ -438,7 +438,7 @@ class ModelSerializationAccessibleTestClass
     use SerializesModels;
 
     public $user;
-    private $user2;
+    protected $user2;
     private $user3;
 
     public function __construct($user, $user2, $user3)
@@ -447,6 +447,10 @@ class ModelSerializationAccessibleTestClass
         $this->user2 = $user2;
         $this->user3 = $user3;
     }
+}
+
+class ModelSerializationParentAccessibleTestClass extends ModelSerializationAccessibleTestClass{
+
 }
 
 class ModelRelationSerializationTestClass
