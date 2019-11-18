@@ -58,6 +58,18 @@ class File extends UploadedFile
     }
 
     /**
+     * Create a new fake file with content.
+     *
+     * @param  string  $name
+     * @param  string  $content
+     * @return \Illuminate\Http\Testing\File
+     */
+    public static function createWithContent($name, $content)
+    {
+        return (new FileFactory)->createWithContent($name, $content);
+    }
+
+    /**
      * Create a new fake image.
      *
      * @param  string  $name

@@ -21,6 +21,23 @@ class FileFactory
     }
 
     /**
+     * Create a new fake file with content.
+     *
+     * @param  string  $name
+     * @param  string  $content
+     * @return \Illuminate\Http\Testing\File
+     */
+    public function createWithContent($name, $content)
+    {
+        $tmpfile = tmpfile();
+        fwrite($tmpfile, $content);
+
+        return tap(new File($name, $tmpfile), function ($file) use ($tmpfile) {
+            $file->sizeToReport = fstat($tmpfile)['size'];
+        });
+    }
+
+    /**
      * Create a new fake image.
      *
      * @param  string  $name
