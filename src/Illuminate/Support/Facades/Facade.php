@@ -33,11 +33,11 @@ abstract class Facade
     {
         $accessor = static::getFacadeAccessor();
 
-        if (!! static::$app->resolved($accessor)) {
+        if (static::$app->resolved($accessor) === true) {
             $callback(static::getFacadeRoot());
         }
 
-        static::$app->afterResolving(static::getFacadeAccessor(), function ($service) use ($callback) {
+        static::$app->afterResolving($accessor, function ($service) use ($callback) {
             $callback($service);
         });
     }
