@@ -27,7 +27,6 @@ class FacadesTest extends TestCase
         $this->assertTrue(isset($_SERVER['__laravel.authResolved']));
     }
 
-
     public function testFacadeResolvedCanResolveCallbackAfterAccessRootHasBeenResolved()
     {
         $this->app->make('auth');
