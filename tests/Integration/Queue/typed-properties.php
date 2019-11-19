@@ -11,15 +11,31 @@ class TypedPropertyTestClass
 
     public ModelSerializationTestUser $user;
 
-    public int $id;
+    protected int $id;
 
-    public array $names;
+    private array $names;
 
     public function __construct(ModelSerializationTestUser $user, int $id, array $names)
     {
         $this->user = $user;
         $this->id = $id;
         $this->names = $names;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNames()
+    {
+        return $this->names;
     }
 }
 
