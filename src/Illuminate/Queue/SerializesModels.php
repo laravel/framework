@@ -73,7 +73,9 @@ trait SerializesModels
                 $name = "\0*\0{$name}";
             }
 
-            $values[$name] = $this->getSerializedPropertyValue($this->getPropertyValue($property));
+            $values[$name] = $this->getSerializedPropertyValue(
+                $this->getPropertyValue($property)
+            );
         }
 
         return $values;
@@ -109,7 +111,10 @@ trait SerializesModels
             }
 
             $property->setAccessible(true);
-            $property->setValue($this, $this->getRestoredPropertyValue($values[$name]));
+
+            $property->setValue(
+                $this, $this->getRestoredPropertyValue($values[$name])
+            );
         }
 
         return $values;
