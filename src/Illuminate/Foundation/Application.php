@@ -980,7 +980,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             return $this->bootstrapPath($default);
         }
 
-        return Str::startsWith($env, '/')
+        return Str::startsWith($env, '/') || preg_match("/^[a-z]:/i", $env)
                 ? $env
                 : $this->basePath($env);
     }
