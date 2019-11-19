@@ -49,7 +49,7 @@ class File extends UploadedFile
      * Create a new fake file.
      *
      * @param  string  $name
-     * @param  int  $kilobytes
+     * @param  string|int  $kilobytes
      * @return \Illuminate\Http\Testing\File
      */
     public static function create($name, $kilobytes = 0)
