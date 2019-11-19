@@ -2,20 +2,12 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Database\ModelIdentifier;
 use ReflectionClass;
 use ReflectionProperty;
 
 trait SerializesModels
 {
     use SerializesAndRestoresModelIdentifiers;
-
-    /**
-     * The list of serialized model identifiers.
-     *
-     * @var array
-     */
-    protected $modelIdentifiers = [];
 
     /**
      * Prepare the instance for serialization.
@@ -27,22 +19,9 @@ trait SerializesModels
         $properties = (new ReflectionClass($this))->getProperties();
 
         foreach ($properties as $property) {
-            if ($property->getName() === 'modelIdentifiers') {
-                continue;
-            }
-
-            $serializedValue = $this->getSerializedPropertyValue(
-                $value = $this->getPropertyValue($property)
-            );
-
-            if ($serializedValue instanceof ModelIdentifier) {
-                $this->modelIdentifiers[$property->getName()] = $serializedValue;
-
-                // Empty instance of the model or collection to support typed properties...
-                $property->setValue($this, new $value);
-            } else {
-                $property->setValue($this, $value);
-            }
+            $property->setValue($this, $this->getSerializedPropertyValue(
+                $this->getPropertyValue($property)
+            ));
         }
 
         return array_values(array_filter(array_map(function ($p) {
@@ -58,20 +37,87 @@ trait SerializesModels
     public function __wakeup()
     {
         foreach ((new ReflectionClass($this))->getProperties() as $property) {
-            if ($property->isStatic() || $property->getName() === 'modelIdentifiers') {
+            if ($property->isStatic()) {
                 continue;
             }
 
-            if (isset($this->modelIdentifiers[$property->getName()])) {
-                $value = $this->modelIdentifiers[$property->getName()];
-            } else {
-                $value = $this->getPropertyValue($property);
-            }
-
             $property->setValue($this, $this->getRestoredPropertyValue(
-                $value
+                $this->getPropertyValue($property)
             ));
         }
+    }
+
+    /**
+     * Prepare the instance values for serialization.
+     *
+     * @return array
+     */
+    public function __serialize()
+    {
+        $values = [];
+
+        $properties = (new ReflectionClass($this))->getProperties();
+
+        $class = get_class($this);
+
+        foreach ($properties as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            $name = $property->getName();
+
+            if ($property->isPrivate()) {
+                $name = "\0{$class}\0{$name}";
+            } elseif ($property->isProtected()) {
+                $name = "\0*\0{$name}";
+            }
+
+            $values[$name] = $this->getSerializedPropertyValue(
+                $this->getPropertyValue($property)
+            );
+        }
+
+        return $values;
+    }
+
+    /**
+     * Restore the model after serialization.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    public function __unserialize(array $values)
+    {
+        $properties = (new ReflectionClass($this))->getProperties();
+
+        $class = get_class($this);
+
+        foreach ($properties as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            $name = $property->getName();
+
+            if ($property->isPrivate()) {
+                $name = "\0{$class}\0{$name}";
+            } elseif ($property->isProtected()) {
+                $name = "\0*\0{$name}";
+            }
+
+            if (! array_key_exists($name, $values)) {
+                continue;
+            }
+
+            $property->setAccessible(true);
+
+            $property->setValue(
+                $this, $this->getRestoredPropertyValue($values[$name])
+            );
+        }
+
+        return $values;
     }
 
     /**

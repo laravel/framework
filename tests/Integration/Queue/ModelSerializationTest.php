@@ -292,8 +292,8 @@ class ModelSerializationTest extends TestCase
 
         $this->assertSame('testbench', $unSerialized->user->getConnectionName());
         $this->assertSame('mohamed@laravel.com', $unSerialized->user->email);
-        $this->assertSame(5, $unSerialized->id);
-        $this->assertSame(['James', 'Taylor', 'Mohamed'], $unSerialized->names);
+        $this->assertSame(5, $unSerialized->getId());
+        $this->assertSame(['James', 'Taylor', 'Mohamed'], $unSerialized->getNames());
 
         $serialized = serialize(new TypedPropertyCollectionTestClass(ModelSerializationTestUser::on('testbench')->get()));
 
@@ -303,6 +303,19 @@ class ModelSerializationTest extends TestCase
         $this->assertSame('mohamed@laravel.com', $unSerialized->users[0]->email);
         $this->assertSame('testbench', $unSerialized->users[1]->getConnectionName());
         $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
+    }
+
+    public function test_model_serialization_structure()
+    {
+        $user = ModelSerializationTestUser::create([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $serialized = serialize(new ModelSerializationParentAccessibleTestClass($user, $user, $user));
+
+        $this->assertEquals(
+            'O:78:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationParentAccessibleTestClass":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}s:8:"'."\0".'*'."\0".'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}}', $serialized
+        );
     }
 }
 
@@ -418,6 +431,27 @@ class ModelSerializationTestClass
     {
         $this->user = $user;
     }
+}
+
+class ModelSerializationAccessibleTestClass
+{
+    use SerializesModels;
+
+    public $user;
+    protected $user2;
+    private $user3;
+
+    public function __construct($user, $user2, $user3)
+    {
+        $this->user = $user;
+        $this->user2 = $user2;
+        $this->user3 = $user3;
+    }
+}
+
+class ModelSerializationParentAccessibleTestClass extends ModelSerializationAccessibleTestClass
+{
+    //
 }
 
 class ModelRelationSerializationTestClass
