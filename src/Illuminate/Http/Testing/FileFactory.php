@@ -16,7 +16,7 @@ class FileFactory
     public function create($name, $kilobytes = 0)
     {
         if (is_string($kilobytes)) {
-            return  $this->createWithContent($name, $kilobytes);
+            return $this->createWithContent($name, $kilobytes);
         }
 
         return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
