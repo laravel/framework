@@ -778,15 +778,14 @@ trait HasAttributes
 
         $format = $this->getDateFormat();
 
-        // https://bugs.php.net/bug.php?id=75577
-        if (version_compare(PHP_VERSION, '7.3.0-dev', '<')) {
-            $format = str_replace('.v', '.u', $format);
-        }
-
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
-        return Date::createFromFormat($format, $value);
+        if (Date::hasFormat($value, $format)) {
+            return Date::createFromFormat($format, $value);
+        }
+
+        return Date::parse($value);
     }
 
     /**
