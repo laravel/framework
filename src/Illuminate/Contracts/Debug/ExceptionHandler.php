@@ -9,7 +9,7 @@ interface ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Throwable $e
+     * @param  \Throwable  $e
      * @return void
      */
     public function report(Throwable $e);
