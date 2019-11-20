@@ -30,6 +30,7 @@ class Response extends BaseResponse
     public function __construct($content = '', $status = 200, array $headers = [])
     {
         $this->headers = new ResponseHeaderBag($headers);
+
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
