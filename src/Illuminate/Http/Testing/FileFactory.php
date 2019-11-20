@@ -34,6 +34,7 @@ class FileFactory
     public function createWithContent($name, $content)
     {
         $tmpfile = tmpfile();
+
         fwrite($tmpfile, $content);
 
         return tap(new File($name, $tmpfile), function ($file) use ($tmpfile) {
