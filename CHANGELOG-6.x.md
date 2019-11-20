@@ -1,17 +1,23 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.5.1...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.5.2...6.x)
+
+
+## [v6.5.2 (2019-11-19)](https://github.com/laravel/framework/compare/v6.5.1...v6.5.2)
 
 ### Added
-- Allowed model serialization on jobs for typed properties ([#30604](https://github.com/laravel/framework/pull/30604))
+- Allowed model serialization on jobs for typed properties ([#30604](https://github.com/laravel/framework/pull/30604), [#30605](https://github.com/laravel/framework/pull/30605), [920c364](https://github.com/laravel/framework/commit/920c3640269b7c1dd0f26e5b6f765ca9b7f99366))
+- Allowed fallback when facade root accessor has previously been resolved ([#30616](https://github.com/laravel/framework/pull/30616))
+- Added support for separation between `geometry` and `geography` types for `Postgres` ([#30545](https://github.com/laravel/framework/pull/30545))
+- Added `createWithContent()` method to `Illuminate\Http\Testing\File` and `Illuminate\Http\Testing\FileFactory` ([2cc6fa3](https://github.com/laravel/framework/commit/2cc6fa33732118cc71c74209b02382b989689b63), [181db51](https://github.com/laravel/framework/commit/181db51595d546cbd24b3fac0cb276255e147286))
 
 ### Refactoring
 - Improved `PostgresGrammar::formatPostGisType()` method readability ([#30593](https://github.com/laravel/framework/pull/30593))
 
-### TODO
-- Override BelongsToMany::cursor() to hydrate pivot relations ([#30580](https://github.com/laravel/framework/pull/30580))
-- Added support for separation between geometry and geography types ([#30545](https://github.com/laravel/framework/pull/30545))
-- RedisBroadcaster - Ignore Redis Prefix When Verifying Channel Access ([#30597](https://github.com/laravel/framework/pull/30597), [d77ce36](https://github.com/laravel/framework/commit/d77ce36917510d5a6800dd4116a4e18b7bf720b3))
+### Changed
+- Added `symfony/debug` dependency to `illuminate/pipeline` ([#30611](https://github.com/laravel/framework/pull/30611))
+- Override `BelongsToMany::cursor()` to hydrate pivot relations ([#30580](https://github.com/laravel/framework/pull/30580))
+- Ignore Redis prefix when verifying channel access in RedisBroadcaster ([#30597](https://github.com/laravel/framework/pull/30597), [d77ce36](https://github.com/laravel/framework/commit/d77ce36917510d5a6800dd4116a4e18b7bf720b3))
 
 
 ## [v6.5.1 (2019-11-12)](https://github.com/laravel/framework/compare/v6.5.0...v6.5.1)
