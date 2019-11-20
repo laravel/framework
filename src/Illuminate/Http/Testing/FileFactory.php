@@ -15,14 +15,12 @@ class FileFactory
      */
     public function create($name, $kilobytes = 0)
     {
-        $tmp = tmpfile();
-
         if (is_string($kilobytes)) {
-            file_put_contents($tmp, $kilobytes);
+            return $this->createWithContent($name, $kilobytes);
         }
 
-        return tap(new File($name, $tmp), function ($file) use ($kilobytes) {
-            $file->sizeToReport = is_string($kilobytes) ? fstat($tmp)['size'] : ($kilobytes * 1024);
+        return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
+            $file->sizeToReport = $kilobytes * 1024;
         });
     }
 
@@ -36,6 +34,7 @@ class FileFactory
     public function createWithContent($name, $content)
     {
         $tmpfile = tmpfile();
+
         fwrite($tmpfile, $content);
 
         return tap(new File($name, $tmpfile), function ($file) use ($tmpfile) {
