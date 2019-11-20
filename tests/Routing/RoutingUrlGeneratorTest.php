@@ -204,6 +204,15 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
 
         /*
+         * Optional parameter inside
+         */
+        $route = new Route(['GET'], 'foo/bar/{baz?}/breeze/{boom?}', ['as' => 'optional_inside']);
+        $routes->add($route);
+
+        $route = new Route(['GET'], 'foo/{zap}/bar/{baz?}/breeze/{boom?}', ['as' => 'required_and_optional_inside']);
+        $routes->add($route);
+
+        /*
          * HTTPS...
          */
         $route = new Route(['GET'], 'foo/baz', ['as' => 'baz', 'https']);
@@ -266,6 +275,16 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/bar/taylor?wall=woz', $url->route('optional', ['wall' => 'woz', 'taylor']));
         $this->assertSame('http://www.foo.com/foo/bar/taylor?wall=woz&breeze', $url->route('optional', ['wall' => 'woz', 'breeze', 'baz' => 'taylor']));
         $this->assertSame('http://www.foo.com/foo/bar?wall=woz', $url->route('optional', ['wall' => 'woz']));
+        $this->assertSame('http://www.foo.com/foo/bar/breeze', $url->route('optional_inside'));
+        $this->assertSame('http://www.foo.com/foo/bar/breeze', $url->route('optional_inside', ['baz' => null, 'boom' => null]));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze', $url->route('optional_inside', ['baz' => 'taylor', 'boom' => null]));
+        $this->assertSame('http://www.foo.com/foo/bar/breeze/otwell', $url->route('optional_inside', ['baz' => null, 'boom' => 'otwell']));
+        $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell', $url->route('optional_inside', ['baz' => 'taylor', 'boom' => 'otwell']));
+        $this->assertSame('http://www.foo.com/foo/sir/bar/breeze', $url->route('required_and_optional_inside', ['zap' => 'sir']));
+        $this->assertSame('http://www.foo.com/foo/sir/bar/breeze', $url->route('required_and_optional_inside', ['zap' => 'sir', 'baz' => null, 'boom' => null]));
+        $this->assertSame('http://www.foo.com/foo/sir/bar/taylor/breeze', $url->route('required_and_optional_inside', ['zap' => 'sir', 'baz' => 'taylor', 'boom' => null]));
+        $this->assertSame('http://www.foo.com/foo/sir/bar/breeze/taylor', $url->route('required_and_optional_inside', ['zap' => 'sir', 'baz' => null, 'boom' => 'taylor']));
+        $this->assertSame('http://www.foo.com/foo/sir/bar/taylor/breeze/jeffery', $url->route('required_and_optional_inside', ['zap' => 'sir', 'baz' => 'taylor', 'boom' => 'jeffery']));
         $this->assertSame('http://www.foo.com/foo/bar/%C3%A5%CE%B1%D1%84/%C3%A5%CE%B1%D1%84', $url->route('foobarbaz', ['baz' => 'åαф']));
         $this->assertSame('/foo/bar#derp', $url->route('fragment', [], false));
         $this->assertSame('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));
