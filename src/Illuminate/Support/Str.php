@@ -190,6 +190,18 @@ class Str
     }
 
     /**
+     * Explode a given string into a Collection using the given delimiter
+     *
+     * @param  string  $string
+     * @param  string  $delimiter
+     * @return Collection
+     */
+    public static function explodeIntoCollection($string, $delimiter = ',')
+    {
+        return new Collection(explode($delimiter, $string));
+    }
+
+    /**
      * Cap a string with a single instance of a given value.
      *
      * @param  string  $value

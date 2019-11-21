@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
@@ -386,6 +387,24 @@ class SupportStrTest extends TestCase
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
+    }
+
+    public function testExplodeIntoCollectionWithValidString()
+    {
+        $this->assertInstanceOf(Collection::class, Str::explodeIntoCollection('Foo'));
+        $this->assertInstanceOf(Collection::class, Str::explodeIntoCollection('Foo,Bar,Biz'));
+        $this->assertCount(3, Str::explodeIntoCollection('Foo,Bar,Biz'));
+        $this->assertEquals('Foo', Str::explodeIntoCollection('Foo,Bar')->first());
+        $this->assertEquals('Bar', Str::explodeIntoCollection('Foo,Bar')->last());
+    }
+
+    public function testExplodeIntoCollectionWithASpecifiedDelimiter()
+    {
+        $this->assertInstanceOf(Collection::class, Str::explodeIntoCollection('Foo', '|'));
+        $this->assertInstanceOf(Collection::class, Str::explodeIntoCollection('Foo|Bar|Biz', '|'));
+        $this->assertCount(3, Str::explodeIntoCollection('Foo|Bar|Biz', '|'));
+        $this->assertEquals('Foo', Str::explodeIntoCollection('Foo|Bar', '|')->first());
+        $this->assertEquals('Bar', Str::explodeIntoCollection('Foo|Bar', '|')->last());
     }
 }
 
