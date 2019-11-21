@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Testing\Concerns;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
@@ -59,11 +60,50 @@ class InteractsWithAuthenticationTest extends TestCase
             ->assertSeeText('Hello taylorotwell');
     }
 
+    public function testActingAsGuestIsProperlyHandledForSessionAuth()
+    {
+        Route::get('me', function (Request $request) {
+            return 'Hello '.$request->user()->username;
+        })->middleware(['auth']);
+
+        Route::get('login', function (Request $request) {
+            return 'This is a login page.';
+        })->middleware(['guest'])->name('login');
+
+        $user = AuthenticationTestUser::where('username', '=', 'taylorotwell')->first();
+
+        $this->withoutExceptionHandling()
+            ->expectException(AuthenticationException::class);
+
+        $this->actingAs($user)
+            ->actingAs(null)
+            ->get('/me');
+    }
+
     public function testActingAsIsProperlyHandledForAuthViaRequest()
     {
         Route::get('me', function (Request $request) {
             return 'Hello '.$request->user()->username;
         })->middleware(['auth:api']);
+        Auth::viaRequest('api', function ($request) {
+            return $request->user();
+        });
+        $user = AuthenticationTestUser::where('username', '=', 'taylorotwell')->first();
+        $this->actingAs($user, 'api')
+            ->get('/me')
+            ->assertSuccessful()
+            ->assertSeeText('Hello taylorotwell');
+    }
+
+    public function testActingAsGuestIsProperlyHandledForAuthViaRequest()
+    {
+        Route::get('me', function (Request $request) {
+            return 'Hello '.$request->user()->username;
+        })->middleware(['auth:api']);
+
+        Route::get('login', function (Request $request) {
+            return 'This is a login page.';
+        })->middleware(['guest'])->name('login');
 
         Auth::viaRequest('api', function ($request) {
             return $request->user();
@@ -71,10 +111,12 @@ class InteractsWithAuthenticationTest extends TestCase
 
         $user = AuthenticationTestUser::where('username', '=', 'taylorotwell')->first();
 
+        $this->withoutExceptionHandling()
+            ->expectException(AuthenticationException::class);
+
         $this->actingAs($user, 'api')
-            ->get('/me')
-            ->assertSuccessful()
-            ->assertSeeText('Hello taylorotwell');
+            ->actingAs(null, 'api')
+            ->get('/me');
     }
 }
 
