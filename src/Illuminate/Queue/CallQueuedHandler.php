@@ -136,7 +136,7 @@ class CallQueuedHandler
      * Handle a model not found exception.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
     protected function handleModelNotFound(Job $job, $e)
@@ -163,7 +163,7 @@ class CallQueuedHandler
      * The exception that caused the failure will be passed.
      *
      * @param  array  $data
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
     public function failed(array $data, $e)
