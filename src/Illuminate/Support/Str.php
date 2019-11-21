@@ -190,7 +190,7 @@ class Str
     }
 
     /**
-     * Explode a given string into a Collection using the given delimiter
+     * Explode a given string into a Collection using the given delimiter.
      *
      * @param  string  $string
      * @param  string  $delimiter
