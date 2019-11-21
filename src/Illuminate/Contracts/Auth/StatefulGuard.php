@@ -53,11 +53,4 @@ interface StatefulGuard extends Guard
      * @return bool
      */
     public function viaRemember();
-
-    /**
-     * Log the user out of the application.
-     *
-     * @return void
-     */
-    public function logout();
 }
