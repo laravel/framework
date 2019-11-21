@@ -85,10 +85,10 @@ trait GuardHelpers
     /**
      * Set the current user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return $this
      */
-    public function setUser(?AuthenticatableContract $user)
+    public function setUser(AuthenticatableContract $user)
     {
         $this->user = $user;
 
@@ -114,5 +114,15 @@ trait GuardHelpers
     public function setProvider(UserProvider $provider)
     {
         $this->provider = $provider;
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @return void
+     */
+    public function logout()
+    {
+        $this->user = null;
     }
 }
