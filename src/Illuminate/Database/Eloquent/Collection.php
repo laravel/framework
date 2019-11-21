@@ -315,7 +315,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $intersect = new static;
 
-        if(empty($items)) {
+        if (empty($items)) {
             return $intersect;
         }
 
