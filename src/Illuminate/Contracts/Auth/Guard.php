@@ -43,8 +43,8 @@ interface Guard
     /**
      * Set the current user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @return void
      */
-    public function setUser(Authenticatable $user);
+    public function setUser(?Authenticatable $user);
 }
