@@ -788,17 +788,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Set the current user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return $this
      */
-    public function setUser(?AuthenticatableContract $user)
+    public function setUser(AuthenticatableContract $user)
     {
-        if ($user === null) {
-            $this->logout();
-
-            return $this;
-        }
-
         $this->user = $user;
 
         $this->loggedOut = false;

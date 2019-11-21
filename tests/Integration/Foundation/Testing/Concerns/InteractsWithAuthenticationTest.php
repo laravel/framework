@@ -76,7 +76,7 @@ class InteractsWithAuthenticationTest extends TestCase
             ->expectException(AuthenticationException::class);
 
         $this->actingAs($user)
-            ->actingAs(null)
+            ->actingAsGuest()
             ->get('/me');
     }
 
@@ -115,7 +115,7 @@ class InteractsWithAuthenticationTest extends TestCase
             ->expectException(AuthenticationException::class);
 
         $this->actingAs($user, 'api')
-            ->actingAs(null, 'api')
+            ->actingAsGuest('api')
             ->get('/me');
     }
 }
