@@ -315,6 +315,10 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $intersect = new static;
 
+        if (empty($items)) {
+            return $intersect;
+        }
+
         $dictionary = $this->getDictionary($items);
 
         foreach ($this->items as $item) {
