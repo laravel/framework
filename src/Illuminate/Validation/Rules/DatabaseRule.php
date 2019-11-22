@@ -2,8 +2,8 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Closure;
 use Illuminate\Support\Str;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 
 trait DatabaseRule
@@ -55,7 +55,8 @@ trait DatabaseRule
      * @param  string  $table
      * @return string
      */
-    public function resolveTableName($table) {
+    public function resolveTableName($table)
+    {
         if (! Str::contains($table, '\\') || ! class_exists($table)) {
             return $table;
         }
@@ -65,7 +66,7 @@ trait DatabaseRule
         if (! $model instanceof Model) {
             return $table;
         }
-        
+
         return $model->getTable();
     }
 
