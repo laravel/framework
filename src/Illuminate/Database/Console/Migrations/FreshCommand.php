@@ -36,9 +36,12 @@ class FreshCommand extends Command
         }
 
         $database = $this->input->getOption('database');
+        $databases = $this->input->getOption('databases');
 
         $this->call('db:wipe', array_filter([
+            '--all' => $this->option('all'),
             '--database' => $database,
+            '--databases' => $databases,
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),
             '--force' => true,
@@ -90,7 +93,9 @@ class FreshCommand extends Command
     protected function getOptions()
     {
         return [
+            ['all', null, InputOption::VALUE_NONE, 'Drop all tables from all databases'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
+            ['databases', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The databases connection to use'],
             ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
             ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],

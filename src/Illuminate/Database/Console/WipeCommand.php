@@ -43,7 +43,13 @@ class WipeCommand extends Command
             $this->info('Dropped all views successfully.');
         }
 
-        $this->dropAllTables($database);
+        if ($this->option('all')) {
+            $this->dropAllTablesFromAllDatabases();
+        } elseif ($this->option('databases')) {
+            $this->dropAllTablesFromSpecificDatabases($this->option('databases'));
+        } else {
+            $this->dropAllTables($database);
+        }
 
         $this->info('Dropped all tables successfully.');
 
@@ -65,6 +71,36 @@ class WipeCommand extends Command
         $this->laravel['db']->connection($database)
                     ->getSchemaBuilder()
                     ->dropAllTables();
+    }
+
+    /**
+     * Drop all tables from all databases.
+     *
+     * @return void
+     */
+    protected function dropAllTablesFromAllDatabases()
+    {
+        $connections = \Config::get('database');
+        foreach ($connections['connections'] as $database => $config) {
+            $this->laravel['db']->connection($database)
+                    ->getSchemaBuilder()
+                    ->dropAllTables();
+        }
+    }
+
+    /**
+     * Drop all tables from the passed databases.
+     *
+     * @param  string  $databases
+     * @return void
+     */
+    protected function dropAllTablesFromSpecificDatabases($databases)
+    {
+        foreach ($databases as $database) {
+            $this->laravel['db']->connection($database)
+                    ->getSchemaBuilder()
+                    ->dropAllTables();
+        }
     }
 
     /**
@@ -101,7 +137,9 @@ class WipeCommand extends Command
     protected function getOptions()
     {
         return [
+            ['all', null, InputOption::VALUE_NONE, 'Wipe all tables from all databases'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
+            ['databases', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The databases connection to use'],
             ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
             ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],

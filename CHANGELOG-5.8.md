@@ -2,6 +2,7 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v5.8.35...5.8)
 
+- Added --all and --databases option to migrate:fresh and db:wipe
 
 ## [v5.8.35 (2019-09-03)](https://github.com/laravel/framework/compare/v5.8.34...v5.8.35)
 
