@@ -2,9 +2,9 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Illuminate\Support\Str;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 trait DatabaseRule
 {
