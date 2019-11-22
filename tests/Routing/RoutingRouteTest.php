@@ -372,6 +372,23 @@ class RoutingRouteTest extends TestCase
         $this->assertNull($route->getAction('unknown_property'));
     }
 
+    public function testResolvingBindingParameters()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('foo/{bar:slug}', function () {
+            return 'foo';
+        })->name('foo');
+
+        $this->assertEquals('slug', $route->bindingFieldFor('bar'));
+
+        $route = $router->get('foo/{bar:slug}/{baz}', function () {
+            return 'foo';
+        })->name('foo');
+
+        $this->assertNull($route->bindingFieldFor('baz'));
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();

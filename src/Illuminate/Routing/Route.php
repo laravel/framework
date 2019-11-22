@@ -120,6 +120,13 @@ class Route
     protected $container;
 
     /**
+     * The fields that implicit binding should use for a given parameter.
+     *
+     * @var array
+     */
+    protected $bindingFields = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -136,7 +143,7 @@ class Route
      */
     public function __construct($methods, $uri, $action)
     {
-        $this->uri = $uri;
+        $this->uri = $this->parseUri($uri);
         $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
 
@@ -147,6 +154,19 @@ class Route
         if (isset($this->action['prefix'])) {
             $this->prefix($this->action['prefix']);
         }
+    }
+
+    /**
+     * Parse the route URI and normalize / store any implicit binding fields.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function parseUri($uri)
+    {
+        return tap(RouteUri::parse($uri), function ($uri) {
+            $this->bindingFields = $uri->bindingFields;
+        })->uri;
     }
 
     /**
@@ -469,6 +489,17 @@ class Route
     public function signatureParameters($subClass = null)
     {
         return RouteSignatureParameters::fromAction($this->action, $subClass);
+    }
+
+    /**
+     * Get the binding field for the given parameter.
+     *
+     * @param  string  $parameter
+     * @return string|null
+     */
+    public function bindingFieldFor($parameter)
+    {
+        return $this->bindingFields[$parameter] ?? null;
     }
 
     /**
