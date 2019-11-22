@@ -32,12 +32,13 @@ trait DelegatesToResource
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
+     * @param  mixed   $value
+     * @param  string  $field
      * @return void
      *
      * @throws \Exception
      */
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = null)
     {
         throw new Exception('Resources may not be implicitly resolved from route bindings.');
     }
