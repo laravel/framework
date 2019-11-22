@@ -142,7 +142,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public function head($uri, $action = null)
     {
         return $this->addRoute('HEAD', $uri, $action);
-    }    
+    }
 
     /**
      * Register a new GET route with the router.
