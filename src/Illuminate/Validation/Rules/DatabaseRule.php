@@ -45,8 +45,9 @@ trait DatabaseRule
      */
     public function __construct($table, $column = 'NULL')
     {
-        $this->table = $this->resolveTableName($table);
         $this->column = $column;
+
+        $this->table = $this->resolveTableName($table);
     }
 
     /**
@@ -63,11 +64,9 @@ trait DatabaseRule
 
         $model = new $table;
 
-        if (! $model instanceof Model) {
-            return $table;
-        }
-
-        return $model->getTable();
+        return $model instanceof Model
+                ? $model->getTable()
+                : $table;
     }
 
     /**
