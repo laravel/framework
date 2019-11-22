@@ -3,6 +3,8 @@
 namespace Illuminate\Validation\Rules;
 
 use Closure;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 trait DatabaseRule
 {
@@ -43,8 +45,28 @@ trait DatabaseRule
      */
     public function __construct($table, $column = 'NULL')
     {
-        $this->table = $table;
+        $this->table = $this->resolveTableName($table);
         $this->column = $column;
+    }
+
+    /**
+     * Resolves the name of the table from the given string.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function resolveTableName($table) {
+        if (! Str::contains($table, '\\') || ! class_exists($table)) {
+            return $table;
+        }
+
+        $model = new $table;
+
+        if (! $model instanceof Model) {
+            return $table;
+        }
+        
+        return $model->getTable();
     }
 
     /**
