@@ -33,7 +33,7 @@ trait DelegatesToResource
      * Retrieve the model for a bound value.
      *
      * @param  mixed   $value
-     * @param  string  $field
+     * @param  string|string  $field
      * @return void
      *
      * @throws \Exception
