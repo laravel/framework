@@ -352,6 +352,22 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo/routable', $url->route('routable', [$model], false));
     }
 
+    public function testRoutableInterfaceRoutingWithCustomBindingField()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{bar:slug}', ['as' => 'routable']);
+        $routes->add($route);
+
+        $model = new RoutableInterfaceStub;
+        $model->key = 'routable';
+
+        $this->assertSame('/foo/test-slug', $url->route('routable', ['bar' => $model], false));
+    }
+
     public function testRoutableInterfaceRoutingWithSingleParameter()
     {
         $url = new UrlGenerator(
@@ -654,6 +670,7 @@ class RoutingUrlGeneratorTest extends TestCase
 class RoutableInterfaceStub implements UrlRoutable
 {
     public $key;
+    public $slug = 'test-slug';
 
     public function getRouteKey()
     {
