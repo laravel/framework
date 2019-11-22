@@ -105,4 +105,9 @@ class RoutableInterfaceStub implements UrlRoutable
     {
         //
     }
+
+    public function resolveChildRouteBinding($childType, $routeKey, $field = null)
+    {
+        //
+    }
 }

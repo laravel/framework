@@ -1486,6 +1486,7 @@ class RoutingRouteTest extends TestCase
     public function testImplicitBindings()
     {
         $router = $this->getRouter();
+
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
             'uses' => function (RoutingTestUserModel $bar) {
@@ -1494,7 +1495,25 @@ class RoutingRouteTest extends TestCase
                 return $bar->value;
             },
         ]);
+
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testParentChildImplicitBindings()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{user}/{post:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $user, RoutingTestPostModel $post) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $post);
+
+                return $user->value.'|'.$post->value;
+            },
+        ]);
+
+        $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
@@ -1976,6 +1995,11 @@ class RoutingTestMiddlewareGroupTwo
 
 class RoutingTestUserModel extends Model
 {
+    public function posts()
+    {
+        return new RoutingTestPostModel;
+    }
+
     public function getRouteKeyName()
     {
         return 'id';
@@ -1994,6 +2018,26 @@ class RoutingTestUserModel extends Model
     }
 
     public function firstOrFail()
+    {
+        return $this;
+    }
+}
+
+class RoutingTestPostModel extends Model
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function first()
     {
         return $this;
     }

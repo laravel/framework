@@ -502,6 +502,17 @@ class Route
         return $this->bindingFields[$parameter] ?? null;
     }
 
+    public function parentOfParameter($parameter)
+    {
+        $key = array_search($parameter, array_keys($this->parameters));
+
+        if ($key === 0) {
+            return;
+        }
+
+        return array_values($this->parameters)[$key - 1];
+    }
+
     /**
      * Set a default value for the route.
      *

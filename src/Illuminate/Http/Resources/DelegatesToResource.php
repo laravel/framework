@@ -44,6 +44,21 @@ trait DelegatesToResource
     }
 
     /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  string   $childType
+     * @param  mixed   $value
+     * @param  string|null  $field
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function resolveChildRouteBinding($childType, $value, $field = null)
+    {
+        throw new Exception('Resources may not be implicitly resolved from route bindings.');
+    }
+
+    /**
      * Determine if the given attribute exists.
      *
      * @param  mixed  $offset
