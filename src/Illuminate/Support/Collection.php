@@ -1054,13 +1054,13 @@ class Collection implements ArrayAccess, Enumerable
      * @param  callable|null  $callback
      * @return static
      */
-    public function sort(callable $callback = null)
+    public function sort($callback = null)
     {
         $items = $this->items;
 
-        $callback
+        $callback && is_callable($callback)
             ? uasort($items, $callback)
-            : asort($items);
+            : asort($items, $callback);
 
         return new static($items);
     }

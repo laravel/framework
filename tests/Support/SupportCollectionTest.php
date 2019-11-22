@@ -1342,6 +1342,12 @@ class SupportCollectionTest extends TestCase
 
         $data = (new $collection(['foo', 'bar-10', 'bar-1']))->sort();
         $this->assertEquals(['bar-1', 'bar-10', 'foo'], $data->values()->all());
+
+        $data = (new $collection(['T2', 'T1', 'T10']))->sort();
+        $this->assertEquals(['T1', 'T10', 'T2'], $data->values()->all());
+
+        $data = (new $collection(['T2', 'T1', 'T10']))->sort(SORT_NATURAL);
+        $this->assertEquals(['T1', 'T2', 'T10'], $data->values()->all());
     }
 
     /**
