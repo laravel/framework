@@ -39,6 +39,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('exists:table,NULL,foo,"bar"', (string) $rule);
 
+        $rule = new Exists(User::class);
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:users,NULL,foo,"bar"', (string) $rule);
+
         $rule = new Exists('table', 'column');
         $rule->where('foo', 'bar');
         $this->assertSame('exists:table,column,foo,"bar"', (string) $rule);
@@ -194,9 +198,6 @@ class User extends Eloquent
     public $timestamps = false;
 }
 
-/**
- * Eloquent Models.
- */
 class NoTableNameModel extends Eloquent
 {
     protected $guarded = [];
