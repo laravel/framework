@@ -267,6 +267,22 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertSame([1 => $two, 2 => $three], $duplicates);
     }
 
+    public function testCollectionIntersectWithNull()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturn(2);
+
+        $three = m::mock(Model::class);
+        $three->shouldReceive('getKey')->andReturn(3);
+
+        $c1 = new Collection([$one, $two, $three]);
+
+        $this->assertEquals([], $c1->intersect(null)->all());
+    }
+
     public function testCollectionIntersectsWithGivenCollection()
     {
         $one = m::mock(Model::class);

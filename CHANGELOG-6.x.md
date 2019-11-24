@@ -2,6 +2,20 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.5.2...6.x)
 
+### Added
+- Allowed explicit Model definitions in database rules ([#30653](https://github.com/laravel/framework/pull/30653), [9beceac](https://github.com/laravel/framework/commit/9beceacb1a1b8ba37cd0f775cb2fb81e21ba4c31))
+- Allowed `ResponseFactory::view()` to return first view ([#30651](https://github.com/laravel/framework/pull/30651))
+- Added `Foundation\Testing\Concerns\InteractsWithDatabase::assertDeleted()` method ([#30648](https://github.com/laravel/framework/pull/30648))
+- Added `Illuminate\Routing\Router::head()` ([#30646](https://github.com/laravel/framework/pull/30646))
+
+### Fixed
+- Fixed errors in `Illuminate\Http\Testing\FileFactory::create()` ([#30632](https://github.com/laravel/framework/pull/30632))
+
+### TODO:
+- Added options to encrypt data with Azure Key vault ([#30636](https://github.com/laravel/framework/pull/30636))
+- Fix routing bug that causes missing parameters to be ignored ([#30659](https://github.com/laravel/framework/pull/30659))
+- Update 'windows_os()' helper to use PHP_OS_FAMILY ([#30660](https://github.com/laravel/framework/pull/30660))
+
 
 ## [v6.5.2 (2019-11-19)](https://github.com/laravel/framework/compare/v6.5.1...v6.5.2)
 

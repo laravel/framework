@@ -100,6 +100,48 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
+    public function testAssertDeletedPassesWhenDoesNotFindResults()
+    {
+        $this->mockCountBuilder(0);
+
+        $this->assertDatabaseMissing($this->table, $this->data);
+    }
+
+    public function testAssertDeletedFailsWhenFindsResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $builder = $this->mockCountBuilder(1);
+
+        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
+
+        $this->assertDatabaseMissing($this->table, $this->data);
+    }
+
+    public function testAssertDeletedPassesWhenDoesNotFindModelResults()
+    {
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertDeleted(new ProductStub($this->data));
+    }
+
+    public function testAssertDeletedFailsWhenFindsModelResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(1);
+
+        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
+
+        $this->assertDeleted(new ProductStub($this->data));
+    }
+
     public function testAssertSoftDeletedInDatabaseFindsResults()
     {
         $this->mockCountBuilder(1);
