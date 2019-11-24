@@ -475,7 +475,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function renderForConsole($output, Throwable $e)
     {
-        (new ConsoleApplication)->renderException($e, $output);
+        (new ConsoleApplication)->renderThrowable($e, $output);
     }
 
     /**
