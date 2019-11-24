@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
@@ -13,6 +12,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrator
 {
@@ -61,7 +61,7 @@ class Migrator
     /**
      * The output interface implementation.
      *
-     * @var \Illuminate\Console\OutputStyle
+     * @var \Symfony\Component\Console\Output\OutputInterface
      */
     protected $output;
 
@@ -598,10 +598,10 @@ class Migrator
     /**
      * Set the output implementation that should be used by the console.
      *
-     * @param  \Illuminate\Console\OutputStyle  $output
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return $this
      */
-    public function setOutput(OutputStyle $output)
+    public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
 
