@@ -70,7 +70,7 @@ class PhpRedisConnector implements Connector
         return tap(new Redis, function ($client) use ($config) {
             if ($client instanceof RedisFacade) {
                 $message = 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.';
-                if (!extension_loaded('redis')) {
+                if (! extension_loaded('redis')) {
                     $message = 'Please make sure the PHP Redis extension is installed and enabled.';
                 }
                 throw new LogicException($message);
