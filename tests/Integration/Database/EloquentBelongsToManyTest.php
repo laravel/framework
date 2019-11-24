@@ -717,7 +717,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag2->id]);
     }
 
-
     public function testCanUpdateExistingPivot()
     {
         $tag = Tag::create(['name' => Str::random()]);
