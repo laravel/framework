@@ -1066,6 +1066,21 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Sort items in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortDesc($options = SORT_REGULAR)
+    {
+        $items = $this->items;
+
+        arsort($items, $options);
+
+        return new static($items);
+    }
+
+    /**
      * Sort the collection using the given callback.
      *
      * @param  callable|string  $callback
