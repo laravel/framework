@@ -426,6 +426,31 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Set a "where not in" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function wherePivotNotIn($column, $values, $boolean = 'and')
+    {
+        return $this->wherePivotIn($column, $values, $boolean, true);
+    }
+
+    /**
+     * Set an "or where not in" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  mixed   $values
+     * @return $this
+     */
+    public function orWherePivotNotIn($column, $values)
+    {
+        return $this->wherePivotNotIn($column, $values, 'or');
+    }
+
+    /**
      * Find a related model by its primary key or return new instance of the related model.
      *
      * @param  mixed  $id
