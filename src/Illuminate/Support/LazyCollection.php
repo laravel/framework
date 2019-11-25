@@ -1027,6 +1027,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Sort items in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortDesc($options = SORT_REGULAR)
+    {
+        return $this->passthru('sortDesc', func_get_args());
+    }
+
+    /**
      * Sort the collection using the given callback.
      *
      * @param  callable|string  $callback

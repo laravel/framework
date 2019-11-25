@@ -761,6 +761,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function sort(callable $callback = null);
 
     /**
+     * Sort items in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortDesc($options = SORT_REGULAR);
+
+    /**
      * Sort the collection using the given callback.
      *
      * @param  callable|string  $callback

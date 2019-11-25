@@ -1347,6 +1347,27 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSortDesc($collection)
+    {
+        $data = (new $collection([5, 3, 1, 2, 4]))->sortDesc();
+        $this->assertEquals([5, 4, 3, 2, 1], $data->values()->all());
+
+        $data = (new $collection([-1, -3, -2, -4, -5, 0, 5, 3, 1, 2, 4]))->sortDesc();
+        $this->assertEquals([5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5], $data->values()->all());
+
+        $data = (new $collection(['bar-1', 'foo', 'bar-10']))->sortDesc();
+        $this->assertEquals(['foo', 'bar-10', 'bar-1'], $data->values()->all());
+
+        $data = (new $collection(['T2', 'T1', 'T10']))->sortDesc();
+        $this->assertEquals(['T2', 'T10', 'T1'], $data->values()->all());
+
+        $data = (new $collection(['T2', 'T1', 'T10']))->sortDesc(SORT_NATURAL);
+        $this->assertEquals(['T10', 'T2', 'T1'], $data->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSortWithCallback($collection)
     {
         $data = (new $collection([5, 3, 1, 2, 4]))->sort(function ($a, $b) {
