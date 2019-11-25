@@ -7,6 +7,8 @@ use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
@@ -458,6 +460,17 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Hello', 'second' => 'World'], $c->filter(function ($item, $key) {
             return $key != 'id';
         })->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFilterByClass($collection)
+    {
+        $request = new Request();
+        $response = new Response();
+        $c = new $collection([$request, $response]);
+        $this->assertEquals([$request], $c->filterByClass(Request::class)->all());
     }
 
     /**
