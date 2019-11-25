@@ -37,14 +37,14 @@ class MigrationCreator
     /**
      * Create a new migration at the given path.
      *
-     * @param string $name
-     * @param string $path
-     * @param string|null $table
-     * @param bool $create
-     * @param array $pivot
+     * @param  string  $name
+     * @param  string  $path
+     * @param  string|null  $table
+     * @param  bool  $create
+     * @param  array  $pivot
      * @return string
      */
-    public function create($name, $path, $table = null, $create = false, $pivot = [])
+    public function create($name, $path, $table = null, $create = false, array $pivot = [])
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -70,7 +70,7 @@ class MigrationCreator
      * Ensure that a migration with the given name doesn't already exist.
      *
      * @param  string  $name
-     * @param  string  $migrationPath
+     * @param  string|null  $migrationPath
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -95,10 +95,10 @@ class MigrationCreator
      *
      * @param  string|null  $table
      * @param  bool  $create
-     * @param  $pivot
+     * @param  array  $pivot
      * @return string
      */
-    protected function getStub($table, $create, $pivot)
+    protected function getStub($table, $create, array $pivot)
     {
         if (is_null($table)) {
             return $this->files->get($this->stubPath().'/blank.stub');
@@ -107,7 +107,7 @@ class MigrationCreator
         // We also have stubs for creating new tables and modifying existing tables
         // to save the developer some typing when they are creating a new tables
         // or modifying existing tables. We'll grab the appropriate stub here.
-        $stub = $create ? ($pivot['is'] ? 'pivot.stub' : 'create.stub') : 'update.stub';
+        $stub = $create ? (isset($pivot['is']) && $pivot['is'] ? 'pivot.stub' : 'create.stub') : 'update.stub';
 
         return $this->files->get($this->stubPath()."/{$stub}");
     }
@@ -121,7 +121,7 @@ class MigrationCreator
      * @param  array  $pivot
      * @return string
      */
-    protected function populateStub($name, $stub, $table, $pivot)
+    protected function populateStub($name, $stub, $table, array $pivot)
     {
         $stub = str_replace('DummyClass', $this->getClassName($name), $stub);
 
@@ -133,7 +133,7 @@ class MigrationCreator
         }
 
         // if it's pivot table, replace fields and table names by given prefixes
-        if ($pivot['is']) {
+        if (isset($pivot['is']) && $pivot['is']) {
             [$first, $second] = explode(
                 $pivot['prefixes'] ? ',' : '_',
                 $pivot['prefixes'] ?: $table
