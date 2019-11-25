@@ -229,7 +229,11 @@ class MySqlGrammar extends Grammar
     {
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
-        return 'json_unquote(json_extract('.$field.$path.'))';
+        if (count(explode('->>', $value, 2)) > 1) {
+            return 'json_unquote(json_extract('.$field.$path.'))';
+        } else {
+            return 'json_extract('.$field.$path.')';
+        }
     }
 
     /**
@@ -243,5 +247,30 @@ class MySqlGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_extract('.$field.$path.')';
+    }
+
+    /**
+     * Split the given JSON selector into the field and the optional path and wrap them separately.
+     *
+     * @param  string  $column
+     * @return array
+     */
+    protected function wrapJsonFieldAndPath($column)
+    {
+        if (count($parts = explode('->>', $column, 2)) > 1) {
+            $field = $this->wrap($parts[0]);
+
+            $path = ', '.$this->wrapJsonPath($parts[1], '->>');
+
+            return [$field, $path];
+        } else {
+            $parts = explode('->', $column, 2);
+
+            $field = $this->wrap($parts[0]);
+
+            $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1], '->') : '';
+
+            return [$field, $path];
+        }
     }
 }
