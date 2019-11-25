@@ -367,6 +367,22 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Run a filter over each of the items for a specified class.
+     *
+     * @param  string|null  $class
+     * @return static
+     */
+    public function filterByClass(string $class = null)
+    {
+        if ($class) {
+            return (new static($this))
+                ->filter(function ($item) use ($class) {
+                    return $item instanceof $class;
+                });
+        }
+    }
+
+    /**
      * Get the first item from the enumerable passing the given truth test.
      *
      * @param  callable|null  $callback
