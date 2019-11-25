@@ -353,6 +353,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame('/base/path/bootstrap/cache/config.php', $app->getCachedConfigPath());
         $this->assertSame('/base/path/bootstrap/cache/routes.php', $app->getCachedRoutesPath());
         $this->assertSame('/base/path/bootstrap/cache/events.php', $app->getCachedEventsPath());
+        $this->assertSame('/base/path/bootstrap/cache/observers.php', $app->getCachedObserversPath());
     }
 
     public function testEnvPathsAreUsedForCachePathsWhenSpecified()
@@ -363,19 +364,22 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_CONFIG_CACHE'] = '/absolute/path/config.php';
         $_SERVER['APP_ROUTES_CACHE'] = '/absolute/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = '/absolute/path/events.php';
+        $_SERVER['APP_OBSERVERS_CACHE'] = '/absolute/path/observers.php';
 
         $this->assertSame('/absolute/path/services.php', $app->getCachedServicesPath());
         $this->assertSame('/absolute/path/packages.php', $app->getCachedPackagesPath());
         $this->assertSame('/absolute/path/config.php', $app->getCachedConfigPath());
         $this->assertSame('/absolute/path/routes.php', $app->getCachedRoutesPath());
         $this->assertSame('/absolute/path/events.php', $app->getCachedEventsPath());
+        $this->assertSame('/absolute/path/observers.php', $app->getCachedObserversPath());
 
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
             $_SERVER['APP_PACKAGES_CACHE'],
             $_SERVER['APP_CONFIG_CACHE'],
             $_SERVER['APP_ROUTES_CACHE'],
-            $_SERVER['APP_EVENTS_CACHE']
+            $_SERVER['APP_EVENTS_CACHE'],
+            $_SERVER['APP_OBSERVERS_CACHE']
         );
     }
 
@@ -387,19 +391,22 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_CONFIG_CACHE'] = 'relative/path/config.php';
         $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
+        $_SERVER['APP_OBSERVERS_CACHE'] = 'relative/path/observers.php';
 
         $this->assertSame('/base/path/relative/path/services.php', $app->getCachedServicesPath());
         $this->assertSame('/base/path/relative/path/packages.php', $app->getCachedPackagesPath());
         $this->assertSame('/base/path/relative/path/config.php', $app->getCachedConfigPath());
         $this->assertSame('/base/path/relative/path/routes.php', $app->getCachedRoutesPath());
         $this->assertSame('/base/path/relative/path/events.php', $app->getCachedEventsPath());
+        $this->assertSame('/base/path/relative/path/observers.php', $app->getCachedObserversPath());
 
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
             $_SERVER['APP_PACKAGES_CACHE'],
             $_SERVER['APP_CONFIG_CACHE'],
             $_SERVER['APP_ROUTES_CACHE'],
-            $_SERVER['APP_EVENTS_CACHE']
+            $_SERVER['APP_EVENTS_CACHE'],
+            $_SERVER['APP_OBSERVERS_CACHE']
         );
     }
 
@@ -411,19 +418,22 @@ class FoundationApplicationTest extends TestCase
         $_SERVER['APP_CONFIG_CACHE'] = 'relative/path/config.php';
         $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
+        $_SERVER['APP_OBSERVERS_CACHE'] = 'relative/path/observers.php';
 
         $this->assertSame('/relative/path/services.php', $app->getCachedServicesPath());
         $this->assertSame('/relative/path/packages.php', $app->getCachedPackagesPath());
         $this->assertSame('/relative/path/config.php', $app->getCachedConfigPath());
         $this->assertSame('/relative/path/routes.php', $app->getCachedRoutesPath());
         $this->assertSame('/relative/path/events.php', $app->getCachedEventsPath());
+        $this->assertSame('/relative/path/observers.php', $app->getCachedObserversPath());
 
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
             $_SERVER['APP_PACKAGES_CACHE'],
             $_SERVER['APP_CONFIG_CACHE'],
             $_SERVER['APP_ROUTES_CACHE'],
-            $_SERVER['APP_EVENTS_CACHE']
+            $_SERVER['APP_EVENTS_CACHE'],
+            $_SERVER['APP_OBSERVERS_CACHE']
         );
     }
 }

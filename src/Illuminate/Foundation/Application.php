@@ -968,6 +968,26 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Determine if the application observers are cached.
+     *
+     * @return bool
+     */
+    public function observersAreCached()
+    {
+        return $this['files']->exists($this->getCachedObserversPath());
+    }
+
+    /**
+     * Get the path to the observers cache file.
+     *
+     * @return string
+     */
+    public function getCachedObserversPath()
+    {
+        return $this->normalizeCachePath('APP_OBSERVERS_CACHE', 'cache/observers.php');
+    }
+
+    /**
      * Normalize a relative or absolute path to a cache file.
      *
      * @param  string  $key

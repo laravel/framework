@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Support\Providers;
 
 use Illuminate\Foundation\Events\DiscoverEvents;
+use Illuminate\Foundation\Observers\DiscoverObservers;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +24,13 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [];
 
     /**
+     * The observer mappings for the application.
+     *
+     * @var array
+     */
+    protected $observe = [];
+
+    /**
      * Register the application's event listeners.
      *
      * @return void
@@ -39,6 +47,14 @@ class EventServiceProvider extends ServiceProvider
 
         foreach ($this->subscribe as $subscriber) {
             Event::subscribe($subscriber);
+        }
+
+        $observers = $this->getObservers();
+
+        foreach ($observers as $model => $modelObservers) {
+            foreach (array_unique($modelObservers) as $observer) {
+                $model::observe($observer);
+            }
         }
     }
 
@@ -121,6 +137,57 @@ class EventServiceProvider extends ServiceProvider
     {
         return [
             $this->app->path('Listeners'),
+        ];
+    }
+
+    /**
+     * Get the observers.
+     *
+     * @return array
+     */
+    public function observes()
+    {
+        return $this->observe;
+    }
+
+    /**
+     * Determine if observers should be automatically discovered.
+     *
+     * @return bool
+     */
+    public function shouldDiscoverObservers()
+    {
+        return false;
+    }
+
+    /**
+     * Discover the observers for the application.
+     *
+     * @return array
+     */
+    public function discoverObservers()
+    {
+        return collect($this->discoverObserversWithin())
+                    ->reject(function ($directory) {
+                        return ! is_dir($directory);
+                    })
+                    ->reduce(function ($discovered, $directory) {
+                        return array_merge_recursive(
+                            $discovered,
+                            DiscoverObservers::within($directory, base_path())
+                        );
+                    }, []);
+    }
+
+    /**
+     * Get the observer directories that should be used to discover observers.
+     *
+     * @return array
+     */
+    protected function discoverObserversWithin()
+    {
+        return [
+            $this->app->path('Observers'),
         ];
     }
 }
