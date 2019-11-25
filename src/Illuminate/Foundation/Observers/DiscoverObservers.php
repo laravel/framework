@@ -30,7 +30,7 @@ class DiscoverObservers
      * Get all of the observers and their corresponding models.
      *
      * @param  iterable  $observers
-     * @param  string    $basePath
+     * @param  string  $basePath
      * @return arrays
      */
     protected static function getObservers($observers, $basePath)
@@ -63,8 +63,8 @@ class DiscoverObservers
     /**
      * Extract the class name from the given file path.
      *
-     * @param \SplFileInfo $file
-     * @param string       $basePath
+     * @param  \SplFileInfo  $file
+     * @param  string  $basePath
      * @return string
      */
     protected static function classFromFile(SplFileInfo $file, $basePath)
