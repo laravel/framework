@@ -690,6 +690,65 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
+    public function testOrWherePivotInMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => 'baz'],
+        ]);
+
+        $relationTags = $post->tags()->wherePivotIn('flag', ['foo'])->orWherePivotIn('flag', ['baz'])->get();
+        $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag3->id]);
+    }
+
+    public function testWherePivotNotInMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+        ]);
+
+        $relationTag = $post->tags()->wherePivotNotIn('flag', ['foo'])->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag2->getAttributes());
+    }
+
+    public function testOrWherePivotNotInMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => 'baz'],
+        ]);
+
+        $relationTags = $post->tags()->wherePivotIn('flag', ['foo'])->orWherePivotNotIn('flag', ['baz'])->get();
+        $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag2->id]);
+    }
+
     public function testCanUpdateExistingPivot()
     {
         $tag = Tag::create(['name' => Str::random()]);
