@@ -2,9 +2,9 @@
 
 namespace Illuminate\Http;
 
-use Exception;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Throwable;
 
 trait ResponseTrait
 {
@@ -18,7 +18,7 @@ trait ResponseTrait
     /**
      * The exception that triggered the error response (if applicable).
      *
-     * @var \Exception|null
+     * @var \Throwable|null
      */
     public $exception;
 
@@ -129,10 +129,10 @@ trait ResponseTrait
     /**
      * Set the exception to attach to the response.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return $this
      */
-    public function withException(Exception $e)
+    public function withException(Throwable $e)
     {
         $this->exception = $e;
 

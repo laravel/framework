@@ -14,7 +14,6 @@ class HttpUploadedFileTest extends TestCase
             'test.txt',
             null,
             null,
-            null,
             true
         );
 

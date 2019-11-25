@@ -4,7 +4,6 @@ namespace Illuminate\View;
 
 use ArrayAccess;
 use BadMethodCallException;
-use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\MessageProvider;
@@ -98,10 +97,6 @@ class View implements ArrayAccess, Htmlable, ViewContract
             $this->factory->flushStateIfDoneRendering();
 
             return ! is_null($response) ? $response : $contents;
-        } catch (Exception $e) {
-            $this->factory->flushState();
-
-            throw $e;
         } catch (Throwable $e) {
             $this->factory->flushState();
 

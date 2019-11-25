@@ -20,7 +20,6 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Response;
 
 if (! function_exists('abort')) {
@@ -662,13 +661,8 @@ if (! function_exists('report')) {
      * @param  \Throwable  $exception
      * @return void
      */
-    function report($exception)
+    function report(Throwable $exception)
     {
-        if ($exception instanceof Throwable &&
-            ! $exception instanceof Exception) {
-            $exception = new FatalThrowableError($exception);
-        }
-
         app(ExceptionHandler::class)->report($exception);
     }
 }

@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2.5",
         "ext-json": "*",
         "erusev/parsedown": "^1.7",
         "illuminate/container": "^7.0",
@@ -22,7 +22,7 @@
         "illuminate/support": "^7.0",
         "psr/log": "^1.0",
         "swiftmailer/swiftmailer": "^6.0",
-        "tijsverkoyen/css-to-inline-styles": "^2.2.1"
+        "tijsverkoyen/css-to-inline-styles": "^2.2.2"
     },
     "autoload": {
         "psr-4": {

@@ -150,6 +150,6 @@ class ClearCommandTestStub extends ClearCommand
 {
     public function call($command, array $arguments = [])
     {
-        //
+        return 0;
     }
 }
