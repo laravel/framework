@@ -81,7 +81,7 @@ class MigrateMakeCommand extends BaseCommand
 
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
-        // to pass a table name into this opt   ion as a short-cut for creating.
+        // to pass a table name into this option as a short-cut for creating.
         if (! $table && is_string($create)) {
             $table = $create;
 
@@ -106,13 +106,13 @@ class MigrateMakeCommand extends BaseCommand
     /**
      * Write the migration file to disk.
      *
-     * @param string $name
-     * @param string $table
-     * @param bool $create
-     * @param $pivot
+     * @param  string  $name
+     * @param  string  $table
+     * @param  bool  $create
+     * @param  array  $pivot
      * @return string
      */
-    protected function writeMigration($name, $table, $create, $pivot)
+    protected function writeMigration($name, $table, $create, array $pivot)
     {
         $file = $this->creator->create(
             $name, $this->getMigrationPath(), $table, $create, $pivot
