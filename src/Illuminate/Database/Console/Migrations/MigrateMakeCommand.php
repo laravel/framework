@@ -76,12 +76,12 @@ class MigrateMakeCommand extends BaseCommand
 
         $pivot = [
             'is' => $this->input->getOption('pivot') ?: false,
-            'prefixes' => $this->input->getOption('pivot-prefixes')
+            'prefixes' => $this->input->getOption('pivot-prefixes'),
         ];
 
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
-        // to pass a table name into this option as a short-cut for creating.
+        // to pass a table name into this opt   ion as a short-cut for creating.
         if (! $table && is_string($create)) {
             $table = $create;
 

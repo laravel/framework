@@ -43,7 +43,6 @@ class MigrationCreator
      * @param bool $create
      * @param array $pivot
      * @return string
-     *
      */
     public function create($name, $path, $table = null, $create = false, $pivot = [])
     {
@@ -140,8 +139,8 @@ class MigrationCreator
                 $pivot['prefixes'] ?: $table
             );
             $stub = str_replace(
-                ['firstPivotId','secondPivotId','firstPivotTable','secondPivotTable'],
-                [$first.'_id', $second."_id", Str::plural($first), Str::plural($second)],
+                ['firstPivotId', 'secondPivotId', 'firstPivotTable', 'secondPivotTable'],
+                [$first.'_id', $second.'_id', Str::plural($first), Str::plural($second)],
                 $stub
             );
         }
