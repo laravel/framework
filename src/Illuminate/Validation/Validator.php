@@ -204,7 +204,6 @@ class Validator implements ValidatorContract
     public function __construct(Translator $translator, array $data, array $rules,
                                 array $messages = [], array $customAttributes = [])
     {
-        $this->initialRules = $rules;
         $this->translator = $translator;
         $this->customMessages = $messages;
         $this->data = $this->parseData($data);
