@@ -896,15 +896,13 @@ if (! function_exists('__')) {
      * @param  string|null  $key
      * @param  array  $replace
      * @param  string|null  $locale
-     * @return string|array|null
+     * @return string
      */
     function __($key = null, $replace = [], $locale = null)
     {
-        if (is_null($key)) {
-            return $key;
-        }
+        $value = trans($key, $replace, $locale);
 
-        return trans($key, $replace, $locale);
+        return is_string($value) ? $value : $key;
     }
 }
 
