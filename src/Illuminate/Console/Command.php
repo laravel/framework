@@ -589,6 +589,28 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Set the input interface implementation.
+     *
+     * @param InputInterface $input
+     * @return void
+     */
+    public function setInput(InputInterface $input)
+    {
+        $this->input = $input;
+    }
+
+    /**
+     * Set the output interface implementation.
+     *
+     * @param OutputStyle $output
+     * @return void
+     */
+    public function setOutput(OutputStyle $output)
+    {
+        $this->output = $output;
+    }
+
+    /**
      * Set the verbosity level.
      *
      * @param  string|int  $level
