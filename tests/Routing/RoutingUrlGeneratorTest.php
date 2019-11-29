@@ -652,7 +652,7 @@ class RoutingUrlGeneratorTest extends TestCase
     }
 
     /**
-     * Test that a route can be build from a model instance
+     * Test that a route can be build from a model instance.
      */
     public function testGetBuildingRouteFromModel()
     {
@@ -661,7 +661,7 @@ class RoutingUrlGeneratorTest extends TestCase
             $request = Request::create('http://www.foo.com/')
         );
 
-        $route = new Route(['GET'], 'foo/{name}', function(){
+        $route = new Route(['GET'], 'foo/{name}', function () {
             return true;
         });
         $route->name('route');
@@ -674,7 +674,7 @@ class RoutingUrlGeneratorTest extends TestCase
     }
 
     /**
-     * Test a route can be built from a model with a relationship
+     * Test a route can be built from a model with a relationship.
      */
     public function testGetBuildingRouteFromModelWithRelationship()
     {
@@ -683,7 +683,7 @@ class RoutingUrlGeneratorTest extends TestCase
             $request = Request::create('http://www.foo.com/')
         );
 
-        $route = new Route(['GET'], 'foo/{name}/{child->name}', function(){
+        $route = new Route(['GET'], 'foo/{name}/{child->name}', function () {
             return true;
         });
         $route->name('route');
@@ -727,21 +727,22 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame(
             'http://www.foo.com/foo/test/test-child/something',
             $urlGenerator->routeFromModel('route', $model, [
-                'extra' => 'something'
+                'extra' => 'something',
             ])
         );
     }
 }
 
-class ModelTest extends Model {
-
-    public function child(){
+class ModelTest extends Model
+{
+    public function child()
+    {
         return $this->hasOne(ModelChildTest::class);
     }
 }
 
-class ModelChildTest extends Model {
-
+class ModelChildTest extends Model
+{
 }
 
 class RoutableInterfaceStub implements UrlRoutable
