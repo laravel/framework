@@ -78,6 +78,7 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "^3.0",
+        "cheprasov/php-redis-client": "^1.9",
         "doctrine/dbal": "^2.6",
         "filp/whoops": "^2.4",
         "guzzlehttp/guzzle": "^6.3",

@@ -551,6 +551,7 @@ class RedisConnectionTest extends TestCase
     {
         $connections = [
             'predis' => $this->redis['predis']->connection(),
+            'redisclient' => $this->redis['redisclient']->connection(),
             'phpredis' => $this->redis['phpredis']->connection(),
         ];
 
