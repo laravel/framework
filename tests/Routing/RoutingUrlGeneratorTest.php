@@ -710,7 +710,7 @@ class RoutingUrlGeneratorTest extends TestCase
             $request = Request::create('http://www.foo.com/')
         );
 
-        $route = new Route(['GET'], 'foo/{name}/{child->name}/{extra}', function(){
+        $route = new Route(['GET'], 'foo/{name}/{child->name}/{extra}', function () {
             return true;
         });
         $route->name('route');
