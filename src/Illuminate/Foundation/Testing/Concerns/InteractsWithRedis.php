@@ -93,6 +93,7 @@ trait InteractsWithRedis
     {
         return [
             ['predis'],
+            ['redisclient'],
             ['phpredis'],
         ];
     }

@@ -25,6 +25,7 @@
     },
     "suggest": {
         "ext-redis": "Required to use the phpredis connector.",
+        "cheprasov/php-redis-client": "Required to use the redisclient connector (^1.9).",
         "predis/predis": "Required to use the predis connector (^1.0)."
     },
     "extra": {
