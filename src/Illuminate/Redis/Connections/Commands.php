@@ -49,7 +49,7 @@ trait Commands
     }
 
     /**
-     * Delete the given keys
+     * Delete the given keys.
      *
      * @param  mixed  $keys
      * @return int

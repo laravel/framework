@@ -4,7 +4,6 @@ namespace Illuminate\Redis\Connections;
 
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Redis;
-use RedisCluster;
 
 /**
  * @mixin \Redis
