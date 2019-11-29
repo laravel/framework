@@ -798,9 +798,9 @@ if (! function_exists('route_from_model')) {
      * You can change the route to be:
      *      '/test/{name}/{id}/{group->default_blurb->id}/{group->name}/{group->id}'
      * And the route will successfully change, as all the extra parts can be extracted from the Model.
-     * Relationships can be called and/or chained with "->" (Imagine Model is a CustomerSurveyAnswer):
-     *      {header->customer->site->group->default_blurb->blurb}
-     * Would get the related groups default blurb (which is a custom attribute, which also is valid)
+     * Relationships can be called and/or chained with "->" (Imagine Model is a Order):
+     *      {customer->address->postcode}
+     * Would get the postcode of the customer who owns the order.
      * @param string $routeName The route you want to use
      * @param Model $model
      * @param array $data
