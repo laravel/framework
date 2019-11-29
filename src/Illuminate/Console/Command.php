@@ -592,7 +592,7 @@ class Command extends SymfonyCommand
      * Set the input interface implementation.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface $input
-     * @return  void
+     * @return void
      */
     public function setInput(InputInterface $input)
     {
@@ -603,7 +603,7 @@ class Command extends SymfonyCommand
      * Set the output interface implementation.
      *
      * @param  \Illuminate\Console\OutputStyle $output
-     * @return  void
+     * @return void
      */
     public function setOutput(OutputStyle $output)
     {
