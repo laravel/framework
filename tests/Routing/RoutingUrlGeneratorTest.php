@@ -260,6 +260,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
         $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional'));
         $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional', ['baz' => null]));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional', ['baz' => '']));
         $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', 'taylor'));
         $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', ['taylor']));
         $this->assertSame('http://www.foo.com/foo/bar/taylor?breeze', $url->route('optional', ['taylor', 'breeze']));
@@ -501,7 +502,18 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
-    public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
+    public function providerRouteParameters() {
+        return [
+            [['test' => 123]],
+            [['one' => null, 'test' => 123]],
+            [['one' => '', 'test' => 123]],
+        ];
+    }
+
+    /**
+     * @dataProvider providerRouteParameters
+     */
+    public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters($parameters)
     {
         $this->expectException(UrlGenerationException::class);
 
@@ -515,7 +527,7 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
-        $this->assertSame('http://www.foo.com:8080/foo?test=123', $url->route('foo', ['test' => 123]));
+        $this->assertSame('http://www.foo.com:8080/foo?test=123', $url->route('foo', $parameters));
     }
 
     public function testForceRootUrl()

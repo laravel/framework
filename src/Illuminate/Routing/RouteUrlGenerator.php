@@ -222,8 +222,8 @@ class RouteUrlGenerator
                 return Arr::pull($parameters, $m[1]);
             } elseif (isset($this->defaultParameters[$m[1]])) {
                 return $this->defaultParameters[$m[1]];
-            } elseif (! empty($m[2])) {
-                return Arr::pull($parameters, $m[1]);
+            } elseif (isset($parameters[$m[1]])) {
+                Arr::pull($parameters, $m[1]);
             }
 
             return $m[0];
