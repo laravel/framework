@@ -207,7 +207,7 @@ class BelongsTo extends Relation
 
         if ($model instanceof Model) {
             $this->child->setRelation($this->relationName, $model);
-        } elseif ($this->child->isDirty($this->foreignKey)) {
+        } else {
             $this->child->unsetRelation($this->relationName);
         }
 
