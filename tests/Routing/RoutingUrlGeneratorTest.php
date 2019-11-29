@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
@@ -649,6 +650,98 @@ class RoutingUrlGeneratorTest extends TestCase
 
         Request::create($url->signedRoute('foo', ['signature' => 'bar']));
     }
+
+    /**
+     * Test that a route can be build from a model instance
+     */
+    public function testGetBuildingRouteFromModel()
+    {
+        $urlGenerator = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{name}', function(){
+            return true;
+        });
+        $route->name('route');
+        $routes->add($route);
+
+        $model = new ModelTest();
+        $model->name = 'test';
+
+        $this->assertSame('http://www.foo.com/foo/test', $urlGenerator->routeFromModel('route', $model));
+    }
+
+    /**
+     * Test a route can be built from a model with a relationship
+     */
+    public function testGetBuildingRouteFromModelWithRelationship()
+    {
+        $urlGenerator = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{name}/{child->name}', function(){
+            return true;
+        });
+        $route->name('route');
+        $routes->add($route);
+
+        $model = new ModelTest();
+        $model->name = 'test';
+
+        $modelChild = new ModelChildTest();
+        $modelChild->name = 'test-child';
+
+        $model->setRelation('child', $modelChild);
+
+        $this->assertSame('http://www.foo.com/foo/test/test-child', $urlGenerator->routeFromModel('route', $model));
+    }
+
+    /**
+     * Test you can pass extra data along with a model.
+     */
+    public function testGetBuildingRouteFromModelAndStaticData()
+    {
+        $urlGenerator = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo/{name}/{child->name}/{extra}', function(){
+            return true;
+        });
+        $route->name('route');
+        $routes->add($route);
+
+        $model = new ModelTest();
+        $model->name = 'test';
+
+        $modelChild = new ModelChildTest();
+        $modelChild->name = 'test-child';
+
+        $model->setRelation('child', $modelChild);
+
+        $this->assertSame(
+            'http://www.foo.com/foo/test/test-child/something',
+            $urlGenerator->routeFromModel('route', $model, [
+                'extra' => 'something'
+            ])
+        );
+    }
+}
+
+class ModelTest extends Model {
+
+    public function child(){
+        return $this->hasOne(ModelChildTest::class);
+    }
+}
+
+class ModelChildTest extends Model {
+
 }
 
 class RoutableInterfaceStub implements UrlRoutable

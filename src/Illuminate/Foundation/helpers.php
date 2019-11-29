@@ -13,6 +13,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -780,6 +781,34 @@ if (! function_exists('route')) {
     function route($name, $parameters = [], $absolute = true)
     {
         return app('url')->route($name, $parameters, $absolute);
+    }
+}
+
+if (! function_exists('route_from_model')) {
+    /**
+     * This allows a route to be dynamically built just from a Model instance.
+     * Imagine a route called "test":
+     *      '/test/{name}/{id}'
+     * Calling:
+     *      Router::fromModel('test', Site::find(8));
+     * will successfully build the route, as "name" and "id" are both attributes on the Site model.
+     *
+     * Further more, once using "fromModel", the route can be changed. Without changing the call:
+     *      Router::fromModel('test', Site::find(8));
+     * You can change the route to be:
+     *      '/test/{name}/{id}/{group->default_blurb->id}/{group->name}/{group->id}'
+     * And the route will successfully change, as all the extra parts can be extracted from the Model.
+     * Relationships can be called and/or chained with "->" (Imagine Model is a CustomerSurveyAnswer):
+     *      {header->customer->site->group->default_blurb->blurb}
+     * Would get the related groups default blurb (which is a custom attribute, which also is valid)
+     * @param string $routeName The route you want to use
+     * @param Model $model
+     * @param array $data
+     * @return string
+     */
+    function route_from_model(string $routeName, Model $model, array $data = [])
+    {
+        return app('url')->routeFromModel($routeName, $model, $data);
     }
 }
 
