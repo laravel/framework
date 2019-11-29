@@ -430,9 +430,9 @@ class UrlGenerator implements UrlGeneratorContract
      * will successfully build the route, as "name" and "id" are both attributes on the Site model.
      *
      * Further more, once using routeFromModel, the route can be changed. Without changing the call:
-     *      Router::fromModel('test', Site::find(8));
+     *      routeFromModel('test', Site::find(8));
      * You can change the route to be:
-     *      '/test/{name}/{id}/{group->default_blurb->id}/{group->name}/{group->id}'
+     *      '/test/{name}/{id}/{parent->relationship->value}/{slug}/{otherParent->value}'
      * And the route will successfully change, as all the extra parts can be extracted from the Model.
      * Relationships can be called and/or chained with "->" (Imagine Model is a Order):
      *      {customer->address->postcode}
