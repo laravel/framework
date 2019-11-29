@@ -90,7 +90,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(
             [
                 'post_id' => '1', 'tag_id' => '1', 'flag' => 'taylor',
-                'created_at' => '2017-10-10 10:10:10', 'updated_at' => '2017-10-10 10:10:10',
+                'created_at' => '2017-10-10T10:10:10.000000Z', 'updated_at' => '2017-10-10T10:10:10.000000Z',
             ],
             $post->tags[0]->pivot->toArray()
         );
