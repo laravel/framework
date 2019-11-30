@@ -63,7 +63,7 @@ class Env
                 ->withReaders($adapters)
                 ->withWriters($adapters)
                 ->immutable()
-                ->get();
+                ->make();
         }
 
         return static::$repository;
