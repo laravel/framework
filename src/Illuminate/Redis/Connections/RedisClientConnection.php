@@ -2,10 +2,7 @@
 
 namespace Illuminate\Redis\Connections;
 
-use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
-use Predis\Command\ServerFlushDatabase;
-use Predis\Connection\Aggregate\ClusterInterface;
 
 /**
  * @mixin \RedisClient\RedisClient
