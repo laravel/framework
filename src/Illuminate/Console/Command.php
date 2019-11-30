@@ -377,7 +377,7 @@ class Command extends SymfonyCommand
      * Confirm a question with the user.
      *
      * @param  string  $question
-     * @param  bool    $default
+     * @param  bool  $default
      * @return bool
      */
     public function confirm($question, $default = false)
@@ -433,7 +433,7 @@ class Command extends SymfonyCommand
      * Prompt the user for input but hide the answer from the console.
      *
      * @param  string  $question
-     * @param  bool    $fallback
+     * @param  bool  $fallback
      * @return mixed
      */
     public function secret($question, $fallback = true)
@@ -449,10 +449,10 @@ class Command extends SymfonyCommand
      * Give the user a single choice from an array of answers.
      *
      * @param  string  $question
-     * @param  array   $choices
+     * @param  array  $choices
      * @param  string|null  $default
-     * @param  mixed|null   $attempts
-     * @param  bool|null    $multiple
+     * @param  mixed|null  $attempts
+     * @param  bool|null  $multiple
      * @return string
      */
     public function choice($question, array $choices, $default = null, $attempts = null, $multiple = null)
@@ -467,10 +467,10 @@ class Command extends SymfonyCommand
     /**
      * Format input to textual table.
      *
-     * @param  array   $headers
+     * @param  array  $headers
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  string  $tableStyle
-     * @param  array   $columnStyles
+     * @param  array  $columnStyles
      * @return void
      */
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
@@ -586,6 +586,28 @@ class Command extends SymfonyCommand
         $this->comment(str_repeat('*', $length));
 
         $this->output->newLine();
+    }
+
+    /**
+     * Set the input interface implementation.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @return void
+     */
+    public function setInput(InputInterface $input)
+    {
+        $this->input = $input;
+    }
+
+    /**
+     * Set the output interface implementation.
+     *
+     * @param  \Illuminate\Console\OutputStyle  $output
+     * @return void
+     */
+    public function setOutput(OutputStyle $output)
+    {
+        $this->output = $output;
     }
 
     /**

@@ -5,7 +5,6 @@ namespace Illuminate\Support\Facades;
 /**
  * @method static \Illuminate\Routing\Route fallback(\Closure|array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route get(string $uri, \Closure|array|string|callable|null $action = null)
- * @method static \Illuminate\Routing\Route head(string $uri, \Closure|array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route post(string $uri, \Closure|array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route put(string $uri, \Closure|array|string|callable|null $action = null)
  * @method static \Illuminate\Routing\Route delete(string $uri, \Closure|array|string|callable|null $action = null)
