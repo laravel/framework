@@ -52,6 +52,13 @@ class Migrator
     protected $connection;
 
     /**
+     * The connection name before migration is run.
+     *
+     * @var string
+     */
+    protected $previousConnection = null;
+
+    /**
      * The paths to all of the migration files.
      *
      * @var array
@@ -141,6 +148,8 @@ class Migrator
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to migrate.</info>');
 
+            $this->restorePriorConnection();
+
             return;
         }
 
@@ -165,6 +174,8 @@ class Migrator
                 $batch++;
             }
         }
+
+        $this->restorePriorConnection();
 
         $this->fireMigrationEvent(new MigrationsEnded);
     }
@@ -223,6 +234,8 @@ class Migrator
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
+            $this->restorePriorConnection();
+
             return [];
         }
 
@@ -280,6 +293,8 @@ class Migrator
             );
         }
 
+        $this->restorePriorConnection();
+
         $this->fireMigrationEvent(new MigrationsEnded);
 
         return $rolledBack;
@@ -301,6 +316,8 @@ class Migrator
 
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to rollback.</info>');
+
+            $this->restorePriorConnection();
 
             return [];
         }
@@ -528,7 +545,8 @@ class Migrator
      */
     public function setConnection($name)
     {
-        if (! is_null($name)) {
+        if ($name) {
+            $this->previousConnection = $this->resolver->getDefaultConnection();
             $this->resolver->setDefaultConnection($name);
         }
 
@@ -546,6 +564,20 @@ class Migrator
     public function resolveConnection($connection)
     {
         return $this->resolver->connection($connection ?: $this->connection);
+    }
+
+    /**
+     * Restore prior connection after migration runs.
+     *
+     * @param  string  $passedPreviousConnection
+     *
+     * @return void
+     */
+    public function restorePriorConnection($passedPreviousConnection = null)
+    {
+        if ($previousConnection = $passedPreviousConnection ?? $this->previousConnection) {
+            $this->resolver->setDefaultConnection($previousConnection);
+        }
     }
 
     /**
