@@ -50,6 +50,7 @@ class StatusCommand extends BaseCommand
     public function handle()
     {
         $previousConnection = $this->migrator->getConnection();
+
         $this->migrator->setConnection($this->option('database'));
 
         if (! $this->migrator->repositoryExists()) {

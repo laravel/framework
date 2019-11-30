@@ -28,13 +28,13 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->db = $db = new DB;
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ]);
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ], 'sqlite2');
 
         $db->setAsGlobal();
@@ -61,6 +61,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         $repository2 = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations');
         $repository2->setSource('sqlite2');
+
         if (! $repository2->repositoryExists()) {
             $repository2->createRepository();
         }

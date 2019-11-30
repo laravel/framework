@@ -547,6 +547,7 @@ class Migrator
     {
         if ($name) {
             $this->previousConnection = $this->resolver->getDefaultConnection();
+
             $this->resolver->setDefaultConnection($name);
         }
 
@@ -570,7 +571,6 @@ class Migrator
      * Restore prior connection after migration runs.
      *
      * @param  string  $passedPreviousConnection
-     *
      * @return void
      */
     public function restorePriorConnection($passedPreviousConnection = null)
