@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\PaginatedResourceResponse;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -484,6 +485,53 @@ class ResourceTest extends TestCase
                 'total' => 10,
             ],
         ]);
+    }
+
+    public function testPaginatorResourceCanPreserveQueryParameters()
+    {
+        PaginatedResourceResponse::preserveQueryParameters();
+
+        Route::get('/', function () {
+            $collection = collect([new Post(['id' => 2, 'title' => 'Laravel Nova'])]);
+
+            $paginator = new LengthAwarePaginator(
+                $collection, 3, 1, 2
+            );
+
+            return new PostCollectionResource($paginator);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/?framework=laravel&author=Otwell&page=2', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 2,
+                    'title' => 'Laravel Nova',
+                ],
+            ],
+            'links' => [
+                'first' => '/?framework=laravel&author=Otwell&page=1',
+                'last' => '/?framework=laravel&author=Otwell&page=3',
+                'prev' => '/?framework=laravel&author=Otwell&page=1',
+                'next' => '/?framework=laravel&author=Otwell&page=3',
+            ],
+            'meta' => [
+                'current_page' => 2,
+                'from' => 2,
+                'last_page' => 3,
+                'path' => '/',
+                'per_page' => 1,
+                'to' => 2,
+                'total' => 3,
+            ],
+        ]);
+
+        PaginatedResourceResponse::ignoreQueryParameters();
     }
 
     public function testToJsonMayBeLeftOffOfCollection()

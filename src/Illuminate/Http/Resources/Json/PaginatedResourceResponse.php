@@ -7,6 +7,33 @@ use Illuminate\Support\Arr;
 class PaginatedResourceResponse extends ResourceResponse
 {
     /**
+     * Determines whether to preserve all query parameters when generating the navigation links.
+     *
+     * @var bool
+     */
+    private static $queryParameters;
+
+    /**
+     * Preserve all query parameters when generating the navigation links.
+     *
+     * @return void
+     */
+    public static function preserveQueryParameters()
+    {
+        self::$queryParameters = true;
+    }
+
+    /**
+     * Restore default behavior of ignoring query parameters when generating the navigation links.
+     *
+     * @return void
+     */
+    public static function ignoreQueryParameters()
+    {
+        self::$queryParameters = false;
+    }
+
+    /**
      * Create an HTTP response that represents the object.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -39,6 +66,10 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     protected function paginationInformation($request)
     {
+        if (self::$queryParameters) {
+            $this->resource->appends($request->query());
+        }
+
         $paginated = $this->resource->resource->toArray();
 
         return [
