@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 language: php
 
 env:
@@ -17,7 +17,7 @@ matrix:
     - php: 7.3
     - php: 7.3
       env: SETUP=lowest
-    - php: 7.4snapshot
+    - php: 7.4
 
 cache:
   directories:
