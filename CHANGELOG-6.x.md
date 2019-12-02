@@ -2,6 +2,11 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.6.0...6.x)
 
+### TODO
+- Force usage getting timestamps columns ([#30697](https://github.com/laravel/framework/pull/30697))
+- Revert adding head method to router ([#30710](https://github.com/laravel/framework/pull/30710))
+- Allow commands to overwrite their input and output handlers ([#30706](https://github.com/laravel/framework/pull/30706))
+
 
 ## [v6.6.0 (2019-11-26)](https://github.com/laravel/framework/compare/v6.5.2...v6.6.0)
 
