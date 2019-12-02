@@ -99,7 +99,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @return array
      */
-    protected function elements()
+    public function elements()
     {
         $window = UrlWindow::make($this);
 
