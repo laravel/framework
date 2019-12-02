@@ -75,6 +75,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->increments('id');
                 $table->string('name')->nullable();
                 $table->string('email');
+                $table->timestamp('birthday', 6)->nullable();
                 $table->timestamps();
             });
 
@@ -1203,28 +1204,74 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $now = Carbon::now();
         $nowSerialized = $now->startOfSecond()->toJSON();
+        $nowWithFractionsSerialized = $now->toJSON();
         Carbon::setTestNow($now);
 
-        $storedUser1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        $storedUser1->newQuery()->update(['email' => 'dev@mathieutu.ovh', 'name' => 'Mathieu TUDISCO']);
+        $storedUser1 = EloquentTestUser::create([
+            'id' => 1,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
+        $storedUser1->newQuery()->update([
+            'email' => 'dev@mathieutu.ovh',
+            'name' => 'Mathieu TUDISCO',
+        ]);
         $freshStoredUser1 = $storedUser1->fresh();
 
-        $storedUser2 = EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwell@gmail.com']);
+        $storedUser2 = EloquentTestUser::create([
+            'id' => 2,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
         $storedUser2->newQuery()->update(['email' => 'dev@mathieutu.ovh']);
         $freshStoredUser2 = $storedUser2->fresh();
 
-        $notStoredUser = new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']);
+        $notStoredUser = new EloquentTestUser([
+            'id' => 3,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
         $freshNotStoredUser = $notStoredUser->fresh();
 
-        $this->assertEquals(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'created_at' => $nowSerialized, 'updated_at' => $nowSerialized], $storedUser1->toArray());
-        $this->assertEquals(['id' => 1, 'name' => 'Mathieu TUDISCO', 'email' => 'dev@mathieutu.ovh', 'created_at' => $nowSerialized, 'updated_at' => $nowSerialized], $freshStoredUser1->toArray());
+        $this->assertEquals([
+            'id' => 1,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $storedUser1->toArray());
+        $this->assertEquals([
+            'id' => 1,
+            'name' => 'Mathieu TUDISCO',
+            'email' => 'dev@mathieutu.ovh',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $freshStoredUser1->toArray());
         $this->assertInstanceOf(EloquentTestUser::class, $storedUser1);
 
-        $this->assertEquals(['id' => 2, 'email' => 'taylorotwell@gmail.com', 'created_at' => $nowSerialized, 'updated_at' => $nowSerialized], $storedUser2->toArray());
-        $this->assertEquals(['id' => 2, 'name' => null, 'email' => 'dev@mathieutu.ovh', 'created_at' => $nowSerialized, 'updated_at' => $nowSerialized], $freshStoredUser2->toArray());
+        $this->assertEquals([
+            'id' => 2,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $storedUser2->toArray());
+        $this->assertEquals([
+            'id' => 2,
+            'name' => null,
+            'email' => 'dev@mathieutu.ovh',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $freshStoredUser2->toArray());
         $this->assertInstanceOf(EloquentTestUser::class, $storedUser2);
 
-        $this->assertEquals(['id' => 3, 'email' => 'taylorotwell@gmail.com'], $notStoredUser->toArray());
+        $this->assertEquals([
+            'id' => 3,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+        ], $notStoredUser->toArray());
         $this->assertNull($freshNotStoredUser);
     }
 
@@ -1637,6 +1684,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';
+    protected $dates = ['birthday'];
     protected $guarded = [];
 
     public function friends()
