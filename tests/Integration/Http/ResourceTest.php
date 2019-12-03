@@ -528,7 +528,6 @@ class ResourceTest extends TestCase
         ]);
     }
 
-
     public function testToJsonMayBeLeftOffOfCollection()
     {
         Route::get('/', function () {
