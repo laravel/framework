@@ -6,7 +6,7 @@
 - Support retryAfter Option on Queued Listeners ([#30743](https://github.com/laravel/framework/pull/30743))
 
 
-## [v6.6.0 (2019-12-03)](https://github.com/laravel/framework/compare/v6.6.0...v6.6.1)
+## [v6.6.1 (2019-12-03)](https://github.com/laravel/framework/compare/v6.6.0...v6.6.1)
 
 ### Added
 - Added `setInput()` and `setOutput()` methods to `Illuminate\Console\Command` ([#30706](https://github.com/laravel/framework/pull/30706))
