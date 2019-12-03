@@ -99,7 +99,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      * @param \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    private function preparePaginatedResponse($request)
+    protected function preparePaginatedResponse($request)
     {
         if ($this->queryParameters) {
             $this->resource->appends($request->query());
