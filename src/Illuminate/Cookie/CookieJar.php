@@ -140,9 +140,9 @@ class CookieJar implements JarContract
      */
     public function queue(...$parameters)
     {
-        $cookie = head($parameters);
-
-        if (! $cookie instanceof Cookie) {
+        if (head($parameters) instanceof Cookie) {
+            $cookie = head($parameters);
+        } else {
             $cookie = call_user_func_array([$this, 'make'], $parameters);
         }
 
