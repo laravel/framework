@@ -52,7 +52,7 @@ class Migrator
     protected $connection;
 
     /**
-     * The connection name before migration is run.
+     * The name of the connection before the latest migration was ran.
      *
      * @var string
      */
@@ -570,12 +570,12 @@ class Migrator
     /**
      * Restore prior connection after migration runs.
      *
-     * @param  string  $passedPreviousConnection
+     * @param  string  $connection
      * @return void
      */
-    public function restorePriorConnection($passedPreviousConnection = null)
+    public function restorePriorConnection($connection = null)
     {
-        if ($previousConnection = $passedPreviousConnection ?? $this->previousConnection) {
+        if ($previousConnection = $connection ?? $this->previousConnection) {
             $this->resolver->setDefaultConnection($previousConnection);
         }
     }
