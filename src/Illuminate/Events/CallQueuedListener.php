@@ -38,7 +38,7 @@ class CallQueuedListener implements ShouldQueue
      * @var int
      */
     public $tries;
-    
+
     /**
      * The number of seconds to wait before retrying the job.
      *
