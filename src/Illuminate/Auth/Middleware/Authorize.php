@@ -72,22 +72,12 @@ class Authorize
      */
     protected function getModel($request, $model)
     {
-        if ($this->isClassName($model)) {
+        // Checks if it looks like a fully qualified class name
+        if (strpos($model, '\\') !== false) {
             return trim($model);
         } else {
             return $request->route($model, null) ?:
                 ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches)) ? $matches[1] : null);
         }
-    }
-
-    /**
-     * Checks if the given string looks like a fully qualified class name.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    protected function isClassName($value)
-    {
-        return strpos($value, '\\') !== false;
     }
 }
