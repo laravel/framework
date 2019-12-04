@@ -114,7 +114,7 @@ class PostgresBuilder extends Builder
      *
      * @return array
      */
-    protected function getAllViews()
+    public function getAllViews()
     {
         return $this->connection->select(
             $this->grammar->compileGetAllViews((array) $this->connection->getConfig('schema'))
@@ -126,7 +126,7 @@ class PostgresBuilder extends Builder
      *
      * @return array
      */
-    protected function getAllTypes()
+    public function getAllTypes()
     {
         return $this->connection->select(
             $this->grammar->compileGetAllTypes()
