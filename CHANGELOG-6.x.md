@@ -1,11 +1,24 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.6.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.6.1...6.x)
 
 ### TODO
-- Force usage getting timestamps columns ([#30697](https://github.com/laravel/framework/pull/30697))
-- Revert adding head method to router ([#30710](https://github.com/laravel/framework/pull/30710))
-- Allow commands to overwrite their input and output handlers ([#30706](https://github.com/laravel/framework/pull/30706))
+- Support retryAfter Option on Queued Listeners ([#30743](https://github.com/laravel/framework/pull/30743))
+
+
+## [v6.6.1 (2019-12-03)](https://github.com/laravel/framework/compare/v6.6.0...v6.6.1)
+
+### Added
+- Added `setInput()` and `setOutput()` methods to `Illuminate\Console\Command` ([#30706](https://github.com/laravel/framework/pull/30706))
+
+### Fixed
+- Fixed RouteUrlGenerator with empty string for required parameter ([#30714](https://github.com/laravel/framework/pull/30714))
+
+### Changed
+- Force usage getting timestamps columns in model ([#30697](https://github.com/laravel/framework/pull/30697))
+
+### Reverted
+- Revert [Added `Illuminate\Routing\Router::head()`](https://github.com/laravel/framework/pull/30646) ([#30710](https://github.com/laravel/framework/pull/30710))
 
 
 ## [v6.6.0 (2019-11-26)](https://github.com/laravel/framework/compare/v6.5.2...v6.6.0)
