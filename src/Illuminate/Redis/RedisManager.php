@@ -114,6 +114,10 @@ class RedisManager implements Factory
             return $this->resolveCluster($name);
         }
 
+        if (isset($this->config['sentinel'][$name])) {
+            return $this->resolveSentinel($name);
+        }
+
         throw new InvalidArgumentException("Redis connection [{$name}] not configured.");
     }
 
@@ -130,6 +134,23 @@ class RedisManager implements Factory
                 return $this->parseConnectionConfiguration($config);
             }, $this->config['clusters'][$name]),
             $this->config['clusters']['options'] ?? [],
+            $this->config['options'] ?? []
+        );
+    }
+
+    /**
+     * Resolve the given sentinel connection by name.
+     *
+     * @param  string $name
+     * @return \Illuminate\Redis\Connections\Connection
+     */
+    protected function resolveSentinel($name)
+    {
+        return $this->connector()->connectToSentinel(
+            array_map(function ($config) {
+                return $this->parseConnectionConfiguration($config);
+            }, $this->config['sentinel'][$name]),
+            $this->config['sentinel']['options'] ?? [],
             $this->config['options'] ?? []
         );
     }
