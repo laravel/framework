@@ -26,7 +26,7 @@ interface ResponseFactory
     /**
      * Create a new response for a given view.
      *
-     * @param  string  $view
+     * @param  string|array  $view
      * @param  array  $data
      * @param  int  $status
      * @param  array  $headers
