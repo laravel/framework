@@ -59,6 +59,22 @@ abstract class Facade
     }
 
     /**
+     * Initiate a partial mock on the facade.
+     *
+     * @return \Mockery\MockInterface
+     */
+    public static function partialMock()
+    {
+        $name = static::getFacadeAccessor();
+
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
+
+        return $mock->makePartial();
+    }
+
+    /**
      * Initiate a mock expectation on the facade.
      *
      * @return \Mockery\Expectation
