@@ -642,9 +642,15 @@ trait HasAttributes
     {
         [$key, $path] = explode('->', $key, 2);
 
-        $this->attributes[$key] = $this->asJson($this->getArrayAttributeWithValue(
+        $value = $this->getArrayAttributeWithValue(
             $path, $key, $value
-        ));
+        );
+
+        if ($this->hasSetMutator($key)) {
+            $this->setAttribute($key, $value);
+        } else {
+            $this->attributes[$key] = $this->asJson($value);
+        }
 
         return $this;
     }

@@ -968,6 +968,14 @@ class DatabaseEloquentModelTest extends TestCase
             ['meta' => json_encode(['name' => 'foo', 'price' => 'bar', 'size' => ['width' => 'baz']])],
             $model->toArray()
         );
+
+        $model = new EloquentModelStub;
+        $model->fillable(['mutated->name']);
+        $model->fill(['mutated->name' => 'foo']);
+        $this->assertEquals(
+            ['mutated' => json_encode(['name' => 'FOO'])],
+            $model->toArray()
+        );
     }
 
     public function testUnguardAllowsAnythingToBeSet()
@@ -2001,6 +2009,11 @@ class EloquentModelStub extends Model
     public function setListItemsAttribute($value)
     {
         $this->attributes['list_items'] = json_encode($value);
+    }
+
+    public function setMutatedAttribute($value)
+    {
+        $this->attributes['mutated'] = json_encode(array_map('strtoupper', $value));
     }
 
     public function getPasswordAttribute()
