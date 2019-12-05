@@ -19,6 +19,7 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
+        "ext-pdo": "*",
         "doctrine/inflector": "^1.1",
         "dragonmantank/cron-expression": "^2.0",
         "egulias/email-validator": "^2.1.10",
