@@ -604,7 +604,7 @@ trait EnumeratesValues
     /**
      * Pass the collection to the given callback and return the result.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return mixed
      */
     public function pipe(callable $callback)

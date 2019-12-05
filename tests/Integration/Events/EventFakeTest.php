@@ -13,8 +13,7 @@ class EventFakeTest extends TestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application   $app
-     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)

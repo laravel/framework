@@ -241,7 +241,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     /**
      * Format an array of messages.
      *
-     * @param  array   $messages
+     * @param  array  $messages
      * @param  string  $format
      * @param  string  $messageKey
      * @return array

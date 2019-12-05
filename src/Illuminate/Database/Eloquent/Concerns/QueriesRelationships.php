@@ -18,7 +18,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -67,7 +67,7 @@ trait QueriesRelationships
      *
      * @param  string  $relations
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -100,7 +100,7 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orHas($relation, $operator = '>=', $count = 1)
@@ -138,7 +138,7 @@ trait QueriesRelationships
      * @param  string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
@@ -149,10 +149,10 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string    $relation
+     * @param  string  $relation
      * @param  \Closure  $callback
-     * @param  string    $operator
-     * @param  int       $count
+     * @param  string  $operator
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
@@ -175,7 +175,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string    $relation
+     * @param  string  $relation
      * @param  \Closure  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
@@ -445,7 +445,7 @@ trait QueriesRelationships
     /**
      * Add a sub-query count clause to this query.
      *
-     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean

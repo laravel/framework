@@ -213,8 +213,8 @@ trait BuildsQueries
      * Create a new simple paginator instance.
      *
      * @param  \Illuminate\Support\Collection  $items
-     * @param  int $perPage
-     * @param  int $currentPage
+     * @param  int  $perPage
+     * @param  int  $currentPage
      * @param  array  $options
      * @return \Illuminate\Pagination\Paginator
      */

@@ -248,8 +248,8 @@ class EventFake implements Dispatcher
     /**
      * Dispatch an event and call the listeners.
      *
-     * @param  string|object $event
-     * @param  mixed $payload
+     * @param  string|object  $event
+     * @param  mixed  $payload
      * @return void
      */
     public function until($event, $payload = [])

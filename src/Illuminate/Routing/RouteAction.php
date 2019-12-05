@@ -78,7 +78,7 @@ class RouteAction
     /**
      * Make an action for an invokable controller.
      *
-     * @param  string $action
+     * @param  string  $action
      * @return string
      *
      * @throws \UnexpectedValueException

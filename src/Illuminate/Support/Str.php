@@ -272,7 +272,7 @@ class Str
      * Limit the number of characters in a string.
      *
      * @param  string  $value
-     * @param  int     $limit
+     * @param  int  $limit
      * @param  string  $end
      * @return string
      */
@@ -300,7 +300,7 @@ class Str
      * Limit the number of words in a string.
      *
      * @param  string  $value
-     * @param  int     $words
+     * @param  int  $words
      * @param  string  $end
      * @return string
      */
@@ -331,7 +331,7 @@ class Str
      * Get the plural form of an English word.
      *
      * @param  string  $value
-     * @param  int     $count
+     * @param  int  $count
      * @return string
      */
     public static function plural($value, $count = 2)
@@ -343,7 +343,7 @@ class Str
      * Pluralize the last word of an English, studly caps case string.
      *
      * @param  string  $value
-     * @param  int     $count
+     * @param  int  $count
      * @return string
      */
     public static function pluralStudly($value, $count = 2)
@@ -380,7 +380,7 @@ class Str
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
-     * @param  array   $replace
+     * @param  array  $replace
      * @param  string  $subject
      * @return string
      */

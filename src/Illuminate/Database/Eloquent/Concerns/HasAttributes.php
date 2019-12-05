@@ -1156,7 +1156,7 @@ trait HasAttributes
     /**
      * Determine if the new and old values for a given key are equivalent.
      *
-     * @param  string $key
+     * @param  string  $key
      * @param  mixed  $current
      * @return bool
      */

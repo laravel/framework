@@ -94,7 +94,7 @@ interface Repository extends CacheInterface
     /**
      * Remove an item from the cache.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     public function forget($key);
