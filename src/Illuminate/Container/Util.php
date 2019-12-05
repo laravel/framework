@@ -2,6 +2,8 @@
 
 namespace Illuminate\Container;
 
+use Closure;
+
 class Util
 {
     /**
@@ -31,6 +33,6 @@ class Util
      */
     public static function unwrapIfClosure($value)
     {
-        return $value instanceof \Closure ? $value() : $value;
+        return $value instanceof Closure ? $value() : $value;
     }
 }

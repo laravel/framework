@@ -8,6 +8,10 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Events\StatementPrepared;
+use Illuminate\Database\Events\TransactionBeginning;
+use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
@@ -382,7 +386,7 @@ class Connection implements ConnectionInterface
     {
         $statement->setFetchMode($this->fetchMode);
 
-        $this->event(new Events\StatementPrepared(
+        $this->event(new StatementPrepared(
             $this, $statement
         ));
 
@@ -809,11 +813,11 @@ class Connection implements ConnectionInterface
 
         switch ($event) {
             case 'beganTransaction':
-                return $this->events->dispatch(new Events\TransactionBeginning($this));
+                return $this->events->dispatch(new TransactionBeginning($this));
             case 'committed':
-                return $this->events->dispatch(new Events\TransactionCommitted($this));
+                return $this->events->dispatch(new TransactionCommitted($this));
             case 'rollingBack':
-                return $this->events->dispatch(new Events\TransactionRolledBack($this));
+                return $this->events->dispatch(new TransactionRolledBack($this));
         }
     }
 

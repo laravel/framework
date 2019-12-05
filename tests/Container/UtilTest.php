@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Container;
 
 use Illuminate\Container\Util;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class UtilTest extends TestCase
 {
@@ -19,7 +20,7 @@ class UtilTest extends TestCase
     {
         $string = 'a';
         $array = ['a'];
-        $object = new \stdClass;
+        $object = new stdClass;
         $object->value = 'a';
         $this->assertEquals(['a'], Util::arrayWrap($string));
         $this->assertEquals($array, Util::arrayWrap($array));
@@ -33,7 +34,7 @@ class UtilTest extends TestCase
         $this->assertEquals([false], Util::arrayWrap([false]));
         $this->assertEquals([0], Util::arrayWrap(0));
 
-        $obj = new \stdClass;
+        $obj = new stdClass;
         $obj->value = 'a';
         $obj = unserialize(serialize($obj));
         $this->assertEquals([$obj], Util::arrayWrap($obj));
