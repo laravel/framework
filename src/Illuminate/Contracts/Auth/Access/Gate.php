@@ -26,7 +26,7 @@ interface Gate
      *
      * @param  string  $name
      * @param  string  $class
-     * @param  array|null   $abilities
+     * @param  array|null  $abilities
      * @return $this
      */
     public function resource($name, $class, array $abilities = null);
