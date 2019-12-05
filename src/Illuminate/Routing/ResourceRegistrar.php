@@ -425,7 +425,7 @@ class ResourceRegistrar
     /**
      * Set the global parameter mapping.
      *
-     * @param  array $parameters
+     * @param  array  $parameters
      * @return void
      */
     public static function setParameters(array $parameters = [])

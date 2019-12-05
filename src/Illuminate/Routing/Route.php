@@ -325,7 +325,7 @@ class Route
     /**
      * Determine a given parameter exists from the route.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function hasParameter($name)
@@ -798,7 +798,7 @@ class Route
     /**
      * Get or set the middlewares attached to the route.
      *
-     * @param  array|string|null $middleware
+     * @param  array|string|null  $middleware
      * @return $this|array
      */
     public function middleware($middleware = null)

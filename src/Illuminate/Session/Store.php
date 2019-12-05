@@ -49,9 +49,9 @@ class Store implements Session
     /**
      * Create a new session instance.
      *
-     * @param  string $name
-     * @param  \SessionHandlerInterface $handler
-     * @param  string|null $id
+     * @param  string  $name
+     * @param  \SessionHandlerInterface  $handler
+     * @param  string|null  $id
      * @return void
      */
     public function __construct($name, SessionHandlerInterface $handler, $id = null)
@@ -363,8 +363,8 @@ class Store implements Session
     /**
      * Flash a key / value pair to the session for immediate use.
      *
-     * @param  string $key
-     * @param  mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
      * @return void
      */
     public function now($key, $value)

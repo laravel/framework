@@ -68,10 +68,10 @@ class Worker
     /**
      * Create a new queue worker.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory $manager
+     * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
-     * @param  \callable $isDownForMaintenance
+     * @param  \callable  $isDownForMaintenance
      * @return void
      */
     public function __construct(QueueManager $manager,
@@ -653,7 +653,7 @@ class Worker
     /**
      * Set the queue manager instance.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory $manager
+     * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @return void
      */
     public function setManager(QueueManager $manager)

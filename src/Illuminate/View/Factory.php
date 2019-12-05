@@ -221,7 +221,7 @@ class Factory implements FactoryContract
     /**
      * Normalize a view name.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return string
      */
     protected function normalizeName($name)

@@ -240,7 +240,7 @@ trait ValidatesAttributes
     /**
      * Get a DateTime instance from a string with no format.
      *
-     * @param  string $value
+     * @param  string  $value
      * @return \DateTime|null
      */
     protected function getDateTime($value)
@@ -259,7 +259,7 @@ trait ValidatesAttributes
     /**
      * Check if the given value should be adjusted to Carbon::getTestNow().
      *
-     * @param  mixed $value
+     * @param  mixed  $value
      * @return bool
      */
     protected function isTestingRelativeDateTime($value)
@@ -492,9 +492,9 @@ trait ValidatesAttributes
     /**
      * Validate the dimensions of an image matches the given values.
      *
-     * @param  string $attribute
-     * @param  mixed $value
-     * @param  array $parameters
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
      * @return bool
      */
     public function validateDimensions($attribute, $value, $parameters)
