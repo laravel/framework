@@ -238,6 +238,6 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter->put('bar.txt', $stream);
 
         $spy->shouldHaveReceived('putStream');
-        $this->assertEquals('some-data', $filesystemAdapter->get('bar.txt'));
+        $this->assertSame('some-data', $filesystemAdapter->get('bar.txt'));
     }
 }

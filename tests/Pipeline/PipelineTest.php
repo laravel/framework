@@ -91,8 +91,8 @@ class PipelineTest extends TestCase
             ->through($function)
             ->thenReturn();
 
-        $this->assertEquals('bar', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('bar', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }

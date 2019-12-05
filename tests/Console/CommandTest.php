@@ -83,10 +83,10 @@ class CommandTest extends TestCase
 
         $command->run($input, $output);
 
-        $this->assertEquals('test-first-argument', $command->argument('argument-one'));
-        $this->assertequals('test-second-argument', $command->argument('argument-two'));
-        $this->assertEquals('test-first-option', $command->option('option-one'));
-        $this->assertEquals('test-second-option', $command->option('option-two'));
+        $this->assertSame('test-first-argument', $command->argument('argument-one'));
+        $this->assertSame('test-second-argument', $command->argument('argument-two'));
+        $this->assertSame('test-first-option', $command->option('option-one'));
+        $this->assertSame('test-second-option', $command->option('option-two'));
     }
 
     public function testTheInputSetterOverwrite()
