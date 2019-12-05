@@ -1,9 +1,22 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.6.1...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.6.2...6.x)
 
 ### TODO
-- Support retryAfter Option on Queued Listeners ([#30743](https://github.com/laravel/framework/pull/30743))
+- Added `ResourceCollection::preserveQueryParameters()` for preserve query parameters on paginated api resources ([#30745](https://github.com/laravel/framework/pull/30745), [e92a708](https://github.com/laravel/framework/commit/e92a70800671187cc30a39e965144101d5db169a))
+
+
+## [v6.6.2 (2019-12-05)](https://github.com/laravel/framework/compare/v6.6.1...v6.6.2)
+
+### Added
+- Added `Illuminate\Support\Facades\Facade::partialMock()` method ([#30754](https://github.com/laravel/framework/pull/30754))
+- Added of support `retryAfter` option on queued listeners ([#30743](https://github.com/laravel/framework/pull/30743))
+
+### Fixed
+- Fixed zero parameter for routes ([#30768](https://github.com/laravel/framework/pull/30768))
+
+### Changed
+- Changed `getAllViews()` method visibility from `protected` to `public` in all schema builders ([#30757](https://github.com/laravel/framework/pull/30757))
 
 
 ## [v6.6.1 (2019-12-03)](https://github.com/laravel/framework/compare/v6.6.0...v6.6.1)
