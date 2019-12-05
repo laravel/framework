@@ -238,7 +238,7 @@ class QueueFake extends QueueManager implements Queue
      * Push a new job onto the queue.
      *
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string|null  $queue
      * @return mixed
      */
@@ -255,7 +255,7 @@ class QueueFake extends QueueManager implements Queue
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array   $options
+     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
@@ -268,7 +268,7 @@ class QueueFake extends QueueManager implements Queue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string|null  $queue
      * @return mixed
      */
@@ -282,7 +282,7 @@ class QueueFake extends QueueManager implements Queue
      *
      * @param  string  $queue
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @return mixed
      */
     public function pushOn($queue, $job, $data = '')
@@ -296,7 +296,7 @@ class QueueFake extends QueueManager implements Queue
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @return mixed
      */
     public function laterOn($queue, $delay, $job, $data = '')
@@ -365,7 +365,7 @@ class QueueFake extends QueueManager implements Queue
      * Override the QueueManager to prevent circular dependency.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)
