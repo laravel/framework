@@ -173,8 +173,8 @@ class Migrator
      * Run "up" a migration instance.
      *
      * @param  string  $file
-     * @param  int     $batch
-     * @param  bool    $pretend
+     * @param  int  $batch
+     * @param  bool  $pretend
      * @return void
      */
     protected function runUp($file, $batch, $pretend)
@@ -335,7 +335,7 @@ class Migrator
      *
      * @param  string  $file
      * @param  object  $migration
-     * @param  bool    $pretend
+     * @param  bool  $pretend
      * @return void
      */
     protected function runDown($file, $migration, $pretend)
@@ -468,7 +468,7 @@ class Migrator
     /**
      * Require in all the migration files in a given path.
      *
-     * @param  array   $files
+     * @param  array  $files
      * @return void
      */
     public function requireFiles(array $files)
