@@ -54,6 +54,8 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
 
     /**
      * Indicate that all current query parameters should be appended to pagination links.
+     *
+     * @return $this
      */
     public function preserveQuery()
     {
