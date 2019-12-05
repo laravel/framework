@@ -35,7 +35,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Create a DSN string from a configuration.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @return string
      */
     protected function getDsn(array $config)
