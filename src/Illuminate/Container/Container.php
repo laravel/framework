@@ -293,7 +293,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the method to be bound in class@method format.
      *
-     * @param  array|string $method
+     * @param  array|string  $method
      * @return string
      */
     protected function parseBindMethod($method)

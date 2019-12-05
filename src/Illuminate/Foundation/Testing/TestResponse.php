@@ -825,7 +825,7 @@ class TestResponse
     /**
      * Assert that the response view equals the given value.
      *
-     * @param  string $value
+     * @param  string  $value
      * @return $this
      */
     public function assertViewIs($value)

@@ -241,7 +241,7 @@ class Builder
     /**
      * Add a subselect expression to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @return \Illuminate\Database\Query\Builder|static
      *
@@ -277,7 +277,7 @@ class Builder
     /**
      * Makes "from" fetch from a subquery.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @return \Illuminate\Database\Query\Builder|static
      *
@@ -309,7 +309,7 @@ class Builder
     /**
      * Creates a subquery and parse it.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @return array
      */
     protected function createSub($query)
@@ -466,7 +466,7 @@ class Builder
     /**
      * Add a subquery join clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
@@ -519,7 +519,7 @@ class Builder
     /**
      * Add a subquery left join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
@@ -562,7 +562,7 @@ class Builder
     /**
      * Add a subquery right join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
@@ -597,7 +597,7 @@ class Builder
     /**
      * Get a new join clause.
      *
-     * @param  \Illuminate\Database\Query\Builder $parentQuery
+     * @param  \Illuminate\Database\Query\Builder  $parentQuery
      * @param  string  $type
      * @param  string  $table
      * @return \Illuminate\Database\Query\JoinClause
@@ -1393,7 +1393,7 @@ class Builder
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -1413,7 +1413,7 @@ class Builder
     /**
      * Add an or exists clause to the query.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @param  bool  $not
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1425,7 +1425,7 @@ class Builder
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1448,7 +1448,7 @@ class Builder
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -2315,8 +2315,8 @@ class Builder
      * Retrieve column values from rows represented as objects.
      *
      * @param  array  $queryResult
-     * @param  string $column
-     * @param  string $key
+     * @param  string  $column
+     * @param  string  $key
      * @return \Illuminate\Support\Collection
      */
     protected function pluckFromObjectColumn($queryResult, $column, $key)
@@ -2340,8 +2340,8 @@ class Builder
      * Retrieve column values from rows represented as arrays.
      *
      * @param  array  $queryResult
-     * @param  string $column
-     * @param  string $key
+     * @param  string  $column
+     * @param  string  $key
      * @return \Illuminate\Support\Collection
      */
     protected function pluckFromArrayColumn($queryResult, $column, $key)
@@ -2409,7 +2409,7 @@ class Builder
     /**
      * Execute the given callback if no rows exist for the current query.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @return mixed
      */
     public function existsOr(Closure $callback)
@@ -2420,7 +2420,7 @@ class Builder
     /**
      * Execute the given callback if rows exist for the current query.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @return mixed
      */
     public function doesntExistOr(Closure $callback)

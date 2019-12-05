@@ -564,7 +564,7 @@ class Connection implements ConnectionInterface
     /**
      * Bind values to their parameters in the given statement.
      *
-     * @param  \PDOStatement $statement
+     * @param  \PDOStatement  $statement
      * @param  array  $bindings
      * @return void
      */

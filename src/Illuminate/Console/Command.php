@@ -229,7 +229,7 @@ class Command extends SymfonyCommand
     /**
      * Run the given the console command.
      *
-     * @param  \Symfony\Component\Console\Command\Command|string $command
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
      * @param  array  $arguments
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return int
@@ -414,7 +414,7 @@ class Command extends SymfonyCommand
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  array|callable $choices
+     * @param  array|callable  $choices
      * @param  string|null  $default
      * @return mixed
      */

@@ -541,9 +541,9 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get a temporary URL for the file at the given path.
      *
      * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
-     * @param  string $path
-     * @param  \DateTimeInterface $expiration
-     * @param  array $options
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
      * @return string
      */
     public function getAwsTemporaryUrl($adapter, $path, $expiration, $options)
@@ -563,8 +563,8 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Concatenate a path to a URL.
      *
-     * @param  string $url
-     * @param  string $path
+     * @param  string  $url
+     * @param  string  $path
      * @return string
      */
     protected function concatPathToUrl($url, $path)

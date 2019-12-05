@@ -633,7 +633,7 @@ trait InteractsWithPivotTable
     /**
      * Cast the given pivot attributes.
      *
-     * @param  array $attributes
+     * @param  array  $attributes
      * @return array
      */
     protected function castAttributes($attributes)
@@ -646,7 +646,7 @@ trait InteractsWithPivotTable
     /**
      * Converts a given value to a given type value.
      *
-     * @param  string $type
+     * @param  string  $type
      * @param  mixed  $value
      * @return mixed
      */

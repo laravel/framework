@@ -158,7 +158,7 @@ interface Container extends ContainerInterface
     /**
      * Determine if the given abstract type has been resolved.
      *
-     * @param  string $abstract
+     * @param  string  $abstract
      * @return bool
      */
     public function resolved($abstract);

@@ -209,7 +209,7 @@ class Migrator
     /**
      * Rollback the last migration operation.
      *
-     * @param  array|string $paths
+     * @param  array|string  $paths
      * @param  array  $options
      * @return array
      */
@@ -288,7 +288,7 @@ class Migrator
     /**
      * Rolls all of the currently applied migrations back.
      *
-     * @param  array|string $paths
+     * @param  array|string  $paths
      * @param  bool  $pretend
      * @return array
      */
@@ -624,7 +624,7 @@ class Migrator
     /**
      * Fire the given event for the migration.
      *
-     * @param  \Illuminate\Contracts\Database\Events\MigrationEvent $event
+     * @param  \Illuminate\Contracts\Database\Events\MigrationEvent  $event
      * @return void
      */
     public function fireMigrationEvent($event)
