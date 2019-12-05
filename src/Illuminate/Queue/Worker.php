@@ -563,7 +563,7 @@ class Worker
     /**
      * Determine if the memory limit has been exceeded.
      *
-     * @param  int   $memoryLimit
+     * @param  int  $memoryLimit
      * @return bool
      */
     public function memoryExceeded($memoryLimit)
@@ -617,7 +617,7 @@ class Worker
     /**
      * Sleep the script for a given number of seconds.
      *
-     * @param  int|float   $seconds
+     * @param  int|float  $seconds
      * @return void
      */
     public function sleep($seconds)
