@@ -18,7 +18,7 @@ class Pipeline extends BasePipeline
     /**
      * Handles the value returned from each pipe before passing it to the next.
      *
-     * @param  mixed $carry
+     * @param  mixed  $carry
      * @return mixed
      */
     protected function handleCarry($carry)

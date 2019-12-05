@@ -23,7 +23,7 @@ class JsonEncodingException extends RuntimeException
      *
      * @param  mixed  $model
      * @param  mixed  $key
-     * @param  string $message
+     * @param  string  $message
      * @return static
      */
     public static function forAttribute($model, $key, $message)

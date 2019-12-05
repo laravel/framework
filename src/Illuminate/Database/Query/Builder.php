@@ -241,7 +241,7 @@ class Builder
     /**
      * Add a subselect expression to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @return \Illuminate\Database\Query\Builder|static
      *
@@ -260,7 +260,7 @@ class Builder
      * Add a new "raw" select expression to the query.
      *
      * @param  string  $expression
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function selectRaw($expression, array $bindings = [])
@@ -277,7 +277,7 @@ class Builder
     /**
      * Makes "from" fetch from a subquery.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @return \Illuminate\Database\Query\Builder|static
      *
@@ -294,7 +294,7 @@ class Builder
      * Add a raw from clause to the query.
      *
      * @param  string  $expression
-     * @param  mixed   $bindings
+     * @param  mixed  $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function fromRaw($expression, $bindings = [])
@@ -309,7 +309,7 @@ class Builder
     /**
      * Creates a subquery and parse it.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @return array
      */
     protected function createSub($query)
@@ -416,7 +416,7 @@ class Builder
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
-     * @param  bool    $where
+     * @param  bool  $where
      * @return $this
      */
     public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
@@ -466,13 +466,13 @@ class Builder
     /**
      * Add a subquery join clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
-     * @param  bool    $where
+     * @param  bool  $where
      * @return \Illuminate\Database\Query\Builder|static
      *
      * @throws \InvalidArgumentException
@@ -519,7 +519,7 @@ class Builder
     /**
      * Add a subquery left join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
@@ -562,7 +562,7 @@ class Builder
     /**
      * Add a subquery right join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
@@ -597,7 +597,7 @@ class Builder
     /**
      * Get a new join clause.
      *
-     * @param  \Illuminate\Database\Query\Builder $parentQuery
+     * @param  \Illuminate\Database\Query\Builder  $parentQuery
      * @param  string  $type
      * @param  string  $table
      * @return \Illuminate\Database\Query\JoinClause
@@ -627,8 +627,8 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  \Closure|string|array  $column
-     * @param  mixed   $operator
-     * @param  mixed   $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -843,7 +843,7 @@ class Builder
      * Add a raw where clause to the query.
      *
      * @param  string  $sql
-     * @param  mixed   $bindings
+     * @param  mixed  $bindings
      * @param  string  $boolean
      * @return $this
      */
@@ -860,7 +860,7 @@ class Builder
      * Add a raw or where clause to the query.
      *
      * @param  string  $sql
-     * @param  mixed   $bindings
+     * @param  mixed  $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereRaw($sql, $bindings = [])
@@ -872,9 +872,9 @@ class Builder
      * Add a "where in" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed   $values
+     * @param  mixed  $values
      * @param  string  $boolean
-     * @param  bool    $not
+     * @param  bool  $not
      * @return $this
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
@@ -913,7 +913,7 @@ class Builder
      * Add an "or where in" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed   $values
+     * @param  mixed  $values
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereIn($column, $values)
@@ -925,7 +925,7 @@ class Builder
      * Add a "where not in" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed   $values
+     * @param  mixed  $values
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -938,7 +938,7 @@ class Builder
      * Add an "or where not in" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed   $values
+     * @param  mixed  $values
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereNotIn($column, $values)
@@ -990,7 +990,7 @@ class Builder
      *
      * @param  string|array  $columns
      * @param  string  $boolean
-     * @param  bool    $not
+     * @param  bool  $not
      * @return $this
      */
     public function whereNull($columns, $boolean = 'and', $not = false)
@@ -1031,7 +1031,7 @@ class Builder
      * Add a where between statement to the query.
      *
      * @param  string  $column
-     * @param  array   $values
+     * @param  array  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -1051,7 +1051,7 @@ class Builder
      * Add an or where between statement to the query.
      *
      * @param  string  $column
-     * @param  array   $values
+     * @param  array  $values
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereBetween($column, array $values)
@@ -1063,7 +1063,7 @@ class Builder
      * Add a where not between statement to the query.
      *
      * @param  string  $column
-     * @param  array   $values
+     * @param  array  $values
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1076,7 +1076,7 @@ class Builder
      * Add an or where not between statement to the query.
      *
      * @param  string  $column
-     * @param  array   $values
+     * @param  array  $values
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereNotBetween($column, array $values)
@@ -1138,9 +1138,9 @@ class Builder
      * Add a "where time" statement to the query.
      *
      * @param  string  $column
-     * @param  string   $operator
+     * @param  string  $operator
      * @param  \DateTimeInterface|string|null  $value
-     * @param  string   $boolean
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
@@ -1160,7 +1160,7 @@ class Builder
      * Add an "or where time" statement to the query.
      *
      * @param  string  $column
-     * @param  string   $operator
+     * @param  string  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1322,8 +1322,8 @@ class Builder
     /**
      * Add a nested where statement to the query.
      *
-     * @param  \Closure $callback
-     * @param  string   $boolean
+     * @param  \Closure  $callback
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function whereNested(Closure $callback, $boolean = 'and')
@@ -1346,7 +1346,7 @@ class Builder
     /**
      * Add another query builder as a nested where to the query builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|static $query
+     * @param  \Illuminate\Database\Query\Builder|static  $query
      * @param  string  $boolean
      * @return $this
      */
@@ -1366,10 +1366,10 @@ class Builder
     /**
      * Add a full sub-select to the query.
      *
-     * @param  string   $column
-     * @param  string   $operator
-     * @param  \Closure $callback
-     * @param  string   $boolean
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  \Closure  $callback
+     * @param  string  $boolean
      * @return $this
      */
     protected function whereSub($column, $operator, Closure $callback, $boolean)
@@ -1393,9 +1393,9 @@ class Builder
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Closure $callback
-     * @param  string   $boolean
-     * @param  bool     $not
+     * @param  \Closure  $callback
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return $this
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
@@ -1413,8 +1413,8 @@ class Builder
     /**
      * Add an or exists clause to the query.
      *
-     * @param  \Closure $callback
-     * @param  bool     $not
+     * @param  \Closure  $callback
+     * @param  bool  $not
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereExists(Closure $callback, $not = false)
@@ -1425,8 +1425,8 @@ class Builder
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  \Closure $callback
-     * @param  string   $boolean
+     * @param  \Closure  $callback
+     * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function whereNotExists(Closure $callback, $boolean = 'and')
@@ -1448,7 +1448,7 @@ class Builder
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -1467,9 +1467,9 @@ class Builder
     /**
      * Adds a where condition using row values.
      *
-     * @param  array   $columns
+     * @param  array  $columns
      * @param  string  $operator
-     * @param  array   $values
+     * @param  array  $values
      * @param  string  $boolean
      * @return $this
      */
@@ -1491,9 +1491,9 @@ class Builder
     /**
      * Adds a or where condition using row values.
      *
-     * @param  array   $columns
+     * @param  array  $columns
      * @param  string  $operator
-     * @param  array   $values
+     * @param  array  $values
      * @return $this
      */
     public function orWhereRowValues($columns, $operator, $values)
@@ -1651,8 +1651,8 @@ class Builder
      *
      * @param  string  $segment
      * @param  string  $connector
-     * @param  array   $parameters
-     * @param  int     $index
+     * @param  array  $parameters
+     * @param  int  $index
      * @return void
      */
     protected function addDynamic($segment, $connector, $parameters, $index)
@@ -1760,7 +1760,7 @@ class Builder
      * Add a raw having clause to the query.
      *
      * @param  string  $sql
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @param  string  $boolean
      * @return $this
      */
@@ -1779,7 +1779,7 @@ class Builder
      * Add a raw or having clause to the query.
      *
      * @param  string  $sql
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orHavingRaw($sql, array $bindings = [])
@@ -2315,8 +2315,8 @@ class Builder
      * Retrieve column values from rows represented as objects.
      *
      * @param  array  $queryResult
-     * @param  string $column
-     * @param  string $key
+     * @param  string  $column
+     * @param  string  $key
      * @return \Illuminate\Support\Collection
      */
     protected function pluckFromObjectColumn($queryResult, $column, $key)
@@ -2340,8 +2340,8 @@ class Builder
      * Retrieve column values from rows represented as arrays.
      *
      * @param  array  $queryResult
-     * @param  string $column
-     * @param  string $key
+     * @param  string  $column
+     * @param  string  $key
      * @return \Illuminate\Support\Collection
      */
     protected function pluckFromArrayColumn($queryResult, $column, $key)
@@ -2409,7 +2409,7 @@ class Builder
     /**
      * Execute the given callback if no rows exist for the current query.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @return mixed
      */
     public function existsOr(Closure $callback)
@@ -2420,7 +2420,7 @@ class Builder
     /**
      * Execute the given callback if rows exist for the current query.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @return mixed
      */
     public function doesntExistOr(Closure $callback)
@@ -2500,7 +2500,7 @@ class Builder
      * Execute an aggregate function on the database.
      *
      * @param  string  $function
-     * @param  array   $columns
+     * @param  array  $columns
      * @return mixed
      */
     public function aggregate($function, $columns = ['*'])
@@ -2519,7 +2519,7 @@ class Builder
      * Execute a numeric aggregate function on the database.
      *
      * @param  string  $function
-     * @param  array   $columns
+     * @param  array  $columns
      * @return float|int
      */
     public function numericAggregate($function, $columns = ['*'])
@@ -2852,7 +2852,7 @@ class Builder
     /**
      * Set the bindings on the query builder.
      *
-     * @param  array   $bindings
+     * @param  array  $bindings
      * @param  string  $type
      * @return $this
      *
@@ -2872,7 +2872,7 @@ class Builder
     /**
      * Add a binding to the query.
      *
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  string  $type
      * @return $this
      *
@@ -3040,7 +3040,7 @@ class Builder
      * Handle dynamic method calls into the method.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      *
      * @throws \BadMethodCallException

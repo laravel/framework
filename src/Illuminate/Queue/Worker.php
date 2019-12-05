@@ -66,10 +66,10 @@ class Worker
     /**
      * Create a new queue worker.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory $manager
+     * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
-     * @param  \callable $isDownForMaintenance
+     * @param  \callable  $isDownForMaintenance
      * @return void
      */
     public function __construct(QueueManager $manager,
@@ -547,7 +547,7 @@ class Worker
     /**
      * Determine if the memory limit has been exceeded.
      *
-     * @param  int   $memoryLimit
+     * @param  int  $memoryLimit
      * @return bool
      */
     public function memoryExceeded($memoryLimit)
@@ -601,7 +601,7 @@ class Worker
     /**
      * Sleep the script for a given number of seconds.
      *
-     * @param  int|float   $seconds
+     * @param  int|float  $seconds
      * @return void
      */
     public function sleep($seconds)
@@ -637,7 +637,7 @@ class Worker
     /**
      * Set the queue manager instance.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory $manager
+     * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @return void
      */
     public function setManager(QueueManager $manager)

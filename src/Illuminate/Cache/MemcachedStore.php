@@ -36,7 +36,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
      * Create a new Memcached store.
      *
      * @param  \Memcached  $memcached
-     * @param  string      $prefix
+     * @param  string  $prefix
      * @return void
      */
     public function __construct($memcached, $prefix = '')
@@ -96,7 +96,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -131,7 +131,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
      * Store an item in the cache if the key doesn't exist.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -146,7 +146,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -158,7 +158,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
@@ -170,7 +170,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
@@ -181,9 +181,9 @@ class MemcachedStore extends TaggableStore implements LockProvider
     /**
      * Get a lock instance.
      *
-     * @param  string $name
-     * @param  int $seconds
-     * @param  string|null $owner
+     * @param  string  $name
+     * @param  int  $seconds
+     * @param  string|null  $owner
      * @return \Illuminate\Contracts\Cache\Lock
      */
     public function lock($name, $seconds = 0, $owner = null)

@@ -591,7 +591,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Register a service provider with the application.
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
-     * @param  bool   $force
+     * @param  bool  $force
      * @return \Illuminate\Support\ServiceProvider
      */
     public function register($provider, $force = false)
@@ -1000,9 +1000,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Throw an HttpException with the given data.
      *
-     * @param  int     $code
+     * @param  int  $code
      * @param  string  $message
-     * @param  array   $headers
+     * @param  array  $headers
      * @return void
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException

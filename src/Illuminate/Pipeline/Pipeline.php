@@ -178,7 +178,7 @@ class Pipeline implements PipelineContract
     /**
      * Parse full pipe string to get name and parameters.
      *
-     * @param  string $pipe
+     * @param  string  $pipe
      * @return array
      */
     protected function parsePipeString($pipe)
@@ -221,7 +221,7 @@ class Pipeline implements PipelineContract
     /**
      * Handles the value returned from each pipe before passing it to the next.
      *
-     * @param  mixed $carry
+     * @param  mixed  $carry
      * @return mixed
      */
     protected function handleCarry($carry)

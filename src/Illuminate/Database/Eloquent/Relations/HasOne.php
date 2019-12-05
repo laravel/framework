@@ -27,7 +27,7 @@ class HasOne extends HasOneOrMany
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  string  $relation
      * @return array
      */

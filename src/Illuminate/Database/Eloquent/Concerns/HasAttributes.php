@@ -1139,7 +1139,7 @@ trait HasAttributes
     /**
      * Determine if the new and old values for a given key are equivalent.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     public function originalIsEquivalent($key)

@@ -222,7 +222,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all types.
      *
-     * @param array $types
+     * @param  array  $types
      * @return string
      */
     public function compileDropAllTypes($types)
@@ -359,8 +359,8 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a rename index command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
-     * @param  \Illuminate\Support\Fluent $command
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command)

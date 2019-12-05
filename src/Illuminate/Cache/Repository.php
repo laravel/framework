@@ -584,7 +584,7 @@ class Repository implements ArrayAccess, CacheContract
      * Store an item in the cache for the default time.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function offsetSet($key, $value)
