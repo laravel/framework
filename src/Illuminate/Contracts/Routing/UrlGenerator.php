@@ -33,7 +33,7 @@ interface UrlGenerator
      * Generate a secure, absolute URL to the given path.
      *
      * @param  string  $path
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return string
      */
     public function secure($path, $parameters = []);
@@ -51,7 +51,7 @@ interface UrlGenerator
      * Get the URL to a named route.
      *
      * @param  string  $name
-     * @param  mixed   $parameters
+     * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
      *

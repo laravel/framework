@@ -30,7 +30,7 @@ interface Job
      *
      * Accepts a delay specified in seconds.
      *
-     * @param  int   $delay
+     * @param  int  $delay
      * @return void
      */
     public function release($delay = 0);
