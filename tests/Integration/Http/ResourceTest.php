@@ -494,7 +494,7 @@ class ResourceTest extends TestCase
                 $collection, 3, 1, 2
             );
 
-            return PostCollectionResource::make($paginator)->preserveQueryParameters();
+            return PostCollectionResource::make($paginator)->preserveQuery();
         });
 
         $response = $this->withoutExceptionHandling()->get(
@@ -515,6 +515,48 @@ class ResourceTest extends TestCase
                 'last' => '/?framework=laravel&author=Otwell&page=3',
                 'prev' => '/?framework=laravel&author=Otwell&page=1',
                 'next' => '/?framework=laravel&author=Otwell&page=3',
+            ],
+            'meta' => [
+                'current_page' => 2,
+                'from' => 2,
+                'last_page' => 3,
+                'path' => '/',
+                'per_page' => 1,
+                'to' => 2,
+                'total' => 3,
+            ],
+        ]);
+    }
+
+    public function testPaginatorResourceCanReceiveQueryParameters()
+    {
+        Route::get('/', function () {
+            $collection = collect([new Post(['id' => 2, 'title' => 'Laravel Nova'])]);
+            $paginator = new LengthAwarePaginator(
+                $collection, 3, 1, 2
+            );
+
+            return PostCollectionResource::make($paginator)->withQuery(['author' => 'Taylor']);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/?framework=laravel&author=Otwell&page=2', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 2,
+                    'title' => 'Laravel Nova',
+                ],
+            ],
+            'links' => [
+                'first' => '/?author=Taylor&page=1',
+                'last' => '/?author=Taylor&page=3',
+                'prev' => '/?author=Taylor&page=1',
+                'next' => '/?author=Taylor&page=3',
             ],
             'meta' => [
                 'current_page' => 2,

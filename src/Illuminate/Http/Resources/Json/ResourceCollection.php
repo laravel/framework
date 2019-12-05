@@ -26,9 +26,16 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     public $collection;
 
     /**
-     * Determines whether to preserve all query parameters when generating the navigation links.
+     * Indicates if all existing request query parameters should be added to pagination links.
      *
      * @var bool
+     */
+    protected $preserveAllQueryParameters = false;
+
+    /**
+     * The query parameters that should be added to the pagination links.
+     *
+     * @var array
      */
     protected $queryParameters;
 
@@ -46,13 +53,26 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     }
 
     /**
-     * Preserve all query parameters when generating the navigation links.
+     * Indicate that all current query parameters should be appended to pagination links.
+     */
+    public function preserveQuery()
+    {
+        $this->preserveAllQueryParameters = true;
+
+        return $this;
+    }
+
+    /**
+     * Preserve the given (or all) query parameters when generating the pagination links.
      *
+     * @param  array  $query
      * @return $this
      */
-    public function preserveQueryParameters()
+    public function withQuery(array $query)
     {
-        $this->queryParameters = true;
+        $this->preserveAllQueryParameters = false;
+
+        $this->queryParameters = $query;
 
         return $this;
     }
@@ -101,8 +121,10 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      */
     protected function preparePaginatedResponse($request)
     {
-        if ($this->queryParameters) {
+        if ($this->preserveAllQueryParameters) {
             $this->resource->appends($request->query());
+        } elseif (! is_null($this->queryParameters)) {
+            $this->resource->appends($this->queryParameters);
         }
 
         return (new PaginatedResourceResponse($this))->toResponse($request);
