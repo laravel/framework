@@ -563,7 +563,7 @@ class TestResponse
      * Assert that the response does not contain the given JSON fragment.
      *
      * @param  array  $data
-     * @param  bool   $exact
+     * @param  bool  $exact
      * @return $this
      */
     public function assertJsonMissing(array $data, $exact = false)

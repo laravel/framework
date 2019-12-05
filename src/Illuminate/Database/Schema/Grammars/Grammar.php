@@ -194,7 +194,7 @@ abstract class Grammar extends BaseGrammar
      * Add a prefix to an array of values.
      *
      * @param  string  $prefix
-     * @param  array   $values
+     * @param  array  $values
      * @return array
      */
     public function prefixArray($prefix, array $values)
@@ -207,7 +207,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param  mixed   $table
+     * @param  mixed  $table
      * @return string
      */
     public function wrapTable($table)
@@ -221,7 +221,7 @@ abstract class Grammar extends BaseGrammar
      * Wrap a value in keyword identifiers.
      *
      * @param  \Illuminate\Database\Query\Expression|string  $value
-     * @param  bool    $prefixAlias
+     * @param  bool  $prefixAlias
      * @return string
      */
     public function wrap($value, $prefixAlias = false)
@@ -234,7 +234,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Format a value so that it can be used in "default" clauses.
      *
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return string
      */
     protected function getDefaultValue($value)
