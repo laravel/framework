@@ -96,7 +96,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     /**
      * Create a paginate-aware HTTP response.
      *
-     * @param \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     protected function preparePaginatedResponse($request)
