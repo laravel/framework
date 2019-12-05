@@ -26,6 +26,13 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     public $collection;
 
     /**
+     * Determines whether to preserve all query parameters when generating the navigation links.
+     *
+     * @var bool
+     */
+    protected $queryParameters;
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
@@ -36,6 +43,18 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
         parent::__construct($resource);
 
         $this->resource = $this->collectResource($resource);
+    }
+
+    /**
+     * Preserve all query parameters when generating the navigation links.
+     *
+     * @return $this
+     */
+    public function preserveQueryParameters()
+    {
+        $this->queryParameters = true;
+
+        return $this;
     }
 
     /**
@@ -67,8 +86,25 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      */
     public function toResponse($request)
     {
-        return $this->resource instanceof AbstractPaginator
-                    ? (new PaginatedResourceResponse($this))->toResponse($request)
-                    : parent::toResponse($request);
+        if ($this->resource instanceof AbstractPaginator) {
+            return $this->preparePaginatedResponse($request);
+        }
+
+        return parent::toResponse($request);
+    }
+
+    /**
+     * Create a paginate-aware HTTP response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function preparePaginatedResponse($request)
+    {
+        if ($this->queryParameters) {
+            $this->resource->appends($request->query());
+        }
+
+        return (new PaginatedResourceResponse($this))->toResponse($request);
     }
 }
