@@ -30,7 +30,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      *
      * @var bool
      */
-    private $queryParameters;
+    protected $queryParameters;
 
     /**
      * Create a new resource instance.
