@@ -222,7 +222,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all types.
      *
-     * @param array $types
+     * @param  array  $types
      * @return string
      */
     public function compileDropAllTypes($types)
