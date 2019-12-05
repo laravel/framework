@@ -63,7 +63,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     }
 
     /**
-     * Preserve the given (or all) query parameters when generating the pagination links.
+     * Preserve the given query parameters when generating the pagination links.
      *
      * @param  array  $query
      * @return $this
