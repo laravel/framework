@@ -52,13 +52,6 @@ class Migrator
     protected $connection;
 
     /**
-     * The name of the connection before the latest migration was ran.
-     *
-     * @var string
-     */
-    protected $previousConnection = null;
-
-    /**
      * The paths to all of the migration files.
      *
      * @var array
@@ -148,8 +141,6 @@ class Migrator
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to migrate.</info>');
 
-            $this->restorePriorConnection();
-
             return;
         }
 
@@ -174,8 +165,6 @@ class Migrator
                 $batch++;
             }
         }
-
-        $this->restorePriorConnection();
 
         $this->fireMigrationEvent(new MigrationsEnded);
     }
@@ -234,8 +223,6 @@ class Migrator
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
-            $this->restorePriorConnection();
-
             return [];
         }
 
@@ -293,8 +280,6 @@ class Migrator
             );
         }
 
-        $this->restorePriorConnection();
-
         $this->fireMigrationEvent(new MigrationsEnded);
 
         return $rolledBack;
@@ -316,8 +301,6 @@ class Migrator
 
         if (count($migrations) === 0) {
             $this->note('<info>Nothing to rollback.</info>');
-
-            $this->restorePriorConnection();
 
             return [];
         }
@@ -538,6 +521,24 @@ class Migrator
     }
 
     /**
+     * Execute the given callback using the given connection as the default connection.
+     *
+     * @param  string  $name
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function usingConnection($name, callable $callback)
+    {
+        $previousConnection = $this->resolver->getDefaultConnection();
+
+        $this->setConnection($name);
+
+        return tap($callback(), function () use ($previousConnection) {
+            $this->setConnection($previousConnection);
+        });
+    }
+
+    /**
      * Set the default connection name.
      *
      * @param  string  $name
@@ -545,9 +546,7 @@ class Migrator
      */
     public function setConnection($name)
     {
-        if ($name) {
-            $this->previousConnection = $this->resolver->getDefaultConnection();
-
+        if (! is_null($name)) {
             $this->resolver->setDefaultConnection($name);
         }
 
@@ -565,19 +564,6 @@ class Migrator
     public function resolveConnection($connection)
     {
         return $this->resolver->connection($connection ?: $this->connection);
-    }
-
-    /**
-     * Restore prior connection after migration runs.
-     *
-     * @param  string  $connection
-     * @return void
-     */
-    public function restorePriorConnection($connection = null)
-    {
-        if ($previousConnection = $connection ?? $this->previousConnection) {
-            $this->resolver->setDefaultConnection($previousConnection);
-        }
     }
 
     /**
