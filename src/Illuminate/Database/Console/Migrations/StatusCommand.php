@@ -49,6 +49,8 @@ class StatusCommand extends BaseCommand
      */
     public function handle()
     {
+        $previousConnection = $this->migrator->getConnection();
+
         $this->migrator->setConnection($this->option('database'));
 
         if (! $this->migrator->repositoryExists()) {
@@ -66,6 +68,8 @@ class StatusCommand extends BaseCommand
         } else {
             $this->error('No migrations found');
         }
+
+        $this->migrator->restorePriorConnection($previousConnection);
     }
 
     /**

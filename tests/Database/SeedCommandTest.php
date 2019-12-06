@@ -25,6 +25,7 @@ class SeedCommandTest extends TestCase
         $seeder->shouldReceive('__invoke')->once();
 
         $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
         $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
 
         $container = m::mock(Container::class);
