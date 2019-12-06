@@ -260,7 +260,8 @@ trait ManagesTransactions
     /**
      * Handle an exception from a rollback.
      *
-     * @param \Throwable  $e
+     * @param  \Throwable  $e
+     * @return void
      *
      * @throws \Throwable
      */

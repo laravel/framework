@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cookie;
 use Illuminate\Cookie\CookieJar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CookieTest extends TestCase
@@ -194,7 +195,7 @@ class CookieTest extends TestCase
 
     private function getQueuedPropertyValue(CookieJar $cookieJar)
     {
-        $property = (new \ReflectionObject($cookieJar))->getProperty('queued');
+        $property = (new ReflectionObject($cookieJar))->getProperty('queued');
         $property->setAccessible(true);
 
         return $property->getValue($cookieJar);

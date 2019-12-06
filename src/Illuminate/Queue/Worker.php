@@ -7,6 +7,11 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Database\DetectsLostConnections;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
 use Throwable;
 
@@ -187,7 +192,7 @@ class Worker
     {
         return ! ((($this->isDownForMaintenance)() && ! $options->force) ||
             $this->paused ||
-            $this->events->until(new Events\Looping($connectionName, $queue)) === false);
+            $this->events->until(new Looping($connectionName, $queue)) === false);
     }
 
     /**
@@ -210,6 +215,7 @@ class Worker
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
      * @param  mixed  $job
+     * @return void
      */
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $job = null)
     {
@@ -455,7 +461,7 @@ class Worker
      */
     protected function raiseBeforeJobEvent($connectionName, $job)
     {
-        $this->events->dispatch(new Events\JobProcessing(
+        $this->events->dispatch(new JobProcessing(
             $connectionName, $job
         ));
     }
@@ -469,7 +475,7 @@ class Worker
      */
     protected function raiseAfterJobEvent($connectionName, $job)
     {
-        $this->events->dispatch(new Events\JobProcessed(
+        $this->events->dispatch(new JobProcessed(
             $connectionName, $job
         ));
     }
@@ -484,7 +490,7 @@ class Worker
      */
     protected function raiseExceptionOccurredJobEvent($connectionName, $job, Throwable $e)
     {
-        $this->events->dispatch(new Events\JobExceptionOccurred(
+        $this->events->dispatch(new JobExceptionOccurred(
             $connectionName, $job, $e
         ));
     }
@@ -563,7 +569,7 @@ class Worker
      */
     public function stop($status = 0)
     {
-        $this->events->dispatch(new Events\WorkerStopping($status));
+        $this->events->dispatch(new WorkerStopping($status));
 
         exit($status);
     }
@@ -576,7 +582,7 @@ class Worker
      */
     public function kill($status = 0)
     {
-        $this->events->dispatch(new Events\WorkerStopping($status));
+        $this->events->dispatch(new WorkerStopping($status));
 
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);

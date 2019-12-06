@@ -4,6 +4,9 @@ namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Jobs\SyncJob;
 use Throwable;
 
@@ -68,7 +71,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseBeforeJobEvent(Job $job)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new Events\JobProcessing($this->connectionName, $job));
+            $this->container['events']->dispatch(new JobProcessing($this->connectionName, $job));
         }
     }
 
@@ -81,7 +84,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseAfterJobEvent(Job $job)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new Events\JobProcessed($this->connectionName, $job));
+            $this->container['events']->dispatch(new JobProcessed($this->connectionName, $job));
         }
     }
 
@@ -95,7 +98,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseExceptionOccurredJobEvent(Job $job, Throwable $e)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new Events\JobExceptionOccurred($this->connectionName, $job, $e));
+            $this->container['events']->dispatch(new JobExceptionOccurred($this->connectionName, $job, $e));
         }
     }
 
