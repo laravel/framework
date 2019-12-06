@@ -115,8 +115,12 @@ class Handler implements ExceptionHandlerContract
 
         $logger->error(
             $e->getMessage(),
-            array_merge($this->context(), ['exception' => $e]
-        ));
+            array_merge(
+                $this->exceptionContext($e),
+                $this->context(),
+                ['exception' => $e]
+            )
+        );
     }
 
     /**
@@ -143,6 +147,17 @@ class Handler implements ExceptionHandlerContract
         return ! is_null(Arr::first($dontReport, function ($type) use ($e) {
             return $e instanceof $type;
         }));
+    }
+
+    /**
+     * Get the default exception context variables for logging.
+     *
+     * @param  \Exception  $e
+     * @return array
+     */
+    protected function exceptionContext(Exception $e)
+    {
+        return [];
     }
 
     /**
