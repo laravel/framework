@@ -15,6 +15,13 @@ use RedisException;
 class PhpRedisConnection extends Connection implements ConnectionContract
 {
     /**
+     * The connection creation callback.
+     *
+     * @var callable
+     */
+    protected $connector;
+
+    /**
      * Create a new PhpRedis connection.
      *
      * @param  \Redis  $client
