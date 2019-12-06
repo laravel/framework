@@ -52,7 +52,7 @@ class Worker
     /**
      * The callback used to determine if the application is in maintenance mode.
      *
-     * @var \callable
+     * @var callable
      */
     protected $isDownForMaintenance;
 
@@ -76,7 +76,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
-     * @param  \callable  $isDownForMaintenance
+     * @param  callable  $isDownForMaintenance
      * @return void
      */
     public function __construct(QueueManager $manager,

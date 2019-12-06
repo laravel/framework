@@ -46,6 +46,7 @@ abstract class GeneratorCommand extends Command
      * Execute the console command.
      *
      * @return bool|null
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
@@ -153,6 +154,7 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $name
      * @return string
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function buildClass($name)

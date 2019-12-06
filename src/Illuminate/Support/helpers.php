@@ -454,6 +454,7 @@ if (! function_exists('throw_unless')) {
      * @param  \Throwable|string  $exception
      * @param  array  ...$parameters
      * @return mixed
+     *
      * @throws \Throwable
      */
     function throw_unless($condition, $exception, ...$parameters)
