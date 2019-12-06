@@ -62,13 +62,7 @@ class RateLimiter
 
         $added = $this->cache->add($key, 0, $decaySeconds);
 
-        $hits = (int) $this->cache->increment($key);
-
-        if (! $added && $hits == 1) {
-            $this->cache->put($key, 1, $decaySeconds);
-        }
-
-        return $hits;
+        return (int) $this->cache->increment($key);
     }
 
     /**
