@@ -112,6 +112,15 @@ interface Session
     public function flush();
 
     /**
+     * Switch session or create new session.
+     *
+     * @param  string $id
+     * @param  bool $destroy
+     * @return $this
+     */
+    public function checkout($id = null, $destroy = false);
+
+    /**
      * Generate a new session ID for the session.
      *
      * @param  bool  $destroy

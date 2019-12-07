@@ -146,7 +146,7 @@ class Store implements Session
     /**
      * Age the flash data for the session.
      *
-     * @return void
+     * @return $this
      */
     public function ageFlashData()
     {
@@ -154,7 +154,7 @@ class Store implements Session
 
         $this->put('_flash.old', $this->get('_flash.new', []));
 
-        $this->put('_flash.new', []);
+        return $this->put('_flash.new', []);
     }
 
     /**
@@ -259,11 +259,11 @@ class Store implements Session
      * Replace the given session attributes entirely.
      *
      * @param  array  $attributes
-     * @return void
+     * @return $this
      */
     public function replace(array $attributes)
     {
-        $this->put($attributes);
+        return $this->put($attributes);
     }
 
     /**
@@ -271,7 +271,7 @@ class Store implements Session
      *
      * @param  string|array  $key
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function put($key, $value = null)
     {
@@ -282,6 +282,8 @@ class Store implements Session
         foreach ($key as $arrayKey => $arrayValue) {
             Arr::set($this->attributes, $arrayKey, $arrayValue);
         }
+
+        return $this;
     }
 
     /**
@@ -307,7 +309,7 @@ class Store implements Session
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function push($key, $value)
     {
@@ -315,7 +317,7 @@ class Store implements Session
 
         $array[] = $value;
 
-        $this->put($key, $array);
+        return $this->put($key, $array);
     }
 
     /**
@@ -349,15 +351,11 @@ class Store implements Session
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function flash(string $key, $value = true)
     {
-        $this->put($key, $value);
-
-        $this->push('_flash.new', $key);
-
-        $this->removeFromOldFlashData([$key]);
+        return $this->put($key, $value)->push('_flash.new', $key)->removeFromOldFlashData([$key]);
     }
 
     /**
@@ -365,73 +363,69 @@ class Store implements Session
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
     public function now($key, $value)
     {
-        $this->put($key, $value);
-
-        $this->push('_flash.old', $key);
+        return $this->put($key, $value)->push('_flash.old', $key);
     }
 
     /**
      * Reflash all of the session flash data.
      *
-     * @return void
+     * @return $this
      */
     public function reflash()
     {
-        $this->mergeNewFlashes($this->get('_flash.old', []));
-
-        $this->put('_flash.old', []);
+        return $this->mergeNewFlashes($this->get('_flash.old', []))->put('_flash.old', []);
     }
 
     /**
      * Reflash a subset of the current flash data.
      *
      * @param  array|mixed  $keys
-     * @return void
+     * @return $this
      */
     public function keep($keys = null)
     {
-        $this->mergeNewFlashes($keys = is_array($keys) ? $keys : func_get_args());
+        $keys = is_array($keys) ? $keys : func_get_args();
 
-        $this->removeFromOldFlashData($keys);
+        return $this->mergeNewFlashes($keys)->removeFromOldFlashData($keys);
     }
 
     /**
      * Merge new flash keys into the new flash array.
      *
      * @param  array  $keys
-     * @return void
+     * @return $this
      */
     protected function mergeNewFlashes(array $keys)
     {
         $values = array_unique(array_merge($this->get('_flash.new', []), $keys));
 
-        $this->put('_flash.new', $values);
+        return $this->put('_flash.new', $values);
     }
 
     /**
      * Remove the given keys from the old flash data.
      *
      * @param  array  $keys
-     * @return void
+     * @return $this
      */
     protected function removeFromOldFlashData(array $keys)
     {
-        $this->put('_flash.old', array_diff($this->get('_flash.old', []), $keys));
+        return $this->put('_flash.old', array_diff($this->get('_flash.old', []), $keys));
     }
 
     /**
      * Flash an input array to the session.
      *
      * @param  array  $value
-     * @return void
+     * @return $this
      */
     public function flashInput(array $value)
     {
-        $this->flash('_old_input', $value);
+        return $this->flash('_old_input', $value);
     }
 
     /**
@@ -449,21 +443,25 @@ class Store implements Session
      * Remove one or many items from the session.
      *
      * @param  string|array  $keys
-     * @return void
+     * @return $this
      */
     public function forget($keys)
     {
         Arr::forget($this->attributes, $keys);
+
+        return $this;
     }
 
     /**
      * Remove all of the items from the session.
      *
-     * @return void
+     * @return $this
      */
     public function flush()
     {
         $this->attributes = [];
+
+        return $this;
     }
 
     /**
@@ -473,9 +471,7 @@ class Store implements Session
      */
     public function invalidate()
     {
-        $this->flush();
-
-        return $this->migrate(true);
+        return $this->flush()->migrate(true);
     }
 
     /**
@@ -489,6 +485,26 @@ class Store implements Session
         return tap($this->migrate($destroy), function () {
             $this->regenerateToken();
         });
+    }
+
+    /**
+     * Switch session or create new session.
+     *
+     * @param  string $id
+     * @param  bool $destroy
+     * @return $this
+     */
+    public function checkout($id = null, $destroy = false)
+    {
+        if ($destroy) {
+            $this->handler->destroy($this->getId());
+        }
+
+        $this->setExists(false)->setId($id);
+
+        $this->attributes = $this->readFromHandler();
+
+        return $this;
     }
 
     /**
@@ -534,11 +550,13 @@ class Store implements Session
      * Set the name of the session.
      *
      * @param  string  $name
-     * @return void
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -555,11 +573,13 @@ class Store implements Session
      * Set the session ID.
      *
      * @param  string  $id
-     * @return void
+     * @return $this
      */
     public function setId($id)
     {
         $this->id = $this->isValidId($id) ? $id : $this->generateSessionId();
+
+        return $this;
     }
 
     /**
@@ -587,13 +607,15 @@ class Store implements Session
      * Set the existence of the session on the handler if applicable.
      *
      * @param  bool  $value
-     * @return void
+     * @return $this
      */
     public function setExists($value)
     {
         if ($this->handler instanceof ExistenceAwareInterface) {
             $this->handler->setExists($value);
         }
+
+        return $this;
     }
 
     /**
@@ -609,11 +631,11 @@ class Store implements Session
     /**
      * Regenerate the CSRF token value.
      *
-     * @return void
+     * @return $this
      */
     public function regenerateToken()
     {
-        $this->put('_token', Str::random(40));
+        return $this->put('_token', Str::random(40));
     }
 
     /**
@@ -630,11 +652,11 @@ class Store implements Session
      * Set the "previous" URL in the session.
      *
      * @param  string  $url
-     * @return void
+     * @return $this
      */
     public function setPreviousUrl($url)
     {
-        $this->put('_previous.url', $url);
+        return $this->put('_previous.url', $url);
     }
 
     /**
@@ -661,12 +683,14 @@ class Store implements Session
      * Set the request on the handler instance.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return void
+     * @return $this
      */
     public function setRequestOnHandler($request)
     {
         if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
+
+        return $this;
     }
 }

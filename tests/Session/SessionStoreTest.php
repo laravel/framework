@@ -19,6 +19,27 @@ class SessionStoreTest extends TestCase
         m::close();
     }
 
+    public function testSessionCheckout()
+    {
+        $session = $this->getSession();
+        $id = $session->getId();
+
+        $session->getHandler()->shouldReceive('read')->with($id)->andReturn(serialize(['foo' => 'bar']));
+        $session->start();
+
+        $newId = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+        $session->getHandler()->shouldReceive('read')->with($newId)->andReturn(serialize(['name' => 'taylor']));
+
+        $session->checkout($newId, false)->put('master_session', $id);
+        $this->assertSame($id, $session->get('master_session'));
+        $this->assertSame('taylor', $session->get('name'));
+        $this->assertNull($session->get('foo'));
+
+        $session->getHandler()->shouldReceive('destroy')->once()->with($newId);
+        $session->checkout($id, true);
+        $this->assertSame('bar', $session->get('foo'));
+    }
+
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();
