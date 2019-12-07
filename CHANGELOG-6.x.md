@@ -4,6 +4,7 @@
 
 ### TODO
 - Added `ResourceCollection::preserveQueryParameters()` for preserve query parameters on paginated api resources ([#30745](https://github.com/laravel/framework/pull/30745), [e92a708](https://github.com/laravel/framework/commit/e92a70800671187cc30a39e965144101d5db169a))
+- Reconnect on connection missing to recover horizon ([#30778](https://github.com/laravel/framework/pull/30778))
 
 
 ## [v6.6.2 (2019-12-05)](https://github.com/laravel/framework/compare/v6.6.1...v6.6.2)
