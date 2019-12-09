@@ -29,7 +29,7 @@ class Mix
             $manifestDirectory = "/{$manifestDirectory}";
         }
 
-        if (file_exists(public_path($manifestDirectory.'/hot'))) {
+        if (file_exists(public_path(app('config')->get('app.mix_folder').$manifestDirectory.'/hot'))) {
             $url = rtrim(file_get_contents(public_path($manifestDirectory.'/hot')));
 
             if (Str::startsWith($url, ['http://', 'https://'])) {
@@ -39,7 +39,7 @@ class Mix
             return new HtmlString("//localhost:8080{$path}");
         }
 
-        $manifestPath = public_path($manifestDirectory.'/mix-manifest.json');
+        $manifestPath = public_path(app('config')->get('app.mix_folder').$manifestDirectory.'/mix-manifest.json');
 
         if (! isset($manifests[$manifestPath])) {
             if (! file_exists($manifestPath)) {
@@ -63,6 +63,10 @@ class Mix
             }
         }
 
-        return new HtmlString(app('config')->get('app.mix_url').$manifestDirectory.$manifest[$path]);
+        if (app('config')->get('app.mix_folderless')) {
+            return new HtmlString(app('config')->get('app.mix_url').$manifestDirectory.$manifest[$path]);
+        }
+
+        return new HtmlString(app('config')->get('app.mix_url').app('config')->get('app.mix_folder').$manifestDirectory.$manifest[$path]);
     }
 }
