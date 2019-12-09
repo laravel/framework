@@ -130,7 +130,11 @@ class ChangeColumn
         if (in_array($fluent['type'], ['smallinteger', 'integer', 'biginteger'])) {
             $options['customSchemaOptions'] = [
                 'collation' => null,
-                'charSet' => null
+                'charset' => null
+            ];
+            $options['platformOptions'] = [
+                'collation' => null,
+                'charset' => null
             ];
         }
 
