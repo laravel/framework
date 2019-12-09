@@ -13,6 +13,7 @@ use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Egulias\EmailValidator\Validation\SpoofCheckValidation;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
@@ -815,7 +816,17 @@ trait ValidatesAttributes
      */
     public function parseTable($table)
     {
-        return Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
+        [$connection, $table] = Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
+
+        if (Str::contains($table, '\\') && class_exists($table)) {
+            $model = new $table;
+
+            if ($model instanceof Model) {
+                $table = $model->getTable();
+            }
+        }
+
+        return [$connection, $table];
     }
 
     /**
