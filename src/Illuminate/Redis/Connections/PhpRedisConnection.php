@@ -4,8 +4,10 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
+use Illuminate\Support\Str;
 use Redis;
 use RedisCluster;
+use RedisException;
 
 /**
  * @mixin \Redis
@@ -13,14 +15,23 @@ use RedisCluster;
 class PhpRedisConnection extends Connection implements ConnectionContract
 {
     /**
+     * The connection creation callback.
+     *
+     * @var callable
+     */
+    protected $connector;
+
+    /**
      * Create a new PhpRedis connection.
      *
      * @param  \Redis  $client
+     * @param  callable  $connector
      * @return void
      */
-    public function __construct($client)
+    public function __construct($client, callable $connector = null)
     {
         $this->client = $client;
+        $this->connector = $connector;
     }
 
     /**
@@ -414,6 +425,26 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function executeRaw(array $parameters)
     {
         return $this->command('rawCommand', $parameters);
+    }
+
+    /**
+     * Run a command against the Redis database.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function command($method, array $parameters = [])
+    {
+        try {
+            return parent::command($method, $parameters);
+        } catch (RedisException $e) {
+            if (Str::contains($e->getMessage(), 'went away')) {
+                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+            }
+
+            throw $e;
+        }
     }
 
     /**

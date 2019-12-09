@@ -11,6 +11,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;
@@ -4299,6 +4300,36 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], ValidationData::extractDataFromPath('cat.cat1.name', $data));
     }
 
+    public function testParsingTablesFromModels()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], []);
+
+        $implicit_no_connection = $v->parseTable(ImplicitTableModel::class);
+        $this->assertEquals(null, $implicit_no_connection[0]);
+        $this->assertEquals('implicit_table_models', $implicit_no_connection[1]);
+
+        $explicit_no_connection = $v->parseTable(ExplicitTableModel::class);
+        $this->assertEquals(null, $explicit_no_connection[0]);
+        $this->assertEquals('explicits', $explicit_no_connection[1]);
+
+        $raw_no_connection = $v->parseTable('table');
+        $this->assertEquals(null, $raw_no_connection[0]);
+        $this->assertEquals('table', $raw_no_connection[1]);
+
+        $implicit_connection = $v->parseTable('connection.'.ImplicitTableModel::class);
+        $this->assertEquals('connection', $implicit_connection[0]);
+        $this->assertEquals('implicit_table_models', $implicit_connection[1]);
+
+        $explicit_connection = $v->parseTable('connection.'.ExplicitTableModel::class);
+        $this->assertEquals('connection', $explicit_connection[0]);
+        $this->assertEquals('explicits', $explicit_connection[1]);
+
+        $raw_connection = $v->parseTable('connection.table');
+        $this->assertEquals('connection', $raw_connection[0]);
+        $this->assertEquals('table', $raw_connection[1]);
+    }
+
     public function testUsingSettersWithImplicitRules()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4760,4 +4791,17 @@ class ValidationValidatorTest extends TestCase
             new ArrayLoader, 'en'
         );
     }
+}
+
+class ImplicitTableModel extends Model
+{
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class ExplicitTableModel extends Model
+{
+    protected $table = 'explicits';
+    protected $guarded = [];
+    public $timestamps = false;
 }
