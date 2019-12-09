@@ -4299,9 +4299,29 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [], []);
 
-        $this->assertEquals('implicit_table_models', $v->parseTable(ImplicitTableModel::class)[1]);
-        $this->assertEquals('explicits', $v->parseTable(ExplicitTableModel::class)[1]);
-        $this->assertEquals('table', $v->parseTable('table')[1]);
+        $implicit_no_connection = $v->parseTable(ImplicitTableModel::class);
+        $this->assertEquals(null, $implicit_no_connection[0]);
+        $this->assertEquals('implicit_table_models', $implicit_no_connection[1]);
+
+        $explicit_no_connection = $v->parseTable(ExplicitTableModel::class);
+        $this->assertEquals(null, $explicit_no_connection[0]);
+        $this->assertEquals('explicits', $explicit_no_connection[1]);
+
+        $raw_no_connection = $v->parseTable('table');
+        $this->assertEquals(null, $raw_no_connection[0]);
+        $this->assertEquals('table', $raw_no_connection[1]);
+
+        $implicit_connection = $v->parseTable('connection.'.ImplicitTableModel::class);
+        $this->assertEquals('connection', $implicit_connection[0]);
+        $this->assertEquals('implicit_table_models', $implicit_connection[1]);
+
+        $explicit_connection = $v->parseTable('connection.'.ExplicitTableModel::class);
+        $this->assertEquals('connection', $explicit_connection[0]);
+        $this->assertEquals('explicits', $explicit_connection[1]);
+
+        $raw_connection = $v->parseTable('connection.table');
+        $this->assertEquals('connection', $raw_connection[0]);
+        $this->assertEquals('table', $raw_connection[1]);
     }
 
     public function testUsingSettersWithImplicitRules()
