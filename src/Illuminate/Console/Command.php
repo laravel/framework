@@ -530,6 +530,31 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Write a string as hyperlink output.
+     *
+     * @param  string  $href
+     * @param  string|null  $string
+     * @param  int|string|null  $verbosity
+     * @return void
+     */
+    public function hyperlink($href, $string = null, $verbosity = null)
+    {
+        $this->line($this->getHyperlink($href, $string), null, $verbosity);
+    }
+
+    /**
+     * Format a string as a hyperlink.
+     *
+     * @param  string  $href
+     * @param  string|null  $string
+     * @return string
+     */
+    protected function getHyperlink($href, $string = null)
+    {
+        return sprintf('<href=%s>%s</>', $href, $string ?? $href);
+    }
+
+    /**
      * Write a string as question output.
      *
      * @param  string  $string
