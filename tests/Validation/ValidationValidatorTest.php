@@ -11,6 +11,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;
@@ -4293,6 +4294,16 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], ValidationData::extractDataFromPath('cat.cat1.name', $data));
     }
 
+    public function testParsingTablesFromModels()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], []);
+
+        $this->assertEquals('implicit_table_models', $v->parseTable(ImplicitTableModel::class)[1]);
+        $this->assertEquals('explicits', $v->parseTable(ExplicitTableModel::class)[1]);
+        $this->assertEquals('table', $v->parseTable('table')[1]);
+    }
+
     public function testUsingSettersWithImplicitRules()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4754,4 +4765,17 @@ class ValidationValidatorTest extends TestCase
             new ArrayLoader, 'en'
         );
     }
+}
+
+class ImplicitTableModel extends Model
+{
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class ExplicitTableModel extends Model
+{
+    protected $table = 'explicits';
+    protected $guarded = [];
+    public $timestamps = false;
 }
