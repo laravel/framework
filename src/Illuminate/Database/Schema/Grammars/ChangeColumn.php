@@ -127,6 +127,17 @@ class ChangeColumn
             ];
         }
 
+        if (in_array($fluent['type'], ['smallInteger', 'integer', 'bigInteger'])) {
+            $options['customSchemaOptions'] = [
+                'collation' => null,
+                'charset' => null
+            ];
+            $options['platformOptions'] = [
+                'collation' => null,
+                'charset' => null
+            ];
+        }
+
         return $options;
     }
 
