@@ -151,10 +151,10 @@ class Handler implements ExceptionHandlerContract
     /**
      * Get the default exception context variables for logging.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return array
      */
-    protected function exceptionContext(Exception $e)
+    protected function exceptionContext(Throwable $e)
     {
         return [];
     }
