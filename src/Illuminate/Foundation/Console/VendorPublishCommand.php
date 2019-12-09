@@ -278,7 +278,7 @@ class VendorPublishCommand extends Command
     {
         $from = str_replace(base_path(), '', realpath($from));
 
-        $to = str_replace(base_path(), '', realpath($to));
+        $to = $this->getHyperlink('file://'.realpath($to), str_replace(base_path(), '', realpath($to)));
 
         $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
     }
