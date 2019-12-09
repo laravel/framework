@@ -42,7 +42,9 @@ class ServeCommand extends Command
     {
         chdir(public_path());
 
-        $this->line("<info>Laravel development server started:</info> http://{$this->host()}:{$this->port()}");
+        $this->line(sprintf('<info>Laravel development server started:</info> %s',
+            $this->getHyperlink("http://{$this->host()}:{$this->port()}")
+        ));
 
         passthru($this->serverCommand(), $status);
 
