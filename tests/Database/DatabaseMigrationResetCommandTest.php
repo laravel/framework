@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
@@ -24,7 +25,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->with(null, m::type('Closure'))->andReturnUsing(function ($connection, $callback) {
+        $migrator->shouldReceive('usingConnection')->once()->with(null, m::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
             $callback();
         });
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
@@ -41,7 +42,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->with('foo', m::type('Closure'))->andReturnUsing(function ($connection, $callback) {
+        $migrator->shouldReceive('usingConnection')->once()->with('foo', m::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
             $callback();
         });
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
