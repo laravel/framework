@@ -73,7 +73,7 @@ abstract class GeneratorCommand extends Command
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
-        $this->info($this->type.' created successfully.');
+        $this->info($this->getHyperlink('file://'.$path, $this->type).' created successfully.');
     }
 
     /**
