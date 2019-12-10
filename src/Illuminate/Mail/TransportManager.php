@@ -12,6 +12,7 @@ use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Manager;
 use Postmark\Transport as PostmarkTransport;
+use Postmark\ThrowExceptionOnFailurePlugin;
 use Psr\Log\LoggerInterface;
 use Swift_SendmailTransport as SendmailTransport;
 use Swift_SmtpTransport as SmtpTransport;
@@ -148,9 +149,13 @@ class TransportManager extends Manager
      */
     protected function createPostmarkDriver()
     {
-        return new PostmarkTransport(
+        $transport = new PostmarkTransport(
             $this->config->get('services.postmark.token')
         );
+
+        $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
+
+        return $transport;
     }
 
     /**
