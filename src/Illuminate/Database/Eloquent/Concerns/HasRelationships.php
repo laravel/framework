@@ -723,30 +723,6 @@ trait HasRelationships
     }
 
     /**
-     * Duplicate the instance and unset all the loaded relations.
-     *
-     * @return $this
-     */
-    public function withoutRelations()
-    {
-        $model = clone $this;
-
-        return $model->unsetRelations();
-    }
-
-    /**
-     * Unset all the loaded relations for the instance.
-     *
-     * @return $this
-     */
-    public function unsetRelations()
-    {
-        $this->relations = [];
-
-        return $this;
-    }
-
-    /**
      * Get all the loaded relations for the instance.
      *
      * @return array
@@ -814,6 +790,30 @@ trait HasRelationships
     public function setRelations(array $relations)
     {
         $this->relations = $relations;
+
+        return $this;
+    }
+
+    /**
+     * Duplicate the instance and unset all the loaded relations.
+     *
+     * @return $this
+     */
+    public function withoutRelations()
+    {
+        $model = clone $this;
+
+        return $model->unsetRelations();
+    }
+
+    /**
+     * Unset all the loaded relations for the instance.
+     *
+     * @return $this
+     */
+    public function unsetRelations()
+    {
+        $this->relations = [];
 
         return $this;
     }
