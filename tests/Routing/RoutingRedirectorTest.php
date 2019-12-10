@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Http\InternalRedirectResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -167,5 +168,13 @@ class RoutingRedirectorTest extends TestCase
 
         $result = $this->redirect->setIntendedUrl('http://foo.com/bar');
         $this->assertNull($result);
+    }
+
+    public function testInternalRedirect()
+    {
+        $response = $this->redirect->internal('bar');
+
+        $this->assertInstanceOf(InternalRedirectResponse::class, $response);
+        $this->assertEquals('bar', $response->getName());
     }
 }

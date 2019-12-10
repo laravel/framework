@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Http\InternalRedirectResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Traits\Macroable;
@@ -188,6 +189,15 @@ class Redirector
     public function action($action, $parameters = [], $status = 302, $headers = [])
     {
         return $this->to($this->generator->action($action, $parameters), $status, $headers);
+    }
+
+    /**
+     * @param  string  $name
+     * @return \Illuminate\Http\InternalRedirectResponse
+     */
+    public function internal($name)
+    {
+        return new InternalRedirectResponse($name);
     }
 
     /**

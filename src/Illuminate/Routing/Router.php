@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\InternalRedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -23,6 +24,7 @@ use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * @mixin \Illuminate\Routing\RouteRegistrar
@@ -592,9 +594,14 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  string  $name
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
      */
     public function respondWithRoute($name)
     {
+        if (!$this->routes->hasNamedRoute($name)) {
+            throw new RouteNotFoundException("Route [{$name}] not defined for the internal redirect.");
+        }
+
         $route = tap($this->routes->getByName($name))->bind($this->currentRequest);
 
         return $this->runRoute($this->currentRequest, $route);
@@ -718,6 +725,10 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function prepareResponse($request, $response)
     {
+        if ($response instanceof InternalRedirectResponse) {
+            return $this->respondWithRoute($response->getName());
+        }
+
         return static::toResponse($request, $response);
     }
 

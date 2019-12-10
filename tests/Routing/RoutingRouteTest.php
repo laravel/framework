@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\InternalRedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -1701,6 +1702,21 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact'));
         $this->assertEquals(301, $response->getStatusCode());
+    }
+
+    public function testInternalRedirect()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo', function () {
+            return new InternalRedirectResponse('bar');
+        });
+
+        $router->name('bar')->get('bar', function () {
+            return 'baz';
+        });
+
+        $this->assertSame('baz', $router->dispatch(Request::create('foo', 'GET'))->getContent());
     }
 
     protected function getRouter()
