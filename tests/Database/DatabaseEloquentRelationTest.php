@@ -236,15 +236,22 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testWithoutRelations()
     {
-        $model = new EloquentNoTouchingModelStub;
+        $original = new EloquentNoTouchingModelStub;
 
-        $model->setRelation('foo', 'baz');
+        $original->setRelation('foo', 'baz');
 
-        $this->assertEquals('baz', $model->getRelation('foo'));
+        $this->assertEquals('baz', $original->getRelation('foo'));
 
-        $model = $model->withoutRelations();
+        $model = $original->withoutRelations();
 
         $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertTrue($original->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('foo'));
+
+        $model = $original->unsetRelations();
+
+        $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertFalse($original->relationLoaded('foo'));
         $this->assertFalse($model->relationLoaded('foo'));
     }
 
