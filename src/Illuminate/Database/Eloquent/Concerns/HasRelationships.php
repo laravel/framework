@@ -723,6 +723,18 @@ trait HasRelationships
     }
 
     /**
+     * Unset all the loaded relations for the instance.
+     *
+     * @return $this
+     */
+    public function withoutRelations()
+    {
+        $this->relations = [];
+
+        return $this;
+    }
+
+    /**
      * Get all the loaded relations for the instance.
      *
      * @return array
