@@ -598,7 +598,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function respondWithRoute($name)
     {
-        if (!$this->routes->hasNamedRoute($name)) {
+        if (! $this->routes->hasNamedRoute($name)) {
             throw new RouteNotFoundException("Route [{$name}] not defined for the internal redirect.");
         }
 
