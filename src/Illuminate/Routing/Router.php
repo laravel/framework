@@ -260,6 +260,17 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Register a route which returns 410 Gone.
+     *
+     * @param  string  $uri
+     * @return \Illuminate\Routing\Route
+     */
+    public function gone($uri)
+    {
+        return $this->any($uri, '\Illuminate\Routing\GoneController');
+    }
+
+    /**
      * Register a new route that returns a view.
      *
      * @param  string  $uri
