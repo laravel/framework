@@ -149,13 +149,11 @@ class TransportManager extends Manager
      */
     protected function createPostmarkDriver()
     {
-        $transport = new PostmarkTransport(
+        return tap(new PostmarkTransport(
             $this->config->get('services.postmark.token')
-        );
-
-        $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
-
-        return $transport;
+        ), function ($transport) {
+            $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
+        });
     }
 
     /**
