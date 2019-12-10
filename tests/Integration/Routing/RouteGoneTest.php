@@ -11,16 +11,17 @@ use Orchestra\Testbench\TestCase;
  */
 class RouteGoneTest extends TestCase
 {
-    public function testRouteGoneReturnsResponse()
+    public function testRouteGoneReturnsResponseWhenNoViewExists()
     {
         Route::gone('old_page');
 
         $response = $this->get('/old_page');
         $this->assertEquals(410, $response->getStatusCode());
+        $this->assertStringNotContainsString('html', $response->getContent());
         $this->assertEquals('Gone', $response->getContent());
     }
 
-    public function testRouteGoneReturnsView()
+    public function testRouteGoneReturnsViewWhenViewExists()
     {
         Route::gone('old_page');
 
@@ -28,16 +29,29 @@ class RouteGoneTest extends TestCase
 
         $response = $this->get('/old_page');
         $this->assertEquals(410, $response->getStatusCode());
+        $this->assertStringContainsString('html', $response->getContent());
         $this->assertStringContainsString('Gone', $response->getContent());
     }
 
-//    public function testRouteViewWithParams()
-//    {
-//        Route::view('route/{param}/{param2?}', 'view', ['foo' => 'bar']);
-//
-//        View::addLocation(__DIR__.'/Fixtures');
-//
-//        $this->assertStringContainsString('Test bar', $this->get('/route/value1/value2')->getContent());
-//        $this->assertStringContainsString('Test bar', $this->get('/route/value1')->getContent());
-//    }
+    public function testRouteGoneWithParamsReturnsResponseWhenNoViewExists()
+    {
+        Route::gone('old_page/{param}/{param2?}');
+
+        $response = $this->get('/old_page/foo');
+        $this->assertEquals(410, $response->getStatusCode());
+        $this->assertStringNotContainsString('html', $response->getContent());
+        $this->assertStringContainsString('Gone', $response->getContent());
+    }
+
+    public function testRouteGoneWithParamsReturnsReturnsViewWhenViewExists()
+    {
+        Route::gone('old_page/{param}/{param2?}');
+
+        View::addNamespace('errors', __DIR__.'/Fixtures/errors');
+
+        $response = $this->get('/old_page/bar');
+        $this->assertEquals(410, $response->getStatusCode());
+        $this->assertStringContainsString('html', $response->getContent());
+        $this->assertStringContainsString('Gone', $response->getContent());
+    }
 }
