@@ -61,12 +61,12 @@ class Markdown
             'mail', $this->htmlComponentPaths()
         )->make($view, $data)->render();
 
-        $viewPath = Str::contains($this->theme, '::')
+        $theme = Str::contains($this->theme, '::')
             ? $this->theme
             : 'mail::themes.'.$this->theme;
 
         return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
-            $contents, $this->view->make($viewPath, $data)->render()
+            $contents, $this->view->make($theme, $data)->render()
         ));
     }
 
