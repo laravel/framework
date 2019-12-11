@@ -625,7 +625,7 @@ trait HasRelationships
         // just sort the models and join them together to get the table name.
         $segments = [
             $instance ? $instance->joiningTableSegment()
-                      : Str::snake(class_basename($related)),
+                      : Str::singular($instance->getTable()),
             $this->joiningTableSegment(),
         ];
 
@@ -644,7 +644,7 @@ trait HasRelationships
      */
     public function joiningTableSegment()
     {
-        return Str::snake(class_basename($this));
+        return Str::singular($this->getTable());
     }
 
     /**
