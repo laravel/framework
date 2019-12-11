@@ -344,13 +344,13 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->schema()->create('users_default', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
-            $table->unsignedInteger('has_many_through_default_test_country_id');
+            $table->unsignedInteger('countries_default_id');
             $table->timestamps();
         });
 
         $this->schema()->create('posts_default', function ($table) {
             $table->increments('id');
-            $table->integer('has_many_through_default_test_user_id');
+            $table->integer('users_default_id');
             $table->string('title');
             $table->text('body');
             $table->timestamps();
