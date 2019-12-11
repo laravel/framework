@@ -23,7 +23,6 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
