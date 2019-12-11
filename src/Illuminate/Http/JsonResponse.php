@@ -151,7 +151,7 @@ class JsonResponse extends BaseJsonResponse
      */
     public function offsetSet($offset, $value)
     {
-        throw new LogicException("Response data may not be mutated using array access.");
+        throw new LogicException('Response data may not be mutated using array access.');
     }
 
     /**
@@ -162,6 +162,6 @@ class JsonResponse extends BaseJsonResponse
      */
     public function offsetUnset($offset)
     {
-        throw new LogicException("Response data may not be mutated using array access.");
+        throw new LogicException('Response data may not be mutated using array access.');
     }
 }
