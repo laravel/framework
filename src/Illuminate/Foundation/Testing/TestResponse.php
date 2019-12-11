@@ -1243,7 +1243,7 @@ class TestResponse implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        throw new LogicException("Response data may not be mutated using array access.");
+        throw new LogicException('Response data may not be mutated using array access.');
     }
 
     /**
@@ -1254,7 +1254,7 @@ class TestResponse implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        throw new LogicException("Response data may not be mutated using array access.");
+        throw new LogicException('Response data may not be mutated using array access.');
     }
 
     /**
