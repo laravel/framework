@@ -89,7 +89,7 @@ abstract class ServiceProvider
     {
         $view = $this->app['view'];
 
-        if (is_array($this->app->config['view']) && is_array($this->app->config['view']['paths'])) {
+        if (isset($this->app->config['view']['paths']) && is_array($this->app->config['view']['paths'])) {
             foreach ($this->app->config['view']['paths'] as $viewPath) {
                 if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
                     $view->addNamespace($namespace, $appPath);
