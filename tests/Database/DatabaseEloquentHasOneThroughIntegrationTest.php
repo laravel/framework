@@ -300,13 +300,13 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->schema()->create('users_default', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
-            $table->unsignedInteger('has_one_through_default_test_position_id')->unique()->nullable();
+            $table->unsignedInteger('positions_default_id')->unique()->nullable();
             $table->timestamps();
         });
 
         $this->schema()->create('contracts_default', function ($table) {
             $table->increments('id');
-            $table->integer('has_one_through_default_test_user_id')->unique();
+            $table->integer('users_default_id')->unique();
             $table->string('title');
             $table->text('body');
             $table->timestamps();
