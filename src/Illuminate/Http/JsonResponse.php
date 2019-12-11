@@ -17,6 +17,13 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
+     * The formatted JSON decoded.
+     *
+     * @var mixed
+     */
+    protected $decoded;
+
+    /**
      * Constructor.
      *
      * @param  mixed  $data
@@ -128,7 +135,9 @@ class JsonResponse extends BaseJsonResponse
      */
     public function offsetExists($offset)
     {
-        return isset($this->original[$offset]);
+        $this->decoded = $this->decoded ?: json_decode($this->data, true);
+
+        return isset($this->decoded[$offset]);
     }
 
     /**
@@ -139,7 +148,9 @@ class JsonResponse extends BaseJsonResponse
      */
     public function offsetGet($offset)
     {
-        return $this->original[$offset];
+        $this->decoded = $this->decoded ?: json_decode($this->data, true);
+
+        return $this->decoded[$offset];
     }
 
     /**
