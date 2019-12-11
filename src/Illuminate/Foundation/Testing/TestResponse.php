@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * @mixin \Illuminate\Http\Response
  */
-class TestResponse
+class TestResponse implements ArrayAccess
 {
     use Tappable, Macroable {
         __call as macroCall;
@@ -1208,6 +1209,51 @@ class TestResponse
     public function __isset($key)
     {
         return isset($this->baseResponse->{$key});
+    }
+
+    /**
+     * Determine if the given offset exists.
+     *
+     * @param  string  $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return $this->baseResponse->offsetExists($offset);
+    }
+
+    /**
+     * Get the value for a given offset.
+     *
+     * @param  string  $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->baseResponse->offsetGet($offset);
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param  string  $offset
+     * @param  mixed  $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        return $this->baseResponse->offsetSet($offset, $value);
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param  string  $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        $this->baseResponse->offsetUnset($offset);
     }
 
     /**
