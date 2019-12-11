@@ -17,6 +17,30 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 
+/**
+ * @method static \Illuminate\Database\Eloquent\Model make(array $attributes = [])
+ * @method static \Illuminate\Database\Eloquent\Builder whereKey(mixed $id)
+ * @method static \Illuminate\Database\Eloquent\Builder whereKeyNot(mixed $id)
+ * @method static \Illuminate\Database\Eloquent\Builder where(\Closure|string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+ * @method static \Illuminate\Database\Eloquent\Builder latest(string $column = null)
+ * @method static \Illuminate\Database\Eloquent\Builder oldest(string $column = null) Add an "order by" clause for a timestamp to the query.
+ * @method static \Illuminate\Database\Eloquent\Collection hydrate(array $items)
+ * @method static \Illuminate\Database\Eloquent\Collection fromQuery(string $query, array $bindings = [])
+ * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null find(mixed $id, array $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Collection findMany(\Illuminate\Contracts\Support\Arrayable|array $ids, array $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection findOrFail(mixed $ids, array $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Model findOrNew(mixed $id, array $columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Model firstOrNew(array $attributes, array $values = [])
+ * @method static \Illuminate\Database\Eloquent\Model firstOrCreate(array $attributes, array $values = [])
+ * @method static \Illuminate\Database\Eloquent\Model updateOrCreate(array $attributes, array $values = [])
+ * @method static \Illuminate\Database\Eloquent\Model firstOrFail($columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Model|mixed firstOr(\Closure|array $columns = ['*'], \Closure $callback = null)
+ * @method static \Illuminate\Contracts\Pagination\LengthAwarePaginator paginate(int $perPage = null, array $columns = ['*'], string $pageName = 'page', int|null $page = null)
+ * @method static \Illuminate\Contracts\Pagination\Paginator simplePaginate(int $perPage = null, array $columns = ['*'], string $pageName = 'page', int|null $page = null)
+ * @method static \Illuminate\Database\Eloquent\Model create(array $attributes = [])
+ * @method static \Illuminate\Database\Eloquent\Model forceCreate(array $attributes = [])
+ * @method static \Illuminate\Database\Eloquent\Builder without(mixed $relations)
+ */
 abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
