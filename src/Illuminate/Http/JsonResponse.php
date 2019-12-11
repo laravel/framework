@@ -16,13 +16,6 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
-     * The formatted JSON decoded.
-     *
-     * @var mixed
-     */
-    protected $decoded;
-
-    /**
      * Constructor.
      *
      * @param  mixed  $data
