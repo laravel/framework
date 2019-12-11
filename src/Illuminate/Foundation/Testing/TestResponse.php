@@ -1219,7 +1219,7 @@ class TestResponse implements ArrayAccess
      */
     public function offsetExists($offset)
     {
-        return $this->baseResponse->offsetExists($offset);
+        return isset($this->json()[$offset]);
     }
 
     /**
@@ -1230,7 +1230,7 @@ class TestResponse implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return $this->baseResponse->offsetGet($offset);
+        return $this->json()[$offset];
     }
 
     /**
@@ -1242,7 +1242,7 @@ class TestResponse implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        return $this->baseResponse->offsetSet($offset, $value);
+        throw new LogicException("Response data may not be mutated using array access.");
     }
 
     /**
@@ -1253,7 +1253,7 @@ class TestResponse implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        $this->baseResponse->offsetUnset($offset);
+        throw new LogicException("Response data may not be mutated using array access.");
     }
 
     /**
