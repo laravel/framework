@@ -68,16 +68,18 @@ class ConsoleApplicationTest extends TestCase
 
     public function testArtisanWithHyperlink()
     {
-        $this->app[Kernel::class]->registerCommand(new HyperlinkCommandStub);
+        $kernel = $this->app[Kernel::class];
 
-        $mock = $this->artisan('foo:hyperlink');
-        $mock->expectsOutput('Laravel');
+        $kernel->registerCommand(new HyperlinkCommandStub);
 
-        $mock = $this->artisan('foo:hyperlink', ['--ansi' => true]);
-        $mock->expectsOutput("\033]8;;https://laravel.com\033\\Laravel\033]8;;\033\\");
+        $kernel->call('foo:hyperlink');
+        $this->assertEquals("Laravel\n", $kernel->output());
 
-        $mock = $this->artisan('foo:hyperlink', ['--no-ansi' => true]);
-        $mock->expectsOutput('Laravel');
+        $kernel->call('foo:hyperlink', ['--ansi' => true]);
+        $this->assertEquals("\033]8;;https://laravel.com\033\\Laravel\033]8;;\033\\\n", $kernel->output());
+
+        $kernel->call('foo:hyperlink', ['--no-ansi' => true]);
+        $this->assertEquals("Laravel\n", $kernel->output());
     }
 }
 
@@ -107,12 +109,6 @@ class HyperlinkCommandStub extends Command
 
     public function handle()
     {
-        if ($this->option('ansi')) {
-            $this->output->setDecorated(true);
-        } elseif ($this->option('no-ansi')) {
-            $this->output->setDecorated(false);
-        }
-
         $this->hyperlink('https://laravel.com', 'Laravel');
     }
 }
