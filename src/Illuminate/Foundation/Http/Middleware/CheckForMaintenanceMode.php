@@ -48,7 +48,7 @@ class CheckForMaintenanceMode
         if ($this->app->isDownForMaintenance()) {
             $data = json_decode(file_get_contents($this->app->storagePath().'/framework/down'), true);
 
-            if (isset($data['allowed']) && IpUtils::checkIp($request->ip(), (array) $data['allowed'])) {
+            if (isset($data['allowed']) && $this->containsAllowedIp($request, (array) $data['allowed'])) {
                 return $next($request);
             }
 
@@ -60,6 +60,24 @@ class CheckForMaintenanceMode
         }
 
         return $next($request);
+    }
+
+    /**
+     * Checks if allow IP addresses is contained in the client IP addresses.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array $allowedIps
+     * @return bool
+     */
+    protected function containsAllowedIp($request, $allowedIps)
+    {
+        foreach ($request->ips() as $ip) {
+            if (IpUtils::checkIp($ip, $allowedIps)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
