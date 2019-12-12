@@ -55,6 +55,10 @@ class ModelMakeCommand extends GeneratorCommand
             $this->createMigration();
         }
 
+        if ($this->option('seed')) {
+            $this->createSeeder();
+        }
+
         if ($this->option('controller') || $this->option('resource')) {
             $this->createController();
         }
@@ -91,6 +95,20 @@ class ModelMakeCommand extends GeneratorCommand
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
             '--create' => $table,
+        ]);
+    }
+    
+    /**
+     * Create a seeder file for the model.
+     *
+     * @return void
+     */
+    protected function createSeeder()
+    {
+        $seederName = Str::plural(Str::ucfirst($this->argument('name')));
+
+        $this->call('make:seed', [
+            'name' => "{$seederName}Seeder"
         ]);
     }
 
@@ -142,6 +160,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
 
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
+
+            ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder file for the model'],
 
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
 
