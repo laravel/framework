@@ -65,6 +65,20 @@ class ConsoleApplicationTest extends TestCase
 
         $this->assertTrue($this->app->resolved(Schedule::class));
     }
+
+    public function testArtisanWithHyperlink()
+    {
+        $this->app[Kernel::class]->registerCommand(new HyperlinkCommandStub);
+
+        $mock = $this->artisan('foo:hyperlink');
+        $mock->expectsOutput('Laravel');
+
+        $mock = $this->artisan('foo:hyperlink', ['--ansi' => true]);
+        $mock->expectsOutput("\033]8;;https://laravel.com\033\\Laravel\033]8;;\033\\");
+
+        $mock = $this->artisan('foo:hyperlink', ['--no-ansi' => true]);
+        $mock->expectsOutput('Laravel');
+    }
 }
 
 class FooCommandStub extends Command
@@ -84,5 +98,21 @@ class ScheduleCommandStub extends Command
     public function handle(Schedule $schedule)
     {
         //
+    }
+}
+
+class HyperlinkCommandStub extends Command
+{
+    protected $signature = 'foo:hyperlink';
+
+    public function handle()
+    {
+        if ($this->option('ansi')) {
+            $this->output->setDecorated(true);
+        } elseif ($this->option('no-ansi')) {
+            $this->output->setDecorated(false);
+        }
+
+        $this->hyperlink('https://laravel.com', 'Laravel');
     }
 }
