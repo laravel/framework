@@ -40,6 +40,10 @@ class Inspiring
             'I begin to speak only when I am certain what I will say is not better left unsaid - Cato the Younger',
             'Order your soul. Reduce your wants. - Augustine',
             'Be present above all else. - Naval Ravikant',
+            'Let all your things have their places; let each part of your business have its time. - Benjamin Franklin',
+            'If you do not have a consistent goal in life, you can not live it in a consistent way. - Marcus Aurelius',
+            'No surplus words or unnecessary actions. - Marcus Aurelius',
+            'People find pleasure in different ways. I find it in keeping my mind clear. - Marcus Aurelius',
         ])->random();
     }
 }
