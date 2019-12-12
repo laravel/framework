@@ -97,7 +97,7 @@ class ModelMakeCommand extends GeneratorCommand
             '--create' => $table,
         ]);
     }
-    
+
     /**
      * Create a seeder file for the model.
      *
@@ -108,7 +108,7 @@ class ModelMakeCommand extends GeneratorCommand
         $seederName = Str::plural(Str::ucfirst($this->argument('name')));
 
         $this->call('make:seed', [
-            'name' => "{$seederName}Seeder"
+            'name' => "{$seederName}Seeder",
         ]);
     }
 
