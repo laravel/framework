@@ -388,11 +388,12 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @param  bool  $encryptCookies
+     * @return  \Illuminate\Foundation\Testing\TestResponse
      */
-    public function json($method, $uri, array $data = [], array $headers = [])
+    public function json($method, $uri, array $data = [], array $headers = [], bool $encryptCookies = false)
     {
-        $files = $this->extractFilesFromDataArray($data);
+        $this->encryptCookies = $encryptCookies;
 
         $content = json_encode($data);
 
@@ -402,8 +403,12 @@ trait MakesHttpRequests
             'Accept' => 'application/json',
         ], $headers);
 
+        $cookies = $this->prepareCookiesForRequest();
+        $files = $this->extractFilesFromDataArray($data);
+        $server = $this->transformHeadersToServerVars($headers);
+
         return $this->call(
-            $method, $uri, [], [], $files, $this->transformHeadersToServerVars($headers), $content
+            $method, $uri, [], $cookies, $files, $server, $content
         );
     }
 
