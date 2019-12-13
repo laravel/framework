@@ -4783,7 +4783,7 @@ class ValidationValidatorTest extends TestCase
                     'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
                 ], [
                     'has_appointment' => false,
-                    'appointment_date' => 'should be excluded'
+                    'appointment_date' => 'should be excluded',
                 ], [
                     'has_appointment' => false,
                 ],
@@ -4821,7 +4821,7 @@ class ValidationValidatorTest extends TestCase
                     'doctor_appointment_date' => '2019-12-13',
                 ], [
                     'has_no_appointments' => true,
-                ]
+                ],
             ],
             [
                 [
