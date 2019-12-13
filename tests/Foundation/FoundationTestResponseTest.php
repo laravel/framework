@@ -84,7 +84,7 @@ class FoundationTestResponseTest extends TestCase
             'render' => 'hello world',
             'gatherData' => [
                 'foo' => [
-                    'nested' => 'bar'
+                    'nested' => 'bar',
                 ],
             ],
         ]);
