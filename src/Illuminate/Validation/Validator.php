@@ -49,6 +49,13 @@ class Validator implements ValidatorContract
     protected $failedRules = [];
 
     /**
+     * Attributes that should be excluded from the validated data.
+     *
+     * @var array
+     */
+    protected $excludeAttributes = [];
+
+    /**
      * The message bag instance.
      *
      * @var \Illuminate\Support\MessageBag
@@ -178,6 +185,13 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * The validation rules that can exclude an attribute.
+     *
+     * @var array
+     */
+    protected $excludeRules = ['ExcludeIf'];
+
+    /**
      * The size related validation rules.
      *
      * @var array
@@ -280,6 +294,10 @@ class Validator implements ValidatorContract
                     break;
                 }
             }
+        }
+
+        foreach ($this->excludeAttributes as $excludeAttribute) {
+            unset($this->rules[$excludeAttribute]);
         }
 
         // Here we will spin through all of the "after" hooks on this validator and
@@ -475,6 +493,10 @@ class Validator implements ValidatorContract
      */
     protected function isValidatable($rule, $attribute, $value)
     {
+        if (in_array($rule, $this->excludeRules)) {
+            return true;
+        }
+
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
                $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
@@ -594,6 +616,10 @@ class Validator implements ValidatorContract
             return $this->messages->has($attribute);
         }
 
+        if (in_array($attribute, $this->excludeAttributes)) {
+            return true;
+        }
+
         if (isset($this->failedRules[$attribute]) &&
             array_key_exists('uploaded', $this->failedRules[$attribute])) {
             return true;
@@ -619,6 +645,12 @@ class Validator implements ValidatorContract
     {
         if (! $this->messages) {
             $this->passes();
+        }
+
+        if (in_array($rule, $this->excludeRules)) {
+            $this->excludeAttributes[] = $attribute;
+
+            return;
         }
 
         $this->messages->add($attribute, $this->makeReplacements(

@@ -4774,6 +4774,139 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    public function providesPassingExcludeIfData()
+    {
+        return [
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
+                ], [
+                    'has_appointment' => false,
+                    'appointment_date' => 'should be excluded'
+                ], [
+                    'has_appointment' => false,
+                ],
+            ],
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
+                ], [
+                    'has_appointment' => false,
+                ], [
+                    'has_appointment' => false,
+                ],
+            ],
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
+                ], [
+                    'has_appointment' => true,
+                    'appointment_date' => '2019-12-13',
+                ], [
+                    'has_appointment' => true,
+                    'appointment_date' => '2019-12-13',
+                ],
+            ],
+            [
+                [
+                    'has_no_appointments' => ['required', 'bool'],
+                    'has_doctor_appointment' => ['exclude_if:has_no_appointments,true', 'required', 'bool'],
+                    'doctor_appointment_date' => ['exclude_if:has_no_appointments,true', 'exclude_if:has_doctor_appointment,false', 'required', 'date'],
+                ], [
+                    'has_no_appointments' => true,
+                    'has_doctor_appointment' => true,
+                    'doctor_appointment_date' => '2019-12-13',
+                ], [
+                    'has_no_appointments' => true,
+                ]
+            ],
+            [
+                [
+                    'has_no_appointments' => ['required', 'bool'],
+                    'has_doctor_appointment' => ['exclude_if:has_no_appointments,true', 'required', 'bool'],
+                    'doctor_appointment_date' => ['exclude_if:has_no_appointments,true', 'exclude_if:has_doctor_appointment,false', 'required', 'date'],
+                ], [
+                    'has_no_appointments' => false,
+                    'has_doctor_appointment' => false,
+                    'doctor_appointment_date' => 'should be excluded',
+                ], [
+                    'has_no_appointments' => false,
+                    'has_doctor_appointment' => false,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providesPassingExcludeIfData
+     */
+    public function testExcludeIf($rules, $data, $expectedValidatedData)
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            $data,
+            $rules
+        );
+
+        $passes = $validator->passes();
+
+        if (! $passes) {
+            $message = sprintf("Validation unexpectedly failed:\nRules: %s\nData: %s\nValidation error: %s",
+                json_encode($rules, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($validator->messages()->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
+        }
+
+        $this->assertTrue($passes, $message ?? '');
+
+        $this->assertSame($expectedValidatedData, $validator->validated());
+    }
+
+    public function providesFailingExcludeIfData()
+    {
+        return [
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
+                ], [
+                    'has_appointment' => true,
+                ], [
+                    'appointment_date' => ['validation.required'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providesFailingExcludeIfData
+     */
+    public function testExcludeIfWhenValidationFails($rules, $data, $expectedMessages)
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            $data,
+            $rules
+        );
+
+        $fails = $validator->fails();
+
+        if (! $fails) {
+            $message = sprintf("Validation unexpectedly passed:\nRules: %s\nData: %s",
+                json_encode($rules, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+            );
+        }
+
+        $this->assertTrue($fails, $message ?? '');
+
+        $this->assertSame($expectedMessages, $validator->messages()->toArray());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
