@@ -861,7 +861,7 @@ class TestResponse implements ArrayAccess
         } elseif ($value instanceof Model) {
             PHPUnit::assertTrue($value->is($this->original->gatherData()[$key]));
         } else {
-            PHPUnit::assertEquals($value, $this->original->gatherData()[$key]);
+            PHPUnit::assertEquals($value, Arr::get($this->original->gatherData(), $key));
         }
 
         return $this;
