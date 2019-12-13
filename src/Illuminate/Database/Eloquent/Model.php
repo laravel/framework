@@ -341,6 +341,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $totallyGuarded = $this->totallyGuarded();
 
+        $guarded = [];
+
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
             $key = $this->removeTableFromKey($key);
 
@@ -350,11 +352,12 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded) {
-                throw new MassAssignmentException(sprintf(
-                    'Add [%s] to fillable property to allow mass assignment on [%s].',
-                    $key, get_class($this)
-                ));
+                $guarded[] = $key;
             }
+        }
+
+        if (count($guarded) > 0) {
+            throw new MassAssignmentException($guarded, get_class($this));
         }
 
         return $this;

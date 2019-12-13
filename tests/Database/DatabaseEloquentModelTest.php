@@ -1020,12 +1020,26 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testGlobalGuarded()
     {
-        $this->expectException(MassAssignmentException::class);
-        $this->expectExceptionMessage('name');
-
-        $model = new EloquentModelStub;
-        $model->guard(['*']);
-        $model->fill(['name' => 'foo', 'age' => 'bar', 'votes' => 'baz']);
+        try {
+            $model = new EloquentModelStub;
+            $model->guard(['*']);
+            $model->fill([
+                'age' => 'bar',
+                'name' => 'foo',
+                'votes' => 'baz',
+            ]);
+        } catch (MassAssignmentException $exception) {
+            $this->assertSame(
+                'Add [age, name, votes] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].',
+                $exception->getMessage()
+            );
+            $this->assertSame([
+                'age',
+                'name',
+                'votes',
+            ], $exception->attributes());
+            $this->assertSame(EloquentModelStub::class, $exception->model());
+        }
     }
 
     public function testUnguardedRunsCallbackWhileBeingUnguarded()
