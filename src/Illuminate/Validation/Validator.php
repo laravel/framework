@@ -287,17 +287,27 @@ class Validator implements ValidatorContract
         foreach ($this->rules as $attribute => $rules) {
             $attribute = str_replace('\.', '->', $attribute);
 
+            // If this attribute is a nested rule, its parent might have already
+            // been excluded. If so, we have to remove the attribute.
+            if ($this->shouldBeExcluded($attribute)) {
+                $this->removeAttribute($attribute);
+
+                continue;
+            }
+
             foreach ($rules as $rule) {
                 $this->validateAttribute($attribute, $rule);
+
+                if ($this->shouldBeExcluded($attribute)) {
+                    $this->removeAttribute($attribute);
+
+                    break;
+                }
 
                 if ($this->shouldStopValidating($attribute)) {
                     break;
                 }
             }
-        }
-
-        foreach ($this->excludeAttributes as $excludeAttribute) {
-            unset($this->rules[$excludeAttribute]);
         }
 
         // Here we will spin through all of the "after" hooks on this validator and
@@ -308,6 +318,40 @@ class Validator implements ValidatorContract
         }
 
         return $this->messages->isEmpty();
+    }
+
+    /**
+     * Determine if the attribute should be excluded.
+     *
+     * @param  string  $attribute
+     *
+     * @return bool
+     */
+    protected function shouldBeExcluded($attribute)
+    {
+        foreach ($this->excludeAttributes as $excludeAttribute) {
+            if ($attribute === $excludeAttribute) {
+                return true;
+            }
+
+            if (Str::startsWith($attribute, $excludeAttribute.'.')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove the given attribute.
+     *
+     * @param  string  $attribute
+     *
+     * @return void
+     */
+    protected function removeAttribute($attribute)
+    {
+        unset($this->rules[$attribute]);
     }
 
     /**
@@ -614,10 +658,6 @@ class Validator implements ValidatorContract
     {
         if ($this->hasRule($attribute, ['Bail'])) {
             return $this->messages->has($attribute);
-        }
-
-        if (in_array($attribute, $this->excludeAttributes)) {
-            return true;
         }
 
         if (isset($this->failedRules[$attribute]) &&

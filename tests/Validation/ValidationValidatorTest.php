@@ -4790,6 +4790,17 @@ class ValidationValidatorTest extends TestCase
             ],
             [
                 [
+                    'cat' => ['required', 'string'],
+                    'mouse' => ['exclude_if:cat,Tom', 'required', 'file'],
+                ], [
+                    'cat' => 'Tom',
+                    'mouse' => 'should be excluded',
+                ], [
+                    'cat' => 'Tom',
+                ],
+            ],
+            [
+                [
                     'has_appointment' => ['required', 'bool'],
                     'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
                 ], [
@@ -4837,6 +4848,60 @@ class ValidationValidatorTest extends TestCase
                     'has_doctor_appointment' => false,
                 ],
             ],
+            'nested-01' => [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments.*' => ['exclude_if:has_appointments,false', 'required', 'date'],
+                ], [
+                    'has_appointments' => false,
+                    'appointments' => ['2019-05-15', '2020-05-15'],
+                ], [
+                    'has_appointments' => false,
+                ],
+            ],
+            'nested-02' => [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments.*.date' => ['exclude_if:has_appointments,false', 'required', 'date'],
+                    'appointments.*.name' => ['exclude_if:has_appointments,false', 'required', 'string'],
+                ], [
+                    'has_appointments' => false,
+                    'appointments' => [
+                        ['date' => 'should be excluded', 'name' => 'should be excluded'],
+                    ],
+                ], [
+                    'has_appointments' => false,
+                ],
+            ],
+            'nested-03' => [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments' => ['exclude_if:has_appointments,false', 'required', 'array'],
+                    'appointments.*.date' => ['required', 'date'],
+                    'appointments.*.name' => ['required', 'string'],
+                ], [
+                    'has_appointments' => false,
+                    'appointments' => [
+                        ['date' => 'should be excluded', 'name' => 'should be excluded'],
+                    ],
+                ], [
+                    'has_appointments' => false,
+                ],
+            ],
+            'nested-04' => [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments.*.date' => ['required', 'date'],
+                    'appointments' => ['exclude_if:has_appointments,false', 'required', 'array'],
+                ], [
+                    'has_appointments' => false,
+                    'appointments' => [
+                        ['date' => 'should be excluded', 'name' => 'should be excluded'],
+                    ],
+                ], [
+                    'has_appointments' => false,
+                ],
+            ],
         ];
     }
 
@@ -4879,6 +4944,34 @@ class ValidationValidatorTest extends TestCase
                     'appointment_date' => ['validation.required'],
                 ],
             ],
+            [
+                [
+                    'cat' => ['required', 'string'],
+                    'mouse' => ['exclude_if:cat,Tom', 'required', 'file'],
+                ], [
+                    'cat' => 'Bob',
+                    'mouse' => 'not a file',
+                ], [
+                    'mouse' => ['validation.file'],
+                ],
+            ],
+            [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments' => ['exclude_if:has_appointments,false', 'required', 'array'],
+                    'appointments.*.date' => ['required', 'date'],
+                    'appointments.*.name' => ['required', 'string'],
+                ], [
+                    'has_appointments' => true,
+                    'appointments' => [
+                        ['date' => 'invalid', 'name' => 'Bob'],
+                        ['date' => '2019-05-15'],
+                    ],
+                ], [
+                    'appointments.0.date' => ['validation.date'],
+                    'appointments.1.name' => ['validation.required'],
+                ],
+            ],
         ];
     }
 
@@ -4898,7 +4991,7 @@ class ValidationValidatorTest extends TestCase
         if (! $fails) {
             $message = sprintf("Validation unexpectedly passed:\nRules: %s\nData: %s",
                 json_encode($rules, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
-                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
             );
         }
 
