@@ -485,13 +485,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @return void
      */
-    public function logout()
+    public function logout($cycleRememberToken = true)
     {
         $user = $this->user();
 
         $this->clearUserDataFromStorage();
 
-        if (! is_null($this->user) && ! empty($user->getRememberToken())) {
+        if (! is_null($this->user) && ! empty($user->getRememberToken()) && $cycleRememberToken) {
             $this->cycleRememberToken($user);
         }
 

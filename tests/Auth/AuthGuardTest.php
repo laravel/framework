@@ -282,6 +282,27 @@ class AuthGuardTest extends TestCase
         $this->assertNull($mock->getUser());
     }
 
+    public function testLogoutRemovesRememberMeCookieButLeavesRememberMeTokenAlone()
+    {
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $mock = $this->getMockBuilder(SessionGuard::class)->setMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
+        $mock->setCookieJar($cookies = m::mock(CookieJar::class));
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getRememberToken')->once()->andReturn('a');
+        $mock->expects($this->once())->method('getName')->willReturn('foo');
+        $mock->expects($this->once())->method('getRecallerName')->willReturn('bar');
+        $mock->expects($this->once())->method('recaller')->willReturn('non-null-cookie');
+        $provider->shouldNotReceive('updateRememberToken');
+
+        $cookie = m::mock(Cookie::class);
+        $cookies->shouldReceive('forget')->once()->with('bar')->andReturn($cookie);
+        $cookies->shouldReceive('queue')->once()->with($cookie);
+        $mock->getSession()->shouldReceive('remove')->once()->with('foo');
+        $mock->setUser($user);
+        $mock->logout(false);
+        $this->assertNull($mock->getUser());
+    }
+
     public function testLogoutDoesNotEnqueueRememberMeCookieForDeletionIfCookieDoesntExist()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
