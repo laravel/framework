@@ -483,7 +483,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Log the user out of the application.
      *
-     * @param  string  $attribute
+     * @param  bool  $cycleRememberToken
      * @return void
      */
     public function logout($cycleRememberToken = true)
