@@ -818,12 +818,9 @@ trait ValidatesAttributes
     {
         [$connection, $table] = Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
 
-        if (Str::contains($table, '\\') && class_exists($table)) {
+        if (Str::contains($table, '\\') && class_exists($table) && is_a($table, Model::class, true)) {
             $model = new $table;
-
-            if ($model instanceof Model) {
-                $table = $model->getTable();
-            }
+            $table = $model->getTable();
         }
 
         return [$connection, $table];
