@@ -14,6 +14,13 @@ trait WithFaker
     protected $faker;
 
     /**
+     * Static Faker instance shared between test classes.
+     *
+     * @var \Faker\Generator[]
+     */
+    protected static $staticFakers = [];
+
+    /**
      * Setup up the Faker instance.
      *
      * @return void
@@ -42,6 +49,10 @@ trait WithFaker
      */
     protected function makeFaker($locale = null)
     {
-        return Factory::create($locale ?? config('app.faker_locale', Factory::DEFAULT_LOCALE));
+        if (! isset(static::$staticFakers[$locale])) {
+            static::$staticFakers[$locale] = Factory::create($locale ?? Factory::DEFAULT_LOCALE);
+        }
+
+        return static::$staticFakers[$locale];
     }
 }
