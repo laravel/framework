@@ -4809,4 +4809,5 @@ class ExplicitTableModel extends Model
 }
 
 class NonEloquentModel
-{}
+{
+}
