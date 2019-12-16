@@ -16,10 +16,11 @@ class MessageSelector
 
         // Select proper translation string of each bracket
         $replace = [];
+        // Iterate matches without brackets
         foreach($matches[1] as $match){
             $replace[] = $this->choose($match, $number, $locale);
         }
-
+        // Replace matches including brackets
         $line = str_replace($matches[0], $replace, $line);
 
         return $this->choose($line, $number, $locale);
