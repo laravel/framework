@@ -6,11 +6,19 @@ use Illuminate\Support\Str;
 
 class MessageSelector
 {
+    /**
+     * Select a proper translation string based on the given number.
+     * Supporting groups inside the string
+     *
+     * @param  string  $line
+     * @param  int  $number
+     * @param  string  $locale
+     * @return mixed
+     */
     public function chooseGroups($line, $number, $locale)
     {
-        // Find all brackets in string $line
-        // that contain at least one character |
-        // for example "(...|...|...)"
+        // Find all brackets that contain at least one logical
+        // "or" symbol `|` for example "(...|...|...)"        
         $regex = '#\(([^)]*\|.*?)\)#';
         preg_match_all($regex, $line, $matches);
 
