@@ -2,8 +2,10 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 
 trait SendsPasswordResetEmails
 {
@@ -70,7 +72,9 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkResponse(Request $request, $response)
     {
-        return back()->with('status', trans($response));
+        return $request->wantsJson()
+                    ? new JsonResponse(['message' => trans($response)], 200)
+                    : back()->with('status', trans($response));
     }
 
     /**
@@ -82,6 +86,12 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
+        if ($request->wantsJson()) {
+            throw ValidationException::withMessages([
+                'email' => [trans($response)],
+            ]);
+        }
+
         return back()
                 ->withInput($request->only('email'))
                 ->withErrors(['email' => trans($response)]);
