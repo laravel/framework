@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\HigherOrderWhenProxy;
 
 trait ConditionallyLoadsAttributes
 {
@@ -97,15 +98,21 @@ trait ConditionallyLoadsAttributes
      * @param  bool  $condition
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     * @return \Illuminate\Http\Resources\MissingValue|\Illuminate\Support\HigherOrderWhenProxy|mixed
      */
-    protected function when($condition, $value, $default = null)
+    protected function when($condition, $value = null, $default = null)
     {
-        if ($condition) {
-            return value($value);
+        if (func_num_args() === 1) {
+            return new HigherOrderWhenProxy($this, !$condition);
         }
 
-        return func_num_args() === 3 ? value($default) : new MissingValue;
+        if (!$condition) {
+            return func_num_args() === 3
+                ? value($default)
+                : new MissingValue;
+        }
+
+        return value($value);
     }
 
     /**

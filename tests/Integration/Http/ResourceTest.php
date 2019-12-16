@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
+use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithHigherOrderWhenProxy;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
@@ -1093,6 +1094,40 @@ class ResourceTest extends TestCase
         ], ['data' => [0 => 10, 1 => 20, 'total' => 30]]);
     }
 
+    public function testHigherOrderWhenMethodWhenConditionPasses()
+    {
+         Route::get('/', function () {
+            return AuthorResourceWithHigherOrderWhenProxy::make(
+                (object) ['name' => 'Bob']
+            );
+        });
+
+        $this->withoutExceptionHandling()
+            ->get('/?conditionPasses=true', ['Accept' => 'application/json'])
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'name' => 'Bob',
+                ],
+            ]);
+    }
+
+    public function testHigherOrderWhenMethodWhenConditionDoesntPass()
+    {
+         Route::get('/', function () {
+            return AuthorResourceWithHigherOrderWhenProxy::make(
+                (object) ['name' => 'Bob']
+            );
+        });
+
+        $this->withoutExceptionHandling()
+            ->get('/?conditionPasses=false', ['Accept' => 'application/json'])
+            ->assertStatus(200)
+            ->assertJsonMissing([
+                'data' => ['name'],
+            ]);
+    }
+
     private function assertJsonResourceResponse($data, $expectedJson)
     {
         Route::get('/', function () use ($data) {
@@ -1104,4 +1139,6 @@ class ResourceTest extends TestCase
             ->assertStatus(200)
             ->assertExactJson($expectedJson);
     }
+
+
 }
