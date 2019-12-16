@@ -21,7 +21,7 @@ class TranslationMessageSelectorTest extends TestCase
     {
         $selector = new MessageSelector;
 
-        $phrase   = 'There are ({0}none|[1,19]some|[20,*]many). There are ({0}x|[1,19]y|[20,*]z). (x).';
+        $phrase = 'There are ({0}none|[1,19]some|[20,*]many). There are ({0}x|[1,19]y|[20,*]z). (x).';
 
         $this->assertEquals('There are none. There are x. (x).', $selector->chooseGroups($phrase, 0, 'en'));
         $this->assertEquals('There are some. There are y. (x).', $selector->chooseGroups($phrase, 15, 'en'));

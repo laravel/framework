@@ -8,7 +8,7 @@ class MessageSelector
 {
     /**
      * Select a proper translation string based on the given number.
-     * Supporting groups inside the string
+     * Supporting groups inside the string.
      *
      * @param  string  $line
      * @param  int  $number
@@ -18,14 +18,14 @@ class MessageSelector
     public function chooseGroups($line, $number, $locale)
     {
         // Find all brackets that contain at least one logical
-        // "or" symbol `|` for example "(...|...|...)"        
+        // "or" symbol `|` for example "(...|...|...)"
         $regex = '#\(([^)]*\|.*?)\)#';
         preg_match_all($regex, $line, $matches);
 
         // Select proper translation string of each bracket
         $replace = [];
         // Iterate matches without brackets
-        foreach($matches[1] as $match){
+        foreach ($matches[1] as $match) {
             $replace[] = $this->choose($match, $number, $locale);
         }
         // Replace matches including brackets
