@@ -4,10 +4,13 @@
 
 ### Added
 - Allowed packages to use custom markdown mail themes ([#30814](https://github.com/laravel/framework/pull/30814), [2206d52](https://github.com/laravel/framework/commit/2206d5223606f5a24e7e3bf0ba1f25b343dfcc6b))
-- Added more quotes to `Inspiring` ([4a7d566](https://github.com/laravel/framework/commit/4a7d566ff4a330970cfaa03df4c988c580804a7f))
+- Added more quotes to `Inspiring` ([4a7d566](https://github.com/laravel/framework/commit/4a7d566ff4a330970cfaa03df4c988c580804a7f), [9693ced](https://github.com/laravel/framework/commit/9693cedbfc1fb0e38a8e688375e5b2ce5273b75f))
 
 ### TODO
 - Allow passing an array to resource::collection() ([#30800](https://github.com/laravel/framework/pull/30800))
+- Implement ArrayAccess on JsonResponse + TestResponse ([#30817](https://github.com/laravel/framework/pull/30817))
+- PHP 7.4 support for ServiceProvider ([#30819](https://github.com/laravel/framework/pull/30819))
+- Change DatabaseNotification keyType to match uuid ([#30823](https://github.com/laravel/framework/pull/30823))
 
 
 ## [v6.7.0 (2019-12-10)](https://github.com/laravel/framework/compare/v6.6.2...v6.7.0)
