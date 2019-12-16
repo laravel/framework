@@ -715,7 +715,7 @@ if (! function_exists('rescue')) {
                 report($e);
             }
 
-            return value($rescue);
+            return $rescue instanceof Closure ? $rescue($e) : $rescue;
         }
     }
 }
