@@ -177,7 +177,7 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         return [
             ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller.'],
-            ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
+            ['force', null, InputOption::VALUE_NONE, 'Create the class even if the controller already exists'],
             ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable controller class.'],
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
