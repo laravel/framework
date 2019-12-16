@@ -14,9 +14,9 @@ class HigherOrderWhenProxy
     public $target;
 
     /**
-     * The target is missing
+     * The target is missing.
      *
-     * @var boolean
+     * @var bool
      */
     private $isMissing;
 
@@ -24,6 +24,7 @@ class HigherOrderWhenProxy
      * Create a new proxy instance.
      *
      * @param  mixed  $target
+     * @param  bool $isMissing
      * @return void
      */
     public function __construct($target, bool $isMissing)
@@ -47,15 +48,15 @@ class HigherOrderWhenProxy
     }
 
     /**
-     * Dynamically pass attribute calls to the target
+     * Dynamically pass attribute calls to the target.
      *
-     * @param string $attributeName
+     * @param  string  $attributeName
      * @return mixed
      */
     public function __get($attributeName)
     {
         return $this->isMissing
-             ? new MissingValue()
-             : $this->target->{$attributeName};
+            ? new MissingValue()
+            : $this->target->{$attributeName};
     }
 }

@@ -1096,7 +1096,7 @@ class ResourceTest extends TestCase
 
     public function testHigherOrderWhenMethodWhenConditionPasses()
     {
-         Route::get('/', function () {
+        Route::get('/', function () {
             return AuthorResourceWithHigherOrderWhenProxy::make(
                 (object) ['name' => 'Bob']
             );
@@ -1114,7 +1114,7 @@ class ResourceTest extends TestCase
 
     public function testHigherOrderWhenMethodWhenConditionDoesntPass()
     {
-         Route::get('/', function () {
+        Route::get('/', function () {
             return AuthorResourceWithHigherOrderWhenProxy::make(
                 (object) ['name' => 'Bob']
             );
@@ -1139,6 +1139,4 @@ class ResourceTest extends TestCase
             ->assertStatus(200)
             ->assertExactJson($expectedJson);
     }
-
-
 }

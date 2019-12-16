@@ -60,8 +60,8 @@ trait ConditionallyLoadsAttributes
         }
 
         return $this->removeMissingValues(array_slice($data, 0, $index, true) +
-                $merge +
-                $this->filter(array_slice($data, $index + 1, null, true)));
+            $merge +
+            $this->filter(array_slice($data, $index + 1, null, true)));
     }
 
     /**
@@ -77,8 +77,8 @@ trait ConditionallyLoadsAttributes
         foreach ($data as $key => $value) {
             if (($value instanceof PotentiallyMissing && $value->isMissing()) ||
                 ($value instanceof self &&
-                $value->resource instanceof PotentiallyMissing &&
-                $value->isMissing())) {
+                    $value->resource instanceof PotentiallyMissing &&
+                    $value->isMissing())) {
                 unset($data[$key]);
             } else {
                 $numericKeys = $numericKeys && is_numeric($key);
@@ -90,29 +90,6 @@ trait ConditionallyLoadsAttributes
         }
 
         return $numericKeys ? array_values($data) : $data;
-    }
-
-    /**
-     * Retrieve a value based on a given condition.
-     *
-     * @param  bool  $condition
-     * @param  mixed  $value
-     * @param  mixed  $default
-     * @return \Illuminate\Http\Resources\MissingValue|\Illuminate\Support\HigherOrderWhenProxy|mixed
-     */
-    protected function when($condition, $value = null, $default = null)
-    {
-        if (func_num_args() === 1) {
-            return new HigherOrderWhenProxy($this, !$condition);
-        }
-
-        if (!$condition) {
-            return func_num_args() === 3
-                ? value($default)
-                : new MissingValue;
-        }
-
-        return value($value);
     }
 
     /**
@@ -211,9 +188,32 @@ trait ConditionallyLoadsAttributes
         return $this->when(
             $this->resource->$accessor &&
             ($this->resource->$accessor instanceof $table ||
-            $this->resource->$accessor->getTable() === $table),
+                $this->resource->$accessor->getTable() === $table),
             ...[$value, $default]
         );
+    }
+
+    /**
+     * Retrieve a value based on a given condition.
+     *
+     * @param  bool  $condition
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|\Illuminate\Support\HigherOrderWhenProxy|mixed
+     */
+    protected function when($condition, $value = null, $default = null)
+    {
+        if (func_num_args() === 1) {
+            return new HigherOrderWhenProxy($this, ! $condition);
+        }
+
+        if (! $condition) {
+            return func_num_args() === 3
+                ? value($default)
+                : new MissingValue;
+        }
+
+        return value($value);
     }
 
     /**
