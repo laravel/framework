@@ -857,11 +857,11 @@ class TestResponse implements ArrayAccess
         if (is_null($value)) {
             PHPUnit::assertArrayHasKey($key, $this->original->gatherData());
         } elseif ($value instanceof Closure) {
-            PHPUnit::assertTrue($value($this->original->gatherData()[$key]));
+            PHPUnit::assertTrue($value(Arr::get($this->original->gatherData(), $key)));
         } elseif ($value instanceof Model) {
-            PHPUnit::assertTrue($value->is($this->original->gatherData()[$key]));
+            PHPUnit::assertTrue($value->is(Arr::get($this->original->gatherData(), $key)));
         } else {
-            PHPUnit::assertEquals($value, $this->original->gatherData()[$key]);
+            PHPUnit::assertEquals($value, Arr::get($this->original->gatherData(), $key));
         }
 
         return $this;
