@@ -6,6 +6,25 @@ use Illuminate\Support\Str;
 
 class MessageSelector
 {
+    public function chooseGroups($line, $number, $locale)
+    {
+        // Find all brackets in string $line
+        // that contain at least one character |
+        // for example "(...|...|...)"
+        $regex = '#\(([^)]*\|.*?)\)#';
+        preg_match_all($regex, $line, $matches);
+
+        // Select proper translation string of each bracket
+        $replace = [];
+        foreach($matches[1] as $match){
+            $replace[] = $this->choose($match, $number, $locale);
+        }
+
+        $line = str_replace($matches[0], $replace, $line);
+
+        return $this->choose($line, $number, $locale);
+    }
+
     /**
      * Select a proper translation string based on the given number.
      *
