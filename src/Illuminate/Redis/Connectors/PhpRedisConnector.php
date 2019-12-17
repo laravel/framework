@@ -110,21 +110,21 @@ class PhpRedisConnector implements Connector
     protected function establishConnection($client, array $config)
     {
         $persistent = $config['persistent'] ?? false;
-		if (isset($config['path'])) {
-			$parameters = [$config['path']];
-		} else {
-			$parameters = [
-				$config['host'],
-				$config['port'],
-				Arr::get($config, 'timeout', 0.0),
-				$persistent ? Arr::get($config, 'persistent_id', null) : null,
-				Arr::get($config, 'retry_interval', 0),
-			];
+        if (isset($config['path'])) {
+            $parameters = [$config['path']];
+        } else {
+            $parameters = [
+                $config['host'],
+                $config['port'],
+                Arr::get($config, 'timeout', 0.0),
+           	    $persistent ? Arr::get($config, 'persistent_id', null) : null,
+                Arr::get($config, 'retry_interval', 0),
+            ];
 
-			if (version_compare(phpversion('redis'), '3.1.3', '>=')) {
-				$parameters[] = Arr::get($config, 'read_timeout', 0.0);
-			}
-		}
+            if (version_compare(phpversion('redis'), '3.1.3', '>=')) {
+                $parameters[] = Arr::get($config, 'read_timeout', 0.0);
+            }
+        }
         $client->{($persistent ? 'pconnect' : 'connect')}(...$parameters);
     }
 
