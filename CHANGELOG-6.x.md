@@ -1,10 +1,34 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.6.2...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.7.0...6.x)
+
+### Added
+- Allowed packages to use custom markdown mail themes ([#30814](https://github.com/laravel/framework/pull/30814), [2206d52](https://github.com/laravel/framework/commit/2206d5223606f5a24e7e3bf0ba1f25b343dfcc6b))
+- Added more quotes to `Inspiring` ([4a7d566](https://github.com/laravel/framework/commit/4a7d566ff4a330970cfaa03df4c988c580804a7f), [9693ced](https://github.com/laravel/framework/commit/9693cedbfc1fb0e38a8e688375e5b2ce5273b75f))
 
 ### TODO
+- Allow passing an array to resource::collection() ([#30800](https://github.com/laravel/framework/pull/30800))
+- Implement ArrayAccess on JsonResponse + TestResponse ([#30817](https://github.com/laravel/framework/pull/30817))
+- PHP 7.4 support for ServiceProvider ([#30819](https://github.com/laravel/framework/pull/30819))
+- Change DatabaseNotification keyType to match uuid ([#30823](https://github.com/laravel/framework/pull/30823))
+
+
+## [v6.7.0 (2019-12-10)](https://github.com/laravel/framework/compare/v6.6.2...v6.7.0)
+
+### Added
+- Added `getQualifiedCreatedAtColumn()` and `getQualifiedUpdatedAtColumn()` methods to `HasTimestamps` concern ([#30792](https://github.com/laravel/framework/pull/30792))
+- Added `exceptionContext()` method to the `Exceptions\Handler` ([#30780](https://github.com/laravel/framework/pull/30780))
+- Added ability for postmark transport to throw errors ([#30799](https://github.com/laravel/framework/pull/30799), [4320b82](https://github.com/laravel/framework/commit/4320b82f848d63d41df95860ed3bf595202873a9))
+- Added `withoutRelations()` and `unsetRelations()` methods to `HasRelationships` ([#30802](https://github.com/laravel/framework/pull/30802))
 - Added `ResourceCollection::preserveQueryParameters()` for preserve query parameters on paginated api resources ([#30745](https://github.com/laravel/framework/pull/30745), [e92a708](https://github.com/laravel/framework/commit/e92a70800671187cc30a39e965144101d5db169a))
-- Reconnect on connection missing to recover horizon ([#30778](https://github.com/laravel/framework/pull/30778))
+
+### Fixed
+- Fixed explicit models in string-based database validation rules ([#30790](https://github.com/laravel/framework/pull/30790))
+- Fixed `Routing\RedirectController()` ([#30783](https://github.com/laravel/framework/pull/30783))
+
+### Changed
+- Reconnect `PhpRedisConnection` on connection missing ([#30778](https://github.com/laravel/framework/pull/30778))
+- Improved ShouldBroadcastNow performance ([#30797](https://github.com/laravel/framework/pull/30797), [5b3cc97](https://github.com/laravel/framework/commit/5b3cc9752d873be96ac34d9062cc35aa9c95bd59))
 
 
 ## [v6.6.2 (2019-12-05)](https://github.com/laravel/framework/compare/v6.6.1...v6.6.2)

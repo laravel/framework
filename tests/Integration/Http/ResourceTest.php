@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
@@ -65,6 +66,47 @@ class ResourceTest extends TestCase
         ]));
 
         $this->assertEquals('{"id":5,"title":"Test Title","custom":true}', $resource->toJson());
+    }
+
+    public function testAnObjectsMayBeConvertedToJson()
+    {
+        Route::get('/', function () {
+            return ObjectResource::make(
+                (object) ['first_name' => 'Bob', 'age' => 40]
+            );
+        });
+
+        $this->withoutExceptionHandling()
+            ->get('/', ['Accept' => 'application/json'])
+            ->assertStatus(200)
+            ->assertExactJson([
+                'data' => [
+                    'name' => 'Bob',
+                    'age' => 40,
+                ],
+            ]);
+    }
+
+    public function testArraysWithObjectsMayBeConvertedToJson()
+    {
+        Route::get('/', function () {
+            $objects = [
+                (object) ['first_name' => 'Bob', 'age' => 40],
+                (object) ['first_name' => 'Jack', 'age' => 25],
+            ];
+
+            return ObjectResource::collection($objects);
+        });
+
+        $this->withoutExceptionHandling()
+            ->get('/', ['Accept' => 'application/json'])
+            ->assertStatus(200)
+            ->assertExactJson([
+                'data' => [
+                    ['name' => 'Bob', 'age' => 40],
+                    ['name' => 'Jack', 'age' => 25],
+                ],
+            ]);
     }
 
     public function testResourcesMayHaveNoWrap()

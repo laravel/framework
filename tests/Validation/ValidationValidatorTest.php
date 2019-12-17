@@ -4313,6 +4313,10 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(null, $explicit_no_connection[0]);
         $this->assertEquals('explicits', $explicit_no_connection[1]);
 
+        $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
+        $this->assertEquals(null, $noneloquent_no_connection[0]);
+        $this->assertEquals(NonEloquentModel::class, $noneloquent_no_connection[1]);
+
         $raw_no_connection = $v->parseTable('table');
         $this->assertEquals(null, $raw_no_connection[0]);
         $this->assertEquals('table', $raw_no_connection[1]);
@@ -4324,6 +4328,10 @@ class ValidationValidatorTest extends TestCase
         $explicit_connection = $v->parseTable('connection.'.ExplicitTableModel::class);
         $this->assertEquals('connection', $explicit_connection[0]);
         $this->assertEquals('explicits', $explicit_connection[1]);
+
+        $noneloquent_connection = $v->parseTable('connection.'.NonEloquentModel::class);
+        $this->assertEquals('connection', $noneloquent_connection[0]);
+        $this->assertEquals(NonEloquentModel::class, $noneloquent_connection[1]);
 
         $raw_connection = $v->parseTable('connection.table');
         $this->assertEquals('connection', $raw_connection[0]);
@@ -4804,4 +4812,8 @@ class ExplicitTableModel extends Model
     protected $table = 'explicits';
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class NonEloquentModel
+{
 }
