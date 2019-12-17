@@ -39,6 +39,8 @@ class FoundationHelpersTest extends TestCase
         $this->assertEquals(rescue(function () use ($testClass) {
             $testClass->test([]);
         }, 'rescued!'), 'rescued!');
+
+        $this->assertEquals('Oh no!', rescue([RescueClass::class, 'crash'], [RescueClass::class, 'run']));
     }
 
     public function testMixReportsExceptionWhenAssetIsMissingFromManifest()
@@ -133,5 +135,18 @@ class FakeHandler
     public function render($exception)
     {
         //
+    }
+}
+
+class RescueClass
+{
+    public static function crash()
+    {
+        throw new Exception('Oh no!');
+    }
+
+    public static function run(Exception $e)
+    {
+        return $e->getMessage();
     }
 }
