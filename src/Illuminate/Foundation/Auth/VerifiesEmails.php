@@ -44,7 +44,7 @@ trait VerifiesEmails
 
         if ($request->user()->hasVerifiedEmail()) {
             return $request->wantsJson()
-                        ? new Response
+                        ? new Response('', 204)
                         : redirect($this->redirectPath());
         }
 
@@ -53,7 +53,7 @@ trait VerifiesEmails
         }
 
         return $request->wantsJson()
-                    ? new Response
+                    ? new Response('', 204)
                     : redirect($this->redirectPath())->with('verified', true);
     }
 
@@ -67,7 +67,7 @@ trait VerifiesEmails
     {
         if ($request->user()->hasVerifiedEmail()) {
             return $request->wantsJson()
-                        ? new Response
+                        ? new Response('', 204)
                         : redirect($this->redirectPath());
         }
 
