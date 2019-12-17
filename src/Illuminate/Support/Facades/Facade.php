@@ -170,13 +170,8 @@ abstract class Facade
      * Get the registered name of the component.
      *
      * @return string
-     *
-     * @throws \RuntimeException
      */
-    protected static function getFacadeAccessor()
-    {
-        throw new RuntimeException('Facade does not implement getFacadeAccessor method.');
-    }
+    abstract protected static function getFacadeAccessor();
 
     /**
      * Resolve the facade root instance from the container.
