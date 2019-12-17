@@ -980,6 +980,25 @@ trait HasAttributes
     }
 
     /**
+     * Set the model attribute. No checking is done.
+     *
+     * @param  string  $key
+     * @param  mixed $value
+     * @param  bool  $sync
+     * @return $this
+     */
+    public function setRawAttribute($key, $value, $sync = false)
+    {
+        $this->attributes[$key] = $value;
+
+        if ($sync) {
+            $this->syncOriginalAttribute($key);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the model's original attribute values.
      *
      * @param  string|null  $key
