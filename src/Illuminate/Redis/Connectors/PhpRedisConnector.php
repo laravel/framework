@@ -117,7 +117,7 @@ class PhpRedisConnector implements Connector
                 $config['host'],
                 $config['port'],
                 Arr::get($config, 'timeout', 0.0),
-           	    $persistent ? Arr::get($config, 'persistent_id', null) : null,
+                $persistent ? Arr::get($config, 'persistent_id', null) : null,
                 Arr::get($config, 'retry_interval', 0),
             ];
 
