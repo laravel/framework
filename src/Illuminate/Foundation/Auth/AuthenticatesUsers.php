@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -106,8 +107,13 @@ trait AuthenticatesUsers
 
         $this->clearLoginAttempts($request);
 
-        return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
+        if ($response = $this->authenticated($request, $this->guard()->user())) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+                    ? new Response('', 204)
+                    : redirect()->intended($this->redirectPath());
     }
 
     /**
