@@ -39,6 +39,7 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('foo', value(function () {
             return 'foo';
         }));
+        $this->assertSame('foo', [ValueClass::class, 'hello']);
     }
 
     public function testObjectGet()
@@ -702,5 +703,13 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+class ValueClass
+{
+    public static function hello()
+    {
+        return 'foo';
     }
 }
