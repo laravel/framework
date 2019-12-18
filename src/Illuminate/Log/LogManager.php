@@ -159,13 +159,17 @@ class LogManager implements LoggerInterface
     /**
      * Create an emergency log handler to avoid white screens of death.
      *
-     * @return \Psr\Log\LoggerInterface
+     * @return \Illuminate\Log\Logger|\Psr\Log\LoggerInterface
      */
     protected function createEmergencyLogger()
     {
-        return new Logger(new Monolog('laravel', $this->prepareHandlers([new StreamHandler(
-                $this->app->storagePath().'/logs/laravel.log', $this->level(['level' => 'debug'])
-        )])), $this->app['events']);
+        $config = $this->configurationFor('emergency');
+
+        return new Logger(
+            new Monolog('laravel', $this->prepareHandlers([
+                new StreamHandler($config['path'], $this->level(['level' => 'debug'])),
+            ])), $this->app['events']
+        );
     }
 
     /**
