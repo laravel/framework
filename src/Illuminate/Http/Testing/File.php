@@ -28,7 +28,7 @@ class File extends UploadedFile
     public $sizeToReport;
 
     /**
-     * The "MIME type" to report.
+     * The MIME type to report.
      *
      * @var string|null
      */
