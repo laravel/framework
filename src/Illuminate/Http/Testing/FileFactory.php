@@ -11,16 +11,18 @@ class FileFactory
      *
      * @param  string  $name
      * @param  string|int  $kilobytes
+     * @param  string|null  $mimeType
      * @return \Illuminate\Http\Testing\File
      */
-    public function create($name, $kilobytes = 0)
+    public function create($name, $kilobytes = 0, $mimeType = null)
     {
         if (is_string($kilobytes)) {
             return $this->createWithContent($name, $kilobytes);
         }
 
-        return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) {
+        return tap(new File($name, tmpfile()), function ($file) use ($kilobytes, $mimeType) {
             $file->sizeToReport = $kilobytes * 1024;
+            $file->mimeTypeToReport = $mimeType;
         });
     }
 
