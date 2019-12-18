@@ -93,15 +93,7 @@ class Kernel implements KernelContract
         $this->app = $app;
         $this->router = $router;
 
-        $router->middlewarePriority = $this->middlewarePriority;
-
-        foreach ($this->middlewareGroups as $key => $middleware) {
-            $router->middlewareGroup($key, $middleware);
-        }
-
-        foreach ($this->routeMiddleware as $key => $middleware) {
-            $router->aliasMiddleware($key, $middleware);
-        }
+        $this->syncMiddlewareToRouter();
     }
 
     /**
@@ -312,6 +304,8 @@ class Kernel implements KernelContract
             array_unshift($this->middlewareGroups[$group], $middleware);
         }
 
+        $this->syncMiddlewareToRouter();
+
         return $this;
     }
 
@@ -332,6 +326,8 @@ class Kernel implements KernelContract
             $this->middlewareGroups[$group][] = $middleware;
         }
 
+        $this->syncMiddlewareToRouter();
+
         return $this;
     }
 
@@ -346,6 +342,8 @@ class Kernel implements KernelContract
         if (! in_array($middleware, $this->middlewarePriority)) {
             array_unshift($this->middlewarePriority, $middleware);
         }
+
+        $this->syncMiddlewareToRouter();
 
         return $this;
     }
@@ -362,7 +360,27 @@ class Kernel implements KernelContract
             $this->middlewarePriority[] = $middleware;
         }
 
+        $this->syncMiddlewareToRouter();
+
         return $this;
+    }
+
+    /**
+     * Sync the current state of the middleware to the router.
+     *
+     * @return void
+     */
+    protected function syncMiddlewareToRouter()
+    {
+        $this->router->middlewarePriority = $this->middlewarePriority;
+
+        foreach ($this->middlewareGroups as $key => $middleware) {
+            $this->router->middlewareGroup($key, $middleware);
+        }
+
+        foreach ($this->routeMiddleware as $key => $middleware) {
+            $this->router->aliasMiddleware($key, $middleware);
+        }
     }
 
     /**
