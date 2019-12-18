@@ -106,7 +106,7 @@ class EloquentFactoryBuilderTest extends TestCase
             ];
         });
 
-        $factory->state(FactoryBuildableCar::class, 'foreign', function(Generator $faker, $attributes, $primers) {
+        $factory->state(FactoryBuildableCar::class, 'foreign', function (Generator $faker, $attributes, $primers) {
             return [
                 'make' => $primers['makes'] ? $primers['makes']->random() : $faker->randomElement(['Porsche', 'Ferrari', 'Volkswagen']),
             ];
