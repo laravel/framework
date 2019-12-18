@@ -40,11 +40,9 @@ class SortedMiddleware extends Collection
                 continue;
             }
 
-            $stripped = head(explode(':', $middleware));
+            $priorityIndex = $this->priorityIndex($priorityMap, $middleware);
 
-            if (in_array($stripped, $priorityMap)) {
-                $priorityIndex = array_search($stripped, $priorityMap);
-
+            if (! is_null($priorityIndex)) {
                 // This middleware is in the priority map. If we have encountered another middleware
                 // that was also in the priority map and was at a lower priority than the current
                 // middleware, we will move this middleware to be above the previous encounter.
@@ -80,5 +78,46 @@ class SortedMiddleware extends Collection
         unset($middlewares[$from + 1]);
 
         return $middlewares;
+    }
+
+    /**
+     * Calculate the priority index of the middleware.
+     *
+     * This calculated by first seeing if the name exists in the priority list,
+     * and if it doesn't we see if it implements any interfaces in the list.
+     *
+     * @param  array  $priorityMap
+     * @param  string  $middleware
+     * @return int|null
+     */
+    protected function priorityMapIndex($priorityMap, $middleware)
+    {
+        foreach ($this->middlewareNames($middleware) as $name) {
+            $priorityIndex = array_search($stripped, $priorityMap);
+            if ($priorityIndex !== false) {
+                return $priorityIndex;
+            }
+        }
+    }
+
+    /**
+     * Calculate the middleware names to look for in the priority array.
+     *
+     * @param  string  $middleware
+     * @return \Generator
+     */
+    protected function middlewareNames($middleware)
+    {
+        $stripped = head(explode(':', $middleware));
+
+        yield $stripped;
+
+        $interfaces = @class_implements($stripped);
+
+        if ($interfaces !== false) {
+            foreach ($interfaces as $interface) {
+                yield $interface;
+            }
+        }
     }
 }
