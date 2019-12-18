@@ -99,6 +99,19 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->state(FactoryBuildableServer::class, 'inline', ['status' => 'inline']);
 
+        $factory->define(FactoryBuildableCar::class, function (Generator $faker, $attributes, $primers) {
+            return [
+                'color' => $faker->colorName,
+                'make' => $primers['makes'] ? $primers['makes']->random() : $faker->randomElement(['Ford', 'Chevrolet', 'Honda']),
+            ];
+        });
+
+        $factory->state(FactoryBuildableCar::class, 'foreign', function(Generator $faker, $attributes, $primers) {
+           return [
+               'make' => $primers['makes'] ? $primers['makes']->random() : $faker->randomElement(['Porsche', 'Ferrari', 'Volkswagen']),
+           ];
+        });
+
         $app->singleton(Factory::class, function ($app) use ($factory) {
             return $factory;
         });
@@ -259,6 +272,22 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertNotNull($user->profile);
         $this->assertNotNull($user->servers->where('status', 'callable')->first());
     }
+
+    public function testMakingModelWithPrimers()
+    {
+        $primers = collect(['Jeep', 'BMW', 'Audi']);
+
+        $car = factory(FactoryBuildableCar::class)->prime('makes', $primers)->make();
+        $this->assertContains($car->make, $primers->toArray());
+    }
+
+    public function testMakingModelWithStatePrimer()
+    {
+        $primers = collect(['Jeep', 'BMW', 'Audi']);
+
+        $car = factory(FactoryBuildableCar::class)->state('foreign')->prime('makes', $primers)->make();
+        $this->assertContains($car->make, $primers->toArray());
+    }
 }
 
 class FactoryBuildableUser extends Model
@@ -323,4 +352,9 @@ class FactoryBuildableServer extends Model
     {
         return $this->belongsTo(FactoryBuildableUser::class, 'user_id');
     }
+}
+
+class FactoryBuildableCar extends Model
+{
+    public $table = 'cars';
 }

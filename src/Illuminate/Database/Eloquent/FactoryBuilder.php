@@ -46,6 +46,13 @@ class FactoryBuilder
     protected $states;
 
     /**
+     * The primed data.
+     *
+     * @var array
+     */
+    protected $primers;
+
+    /**
      * The model after making callbacks.
      *
      * @var array
@@ -137,6 +144,20 @@ class FactoryBuilder
     public function states($states)
     {
         $this->activeStates = is_array($states) ? $states : func_get_args();
+
+        return $this;
+    }
+
+    /**
+     * Prime the factories with data.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function prime($key, $value)
+    {
+        $this->primers[$key] = $value;
 
         return $this;
     }
@@ -271,7 +292,7 @@ class FactoryBuilder
 
         $definition = call_user_func(
             $this->definitions[$this->class][$this->name],
-            $this->faker, $attributes
+            $this->faker, $attributes, $this->primers
         );
 
         return $this->expandAttributes(
@@ -344,7 +365,7 @@ class FactoryBuilder
             return $stateAttributes;
         }
 
-        return $stateAttributes($this->faker, $attributes);
+        return $stateAttributes($this->faker, $attributes, $this->primers);
     }
 
     /**
