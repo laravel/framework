@@ -5010,7 +5010,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($validator->passes());
         $this->assertSame(['cat' => 'Felix'], $validator->validated());
 
-
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['cat' => 'Felix'],
@@ -5019,7 +5018,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($validator->passes());
         $this->assertSame(['cat' => 'Felix'], $validator->validated());
 
-
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['cat' => 'Tom', 'mouse' => 'Jerry'],
@@ -5027,7 +5025,6 @@ class ValidationValidatorTest extends TestCase
         );
         $this->assertTrue($validator->passes());
         $this->assertSame(['cat' => 'Tom', 'mouse' => 'Jerry'], $validator->validated());
-
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
