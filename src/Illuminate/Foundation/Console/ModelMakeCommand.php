@@ -42,6 +42,7 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('all')) {
             $this->input->setOption('factory', true);
+            $this->input->setOption('seed', true);
             $this->input->setOption('migration', true);
             $this->input->setOption('controller', true);
             $this->input->setOption('resource', true);
