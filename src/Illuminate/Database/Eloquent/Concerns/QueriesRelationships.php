@@ -390,6 +390,7 @@ trait QueriesRelationships
 
             if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
+                $query->bindings['select'] = [];
             }
 
             // Finally we will add the proper result column alias to the query and run the subselect
