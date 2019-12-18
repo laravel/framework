@@ -167,7 +167,7 @@ class LogManager implements LoggerInterface
 
         return new Logger(
             new Monolog('laravel', $this->prepareHandlers([
-                new StreamHandler($config['path'], $this->level(['level' => 'debug'])),
+                new StreamHandler($config['path'] ?? storage_path('logs/laravel.log'), $this->level(['level' => 'debug'])),
             ])), $this->app['events']
         );
     }
