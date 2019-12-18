@@ -1435,6 +1435,29 @@ trait ValidatesAttributes
     }
 
     /**
+     * Indicate that an attribute should be excluded when another attribute does not have given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateExcludeUnless($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'exclude_unless');
+
+        $other = Arr::get($this->data, $parameters[0]);
+
+        $values = array_slice($parameters, 1);
+
+        if (is_bool($other)) {
+            $values = $this->convertValuesToBoolean($values);
+        }
+
+        return in_array($other, $values);
+    }
+
+    /**
      * Convert the given values to boolean if they are string "true" / "false".
      *
      * @param  array  $values

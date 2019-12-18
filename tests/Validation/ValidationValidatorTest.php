@@ -5000,6 +5000,44 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedMessages, $validator->messages()->toArray());
     }
 
+    public function testExcludeUnless()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Felix', 'mouse' => 'Jerry'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Felix'], $validator->validated());
+
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Felix'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Felix'], $validator->validated());
+
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Tom', 'mouse' => 'Jerry'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Tom', 'mouse' => 'Jerry'], $validator->validated());
+
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Tom'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['mouse' => ['validation.required']], $validator->messages()->toArray());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
