@@ -5035,6 +5035,28 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['mouse' => ['validation.required']], $validator->messages()->toArray());
     }
 
+    public function testExcludeValuesAreReallyRemoved()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Tom', 'mouse' => 'Jerry'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_if:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Tom'], $validator->validated());
+        $this->assertSame(['cat' => 'Tom'], $validator->valid());
+        $this->assertSame([], $validator->invalid());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Tom', 'mouse' => null],
+            ['cat' => 'required|string', 'mouse' => 'exclude_if:cat,Felix|required|string']
+        );
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['cat' => 'Tom'], $validator->valid());
+        $this->assertSame(['mouse' => null], $validator->invalid());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

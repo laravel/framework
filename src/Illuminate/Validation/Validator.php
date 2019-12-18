@@ -351,7 +351,7 @@ class Validator implements ValidatorContract
      */
     protected function removeAttribute($attribute)
     {
-        unset($this->rules[$attribute]);
+        unset($this->data[$attribute], $this->rules[$attribute]);
     }
 
     /**
