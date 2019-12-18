@@ -846,12 +846,13 @@ class RoutingRouteTest extends TestCase
             SubstituteBindings::class,
             Placeholder2::class,
             Authenticate::class,
+            ExampleMiddleware::class,
             Placeholder3::class,
         ];
 
         $router = $this->getRouter();
 
-        $router->middlewarePriority = [Authenticate::class, SubstituteBindings::class, Authorize::class];
+        $router->middlewarePriority = [ExampleMiddlewareContract::class, Authenticate::class, SubstituteBindings::class, Authorize::class];
 
         $route = $router->get('foo', ['middleware' => $middleware, 'uses' => function ($name) {
             return $name;
@@ -859,6 +860,7 @@ class RoutingRouteTest extends TestCase
 
         $this->assertEquals([
             Placeholder1::class,
+            ExampleMiddleware::class,
             Authenticate::class,
             SubstituteBindings::class,
             Placeholder2::class,
@@ -2091,5 +2093,18 @@ class ActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+}
+
+interface ExampleMiddlewareContract
+{
+    //
+}
+
+class ExampleMiddleware implements ExampleMiddlewareContract
+{
+    public function handle($request, Closure $next)
+    {
+        return $next($request);
     }
 }
