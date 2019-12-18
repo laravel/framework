@@ -159,7 +159,7 @@ class LogManager implements LoggerInterface
     /**
      * Create an emergency log handler to avoid white screens of death.
      *
-     * @return \Illuminate\Log\Logger|\Psr\Log\LoggerInterface
+     * @return \Psr\Log\LoggerInterface
      */
     protected function createEmergencyLogger()
     {
