@@ -403,6 +403,27 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(' is not a valid email', $v->messages()->first('email'));
     }
 
+    public function testInputIsReplacedByItsDisplayableValue()
+    {
+        $frameworks = [
+            1 => 'Laravel',
+            2 => 'Symfony',
+            3 => 'Rails',
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.framework_php' => ':input is not a valid PHP Framework'], 'en');
+
+        $v = new Validator($trans, ['framework' => 3], ['framework' => 'framework_php']);
+        $v->addExtension('framework_php', function ($attribute, $value, $parameters, $validator) {
+            return in_array($value, [1, 2]);
+        });
+        $v->addCustomValues(['framework' => $frameworks]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('Rails is not a valid PHP Framework', $v->messages()->first('framework'));
+    }
+
     public function testDisplayableValuesAreReplaced()
     {
         //required_if:foo,bar
