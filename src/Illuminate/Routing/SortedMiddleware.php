@@ -40,7 +40,7 @@ class SortedMiddleware extends Collection
                 continue;
             }
 
-            $priorityIndex = $this->priorityIndex($priorityMap, $middleware);
+            $priorityIndex = $this->priorityMapIndex($priorityMap, $middleware);
 
             if (! is_null($priorityIndex)) {
                 // This middleware is in the priority map. If we have encountered another middleware
@@ -81,7 +81,7 @@ class SortedMiddleware extends Collection
     }
 
     /**
-     * Calculate the priority index of the middleware.
+     * Calculate the priority map index of the middleware.
      *
      * This calculated by first seeing if the name exists in the priority list,
      * and if it doesn't we see if it implements any interfaces in the list.
@@ -93,7 +93,7 @@ class SortedMiddleware extends Collection
     protected function priorityMapIndex($priorityMap, $middleware)
     {
         foreach ($this->middlewareNames($middleware) as $name) {
-            $priorityIndex = array_search($stripped, $priorityMap);
+            $priorityIndex = array_search($name, $priorityMap);
             if ($priorityIndex !== false) {
                 return $priorityIndex;
             }
