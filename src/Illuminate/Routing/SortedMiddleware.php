@@ -56,6 +56,7 @@ class SortedMiddleware extends Collection
                 // encountered from the map thus far. We'll save its current index plus its index
                 // from the priority map so we can compare against them on the next iterations.
                 $lastIndex = $index;
+
                 $lastPriorityIndex = $priorityIndex;
             }
         }
@@ -64,27 +65,7 @@ class SortedMiddleware extends Collection
     }
 
     /**
-     * Splice a middleware into a new position and remove the old entry.
-     *
-     * @param  array  $middlewares
-     * @param  int  $from
-     * @param  int  $to
-     * @return array
-     */
-    protected function moveMiddleware($middlewares, $from, $to)
-    {
-        array_splice($middlewares, $to, 0, $middlewares[$from]);
-
-        unset($middlewares[$from + 1]);
-
-        return $middlewares;
-    }
-
-    /**
      * Calculate the priority map index of the middleware.
-     *
-     * This calculated by first seeing if the name exists in the priority list,
-     * and if it doesn't we see if it implements any interfaces in the list.
      *
      * @param  array  $priorityMap
      * @param  string  $middleware
@@ -94,6 +75,7 @@ class SortedMiddleware extends Collection
     {
         foreach ($this->middlewareNames($middleware) as $name) {
             $priorityIndex = array_search($name, $priorityMap);
+
             if ($priorityIndex !== false) {
                 return $priorityIndex;
             }
@@ -101,7 +83,7 @@ class SortedMiddleware extends Collection
     }
 
     /**
-     * Calculate the middleware names to look for in the priority array.
+     * Resolve the middleware names to look for in the priority array.
      *
      * @param  string  $middleware
      * @return \Generator
@@ -119,5 +101,22 @@ class SortedMiddleware extends Collection
                 yield $interface;
             }
         }
+    }
+
+    /**
+     * Splice a middleware into a new position and remove the old entry.
+     *
+     * @param  array  $middlewares
+     * @param  int  $from
+     * @param  int  $to
+     * @return array
+     */
+    protected function moveMiddleware($middlewares, $from, $to)
+    {
+        array_splice($middlewares, $to, 0, $middlewares[$from]);
+
+        unset($middlewares[$from + 1]);
+
+        return $middlewares;
     }
 }
