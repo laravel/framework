@@ -121,8 +121,9 @@ class ScheduleRunCommand extends Command
      */
     protected function runEvent($event)
     {
-        $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
-
+        $datetime = date('Y-m-d H:i:s');
+        $this->line("<info>[{$datetime}] Running scheduled command:</info> ".$event->getSummaryForDisplay());
+        
         $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
         $start = microtime(true);
