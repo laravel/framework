@@ -230,7 +230,7 @@ class Validator implements ValidatorContract
 
             // If the data key contains a dot, we will replace it with another character
             // sequence so it doesn't interfere with dot processing when working with
-            // array based validation rules and array_dot later in the validations.
+            // array based validation rules plus Arr::dot later in the validations.
             if (Str::contains($key, '.')) {
                 $newData[str_replace('.', '->', $key)] = $value;
             } else {
