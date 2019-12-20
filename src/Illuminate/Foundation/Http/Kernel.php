@@ -10,7 +10,6 @@ use Illuminate\Routing\Pipeline;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Facade;
 use InvalidArgumentException;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Throwable;
 
 class Kernel implements KernelContract
