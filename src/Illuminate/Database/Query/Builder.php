@@ -1472,6 +1472,8 @@ class Builder
      * @param  array  $values
      * @param  string  $boolean
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereRowValues($columns, $operator, $values, $boolean = 'and')
     {
@@ -2729,6 +2731,8 @@ class Builder
      * @param  float|int  $amount
      * @param  array  $extra
      * @return int
+     *
+     * @throws \InvalidArgumentException
      */
     public function increment($column, $amount = 1, array $extra = [])
     {
@@ -2750,6 +2754,8 @@ class Builder
      * @param  float|int  $amount
      * @param  array  $extra
      * @return int
+     *
+     * @throws \InvalidArgumentException
      */
     public function decrement($column, $amount = 1, array $extra = [])
     {

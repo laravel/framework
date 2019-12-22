@@ -510,6 +510,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $name
      * @param  callable  $handler
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function directive($name, callable $handler)
     {

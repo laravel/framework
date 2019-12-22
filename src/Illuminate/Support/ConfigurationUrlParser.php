@@ -124,6 +124,8 @@ class ConfigurationUrlParser
      *
      * @param  string  $url
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function parseUrl($url)
     {

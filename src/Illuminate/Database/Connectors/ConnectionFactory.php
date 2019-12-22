@@ -194,6 +194,8 @@ class ConnectionFactory
      *
      * @param  array  $config
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function parseHosts(array $config)
     {
