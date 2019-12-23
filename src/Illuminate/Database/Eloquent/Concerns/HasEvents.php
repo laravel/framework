@@ -159,6 +159,18 @@ trait HasEvents
     }
 
     /**
+     * Register a model event listener.
+     *
+     * @param  string  $event
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function when($event, $callback)
+    {
+        static::registerModelEvent($event, $callback);
+    }
+
+    /**
      * Fire the given event for the model.
      *
      * @param  string  $event
