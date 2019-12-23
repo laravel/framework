@@ -107,7 +107,7 @@ trait ManagesComponents
     public function slot($name, $content = null)
     {
         if (func_num_args() > 2) {
-            throw new InvalidArgumentException('You passed the slot ['.$name.'] too many arguments.');
+            throw new InvalidArgumentException('You passed too many arguments to the ['.$name.'] slot.');
         } elseif (func_num_args() === 2) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
