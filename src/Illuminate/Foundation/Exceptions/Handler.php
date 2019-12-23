@@ -321,7 +321,7 @@ class Handler implements ExceptionHandlerContract
     {
         return SymfonyResponse::create(
             $this->renderExceptionContent($e),
-            $this->isHttpException($e) ? $e->getStatusCode() : 500,
+            $this->isHttpException($e) ? $e->getStatusCode() : $e->getCode(),
             $this->isHttpException($e) ? $e->getHeaders() : []
         );
     }
