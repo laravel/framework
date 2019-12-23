@@ -303,7 +303,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         if (! $this->isHttpException($e)) {
-            $e = new HttpException(500, $e->getMessage());
+            $e = new HttpException($e->getCode(), $e->getMessage());
         }
 
         return $this->toIlluminateResponse(
@@ -321,7 +321,7 @@ class Handler implements ExceptionHandlerContract
     {
         return SymfonyResponse::create(
             $this->renderExceptionContent($e),
-            $this->isHttpException($e) ? $e->getStatusCode() : 500,
+            $this->isHttpException($e) ? $e->getStatusCode() : $e->getCode(),
             $this->isHttpException($e) ? $e->getHeaders() : []
         );
     }
@@ -455,7 +455,7 @@ class Handler implements ExceptionHandlerContract
     {
         return new JsonResponse(
             $this->convertExceptionToArray($e),
-            $this->isHttpException($e) ? $e->getStatusCode() : 500,
+            $this->isHttpException($e) ? $e->getStatusCode() : $e->getCode(),
             $this->isHttpException($e) ? $e->getHeaders() : [],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
