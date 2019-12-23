@@ -165,6 +165,8 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * Flush all of the failed jobs from storage.
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function flush()
     {

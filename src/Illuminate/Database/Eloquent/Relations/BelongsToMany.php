@@ -393,6 +393,8 @@ class BelongsToMany extends Relation
      * @param  string|array  $column
      * @param  mixed  $value
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function withPivotValue($column, $value = null)
     {
