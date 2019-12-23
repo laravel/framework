@@ -916,11 +916,21 @@ class TestResponse implements ArrayAccess
      */
     protected function ensureResponseHasView()
     {
-        if (! isset($this->original) || ! $this->original instanceof View) {
+        if (! $this->responseHasView()) {
             return PHPUnit::fail('The response is not a view.');
         }
 
         return $this;
+    }
+
+    /**
+     * Determine if the original response is a view.
+     *
+     * @return bool
+     */
+    protected function responseHasView()
+    {
+        return isset($this->original) && $this->original instanceof View;
     }
 
     /**
@@ -1215,7 +1225,9 @@ class TestResponse implements ArrayAccess
      */
     public function offsetExists($offset)
     {
-        return isset($this->json()[$offset]);
+        return $this->responseHasView()
+                    ? isset($this->original->gatherData()[$key])
+                    : isset($this->json()[$offset]);
     }
 
     /**
@@ -1226,7 +1238,9 @@ class TestResponse implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return $this->json()[$offset];
+        return $this->responseHasView()
+                    ? $this->viewData($offset)
+                    : $this->json()[$offset];
     }
 
     /**
