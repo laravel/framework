@@ -49,7 +49,7 @@ trait VerifiesEmails
             event(new Verified($request->user()));
         }
 
-        return redirect($this->redirectPath())->with('verified', true);
+        return $this->verified($request) ?: redirect($this->redirectPath())->with('verified', true);
     }
 
     /**
@@ -67,5 +67,16 @@ trait VerifiesEmails
         $request->user()->sendEmailVerificationNotification();
 
         return back()->with('resent', true);
+    }
+
+    /**
+     * The user has been verified.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function verified(Request $request)
+    {
+        //
     }
 }
