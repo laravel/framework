@@ -551,11 +551,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        if (Env::get('APP_RUNNING_IN_CONSOLE') !== null) {
-            return Env::get('APP_RUNNING_IN_CONSOLE') === true;
+        $inConsole = Env::get('APP_RUNNING_IN_CONSOLE');
+
+        if ($inConsole !== null) {
+            return $inConsole === true;
         }
 
-        return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
+        return \PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg';
     }
 
     /**
