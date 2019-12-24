@@ -62,7 +62,6 @@ class Env
             static::$repository = RepositoryBuilder::create()
                 ->withReaders($adapters)
                 ->withWriters($adapters)
-                ->immutable()
                 ->make();
         }
 
