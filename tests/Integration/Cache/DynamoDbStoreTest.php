@@ -15,7 +15,7 @@ class DynamoDbStoreTest extends TestCase
     {
         parent::setUp();
 
-        if (!env('DYNAMODB_CACHE_TABLE'])) {
+        if (! env('DYNAMODB_CACHE_TABLE')) {
             $this->markTestSkipped('DynamoDB not configured.');
         }
     }
