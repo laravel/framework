@@ -826,7 +826,9 @@ class Blueprint
      */
     public function float($column, $total = 8, $places = 2)
     {
-        return $this->addColumn('float', $column, compact('total', 'places'));
+        return $this->addColumn('float', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => false,
+        ]);
     }
 
     /**
@@ -839,7 +841,9 @@ class Blueprint
      */
     public function double($column, $total = null, $places = null)
     {
-        return $this->addColumn('double', $column, compact('total', 'places'));
+        return $this->addColumn('double', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => false,
+        ]);
     }
 
     /**
@@ -852,7 +856,9 @@ class Blueprint
      */
     public function decimal($column, $total = 8, $places = 2)
     {
-        return $this->addColumn('decimal', $column, compact('total', 'places'));
+        return $this->addColumn('decimal', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => false,
+        ]);
     }
 
     /**

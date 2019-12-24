@@ -1,6 +1,24 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.8.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.9.0...6.x)
+
+
+## [v6.9.0 (2019-12-19)](https://github.com/laravel/framework/compare/v6.8.0...v6.9.0)
+
+### Added
+- Added `MIME` type argument to `Testing/FileFactory::create()` ([#30870](https://github.com/laravel/framework/pull/30870))
+- Added `seed` to `all` option when creating the model (`make:model` command) ([#30874](https://github.com/laravel/framework/pull/30874))
+- Allowed configurable emergency logger ([#30873](https://github.com/laravel/framework/pull/30873))
+- Added `prependMiddlewareToGroup()` / `appendMiddlewareToGroup()` / `prependToMiddlewarePriority()` / `appendToMiddlewarePriority()` to `Kernal` for manipulating middleware ([6f33feb](https://github.com/laravel/framework/commit/6f33feba124d4a7ff2af4f3ed18583d67fb68f7c))
+
+### Reverted
+- Reverted [Added `Model::setRawAttribute()`](https://github.com/laravel/framework/pull/30853) ([#30885](https://github.com/laravel/framework/pull/30885))
+
+### Fixed
+- Fixed `Builder::withCount()` binding error when a scope is added into related model with binding in a sub-select ([#30869](https://github.com/laravel/framework/pull/30869))
+
+### Changed
+-  Dont throw exception when session is not set in `AuthenticateSession` middleware ([4de1d24](https://github.com/laravel/framework/commit/4de1d24cf390f07d4f503973e5556f73060fbb31))
 
 
 ## [v6.8.0 (2019-12-17)](https://github.com/laravel/framework/compare/v6.7.0...v6.8.0)

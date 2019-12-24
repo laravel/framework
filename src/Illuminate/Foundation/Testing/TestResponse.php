@@ -1249,6 +1249,8 @@ class TestResponse implements ArrayAccess
      * @param  string  $offset
      * @param  mixed  $value
      * @return void
+     *
+     * @throws \LogicException
      */
     public function offsetSet($offset, $value)
     {
@@ -1260,6 +1262,8 @@ class TestResponse implements ArrayAccess
      *
      * @param  string  $offset
      * @return void
+     *
+     * @throws \LogicException
      */
     public function offsetUnset($offset)
     {

@@ -878,6 +878,8 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
@@ -1144,6 +1146,8 @@ class Grammar extends BaseGrammar
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function wrapJsonSelector($value)
     {

@@ -11,6 +11,8 @@ interface ExceptionHandler
      *
      * @param  \Throwable  $e
      * @return void
+     *
+     * @throws \Exception
      */
     public function report(Throwable $e);
 
@@ -28,6 +30,8 @@ interface ExceptionHandler
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Throwable
      */
     public function render($request, Throwable $e);
 
