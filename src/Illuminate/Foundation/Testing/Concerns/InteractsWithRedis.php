@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Exception;
-use Illuminate\Support\Env;
 use Illuminate\Foundation\Application;
 use Illuminate\Redis\RedisManager;
+use Illuminate\Support\Env;
 
 trait InteractsWithRedis
 {
