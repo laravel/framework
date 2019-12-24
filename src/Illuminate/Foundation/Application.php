@@ -132,6 +132,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $environmentFile = '.env';
 
     /**
+     * If the application is running in the console.
+     *
+     * @var bool|null
+     */
+    protected $runningInConsole;
+
+    /**
      * The application namespace.
      *
      * @var string
@@ -551,13 +558,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        $inConsole = Env::get('APP_RUNNING_IN_CONSOLE');
-
-        if ($inConsole !== null) {
-            return $inConsole === true;
+        if ($this->runningInConsole === null) {
+            $this->runningInConsole = Env::get('APP_RUNNING_IN_CONSOLE') ?? (\PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg');
         }
 
-        return \PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg';
+        return $this->runningInConsole;
     }
 
     /**
