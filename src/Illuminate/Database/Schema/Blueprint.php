@@ -202,6 +202,7 @@ class Blueprint
                 // index method can be called without a name and it will generate one.
                 if ($column->{$index} === true) {
                     $this->{$index}($column->name);
+                    $column->{$index} = false;
 
                     continue 2;
                 }
@@ -211,6 +212,7 @@ class Blueprint
                 // the index since the developer specified the explicit name for this.
                 elseif (isset($column->{$index})) {
                     $this->{$index}($column->name, $column->{$index});
+                    $column->{$index} = false;
 
                     continue 2;
                 }
@@ -520,11 +522,28 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string|null  $name
-     * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
+     * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function foreign($columns, $name = null)
     {
-        return $this->indexCommand('foreign', $columns, $name);
+        $command = new ForeignKeyDefinition(
+            $this->indexCommand('foreign', $columns, $name)->getAttributes()
+        );
+
+        $this->commands[count($this->commands) - 1] = $command;
+
+        return $command;
+    }
+
+    /**
+     * Create a new auto-incrementing big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function id($column = 'id')
+    {
+        return $this->bigIncrements($column);
     }
 
     /**
@@ -780,6 +799,24 @@ class Blueprint
     }
 
     /**
+     * Create a new unsigned big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignId($column)
+    {
+        $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
+            'type' => 'bigInteger',
+            'name' => $column,
+            'autoIncrement' => false,
+            'unsigned' => true,
+        ]);
+
+        return $column;
+    }
+
+    /**
      * Create a new float column on the table.
      *
      * @param  string  $column
@@ -789,7 +826,9 @@ class Blueprint
      */
     public function float($column, $total = 8, $places = 2)
     {
-        return $this->addColumn('float', $column, compact('total', 'places'));
+        return $this->addColumn('float', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => false,
+        ]);
     }
 
     /**
@@ -802,7 +841,9 @@ class Blueprint
      */
     public function double($column, $total = null, $places = null)
     {
-        return $this->addColumn('double', $column, compact('total', 'places'));
+        return $this->addColumn('double', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => false,
+        ]);
     }
 
     /**
@@ -815,7 +856,9 @@ class Blueprint
      */
     public function decimal($column, $total = 8, $places = 2)
     {
-        return $this->addColumn('decimal', $column, compact('total', 'places'));
+        return $this->addColumn('decimal', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => false,
+        ]);
     }
 
     /**

@@ -880,6 +880,19 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', 'qux', 'quuux'], $builder->getBindings());
     }
 
+    public function testWithCountAndConstraintsWithBindingInSelectSub()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->newQuery();
+        $builder->withCount(['foo' => function ($q) use ($model) {
+            $q->selectSub($model->newQuery()->where('bam', '=', 3)->selectRaw('count(0)'), 'bam_3_count');
+        }]);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertSame([], $builder->getBindings());
+    }
+
     public function testHasNestedWithConstraints()
     {
         $model = new EloquentBuilderTestModelParentStub;

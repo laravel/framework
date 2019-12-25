@@ -130,7 +130,7 @@ class PendingMail
     /**
      * Send a mailable message immediately.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable $mailable;
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      */
     public function sendNow(MailableContract $mailable)
@@ -141,7 +141,7 @@ class PendingMail
     /**
      * Push the given mailable onto the queue.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable $mailable;
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      */
     public function queue(MailableContract $mailable)
@@ -159,7 +159,7 @@ class PendingMail
      * Deliver the queued message after the given delay.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  \Illuminate\Contracts\Mail\Mailable $mailable;
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      */
     public function later($delay, MailableContract $mailable)
@@ -170,7 +170,7 @@ class PendingMail
     /**
      * Populate the mailable with the addresses.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable $mailable;
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return \Illuminate\Mail\Mailable
      */
     protected function fill(MailableContract $mailable)

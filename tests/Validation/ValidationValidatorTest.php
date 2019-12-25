@@ -11,6 +11,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;
@@ -265,7 +266,7 @@ class ValidationValidatorTest extends TestCase
     public function testNestedAttributesAreReplacedInDimensions()
     {
         // Knowing that demo image.png has width = 3 and height = 2
-        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.png', '', null, null, null, true);
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.png', '', null, null, true);
 
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.dimensions' => ':min_width :max_height :ratio'], 'en');
@@ -401,6 +402,27 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame(' is not a valid email', $v->messages()->first('email'));
+    }
+
+    public function testInputIsReplacedByItsDisplayableValue()
+    {
+        $frameworks = [
+            1 => 'Laravel',
+            2 => 'Symfony',
+            3 => 'Rails',
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.framework_php' => ':input is not a valid PHP Framework'], 'en');
+
+        $v = new Validator($trans, ['framework' => 3], ['framework' => 'framework_php']);
+        $v->addExtension('framework_php', function ($attribute, $value, $parameters, $validator) {
+            return in_array($value, [1, 2]);
+        });
+        $v->addCustomValues(['framework' => $frameworks]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('Rails is not a valid PHP Framework', $v->messages()->first('framework'));
     }
 
     public function testDisplayableValuesAreReplaced()
@@ -2560,6 +2582,7 @@ class ValidationValidatorTest extends TestCase
             ['http://local.dev'],
             ['http://google.com'],
             ['http://www.google.com'],
+            ['http://goog_le.com'],
             ['https://google.com'],
             ['http://illuminate.dev'],
             ['http://localhost'],
@@ -2584,7 +2607,6 @@ class ValidationValidatorTest extends TestCase
             ['://google.com'],
             ['http ://google.com'],
             ['http:/google.com'],
-            ['http://goog_le.com'],
             ['http://google.com::aa'],
             ['http://google.com:aa'],
             ['http://127.0.0.1:aa'],
@@ -2616,7 +2638,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateImage()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
+        $uploadedFile = [__FILE__, '', null, null, true];
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('php');
@@ -2664,7 +2686,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateImageDoesNotAllowPhpExtensionsOnImageMime()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
+        $uploadedFile = [__FILE__, '', null, null, true];
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('jpeg');
@@ -2676,7 +2698,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateImageDimensions()
     {
         // Knowing that demo image.png has width = 3 and height = 2
-        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.png', '', null, null, null, true);
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => 'file'], ['x' => 'dimensions']);
@@ -2725,7 +2747,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         // Knowing that demo image2.png has width = 4 and height = 2
-        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image2.png', '', null, null, null, true);
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image2.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         // Ensure validation doesn't erroneously fail when ratio has no fractional part
@@ -2733,14 +2755,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         // This test fails without suppressing warnings on getimagesize() due to a read error.
-        $emptyUploadedFile = new UploadedFile(__DIR__.'/fixtures/empty.png', '', null, null, null, true);
+        $emptyUploadedFile = new UploadedFile(__DIR__.'/fixtures/empty.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => $emptyUploadedFile], ['x' => 'dimensions:min_width=1']);
         $this->assertTrue($v->fails());
 
         // Knowing that demo image3.png has width = 7 and height = 10
-        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image3.png', '', null, null, null, true);
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image3.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         // Ensure validation doesn't erroneously fail when ratio has no fractional part
@@ -2748,26 +2770,26 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         // Ensure svg images always pass as size is irreleveant (image/svg+xml)
-        $svgXmlUploadedFile = new UploadedFile(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
+        $svgXmlUploadedFile = new UploadedFile(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => $svgXmlUploadedFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
 
-        $svgXmlFile = new File(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, null, true);
+        $svgXmlFile = new File(__DIR__.'/fixtures/image.svg', '', 'image/svg+xml', null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => $svgXmlFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
 
         // Ensure svg images always pass as size is irreleveant (image/svg)
-        $svgUploadedFile = new UploadedFile(__DIR__.'/fixtures/image2.svg', '', 'image/svg', null, null, true);
+        $svgUploadedFile = new UploadedFile(__DIR__.'/fixtures/image2.svg', '', 'image/svg', null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => $svgUploadedFile], ['x' => 'dimensions:max_width=1,max_height=1']);
         $this->assertTrue($v->passes());
 
-        $svgFile = new File(__DIR__.'/fixtures/image2.svg', '', 'image/svg', null, null, true);
+        $svgFile = new File(__DIR__.'/fixtures/image2.svg', '', 'image/svg', null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => $svgFile], ['x' => 'dimensions:max_width=1,max_height=1']);
@@ -2780,7 +2802,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidatePhpMimetypes()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $uploadedFile = [__DIR__.'/ValidationRuleTest.php', '', null, null, null, true];
+        $uploadedFile = [__DIR__.'/ValidationRuleTest.php', '', null, null, true];
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('rtf');
@@ -2793,7 +2815,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateMime()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
+        $uploadedFile = [__FILE__, '', null, null, true];
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('pdf');
@@ -2811,7 +2833,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateMimeEnforcesPhpCheck()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
+        $uploadedFile = [__FILE__, '', null, null, true];
 
         $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('pdf');
@@ -2832,7 +2854,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateFile()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $file = new UploadedFile(__FILE__, '', null, null, null, true);
+        $file = new UploadedFile(__FILE__, '', null, null, true);
 
         $v = new Validator($trans, ['x' => '1'], ['x' => 'file']);
         $this->assertTrue($v->fails());
@@ -4299,6 +4321,44 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], ValidationData::extractDataFromPath('cat.cat1.name', $data));
     }
 
+    public function testParsingTablesFromModels()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], []);
+
+        $implicit_no_connection = $v->parseTable(ImplicitTableModel::class);
+        $this->assertEquals(null, $implicit_no_connection[0]);
+        $this->assertEquals('implicit_table_models', $implicit_no_connection[1]);
+
+        $explicit_no_connection = $v->parseTable(ExplicitTableModel::class);
+        $this->assertEquals(null, $explicit_no_connection[0]);
+        $this->assertEquals('explicits', $explicit_no_connection[1]);
+
+        $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
+        $this->assertEquals(null, $noneloquent_no_connection[0]);
+        $this->assertEquals(NonEloquentModel::class, $noneloquent_no_connection[1]);
+
+        $raw_no_connection = $v->parseTable('table');
+        $this->assertEquals(null, $raw_no_connection[0]);
+        $this->assertEquals('table', $raw_no_connection[1]);
+
+        $implicit_connection = $v->parseTable('connection.'.ImplicitTableModel::class);
+        $this->assertEquals('connection', $implicit_connection[0]);
+        $this->assertEquals('implicit_table_models', $implicit_connection[1]);
+
+        $explicit_connection = $v->parseTable('connection.'.ExplicitTableModel::class);
+        $this->assertEquals('connection', $explicit_connection[0]);
+        $this->assertEquals('explicits', $explicit_connection[1]);
+
+        $noneloquent_connection = $v->parseTable('connection.'.NonEloquentModel::class);
+        $this->assertEquals('connection', $noneloquent_connection[0]);
+        $this->assertEquals(NonEloquentModel::class, $noneloquent_connection[1]);
+
+        $raw_connection = $v->parseTable('connection.table');
+        $this->assertEquals('connection', $raw_connection[0]);
+        $this->assertEquals('table', $raw_connection[1]);
+    }
+
     public function testUsingSettersWithImplicitRules()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4760,4 +4820,21 @@ class ValidationValidatorTest extends TestCase
             new ArrayLoader, 'en'
         );
     }
+}
+
+class ImplicitTableModel extends Model
+{
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class ExplicitTableModel extends Model
+{
+    protected $table = 'explicits';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class NonEloquentModel
+{
 }

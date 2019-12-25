@@ -27,18 +27,18 @@ class CookieJar implements JarContract
     protected $domain;
 
     /**
-     * The default secure setting (defaults to false).
+     * The default secure setting (defaults to null).
      *
-     * @var bool
+     * @var bool|null
      */
-    protected $secure = false;
+    protected $secure;
 
     /**
-     * The default SameSite option (if specified).
+     * The default SameSite option (defaults to lax).
      *
      * @var string
      */
-    protected $sameSite;
+    protected $sameSite = 'lax';
 
     /**
      * All of the cookies queued for sending.
@@ -50,14 +50,14 @@ class CookieJar implements JarContract
     /**
      * Create a new cookie instance.
      *
-     * @param  string       $name
-     * @param  string       $value
-     * @param  int          $minutes
+     * @param  string  $name
+     * @param  string  $value
+     * @param  int  $minutes
      * @param  string|null  $path
      * @param  string|null  $domain
-     * @param  bool|null    $secure
-     * @param  bool         $httpOnly
-     * @param  bool         $raw
+     * @param  bool|null  $secure
+     * @param  bool  $httpOnly
+     * @param  bool  $raw
      * @param  string|null  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -73,13 +73,13 @@ class CookieJar implements JarContract
     /**
      * Create a cookie that lasts "forever" (five years).
      *
-     * @param  string       $name
-     * @param  string       $value
+     * @param  string  $name
+     * @param  string  $value
      * @param  string|null  $path
      * @param  string|null  $domain
-     * @param  bool|null    $secure
-     * @param  bool         $httpOnly
-     * @param  bool         $raw
+     * @param  bool|null  $secure
+     * @param  bool  $httpOnly
+     * @param  bool  $raw
      * @param  string|null  $sameSite
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -117,7 +117,7 @@ class CookieJar implements JarContract
      * Get a queued cookie instance.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @param  string  $path
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
@@ -140,10 +140,10 @@ class CookieJar implements JarContract
      */
     public function queue(...$parameters)
     {
-        if (head($parameters) instanceof Cookie) {
-            $cookie = head($parameters);
+        if (isset($parameters[0]) && $parameters[0] instanceof Cookie) {
+            $cookie = $parameters[0];
         } else {
-            $cookie = call_user_func_array([$this, 'make'], $parameters);
+            $cookie = $this->make(...$parameters);
         }
 
         if (! isset($this->queued[$cookie->getName()])) {
@@ -157,7 +157,7 @@ class CookieJar implements JarContract
      * Remove a cookie from the queue.
      *
      * @param  string  $name
-     * @param  string|null $path
+     * @param  string|null  $path
      * @return void
      */
     public function unqueue($name, $path = null)
@@ -178,9 +178,9 @@ class CookieJar implements JarContract
     /**
      * Get the path and domain, or the default values.
      *
-     * @param  string    $path
-     * @param  string    $domain
-     * @param  bool|null $secure
+     * @param  string  $path
+     * @param  string  $domain
+     * @param  bool|null  $secure
      * @param  string|null  $sameSite
      * @return array
      */
@@ -194,7 +194,7 @@ class CookieJar implements JarContract
      *
      * @param  string  $path
      * @param  string  $domain
-     * @param  bool    $secure
+     * @param  bool  $secure
      * @param  string|null  $sameSite
      * @return $this
      */

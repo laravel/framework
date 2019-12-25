@@ -15,7 +15,7 @@ class DynamoDbStoreTest extends TestCase
     {
         parent::setUp();
 
-        if (! isset($_ENV['DYNAMODB_CACHE_TABLE'])) {
+        if (! env('DYNAMODB_CACHE_TABLE')) {
             $this->markTestSkipped('DynamoDB not configured.');
         }
     }
@@ -59,7 +59,7 @@ class DynamoDbStoreTest extends TestCase
         $this->assertEquals(0, Cache::driver('dynamodb')->get('counter'));
     }
 
-    public function testLocksCanBeAquired()
+    public function testLocksCanBeAcquired()
     {
         Cache::driver('dynamodb')->lock('lock', 10)->get(function () {
             $this->assertFalse(Cache::driver('dynamodb')->lock('lock', 10)->get());

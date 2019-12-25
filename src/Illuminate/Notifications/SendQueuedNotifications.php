@@ -87,7 +87,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Call the failed method on the notification instance.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
     public function failed($e)

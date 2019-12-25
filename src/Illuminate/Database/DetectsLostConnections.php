@@ -39,6 +39,7 @@ trait DetectsLostConnections
             'Adaptive Server connection failed',
             'Communication link failure',
             'connection is no longer usable',
+            'Login timeout expired',
         ]);
     }
 }

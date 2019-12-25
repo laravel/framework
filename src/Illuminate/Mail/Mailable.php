@@ -202,7 +202,7 @@ class Mailable implements MailableContract, Renderable
     /**
      * Render the mailable into a view.
      *
-     * @return \Illuminate\View\View
+     * @return string
      *
      * @throws \ReflectionException
      */
@@ -724,7 +724,7 @@ class Mailable implements MailableContract, Renderable
      * Set the view data for the message.
      *
      * @param  string|array  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return $this
      */
     public function with($key, $value = null)
@@ -747,7 +747,10 @@ class Mailable implements MailableContract, Renderable
      */
     public function attach($file, array $options = [])
     {
-        $this->attachments[] = compact('file', 'options');
+        $this->attachments = collect($this->attachments)
+                    ->push(compact('file', 'options'))
+                    ->unique('file')
+                    ->all();
 
         return $this;
     }
@@ -776,12 +779,14 @@ class Mailable implements MailableContract, Renderable
      */
     public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
-        $this->diskAttachments[] = [
+        $this->diskAttachments = collect($this->diskAttachments)->push([
             'disk' => $disk,
             'path' => $path,
             'name' => $name ?? basename($path),
             'options' => $options,
-        ];
+        ])->unique(function ($file) {
+            return $file['disk'].$file['path'];
+        })->all();
 
         return $this;
     }
@@ -796,7 +801,10 @@ class Mailable implements MailableContract, Renderable
      */
     public function attachData($data, $name, array $options = [])
     {
-        $this->rawAttachments[] = compact('data', 'name', 'options');
+        $this->rawAttachments = collect($this->rawAttachments)
+                ->push(compact('data', 'name', 'options'))
+                ->unique('data')
+                ->all();
 
         return $this;
     }
@@ -829,7 +837,7 @@ class Mailable implements MailableContract, Renderable
      * Dynamically bind parameters to the message.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return $this
      *
      * @throws \BadMethodCallException

@@ -197,7 +197,7 @@ trait FormatsMessages
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $rule
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return string
      */
     public function makeReplacements($message, $attribute, $rule, $parameters)
@@ -295,7 +295,7 @@ trait FormatsMessages
         $actualValue = $this->getValue($attribute);
 
         if (is_scalar($actualValue) || is_null($actualValue)) {
-            $message = str_replace(':input', $actualValue, $message);
+            $message = str_replace(':input', $this->getDisplayableValue($attribute, $actualValue), $message);
         }
 
         return $message;
@@ -305,7 +305,7 @@ trait FormatsMessages
      * Get the displayable name of the value.
      *
      * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return string
      */
     public function getDisplayableValue($attribute, $value)
@@ -353,7 +353,7 @@ trait FormatsMessages
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $rule
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @param  \Illuminate\Validation\Validator  $validator
      * @return string|null
      */
@@ -375,7 +375,7 @@ trait FormatsMessages
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $rule
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @param  \Illuminate\Validation\Validator  $validator
      * @return string
      */

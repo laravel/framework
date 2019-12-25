@@ -145,7 +145,7 @@ class BelongsTo extends Relation
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  string  $relation
      * @return array
      */
@@ -161,7 +161,7 @@ class BelongsTo extends Relation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
      * @return array
@@ -207,7 +207,7 @@ class BelongsTo extends Relation
 
         if ($model instanceof Model) {
             $this->child->setRelation($this->relationName, $model);
-        } elseif ($this->child->isDirty($this->foreignKey)) {
+        } else {
             $this->child->unsetRelation($this->relationName);
         }
 

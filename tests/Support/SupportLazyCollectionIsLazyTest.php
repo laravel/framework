@@ -763,6 +763,27 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testRememberIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->remember();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection = $collection->remember();
+
+            $collection->all();
+            $collection->all();
+        });
+
+        $this->assertEnumerates(5, function ($collection) {
+            $collection = $collection->remember();
+
+            $collection->take(5)->all();
+            $collection->take(5)->all();
+        });
+    }
+
     public function testReplaceIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -873,6 +894,17 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->sort()->all();
+        });
+    }
+
+    public function testSortDescIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->sortDesc();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sortDesc()->all();
         });
     }
 

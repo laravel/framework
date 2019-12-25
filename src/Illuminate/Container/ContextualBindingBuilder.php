@@ -4,7 +4,6 @@ namespace Illuminate\Container;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
-use Illuminate\Support\Arr;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
 {
@@ -63,7 +62,7 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      */
     public function give($implementation)
     {
-        foreach (Arr::wrap($this->concrete) as $concrete) {
+        foreach (Util::arrayWrap($this->concrete) as $concrete) {
             $this->container->addContextualBinding($concrete, $this->needs, $implementation);
         }
     }

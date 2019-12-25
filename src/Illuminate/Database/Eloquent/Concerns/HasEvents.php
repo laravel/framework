@@ -46,7 +46,7 @@ trait HasEvents
     /**
      * Register a single observer with the model.
      *
-     * @param  object|string $class
+     * @param  object|string  $class
      * @return void
      *
      * @throws \RuntimeException
@@ -68,7 +68,7 @@ trait HasEvents
     /**
      * Resolve the observer's class name from an object or string.
      *
-     * @param  object|string $class
+     * @param  object|string  $class
      * @return string
      *
      * @throws \InvalidArgumentException

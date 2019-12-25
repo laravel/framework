@@ -183,14 +183,26 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
             $this->fireModelEvent('booting', false);
 
+            static::booting();
             static::boot();
+            static::booted();
 
             $this->fireModelEvent('booted', false);
         }
     }
 
     /**
-     * The "booting" method of the model.
+     * Perform any actions required before the model boots.
+     *
+     * @return void
+     */
+    protected static function booting()
+    {
+        //
+    }
+
+    /**
+     * Bootstrap the model and its traits.
      *
      * @return void
      */
@@ -241,6 +253,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         foreach (static::$traitInitializers[static::class] as $method) {
             $this->{$method}();
         }
+    }
+
+    /**
+     * Perform any actions required after the model boots.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        //
     }
 
     /**
@@ -1471,12 +1493,26 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
+     * @param  mixed   $value
+     * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = null)
     {
-        return $this->where($this->getRouteKeyName(), $value)->first();
+        return $this->where($field ?? $this->getRouteKeyName(), $value)->first();
+    }
+
+    /**
+     * Retrieve the child model for a bound value.
+     *
+     * @param  string   $childType
+     * @param  mixed   $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveChildRouteBinding($childType, $value, $field)
+    {
+        return $this->{Str::plural($childType)}()->where($field, $value)->first();
     }
 
     /**

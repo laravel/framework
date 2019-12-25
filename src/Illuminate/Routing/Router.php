@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -651,7 +652,7 @@ class Router implements BindingRegistrar, RegistrarContract
             return $route;
         });
 
-        $this->events->dispatch(new Events\RouteMatched($route, $request));
+        $this->events->dispatch(new RouteMatched($route, $request));
 
         return $this->prepareResponse($request,
             $this->runRouteWithinStack($route, $request)
@@ -1138,77 +1139,6 @@ class Router implements BindingRegistrar, RegistrarContract
     public function currentRouteUses($action)
     {
         return $this->currentRouteAction() == $action;
-    }
-
-    /**
-     * Register the typical authentication routes for an application.
-     *
-     * @param  array  $options
-     * @return void
-     */
-    public function auth(array $options = [])
-    {
-        // Authentication Routes...
-        $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
-        $this->post('login', 'Auth\LoginController@login');
-        $this->post('logout', 'Auth\LoginController@logout')->name('logout');
-
-        // Registration Routes...
-        if ($options['register'] ?? true) {
-            $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
-            $this->post('register', 'Auth\RegisterController@register');
-        }
-
-        // Password Reset Routes...
-        if ($options['reset'] ?? true) {
-            $this->resetPassword();
-        }
-
-        // Password Confirmation Routes...
-        if ($options['confirm'] ?? true) {
-            $this->confirmPassword();
-        }
-
-        // Email Verification Routes...
-        if ($options['verify'] ?? false) {
-            $this->emailVerification();
-        }
-    }
-
-    /**
-     * Register the typical reset password routes for an application.
-     *
-     * @return void
-     */
-    public function resetPassword()
-    {
-        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-        $this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
-    }
-
-    /**
-     * Register the typical confirm password routes for an application.
-     *
-     * @return void
-     */
-    public function confirmPassword()
-    {
-        $this->get('password/confirm', 'Auth\ConfirmPasswordController@showConfirmForm')->name('password.confirm');
-        $this->post('password/confirm', 'Auth\ConfirmPasswordController@confirm');
-    }
-
-    /**
-     * Register the typical email verification routes for an application.
-     *
-     * @return void
-     */
-    public function emailVerification()
-    {
-        $this->get('email/verify', 'Auth\VerificationController@show')->name('verification.notice');
-        $this->get('email/verify/{id}/{hash}', 'Auth\VerificationController@verify')->name('verification.verify');
-        $this->post('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
     }
 
     /**

@@ -1,20 +1,219 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.3.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.9.0...6.x)
+
+### Added
+- Added `withoutMix()` and `withMix()` test helpers ([#30900](https://github.com/laravel/framework/pull/30900))
+- Added `validateWithBag()` macro to `Request` ([#30896](https://github.com/laravel/framework/pull/30896))
+
+### Changed
+- Handled passing too many arguments to `@slot` ([#30893](https://github.com/laravel/framework/pull/30893), [878f159](https://github.com/laravel/framework/commit/878f15922523e748bfbfdf50f40269f8ffe20d9d))
+
+### Fixed
+- Fixed `float` database types in `Blueprint` ([#30891](https://github.com/laravel/framework/pull/30891))
+
+
+## [v6.9.0 (2019-12-19)](https://github.com/laravel/framework/compare/v6.8.0...v6.9.0)
+
+### Added
+- Added `MIME` type argument to `Testing/FileFactory::create()` ([#30870](https://github.com/laravel/framework/pull/30870))
+- Added `seed` to `all` option when creating the model (`make:model` command) ([#30874](https://github.com/laravel/framework/pull/30874))
+- Allowed configurable emergency logger ([#30873](https://github.com/laravel/framework/pull/30873))
+- Added `prependMiddlewareToGroup()` / `appendMiddlewareToGroup()` / `prependToMiddlewarePriority()` / `appendToMiddlewarePriority()` to `Kernal` for manipulating middleware ([6f33feb](https://github.com/laravel/framework/commit/6f33feba124d4a7ff2af4f3ed18583d67fb68f7c))
+
+### Reverted
+- Reverted [Added `Model::setRawAttribute()`](https://github.com/laravel/framework/pull/30853) ([#30885](https://github.com/laravel/framework/pull/30885))
+
+### Fixed
+- Fixed `Builder::withCount()` binding error when a scope is added into related model with binding in a sub-select ([#30869](https://github.com/laravel/framework/pull/30869))
+
+### Changed
+-  Dont throw exception when session is not set in `AuthenticateSession` middleware ([4de1d24](https://github.com/laravel/framework/commit/4de1d24cf390f07d4f503973e5556f73060fbb31))
+
+
+## [v6.8.0 (2019-12-17)](https://github.com/laravel/framework/compare/v6.7.0...v6.8.0)
+
+### Added
+- Allowed packages to use custom markdown mail themes ([#30814](https://github.com/laravel/framework/pull/30814), [2206d52](https://github.com/laravel/framework/commit/2206d5223606f5a24e7e3bf0ba1f25b343dfcc6b))
+- Added more quotes to `Inspiring` ([4a7d566](https://github.com/laravel/framework/commit/4a7d566ff4a330970cfaa03df4c988c580804a7f), [9693ced](https://github.com/laravel/framework/commit/9693cedbfc1fb0e38a8e688375e5b2ce5273b75f))
+- Added support for nested arrays in `TestResponse::assertViewHas()` ([#30837](https://github.com/laravel/framework/pull/30837))
+- Added `Model::setRawAttribute()` ([#30853](https://github.com/laravel/framework/pull/30853))
+- Added `--force` option to the `make:controller` resource ([#30856](https://github.com/laravel/framework/pull/30856))
+- Allowed passing an array to `Resource::collection()` ([#30800](https://github.com/laravel/framework/pull/30800))
+- Implemented ArrayAccess on `JsonResponse` and `TestResponse` ([#30817](https://github.com/laravel/framework/pull/30817))
+- Added `--seed` option to the `make::model` resource ([#30828](https://github.com/laravel/framework/pull/30828), [2cd9417](https://github.com/laravel/framework/commit/2cd9417064123fd6c9114788d331659ede568dbf))
+
+### Fixed
+- Fixed two index creation instead of one when using `change()` ([#30843](https://github.com/laravel/framework/pull/30843))
+- Prevent duplicate attachments in the `Mailable` ([3c8ccc2](https://github.com/laravel/framework/commit/3c8ccc2fb4ec03572076e6df71608f6bbb7d71e1))
+- Fixed `ServiceProvider` for PHP 7.4 in `Lumen` ([#30819](https://github.com/laravel/framework/pull/30819))
+- Fixed non-eloquent model validation in database validation rules ([#30840](https://github.com/laravel/framework/pull/30840))
+
+### Changed
+- Changed `rescue()` helper ([#30838](https://github.com/laravel/framework/pull/30838))
+- Added previous exception to `EntryNotFoundException` thrown in `Container.php` ([#30862](https://github.com/laravel/framework/pull/30862))
+- Changed `DatabaseNotification::$keyType` to match `uuid` ([#30823](https://github.com/laravel/framework/pull/30823))
+
+
+## [v6.7.0 (2019-12-10)](https://github.com/laravel/framework/compare/v6.6.2...v6.7.0)
+
+### Added
+- Added `getQualifiedCreatedAtColumn()` and `getQualifiedUpdatedAtColumn()` methods to `HasTimestamps` concern ([#30792](https://github.com/laravel/framework/pull/30792))
+- Added `exceptionContext()` method to the `Exceptions\Handler` ([#30780](https://github.com/laravel/framework/pull/30780))
+- Added ability for postmark transport to throw errors ([#30799](https://github.com/laravel/framework/pull/30799), [4320b82](https://github.com/laravel/framework/commit/4320b82f848d63d41df95860ed3bf595202873a9))
+- Added `withoutRelations()` and `unsetRelations()` methods to `HasRelationships` ([#30802](https://github.com/laravel/framework/pull/30802))
+- Added `ResourceCollection::preserveQueryParameters()` for preserve query parameters on paginated api resources ([#30745](https://github.com/laravel/framework/pull/30745), [e92a708](https://github.com/laravel/framework/commit/e92a70800671187cc30a39e965144101d5db169a))
+
+### Fixed
+- Fixed explicit models in string-based database validation rules ([#30790](https://github.com/laravel/framework/pull/30790))
+- Fixed `Routing\RedirectController()` ([#30783](https://github.com/laravel/framework/pull/30783))
+
+### Changed
+- Reconnect `PhpRedisConnection` on connection missing ([#30778](https://github.com/laravel/framework/pull/30778))
+- Improved ShouldBroadcastNow performance ([#30797](https://github.com/laravel/framework/pull/30797), [5b3cc97](https://github.com/laravel/framework/commit/5b3cc9752d873be96ac34d9062cc35aa9c95bd59))
+
+
+## [v6.6.2 (2019-12-05)](https://github.com/laravel/framework/compare/v6.6.1...v6.6.2)
+
+### Added
+- Added `Illuminate\Support\Facades\Facade::partialMock()` method ([#30754](https://github.com/laravel/framework/pull/30754))
+- Added of support `retryAfter` option on queued listeners ([#30743](https://github.com/laravel/framework/pull/30743))
+
+### Fixed
+- Fixed zero parameter for routes ([#30768](https://github.com/laravel/framework/pull/30768))
+
+### Changed
+- Changed `getAllViews()` method visibility from `protected` to `public` in all schema builders ([#30757](https://github.com/laravel/framework/pull/30757))
+
+
+## [v6.6.1 (2019-12-03)](https://github.com/laravel/framework/compare/v6.6.0...v6.6.1)
+
+### Added
+- Added `setInput()` and `setOutput()` methods to `Illuminate\Console\Command` ([#30706](https://github.com/laravel/framework/pull/30706))
+
+### Fixed
+- Fixed RouteUrlGenerator with empty string for required parameter ([#30714](https://github.com/laravel/framework/pull/30714))
+
+### Changed
+- Force usage getting timestamps columns in model ([#30697](https://github.com/laravel/framework/pull/30697))
+
+### Reverted
+- Revert [Added `Illuminate\Routing\Router::head()`](https://github.com/laravel/framework/pull/30646) ([#30710](https://github.com/laravel/framework/pull/30710))
+
+
+## [v6.6.0 (2019-11-26)](https://github.com/laravel/framework/compare/v6.5.2...v6.6.0)
+
+### Added
+- Allowed explicit Model definitions in database rules ([#30653](https://github.com/laravel/framework/pull/30653), [9beceac](https://github.com/laravel/framework/commit/9beceacb1a1b8ba37cd0f775cb2fb81e21ba4c31))
+- Allowed `ResponseFactory::view()` to return first view ([#30651](https://github.com/laravel/framework/pull/30651))
+- Added `Foundation\Testing\Concerns\InteractsWithDatabase::assertDeleted()` method ([#30648](https://github.com/laravel/framework/pull/30648))
+- Added `Illuminate\Routing\Router::head()` ([#30646](https://github.com/laravel/framework/pull/30646))
+- Added `wherePivotNotIn()` and `orWherePivotNotIn()` methods to `BelongsToMany` ([#30671](https://github.com/laravel/framework/pull/30671))
+- Added options in `SqlServerConnector` to encrypt data with Azure Key vault ([#30636](https://github.com/laravel/framework/pull/30636))
+
+### Fixed
+- Fixed errors in `Illuminate\Http\Testing\FileFactory::create()` ([#30632](https://github.com/laravel/framework/pull/30632))
+- Fixed routing bug that causes missing parameters to be ignored ([#30659](https://github.com/laravel/framework/pull/30659))
+
+### Changed
+- Updated error message in `PhpRedisConnector::createClient()` if redis extension is not loaded ([#30673](https://github.com/laravel/framework/pull/30673), [184a0f4](https://github.com/laravel/framework/commit/184a0f45bc9959ebadf36a7dd6966c2bfcb96191))
+- Updated `windows_os()` helper to use PHP_OS_FAMILY ([#30660](https://github.com/laravel/framework/pull/30660))
+
+
+## [v6.5.2 (2019-11-19)](https://github.com/laravel/framework/compare/v6.5.1...v6.5.2)
+
+### Added
+- Allowed model serialization on jobs for typed properties ([#30604](https://github.com/laravel/framework/pull/30604), [#30605](https://github.com/laravel/framework/pull/30605), [920c364](https://github.com/laravel/framework/commit/920c3640269b7c1dd0f26e5b6f765ca9b7f99366))
+- Allowed fallback when facade root accessor has previously been resolved ([#30616](https://github.com/laravel/framework/pull/30616))
+- Added support for separation between `geometry` and `geography` types for `Postgres` ([#30545](https://github.com/laravel/framework/pull/30545))
+- Added `createWithContent()` method to `Illuminate\Http\Testing\File` and `Illuminate\Http\Testing\FileFactory` ([2cc6fa3](https://github.com/laravel/framework/commit/2cc6fa33732118cc71c74209b02382b989689b63), [181db51](https://github.com/laravel/framework/commit/181db51595d546cbd24b3fac0cb276255e147286))
+
+### Refactoring
+- Improved `PostgresGrammar::formatPostGisType()` method readability ([#30593](https://github.com/laravel/framework/pull/30593))
+
+### Changed
+- Added `symfony/debug` dependency to `illuminate/pipeline` ([#30611](https://github.com/laravel/framework/pull/30611))
+- Override `BelongsToMany::cursor()` to hydrate pivot relations ([#30580](https://github.com/laravel/framework/pull/30580))
+- Ignore Redis prefix when verifying channel access in RedisBroadcaster ([#30597](https://github.com/laravel/framework/pull/30597), [d77ce36](https://github.com/laravel/framework/commit/d77ce36917510d5a6800dd4116a4e18b7bf720b3))
+
+
+## [v6.5.1 (2019-11-12)](https://github.com/laravel/framework/compare/v6.5.0...v6.5.1)
+
+### Added
+- Added `includeUnless` Blade directive ([#30538](https://github.com/laravel/framework/pull/30538))
+
+### Fixed
+- Fixed default value for $count in `PhpRedisConnection::spop()` method ([#30546](https://github.com/laravel/framework/pull/30546))
+- Fixed breaking compatibility with multi-schema postgres ([#30562](https://github.com/laravel/framework/pull/30562), [6460d2b](https://github.com/laravel/framework/commit/6460d2b1bd89f470a76f5c2c3bddd390fe430e0f))
+- Fixed `Model::isDirty()` with `collection` / `object` casts ([#30565](https://github.com/laravel/framework/pull/30565))
+- Fixed `bcc` in `MailgunTransport::send()` ([#30569](https://github.com/laravel/framework/pull/30569))
+
+### Changed
+- Remove `illuminate/support` dependency from `Container` package  ([#30518](https://github.com/laravel/framework/pull/30518), [#30528](https://github.com/laravel/framework/pull/30528))
+
+
+## [v6.5.0 (2019-11-05)](https://github.com/laravel/framework/compare/v6.4.1...v6.5.0)
+
+### Added
+- Added `LazyCollection::remember()` method ([#30443](https://github.com/laravel/framework/pull/30443))
+- Added `Str::afterLast()` and `Str::beforeLast()` methods ([#30507](https://github.com/laravel/framework/pull/30507))
+- Added `existsOr()` and `doesntExistOr()` methods to the query builder ([#30495](https://github.com/laravel/framework/pull/30495))
+- Added `unless` condition to Blade custom `if` directives ([#30492](https://github.com/laravel/framework/pull/30492))
+
+### Changed
+- Added reconnect if missing connection when beginning transaction ([#30474](https://github.com/laravel/framework/pull/30474))
+- Set Redis cluster prefix with PhpRedis ([#30461](https://github.com/laravel/framework/pull/30461))
+
+
+## [v6.4.1 (2019-10-29)](https://github.com/laravel/framework/compare/v6.4.0...v6.4.1)
+
+### Added
+- Added `ScheduledTaskSkipped` event when a scheduled command was filtered from running ([#30407](https://github.com/laravel/framework/pull/30407))
+- Added `Login timeout expired` to `DetectsLostConnections` ([#30362](https://github.com/laravel/framework/pull/30362))
+- Added `missing` method to `Illuminate\Filesystem\Filesystem` and `Illuminate\Filesystem\FilesystemAdapter` classes ([#30441](https://github.com/laravel/framework/pull/30441))
+
+### Changed
+- Make `vendor:publish` command more informative ([#30408](https://github.com/laravel/framework/pull/30408), [65d040d](https://github.com/laravel/framework/commit/65d040d44f1cef3830748ec59c0056bc2418dca6))
+- Accepted underscores URL in the `URL` validator ([#30417](https://github.com/laravel/framework/pull/30417))
+- Updated `artisan down` output to be consistent with `artisan up` ([#30422](https://github.com/laravel/framework/pull/30422))
+- Changed `!empty` to `isset` for changing redis database ([#30420](https://github.com/laravel/framework/pull/30420))
+- Throw an exception when signing route got in parameter keys `signature` ([#30444](https://github.com/laravel/framework/pull/30444), [71af732](https://github.com/laravel/framework/commit/71af732b6b00ab148cd23b95aca4e05bcb86c242))
+
+### Fixed
+- Fixed of retrieving view config in `ServiceProvider::loadViewsFrom()` for Lumen ([#30404](https://github.com/laravel/framework/pull/30404))
+
+
+## [v6.4.0 (2019-10-23)](https://github.com/laravel/framework/compare/v6.3.0...v6.4.0)
 
 ### Added
 - Added `missing()` method to `Request` class ([#30320](https://github.com/laravel/framework/pull/30320))
+- Added `Pipeline::pipes()` method ([#30346](https://github.com/laravel/framework/pull/30346))
+- Added `TestResponse::assertCreated()` method ([#30368](https://github.com/laravel/framework/pull/30368)) 
 
-### TODO:
+### Changed
+- Added `connection is no longer usable` to `DetectsLostConnections` ([#30362](https://github.com/laravel/framework/pull/30362))
+- Implemented parse ID on find method for many to many relation ([#30359](https://github.com/laravel/framework/pull/30359))
 - Improvements on subqueries ([#30307](https://github.com/laravel/framework/pull/30307), [3f3b621](https://github.com/laravel/framework/commit/3f3b6214cc3353156a490d88fc8f0c148da400d5))
-- Use exit code [1] when migration table not found ([#30321](https://github.com/laravel/framework/pull/30321))
+- Pass mail data to theme css in `Markdown::render()` method ([#30376](https://github.com/laravel/framework/pull/30376))
+- Handle ajax requests in RequirePassword middleware ([#30390](https://github.com/laravel/framework/pull/30390), [331c354](https://github.com/laravel/framework/commit/331c354e586a5a27a9edc9b9a49d23aa872e4b32))
+
+### Fixed
+- Fixed `retry()` with `$times` value less then 1 ([#30356](https://github.com/laravel/framework/pull/30356))
+- Fixed `last_modified` option in `SetCacheHeader` ([#30335](https://github.com/laravel/framework/pull/30335))
+- Fixed the Filesystem manager's exception on unsupported driver ([#30331](https://github.com/laravel/framework/pull/30331), [#30369](https://github.com/laravel/framework/pull/30369))
+- Fixed `shouldQueue()` check for bound event listeners ([#30378](https://github.com/laravel/framework/pull/30378))
+- Used exit code `1` when migration table not found ([#30321](https://github.com/laravel/framework/pull/30321))
+- Alleviate breaking change introduced by password confirm feature ([#30389](https://github.com/laravel/framework/pull/30389))
+
+### Security:
+- Password Reset Security fix ([23041e9](https://github.com/laravel/framework/commit/23041e99833630d93cc7672bd7087eaa350c3a59), [a934160](https://github.com/laravel/framework/commit/a9341609705e2f8febcd356cdfa33391ec6538c7))
 
 
 ## [v6.3.0 (2019-10-15)](https://github.com/laravel/framework/compare/v6.2.0...v6.3.0)
 
 ### Added
 - Added ability to override `setUserPassword` on password reset ([#30218](https://github.com/laravel/framework/pull/30218))
-- Added firing `deleting` \ `deleted` events in `MorphPivot` ([#30229](https://github.com/laravel/framework/pull/30229))
+- Added firing `deleting` / `deleted` events in `MorphPivot` ([#30229](https://github.com/laravel/framework/pull/30229))
 - Added locking mechanism for the array cache driver ([#30253](https://github.com/laravel/framework/pull/30253))
 - Added `dropAllViews` functionality to the SQL Server builder ([#30222](https://github.com/laravel/framework/pull/30222))
 
@@ -84,10 +283,10 @@
 
 ### Added
 - Added `TestResponse::assertJsonPath()` method ([#29957](https://github.com/laravel/framework/pull/29957))
-- Added `hasMacro` \ `getGlobalMacro` \ `hasGlobalMacro` methods to `Eloquent Builder` ([#30008](https://github.com/laravel/framework/pull/30008))
+- Added `hasMacro` / `getGlobalMacro` / `hasGlobalMacro` methods to `Eloquent Builder` ([#30008](https://github.com/laravel/framework/pull/30008))
 - Added `Illuminate\Database\Eloquent\Relations\BelongsToMany::getPivotColumns()` method ([#30049](https://github.com/laravel/framework/pull/30049)) 
-- Added `ScheduledTaskFinished` \ `ScheduledTaskStarting` events to signal when scheduled task runs ([#29888](https://github.com/laravel/framework/pull/29888))
-- Allowing adding command arguments and options with `InputArgument` \ `InputOption` objects ([#29987](https://github.com/laravel/framework/pull/29987))
+- Added `ScheduledTaskFinished` / `ScheduledTaskStarting` events to signal when scheduled task runs ([#29888](https://github.com/laravel/framework/pull/29888))
+- Allowing adding command arguments and options with `InputArgument` / `InputOption` objects ([#29987](https://github.com/laravel/framework/pull/29987))
 
 ### Fixed
 - Fixed `__()` with `null` parameter ([#29967](https://github.com/laravel/framework/pull/29967)) 
@@ -99,7 +298,7 @@
 - Fixed adding `NotFoundHttpException` to "allowed" exceptions in tests ([#29975](https://github.com/laravel/framework/pull/29975))
 
 ### Changed
-- Make it possible to disable encryption via `0`/`false` ([#29985](https://github.com/laravel/framework/pull/29985))
+- Make it possible to disable encryption via `0` / `false` ([#29985](https://github.com/laravel/framework/pull/29985))
 - Allowed a symfony file instance in validate dimensions ([#30009](https://github.com/laravel/framework/pull/30009))
 - Create storage fakes with custom configuration ([#29999](https://github.com/laravel/framework/pull/29999))
 - Set locale in `PendingMail` only if locale present conditionally ([dd1e0a6](https://github.com/laravel/framework/commit/dd1e0a604713ddae21e6a893e4f605a6777300e8))

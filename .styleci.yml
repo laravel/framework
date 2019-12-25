@@ -1,9 +1,8 @@
 php:
   preset: laravel
-  enabled:
-    - alpha_ordered_imports
-  disabled:
-    - length_ordered_imports
+  finder:
+    not-name:
+      - typed-properties.php
 js:
   finder:
     not-name:

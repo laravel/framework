@@ -120,6 +120,13 @@ class Route
     protected $container;
 
     /**
+     * The fields that implicit binding should use for a given parameter.
+     *
+     * @var array
+     */
+    protected $bindingFields = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -136,7 +143,7 @@ class Route
      */
     public function __construct($methods, $uri, $action)
     {
-        $this->uri = $uri;
+        $this->uri = $this->parseUri($uri);
         $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
 
@@ -147,6 +154,19 @@ class Route
         if (isset($this->action['prefix'])) {
             $this->prefix($this->action['prefix']);
         }
+    }
+
+    /**
+     * Parse the route URI and normalize / store any implicit binding fields.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function parseUri($uri)
+    {
+        return tap(RouteUri::parse($uri), function ($uri) {
+            $this->bindingFields = $uri->bindingFields;
+        })->uri;
     }
 
     /**
@@ -325,7 +345,7 @@ class Route
     /**
      * Determine a given parameter exists from the route.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function hasParameter($name)
@@ -341,7 +361,7 @@ class Route
      * Get a given parameter from the route.
      *
      * @param  string  $name
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return string|object
      */
     public function parameter($name, $default = null)
@@ -353,7 +373,7 @@ class Route
      * Get original value of a given parameter from the route.
      *
      * @param  string  $name
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return string
      */
     public function originalParameter($name, $default = null)
@@ -365,7 +385,7 @@ class Route
      * Set a parameter to the given value.
      *
      * @param  string  $name
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function setParameter($name, $value)
@@ -469,6 +489,28 @@ class Route
     public function signatureParameters($subClass = null)
     {
         return RouteSignatureParameters::fromAction($this->action, $subClass);
+    }
+
+    /**
+     * Get the binding field for the given parameter.
+     *
+     * @param  string  $parameter
+     * @return string|null
+     */
+    public function bindingFieldFor($parameter)
+    {
+        return $this->bindingFields[$parameter] ?? null;
+    }
+
+    public function parentOfParameter($parameter)
+    {
+        $key = array_search($parameter, array_keys($this->parameters));
+
+        if ($key === 0) {
+            return;
+        }
+
+        return array_values($this->parameters)[$key - 1];
     }
 
     /**
@@ -798,7 +840,7 @@ class Route
     /**
      * Get or set the middlewares attached to the route.
      *
-     * @param  array|string|null $middleware
+     * @param  array|string|null  $middleware
      * @return $this|array
      */
     public function middleware($middleware = null)
