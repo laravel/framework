@@ -659,7 +659,7 @@ class Builder
         // assume the developer wants to run a subquery and then compare the
         // results of the subquery with the value that was provided.
         if ($column instanceof Closure && ! is_null($operator)) {
-            list($sub, $bindings) = $this->createSub($column);
+            [$sub, $bindings] = $this->createSub($column);
 
             return $this->addBinding($bindings, 'where')
                 ->where(new Expression('('.$sub.')'), $operator, $value, $boolean);
