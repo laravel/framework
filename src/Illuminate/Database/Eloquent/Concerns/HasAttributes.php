@@ -508,6 +508,8 @@ trait HasAttributes
             case 'datetime':
             case 'custom_datetime':
                 return $this->asDateTime($value);
+            case 'time':
+                return $this->asTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
             default:
@@ -835,6 +837,19 @@ trait HasAttributes
         return empty($value) ? $value : $this->asDateTime($value)->format(
             $this->getDateFormat()
         );
+    }
+
+    /**
+     * Return a timestamp as DateTime object with the current date.
+     *
+     * @param  mixed  $value
+     * @return false|\Illuminate\Support\Carbon
+     */
+    protected function asTime($value)
+    {
+        return $value instanceof CarbonInterface
+            ? Date::instance($value)
+            : Date::createFromFormat('H:i:s', $value)->startOfSecond();
     }
 
     /**
