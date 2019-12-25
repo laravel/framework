@@ -2,6 +2,16 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.9.0...6.x)
 
+### Added
+- Added `withoutMix()` and `withMix()` test helpers ([#30900](https://github.com/laravel/framework/pull/30900))
+- Added `validateWithBag()` macro to `Request` ([#30896](https://github.com/laravel/framework/pull/30896))
+
+### Changed
+- Handled passing too many arguments to `@slot` ([#30893](https://github.com/laravel/framework/pull/30893), [878f159](https://github.com/laravel/framework/commit/878f15922523e748bfbfdf50f40269f8ffe20d9d))
+
+### Fixed
+- Fixed `float` database types in `Blueprint` ([#30891](https://github.com/laravel/framework/pull/30891))
+
 
 ## [v6.9.0 (2019-12-19)](https://github.com/laravel/framework/compare/v6.8.0...v6.9.0)
 

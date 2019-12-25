@@ -134,6 +134,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $environmentFile = '.env';
 
     /**
+     * Indicates if the application is running in the console.
+     *
+     * @var bool|null
+     */
+    protected $isRunningInConsole;
+
+    /**
      * The application namespace.
      *
      * @var string
@@ -553,11 +560,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function runningInConsole()
     {
-        if (Env::get('APP_RUNNING_IN_CONSOLE') !== null) {
-            return Env::get('APP_RUNNING_IN_CONSOLE') === true;
+        if ($this->isRunningInConsole === null) {
+            $this->isRunningInConsole = Env::get('APP_RUNNING_IN_CONSOLE') ?? (\PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg');
         }
 
-        return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
+        return $this->isRunningInConsole;
     }
 
     /**

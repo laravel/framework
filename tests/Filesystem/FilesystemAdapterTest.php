@@ -6,6 +6,7 @@ use GuzzleHttp\Psr7\Stream;
 use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -239,5 +240,35 @@ class FilesystemAdapterTest extends TestCase
 
         $spy->shouldHaveReceived('putStream');
         $this->assertEquals('some-data', $filesystemAdapter->get('bar.txt'));
+    }
+
+    public function testPutFileAs()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $uploadedFile = new UploadedFile($filePath, 'org.txt', null, null, true);
+
+        $storagePath = $filesystemAdapter->putFileAs('/', $uploadedFile, 'new.txt');
+
+        $this->assertSame('new.txt', $storagePath);
+
+        $this->assertFileExists($filePath);
+
+        $filesystemAdapter->assertExists($storagePath);
+
+        $this->assertSame('uploaded file content', $filesystemAdapter->read($storagePath));
+    }
+
+    public function testPutFileAsWithAbsoluteFilePath()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $storagePath = $filesystemAdapter->putFileAs('/', $filePath, 'new.txt');
+
+        $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
     }
 }
