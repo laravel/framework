@@ -7,8 +7,8 @@ use Exception;
 use GrahamCampbell\TestBenchCore\ArraySubsetTrait;
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\Constraint\ArraySubset;
-use PHPUnit\Util\InvalidArgumentHelper;
 use PHPUnit\Runner\Version;
+use PHPUnit\Util\InvalidArgumentHelper;
 
 if (trait_exists(ArraySubsetTrait::class)) {
     /**
