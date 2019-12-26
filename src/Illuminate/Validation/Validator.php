@@ -888,7 +888,7 @@ class Validator implements ValidatorContract
     public function addExtensions(array $extensions)
     {
         if ($extensions) {
-            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($extensions));
+            $keys = array_map([Str::class, 'snake'], array_keys($extensions));
 
             $extensions = array_combine($keys, array_values($extensions));
         }
@@ -975,7 +975,7 @@ class Validator implements ValidatorContract
     public function addReplacers(array $replacers)
     {
         if ($replacers) {
-            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($replacers));
+            $keys = array_map([Str::class, 'snake'], array_keys($replacers));
 
             $replacers = array_combine($keys, array_values($replacers));
         }
