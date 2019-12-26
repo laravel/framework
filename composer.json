@@ -87,8 +87,7 @@
         "pda/pheanstalk": "^4.0",
         "phpunit/phpunit": "^8.3",
         "predis/predis": "^1.1.1",
-        "symfony/cache": "^4.3",
-        "true/punycode": "^2.1"
+        "symfony/cache": "^4.3.4"
     },
     "autoload": {
         "files": [
