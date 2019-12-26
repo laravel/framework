@@ -655,9 +655,9 @@ class Builder
             return $this->whereNested($column, $boolean);
         }
 
-        // If the column is a Closure instance and there an operator set, we will
-        // assume the developer wants to run a subquery and then compare the
-        // results of the subquery with the value that was provided.
+        // If the column is a Closure instance and there is an operator set, we
+        // will assume the developer wants to run a subquery and then compare
+        // the results of that subquery with the value that was provided.
         if ($column instanceof Closure && ! is_null($operator)) {
             [$sub, $bindings] = $this->createSub($column);
 
