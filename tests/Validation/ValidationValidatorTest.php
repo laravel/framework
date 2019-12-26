@@ -1153,7 +1153,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'Same:baz']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'bar'], ['foo' => 'Same:baz']);
         $this->assertTrue($v->passes());
@@ -1175,7 +1175,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'Different:baz']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'bar'], ['foo' => 'Different:baz']);
         $this->assertFalse($v->passes());
@@ -1187,7 +1187,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Different:fuu,baz']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'bar', 'fuu' => 'bar', 'baz' => 'boom'], ['foo' => 'Different:fuu,baz']);
         $this->assertFalse($v->passes());

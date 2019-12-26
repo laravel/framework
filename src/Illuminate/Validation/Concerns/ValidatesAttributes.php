@@ -439,14 +439,12 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'different');
 
         foreach ($parameters as $parameter) {
-            if (! Arr::has($this->data, $parameter)) {
-                return false;
-            }
-
-            $other = Arr::get($this->data, $parameter);
-
-            if ($value === $other) {
-                return false;
+            if (Arr::has($this->data, $parameter)) {
+                $other = Arr::get($this->data, $parameter);
+    
+                if ($value === $other) {
+                    return false;
+                }
             }
         }
 
@@ -1554,9 +1552,13 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'same');
 
-        $other = Arr::get($this->data, $parameters[0]);
+        if (Arr::has($this->data, $parameters[0])) {
+            $other = Arr::get($this->data, $parameters[0]);
+            
+            return $value === $other;
+        }
 
-        return $value === $other;
+        return true;
     }
 
     /**
