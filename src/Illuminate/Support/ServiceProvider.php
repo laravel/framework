@@ -155,7 +155,7 @@ abstract class ServiceProvider
         $this->app->afterResolving($name, $callback);
 
         if ($this->app->resolved($name)) {
-            $callback($this->app->make($name, $this->app));
+            $callback($this->app->make($name), $this->app);
         }
     }
 
