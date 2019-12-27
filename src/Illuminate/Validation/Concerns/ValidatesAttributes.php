@@ -1552,13 +1552,9 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'same');
 
-        if (Arr::has($this->data, $parameters[0])) {
-            $other = Arr::get($this->data, $parameters[0]);
-            
-            return $value === $other;
-        }
+        $other = Arr::get($this->data, $parameters[0]);
 
-        return true;
+        return $value === $other;
     }
 
     /**
