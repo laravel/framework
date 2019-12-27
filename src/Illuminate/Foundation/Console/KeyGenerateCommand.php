@@ -39,6 +39,10 @@ class KeyGenerateCommand extends Command
             return $this->line('<comment>'.$key.'</comment>');
         }
 
+        if (! file_exists($this->laravel->environmentFilePath())) {
+            return $this->error('You must create .env file before set the application key');
+        }
+
         // Next, we will replace the application key in the environment file so it is
         // automatically setup for this developer. This key gets generated using a
         // secure random byte generator and is later base64 encoded for storage.
