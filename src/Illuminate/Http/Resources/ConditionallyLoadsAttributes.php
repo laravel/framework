@@ -77,7 +77,7 @@ trait ConditionallyLoadsAttributes
             if (($value instanceof PotentiallyMissing && $value->isMissing()) ||
                 ($value instanceof self &&
                 $value->resource instanceof PotentiallyMissing &&
-                $value->isMissing())) {
+                $value->resource->isMissing())) {
                 unset($data[$key]);
             } else {
                 $numericKeys = $numericKeys && is_numeric($key);
