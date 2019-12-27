@@ -1392,6 +1392,57 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'required_if');
 
+        [$values, $other] = $this->prepareValuesAndOther($parameters);
+
+        if (in_array($other, $values)) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Indicate that an attribute should be excluded when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateExcludeIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'exclude_if');
+
+        [$values, $other] = $this->prepareValuesAndOther($parameters);
+
+        return ! in_array($other, $values);
+    }
+
+    /**
+     * Indicate that an attribute should be excluded when another attribute does not have a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateExcludeUnless($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'exclude_unless');
+
+        [$values, $other] = $this->prepareValuesAndOther($parameters);
+
+        return in_array($other, $values);
+    }
+
+    /**
+     * Prepare the values and the other value for validation.
+     *
+     * @param  array  $parameters
+     * @return array
+     */
+    protected function prepareValuesAndOther($parameters)
+    {
         $other = Arr::get($this->data, $parameters[0]);
 
         $values = array_slice($parameters, 1);
@@ -1400,11 +1451,7 @@ trait ValidatesAttributes
             $values = $this->convertValuesToBoolean($values);
         }
 
-        if (in_array($other, $values)) {
-            return $this->validateRequired($attribute, $value);
-        }
-
-        return true;
+        return [$values, $other];
     }
 
     /**
