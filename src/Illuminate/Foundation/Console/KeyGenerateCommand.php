@@ -36,15 +36,25 @@ class KeyGenerateCommand extends Command
         $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
-            return $this->line('<comment>'.$key.'</comment>');
+            $this->line('<comment>'.$key.'</comment>');
+
+            return;
+        }
+
+        if (! $this->isExistsEnvironmentFile()) {
+            $this->error('You must create .env file before set the application key');
+
+            return;
         }
 
         // Next, we will replace the application key in the environment file so it is
         // automatically setup for this developer. This key gets generated using a
         // secure random byte generator and is later base64 encoded for storage.
-        if (! $this->setKeyInEnvironmentFile($key)) {
+        if (! $this->canSetKeyInEnvironmentFile()) {
             return;
         }
+
+        $this->writeNewEnvironmentFileWith($key);
 
         $this->laravel['config']['app.key'] = $key;
 
@@ -64,20 +74,31 @@ class KeyGenerateCommand extends Command
     }
 
     /**
-     * Set the application key in the environment file.
+     * Check is .env file exists.
      *
-     * @param  string  $key
      * @return bool
      */
-    protected function setKeyInEnvironmentFile($key)
+    protected function isExistsEnvironmentFile()
+    {
+        if (file_exists($this->laravel->environmentFilePath())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Set the application key in the environment file.
+     *
+     * @return bool
+     */
+    protected function canSetKeyInEnvironmentFile()
     {
         $currentKey = $this->laravel['config']['app.key'];
 
         if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
             return false;
         }
-
-        $this->writeNewEnvironmentFileWith($key);
 
         return true;
     }
