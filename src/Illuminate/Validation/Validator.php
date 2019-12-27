@@ -287,8 +287,6 @@ class Validator implements ValidatorContract
         foreach ($this->rules as $attribute => $rules) {
             $attribute = str_replace('\.', '->', $attribute);
 
-            // If this attribute is a nested rule, its parent might have already
-            // been excluded. If so, we have to remove the attribute.
             if ($this->shouldBeExcluded($attribute)) {
                 $this->removeAttribute($attribute);
 
@@ -321,20 +319,26 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Determine if the data fails the validation rules.
+     *
+     * @return bool
+     */
+    public function fails()
+    {
+        return ! $this->passes();
+    }
+
+    /**
      * Determine if the attribute should be excluded.
      *
      * @param  string  $attribute
-     *
      * @return bool
      */
     protected function shouldBeExcluded($attribute)
     {
         foreach ($this->excludeAttributes as $excludeAttribute) {
-            if ($attribute === $excludeAttribute) {
-                return true;
-            }
-
-            if (Str::startsWith($attribute, $excludeAttribute.'.')) {
+            if ($attribute === $excludeAttribute ||
+                Str::startsWith($attribute, $excludeAttribute.'.')) {
                 return true;
             }
         }
@@ -352,16 +356,6 @@ class Validator implements ValidatorContract
     protected function removeAttribute($attribute)
     {
         unset($this->data[$attribute], $this->rules[$attribute]);
-    }
-
-    /**
-     * Determine if the data fails the validation rules.
-     *
-     * @return bool
-     */
-    public function fails()
-    {
-        return ! $this->passes();
     }
 
     /**
@@ -688,9 +682,7 @@ class Validator implements ValidatorContract
         }
 
         if (in_array($rule, $this->excludeRules)) {
-            $this->excludeAttributes[] = $attribute;
-
-            return;
+            return $this->excludeAttribute($attribute);
         }
 
         $this->messages->add($attribute, $this->makeReplacements(
@@ -698,6 +690,19 @@ class Validator implements ValidatorContract
         ));
 
         $this->failedRules[$attribute][$rule] = $parameters;
+    }
+
+    /**
+     * Add the given attribute to the list of excluded attributes.
+     *
+     * @param  string  $attribute
+     * @return void
+     */
+    protected function excludeAttribute(string $attribute)
+    {
+        $this->excludeAttributes[] = $attribute;
+
+        $this->excludeAttributes = array_unique($this->excludeAttributes);
     }
 
     /**
