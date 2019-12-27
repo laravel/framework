@@ -40,7 +40,7 @@ class MigrationCreator
      * @param  string  $name
      * @param  string  $path
      * @param  string|null  $table
-     * @param  bool    $create
+     * @param  bool  $create
      * @return string
      *
      * @throws \Exception
@@ -95,7 +95,7 @@ class MigrationCreator
      * Get the migration stub file.
      *
      * @param  string|null  $table
-     * @param  bool    $create
+     * @param  bool  $create
      * @return string
      */
     protected function getStub($table, $create)

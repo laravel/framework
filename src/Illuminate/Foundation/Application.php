@@ -9,6 +9,7 @@ use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -30,7 +31,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '6.4.1';
+    const VERSION = '6.9.0';
 
     /**
      * The base path for the Laravel installation.
@@ -129,6 +130,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @var string
      */
     protected $environmentFile = '.env';
+
+    /**
+     * Indicates if the application is running in the console.
+     *
+     * @var bool|null
+     */
+    protected $isRunningInConsole;
 
     /**
      * The application namespace.
@@ -550,11 +558,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        if (Env::get('APP_RUNNING_IN_CONSOLE') !== null) {
-            return Env::get('APP_RUNNING_IN_CONSOLE') === true;
+        if ($this->isRunningInConsole === null) {
+            $this->isRunningInConsole = Env::get('APP_RUNNING_IN_CONSOLE') ?? (\PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg');
         }
 
-        return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
+        return $this->isRunningInConsole;
     }
 
     /**
@@ -589,7 +597,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Register a service provider with the application.
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
-     * @param  bool   $force
+     * @param  bool  $force
      * @return \Illuminate\Support\ServiceProvider
      */
     public function register($provider, $force = false)
@@ -998,12 +1006,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Throw an HttpException with the given data.
      *
-     * @param  int     $code
+     * @param  int  $code
      * @param  string  $message
-     * @param  array   $headers
+     * @param  array  $headers
      * @return void
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function abort($code, $message = '', array $headers = [])
     {
@@ -1125,7 +1134,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         $this['translator']->setLocale($locale);
 
-        $this['events']->dispatch(new Events\LocaleUpdated($locale));
+        $this['events']->dispatch(new LocaleUpdated($locale));
     }
 
     /**

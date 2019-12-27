@@ -59,7 +59,7 @@ trait ResponseTrait
      *
      * @param  string  $key
      * @param  array|string  $values
-     * @param  bool    $replace
+     * @param  bool  $replace
      * @return $this
      */
     public function header($key, $values, $replace = true)
@@ -141,6 +141,8 @@ trait ResponseTrait
 
     /**
      * Throws the response in a HttpResponseException instance.
+     *
+     * @return void
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException
      */

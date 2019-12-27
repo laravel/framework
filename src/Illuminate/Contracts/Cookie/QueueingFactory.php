@@ -17,6 +17,7 @@ interface QueueingFactory extends Factory
      *
      * @param  string  $name
      * @param  string|null  $path
+     * @return void
      */
     public function unqueue($name, $path = null);
 

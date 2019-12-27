@@ -5,6 +5,9 @@ namespace Illuminate\Queue;
 use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Jobs\SyncJob;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Throwable;
@@ -26,7 +29,7 @@ class SyncQueue extends Queue implements QueueContract
      * Push a new job onto the queue.
      *
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string|null  $queue
      * @return mixed
      *
@@ -72,7 +75,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseBeforeJobEvent(Job $job)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new Events\JobProcessing($this->connectionName, $job));
+            $this->container['events']->dispatch(new JobProcessing($this->connectionName, $job));
         }
     }
 
@@ -85,7 +88,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseAfterJobEvent(Job $job)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new Events\JobProcessed($this->connectionName, $job));
+            $this->container['events']->dispatch(new JobProcessed($this->connectionName, $job));
         }
     }
 
@@ -99,7 +102,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseExceptionOccurredJobEvent(Job $job, $e)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new Events\JobExceptionOccurred($this->connectionName, $job, $e));
+            $this->container['events']->dispatch(new JobExceptionOccurred($this->connectionName, $job, $e));
         }
     }
 
@@ -126,7 +129,7 @@ class SyncQueue extends Queue implements QueueContract
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array   $options
+     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
@@ -139,7 +142,7 @@ class SyncQueue extends Queue implements QueueContract
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string|null  $queue
      * @return mixed
      */

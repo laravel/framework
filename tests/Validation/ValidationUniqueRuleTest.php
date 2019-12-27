@@ -14,7 +14,24 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('unique:table,NULL,NULL,id,foo,"bar"', (string) $rule);
 
+        $rule = new Unique(EloquentModelStub::class);
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:table,NULL,NULL,id,foo,"bar"', (string) $rule);
+
+        $rule = new Unique(NoTableName::class);
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:no_table_names,NULL,NULL,id,foo,"bar"', (string) $rule);
+
+        $rule = new Unique('Illuminate\Tests\Validation\NoTableName');
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:no_table_names,NULL,NULL,id,foo,"bar"', (string) $rule);
+
         $rule = new Unique('table', 'column');
+        $rule->ignore('Taylor, Otwell', 'id_column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:table,column,"Taylor, Otwell",id_column,foo,"bar"', (string) $rule);
+
+        $rule = new Unique(EloquentModelStub::class, 'column');
         $rule->ignore('Taylor, Otwell', 'id_column');
         $rule->where('foo', 'bar');
         $this->assertSame('unique:table,column,"Taylor, Otwell",id_column,foo,"bar"', (string) $rule);
@@ -51,6 +68,13 @@ class ValidationUniqueRuleTest extends TestCase
 
 class EloquentModelStub extends Model
 {
+    protected $table = 'table';
     protected $primaryKey = 'id_column';
     protected $guarded = [];
+}
+
+class NoTableName extends Model
+{
+    protected $guarded = [];
+    public $timestamps = false;
 }

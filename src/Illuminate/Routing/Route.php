@@ -325,7 +325,7 @@ class Route
     /**
      * Determine a given parameter exists from the route.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function hasParameter($name)
@@ -341,7 +341,7 @@ class Route
      * Get a given parameter from the route.
      *
      * @param  string  $name
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return string|object
      */
     public function parameter($name, $default = null)
@@ -353,7 +353,7 @@ class Route
      * Get original value of a given parameter from the route.
      *
      * @param  string  $name
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return string
      */
     public function originalParameter($name, $default = null)
@@ -365,7 +365,7 @@ class Route
      * Set a parameter to the given value.
      *
      * @param  string  $name
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function setParameter($name, $value)
@@ -798,7 +798,7 @@ class Route
     /**
      * Get or set the middlewares attached to the route.
      *
-     * @param  array|string|null $middleware
+     * @param  array|string|null  $middleware
      * @return $this|array
      */
     public function middleware($middleware = null)

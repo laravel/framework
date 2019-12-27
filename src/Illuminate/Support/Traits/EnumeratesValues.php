@@ -402,7 +402,7 @@ trait EnumeratesValues
     /**
      * Apply the callback if the value is truthy.
      *
-     * @param  bool  $value
+     * @param  bool|mixed  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return static|mixed
@@ -604,7 +604,7 @@ trait EnumeratesValues
     /**
      * Pass the collection to the given callback and return the result.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return mixed
      */
     public function pipe(callable $callback)

@@ -3,10 +3,18 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Closure;
+use Illuminate\Foundation\Mix;
 use Mockery;
 
 trait InteractsWithContainer
 {
+    /**
+     * The original Laravel Mix handler.
+     *
+     * @var \Illuminate\Foundation\Mix|null
+     */
+    protected $originalMix;
+
     /**
      * Register an instance of an object in the container.
      *
@@ -67,5 +75,37 @@ trait InteractsWithContainer
     protected function spy($abstract, Closure $mock = null)
     {
         return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
+    }
+
+    /**
+     * Register an empty handler for Laravel Mix in the container.
+     *
+     * @return $this
+     */
+    protected function withoutMix()
+    {
+        if ($this->originalMix == null) {
+            $this->originalMix = app(Mix::class);
+        }
+
+        $this->swap(Mix::class, function () {
+            return '';
+        });
+
+        return $this;
+    }
+
+    /**
+     * Register an empty handler for Laravel Mix in the container.
+     *
+     * @return $this
+     */
+    protected function withMix()
+    {
+        if ($this->originalMix) {
+            $this->app->instance(Mix::class, $this->originalMix);
+        }
+
+        return $this;
     }
 }

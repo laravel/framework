@@ -215,8 +215,8 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  \Closure|string|array  $column
-     * @param  mixed   $operator
-     * @param  mixed   $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -492,7 +492,7 @@ class Builder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function get($columns = ['*'])
@@ -512,7 +512,7 @@ class Builder
     /**
      * Get the hydrated models without eager loading.
      *
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model[]|static[]
      */
     public function getModels($columns = ['*'])

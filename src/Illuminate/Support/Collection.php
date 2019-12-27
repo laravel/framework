@@ -94,7 +94,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the median of a given key.
      *
-     * @param  string|array|null $key
+     * @param  string|array|null  $key
      * @return mixed
      */
     public function median($key = null)
@@ -1128,7 +1128,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Sort the collection keys in descending order.
      *
-     * @param  int $options
+     * @param  int  $options
      * @return static
      */
     public function sortKeysDesc($options = SORT_REGULAR)

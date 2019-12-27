@@ -65,7 +65,7 @@ class Response extends BaseResponse
     /**
      * Morph the given content into JSON.
      *
-     * @param  mixed   $content
+     * @param  mixed  $content
      * @return string
      */
     protected function morphToJson($content)

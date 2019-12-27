@@ -230,7 +230,7 @@ class Validator implements ValidatorContract
 
             // If the data key contains a dot, we will replace it with another character
             // sequence so it doesn't interfere with dot processing when working with
-            // array based validation rules and array_dot later in the validations.
+            // array based validation rules plus Arr::dot later in the validations.
             if (Str::contains($key, '.')) {
                 $newData[str_replace('.', '->', $key)] = $value;
             } else {
@@ -888,7 +888,7 @@ class Validator implements ValidatorContract
     public function addExtensions(array $extensions)
     {
         if ($extensions) {
-            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($extensions));
+            $keys = array_map([Str::class, 'snake'], array_keys($extensions));
 
             $extensions = array_combine($keys, array_values($extensions));
         }
@@ -975,7 +975,7 @@ class Validator implements ValidatorContract
     public function addReplacers(array $replacers)
     {
         if ($replacers) {
-            $keys = array_map('\Illuminate\Support\Str::snake', array_keys($replacers));
+            $keys = array_map([Str::class, 'snake'], array_keys($replacers));
 
             $replacers = array_combine($keys, array_values($replacers));
         }

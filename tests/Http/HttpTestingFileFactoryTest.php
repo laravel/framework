@@ -36,4 +36,20 @@ class HttpTestingFileFactoryTest extends TestCase
         $this->assertSame(15, $info[0]);
         $this->assertSame(20, $info[1]);
     }
+
+    public function testCreateWithMimeType()
+    {
+        $this->assertSame(
+            'audio/webm',
+            (new FileFactory)->create('someaudio.webm', 0, 'audio/webm')->getMimeType()
+        );
+    }
+
+    public function testCreateWithoutMimeType()
+    {
+        $this->assertSame(
+            'video/webm',
+            (new FileFactory)->create('someaudio.webm')->getMimeType()
+        );
+    }
 }
