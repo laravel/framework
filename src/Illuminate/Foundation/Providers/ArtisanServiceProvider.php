@@ -13,6 +13,7 @@ use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\WipeCommand;
+use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
@@ -130,6 +131,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'MailMake' => 'command.mail.make',
         'MiddlewareMake' => 'command.middleware.make',
         'ModelMake' => 'command.model.make',
+        'CastMake' => 'command.cast.make',
         'NotificationMake' => 'command.notification.make',
         'NotificationTable' => 'command.notification.table',
         'ObserverMake' => 'command.observer.make',
@@ -483,6 +485,13 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.model.make', function ($app) {
             return new ModelMakeCommand($app['files']);
+        });
+    }
+
+    protected function registerCastMakeCommand()
+    {
+        $this->app->singleton('command.cast.make', function ($app) {
+            return new CastMakeCommand($app['files']);
         });
     }
 

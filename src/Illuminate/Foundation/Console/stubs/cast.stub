@@ -1,0 +1,20 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Contracts\Database\Eloquent\Castable;
+
+class DummyClass implements Castable
+{
+    /**
+     * Get the mutated value.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function handle($value = null)
+    {
+        return $value;
+    }
+}
