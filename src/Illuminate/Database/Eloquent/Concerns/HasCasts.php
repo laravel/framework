@@ -21,9 +21,8 @@ trait HasCasts
     /**
      * Determine whether an attribute should be cast to a native type.
      *
-     * @param string $key
-     * @param array|string|null $types
-     *
+     * @param  string  $key
+     * @param  array|string|null  $types
      * @return bool
      */
     public function hasCast($key, $types = null)
@@ -57,12 +56,11 @@ trait HasCasts
     /**
      * Determine if the new and old values for a given key are equivalent.
      *
-     * @param string $key
-     * @param mixed $current
+     * @param  string  $key
+     * @param  mixed  $current
+     * @return bool
      *
      * @throws BindingResolutionException
-     *
-     * @return bool
      */
     public function originalIsEquivalent($key, $current)
     {
@@ -94,12 +92,11 @@ trait HasCasts
     /**
      * Add the casted attributes to the attributes array.
      *
-     * @param array $attributes
-     * @param array $mutatedAttributes
+     * @param  array  $attributes
+     * @param  array  $mutatedAttributes
+     * @return array
      *
      * @throws BindingResolutionException
-     *
-     * @return array
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
@@ -138,12 +135,11 @@ trait HasCasts
     /**
      * Cast an attribute to a native PHP type.
      *
-     * @param string $key
-     * @param mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
      *
      * @throws BindingResolutionException
-     *
-     * @return mixed
      */
     protected function castAttribute($key, $value = null)
     {
@@ -190,8 +186,7 @@ trait HasCasts
     /**
      * Get the type of cast for a model attribute.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return string
      */
     protected function getCastType($key)
@@ -212,9 +207,8 @@ trait HasCasts
     /**
      * Cast the given attribute to JSON.
      *
-     * @param string $key
-     * @param mixed $value
-     *
+     * @param  string  $key
+     * @param  mixed  $value
      * @return string
      */
     protected function castAttributeAsJson($key, $value)
@@ -233,8 +227,7 @@ trait HasCasts
     /**
      * Determine if the cast type is a custom date time cast.
      *
-     * @param string $cast
-     *
+     * @param  string  $cast
      * @return bool
      */
     protected function isCustomDateTimeCast($cast)
@@ -246,8 +239,7 @@ trait HasCasts
     /**
      * Determine if the cast type is a decimal cast.
      *
-     * @param string $cast
-     *
+     * @param  string  $cast
      * @return bool
      */
     protected function isDecimalCast($cast)
@@ -258,8 +250,7 @@ trait HasCasts
     /**
      * Determine if the given attribute is a date or date castable.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return bool
      */
     protected function isDateAttribute($key)
@@ -271,8 +262,7 @@ trait HasCasts
     /**
      * Is the checked value a custom Cast.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return bool
      */
     protected function isCustomCastable($key)
@@ -287,8 +277,7 @@ trait HasCasts
     /**
      * Determine whether a value is Date / DateTime castable for inbound manipulation.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return bool
      */
     protected function isDateCastable($key)
@@ -299,8 +288,7 @@ trait HasCasts
     /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return bool
      */
     protected function isJsonCastable($key)
@@ -311,12 +299,11 @@ trait HasCasts
     /**
      * Getting the execution result from a user Cast object.
      *
-     * @param string $key
-     * @param null $value
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
      *
      * @throws BindingResolutionException
-     *
-     * @return mixed
      */
     protected function fromCustomCastable($key, $value = null)
     {
@@ -326,12 +313,11 @@ trait HasCasts
     }
 
     /**
-     * @param $key
-     * @param null $value
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
      *
      * @throws BindingResolutionException
-     *
-     * @return mixed
      */
     protected function toCustomCastable($key, $value = null)
     {
@@ -341,11 +327,10 @@ trait HasCasts
     }
 
     /**
-     * @param string $key
+     * @param  string  $key
+     * @return Castable
      *
      * @throws BindingResolutionException
-     *
-     * @return Castable
      */
     protected function normalizeHandlerToCallable($key)
     {

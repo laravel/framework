@@ -7,8 +7,7 @@ interface Castable
     /**
      * Get a given attribute from the model.
      *
-     * @param mixed $value
-     *
+     * @param  mixed  $value
      * @return mixed
      */
     public function get($value);
@@ -16,8 +15,7 @@ interface Castable
     /**
      * Set a given attribute on the model.
      *
-     * @param mixed $value
-     *
+     * @param  mixed  $value
      * @return mixed
      */
     public function set($value);
