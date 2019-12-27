@@ -441,6 +441,10 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
+        if ($this->isCustomCastable($key) && ! is_null($value)) {
+            $value = $this->toCustomCastable($key, $value);
+        }
+
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
         }

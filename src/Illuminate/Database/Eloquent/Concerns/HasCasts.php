@@ -2,6 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Support\Collection;
@@ -25,11 +28,13 @@ trait HasCasts
      */
     public function hasCast($key, $types = null)
     {
-        if (array_key_exists($key, $this->getCasts())) {
-            return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
+        if (! array_key_exists($key, $this->getCasts())) {
+            return false;
         }
 
-        return false;
+        return $types
+            ? in_array($this->getCastType($key), (array) $types, true)
+            : true;
     }
 
     /**
@@ -39,11 +44,14 @@ trait HasCasts
      */
     public function getCasts()
     {
-        if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
-        }
+        return $this->getIncrementing()
+            ? array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts)
+            : $this->casts;
+    }
 
-        return $this->casts;
+    public function getCast($key)
+    {
+        return $this->getCasts()[$key] ?? null;
     }
 
     /**
@@ -51,6 +59,8 @@ trait HasCasts
      *
      * @param string $key
      * @param mixed $current
+     *
+     * @throws BindingResolutionException
      *
      * @return bool
      */
@@ -87,6 +97,8 @@ trait HasCasts
      * @param array $attributes
      * @param array $mutatedAttributes
      *
+     * @throws BindingResolutionException
+     *
      * @return array
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
@@ -111,7 +123,7 @@ trait HasCasts
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
+            if ($this->isCustomDateTimeCast($value)) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
 
@@ -129,9 +141,11 @@ trait HasCasts
      * @param string $key
      * @param mixed $value
      *
+     * @throws BindingResolutionException
+     *
      * @return mixed
      */
-    protected function castAttribute($key, $value)
+    protected function castAttribute($key, $value = null)
     {
         if (is_null($value)) {
             return $value;
@@ -146,7 +160,7 @@ trait HasCasts
             case 'double':
                 return $this->fromFloat($value);
             case 'decimal':
-                return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
+                return $this->asDecimal($value, explode(':', $this->getCast($key), 2)[1]);
             case 'string':
                 return (string) $value;
             case 'bool':
@@ -167,7 +181,9 @@ trait HasCasts
             case 'timestamp':
                 return $this->asTimestamp($value);
             default:
-                return $value;
+                return $this->isCustomCastable($key)
+                    ? $this->fromCustomCastable($key, $value)
+                    : $value;
         }
     }
 
@@ -180,15 +196,17 @@ trait HasCasts
      */
     protected function getCastType($key)
     {
-        if ($this->isCustomDateTimeCast($this->getCasts()[$key])) {
+        $cast = $this->getCast($key);
+
+        if ($this->isCustomDateTimeCast($cast)) {
             return 'custom_datetime';
         }
 
-        if ($this->isDecimalCast($this->getCasts()[$key])) {
+        if ($this->isDecimalCast($cast)) {
             return 'decimal';
         }
 
-        return trim(strtolower($this->getCasts()[$key]));
+        return trim(strtolower($cast));
     }
 
     /**
@@ -251,6 +269,22 @@ trait HasCasts
     }
 
     /**
+     * Is the checked value a custom Cast.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    protected function isCustomCastable($key)
+    {
+        if ($cast = $this->getCast($key)) {
+            return is_subclass_of($cast, Castable::class);
+        }
+
+        return false;
+    }
+
+    /**
      * Determine whether a value is Date / DateTime castable for inbound manipulation.
      *
      * @param string $key
@@ -272,5 +306,50 @@ trait HasCasts
     protected function isJsonCastable($key)
     {
         return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
+    }
+
+    /**
+     * Getting the execution result from a user Cast object.
+     *
+     * @param string $key
+     * @param null $value
+     *
+     * @throws BindingResolutionException
+     *
+     * @return mixed
+     */
+    protected function fromCustomCastable($key, $value = null)
+    {
+        return $this
+            ->normalizeHandlerToCallable($key)
+            ->get($value);
+    }
+
+    /**
+     * @param $key
+     * @param null $value
+     *
+     * @throws BindingResolutionException
+     *
+     * @return mixed
+     */
+    protected function toCustomCastable($key, $value = null)
+    {
+        return $this
+            ->normalizeHandlerToCallable($key)
+            ->set($value);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @throws BindingResolutionException
+     *
+     * @return Castable
+     */
+    protected function normalizeHandlerToCallable($key)
+    {
+        return Container::getInstance()
+            ->make($this->getCast($key));
     }
 }
