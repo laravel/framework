@@ -93,13 +93,9 @@ class Env
                     case 'null':
                     case '(null)':
                         return;
+                    default:
+                        return $value;
                 }
-
-                if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
-                    return $matches[2];
-                }
-
-                return $value;
             })
             ->getOrCall(function () use ($default) {
                 return value($default);
