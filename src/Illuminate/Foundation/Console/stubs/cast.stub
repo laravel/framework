@@ -1,0 +1,32 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Contracts\Database\Eloquent\Castable;
+
+class DummyClass implements Castable
+{
+    /**
+     * Get a given attribute from the model.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function get($value)
+    {
+        return $value;
+    }
+
+    /**
+     * Set a given attribute on the model.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function set($value)
+    {
+        return $value;
+    }
+}
