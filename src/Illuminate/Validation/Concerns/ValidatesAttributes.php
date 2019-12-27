@@ -442,7 +442,7 @@ trait ValidatesAttributes
         foreach ($parameters as $parameter) {
             if (Arr::has($this->data, $parameter)) {
                 $other = Arr::get($this->data, $parameter);
-    
+
                 if ($value === $other) {
                     return false;
                 }
