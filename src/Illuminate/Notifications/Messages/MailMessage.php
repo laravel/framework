@@ -5,7 +5,7 @@ namespace Illuminate\Notifications\Messages;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Mail\Markdown;
+use Illuminate\Mail\Renderer;
 use Traversable;
 
 class MailMessage extends SimpleMessage implements Renderable
@@ -316,7 +316,7 @@ class MailMessage extends SimpleMessage implements Renderable
         }
 
         return Container::getInstance()
-            ->make(Markdown::class)
+            ->make(Renderer::class)
             ->render($this->markdown, $this->data());
     }
 

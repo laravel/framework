@@ -36,7 +36,7 @@
                                 <!-- Body content -->
                                 <tr>
                                     <td class="content-cell">
-                                        {{ Illuminate\Mail\Markdown::parse($slot) }}
+                                        {{ Illuminate\Support\Facades\Markdown::render($slot) }}
 
                                         {{ $subcopy ?? '' }}
                                     </td>

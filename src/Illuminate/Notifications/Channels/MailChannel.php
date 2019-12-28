@@ -5,7 +5,7 @@ namespace Illuminate\Notifications\Channels;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Markdown;
+use Illuminate\Mail\Renderer;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -20,23 +20,23 @@ class MailChannel
     protected $mailer;
 
     /**
-     * The markdown implementation.
+     * The renderer implementation.
      *
-     * @var \Illuminate\Mail\Markdown
+     * @var \Illuminate\Mail\Renderer
      */
-    protected $markdown;
+    protected $renderer;
 
     /**
      * Create a new mail channel instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-     * @param  \Illuminate\Mail\Markdown  $markdown
+     * @param  \Illuminate\Mail\Renderer  $renderer
      * @return void
      */
-    public function __construct(Mailer $mailer, Markdown $markdown)
+    public function __construct(Mailer $mailer, Renderer $renderer)
     {
         $this->mailer = $mailer;
-        $this->markdown = $markdown;
+        $this->renderer = $renderer;
     }
 
     /**
@@ -94,12 +94,12 @@ class MailChannel
         }
 
         if (property_exists($message, 'theme') && ! is_null($message->theme)) {
-            $this->markdown->theme($message->theme);
+            $this->renderer->theme($message->theme);
         }
 
         return [
-            'html' => $this->markdown->render($message->markdown, $message->data()),
-            'text' => $this->markdown->renderText($message->markdown, $message->data()),
+            'html' => $this->renderer->render($message->markdown, $message->data()),
+            'text' => $this->renderer->renderText($message->markdown, $message->data()),
         ];
     }
 
