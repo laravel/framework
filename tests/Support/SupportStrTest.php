@@ -234,6 +234,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
     }
 
+    public function testLcfirst()
+    {
+        $this->assertSame('laravel', Str::lcfirst('Laravel'));
+        $this->assertSame('laravel framework', Str::lcfirst('Laravel framework'));
+        $this->assertSame('мама', Str::lcfirst('Мама'));
+        $this->assertSame('мама мыла раму', Str::lcfirst('Мама мыла раму'));
+    }
+
     public function testLower()
     {
         $this->assertSame('foo bar baz', Str::lower('FOO BAR BAZ'));
