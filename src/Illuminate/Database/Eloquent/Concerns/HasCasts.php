@@ -154,10 +154,10 @@ trait HasCasts
      */
     protected function castAttribute($key, $value = null)
     {
-        if (is_null($value)) {
-            return $value;
-        } elseif ($this->isCustomCastable($key)) {
+        if ($this->isCustomCastable($key)) {
             return $this->fromCustomCastable($key, $value);
+        } elseif (is_null($value)) {
+            return $value;
         }
 
         switch ($this->getCastType($key)) {
