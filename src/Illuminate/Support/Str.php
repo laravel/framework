@@ -132,7 +132,7 @@ class Str
             return static::$camelCache[$value];
         }
 
-        return static::$camelCache[$value] = lcfirst(static::studly($value));
+        return static::$camelCache[$value] = static::lcfirst(static::studly($value));
     }
 
     /**
@@ -250,6 +250,17 @@ class Str
     public static function kebab($value)
     {
         return static::snake($value, '-');
+    }
+    
+    /**
+     * Make a string's first character lowercase.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function lcfirst($string)
+    {
+        return static::lower(static::substr($string, 0, 1)).static::substr($string, 1);
     }
 
     /**
