@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -48,6 +47,12 @@ trait HasCasts
             : $this->casts;
     }
 
+    /**
+     * Get the cast from casts array.
+     *
+     * @param  string  $key
+     * @return mixed|null
+     */
     public function getCast($key)
     {
         return $this->getCasts()[$key] ?? null;
@@ -60,7 +65,7 @@ trait HasCasts
      * @param  mixed  $current
      * @return bool
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function originalIsEquivalent($key, $current)
     {
@@ -96,7 +101,7 @@ trait HasCasts
      * @param  array  $mutatedAttributes
      * @return array
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
@@ -139,7 +144,7 @@ trait HasCasts
      * @param  mixed  $value
      * @return mixed
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function castAttribute($key, $value = null)
     {
@@ -303,7 +308,7 @@ trait HasCasts
      * @param  mixed  $value
      * @return mixed
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function fromCustomCastable($key, $value = null)
     {
@@ -313,11 +318,13 @@ trait HasCasts
     }
 
     /**
+     * Converting a value by custom Cast.
+     *
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function toCustomCastable($key, $value = null)
     {
@@ -327,10 +334,12 @@ trait HasCasts
     }
 
     /**
-     * @param  string  $key
-     * @return Castable
+     * Getting a custom cast instance.
      *
-     * @throws BindingResolutionException
+     * @param  string  $key
+     * @return \Illuminate\Contracts\Database\Eloquent\Castable
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function normalizeHandlerToCallable($key)
     {
