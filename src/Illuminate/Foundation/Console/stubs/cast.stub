@@ -9,11 +9,10 @@ class DummyClass implements Castable
     /**
      * Get a given attribute from the model.
      *
-     * @param mixed $value
-     *
+     * @param  mixed  $value
      * @return mixed
      */
-    public function get($value)
+    public function get($value = null)
     {
         return $value;
     }
@@ -21,11 +20,10 @@ class DummyClass implements Castable
     /**
      * Set a given attribute on the model.
      *
-     * @param mixed $value
-     *
+     * @param  mixed  $value
      * @return mixed
      */
-    public function set($value)
+    public function set($value = null)
     {
         return $value;
     }
