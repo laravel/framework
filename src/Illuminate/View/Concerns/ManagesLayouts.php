@@ -146,17 +146,10 @@ trait ManagesLayouts
      */
     public function yieldContent($section, $default = '')
     {
-        $sectionContent = $default instanceof View ? $default : e($default);
+        $sectionContent = $this->sections[$section] ?? ($default instanceof View ? $default : e($default));
 
-        if (isset($this->sections[$section])) {
-            $sectionContent = $this->sections[$section];
-        }
-
-        $sectionContent = str_replace('@@parent', '--parent--holder--', $sectionContent);
-
-        return str_replace(
-            '--parent--holder--', '@parent', str_replace(static::parentPlaceholder($section), '', $sectionContent)
-        );
+        return str_replace(['@@parent', static::parentPlaceholder($section), '--parent--holder--'],
+            ['--parent--holder--', '', '@parent'], $sectionContent);
     }
 
     /**
