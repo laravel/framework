@@ -51,7 +51,7 @@ trait HasCasts
      * Get the cast from casts array.
      *
      * @param  string  $key
-     * @return mixed|null
+     * @return mixed
      */
     public function getCast($key)
     {
