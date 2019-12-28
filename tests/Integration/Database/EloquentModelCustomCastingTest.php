@@ -119,7 +119,7 @@ class NullCast implements Castable
 
     public function set($value = null)
     {
-        return null;
+        return $value;
     }
 }
 
@@ -132,6 +132,6 @@ class NullChangedCast implements Castable
 
     public function set($value = null)
     {
-        return null;
+        return $value;
     }
 }
