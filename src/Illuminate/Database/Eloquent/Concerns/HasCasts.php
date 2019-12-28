@@ -150,6 +150,8 @@ trait HasCasts
     {
         if (is_null($value)) {
             return $value;
+        } elseif ($this->isCustomCastable($key)) {
+            return $this->fromCustomCastable($key, $value);
         }
 
         switch ($this->getCastType($key)) {
@@ -182,9 +184,7 @@ trait HasCasts
             case 'timestamp':
                 return $this->asTimestamp($value);
             default:
-                return $this->isCustomCastable($key)
-                    ? $this->fromCustomCastable($key, $value)
-                    : $value;
+                return $value;
         }
     }
 
