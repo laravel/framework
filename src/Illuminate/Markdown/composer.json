@@ -30,8 +30,8 @@
     },
     "suggest": {
         "erusev/parsedown": "Required to use the Parsedown renderer (^1.7).",
-        "league/commonmark": "Required to use the CommonMark renderer (^1.9).",
-        "michelf/php-markdown": "Required to use the PHP Markdown renderer (^1.8)."
+        "league/commonmark": "Required to use the CommonMark renderer (^1.1).",
+        "michelf/php-markdown": "Required to use the PHP Markdown renderer (^1.9)."
     },
     "config": {
         "sort-packages": true
