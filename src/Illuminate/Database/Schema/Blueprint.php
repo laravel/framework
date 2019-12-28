@@ -822,13 +822,12 @@ class Blueprint
      * @param  string  $column
      * @param  int  $total
      * @param  int  $places
+     * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function float($column, $total = 8, $places = 2)
+    public function float($column, $total = 8, $places = 2, $unsigned = false)
     {
-        return $this->addColumn('float', $column, [
-            'total' => $total, 'places' => $places, 'unsigned' => false,
-        ]);
+        return $this->addColumn('float', $column, compact('total', 'places', 'unsigned'));
     }
 
     /**
@@ -837,13 +836,12 @@ class Blueprint
      * @param  string  $column
      * @param  int|null  $total
      * @param  int|null  $places
+     * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function double($column, $total = null, $places = null)
+    public function double($column, $total = null, $places = null, $unsigned = false)
     {
-        return $this->addColumn('double', $column, [
-            'total' => $total, 'places' => $places, 'unsigned' => false,
-        ]);
+        return $this->addColumn('double', $column, compact('total', 'places', 'unsigned'));
     }
 
     /**
@@ -852,13 +850,12 @@ class Blueprint
      * @param  string  $column
      * @param  int  $total
      * @param  int  $places
+     * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function decimal($column, $total = 8, $places = 2)
+    public function decimal($column, $total = 8, $places = 2, $unsigned = false)
     {
-        return $this->addColumn('decimal', $column, [
-            'total' => $total, 'places' => $places, 'unsigned' => false,
-        ]);
+        return $this->addColumn('decimal', $column, compact('total', 'places', 'unsigned'));
     }
 
     /**
