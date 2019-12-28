@@ -28,11 +28,11 @@ class MarkdownTest extends TestCase
 
     public function rendererProvider()
     {
-    	return [
-    		[new CommonMarkRenderer(new CommonMarkConverter)],
-    		[new ParsedownRenderer(new Parsedown)],
-    		[new PhpMarkdownRenderer(new PhpMarkdown)],
-    	];
+        return [
+            [new CommonMarkRenderer(new CommonMarkConverter)],
+            [new ParsedownRenderer(new Parsedown)],
+            [new PhpMarkdownRenderer(new PhpMarkdown)],
+        ];
     }
 
     /**

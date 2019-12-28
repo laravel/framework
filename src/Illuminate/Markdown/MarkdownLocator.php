@@ -3,12 +3,12 @@
 namespace Illuminate\Markdown;
 
 use Illuminate\Contracts\Container\Container;
-use RuntimeException;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\ConverterInterface;
-use Michelf\MarkdownInterface;
 use Michelf\Markdown as PhpMarkdown;
+use Michelf\MarkdownInterface;
 use Parsedown;
+use RuntimeException;
 
 class MarkdownLocator
 {
