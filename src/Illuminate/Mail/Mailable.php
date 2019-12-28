@@ -255,17 +255,17 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildMarkdownView()
     {
-        $markdown = Container::getInstance()->make(Markdown::class);
+        $renderer = Container::getInstance()->make(Renderer::class);
 
         if (isset($this->theme)) {
-            $markdown->theme($this->theme);
+            $renderer->theme($this->theme);
         }
 
         $data = $this->buildViewData();
 
         return [
-            'html' => $markdown->render($this->markdown, $data),
-            'text' => $this->buildMarkdownText($markdown, $data),
+            'html' => $renderer->render($this->markdown, $data),
+            'text' => $this->buildMarkdownText($renderer, $data),
         ];
     }
 
@@ -296,14 +296,14 @@ class Mailable implements MailableContract, Renderable
     /**
      * Build the text view for a Markdown message.
      *
-     * @param  \Illuminate\Mail\Markdown  $markdown
+     * @param  \Illuminate\Mail\Renderer  $renderer
      * @param  array  $data
      * @return string
      */
-    protected function buildMarkdownText($markdown, $data)
+    protected function buildMarkdownText($renderer, $data)
     {
         return $this->textView
-                ?? $markdown->renderText($this->markdown, $data);
+                ?? $renderer->renderText($this->markdown, $data);
     }
 
     /**

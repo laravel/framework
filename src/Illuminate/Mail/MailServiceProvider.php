@@ -120,10 +120,10 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
             ], 'laravel-mail');
         }
 
-        $this->app->singleton(Markdown::class, function ($app) {
+        $this->app->singleton(Renderer::class, function ($app) {
             $config = $app->make('config');
 
-            return new Markdown($app->make('view'), [
+            return new Renderer($app->make('view'), [
                 'theme' => $config->get('mail.markdown.theme', 'default'),
                 'paths' => $config->get('mail.markdown.paths', []),
             ]);
@@ -138,7 +138,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
     public function provides()
     {
         return [
-            'mailer', 'swift.mailer', 'swift.transport', Markdown::class,
+            'mailer', 'swift.mailer', 'swift.transport', Renderer::class,
         ];
     }
 }

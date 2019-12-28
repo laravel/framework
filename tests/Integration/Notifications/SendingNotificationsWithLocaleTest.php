@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
+use Illuminate\Contracts\Markdown\Markdown;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Mail\Mailable;
+use Illuminate\Markdown\MarkdownLocator;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
@@ -43,7 +45,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         View::addLocation(__DIR__.'/Fixtures');
 
-        app('translator')->setLoaded([
+        $app->make('translator')->setLoaded([
             '*' => [
                 '*' => [
                     'en' => ['hi' => 'hello'],
@@ -52,6 +54,10 @@ class SendingNotificationsWithLocaleTest extends TestCase
                 ],
             ],
         ]);
+
+        $app->singleton(Markdown::class, function ($app) {
+            return MarkdownLocator::create($app);
+        });
     }
 
     protected function setUp(): void
