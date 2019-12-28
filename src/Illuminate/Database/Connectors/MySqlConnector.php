@@ -129,9 +129,14 @@ class MySqlConnector extends Connector implements ConnectorInterface
     {
         extract($config, EXTR_SKIP);
 
-        return isset($port)
-                    ? "mysql:host={$host};port={$port};dbname={$database}"
-                    : "mysql:host={$host};dbname={$database}";
+        $dsn = isset($port)
+            ? "mysql:host={$host};port={$port};dbname={$database}"
+            : "mysql:host={$host};dbname={$database}";
+
+        if (isset($charset)) {
+            $dsn .= ";charset={$charset}";
+        }
+        return $dsn;
     }
 
     /**
