@@ -89,18 +89,18 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        $view = $this->app['view'];
-
-        if (isset($this->app->config['view']['paths']) &&
-            is_array($this->app->config['view']['paths'])) {
-            foreach ($this->app->config['view']['paths'] as $viewPath) {
-                if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
-                    $view->addNamespace($namespace, $appPath);
+        $this->callAfterResolving('view', function ($view) use ($path, $namespace) {
+            if (isset($this->app->config['view']['paths']) &&
+                is_array($this->app->config['view']['paths'])) {
+                foreach ($this->app->config['view']['paths'] as $viewPath) {
+                    if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
+                        $view->addNamespace($namespace, $appPath);
+                    }
                 }
             }
-        }
 
-        $view->addNamespace($namespace, $path);
+            $view->addNamespace($namespace, $path);
+        });
     }
 
     /**
@@ -112,7 +112,9 @@ abstract class ServiceProvider
      */
     protected function loadTranslationsFrom($path, $namespace)
     {
-        $this->app['translator']->addNamespace($namespace, $path);
+        $this->callAfterResolving('translator', function ($translator) use ($path, $namespace) {
+            $translator->addNamespace($namespace, $path);
+        });
     }
 
     /**
@@ -123,7 +125,9 @@ abstract class ServiceProvider
      */
     protected function loadJsonTranslationsFrom($path)
     {
-        $this->app['translator']->addJsonPath($path);
+        $this->callAfterResolving('translator', function ($translator) use ($path) {
+            $translator->addJsonPath($path);
+        });
     }
 
     /**
@@ -134,11 +138,27 @@ abstract class ServiceProvider
      */
     protected function loadMigrationsFrom($paths)
     {
-        $this->app->afterResolving('migrator', function ($migrator) use ($paths) {
+        $this->callAfterResolving('migrator', function ($migrator) use ($paths) {
             foreach ((array) $paths as $path) {
                 $migrator->path($path);
             }
         });
+    }
+
+    /**
+     * Setup an after resolving listener, or fire immediately if already resolved.
+     *
+     * @param  string  $name
+     * @param  callable  $callback
+     * @return void
+     */
+    protected function callAfterResolving($name, $callback)
+    {
+        $this->app->afterResolving($name, $callback);
+
+        if ($this->app->resolved($name)) {
+            $callback($this->app->make($name), $this->app);
+        }
     }
 
     /**
