@@ -746,7 +746,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo')->nullable();
-        $blueprint->boolean('bar')->virtualAs("foo is not null");
+        $blueprint->boolean('bar')->virtualAs('foo is not null');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null)', $statements[0]);
@@ -756,7 +756,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo')->nullable();
-        $blueprint->boolean('bar')->storedAs("foo is not null");
+        $blueprint->boolean('bar')->storedAs('foo is not null');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null) stored', $statements[0]);
