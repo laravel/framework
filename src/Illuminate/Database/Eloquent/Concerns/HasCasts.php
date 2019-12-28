@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -16,6 +15,13 @@ trait HasCasts
      * @var array
      */
     protected $casts = [];
+
+    /**
+     * Initialized instances of custom castes.
+     *
+     * @var array
+     */
+    protected $casts_instances = [];
 
     /**
      * Determine whether an attribute should be cast to a native type.
@@ -343,7 +349,12 @@ trait HasCasts
      */
     protected function normalizeHandlerToCallable($key)
     {
-        return Container::getInstance()
-            ->make($this->getCast($key));
+        if (! array_key_exists($key, $this->casts_instances)) {
+            $cast = $this->getCast($key);
+
+            $this->casts_instances[$key] = new $cast;
+        }
+
+        return $this->casts_instances[$key];
     }
 }
