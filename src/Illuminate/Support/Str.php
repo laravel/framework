@@ -251,7 +251,7 @@ class Str
     {
         return static::snake($value, '-');
     }
-    
+
     /**
      * Make a string's first character lowercase.
      *
