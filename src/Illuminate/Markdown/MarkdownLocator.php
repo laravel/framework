@@ -15,7 +15,7 @@ class MarkdownLocator
     /**
      * Create a new markdown renderer instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \Illuminate\Contracts\Markdown\Markdown
      *
      * @throws \RuntimeException
