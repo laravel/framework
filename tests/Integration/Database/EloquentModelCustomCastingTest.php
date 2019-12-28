@@ -15,6 +15,7 @@ class EloquentModelCustomCastingTest extends DatabaseTestCase
             'field_1' => 'foobar',
             'field_2' => 20,
             'field_3' => '08:19:12',
+            'field_4' => null,
         ]);
 
         $this->assertSame(['f', 'o', 'o', 'b', 'a', 'r'], $item->toArray()['field_1']);
@@ -27,6 +28,8 @@ class EloquentModelCustomCastingTest extends DatabaseTestCase
             strtotime('08:19:12'),
             $item->toArray()['field_3']
         );
+
+        $this->assertSame(null, $item->toArray()['field_4']);
     }
 
     protected function setUp(): void
@@ -38,6 +41,7 @@ class EloquentModelCustomCastingTest extends DatabaseTestCase
             $table->string('field_1')->nullable();
             $table->integer('field_2')->nullable();
             $table->time('field_3')->nullable();
+            $table->string('field_4')->nullable();
         });
     }
 }
@@ -52,6 +56,7 @@ class TestModel extends Model
         'field_1' => StringCast::class,
         'field_2' => NumberCast::class,
         'field_3' => TimeCast::class,
+        'field_4' => NullCast::class,
     ];
 
     protected $guarded = ['id'];
@@ -59,12 +64,12 @@ class TestModel extends Model
 
 class TimeCast implements Castable
 {
-    public function get($value)
+    public function get($value = null)
     {
         return strtotime($value);
     }
 
-    public function set($value)
+    public function set($value = null)
     {
         return is_numeric($value)
             ? date('H:i:s', strtotime($value))
@@ -74,12 +79,12 @@ class TimeCast implements Castable
 
 class StringCast implements Castable
 {
-    public function get($value)
+    public function get($value = null)
     {
         return str_split($value);
     }
 
-    public function set($value)
+    public function set($value = null)
     {
         return is_array($value)
             ? implode('', $value)
@@ -89,13 +94,26 @@ class StringCast implements Castable
 
 class NumberCast implements Castable
 {
-    public function get($value)
+    public function get($value = null)
     {
         return $value / 100;
     }
 
-    public function set($value)
+    public function set($value = null)
     {
         return $value;
+    }
+}
+
+class NullCast implements Castable
+{
+    public function get($value = null)
+    {
+        return null;
+    }
+
+    public function set($value = null)
+    {
+        return null;
     }
 }

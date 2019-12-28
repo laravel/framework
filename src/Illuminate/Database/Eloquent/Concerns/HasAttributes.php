@@ -441,7 +441,7 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isCustomCastable($key) && ! is_null($value)) {
+        if ($this->isCustomCastable($key)) {
             $value = $this->toCustomCastable($key, $value);
         }
 

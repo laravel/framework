@@ -10,7 +10,7 @@ interface Castable
      * @param  mixed  $value
      * @return mixed
      */
-    public function get($value);
+    public function get($value = null);
 
     /**
      * Set a given attribute on the model.
@@ -18,5 +18,5 @@ interface Castable
      * @param  mixed  $value
      * @return mixed
      */
-    public function set($value);
+    public function set($value = null);
 }
