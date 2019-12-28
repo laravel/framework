@@ -4809,6 +4809,289 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    public function providesPassingExcludeIfData()
+    {
+        return [
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
+                ], [
+                    'has_appointment' => false,
+                    'appointment_date' => 'should be excluded',
+                ], [
+                    'has_appointment' => false,
+                ],
+            ],
+            [
+                [
+                    'cat' => ['required', 'string'],
+                    'mouse' => ['exclude_if:cat,Tom', 'required', 'file'],
+                ], [
+                    'cat' => 'Tom',
+                    'mouse' => 'should be excluded',
+                ], [
+                    'cat' => 'Tom',
+                ],
+            ],
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
+                ], [
+                    'has_appointment' => false,
+                ], [
+                    'has_appointment' => false,
+                ],
+            ],
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
+                ], [
+                    'has_appointment' => true,
+                    'appointment_date' => '2019-12-13',
+                ], [
+                    'has_appointment' => true,
+                    'appointment_date' => '2019-12-13',
+                ],
+            ],
+            [
+                [
+                    'has_no_appointments' => ['required', 'bool'],
+                    'has_doctor_appointment' => ['exclude_if:has_no_appointments,true', 'required', 'bool'],
+                    'doctor_appointment_date' => ['exclude_if:has_no_appointments,true', 'exclude_if:has_doctor_appointment,false', 'required', 'date'],
+                ], [
+                    'has_no_appointments' => true,
+                    'has_doctor_appointment' => true,
+                    'doctor_appointment_date' => '2019-12-13',
+                ], [
+                    'has_no_appointments' => true,
+                ],
+            ],
+            [
+                [
+                    'has_no_appointments' => ['required', 'bool'],
+                    'has_doctor_appointment' => ['exclude_if:has_no_appointments,true', 'required', 'bool'],
+                    'doctor_appointment_date' => ['exclude_if:has_no_appointments,true', 'exclude_if:has_doctor_appointment,false', 'required', 'date'],
+                ], [
+                    'has_no_appointments' => false,
+                    'has_doctor_appointment' => false,
+                    'doctor_appointment_date' => 'should be excluded',
+                ], [
+                    'has_no_appointments' => false,
+                    'has_doctor_appointment' => false,
+                ],
+            ],
+            'nested-01' => [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments.*' => ['exclude_if:has_appointments,false', 'required', 'date'],
+                ], [
+                    'has_appointments' => false,
+                    'appointments' => ['2019-05-15', '2020-05-15'],
+                ], [
+                    'has_appointments' => false,
+                ],
+            ],
+            'nested-02' => [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments.*.date' => ['exclude_if:has_appointments,false', 'required', 'date'],
+                    'appointments.*.name' => ['exclude_if:has_appointments,false', 'required', 'string'],
+                ], [
+                    'has_appointments' => false,
+                    'appointments' => [
+                        ['date' => 'should be excluded', 'name' => 'should be excluded'],
+                    ],
+                ], [
+                    'has_appointments' => false,
+                ],
+            ],
+            'nested-03' => [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments' => ['exclude_if:has_appointments,false', 'required', 'array'],
+                    'appointments.*.date' => ['required', 'date'],
+                    'appointments.*.name' => ['required', 'string'],
+                ], [
+                    'has_appointments' => false,
+                    'appointments' => [
+                        ['date' => 'should be excluded', 'name' => 'should be excluded'],
+                    ],
+                ], [
+                    'has_appointments' => false,
+                ],
+            ],
+            'nested-04' => [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments.*.date' => ['required', 'date'],
+                    'appointments' => ['exclude_if:has_appointments,false', 'required', 'array'],
+                ], [
+                    'has_appointments' => false,
+                    'appointments' => [
+                        ['date' => 'should be excluded', 'name' => 'should be excluded'],
+                    ],
+                ], [
+                    'has_appointments' => false,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providesPassingExcludeIfData
+     */
+    public function testExcludeIf($rules, $data, $expectedValidatedData)
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            $data,
+            $rules
+        );
+
+        $passes = $validator->passes();
+
+        if (! $passes) {
+            $message = sprintf("Validation unexpectedly failed:\nRules: %s\nData: %s\nValidation error: %s",
+                json_encode($rules, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($validator->messages()->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
+        }
+
+        $this->assertTrue($passes, $message ?? '');
+
+        $this->assertSame($expectedValidatedData, $validator->validated());
+    }
+
+    public function providesFailingExcludeIfData()
+    {
+        return [
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
+                ], [
+                    'has_appointment' => true,
+                ], [
+                    'appointment_date' => ['validation.required'],
+                ],
+            ],
+            [
+                [
+                    'cat' => ['required', 'string'],
+                    'mouse' => ['exclude_if:cat,Tom', 'required', 'file'],
+                ], [
+                    'cat' => 'Bob',
+                    'mouse' => 'not a file',
+                ], [
+                    'mouse' => ['validation.file'],
+                ],
+            ],
+            [
+                [
+                    'has_appointments' => ['required', 'bool'],
+                    'appointments' => ['exclude_if:has_appointments,false', 'required', 'array'],
+                    'appointments.*.date' => ['required', 'date'],
+                    'appointments.*.name' => ['required', 'string'],
+                ], [
+                    'has_appointments' => true,
+                    'appointments' => [
+                        ['date' => 'invalid', 'name' => 'Bob'],
+                        ['date' => '2019-05-15'],
+                    ],
+                ], [
+                    'appointments.0.date' => ['validation.date'],
+                    'appointments.1.name' => ['validation.required'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providesFailingExcludeIfData
+     */
+    public function testExcludeIfWhenValidationFails($rules, $data, $expectedMessages)
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            $data,
+            $rules
+        );
+
+        $fails = $validator->fails();
+
+        if (! $fails) {
+            $message = sprintf("Validation unexpectedly passed:\nRules: %s\nData: %s",
+                json_encode($rules, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
+        }
+
+        $this->assertTrue($fails, $message ?? '');
+
+        $this->assertSame($expectedMessages, $validator->messages()->toArray());
+    }
+
+    public function testExcludeUnless()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Felix', 'mouse' => 'Jerry'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Felix'], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Felix'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Felix'], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Tom', 'mouse' => 'Jerry'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Tom', 'mouse' => 'Jerry'], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Tom'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_unless:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['mouse' => ['validation.required']], $validator->messages()->toArray());
+    }
+
+    public function testExcludeValuesAreReallyRemoved()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Tom', 'mouse' => 'Jerry'],
+            ['cat' => 'required|string', 'mouse' => 'exclude_if:cat,Tom|required|string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Tom'], $validator->validated());
+        $this->assertSame(['cat' => 'Tom'], $validator->valid());
+        $this->assertSame([], $validator->invalid());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['cat' => 'Tom', 'mouse' => null],
+            ['cat' => 'required|string', 'mouse' => 'exclude_if:cat,Felix|required|string']
+        );
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['cat' => 'Tom'], $validator->valid());
+        $this->assertSame(['mouse' => null], $validator->invalid());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

@@ -49,6 +49,13 @@ class Validator implements ValidatorContract
     protected $failedRules = [];
 
     /**
+     * Attributes that should be excluded from the validated data.
+     *
+     * @var array
+     */
+    protected $excludeAttributes = [];
+
+    /**
      * The message bag instance.
      *
      * @var \Illuminate\Support\MessageBag
@@ -178,6 +185,13 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * The validation rules that can exclude an attribute.
+     *
+     * @var array
+     */
+    protected $excludeRules = ['ExcludeIf', 'ExcludeUnless'];
+
+    /**
      * The size related validation rules.
      *
      * @var array
@@ -273,8 +287,20 @@ class Validator implements ValidatorContract
         foreach ($this->rules as $attribute => $rules) {
             $attribute = str_replace('\.', '->', $attribute);
 
+            if ($this->shouldBeExcluded($attribute)) {
+                $this->removeAttribute($attribute);
+
+                continue;
+            }
+
             foreach ($rules as $rule) {
                 $this->validateAttribute($attribute, $rule);
+
+                if ($this->shouldBeExcluded($attribute)) {
+                    $this->removeAttribute($attribute);
+
+                    break;
+                }
 
                 if ($this->shouldStopValidating($attribute)) {
                     break;
@@ -300,6 +326,36 @@ class Validator implements ValidatorContract
     public function fails()
     {
         return ! $this->passes();
+    }
+
+    /**
+     * Determine if the attribute should be excluded.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function shouldBeExcluded($attribute)
+    {
+        foreach ($this->excludeAttributes as $excludeAttribute) {
+            if ($attribute === $excludeAttribute ||
+                Str::startsWith($attribute, $excludeAttribute.'.')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove the given attribute.
+     *
+     * @param  string  $attribute
+     *
+     * @return void
+     */
+    protected function removeAttribute($attribute)
+    {
+        unset($this->data[$attribute], $this->rules[$attribute]);
     }
 
     /**
@@ -475,6 +531,10 @@ class Validator implements ValidatorContract
      */
     protected function isValidatable($rule, $attribute, $value)
     {
+        if (in_array($rule, $this->excludeRules)) {
+            return true;
+        }
+
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
                $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
@@ -621,11 +681,28 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
+        if (in_array($rule, $this->excludeRules)) {
+            return $this->excludeAttribute($attribute);
+        }
+
         $this->messages->add($attribute, $this->makeReplacements(
             $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
         ));
 
         $this->failedRules[$attribute][$rule] = $parameters;
+    }
+
+    /**
+     * Add the given attribute to the list of excluded attributes.
+     *
+     * @param  string  $attribute
+     * @return void
+     */
+    protected function excludeAttribute(string $attribute)
+    {
+        $this->excludeAttributes[] = $attribute;
+
+        $this->excludeAttributes = array_unique($this->excludeAttributes);
     }
 
     /**
