@@ -109,11 +109,11 @@ class NullCast implements Castable
 {
     public function get($value = null)
     {
-        return null;
+        return $value;
     }
 
     public function set($value = null)
     {
-        return null;
+        return $value;
     }
 }
