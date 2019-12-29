@@ -18,7 +18,7 @@ class CastMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new cast mutator';
+    protected $description = 'Create a new custom Eloquent attribute caster';
 
     /**
      * The type of class being generated.
