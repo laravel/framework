@@ -17,9 +17,9 @@ trait HasCasts
     protected $casts = [];
 
     /**
-     * Initialized instances of custom castes.
+     * Initialized instances of custom casts.
      *
-     * @var array
+     * @var \Illuminate\Contracts\Database\Eloquent\Castable[]
      */
     protected $castsInstances = [];
 
@@ -70,8 +70,6 @@ trait HasCasts
      * @param  string  $key
      * @param  mixed  $current
      * @return bool
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function originalIsEquivalent($key, $current)
     {
@@ -106,8 +104,6 @@ trait HasCasts
      * @param  array  $attributes
      * @param  array  $mutatedAttributes
      * @return array
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
@@ -149,8 +145,6 @@ trait HasCasts
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function castAttribute($key, $value = null)
     {
@@ -313,8 +307,6 @@ trait HasCasts
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function fromCustomCastable($key, $value = null)
     {
@@ -329,8 +321,6 @@ trait HasCasts
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function toCustomCastable($key, $value = null)
     {
@@ -344,8 +334,6 @@ trait HasCasts
      *
      * @param  string  $key
      * @return \Illuminate\Contracts\Database\Eloquent\Castable
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function normalizeHandlerToCallable($key)
     {
