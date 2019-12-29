@@ -11,13 +11,10 @@ use Illuminate\Markdown\CommonMarkRenderer;
 use Illuminate\Markdown\MarkdownServiceProvider;
 use Illuminate\Markdown\ParsedownRenderer;
 use Illuminate\Markdown\PhpMarkdownRenderer;
-use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\ConfigurableEnvironmentInterface;
 use League\CommonMark\Environment;
 use League\CommonMark\EnvironmentInterface;
 use League\CommonMark\Extension\ExtensionInterface;
-use Michelf\Markdown as PhpMarkdown;
-use Parsedown;
 use PHPUnit\Framework\TestCase;
 
 class MarkdownTest extends TestCase
