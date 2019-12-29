@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use DateTime;
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Cast;
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -66,19 +66,19 @@ class TestModel extends Model
     protected $guarded = ['id'];
 }
 
-class TimeCast extends Cast
+class TimeCast implements Castable
 {
     /**
      * @param  mixed  $value
      * @return DateTime
      * @throws \Exception
      */
-    public function get($value = null)
+    public function fromDatabase($key, $value = null)
     {
         return new DateTime($value);
     }
 
-    public function set($value = null)
+    public function toDatabase($key, $value = null)
     {
         return is_numeric($value)
             ? DateTime::createFromFormat('H:i:s', $value)->format('H:i:s')
@@ -86,14 +86,14 @@ class TimeCast extends Cast
     }
 }
 
-class StringCast extends Cast
+class StringCast implements Castable
 {
-    public function get($value = null)
+    public function fromDatabase($key, $value = null)
     {
         return str_split($value);
     }
 
-    public function set($value = null)
+    public function toDatabase($key, $value = null)
     {
         return is_array($value)
             ? implode('', $value)
@@ -101,40 +101,40 @@ class StringCast extends Cast
     }
 }
 
-class NumberCast extends Cast
+class NumberCast implements Castable
 {
-    public function get($value = null)
+    public function fromDatabase($key, $value = null)
     {
         return $value / 100;
     }
 
-    public function set($value = null)
+    public function toDatabase($key, $value = null)
     {
         return $value;
     }
 }
 
-class NullCast extends Cast
+class NullCast implements Castable
 {
-    public function get($value = null)
+    public function fromDatabase($key, $value = null)
     {
         return $value;
     }
 
-    public function set($value = null)
+    public function toDatabase($key, $value = null)
     {
         return $value;
     }
 }
 
-class NullChangedCast extends Cast
+class NullChangedCast implements Castable
 {
-    public function get($value = null)
+    public function fromDatabase($key, $value = null)
     {
         return 'foo';
     }
 
-    public function set($value = null)
+    public function toDatabase($key, $value = null)
     {
         return $value;
     }
