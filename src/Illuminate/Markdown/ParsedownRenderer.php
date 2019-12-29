@@ -35,7 +35,7 @@ class ParsedownRenderer implements Markdown
      */
     public function create(Container $container)
     {
-        return new ParsedownRenderer($container->make(Parsedown::class));
+        return new self($container->make(Parsedown::class));
     }
 
     /**
