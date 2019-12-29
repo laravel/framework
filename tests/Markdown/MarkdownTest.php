@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Markdown;
 
+use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Markdown\Markdown;
 use Illuminate\Contracts\Support\Htmlable;
@@ -11,6 +12,10 @@ use Illuminate\Markdown\MarkdownServiceProvider;
 use Illuminate\Markdown\ParsedownRenderer;
 use Illuminate\Markdown\PhpMarkdownRenderer;
 use League\CommonMark\CommonMarkConverter;
+use League\CommonMark\ConfigurableEnvironmentInterface;
+use League\CommonMark\Environment;
+use League\CommonMark\EnvironmentInterface;
+use League\CommonMark\Extension\ExtensionInterface;
 use Michelf\Markdown as PhpMarkdown;
 use Parsedown;
 use PHPUnit\Framework\TestCase;
@@ -24,10 +29,37 @@ class MarkdownTest extends TestCase
 
         $markdown = $app->make(Markdown::class);
         $this->assertInstanceOf(Markdown::class, $markdown);
+        $this->assertInstanceOf(CommonMarkRenderer::class, $markdown);
 
         $html = $markdown->render('# Hello World');
         $this->assertInstanceOf(Htmlable::class, $html);
         $this->assertSame('<h1>Hello World</h1>', $html->toHtml());
+    }
+
+    public function testResolvesCustomCommonMarkEnv()
+    {
+        $app = new Application();
+        $app->register(new MarkdownServiceProvider($app));
+
+        $app->singleton(EnvironmentInterface::class, function () {
+            $environment = Environment::createCommonMarkEnvironment();
+
+            $environment->addExtension(new class implements ExtensionInterface {
+                public function register(ConfigurableEnvironmentInterface $environment)
+                {
+                    throw new Exception('Ext was resolved!');
+                }
+            });
+
+            return $environment;
+        });
+
+        $markdown = $app->make(Markdown::class);
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Ext was resolved!');
+
+        $markdown->render('foo');
     }
 
     public function rendererProvider()
