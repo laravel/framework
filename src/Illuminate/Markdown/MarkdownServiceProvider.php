@@ -2,7 +2,6 @@
 
 namespace Illuminate\Markdown;
 
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Markdown\Markdown;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;

@@ -38,18 +38,18 @@ class CommonMarkRenderer implements Markdown
     public function create(Container $container)
     {
         if ($container->bound(ConverterInterface::class)) {
-            return new CommonMarkRenderer(
+            return new self(
                 $container->make(ConverterInterface::class)
             );
         }
 
         if ($container->bound(EnvironmentInterface::class)) {
-            return new CommonMarkRenderer(
+            return new self(
                 new CommonMarkConverter([], $container->make(EnvironmentInterface::class))
             );
         }
 
-        return new CommonMarkRenderer(new CommonMarkConverter);
+        return new self(new CommonMarkConverter);
     }
 
     /**

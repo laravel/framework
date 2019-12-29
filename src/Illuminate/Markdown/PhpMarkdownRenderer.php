@@ -37,10 +37,10 @@ class PhpMarkdownRenderer implements Markdown
     public function create(Container $container)
     {
         if ($container->bound(MarkdownInterface::class)) {
-            return new PhpMarkdownRenderer($container->make(MarkdownInterface::class));
+            return new self($container->make(MarkdownInterface::class));
         }
 
-        return new PhpMarkdownRenderer(new PhpMarkdown);
+        return new self(new PhpMarkdown);
     }
 
     /**

@@ -10,9 +10,6 @@ use Illuminate\Markdown\CommonMarkRenderer;
 use Illuminate\Markdown\MarkdownServiceProvider;
 use Illuminate\Markdown\ParsedownRenderer;
 use Illuminate\Markdown\PhpMarkdownRenderer;
-use League\CommonMark\CommonMarkConverter;
-use Michelf\Markdown as PhpMarkdown;
-use Parsedown;
 use PHPUnit\Framework\TestCase;
 
 class MarkdownTest extends TestCase
