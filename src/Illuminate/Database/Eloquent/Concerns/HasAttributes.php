@@ -487,7 +487,9 @@ trait HasAttributes
     {
         if ($this->isCustomCastable($key)) {
             return $this->fromCustomCastable($key, $value);
-        } elseif (is_null($value)) {
+        }
+
+        if (is_null($value)) {
             return $value;
         }
 
@@ -949,9 +951,11 @@ trait HasAttributes
      */
     public function getCasts()
     {
-        return $this->getIncrementing()
-            ? array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts)
-            : $this->casts;
+        if ($this->getIncrementing()) {
+            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+        }
+
+        return $this->casts;
     }
 
     /**
