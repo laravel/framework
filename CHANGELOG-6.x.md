@@ -5,12 +5,26 @@
 ### Added
 - Added `withoutMix()` and `withMix()` test helpers ([#30900](https://github.com/laravel/framework/pull/30900))
 - Added `validateWithBag()` macro to `Request` ([#30896](https://github.com/laravel/framework/pull/30896))
+- Added PHPUnit 9 support ([#30947](https://github.com/laravel/framework/pull/30947))
+- Added `exclude_if` and `exclude_unless` validation rules ([#30835](https://github.com/laravel/framework/pull/30835), [c0fdb56](https://github.com/laravel/framework/commit/c0fdb566831b7ebf34a15bbdfec81dd0039c76f0))
+- Added generated columns (virtual/stored) support for PostgreSQL ([#30971](https://github.com/laravel/framework/pull/30971))
 
 ### Changed
 - Handled passing too many arguments to `@slot` ([#30893](https://github.com/laravel/framework/pull/30893), [878f159](https://github.com/laravel/framework/commit/878f15922523e748bfbfdf50f40269f8ffe20d9d))
+- Make `ThrottleRequestsException` extend `TooManyRequestsHttpException` ([#30943](https://github.com/laravel/framework/pull/30943))
 
 ### Fixed
 - Fixed `float` database types in `Blueprint` ([#30891](https://github.com/laravel/framework/pull/30891))
+
+### Optimization
+- Optimize Service Provider registration ([#30960](https://github.com/laravel/framework/pull/30960))
+
+### TODO
+- Speed up runningInConsole method ([#30922](https://github.com/laravel/framework/pull/30922))
+- Fixed code that depended on getenv ([#30924](https://github.com/laravel/framework/pull/30924))
+- Removed unused dev dep and fixed symfony/cache min version ([#30936](https://github.com/laravel/framework/pull/30936))
+- Use ::class notation for callable ([#30935](https://github.com/laravel/framework/pull/30935))
+- Delay instantiation of transator and view factory ([#30962](https://github.com/laravel/framework/pull/30962))
 
 
 ## [v6.9.0 (2019-12-19)](https://github.com/laravel/framework/compare/v6.8.0...v6.9.0)
