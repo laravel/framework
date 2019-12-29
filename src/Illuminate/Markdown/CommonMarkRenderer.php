@@ -2,9 +2,12 @@
 
 namespace Illuminate\Markdown;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Markdown\Markdown;
 use Illuminate\Support\HtmlString;
+use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\ConverterInterface;
+use League\CommonMark\EnvironmentInterface;
 
 class CommonMarkRenderer implements Markdown
 {
@@ -24,6 +27,29 @@ class CommonMarkRenderer implements Markdown
     public function __construct(ConverterInterface $commonmark)
     {
         $this->commonmark = $commonmark;
+    }
+
+    /**
+     * Create a new CommonMark renderer instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return self
+     */
+    public function create(Container $container)
+    {
+        if ($container->bound(ConverterInterface::class)) {
+            return new CommonMarkRenderer(
+                $container->make(ConverterInterface::class)
+            );
+        }
+
+        if ($container->bound(EnvironmentInterface::class)) {
+            return new CommonMarkRenderer(
+                new CommonMarkConverter([], $container->make(EnvironmentInterface::class))
+            );
+        }
+
+        return new CommonMarkRenderer(new CommonMarkConverter);
     }
 
     /**

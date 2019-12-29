@@ -2,8 +2,10 @@
 
 namespace Illuminate\Markdown;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Markdown\Markdown;
 use Illuminate\Support\HtmlString;
+use Michelf\Markdown as PhpMarkdown;
 use Michelf\MarkdownInterface;
 
 class PhpMarkdownRenderer implements Markdown
@@ -24,6 +26,21 @@ class PhpMarkdownRenderer implements Markdown
     public function __construct(MarkdownInterface $markdown)
     {
         $this->markdown = $markdown;
+    }
+
+    /**
+     * Create a new PHP Markdown renderer instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return self
+     */
+    public function create(Container $container)
+    {
+        if ($container->bound(MarkdownInterface::class)) {
+            return new PhpMarkdownRenderer($container->make(MarkdownInterface::class));
+        }
+
+        return new PhpMarkdownRenderer(new PhpMarkdown);
     }
 
     /**

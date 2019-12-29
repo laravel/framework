@@ -2,6 +2,7 @@
 
 namespace Illuminate\Markdown;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Markdown\Markdown;
 use Illuminate\Support\HtmlString;
 use Parsedown;
@@ -24,6 +25,17 @@ class ParsedownRenderer implements Markdown
     public function __construct(Parsedown $parsedown)
     {
         $this->parsedown = $parsedown;
+    }
+
+    /**
+     * Create a new Parsedown renderer instance.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return self
+     */
+    public function create(Container $container)
+    {
+        return new ParsedownRenderer($container->make(Parsedown::class));
     }
 
     /**

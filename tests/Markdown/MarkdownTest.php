@@ -2,11 +2,12 @@
 
 namespace Illuminate\Tests\Markdown;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Markdown\Markdown;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Foundation\Application;
 use Illuminate\Markdown\CommonMarkRenderer;
-use Illuminate\Markdown\MarkdownLocator;
+use Illuminate\Markdown\MarkdownServiceProvider;
 use Illuminate\Markdown\ParsedownRenderer;
 use Illuminate\Markdown\PhpMarkdownRenderer;
 use League\CommonMark\CommonMarkConverter;
@@ -18,7 +19,10 @@ class MarkdownTest extends TestCase
 {
     public function testCanLocateAndRender()
     {
-        $markdown = MarkdownLocator::create(new Application);
+        $app = new Application();
+        $app->register(new MarkdownServiceProvider($app));
+
+        $markdown = $app->make(Markdown::class);
         $this->assertInstanceOf(Markdown::class, $markdown);
 
         $html = $markdown->render('# Hello World');
@@ -29,9 +33,9 @@ class MarkdownTest extends TestCase
     public function rendererProvider()
     {
         return [
-            [new CommonMarkRenderer(new CommonMarkConverter)],
-            [new ParsedownRenderer(new Parsedown)],
-            [new PhpMarkdownRenderer(new PhpMarkdown)],
+            [CommonMarkRenderer::class],
+            [ParsedownRenderer::class],
+            [PhpMarkdownRenderer::class],
         ];
     }
 
@@ -40,8 +44,9 @@ class MarkdownTest extends TestCase
      */
     public function testRender($markdown)
     {
-        $this->assertSame('', $markdown->render('')->toHtml());
-        $this->assertSame('<h2>Hello There!</h2>', $markdown->render('## Hello There!')->toHtml());
-        $this->assertSame("<ul>\n<li>hello\n*world</li>\n</ul>", $markdown->render("* hello\n*world")->toHtml());
+        $renderer = $markdown::create(new Container());
+        $this->assertSame('', $renderer->render('')->toHtml());
+        $this->assertSame('<h2>Hello There!</h2>', $renderer->render('## Hello There!')->toHtml());
+        $this->assertSame("<ul>\n<li>hello\n*world</li>\n</ul>", $renderer->render("* hello\n*world")->toHtml());
     }
 }
