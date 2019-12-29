@@ -21,7 +21,7 @@ trait HasCasts
      *
      * @var array
      */
-    protected $casts_instances = [];
+    protected $castsInstances = [];
 
     /**
      * Determine whether an attribute should be cast to a native type.
@@ -349,12 +349,12 @@ trait HasCasts
      */
     protected function normalizeHandlerToCallable($key)
     {
-        if (! array_key_exists($key, $this->casts_instances)) {
+        if (! array_key_exists($key, $this->castsInstances)) {
             $cast = $this->getCast($key);
 
-            $this->casts_instances[$key] = new $cast;
+            $this->castsInstances[$key] = new $cast;
         }
 
-        return $this->casts_instances[$key];
+        return $this->castsInstances[$key];
     }
 }
