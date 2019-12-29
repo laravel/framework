@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Mail\Mailable;
-use Illuminate\Markdown\MarkdownLocator;
+use Illuminate\Markdown\ParsedownRenderer;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
@@ -56,7 +56,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         ]);
 
         $app->singleton(Markdown::class, function ($app) {
-            return MarkdownLocator::create($app);
+            return ParsedownRenderer::create($app);
         });
     }
 
