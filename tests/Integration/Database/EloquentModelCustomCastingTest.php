@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use DateTime;
+use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -23,12 +25,9 @@ class EloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertSame(0.2, $item->toArray()['field_2']);
 
-        $this->assertIsNumeric($item->toArray()['field_3']);
+        $this->assertInstanceOf(DateTimeInterface::class, $item->toArray()['field_3']);
 
-        $this->assertSame(
-            strtotime('08:19:12'),
-            $item->toArray()['field_3']
-        );
+        $this->assertSame('08:19:12', $item->toArray()['field_3']->format('H:i:s'));
 
         $this->assertSame(null, $item->toArray()['field_4']);
 
@@ -69,15 +68,20 @@ class TestModel extends Model
 
 class TimeCast implements Castable
 {
+    /**
+     * @param  mixed  $value
+     * @return DateTime
+     * @throws \Exception
+     */
     public function get($value = null)
     {
-        return strtotime($value);
+        return new DateTime($value);
     }
 
     public function set($value = null)
     {
         return is_numeric($value)
-            ? date('H:i:s', strtotime($value))
+            ? DateTime::createFromFormat('H:i:s', $value)->format('H:i:s')
             : $value;
     }
 }
