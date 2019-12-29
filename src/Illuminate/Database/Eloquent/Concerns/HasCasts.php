@@ -19,7 +19,7 @@ trait HasCasts
     /**
      * Initialized instances of custom casts.
      *
-     * @var \Illuminate\Contracts\Database\Eloquent\Castable[]
+     * @var \Illuminate\Database\Eloquent\Cast[]
      */
     protected $castsInstances = [];
 
@@ -312,6 +312,8 @@ trait HasCasts
     {
         return $this
             ->normalizeHandlerToCallable($key)
+            ->setKeyName($key)
+            ->setOriginalValue($value)
             ->get($value);
     }
 
@@ -326,6 +328,8 @@ trait HasCasts
     {
         return $this
             ->normalizeHandlerToCallable($key)
+            ->setKeyName($key)
+            ->setOriginalValue($value)
             ->set($value);
     }
 
@@ -333,7 +337,7 @@ trait HasCasts
      * Getting a custom cast instance.
      *
      * @param  string  $key
-     * @return \Illuminate\Contracts\Database\Eloquent\Castable
+     * @return \Illuminate\Database\Eloquent\Cast
      */
     protected function normalizeHandlerToCallable($key)
     {

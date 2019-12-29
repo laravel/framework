@@ -2,9 +2,9 @@
 
 namespace DummyNamespace;
 
-use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Database\Eloquent\Cast;
 
-class DummyClass implements Castable
+class DummyClass extends Cast
 {
     /**
      * Get a given attribute from the model.

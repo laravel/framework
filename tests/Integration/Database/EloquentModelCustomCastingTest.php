@@ -4,14 +4,14 @@ namespace Illuminate\Tests\Integration\Database;
 
 use DateTime;
 use DateTimeInterface;
-use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Database\Eloquent\Cast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 class EloquentModelCustomCastingTest extends DatabaseTestCase
 {
-    public function testFoo()
+    public function testValues()
     {
         $item = TestModel::create([
             'field_1' => 'foobar',
@@ -66,7 +66,7 @@ class TestModel extends Model
     protected $guarded = ['id'];
 }
 
-class TimeCast implements Castable
+class TimeCast extends Cast
 {
     /**
      * @param  mixed  $value
@@ -86,7 +86,7 @@ class TimeCast implements Castable
     }
 }
 
-class StringCast implements Castable
+class StringCast extends Cast
 {
     public function get($value = null)
     {
@@ -101,7 +101,7 @@ class StringCast implements Castable
     }
 }
 
-class NumberCast implements Castable
+class NumberCast extends Cast
 {
     public function get($value = null)
     {
@@ -114,7 +114,7 @@ class NumberCast implements Castable
     }
 }
 
-class NullCast implements Castable
+class NullCast extends Cast
 {
     public function get($value = null)
     {
@@ -127,7 +127,7 @@ class NullCast implements Castable
     }
 }
 
-class NullChangedCast implements Castable
+class NullChangedCast extends Cast
 {
     public function get($value = null)
     {
