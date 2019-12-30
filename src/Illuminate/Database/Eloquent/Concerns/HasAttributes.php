@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -91,6 +92,7 @@ trait HasAttributes
      * Convert the model's attributes to an array.
      *
      * @return array
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function attributesToArray()
     {
@@ -177,6 +179,7 @@ trait HasAttributes
      * @param  array  $attributes
      * @param  array  $mutatedAttributes
      * @return array
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
@@ -316,6 +319,7 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function getAttribute($key)
     {
@@ -346,6 +350,7 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function getAttributeValue($key)
     {
@@ -482,6 +487,7 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function castAttribute($key, $value)
     {
@@ -592,6 +598,7 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function setAttribute($key, $value)
     {
@@ -997,6 +1004,7 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function fromCustomCastable($key, $value = null)
     {
@@ -1011,6 +1019,7 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function toCustomCastable($key, $value = null)
     {
@@ -1024,13 +1033,13 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return \Illuminate\Contracts\Database\Eloquent\Castable
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function normalizeCastToCallable($key)
     {
         if (! isset($this->castsInstances[$key])) {
-            $cast = $this->getCast($key);
-
-            $this->castsInstances[$key] = new $cast;
+            $this->castsInstances[$key] = Container::getInstance()
+                ->make($this->getCast($key));
         }
 
         return $this->castsInstances[$key];
@@ -1081,6 +1090,7 @@ trait HasAttributes
      *
      * @param  array|mixed  $attributes
      * @return array
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function only($attributes)
     {
@@ -1137,6 +1147,7 @@ trait HasAttributes
      * Sync the changed attributes.
      *
      * @return $this
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function syncChanges()
     {
@@ -1150,6 +1161,7 @@ trait HasAttributes
      *
      * @param  array|string|null  $attributes
      * @return bool
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function isDirty($attributes = null)
     {
@@ -1163,6 +1175,7 @@ trait HasAttributes
      *
      * @param  array|string|null  $attributes
      * @return bool
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function isClean($attributes = null)
     {
@@ -1214,6 +1227,7 @@ trait HasAttributes
      * Get the attributes that have been changed since last sync.
      *
      * @return array
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function getDirty()
     {
@@ -1244,6 +1258,7 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $current
      * @return bool
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function originalIsEquivalent($key, $current)
     {
