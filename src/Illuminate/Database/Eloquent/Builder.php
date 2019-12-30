@@ -13,6 +13,8 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use ReflectionClass;
+use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
@@ -1368,6 +1370,24 @@ class Builder
     {
         if ($method === 'macro') {
             static::$macros[$parameters[0]] = $parameters[1];
+
+            return;
+        }
+
+        if ($method === 'mixin') {
+            $mixin = $parameters[0];
+            $replace = $parameters[1] ?? true;
+
+            $methods = (new ReflectionClass($mixin))->getMethods(
+                ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
+            );
+
+            foreach ($methods as $method) {
+                if ($replace || ! static::hasMacro($method->name)) {
+                    $method->setAccessible(true);
+                    static::macro($method->name, $method->invoke($mixin));
+                }
+            }
 
             return;
         }
