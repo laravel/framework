@@ -126,7 +126,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     public function testFirstOrFailThrowsAnException()
     {
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
 
         HasManyThroughTestCountry::first()->posts()->firstOrFail();
     }
@@ -210,9 +210,9 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
                                  ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
                                  ->posts()->createMany([
-                ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
-                ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
-            ]);
+                                     ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                                     ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+                                 ]);
     }
 
     /**
@@ -221,11 +221,11 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     protected function seedDefaultData()
     {
         HasManyThroughDefaultTestCountry::create(['id' => 1, 'name' => 'United States of America'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com'])
-                                 ->posts()->createMany([
-                ['title' => 'A title', 'body' => 'A body'],
-                ['title' => 'Another title', 'body' => 'Another body'],
-            ]);
+                                        ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com'])
+                                        ->posts()->createMany([
+                                            ['title' => 'A title', 'body' => 'A body'],
+                                            ['title' => 'Another title', 'body' => 'Another body'],
+                                        ]);
     }
 
     /**

@@ -185,8 +185,8 @@ class NotificationSlackChannelTestNotification extends Notification
                                    ->content('Attachment Content')
                                    ->fallback('Attachment Fallback')
                                    ->fields([
-                                        'Project' => 'Laravel',
-                                    ])
+                                       'Project' => 'Laravel',
+                                   ])
                                     ->footer('Laravel')
                                     ->footerIcon('https://laravel.com/fake.png')
                                     ->markdown(['text'])
@@ -212,8 +212,8 @@ class NotificationSlackChannelTestNotificationWithImageIcon extends Notification
                                    ->content('Attachment Content')
                                    ->fallback('Attachment Fallback')
                                    ->fields([
-                                        'Project' => 'Laravel',
-                                    ])
+                                       'Project' => 'Laravel',
+                                   ])
                                     ->footer('Laravel')
                                     ->footerIcon('https://laravel.com/fake.png')
                                     ->markdown(['text'])
@@ -232,8 +232,8 @@ class NotificationSlackChannelWithoutOptionalFieldsTestNotification extends Noti
                         $attachment->title('Laravel', 'https://laravel.com')
                                    ->content('Attachment Content')
                                    ->fields([
-                                        'Project' => 'Laravel',
-                                    ]);
+                                       'Project' => 'Laravel',
+                                   ]);
                     });
     }
 }
