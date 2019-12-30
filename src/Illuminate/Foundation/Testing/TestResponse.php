@@ -4,9 +4,9 @@ namespace Illuminate\Foundation\Testing;
 
 use ArrayAccess;
 use Closure;
+use GrahamCampbell\TestBenchCore\Assert as PHPUnit;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\Assert as PHPUnit;
 use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
