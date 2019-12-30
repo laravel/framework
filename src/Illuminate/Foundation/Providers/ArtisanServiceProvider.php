@@ -488,6 +488,11 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         });
     }
 
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerCastMakeCommand()
     {
         $this->app->singleton('command.cast.make', function ($app) {
