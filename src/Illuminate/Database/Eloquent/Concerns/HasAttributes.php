@@ -1027,7 +1027,7 @@ trait HasAttributes
      */
     protected function normalizeCastToCallable($key)
     {
-        if (! array_key_exists($key, $this->castsInstances)) {
+        if (! isset($this->castsInstances[$key])) {
             $cast = $this->getCast($key);
 
             $this->castsInstances[$key] = new $cast;
