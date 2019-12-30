@@ -616,6 +616,12 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
+        // If the attribute is specified as Cast, we will convert it according to
+        // the method specified in it.
+        if ($this->isCustomCastable($key)) {
+            $value = $this->toCustomCastable($key, $value);
+        }
+
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
         }

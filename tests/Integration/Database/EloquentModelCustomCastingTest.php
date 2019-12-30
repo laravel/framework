@@ -14,7 +14,7 @@ class EloquentModelCustomCastingTest extends DatabaseTestCase
     public function testValues()
     {
         $item = TestModel::create([
-            'field_1' => 'foobar',
+            'field_1' => ['f', 'o', 'o', 'b', 'a', 'r'],
             'field_2' => 20,
             'field_3' => '08:19:12',
             'field_4' => null,
