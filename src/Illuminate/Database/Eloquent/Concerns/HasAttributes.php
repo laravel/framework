@@ -1043,12 +1043,8 @@ trait HasAttributes
      */
     protected function normalizeCastToCallable($key)
     {
-        if (! isset($this->castsInstances[$key])) {
-            $this->castsInstances[$key] = Container::getInstance()
-                ->make($this->getCast($key));
-        }
-
-        return $this->castsInstances[$key];
+        return Container::getInstance()
+            ->make($this->getCast($key));
     }
 
     /**
