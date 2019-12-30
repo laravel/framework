@@ -16,7 +16,8 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "erusev/parsedown": "^1.7",
+        "league/commonmark": "^1.1",
+        "league/commonmark-ext-table": "^2.1",
         "illuminate/container": "^6.0",
         "illuminate/contracts": "^6.0",
         "illuminate/support": "^6.0",
