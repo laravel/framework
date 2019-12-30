@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment;
 use League\CommonMark\Ext\Table\TableExtension;
-use Parsedown;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class Markdown
