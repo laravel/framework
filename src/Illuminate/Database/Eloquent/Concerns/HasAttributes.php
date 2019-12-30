@@ -968,7 +968,7 @@ trait HasAttributes
      * Get the cast from casts array.
      *
      * @param  string  $key
-     * @return mixed
+     * @return string|null
      */
     public function getCast($key)
     {
