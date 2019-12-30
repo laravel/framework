@@ -5,10 +5,9 @@ namespace Illuminate\Mail;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Parsedown;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
-class Markdown
+class Renderer
 {
     /**
      * The view factory implementation.
@@ -32,7 +31,7 @@ class Markdown
     protected $componentPaths = [];
 
     /**
-     * Create a new Markdown renderer instance.
+     * Create a new renderer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
      * @param  array  $options
@@ -46,12 +45,12 @@ class Markdown
     }
 
     /**
-     * Render the Markdown template into HTML.
+     * Render the template into HTML.
      *
      * @param  string  $view
      * @param  array  $data
      * @param  \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles|null  $inliner
-     * @return \Illuminate\Support\HtmlString
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
     public function render($view, array $data = [], $inliner = null)
     {
@@ -71,11 +70,11 @@ class Markdown
     }
 
     /**
-     * Render the Markdown template into text.
+     * Render the template into text.
      *
      * @param  string  $view
      * @param  array  $data
-     * @return \Illuminate\Support\HtmlString
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
     public function renderText($view, array $data = [])
     {
@@ -88,19 +87,6 @@ class Markdown
         return new HtmlString(
             html_entity_decode(preg_replace("/[\r\n]{2,}/", "\n\n", $contents), ENT_QUOTES, 'UTF-8')
         );
-    }
-
-    /**
-     * Parse the given Markdown text into HTML.
-     *
-     * @param  string  $text
-     * @return \Illuminate\Support\HtmlString
-     */
-    public static function parse($text)
-    {
-        $parsedown = new Parsedown;
-
-        return new HtmlString($parsedown->text($text));
     }
 
     /**

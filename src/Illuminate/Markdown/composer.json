@@ -1,6 +1,6 @@
 {
-    "name": "illuminate/mail",
-    "description": "The Illuminate Mail package.",
+    "name": "illuminate/markdown",
+    "description": "The Illuminate Markdown package.",
     "license": "MIT",
     "homepage": "https://laravel.com",
     "support": {
@@ -15,18 +15,12 @@
     ],
     "require": {
         "php": "^7.2.5",
-        "ext-json": "*",
         "illuminate/container": "^7.0",
-        "illuminate/contracts": "^7.0",
-        "illuminate/markdown": "^7.0",
-        "illuminate/support": "^7.0",
-        "psr/log": "^1.0",
-        "swiftmailer/swiftmailer": "^6.0",
-        "tijsverkoyen/css-to-inline-styles": "^2.2.2"
+        "illuminate/support": "^7.0"
     },
     "autoload": {
         "psr-4": {
-            "Illuminate\\Mail\\": ""
+            "Illuminate\\Markdown\\": ""
         }
     },
     "extra": {
@@ -35,9 +29,9 @@
         }
     },
     "suggest": {
-        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.0).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun mail driver (^6.0).",
-        "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
+        "erusev/parsedown": "Required to use the Parsedown renderer (^1.7).",
+        "league/commonmark": "Required to use the CommonMark renderer (^1.1).",
+        "michelf/php-markdown": "Required to use the PHP Markdown renderer (^1.9)."
     },
     "config": {
         "sort-packages": true

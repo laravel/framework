@@ -4,7 +4,7 @@
             <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
                     <td class="panel-item">
-                        {{ Illuminate\Mail\Markdown::parse($slot) }}
+                        {{ Illuminate\Support\Facades\Markdown::render($slot) }}
                     </td>
                 </tr>
             </table>
