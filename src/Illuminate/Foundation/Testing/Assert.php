@@ -25,7 +25,7 @@ abstract class Assert extends PHPUnit
      */
     public static function assertArraySubset($subset, $array, bool $checkForIdentity = false, string $msg = ''): void
     {
-        if (!(is_array($subset) || $subset instanceof ArrayAccess)) {
+        if (! (is_array($subset) || $subset instanceof ArrayAccess)) {
             if (class_exists(InvalidArgumentException::class)) {
                 throw InvalidArgumentException::create(1, 'array or ArrayAccess');
             } else {
@@ -33,7 +33,7 @@ abstract class Assert extends PHPUnit
             }
         }
 
-        if (!(is_array($array) || $array instanceof ArrayAccess)) {
+        if (! (is_array($array) || $array instanceof ArrayAccess)) {
             if (class_exists(InvalidArgumentException::class)) {
                 throw InvalidArgumentException::create(2, 'array or ArrayAccess');
             } else {

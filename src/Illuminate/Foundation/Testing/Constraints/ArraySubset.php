@@ -74,7 +74,7 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
                 return $result;
             }
 
-            if (!$result) {
+            if (! $result) {
                 $f = new ComparisonFailure(
                     $patched,
                     $other,
@@ -209,7 +209,7 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
                 return $result;
             }
 
-            if (!$result) {
+            if (! $result) {
                 $f = new ComparisonFailure(
                     $patched,
                     $other,
