@@ -573,10 +573,9 @@ class FoundationTestResponseTest extends TestCase
     {
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
-            ));
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]));
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -597,10 +596,9 @@ class FoundationTestResponseTest extends TestCase
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
-            ));
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]));
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -614,10 +612,9 @@ class FoundationTestResponseTest extends TestCase
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
-            ));
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]));
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
