@@ -16,11 +16,10 @@ abstract class Assert extends PHPUnit
     /**
      * Asserts that an array has a specified subset.
      *
-     * @param \ArrayAccess|array $subset
-     * @param \ArrayAccess|array $array
-     * @param bool               $checkForIdentity
-     * @param string             $msg
-     *
+     * @param  \ArrayAccess|array  $subset
+     * @param  \ArrayAccess|array  $array
+     * @param  bool  $checkForIdentity
+     * @param  string  $msg
      * @return void
      */
     public static function assertArraySubset($subset, $array, bool $checkForIdentity = false, string $msg = ''): void
