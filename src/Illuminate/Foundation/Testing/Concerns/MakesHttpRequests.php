@@ -217,7 +217,7 @@ trait MakesHttpRequests
      * @param  array  $parameters
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    public function get($uri, array $headers = [],$parameters = [])
+    public function get($uri, array $headers = [], $parameters = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
         $cookies = $this->prepareCookiesForRequest();
