@@ -2,6 +2,8 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
+use Illuminate\Support\Str;
+
 trait CompilesComponents
 {
     /**
@@ -12,7 +14,13 @@ trait CompilesComponents
      */
     protected function compileComponent($expression)
     {
-        return "<?php \$__env->startComponent{$expression}; ?>";
+        [$component, $data] = array_map('trim', explode(',', trim($expression, '()'), 2));
+
+        if (Str::contains($component, ['::class', '\\'])) {
+            $componentDefinition = '<?php $component = app()->make('.$component.', '.($data ?: '[]').'); ?>';
+        }
+
+        return ($componentDefinition ?? '').'<?php $__env->startComponent($component->view, '.($data ?: '[]').'); ?>';
     }
 
     /**
