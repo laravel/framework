@@ -1322,6 +1322,32 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['bar'], $clone->foo);
     }
 
+    public function testCloneModelMakesAFreshCopyOfTheModelIncludingTimestampFieldsWhenTimestampsDisabled()
+    {
+        $class = new EloquentModelStub;
+        $class->timestamps = false;
+
+        $class->id = 1;
+        $class->exists = true;
+        $class->first = 'taylor';
+        $class->last = 'otwell';
+        $class->created_at = $class->freshTimestamp();
+        $class->updated_at = $class->freshTimestamp();
+        $class->setRelation('foo', ['bar']);
+
+        $clone = $class->replicate();
+
+        $this->assertNull($clone->id);
+        $this->assertFalse($clone->exists);
+        $this->assertSame('taylor', $clone->first);
+        $this->assertSame('otwell', $clone->last);
+        $this->assertArrayHasKey('created_at', $clone->getAttributes());
+        $this->assertArrayHasKey('updated_at', $clone->getAttributes());
+        $this->assertSame($class->created_at->toDateTimeString(), $clone->created_at->toDateTimeString());
+        $this->assertSame($class->updated_at->toDateTimeString(), $clone->updated_at->toDateTimeString());
+        $this->assertEquals(['bar'], $clone->foo);
+    }
+
     public function testModelObserversCanBeAttachedToModels()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock(Dispatcher::class));
