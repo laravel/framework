@@ -1317,8 +1317,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($clone->exists);
         $this->assertSame('taylor', $clone->first);
         $this->assertSame('otwell', $clone->last);
-        $this->assertObjectNotHasAttribute('created_at', $clone);
-        $this->assertObjectNotHasAttribute('updated_at', $clone);
+        $this->assertArrayNotHasKey('created_at', $clone->getAttributes());
+        $this->assertArrayNotHasKey('updated_at', $clone->getAttributes());
         $this->assertEquals(['bar'], $clone->foo);
     }
 
