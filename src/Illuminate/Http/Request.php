@@ -32,6 +32,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $json;
 
     /**
+     *  The variable type is the recieved variable type wheather it is snake case or camelcase
+     *  If you want to change all the input request from Camelcase to snake to match your database
+     *  column naming conventions then simply set $convertToSnake=true
+     */
+    protected $convertToSnake;
+
+    /**
      * All of the converted files for the request.
      *
      * @var array
@@ -352,6 +359,15 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         if (! isset($this->json)) {
             $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+
+            if ($this->convertToSnake) {
+                $new_json_data = [];
+                foreach($this->json as $k => $v) {
+                    $new_json_data[$this->convertToSnake($k, '_')] = $v;
+                }
+
+                $this->json = new ParameterBag($new_json_data);
+            }
         }
 
         if (is_null($key)) {
@@ -359,6 +375,15 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return data_get($this->json->all(), $key, $default);
+    }
+
+    /**
+     * @param $string
+     * @param $sep is the separator that separate the variable name wheather it is '_' or '-' for snake
+     * @return string
+     */
+    protected function convertToSnake($string, $sep) {
+        return strtolower(preg_replace('/(?<=\d)(?=[A-Za-z])|(?<=[A-Za-z])(?=\d)|(?<=[a-z])(?=[A-Z])/', $sep, $string));
     }
 
     /**
