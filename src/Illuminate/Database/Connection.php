@@ -928,7 +928,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get the raw current PDO connection parameter.
+     * Get the current PDO connection parameter without executing any reconnect logic.
      *
      * @return \PDO|\Closure|null
      */
@@ -960,7 +960,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get the raw current read PDO connection parameter.
+     * Get the current read PDO connection parameter without executing any reconnect logic.
      *
      * @return \PDO|\Closure|null
      */
