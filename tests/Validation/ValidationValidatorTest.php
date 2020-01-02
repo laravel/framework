@@ -4953,7 +4953,7 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => [
                             ['color' => 'red', 'shape' => 'square'],
-                            ['color' => 'red', 'shape' => 'round'],
+                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
                             ['color' => 'blue', 'shape' => 'hexagon'],
                             ['color' => 'blue', 'shape' => 'triangle'],
                         ]],
@@ -4963,7 +4963,7 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => [
                             ['color' => 'red', 'shape' => 'square'],
-                            ['color' => 'red', 'shape' => 'round'],
+                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
                             // The shape field for these blue wheels were correctly excluded (if they weren't, they would
                             // fail the validation). They still appear in the validated data. This behaviour is unrelated
                             // to the "exclude" type rules.
