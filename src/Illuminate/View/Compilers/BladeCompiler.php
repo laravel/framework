@@ -482,13 +482,33 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Register a class-based component alias directive.
+     *
+     * @param  string  $class
+     * @param  string  $alias
+     * @return void
+     */
+    public function component($class, $alias)
+    {
+        $this->directive($alias, function ($expression) use ($class) {
+            $componentDefinition = '<?php $component = app()->make('.$class.', '.($expression ?: '[]').'); ?>';
+
+            return $componentDefinition.'<?php $__env->startComponent($component->view(), '.($expression ?: '[]').'); ?>';
+        });
+
+        $this->directive('end'.$alias, function () {
+            return '<?php echo $__env->renderComponent(); ?>';
+        });
+    }
+
+    /**
      * Register a component alias directive.
      *
      * @param  string  $path
      * @param  string|null  $alias
      * @return void
      */
-    public function component($path, $alias = null)
+    public function aliasComponent($path, $alias = null)
     {
         $alias = $alias ?: Arr::last(explode('.', $path));
 
@@ -511,6 +531,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @return void
      */
     public function include($path, $alias = null)
+    {
+        return $this->aliasInclude($path, $alias);
+    }
+
+    /**
+     * Register an include alias directive.
+     *
+     * @param  string  $path
+     * @param  string|null  $alias
+     * @return void
+     */
+    public function aliasInclude($path, $alias = null)
     {
         $alias = $alias ?: Arr::last(explode('.', $path));
 
