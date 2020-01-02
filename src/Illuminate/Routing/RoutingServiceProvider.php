@@ -7,10 +7,10 @@ use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Support\ServiceProvider;
+use Laminas\Diactoros\Response as PsrResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
-use Laminas\Diactoros\Response as PsrResponse;
 
 class RoutingServiceProvider extends ServiceProvider
 {
