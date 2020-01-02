@@ -60,14 +60,10 @@ trait CompilesComponents
     public static function compileClassComponentOpening(string $component, string $data, string $hash)
     {
         return implode(PHP_EOL, [
-            '<?php $__component'.$hash.' = app()->make('.$component.'::class, '.($data ?: '[]').'); ?>',
-            '<?php $__componentData'.$hash.' = $__component'.$hash.'->data(); ?>',
-            '<?php $__componentDataOriginal'.$hash.' = []; ?>',
-            '<?php foreach (array_keys($__componentData'.$hash.') as $__componentDataKey): ?>',
-            '<?php if (isset($$__componentDataKey)) { $__componentDataOriginal'.$hash.'[$__componentDataKey] = $$__componentDataKey; } ?>',
-            '<?php endforeach; ?>',
-            '<?php extract($__componentData'.$hash.'); ?>',
-            '<?php $__env->startComponent($__component'.$hash.'->view(), $__componentData'.$hash.'); ?>',
+            '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
+            '<?php $component = app()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
+            '<?php $__componentData'.$hash.' = $component->data(); ?>',
+            '<?php $__env->startComponent($component->view(), $__componentData'.$hash.'); ?>',
         ]);
     }
 
@@ -91,11 +87,9 @@ trait CompilesComponents
         $hash = array_pop(static::$componentHashStack);
 
         return implode(PHP_EOL, [
-            '<?php if (isset($__component'.$hash.')): ?>',
-            '<?php foreach ($__componentDataOriginal'.$hash.' as $__componentDataOriginalKey => $__componentDataOriginalValue): ?>',
-            '<?php $$__componentDataOriginalKey = $__componentDataOriginalValue; ?>',
-            '<?php endforeach; ?>',
-            '<?php unset($__component'.$hash.', $__componentData'.$hash.'); ?>',
+            '<?php if (isset($__componentOriginal'.$hash.')): ?>',
+            '<?php $component = $__componentOriginal'.$hash.'; ?>',
+            '<?php unset($__componentOriginal'.$hash.', $__componentData'.$hash.'); ?>',
             '<?php endif; ?>',
             '<?php echo $__env->renderComponent(); ?>'
         ]);
