@@ -485,11 +485,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a class-based component alias directive.
      *
      * @param  string  $class
-     * @param  string  $alias
+     * @param  string|null  $alias
      * @return void
      */
-    public function component($class, $alias)
+    public function component($class, $alias = null)
     {
+        $alias = $alias ?: strtolower(class_basename($class));
+
         $this->directive($alias, function ($expression) use ($class) {
             return static::compileClassComponentOpening(
                 $class, $expression ?: '[]', static::newComponentHash($class)
@@ -499,6 +501,23 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $this->directive('end'.$alias, function () {
             return static::compileClassComponentClosing();
         });
+    }
+
+    /**
+     * Register an array of class-based components.
+     *
+     * @param  array  $components
+     * @return void
+     */
+    public function components(array $components)
+    {
+        foreach ($components as $key => $value) {
+            if (is_numeric($key)) {
+                static::component($value);
+            } else {
+                static::component($key, $value);
+            }
+        }
     }
 
     /**
