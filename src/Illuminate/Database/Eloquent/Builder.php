@@ -1398,17 +1398,17 @@ class Builder
      */
     protected static function registerMixin($mixin, $replace)
     {
-            $methods = (new ReflectionClass($mixin))->getMethods(
+        $methods = (new ReflectionClass($mixin))->getMethods(
                 ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
             );
 
-            foreach ($methods as $method) {
-                if ($replace || ! static::hasGlobalMacro($method->name)) {
-                    $method->setAccessible(true);
+        foreach ($methods as $method) {
+            if ($replace || ! static::hasGlobalMacro($method->name)) {
+                $method->setAccessible(true);
 
-                    static::macro($method->name, $method->invoke($mixin));
-                }
+                static::macro($method->name, $method->invoke($mixin));
             }
+        }
     }
 
     /**
