@@ -186,17 +186,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileString($value)
     {
-        if (strpos($value, '@verbatim') !== false) {
-            $value = $this->storeVerbatimBlocks($value);
-        }
+        [$this->footer, $result] = [[], ''];
 
-        $this->footer = [];
-
-        if (strpos($value, '@php') !== false) {
-            $value = $this->storePhpBlocks($value);
-        }
-
-        $result = '';
+        $value = $this->storeUncompiledBlocks($value);
 
         // Here we will loop through all of the tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
@@ -217,6 +209,25 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Store the blocks that do not receive compilation.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function storeUncompiledBlocks($value)
+    {
+        if (strpos($value, '@verbatim') !== false) {
+            $value = $this->storeVerbatimBlocks($value);
+        }
+
+        if (strpos($value, '@php') !== false) {
+            $value = $this->storePhpBlocks($value);
+        }
+
+        return $value;
     }
 
     /**
