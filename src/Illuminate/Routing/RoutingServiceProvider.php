@@ -10,7 +10,7 @@ use Illuminate\Support\ServiceProvider;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
-use Zend\Diactoros\Response as PsrResponse;
+use Laminas\Diactoros\Response as PsrResponse;
 
 class RoutingServiceProvider extends ServiceProvider
 {
