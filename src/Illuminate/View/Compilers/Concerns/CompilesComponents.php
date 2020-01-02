@@ -14,13 +14,17 @@ trait CompilesComponents
      */
     protected function compileComponent($expression)
     {
-        [$component, $data] = array_map('trim', explode(',', trim($expression, '()'), 2));
+        [$component, $data] = strpos($expression, ',') !== false
+                    ? array_map('trim', explode(',', trim($expression, '()'), 2))
+                    : [trim($expression, '()'), null];
 
         if (Str::contains($component, ['::class', '\\'])) {
             $componentDefinition = '<?php $component = app()->make('.$component.', '.($data ?: '[]').'); ?>';
+
+            return $componentDefinition.'<?php $__env->startComponent($component->view, '.($data ?: '[]').'); ?>';
         }
 
-        return ($componentDefinition ?? '').'<?php $__env->startComponent($component->view, '.($data ?: '[]').'); ?>';
+        return "<?php \$__env->startComponent{$expression}; ?>";
     }
 
     /**
