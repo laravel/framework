@@ -4918,12 +4918,12 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => 4],
                         ['type' => 'boat', 'wheels' => 'should be excluded'],
-                    ]
+                    ],
                 ], [
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => 4],
                         ['type' => 'boat'],
-                    ]
+                    ],
                 ],
             ],
             'nested-06' => [
@@ -4934,12 +4934,12 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => 4],
                         ['type' => 'boat'],
-                    ]
+                    ],
                 ], [
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => 4],
                         ['type' => 'boat'],
-                    ]
+                    ],
                 ],
             ],
             'nested-07' => [
@@ -4958,7 +4958,7 @@ class ValidationValidatorTest extends TestCase
                             ['color' => 'blue', 'shape' => 'triangle'],
                         ]],
                         ['type' => 'boat'],
-                    ]
+                    ],
                 ], [
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => [
@@ -4971,7 +4971,7 @@ class ValidationValidatorTest extends TestCase
                             ['color' => 'blue', 'shape' => 'triangle'],
                         ]],
                         ['type' => 'boat'],
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -5059,7 +5059,7 @@ class ValidationValidatorTest extends TestCase
                             'price' => 500,
                             'type' => 'boat',
                         ],
-                    ]
+                    ],
                 ], [
                     'vehicles.0.wheels' => ['validation.required'],
                     // vehicles.1.wheels is not required, because type is not "car"
@@ -5081,7 +5081,7 @@ class ValidationValidatorTest extends TestCase
                             ['color' => 'blue', 'shape' => 'triangle'],
                         ]],
                         ['type' => 'boat', 'wheels' => 'should be excluded'],
-                    ]
+                    ],
                 ], [
                     // The blue wheels are excluded and are therefor not validated against the "in:square,round" rule
                     'vehicles.0.wheels.1.shape' => ['validation.in'],
