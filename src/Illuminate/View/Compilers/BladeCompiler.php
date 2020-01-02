@@ -491,13 +491,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function component($class, $alias)
     {
         $this->directive($alias, function ($expression) use ($class) {
-            $componentDefinition = '<?php $component = app()->make('.$class.', '.($expression ?: '[]').'); ?>';
-
-            return $componentDefinition.'<?php $__env->startComponent($component->view(), '.($expression ?: '[]').'); ?>';
+            return static::compileClassComponentOpening(
+                $class, $expression ?: '[]', static::newComponentHash($class)
+            );
         });
 
         $this->directive('end'.$alias, function () {
-            return '<?php echo $__env->renderComponent(); ?>';
+            return static::compileClassComponentClosing();
         });
     }
 
