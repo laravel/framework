@@ -213,15 +213,16 @@ trait MakesHttpRequests
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
+     * @param  array  $parameters
      * @param  array  $headers
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    public function get($uri, array $headers = [])
+    public function get($uri, array $parameters = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('GET', $uri, [], $cookies, [], $server);
+        return $this->call('GET', $uri, $parameters, $cookies, [], $server);
     }
 
     /**
