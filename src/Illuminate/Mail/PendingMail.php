@@ -132,6 +132,7 @@ class PendingMail
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
+     * @deprecated Use send() instead.
      */
     public function sendNow(MailableContract $mailable)
     {
@@ -146,13 +147,7 @@ class PendingMail
      */
     public function queue(MailableContract $mailable)
     {
-        $mailable = $this->fill($mailable);
-
-        if (isset($mailable->delay)) {
-            return $this->mailer->later($mailable->delay, $mailable);
-        }
-
-        return $this->mailer->queue($mailable);
+        return $this->mailer->queue($this->fill($mailable));
     }
 
     /**
