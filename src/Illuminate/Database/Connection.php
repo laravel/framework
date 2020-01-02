@@ -930,7 +930,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the raw current PDO connection parameter.
      *
-     * @return \PDO
+     * @return \PDO|\Closure|null
      */
     public function getRawPdo()
     {
@@ -962,7 +962,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the raw current read PDO connection parameter.
      *
-     * @return \PDO
+     * @return \PDO|\Closure|null
      */
     public function getRawReadPdo()
     {
