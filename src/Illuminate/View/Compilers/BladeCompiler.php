@@ -482,13 +482,52 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Register a class-based component alias directive.
+     *
+     * @param  string  $class
+     * @param  string|null  $alias
+     * @return void
+     */
+    public function component($class, $alias = null)
+    {
+        $alias = $alias ?: strtolower(class_basename($class));
+
+        $this->directive($alias, function ($expression) use ($class) {
+            return static::compileClassComponentOpening(
+                $class, $expression ?: '[]', static::newComponentHash($class)
+            );
+        });
+
+        $this->directive('end'.$alias, function () {
+            return static::compileClassComponentClosing();
+        });
+    }
+
+    /**
+     * Register an array of class-based components.
+     *
+     * @param  array  $components
+     * @return void
+     */
+    public function components(array $components)
+    {
+        foreach ($components as $key => $value) {
+            if (is_numeric($key)) {
+                static::component($value);
+            } else {
+                static::component($key, $value);
+            }
+        }
+    }
+
+    /**
      * Register a component alias directive.
      *
      * @param  string  $path
      * @param  string|null  $alias
      * @return void
      */
-    public function component($path, $alias = null)
+    public function aliasComponent($path, $alias = null)
     {
         $alias = $alias ?: Arr::last(explode('.', $path));
 
@@ -511,6 +550,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @return void
      */
     public function include($path, $alias = null)
+    {
+        return $this->aliasInclude($path, $alias);
+    }
+
+    /**
+     * Register an include alias directive.
+     *
+     * @param  string  $path
+     * @param  string|null  $alias
+     * @return void
+     */
+    public function aliasInclude($path, $alias = null)
     {
         $alias = $alias ?: Arr::last(explode('.', $path));
 

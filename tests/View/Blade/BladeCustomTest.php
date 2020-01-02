@@ -157,7 +157,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomComponents()
     {
-        $this->compiler->component('app.components.alert', 'alert');
+        $this->compiler->aliasComponent('app.components.alert', 'alert');
 
         $string = '@alert
 @endalert';
@@ -168,7 +168,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomComponentsWithSlots()
     {
-        $this->compiler->component('app.components.alert', 'alert');
+        $this->compiler->aliasComponent('app.components.alert', 'alert');
 
         $string = '@alert([\'type\' => \'danger\'])
 @endalert';
@@ -177,20 +177,9 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testCustomComponentsDefaultAlias()
-    {
-        $this->compiler->component('app.components.alert');
-
-        $string = '@alert
-@endalert';
-        $expected = '<?php $__env->startComponent(\'app.components.alert\'); ?>
-<?php echo $__env->renderComponent(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
-    }
-
     public function testCustomComponentsWithExistingDirective()
     {
-        $this->compiler->component('app.components.foreach');
+        $this->compiler->aliasComponent('app.components.foreach', 'foreach');
 
         $string = '@foreach
 @endforeach';
