@@ -124,22 +124,30 @@ class BladeCompiler extends Compiler implements CompilerInterface
             );
 
             if (! empty($this->getPath())) {
-                $tokens = $this->getOpenAndClosingPhpTokens($contents);
-
-                // If the tokens we retrieved from the compiled contents have at least
-                // one opening tag and if that last token isn't the closing tag, we
-                // need to close the statement before adding the path at the end.
-                if ($tokens->isNotEmpty() && $tokens->last() !== T_CLOSE_TAG) {
-                    $contents .= ' ?>';
-                }
-
-                $contents .= "<?php /**PATH {$this->getPath()} ENDPATH**/ ?>";
+                $contents = $this->appendFilePath($contents);
             }
 
             $this->files->put(
                 $this->getCompiledPath($this->getPath()), $contents
             );
         }
+    }
+
+    /**
+     * Append the file path to the compiled string.
+     *
+     * @param  string  $contents
+     * @return string
+     */
+    protected function appendFilePath($contents)
+    {
+        $tokens = $this->getOpenAndClosingPhpTokens($contents);
+
+        if ($tokens->isNotEmpty() && $tokens->last() !== T_CLOSE_TAG) {
+            $contents .= ' ?>';
+        }
+
+        return $contents."<?php /**PATH {$this->getPath()} ENDPATH**/ ?>";
     }
 
     /**
