@@ -13,6 +13,8 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use ReflectionClass;
+use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
@@ -1372,6 +1374,10 @@ class Builder
             return;
         }
 
+        if ($method === 'mixin') {
+            return static::registerMixin($parameters[0], $parameters[1] ?? true);
+        }
+
         if (! static::hasGlobalMacro($method)) {
             static::throwBadMethodCallException($method);
         }
@@ -1381,6 +1387,28 @@ class Builder
         }
 
         return call_user_func_array(static::$macros[$method], $parameters);
+    }
+
+    /**
+     * Register the given mixin with the builder.
+     *
+     * @param  string  $mixin
+     * @param  bool  $replace
+     * @return void
+     */
+    protected static function registerMixin($mixin, $replace)
+    {
+        $methods = (new ReflectionClass($mixin))->getMethods(
+                ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
+            );
+
+        foreach ($methods as $method) {
+            if ($replace || ! static::hasGlobalMacro($method->name)) {
+                $method->setAccessible(true);
+
+                static::macro($method->name, $method->invoke($mixin));
+            }
+        }
     }
 
     /**
