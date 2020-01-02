@@ -1,0 +1,96 @@
+<?php
+
+namespace Illuminate\View;
+
+use Closure;
+use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionProperty;
+
+abstract class Component
+{
+    /**
+     * That properties / methods that should not be exposed to the component.
+     *
+     * @var array
+     */
+    protected $except = [];
+
+    /**
+     * Get the view that represents the component.
+     *
+     * @return string
+     */
+    abstract public function view();
+
+    /**
+     * Get the data that should be supplied to the view.
+     *
+     * @author Freek Van der Herten
+     * @author Brent Roose
+     *
+     * @return array
+     */
+    public function data()
+    {
+        $class = new ReflectionClass($this);
+
+        $publicProperties = collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
+            ->reject(function (ReflectionProperty $property) {
+                return $this->shouldIgnore($property->getName());
+            })
+            ->mapWithKeys(function (ReflectionProperty $property) {
+                return [$property->getName() => $this->{$property->getName()}];
+            });
+
+        $publicMethods = collect($class->getMethods(ReflectionMethod::IS_PUBLIC))
+            ->reject(function (ReflectionMethod $method) {
+                return $this->shouldIgnore($method->getName());
+            })
+            ->mapWithKeys(function (ReflectionMethod $method) {
+                return [$method->getName() => $this->createVariableFromMethod($method)];
+            });
+
+        return $publicProperties->merge($publicMethods)->toArray();
+    }
+
+    /**
+     * Create a callable variable from the given method.
+     *
+     * @param  \ReflectionMethod  $method
+     * @return mixed
+     */
+    protected function createVariableFromMethod(ReflectionMethod $method)
+    {
+        return $method->getNumberOfParameters() === 0
+                        ? $this->{$method->getName()}()
+                        : Closure::fromCallable([$this, $method->getName()]);
+    }
+
+    /**
+     * Determine if the given property / method should be ignored.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function shouldIgnore($name)
+    {
+        return Str::startsWith($name, '__') ||
+               in_array($name, $this->ignoredMethods());
+    }
+
+    /**
+     * Get the methods that should be ignored.
+     *
+     * @return array
+     */
+    protected function ignoredMethods()
+    {
+        return array_merge([
+            'view',
+            'data',
+        ], $this->except);
+    }
+
+}
