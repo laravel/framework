@@ -4953,8 +4953,8 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => [
                             ['color' => 'red', 'shape' => 'square'],
-                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
                             ['color' => 'blue', 'shape' => 'hexagon'],
+                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
                             ['color' => 'blue', 'shape' => 'triangle'],
                         ]],
                         ['type' => 'boat'],
@@ -4962,12 +4962,12 @@ class ValidationValidatorTest extends TestCase
                 ], [
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => [
-                            ['color' => 'red', 'shape' => 'square'],
-                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
                             // The shape field for these blue wheels were correctly excluded (if they weren't, they would
                             // fail the validation). They still appear in the validated data. This behaviour is unrelated
                             // to the "exclude" type rules.
+                            ['color' => 'red', 'shape' => 'square'],
                             ['color' => 'blue', 'shape' => 'hexagon'],
+                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
                             ['color' => 'blue', 'shape' => 'triangle'],
                         ]],
                         ['type' => 'boat'],
@@ -5076,15 +5076,15 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         ['type' => 'car', 'wheels' => [
                             ['color' => 'red', 'shape' => 'square'],
-                            ['color' => 'red', 'shape' => 'hexagon'],
                             ['color' => 'blue', 'shape' => 'hexagon'],
+                            ['color' => 'red', 'shape' => 'hexagon'],
                             ['color' => 'blue', 'shape' => 'triangle'],
                         ]],
                         ['type' => 'boat', 'wheels' => 'should be excluded'],
                     ],
                 ], [
                     // The blue wheels are excluded and are therefor not validated against the "in:square,round" rule
-                    'vehicles.0.wheels.1.shape' => ['validation.in'],
+                    'vehicles.0.wheels.2.shape' => ['validation.in'],
                 ],
             ],
         ];
