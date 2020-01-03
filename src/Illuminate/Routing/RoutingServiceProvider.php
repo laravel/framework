@@ -130,6 +130,7 @@ class RoutingServiceProvider extends ServiceProvider
     {
         $this->app->bind(ServerRequestInterface::class, function ($app) {
             $psr17Factory = new Psr17Factory;
+
             return (new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
                 ->createRequest($app->make('request'));
         });
