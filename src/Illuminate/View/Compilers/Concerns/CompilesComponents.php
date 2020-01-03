@@ -90,7 +90,7 @@ trait CompilesComponents
             '<?php $component = $__componentOriginal'.$hash.'; ?>',
             '<?php unset($__componentOriginal'.$hash.'); ?>',
             '<?php endif; ?>',
-            '<?php echo $__env->renderComponent(); ?>'
+            '<?php echo $__env->renderComponent(); ?>',
         ]);
     }
 

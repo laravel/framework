@@ -145,5 +145,4 @@ abstract class Component
             'withAttributes',
         ], $this->except);
     }
-
 }
