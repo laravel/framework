@@ -8,10 +8,10 @@ use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Support\ServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Response as PsrResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
-use Nyholm\Psr7\Response as PsrResponse;
 
 class RoutingServiceProvider extends ServiceProvider
 {
