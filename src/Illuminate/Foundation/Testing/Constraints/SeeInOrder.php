@@ -38,7 +38,7 @@ class SeeInOrder extends Constraint
      * @param  array  $values
      * @return bool
      */
-    public function matches($values) : bool
+    public function matches($values)
     {
         $position = 0;
 
@@ -67,7 +67,7 @@ class SeeInOrder extends Constraint
      * @param  array  $values
      * @return string
      */
-    public function failureDescription($values) : string
+    public function failureDescription($values)
     {
         return sprintf(
             'Failed asserting that \'%s\' contains "%s" in specified order.',
@@ -81,7 +81,7 @@ class SeeInOrder extends Constraint
      *
      * @return string
      */
-    public function toString() : string
+    public function toString()
     {
         return (new ReflectionClass($this))->name;
     }
