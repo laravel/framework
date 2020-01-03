@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class ComponentMakeCommand extends GeneratorCommand
@@ -38,7 +39,7 @@ class ComponentMakeCommand extends GeneratorCommand
     {
         return str_replace(
             'DummyView',
-            $this->option('view'),
+            $this->option('view') ?? 'components.'.Str::kebab(class_basename($name)),
             parent::buildClass($name)
         );
     }
