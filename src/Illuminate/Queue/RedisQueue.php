@@ -293,7 +293,7 @@ class RedisQueue extends Queue implements QueueContract
      *
      * @return \Illuminate\Redis\Connections\Connection
      */
-    protected function getConnection()
+    public function getConnection()
     {
         return $this->redis->connection($this->connection);
     }
