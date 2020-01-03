@@ -141,7 +141,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "test:unit": "phpunit -d memory_limit=512M",
+        "test:unit": "phpunit -d memory_limit=512M --colors=always",
         "test": [
             "@test:unit"
         ]
