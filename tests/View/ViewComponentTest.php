@@ -5,7 +5,7 @@ namespace Illuminate\Tests\View;
 use Illuminate\View\Component;
 use PHPUnit\Framework\TestCase;
 
-class ViewFactoryTest extends TestCase
+class ViewComponentTest extends TestCase
 {
     public function testAttributeRetrieval()
     {
