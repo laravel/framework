@@ -8,10 +8,12 @@ use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Support\ServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\Response as PsrResponse;
+use Nyholm\Psr7\Response as NyholmPsrResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Zend\Diactoros\Response as ZendPsrResponse;
 
 class RoutingServiceProvider extends ServiceProvider
 {
@@ -129,10 +131,15 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrRequest()
     {
         $this->app->bind(ServerRequestInterface::class, function ($app) {
-            $psr17Factory = new Psr17Factory;
+            if (class_exists(PsrHttpFactory::class)) {
+                $psr17Factory = new Psr17Factory;
 
-            return (new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
-                ->createRequest($app->make('request'));
+                return (new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
+                    ->createRequest($app->make('request'));
+            }
+            if (class_exists(DiactorosFactory::class)) {
+                return (new DiactorosFactory)->createRequest($app->make('request'));
+            }
         });
     }
 
@@ -144,7 +151,12 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrResponse()
     {
         $this->app->bind(ResponseInterface::class, function () {
-            return new PsrResponse;
+            if (class_exists(NyholmPsrResponse::class)) {
+                return new NyholmPsrResponse;
+            }
+            if (class_exists(ZendPsrResponse::class)) {
+                return new ZendPsrResponse;
+            }
         });
     }
 
