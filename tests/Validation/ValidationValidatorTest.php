@@ -4910,6 +4910,70 @@ class ValidationValidatorTest extends TestCase
                     'has_appointments' => false,
                 ],
             ],
+            'nested-05' => [
+                [
+                    'vehicles.*.type' => 'required|in:car,boat',
+                    'vehicles.*.wheels' => 'exclude_if:vehicles.*.type,boat|required|numeric',
+                ], [
+                    'vehicles' => [
+                        ['type' => 'car', 'wheels' => 4],
+                        ['type' => 'boat', 'wheels' => 'should be excluded'],
+                    ],
+                ], [
+                    'vehicles' => [
+                        ['type' => 'car', 'wheels' => 4],
+                        ['type' => 'boat'],
+                    ],
+                ],
+            ],
+            'nested-06' => [
+                [
+                    'vehicles.*.type' => 'required|in:car,boat',
+                    'vehicles.*.wheels' => 'exclude_if:vehicles.*.type,boat|required|numeric',
+                ], [
+                    'vehicles' => [
+                        ['type' => 'car', 'wheels' => 4],
+                        ['type' => 'boat'],
+                    ],
+                ], [
+                    'vehicles' => [
+                        ['type' => 'car', 'wheels' => 4],
+                        ['type' => 'boat'],
+                    ],
+                ],
+            ],
+            'nested-07' => [
+                [
+                    'vehicles.*.type' => 'required|in:car,boat',
+                    'vehicles.*.wheels' => 'exclude_if:vehicles.*.type,boat|required|array',
+                    'vehicles.*.wheels.*.color' => 'required|in:red,blue',
+                    // In this bizzaro world example you can choose a custom shape for your wheels if they are red
+                    'vehicles.*.wheels.*.shape' => 'exclude_unless:vehicles.*.wheels.*.color,red|required|in:square,round',
+                ], [
+                    'vehicles' => [
+                        ['type' => 'car', 'wheels' => [
+                            ['color' => 'red', 'shape' => 'square'],
+                            ['color' => 'blue', 'shape' => 'hexagon'],
+                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
+                            ['color' => 'blue', 'shape' => 'triangle'],
+                        ]],
+                        ['type' => 'boat'],
+                    ],
+                ], [
+                    'vehicles' => [
+                        ['type' => 'car', 'wheels' => [
+                            // The shape field for these blue wheels were correctly excluded (if they weren't, they would
+                            // fail the validation). They still appear in the validated data. This behaviour is unrelated
+                            // to the "exclude" type rules.
+                            ['color' => 'red', 'shape' => 'square'],
+                            ['color' => 'blue', 'shape' => 'hexagon'],
+                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
+                            ['color' => 'blue', 'shape' => 'triangle'],
+                        ]],
+                        ['type' => 'boat'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -4978,6 +5042,49 @@ class ValidationValidatorTest extends TestCase
                 ], [
                     'appointments.0.date' => ['validation.date'],
                     'appointments.1.name' => ['validation.required'],
+                ],
+            ],
+            [
+                [
+                    'vehicles.*.price' => 'required|numeric',
+                    'vehicles.*.type' => 'required|in:car,boat',
+                    'vehicles.*.wheels' => 'exclude_if:vehicles.*.type,boat|required|numeric',
+                ], [
+                    'vehicles' => [
+                        [
+                            'price' => 100,
+                            'type' => 'car',
+                        ],
+                        [
+                            'price' => 500,
+                            'type' => 'boat',
+                        ],
+                    ],
+                ], [
+                    'vehicles.0.wheels' => ['validation.required'],
+                    // vehicles.1.wheels is not required, because type is not "car"
+                ],
+            ],
+            'exclude-validation-error-01' => [
+                [
+                    'vehicles.*.type' => 'required|in:car,boat',
+                    'vehicles.*.wheels' => 'exclude_if:vehicles.*.type,boat|required|array',
+                    'vehicles.*.wheels.*.color' => 'required|in:red,blue',
+                    // In this bizzaro world example you can choose a custom shape for your wheels if they are red
+                    'vehicles.*.wheels.*.shape' => 'exclude_unless:vehicles.*.wheels.*.color,red|required|in:square,round',
+                ], [
+                    'vehicles' => [
+                        ['type' => 'car', 'wheels' => [
+                            ['color' => 'red', 'shape' => 'square'],
+                            ['color' => 'blue', 'shape' => 'hexagon'],
+                            ['color' => 'red', 'shape' => 'hexagon'],
+                            ['color' => 'blue', 'shape' => 'triangle'],
+                        ]],
+                        ['type' => 'boat', 'wheels' => 'should be excluded'],
+                    ],
+                ], [
+                    // The blue wheels are excluded and are therefor not validated against the "in:square,round" rule
+                    'vehicles.0.wheels.2.shape' => ['validation.in'],
                 ],
             ],
         ];
