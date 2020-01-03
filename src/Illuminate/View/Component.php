@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Closure;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -16,6 +17,13 @@ abstract class Component
      * @var array
      */
     protected $except = [];
+
+    /**
+     * The component attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [];
 
     /**
      * Get the view that represents the component.
@@ -81,6 +89,29 @@ abstract class Component
     }
 
     /**
+     * Implode the given attributes into a single HTML ready string.
+     *
+     * @param  array  $attributes
+     * @return string
+     */
+    public function attributes(array $attributes)
+    {
+        return new HtmlString(collect($attributes)->map(function ($value, $key) {
+            if (is_numeric($key)) {
+                [$key, $value] = [$value, ''];
+            }
+
+            $currentValue = $this->attributes[$key] ?? '';
+
+            if ($currentValue === true) {
+                return $key;
+            }
+
+            return $key.'="'.str_replace('"', '\\"', trim($value.' '.$currentValue)).'"';
+        })->filter()->implode(' '));
+    }
+
+    /**
      * Set the extra attributes that the component should make available.
      *
      * @param  array  $attributes
@@ -115,6 +146,7 @@ abstract class Component
         return array_merge([
             'view',
             'data',
+            'withAttributes',
         ], $this->except);
     }
 
