@@ -65,9 +65,9 @@ class ComponentMakeCommand extends GeneratorCommand
 
         file_put_contents(
             $path.'.blade.php',
-            "<div>
-    <!-- ".Inspiring::quote()." -->
-</div>"
+            '<div>
+    <!-- '.Inspiring::quote().' -->
+</div>'
         );
     }
 
