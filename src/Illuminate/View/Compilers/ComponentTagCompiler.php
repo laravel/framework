@@ -74,7 +74,7 @@ class ComponentTagCompiler
                 (?<attributes>
                     (?:
                         \s+
-                        [\w\-:]+
+                        [\w\-:\.]+
                         (
                             =
                             (?:
@@ -115,7 +115,7 @@ class ComponentTagCompiler
                 (?<attributes>
                     (?:
                         \s+
-                        [\w\-:]+
+                        [\w\-:\.]+
                         (
                             =
                             (?:
@@ -234,7 +234,7 @@ class ComponentTagCompiler
         $attributeString = $this->parseBindAttributes($attributeString);
 
         $pattern = '/
-            (?<attribute>[\w:-]+)
+            (?<attribute>[\w\.:-]+)
             (
                 =
                 (?<value>

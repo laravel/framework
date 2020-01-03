@@ -94,20 +94,16 @@ abstract class Component
      * @param  array  $attributes
      * @return string
      */
-    public function attributes(array $attributes)
+    public function attributes(array $attributeDefaults = [])
     {
-        return new HtmlString(collect($attributes)->map(function ($value, $key) {
-            if (is_numeric($key)) {
-                [$key, $value] = [$value, ''];
-            }
-
-            $currentValue = $this->attributes[$key] ?? '';
-
-            if ($currentValue === true) {
+        return new HtmlString(collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
+            if ($value === true) {
                 return $key;
             }
 
-            return $key.'="'.str_replace('"', '\\"', trim($value.' '.$currentValue)).'"';
+            $values = collect([$attributeDefaults[$key] ?? '', $value])->filter()->unique()->join(' ');
+
+            return $key.'="'.str_replace('"', '\\"', trim($values)).'"';
         })->filter()->implode(' '));
     }
 
