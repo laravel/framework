@@ -139,5 +139,11 @@
         "sort-packages": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts": {
+        "test:unit": "phpunit -d memory_limit=512M",
+        "test": [
+            "@test:unit"
+        ]
+    }
 }
