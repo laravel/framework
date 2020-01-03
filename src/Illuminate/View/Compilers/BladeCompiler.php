@@ -107,6 +107,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $rawBlocks = [];
 
     /**
+     * The array of class component aliases and their class names.
+     *
+     * @var array
+     */
+    protected $classComponentAliases = [];
+
+    /**
      * Indicates if component tags should be compiled.
      *
      * @var bool
@@ -296,7 +303,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
             return $value;
         }
 
-        return $value;
+        return (new ComponentTagCompiler(
+            $this->classComponentAliases
+        ))->compile($value);
     }
 
     /**
@@ -516,15 +525,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $alias = $alias ?: Str::kebab(class_basename($class));
 
-        $this->directive($alias, function ($expression) use ($class) {
-            return static::compileClassComponentOpening(
-                $class, $expression ?: '[]', static::newComponentHash($class)
-            );
-        });
-
-        $this->directive('end'.$alias, function () {
-            return static::compileClassComponentClosing();
-        });
+        $this->classComponentAliases[$alias] = $class;
     }
 
     /**

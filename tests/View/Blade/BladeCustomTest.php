@@ -166,23 +166,6 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testCustomClassComponents()
-    {
-        $this->compiler->component('App\\Compnents\\Alert', 'alert');
-
-        $string = '@alert
-@endalert';
-        $expected = '<?php if (isset($component)) { $__componentOriginal71b9a0779afec682330a3e071df1bfdd1e49c047 = $component; } ?>
-<?php $component = app()->make(App\Compnents\Alert::class, []); ?>
-<?php $__env->startComponent($component->view(), $component->data()); ?>
-<?php if (isset($__componentOriginal71b9a0779afec682330a3e071df1bfdd1e49c047)): ?>
-<?php $component = $__componentOriginal71b9a0779afec682330a3e071df1bfdd1e49c047; ?>
-<?php unset($__componentOriginal71b9a0779afec682330a3e071df1bfdd1e49c047); ?>
-<?php endif; ?>
-<?php echo $__env->renderComponent(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
-    }
-
     public function testCustomComponentsWithSlots()
     {
         $this->compiler->aliasComponent('app.components.alert', 'alert');

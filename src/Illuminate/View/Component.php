@@ -69,6 +69,18 @@ abstract class Component
     }
 
     /**
+     * Get a given attribute from the component's attribute array.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function attribute($key, $default = null)
+    {
+        return $this->attributes[$key] ?? value($default);
+    }
+
+    /**
      * Set the extra attributes that the component should make available.
      *
      * @param  array  $attributes

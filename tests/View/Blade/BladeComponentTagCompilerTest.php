@@ -18,11 +18,11 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSelfClosingComponentsCanBeCompiled()
     {
-        $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<x-alert/>');
+        $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<div><x-alert/></div>');
 
-        $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
-\$component->withAttributes([]);
-@endcomponent", trim($result));
+        $this->assertEquals("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+<?php \$component->withAttributes([]); ?>
+@endcomponent</div>", trim($result));
     }
 
     public function testSelfClosingComponentsCanBeCompiledWithDataAndAttributes()
@@ -30,7 +30,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<x-alert title="foo" class="bar" wire:model="foo" />');
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', ['title' => 'foo'])
-\$component->withAttributes(['class' => 'bar','wire:model' => 'foo']);
+<?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo']); ?>
 @endcomponent", trim($result));
     }
 
@@ -39,7 +39,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<x-alert :title="$title" class="bar" />');
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', ['title' => \$title])
-\$component->withAttributes(['class' => 'bar']);
+<?php \$component->withAttributes(['class' => 'bar']); ?>
 @endcomponent", trim($result));
     }
 
@@ -49,7 +49,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 </x-alert>');
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
-\$component->withAttributes([]);
+<?php \$component->withAttributes([]); ?>
 @endcomponent", trim($result));
     }
 }

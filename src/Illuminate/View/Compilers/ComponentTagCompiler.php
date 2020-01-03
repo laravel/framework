@@ -32,6 +32,19 @@ class ComponentTagCompiler
     }
 
     /**
+     * Compile the component and slot tags within the given string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function compile(string $value)
+    {
+        $value = $this->compileSlots($value);
+
+        return $this->compileTags($value);
+    }
+
+    /**
      * Compile the tags within the given string.
      *
      * @param  string  $value
@@ -57,7 +70,7 @@ class ComponentTagCompiler
         $pattern = "/
             <
                 \s*
-                x-(\w*)
+                x-([\w\-]*)
                 (?<attributes>
                     (?:
                         \s+
@@ -97,7 +110,7 @@ class ComponentTagCompiler
         $pattern = "/
             <
                 \s*
-                x-(\w*)
+                x-([\w\-]*)
                 \s*
                 (?<attributes>
                     (?:
@@ -139,8 +152,8 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        return "@component('{$class}', [".$this->attributesToString($data->all())."])
-\$component->withAttributes([".$this->attributesToString($attributes->all())."]);";
+        return " @component('{$class}', [".$this->attributesToString($data->all())."])
+<?php \$component->withAttributes([".$this->attributesToString($attributes->all())."]); ?>";
     }
 
     /**
@@ -192,7 +205,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x-\w*\s*>/", '@endcomponent', $value);
+        return preg_replace("/<\/\s*x-[\w\-]*\s*>/", '@endcomponent', $value);
     }
 
     /**
