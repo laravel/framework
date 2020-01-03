@@ -107,6 +107,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $rawBlocks = [];
 
     /**
+     * Indicates if component tags should be compiled.
+     *
+     * @var bool
+     */
+    protected $compilesComponentTags = true;
+
+    /**
      * Compile the view at the given path.
      *
      * @param  string|null  $path
@@ -194,7 +201,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         [$this->footer, $result] = [[], ''];
 
-        $value = $this->storeUncompiledBlocks($value);
+        $value = $this->compileComponentTags(
+            $this->storeUncompiledBlocks($value)
+        );
 
         // Here we will loop through all of the tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
@@ -273,6 +282,21 @@ class BladeCompiler extends Compiler implements CompilerInterface
         return $this->getRawPlaceholder(
             array_push($this->rawBlocks, $value) - 1
         );
+    }
+
+    /**
+     * Compile the component tags.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileComponentTags($value)
+    {
+        if (! $this->compilesComponentTags) {
+            return $value;
+        }
+
+        return $value;
     }
 
     /**
@@ -629,5 +653,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function withoutDoubleEncoding()
     {
         $this->setEchoFormat('e(%s, false)');
+    }
+
+    /**
+     * Indicate that component tags should not be compiled.
+     *
+     * @return void
+     */
+    public function withoutComponentTags()
+    {
+        $this->compilesComponentTags = false;
     }
 }
