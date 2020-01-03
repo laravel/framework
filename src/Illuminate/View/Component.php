@@ -21,9 +21,9 @@ abstract class Component
     /**
      * The component attributes.
      *
-     * @var array
+     * @var \Illuminate\View\ComponentAttributeBag
      */
-    protected $attributes = [];
+    public $attributes;
 
     /**
      * Get the view that represents the component.
@@ -42,6 +42,8 @@ abstract class Component
      */
     public function data()
     {
+        $this->attributes = $this->attributes ?: new ComponentAttributeBag;
+
         $class = new ReflectionClass($this);
 
         $publicProperties = collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
@@ -77,37 +79,6 @@ abstract class Component
     }
 
     /**
-     * Get a given attribute from the component's attribute array.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public function attribute($key, $default = null)
-    {
-        return $this->attributes[$key] ?? value($default);
-    }
-
-    /**
-     * Implode the given attributes into a single HTML ready string.
-     *
-     * @param  array  $attributes
-     * @return string
-     */
-    public function attributes(array $attributeDefaults = [])
-    {
-        return new HtmlString(collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
-            if ($value === true) {
-                return $key;
-            }
-
-            $values = collect([$attributeDefaults[$key] ?? '', $value])->filter()->unique()->join(' ');
-
-            return $key.'="'.str_replace('"', '\\"', trim($values)).'"';
-        })->filter()->implode(' '));
-    }
-
-    /**
      * Set the extra attributes that the component should make available.
      *
      * @param  array  $attributes
@@ -115,7 +86,9 @@ abstract class Component
      */
     public function withAttributes(array $attributes)
     {
-        $this->attributes = $attributes;
+        $this->attributes = $this->attributes ?: new ComponentAttributeBag;
+
+        $this->attributes->setAttributes($attributes);
 
         return $this;
     }
