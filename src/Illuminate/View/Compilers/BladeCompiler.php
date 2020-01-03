@@ -514,7 +514,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function component($class, $alias = null)
     {
-        $alias = $alias ?: strtolower(class_basename($class));
+        $alias = $alias ?: Str::kebab(class_basename($class));
 
         $this->directive($alias, function ($expression) use ($class) {
             return static::compileClassComponentOpening(

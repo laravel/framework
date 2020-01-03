@@ -69,6 +69,19 @@ abstract class Component
     }
 
     /**
+     * Set the extra attributes that the component should make available.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function withAttributes(array $attributes)
+    {
+        $this->attributes = $attributes;
+
+        return $this;
+    }
+
+    /**
      * Determine if the given property / method should be ignored.
      *
      * @param  string  $name
