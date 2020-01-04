@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Exception;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Contracts\View\Factory as ViewFactoryContract;
@@ -137,9 +138,12 @@ class RoutingServiceProvider extends ServiceProvider
                 return (new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
                     ->createRequest($app->make('request'));
             }
+
             if (class_exists(DiactorosFactory::class)) {
                 return (new DiactorosFactory)->createRequest($app->make('request'));
             }
+
+            throw new Exception('Unable to resolve PSR request. Please install nyholm/psr7 or laminas/laminas-diactoros.');
         });
     }
 
@@ -154,9 +158,12 @@ class RoutingServiceProvider extends ServiceProvider
             if (class_exists(NyholmPsrResponse::class)) {
                 return new NyholmPsrResponse;
             }
+
             if (class_exists(ZendPsrResponse::class)) {
                 return new ZendPsrResponse;
             }
+
+            throw new Exception('Unable to resolve PSR response. Please install nyholm/psr7 or laminas/laminas-diactoros.');
         });
     }
 
