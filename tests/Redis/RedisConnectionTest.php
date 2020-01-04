@@ -6,6 +6,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -551,6 +552,7 @@ class RedisConnectionTest extends TestCase
     public function testItScansForKeys()
     {
         foreach ($this->connections() as $redis) {
+
             $initialKeys = ['test:scan:1', 'test:scan:2'];
 
             foreach ($initialKeys as $key) {
@@ -558,9 +560,17 @@ class RedisConnectionTest extends TestCase
             }
 
             // keys coming out of scan include any prefix so we'll need to expect that
-            if (! empty($prefix = $redis->getOption(Redis::OPT_PREFIX))) {
-                foreach ($initialKeys as $k => $initialKey) {
-                    $initialKeys[$k] = $prefix.$initialKey;
+            if ($redis->client() instanceof Redis) {
+                if (! empty($prefix = $redis->client()->getOption(Redis::OPT_PREFIX))) {
+                    foreach ($initialKeys as $k => $initialKey) {
+                        $initialKeys[$k] = $prefix.$initialKey;
+                    }
+                }
+            } else {
+                if (! empty($prefix = $redis->client()->getOptions()->prefix)) {
+                    foreach ($initialKeys as $k => $initialKey) {
+                        $initialKeys[$k] = $prefix.$initialKey;
+                    }
                 }
             }
 
@@ -579,7 +589,7 @@ class RedisConnectionTest extends TestCase
             do {
                 [$cursor, $returnedKeys] = $redis->scan($iterator);
 
-                if ($redis->getOption(Redis::OPT_SCAN) === Redis::SCAN_RETRY) {
+                if ($redis->client()->getOption(Redis::OPT_SCAN) === Redis::SCAN_RETRY) {
                     $this->assertNotFalse($returnedKeys);
                 } else {
                     $this->assertFalse($returnedKeys);
@@ -639,7 +649,7 @@ class RedisConnectionTest extends TestCase
             'default' => [
                 'host' => $host,
                 'port' => $port,
-                'database' => 7,
+                'database' => 8,
                 'options' => ['scan' => Redis::SCAN_RETRY],
                 'timeout' => 0.5,
             ],
