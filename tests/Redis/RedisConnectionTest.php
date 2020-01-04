@@ -622,7 +622,7 @@ class RedisConnectionTest extends TestCase
                'database' => 7,
                'options' => ['serializer' => Redis::SERIALIZER_JSON],
                'timeout' => 0.5,
-           ]
+           ],
         ]);
 
         $scanRetryPhpRedis = new RedisManager(new Application, 'phpredis', [
@@ -633,7 +633,7 @@ class RedisConnectionTest extends TestCase
                 'database' => 7,
                 'options' => ['scan' => Redis::SCAN_RETRY],
                 'timeout' => 0.5,
-            ]
+            ],
         ]);
 
         $connections[] = $prefixedPhpredis->connection();
