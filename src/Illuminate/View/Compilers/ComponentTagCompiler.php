@@ -2,6 +2,8 @@
 
 namespace Illuminate\View\Compilers;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ReflectionClass;
@@ -167,13 +169,26 @@ class ComponentTagCompiler
             return $this->aliases[$component];
         }
 
-        $class = 'App\\ViewComponents\\'.ucfirst(Str::camel($component));
-
-        if (! class_exists($class)) {
+        if (! class_exists($class = $this->guessClassName($component))) {
             throw new InvalidArgumentException("Unable to locate class for component [{$component}].");
         }
 
         return $class;
+    }
+
+    /**
+     * Guess the class name for the given component.
+     *
+     * @param  string  $component
+     * @return string
+     */
+    public function guessClassName(string $component)
+    {
+        $namespace = Container::getInstance()
+                    ->make(Application::class)
+                    ->getNamespace();
+
+        return $namespace.'ViewComponents\\'.ucfirst(Str::camel($component));
     }
 
     /**
