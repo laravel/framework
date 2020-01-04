@@ -3,7 +3,6 @@
 namespace Illuminate\View;
 
 use Closure;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
