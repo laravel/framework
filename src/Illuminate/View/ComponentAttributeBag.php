@@ -59,7 +59,7 @@ class ComponentAttributeBag implements ArrayAccess
     }
 
     /**
-     * Implode the given attributes into a single HTML ready string.
+     * Merge additional attributes / values into the attribute bag.
      *
      * @param  array  $attributes
      * @return static
@@ -92,10 +92,10 @@ class ComponentAttributeBag implements ArrayAccess
     }
 
     /**
-     * Implode the given attributes into a single HTML ready string.
+     * Merge additional attributes / values into the attribute bag.
      *
      * @param  array  $attributes
-     * @return string
+     * @return static
      */
     public function __invoke(array $attributeDefaults = [])
     {
