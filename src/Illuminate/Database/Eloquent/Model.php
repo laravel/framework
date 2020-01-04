@@ -665,6 +665,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function save(array $options = [])
     {
+        $this->mergeAttributesFromClassCasts();
+
         $query = $this->newModelQuery();
 
         // If the "saving" event returns false we'll bail out of the save and return
@@ -905,6 +907,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function delete()
     {
+        $this->mergeAttributesFromClassCasts();
+
         if (is_null($this->getKeyName())) {
             throw new Exception('No primary key defined on model.');
         }
@@ -1194,7 +1198,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         ];
 
         $attributes = Arr::except(
-            $this->attributes, $except ? array_unique(array_merge($except, $defaults)) : $defaults
+            $this->getAttributes(), $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
 
         return tap(new static, function ($instance) use ($attributes) {
@@ -1675,6 +1679,18 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         return $this->toJson();
     }
+
+    /**
+      * Prepare the object for serialization.
+      *
+      * @return array
+      */
+     public function __sleep()
+     {
+         $this->mergeAttributesFromClassCasts();
+
+         return array_keys(get_object_vars($this));
+     }
 
     /**
      * When a model is being unserialized, check if it needs to be booted.
