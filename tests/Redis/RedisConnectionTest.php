@@ -9,6 +9,7 @@ use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Predis\Client;
 use Redis;
 
 class RedisConnectionTest extends TestCase
@@ -555,7 +556,7 @@ class RedisConnectionTest extends TestCase
 
             foreach ($initialKeys as $k => $key) {
                 $redis->set($key, 'test');
-                $initialKeys[$k] = $this->getPrefix($redis->client()).$key;
+                $initialKeys[$k] = $this->getPrefix($redis->client()) . $key;
             }
 
             $iterator = null;
@@ -569,6 +570,15 @@ class RedisConnectionTest extends TestCase
             } while ($iterator > 0);
 
             $redis->flushAll();
+        }
+    }
+
+    public function testPhpRedisScanOption()
+    {
+        foreach ($this->connections() as $redis) {
+            if ($redis->client() instanceof Client) {
+                continue;
+            }
 
             $iterator = null;
 
