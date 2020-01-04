@@ -15,6 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Zend\Diactoros\Response as ZendPsrResponse;
+use Zend\Diactoros\ServerRequestFactory;
 
 class RoutingServiceProvider extends ServiceProvider
 {
@@ -132,14 +133,14 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrRequest()
     {
         $this->app->bind(ServerRequestInterface::class, function ($app) {
-            if (class_exists(PsrHttpFactory::class)) {
+            if (class_exists(Psr17Factory::class) && class_exists(PsrHttpFactory::class)) {
                 $psr17Factory = new Psr17Factory;
 
                 return (new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
                     ->createRequest($app->make('request'));
             }
 
-            if (class_exists(DiactorosFactory::class)) {
+            if (class_exists(ServerRequestFactory::class) && class_exists(DiactorosFactory::class)) {
                 return (new DiactorosFactory)->createRequest($app->make('request'));
             }
 
