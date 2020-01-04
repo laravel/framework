@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\View;
 
-use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use PHPUnit\Framework\TestCase;
 
