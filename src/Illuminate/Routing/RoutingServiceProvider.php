@@ -143,7 +143,7 @@ class RoutingServiceProvider extends ServiceProvider
                 return (new DiactorosFactory)->createRequest($app->make('request'));
             }
 
-            throw new Exception('Unable to resolve PSR request. Please install nyholm/psr7 or laminas/laminas-diactoros.');
+            throw new Exception('Unable to resolve PSR request. Please install symfony/psr-http-message-bridge and nyholm/psr7.');
         });
     }
 
@@ -163,7 +163,7 @@ class RoutingServiceProvider extends ServiceProvider
                 return new ZendPsrResponse;
             }
 
-            throw new Exception('Unable to resolve PSR response. Please install nyholm/psr7 or laminas/laminas-diactoros.');
+            throw new Exception('Unable to resolve PSR response. Please install nyholm/psr7.');
         });
     }
 
