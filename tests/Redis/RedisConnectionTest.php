@@ -9,6 +9,7 @@ use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Redis;
 
 class RedisConnectionTest extends TestCase
 {
@@ -547,6 +548,37 @@ class RedisConnectionTest extends TestCase
         );
     }
 
+    public function testItScansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $initialKeys = ['test:scan:1', 'test:scan:2'];
+
+            foreach ($initialKeys as $key) {
+                $redis->set($key, 'test');
+            }
+
+            $iterator = null;
+
+            do {
+                $this->assertEquals($initialKeys, $redis->scan($iterator));
+            } while ($iterator > 0);
+
+            $redis->flushAll();
+
+            $iterator = null;
+
+            do {
+                $returnedKeys = $redis->scan($iterator);
+
+                if ($redis->getOption(Redis::OPT_SCAN) === Redis::SCAN_RETRY) {
+                    $this->assertNotFalse($returnedKeys);
+                } else {
+                    $this->assertFalse($returnedKeys);
+                }
+            } while ($iterator > 0);
+        }
+    }
+
     public function connections()
     {
         $connections = [
@@ -582,7 +614,31 @@ class RedisConnectionTest extends TestCase
             ],
         ]);
 
+        $serializerPhpRedis = new RedisManager(new Application, 'phpredis', [
+           'cluster' => false,
+           'default' => [
+               'host' => $host,
+               'port' => $port,
+               'database' => 7,
+               'options' => ['serializer' => Redis::SERIALIZER_JSON],
+               'timeout' => 0.5,
+           ]
+        ]);
+
+        $scanRetryPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 7,
+                'options' => ['scan' => Redis::SCAN_RETRY],
+                'timeout' => 0.5,
+            ]
+        ]);
+
         $connections[] = $prefixedPhpredis->connection();
+        $connections[] = $serializerPhpRedis->connection();
+        $connections[] = $scanRetryPhpRedis->connection();
         $connections['persistent'] = $persistentPhpRedis->connection();
 
         return $connections;
