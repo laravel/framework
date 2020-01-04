@@ -62,23 +62,22 @@ class ComponentAttributeBag implements ArrayAccess
      * Implode the given attributes into a single HTML ready string.
      *
      * @param  array  $attributes
-     * @return string
+     * @return static
      */
     public function merge(array $attributeDefaults = [])
     {
-        return new HtmlString(collect($this->attributes)
-                ->map(function ($value, $key) use ($attributeDefaults) {
-                    if ($value === true) {
-                        return $key;
-                    }
+        return new static(
+            collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
+                if ($value === true) {
+                    return $key;
+                }
 
-                    $values = collect([$attributeDefaults[$key] ?? '', $value])
-                                    ->filter()
-                                    ->unique()
-                                    ->join(' ');
-
-                    return $key.'="'.str_replace('"', '\\"', trim($values)).'"';
-                })->filter()->implode(' '));
+                return collect([$attributeDefaults[$key] ?? '', $value])
+                                ->filter()
+                                ->unique()
+                                ->join(' ');
+            })->filter()->all()
+        );
     }
 
     /**
@@ -155,6 +154,12 @@ class ComponentAttributeBag implements ArrayAccess
      */
     public function __toString()
     {
-        return (string) $this->merge();
+        return (string) new HtmlString(
+            collect($this->attributes)->map(function ($value, $key) {
+                return $value === true
+                        ? $key
+                        : $key.'="'.str_replace('"', '\\"', trim($value)).'"';
+            })->implode(' ')
+        );
     }
 }
