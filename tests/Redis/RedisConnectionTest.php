@@ -6,7 +6,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\Connection;
-use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -552,26 +551,11 @@ class RedisConnectionTest extends TestCase
     public function testItScansForKeys()
     {
         foreach ($this->connections() as $redis) {
-
             $initialKeys = ['test:scan:1', 'test:scan:2'];
 
-            foreach ($initialKeys as $key) {
+            foreach ($initialKeys as $k => $key) {
                 $redis->set($key, 'test');
-            }
-
-            // keys coming out of scan include any prefix so we'll need to expect that
-            if ($redis->client() instanceof Redis) {
-                if (! empty($prefix = $redis->client()->getOption(Redis::OPT_PREFIX))) {
-                    foreach ($initialKeys as $k => $initialKey) {
-                        $initialKeys[$k] = $prefix.$initialKey;
-                    }
-                }
-            } else {
-                if (! empty($prefix = $redis->client()->getOptions()->prefix)) {
-                    foreach ($initialKeys as $k => $initialKey) {
-                        $initialKeys[$k] = $prefix.$initialKey;
-                    }
-                }
+                $initialKeys[$k] = $this->getPrefix($redis->client()).$key;
             }
 
             $iterator = null;
@@ -579,7 +563,9 @@ class RedisConnectionTest extends TestCase
             do {
                 [$cursor, $returnedKeys] = $redis->scan($iterator);
 
-                $this->assertEquals($initialKeys, $returnedKeys);
+                foreach ($returnedKeys as $returnedKey) {
+                    $this->assertTrue(in_array($returnedKey, $initialKeys));
+                }
             } while ($iterator > 0);
 
             $redis->flushAll();
@@ -596,6 +582,15 @@ class RedisConnectionTest extends TestCase
                 }
             } while ($iterator > 0);
         }
+    }
+
+    private function getPrefix($client)
+    {
+        if ($client instanceof Redis) {
+            return $client->getOption(Redis::OPT_PREFIX);
+        }
+
+        return $client->getOptions()->prefix;
     }
 
     public function connections()
