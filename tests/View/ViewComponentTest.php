@@ -7,14 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class ViewComponentTest extends TestCase
 {
-    public function testAttributeRetrieval()
-    {
-        $component = new TestViewComponent;
-        $component->withAttributes(['class' => 'font-bold', 'name' => 'test']);
-
-        $this->assertEquals('class="mt-4 font-bold" name="test"', (string) $component->attributes(['class' => 'mt-4']));
-    }
-
     public function testDataExposure()
     {
         $component = new TestViewComponent;

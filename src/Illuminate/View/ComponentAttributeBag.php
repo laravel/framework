@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use ArrayAccess;
+use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 
 class ComponentAttributeBag implements ArrayAccess
@@ -32,9 +33,29 @@ class ComponentAttributeBag implements ArrayAccess
      * @param  mixed  $default
      * @return mixed
      */
-    public function only($key, $default = null)
+    public function get($key, $default = null)
     {
         return $this->attributes[$key] ?? value($default);
+    }
+
+    /**
+     * Get a given attribute from the attribute array.
+     *
+     * @param  array|string  $key
+     * @param  mixed  $default
+     * @return static
+     */
+    public function only($keys)
+    {
+        if (is_null($keys)) {
+            $values = $this->attributes;
+        } else {
+            $keys = Arr::wrap($keys);
+
+            $values = Arr::only($this->attributes, $keys);
+        }
+
+        return new static($values);
     }
 
     /**
@@ -101,7 +122,7 @@ class ComponentAttributeBag implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return $this->only($offset);
+        return $this->get($offset);
     }
 
     /**
