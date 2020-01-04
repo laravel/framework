@@ -4,7 +4,6 @@ namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
-use InvalidArgumentException;
 
 class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 {

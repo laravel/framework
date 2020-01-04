@@ -2,10 +2,9 @@
 
 namespace Illuminate\View\Compilers;
 
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ReflectionClass;
-
-use Illuminate\Support\Str;
 
 /**
  * @author Spatie bvba <info@spatie.be>
@@ -152,8 +151,8 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        return " @component('{$class}', [".$this->attributesToString($data->all())."])
-<?php \$component->withAttributes([".$this->attributesToString($attributes->all())."]); ?>";
+        return " @component('{$class}', [".$this->attributesToString($data->all()).'])
+<?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
     }
 
     /**
