@@ -134,7 +134,7 @@
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^5.0).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^1.2).",
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
     },
     "config": {
