@@ -557,10 +557,17 @@ class RedisConnectionTest extends TestCase
                 $redis->set($key, 'test');
             }
 
+            // keys coming out of scan include any prefix so we'll need to expect that
+            if (! empty($prefix = $redis->getOption(Redis::OPT_PREFIX))) {
+                foreach ($initialKeys as $k => $initialKey) {
+                    $initialKeys[$k] = $prefix.$initialKey;
+                }
+            }
+
             $iterator = null;
 
             do {
-                list($cursor, $returnedKeys) = $redis->scan($iterator);
+                [$cursor, $returnedKeys] = $redis->scan($iterator);
 
                 $this->assertEquals($initialKeys, $returnedKeys);
             } while ($iterator > 0);
@@ -570,7 +577,7 @@ class RedisConnectionTest extends TestCase
             $iterator = null;
 
             do {
-                list($cursor, $returnedKeys) = $redis->scan($iterator);
+                [$cursor, $returnedKeys] = $redis->scan($iterator);
 
                 if ($redis->getOption(Redis::OPT_SCAN) === Redis::SCAN_RETRY) {
                     $this->assertNotFalse($returnedKeys);
@@ -624,7 +631,7 @@ class RedisConnectionTest extends TestCase
                 'database' => 7,
                 'options' => ['serializer' => Redis::SERIALIZER_JSON],
                 'timeout' => 0.5,
-           ],
+            ],
         ]);
 
         $scanRetryPhpRedis = new RedisManager(new Application, 'phpredis', [
