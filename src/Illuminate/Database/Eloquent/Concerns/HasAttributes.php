@@ -1027,13 +1027,9 @@ trait HasAttributes
      */
     protected function isClassCastable($key)
     {
-        if (! array_key_exists($key, $this->getCasts())) {
-             return false;
-         }
-
-         $class = $this->getCasts()[$key];
-
-         return class_exists($class) && ! in_array($class, static::$primitiveCastTypes);
+         return array_key_exists($key, $this->getCasts()) &&
+                class_exists($class = $this->getCasts()[$key]) &&
+                ! in_array($class, static::$primitiveCastTypes);
     }
 
     /**
