@@ -201,7 +201,7 @@ abstract class ServiceProvider
             return $paths;
         }
 
-        return collect(static::$publishes)->reduce(function ($paths, $p) {
+        return array_reduce(static::$publishes, function ($paths, $p) {
             return array_merge($paths, $p);
         }, []);
     }
