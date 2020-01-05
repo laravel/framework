@@ -33,4 +33,9 @@ class BladeIncludesTest extends AbstractBladeTestCase
         $this->assertSame('<?php echo $__env->first(["one", "two"], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeFirst(["one", "two"])'));
         $this->assertSame('<?php echo $__env->first(["one", "two"], ["foo" => "bar"], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeFirst(["one", "two"], ["foo" => "bar"])'));
     }
+
+    public function testIncludeOncesAreCompiled()
+    {
+        $this->assertSame('<?php echo $__env->renderOnce(\'foo\', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>', $this->compiler->compileString('@includeOnce(\'foo\')'));
+    }
 }

@@ -84,6 +84,13 @@ class Factory implements FactoryContract
     protected $renderCount = 0;
 
     /**
+     * List of views that have been rendered.
+     *
+     * @var array
+     */
+    protected $renderedViews = [];
+
+    /**
      * Create a new view factory instance.
      *
      * @param  \Illuminate\View\Engines\EngineResolver  $engines
@@ -131,6 +138,8 @@ class Factory implements FactoryContract
             $view = $this->normalizeName($view)
         );
 
+        $this->renderedViews[$view] = true;
+
         // Next, we will create the view instance and call the view creator for the view
         // which can set any data, etc. Then we will return the view instance back to
         // the caller for rendering or performing other view manipulations on this.
@@ -176,6 +185,24 @@ class Factory implements FactoryContract
     public function renderWhen($condition, $view, $data = [], $mergeData = [])
     {
         if (! $condition) {
+            return '';
+        }
+
+        return $this->make($view, $this->parseData($data), $mergeData)->render();
+    }
+
+    /**
+     * Get the rendered content of the view, unless
+     * it has already been rendered previously.
+     *
+     * @param  string  $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  array  $mergeData
+     * @return string
+     */
+    public function renderOnce($view, $data = [], $mergeData = [])
+    {
+        if (isset($this->renderedViews[$view])) {
             return '';
         }
 

@@ -79,4 +79,17 @@ trait CompilesIncludes
 
         return "<?php echo \$__env->first({$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
     }
+
+    /**
+     * Compile the include statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIncludeOnce($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return "<?php echo \$__env->renderOnce($expression, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path'])); ?>";
+    }
 }
