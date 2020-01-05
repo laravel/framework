@@ -1681,18 +1681,18 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
-      * Prepare the object for serialization.
-      *
-      * @return array
-      */
-     public function __sleep()
-     {
-         $this->mergeAttributesFromClassCasts();
+     * Prepare the object for serialization.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        $this->mergeAttributesFromClassCasts();
 
-         $this->classCastCache = [];
+        $this->classCastCache = [];
 
-         return array_keys(get_object_vars($this));
-     }
+        return array_keys(get_object_vars($this));
+    }
 
     /**
      * When a model is being unserialized, check if it needs to be booted.
