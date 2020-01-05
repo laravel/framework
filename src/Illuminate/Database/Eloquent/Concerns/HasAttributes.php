@@ -706,12 +706,16 @@ trait HasAttributes
         if (is_null($value)) {
             $this->attributes = array_merge($this->attributes, array_map(
                 function () { return null; },
-                $this->resolveCasterClass($key)->set($this, $key, $this->{$key}, $this->attributes)
+                $this->normalizeCastClassResponse($key, $this->resolveCasterClass($key)->set(
+                    $this, $key, $this->{$key}, $this->attributes
+                ))
             ));
         } else {
             $this->attributes = array_merge(
                 $this->attributes,
-                $this->resolveCasterClass($key)->set($this, $key, $value, $this->attributes)
+                $this->normalizeCastClassResponse($key, $this->resolveCasterClass($key)->set(
+                    $this, $key, $value, $this->attributes
+                ))
             );
         }
 
@@ -1050,23 +1054,35 @@ trait HasAttributes
     }
 
     /**
-      * Merge the cast class attributes back into the model.
-      *
-      * @return void
-      */
-     protected function mergeAttributesFromClassCasts()
-     {
-         foreach ($this->classCastCache as $key => $value) {
+     * Merge the cast class attributes back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributesFromClassCasts()
+    {
+        foreach ($this->classCastCache as $key => $value) {
             $caster = $this->resolveCasterClass($key);
 
-             $this->attributes = array_merge(
+            $this->attributes = array_merge(
                 $this->attributes,
                 $caster instanceof CastsInboundAttributes
-                        ? [$key => $value]
-                        : $caster->set($this, $key, $value, $this->attributes)
-             );
-         }
-     }
+                       ? [$key => $value]
+                       : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
+            );
+        }
+    }
+
+    /**
+     * Normalize the response from a custom class caster.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return array
+     */
+    protected function normalizeCastClassResponse($key, $value)
+    {
+        return is_array($value) ? $value : [$key => $value];
+    }
 
     /**
      * Get all of the current attributes on the model.

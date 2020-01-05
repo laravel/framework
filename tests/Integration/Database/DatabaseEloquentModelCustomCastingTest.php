@@ -170,7 +170,7 @@ class JsonCaster implements CastsAttributes
 
     public function set($model, $key, $value, $attributes)
     {
-        return [$key => json_encode($value)];
+        return json_encode($value);
     }
 }
 
