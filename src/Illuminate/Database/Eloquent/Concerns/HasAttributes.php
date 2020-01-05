@@ -476,7 +476,7 @@ trait HasAttributes
     protected function mutateAttributeForArray($key, $value)
     {
         $value = $this->isClassCastable($key)
-                    ? $this->getClassCastableAttribute($key)
+                    ? $this->getClassCastableAttributeValue($key)
                     : $this->mutateAttribute($key, $value);
 
         return $value instanceof Arrayable ? $value->toArray() : $value;
@@ -529,7 +529,7 @@ trait HasAttributes
         }
 
         if ($this->isClassCastable($key)) {
-            return $this->getClassCastableAttribute($key);
+            return $this->getClassCastableAttributeValue($key);
         }
 
         return $value;
@@ -541,7 +541,7 @@ trait HasAttributes
       * @param  string  $key
       * @return mixed
       */
-    protected function getClassCastableAttribute($key)
+    protected function getClassCastableAttributeValue($key)
     {
         if (isset($this->classCastCache[$key])) {
             return $this->classCastCache[$key];
