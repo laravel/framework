@@ -536,11 +536,11 @@ trait HasAttributes
     }
 
     /**
-      * Cast the given attribute using a custom cast class.
-      *
-      * @param  string  $key
-      * @return mixed
-      */
+     * Cast the given attribute using a custom cast class.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
     protected function getClassCastableAttribute($key)
     {
         if (isset($this->classCastCache[$key])) {
@@ -705,7 +705,8 @@ trait HasAttributes
     {
         if (is_null($value)) {
             $this->attributes = array_merge($this->attributes, array_map(
-                function () { return null; },
+                function () {
+                },
                 $this->normalizeCastClassResponse($key, $this->resolveCasterClass($key)->set(
                     $this, $key, $this->{$key}, $this->attributes
                 ))
@@ -719,7 +720,7 @@ trait HasAttributes
             );
         }
 
-       unset($this->classCastCache[$key]);
+        unset($this->classCastCache[$key]);
     }
 
     /**
@@ -1031,7 +1032,7 @@ trait HasAttributes
      */
     protected function isClassCastable($key)
     {
-         return array_key_exists($key, $this->getCasts()) &&
+        return array_key_exists($key, $this->getCasts()) &&
                 class_exists($class = $this->getCasts()[$key]) &&
                 ! in_array($class, static::$primitiveCastTypes);
     }
