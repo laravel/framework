@@ -41,6 +41,11 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertEquals('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
         $this->assertEquals('My House', json_decode($model->toJson(), true)['address_line_two']);
+
+        $model->address = null;
+
+        $this->assertNull($model->toArray()['address_line_one']);
+        $this->assertNull($model->toArray()['address_line_two']);
     }
 }
 
@@ -72,7 +77,7 @@ class EncryptCaster
 
 class AddressCaster
 {
-    public static function fromModelAttributes($model, $key, $attributes)
+    public static function fromModelAttributes($model, $key, $value, $attributes)
     {
         return new Address($attributes['address_line_one'], $attributes['address_line_two']);
     }
