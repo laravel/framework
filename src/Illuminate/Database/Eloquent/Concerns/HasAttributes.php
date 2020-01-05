@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -540,16 +541,18 @@ trait HasAttributes
       * @param  string  $key
       * @return mixed
       */
-     protected function getClassCastableAttribute($key)
-     {
-         if (isset($this->classCastCache[$key])) {
-             return $this->classCastCache[$key];
-         } else {
-             return $this->classCastCache[$key] = $this->resolveCasterClass($key)->get(
-                $this, $key, $this->attributes[$key] ?? null, $this->attributes
-            );
-         }
-     }
+    protected function getClassCastableAttribute($key)
+    {
+        if (isset($this->classCastCache[$key])) {
+            return $this->classCastCache[$key];
+        } else {
+            $caster = $this->resolveCasterClass($key);
+
+            return $this->classCastCache[$key] = $caster instanceof CastsInboundAttributes
+                ? $this->attributes[$key]
+                : $caster->get($this, $key, $this->attributes[$key] ?? null, $this->attributes);
+        }
+    }
 
     /**
      * Get the type of cast for a model attribute.
@@ -692,14 +695,14 @@ trait HasAttributes
     }
 
     /**
-      * Set the value of a class castable attribute.
-      *
-      * @param  string  $key
-      * @param  mixed  $value
-      * @return void
-      */
-     protected function setClassCastableAttribute($key, $value)
-     {
+     * Set the value of a class castable attribute.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    protected function setClassCastableAttribute($key, $value)
+    {
         if (is_null($value)) {
             $this->attributes = array_merge($this->attributes, array_map(
                 function () { return null; },
@@ -712,8 +715,8 @@ trait HasAttributes
             );
         }
 
-        unset($this->classCastCache[$key]);
-     }
+       unset($this->classCastCache[$key]);
+    }
 
     /**
      * Get an array attribute with the given key and value set.
@@ -1060,9 +1063,13 @@ trait HasAttributes
      protected function mergeAttributesFromClassCasts()
      {
          foreach ($this->classCastCache as $key => $value) {
+            $caster = $this->resolveCasterClass($key);
+
              $this->attributes = array_merge(
                 $this->attributes,
-                $this->resolveCasterClass($key)->set($this, $key, $value, $this->attributes)
+                $caster instanceof CastsInboundAttributes
+                        ? [$key => $value]
+                        : $caster->set($this, $key, $value, $this->attributes)
              );
          }
      }
@@ -1093,6 +1100,8 @@ trait HasAttributes
         if ($sync) {
             $this->syncOriginal();
         }
+
+        $this->classCastCache = [];
 
         return $this;
     }

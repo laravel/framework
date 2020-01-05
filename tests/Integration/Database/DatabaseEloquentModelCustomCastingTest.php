@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -50,15 +51,52 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->options = ['foo' => 'bar'];
         $this->assertEquals(['foo' => 'bar'], $model->options);
+        $this->assertEquals(['foo' => 'bar'], $model->options);
+        $model->options = ['foo' => 'bar'];
+        $model->options = ['foo' => 'bar'];
+        $this->assertEquals(['foo' => 'bar'], $model->options);
+        $this->assertEquals(['foo' => 'bar'], $model->options);
+
         $this->assertEquals(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
     }
 
     public function testOneWayCasting()
     {
+        // CastsInboundAttributes is used for casting that is unidirectional... only use case I can think of is one-way hashing...
         $model = new TestEloquentModelWithCustomCast;
 
         $model->password = 'secret';
-        dd($model->password);
+
+        $this->assertEquals(hash('sha256', 'secret'), $model->password);
+        $this->assertEquals(hash('sha256', 'secret'), $model->getAttributes()['password']);
+        $this->assertEquals(hash('sha256', 'secret'), $model->getAttributes()['password']);
+        $this->assertEquals(hash('sha256', 'secret'), $model->password);
+
+        $model->password = 'secret2';
+
+        $this->assertEquals(hash('sha256', 'secret2'), $model->password);
+        $this->assertEquals(hash('sha256', 'secret2'), $model->getAttributes()['password']);
+        $this->assertEquals(hash('sha256', 'secret2'), $model->getAttributes()['password']);
+        $this->assertEquals(hash('sha256', 'secret2'), $model->password);
+    }
+
+    public function testSettingRawAttributesClearsTheCastCache()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->setRawAttributes([
+            'address_line_one' => '110 Kingsbrook St.',
+            'address_line_two' => 'My House',
+        ]);
+
+        $this->assertEquals('110 Kingsbrook St.', $model->address->lineOne);
+
+        $model->setRawAttributes([
+            'address_line_one' => '117 Spencer St.',
+            'address_line_two' => 'My House',
+        ]);
+
+        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
     }
 }
 
@@ -78,21 +116,15 @@ class TestEloquentModelWithCustomCast extends Model
     ];
 }
 
-class HashCaster implements CastsAttributes
+class HashCaster implements CastsInboundAttributes
 {
     public function __construct($algorithm = 'sha256')
     {
         $this->algorithm = $algorithm;
     }
 
-    public function get($model, $key, $value, $attributes)
-    {
-        return $value;
-    }
-
     public function set($model, $key, $value, $attributes)
     {
-        dump('here');
         return [$key => hash($this->algorithm, $value)];
     }
 }
