@@ -475,7 +475,7 @@ trait HasAttributes
     protected function mutateAttributeForArray($key, $value)
     {
         $value = $this->isClassCastable($key)
-                    ? $this->castUsingClass($key)
+                    ? $this->getClassCastableAttribute($key)
                     : $this->mutateAttribute($key, $value);
 
         return $value instanceof Arrayable ? $value->toArray() : $value;
@@ -528,7 +528,7 @@ trait HasAttributes
         }
 
         if ($this->isClassCastable($key)) {
-            return $this->castUsingClass($key);
+            return $this->getClassCastableAttribute($key);
         }
 
         return $value;
@@ -540,14 +540,14 @@ trait HasAttributes
       * @param  string  $key
       * @return mixed
       */
-     protected function castUsingClass($key)
+     protected function getClassCastableAttribute($key)
      {
          if (isset($this->classCastCache[$key])) {
              return $this->classCastCache[$key];
          } else {
-             return $this->classCastCache[$key] = forward_static_call(
-                 [$this->getCasts()[$key], 'fromModelAttributes'], $this, $key, $this->attributes[$key] ?? null, $this->attributes
-             );
+             return $this->classCastCache[$key] = $this->resolveCasterClass($key)->get(
+                $this, $key, $this->attributes[$key] ?? null, $this->attributes
+            );
          }
      }
 
@@ -700,19 +700,19 @@ trait HasAttributes
       */
      protected function setClassCastableAttribute($key, $value)
      {
-         if (is_null($value)) {
-             $this->attributes = array_merge($this->attributes, array_map(
-                 function () { return null; },
-                 forward_static_call(
-                    [$this->getCasts()[$key], 'toModelAttributes'],
-                    $this, $key, $this->{$key}, $this->attributes
-                )
-             ));
+        if (is_null($value)) {
+            $this->attributes = array_merge($this->attributes, array_map(
+                function () { return null; },
+                $this->resolveCasterClass($key)->set($this, $key, $this->{$key}, $this->attributes)
+            ));
+        } else {
+            $this->attributes = array_merge(
+                $this->attributes,
+                $this->resolveCasterClass($key)->set($this, $key, $value, $this->attributes)
+            );
+        }
 
-             unset($this->classCastCache[$key]);
-         } else {
-             $this->classCastCache[$key] = $value;
-         }
+        unset($this->classCastCache[$key]);
      }
 
     /**
@@ -1034,6 +1034,25 @@ trait HasAttributes
     }
 
     /**
+     * Resolve the custom caster class for a given key.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function resolveCasterClass($key)
+    {
+        $castType = $this->getCasts()[$key];
+
+        if (strpos($castType, ':') === false) {
+            return new $castType;
+        }
+
+        $segments = explode(':', $castType, 2);
+
+        return new $segments[0](...explode(',', $segments[1]));
+    }
+
+    /**
       * Merge the cast class attributes back into the model.
       *
       * @return void
@@ -1043,10 +1062,7 @@ trait HasAttributes
          foreach ($this->classCastCache as $key => $value) {
              $this->attributes = array_merge(
                 $this->attributes,
-                forward_static_call(
-                    [$this->getCasts()[$key], 'toModelAttributes'],
-                    $this, $key, $value, $this->attributes
-                )
+                $this->resolveCasterClass($key)->set($this, $key, $value, $this->attributes)
              );
          }
      }

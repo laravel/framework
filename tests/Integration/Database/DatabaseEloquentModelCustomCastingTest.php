@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -16,11 +17,11 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
     public function testBasicCustomCasting()
     {
         $model = new TestEloquentModelWithCustomCast;
-        $model->encrypted = 'taylor';
+        $model->reversed = 'taylor';
 
-        $this->assertEquals('taylor', $model->encrypted);
-        $this->assertEquals('rolyat', $model->getAttributes()['encrypted']);
-        $this->assertEquals('rolyat', $model->toArray()['encrypted']);
+        $this->assertEquals('taylor', $model->reversed);
+        $this->assertEquals('rolyat', $model->getAttributes()['reversed']);
+        $this->assertEquals('rolyat', $model->toArray()['reversed']);
 
         $model->setRawAttributes([
             'address_line_one' => '110 Kingsbrook St.',
@@ -46,6 +47,18 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $this->assertNull($model->toArray()['address_line_one']);
         $this->assertNull($model->toArray()['address_line_two']);
+
+        $model->options = ['foo' => 'bar'];
+        $this->assertEquals(['foo' => 'bar'], $model->options);
+        $this->assertEquals(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
+    }
+
+    public function testOneWayCasting()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->password = 'secret';
+        dd($model->password);
     }
 }
 
@@ -58,33 +71,68 @@ class TestEloquentModelWithCustomCast extends Model
      */
     protected $casts = [
         'address' => AddressCaster::class,
-        'encrypted' => EncryptCaster::class,
+        'password' => HashCaster::class,
+        'other_password' => HashCaster::class.':md5',
+        'reversed' => ReverseCaster::class,
+        'options' => JsonCaster::class,
     ];
 }
 
-class EncryptCaster
+class HashCaster implements CastsAttributes
 {
-    public static function fromModelAttributes($model, $key, $attributes)
+    public function __construct($algorithm = 'sha256')
     {
-        return strrev($attributes[$key]);
+        $this->algorithm = $algorithm;
     }
 
-    public static function toModelAttributes($model, $key, $value, $attributes)
+    public function get($model, $key, $value, $attributes)
+    {
+        return $value;
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        dump('here');
+        return [$key => hash($this->algorithm, $value)];
+    }
+}
+
+class ReverseCaster implements CastsAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        return strrev($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
     {
         return [$key => strrev($value)];
     }
 }
 
-class AddressCaster
+class AddressCaster implements CastsAttributes
 {
-    public static function fromModelAttributes($model, $key, $value, $attributes)
+    public function get($model, $key, $value, $attributes)
     {
         return new Address($attributes['address_line_one'], $attributes['address_line_two']);
     }
 
-    public static function toModelAttributes($model, $key, $value, $attributes)
+    public function set($model, $key, $value, $attributes)
     {
         return ['address_line_one' => $value->lineOne, 'address_line_two' => $value->lineTwo];
+    }
+}
+
+class JsonCaster implements CastsAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        return json_decode($value, true);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return [$key => json_encode($value)];
     }
 }
 
