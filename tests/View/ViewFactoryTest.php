@@ -258,9 +258,9 @@ class ViewFactoryTest extends TestCase
         $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/basic.php');
         $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new PhpEngine);
         $factory->getDispatcher()->shouldReceive('dispatch');
-        $this->assertSame('Hello World' . PHP_EOL, $factory->renderOnce('foo'));
+        $this->assertSame('Hello World'.PHP_EOL, $factory->renderOnce('foo'));
         $this->assertSame('', $factory->renderOnce('foo'));
-        $this->assertSame('Hello World' . PHP_EOL, $factory->renderOnce('bar'));
+        $this->assertSame('Hello World'.PHP_EOL, $factory->renderOnce('bar'));
     }
 
     public function testYieldDefault()
