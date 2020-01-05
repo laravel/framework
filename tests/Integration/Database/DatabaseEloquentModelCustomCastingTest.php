@@ -24,6 +24,12 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals('rolyat', $model->getAttributes()['reversed']);
         $this->assertEquals('rolyat', $model->toArray()['reversed']);
 
+        $unserializedModel = unserialize(serialize($model));
+
+        $this->assertEquals('taylor', $unserializedModel->reversed);
+        $this->assertEquals('rolyat', $unserializedModel->getAttributes()['reversed']);
+        $this->assertEquals('rolyat', $unserializedModel->toArray()['reversed']);
+
         $model->setRawAttributes([
             'address_line_one' => '110 Kingsbrook St.',
             'address_line_two' => 'My House',

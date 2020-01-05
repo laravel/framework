@@ -1689,6 +1689,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      {
          $this->mergeAttributesFromClassCasts();
 
+         $this->classCastCache = [];
+
          return array_keys(get_object_vars($this));
      }
 
