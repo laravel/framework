@@ -153,9 +153,17 @@ class EloquentUserProvider implements UserProvider
      */
     protected function newModelQuery($model = null)
     {
-        return is_null($model)
+        $query = is_null($model)
                 ? $this->createModel()->newQuery()
                 : $model->newQuery();
+
+        $instance = $query->getModel();
+
+        if (method_exists($instance, 'scopeForAuthentication')) {
+            $query = $instance->scopeForAuthentication($query);
+        }
+
+        return $query;
     }
 
     /**
