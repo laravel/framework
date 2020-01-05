@@ -1040,9 +1040,7 @@ trait HasAttributes
      */
     protected function resolveCasterClass($key)
     {
-        $castType = $this->getCasts()[$key];
-
-        if (strpos($castType, ':') === false) {
+        if (strpos($castType = $this->getCasts()[$key], ':') === false) {
             return new $castType;
         }
 
