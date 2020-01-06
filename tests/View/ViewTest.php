@@ -27,10 +27,6 @@ class ViewTest extends TestCase
         $view->with('foo', 'bar');
         $view->with(['baz' => 'boom']);
         $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
-
-        $view = $this->getView();
-        $view->withFoo('bar')->withBaz('boom');
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
     }
 
     public function testRenderProperlyRendersView()

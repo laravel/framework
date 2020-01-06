@@ -402,13 +402,9 @@ class View implements ArrayAccess, Htmlable, ViewContract
             return $this->macroCall($method, $parameters);
         }
 
-        if (! Str::startsWith($method, 'with')) {
-            throw new BadMethodCallException(sprintf(
-                'Method %s::%s does not exist.', static::class, $method
-            ));
-        }
-
-        return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 
     /**
