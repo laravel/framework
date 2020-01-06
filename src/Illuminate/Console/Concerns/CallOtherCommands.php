@@ -9,6 +9,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 trait CallOtherCommands
 {
     /**
+     * Resolve the console command instance for the given command.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @return \Symfony\Component\Console\Command\Command
+     */
+    abstract protected function resolveCommand($command);
+
+    /**
      * Call another console command.
      *
      * @param  \Symfony\Component\Console\Command\Command|string  $command
@@ -81,12 +89,4 @@ trait CallOtherCommands
             return ["--{$key}" => $value];
         })->all();
     }
-
-    /**
-     * Resolve the console command instance for the given command.
-     *
-     * @param  \Symfony\Component\Console\Command\Command|string  $command
-     * @return \Symfony\Component\Console\Command\Command
-     */
-    abstract protected function resolveCommand($command);
 }
