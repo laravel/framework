@@ -59,15 +59,26 @@ class PackageManifest
     }
 
     /**
+     * Get all of the $name values for all packages.
+     *
+     * @param string $name
+     * @return array
+     */
+    public function extra($name)
+    {
+        return collect($this->getManifest())->flatMap(function ($configuration) use ($name) {
+            return (array) ($configuration[$name] ?? []);
+        })->filter()->all();
+    }
+
+    /**
      * Get all of the service provider class names for all packages.
      *
      * @return array
      */
     public function providers()
     {
-        return collect($this->getManifest())->flatMap(function ($configuration) {
-            return (array) ($configuration['providers'] ?? []);
-        })->filter()->all();
+        return $this->extra('providers');
     }
 
     /**
@@ -77,9 +88,7 @@ class PackageManifest
      */
     public function aliases()
     {
-        return collect($this->getManifest())->flatMap(function ($configuration) {
-            return (array) ($configuration['aliases'] ?? []);
-        })->filter()->all();
+        return $this->extra('aliases');
     }
 
     /**
