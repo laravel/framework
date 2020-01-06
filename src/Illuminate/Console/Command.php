@@ -17,7 +17,7 @@ use Symfony\Component\Console\Question\Question;
 
 class Command extends SymfonyCommand
 {
-    use Concerns\CallOtherCommands,
+    use Concerns\CallsCommands,
         Macroable;
 
     /**

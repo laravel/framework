@@ -6,7 +6,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-trait CallOtherCommands
+trait CallsCommands
 {
     /**
      * Resolve the console command instance for the given command.
