@@ -820,7 +820,9 @@ trait ValidatesAttributes
 
         if (Str::contains($table, '\\') && class_exists($table) && is_a($table, Model::class, true)) {
             $model = new $table;
+
             $table = $model->getTable();
+
             $connection = $connection ?? $model->getConnectionName();
         }
 
