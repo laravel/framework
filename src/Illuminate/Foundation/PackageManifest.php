@@ -64,7 +64,7 @@ class PackageManifest
      * @param  string  $name
      * @return array
      */
-    public function extra($name)
+    public function getRegisteredExtra($name)
     {
         return collect($this->getManifest())->flatMap(function ($configuration) use ($name) {
             return (array) ($configuration[$name] ?? []);
@@ -78,7 +78,7 @@ class PackageManifest
      */
     public function providers()
     {
-        return $this->extra('providers');
+        return $this->getRegisteredExtra('providers');
     }
 
     /**
@@ -88,7 +88,7 @@ class PackageManifest
      */
     public function aliases()
     {
-        return $this->extra('aliases');
+        return $this->getRegisteredExtra('aliases');
     }
 
     /**
