@@ -11,7 +11,6 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Throwable;
 
