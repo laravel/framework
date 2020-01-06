@@ -61,7 +61,7 @@ class PackageManifest
     /**
      * Get all of the $name values for all packages.
      *
-     * @param string $name
+     * @param  string  $name
      * @return array
      */
     public function extra($name)
