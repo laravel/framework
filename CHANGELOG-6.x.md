@@ -8,23 +8,36 @@
 - Added PHPUnit 9 support ([#30947](https://github.com/laravel/framework/pull/30947))
 - Added `exclude_if` and `exclude_unless` validation rules ([#30835](https://github.com/laravel/framework/pull/30835), [c0fdb56](https://github.com/laravel/framework/commit/c0fdb566831b7ebf34a15bbdfec81dd0039c76f0))
 - Added generated columns (virtual/stored) support for PostgreSQL ([#30971](https://github.com/laravel/framework/pull/30971))
+- Added `mixin` support to Eloquent builder ([#30978](https://github.com/laravel/framework/pull/30978), [28fa74e](https://github.com/laravel/framework/commit/28fa74e8222a57118ae1b590101a35f63b964f81))
 
 ### Changed
 - Handled passing too many arguments to `@slot` ([#30893](https://github.com/laravel/framework/pull/30893), [878f159](https://github.com/laravel/framework/commit/878f15922523e748bfbfdf50f40269f8ffe20d9d))
 - Make `ThrottleRequestsException` extend `TooManyRequestsHttpException` ([#30943](https://github.com/laravel/framework/pull/30943))
+- Used `league/commonmark` instead of `erusev/parsedown` for mail markdown ([#30982](https://github.com/laravel/framework/pull/30982))
+- Regenerate token on logout ([b2af428](https://github.com/laravel/framework/commit/b2af428e60188ea55fb06f3a1e0b0b0c690bbe86))
+- Make `RedisQueue::getConnection()` public ([#31016](https://github.com/laravel/framework/pull/31016))
 
 ### Fixed
 - Fixed `float` database types in `Blueprint` ([#30891](https://github.com/laravel/framework/pull/30891))
+- Fixed code that depended on `getenv()` ([#30924](https://github.com/laravel/framework/pull/30924))
+- Prevented making actual pdo connections while reconnecting ([#30998](https://github.com/laravel/framework/pull/30998))
+- Fixed `exclude_if` \ `exclude_unless` validation rules for nested data ([#31006](https://github.com/laravel/framework/pull/31006))
 
 ### Optimization
 - Optimize Service Provider registration ([#30960](https://github.com/laravel/framework/pull/30960))
+- Optimize `runningInConsole` method ([#30922](https://github.com/laravel/framework/pull/30922))
+
+### Deprecated
+- Deprecate `PendingMail::sendNow()` and remove unneeded check ([#30999](https://github.com/laravel/framework/pull/30999))
+
+### Refactoring
+- Refactoring of `BladeCompiler::compileString()` method ([08887f9](https://github.com/laravel/framework/commit/08887f99d05bb85affd3cbc6f7fdbc32a9297eea))
 
 ### TODO
-- Speed up runningInConsole method ([#30922](https://github.com/laravel/framework/pull/30922))
-- Fixed code that depended on getenv ([#30924](https://github.com/laravel/framework/pull/30924))
-- Removed unused dev dep and fixed symfony/cache min version ([#30936](https://github.com/laravel/framework/pull/30936))
-- Use ::class notation for callable ([#30935](https://github.com/laravel/framework/pull/30935))
-- Delay instantiation of transator and view factory ([#30962](https://github.com/laravel/framework/pull/30962))
+- Bring in array subset code directly ([#30989](https://github.com/laravel/framework/pull/30989))
+- Resolve Faker\Generator out of the container if it is bound ([#30992](https://github.com/laravel/framework/pull/30992))
+- Utilize Symfony’s PSR Factory ([#31018](https://github.com/laravel/framework/pull/31018))
+- Added missing class exists checks ([#31027](https://github.com/laravel/framework/pull/31027))
 
 
 ## [v6.9.0 (2019-12-19)](https://github.com/laravel/framework/compare/v6.8.0...v6.9.0)

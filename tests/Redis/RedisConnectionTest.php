@@ -547,6 +547,20 @@ class RedisConnectionTest extends TestCase
         );
     }
 
+    public function testMacroable()
+    {
+        Connection::macro('foo', function () {
+            return 'foo';
+        });
+
+        foreach ($this->connections() as $redis) {
+            $this->assertSame(
+                'foo',
+                $redis->foo()
+            );
+        }
+    }
+
     public function connections()
     {
         $connections = [

@@ -1187,6 +1187,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             'queue.failer'         => [\Illuminate\Queue\Failed\FailedJobProviderInterface::class],
             'redirect'             => [\Illuminate\Routing\Redirector::class],
             'redis'                => [\Illuminate\Redis\RedisManager::class, \Illuminate\Contracts\Redis\Factory::class],
+            'redis.connection'     => [\Illuminate\Redis\Connections\Connection::class, \Illuminate\Contracts\Redis\Connection::class],
             'request'              => [\Illuminate\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
             'router'               => [\Illuminate\Routing\Router::class, \Illuminate\Contracts\Routing\Registrar::class, \Illuminate\Contracts\Routing\BindingRegistrar::class],
             'session'              => [\Illuminate\Session\SessionManager::class],
