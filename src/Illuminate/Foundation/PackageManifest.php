@@ -59,26 +59,13 @@ class PackageManifest
     }
 
     /**
-     * Get all of the $name values for all packages.
-     *
-     * @param  string  $name
-     * @return array
-     */
-    public function getRegisteredExtra($name)
-    {
-        return collect($this->getManifest())->flatMap(function ($configuration) use ($name) {
-            return (array) ($configuration[$name] ?? []);
-        })->filter()->all();
-    }
-
-    /**
      * Get all of the service provider class names for all packages.
      *
      * @return array
      */
     public function providers()
     {
-        return $this->getRegisteredExtra('providers');
+        return $this->config('providers');
     }
 
     /**
@@ -88,7 +75,20 @@ class PackageManifest
      */
     public function aliases()
     {
-        return $this->getRegisteredExtra('aliases');
+        return $this->config('aliases');
+    }
+
+    /**
+     * Get all of the values for all packages for the given configuration name.
+     *
+     * @param  string  $key
+     * @return array
+     */
+    public function config($key)
+    {
+        return collect($this->getManifest())->flatMap(function ($configuration) use ($key) {
+            return (array) ($configuration[$key] ?? []);
+        })->filter()->all();
     }
 
     /**
