@@ -540,7 +540,7 @@ trait InteractsWithPivotTable
             return ($this->using)::query();
         }
         else{
-            $this->query->getQuery()->newQuery()->from($this->table);
+            return $this->query->getQuery()->newQuery()->from($this->table);
         }
     }
 
