@@ -14,7 +14,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class FoundationTestResponseTest extends TestCase
+class TestResponseTest extends TestCase
 {
     public function testAssertViewIs()
     {
