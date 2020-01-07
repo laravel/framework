@@ -28,30 +28,30 @@ class StubPublishCommand extends Command
      */
     public function handle()
     {
-        $files = [
-            __DIR__.'/stubs/job.queued.stub' => base_path('stubs/job.queued.stub'),
-            __DIR__.'/stubs/job.stub' => base_path('stubs/job.stub'),
-            __DIR__.'/stubs/job.stub' => base_path('stubs/job.stub'),
-            __DIR__.'/stubs/model.pivot.stub' => base_path('stubs/model.pivot.stub'),
-            __DIR__.'/stubs/model.stub' => base_path('stubs/model.stub'),
-            __DIR__.'/stubs/test.stub' => base_path('stubs/test.stub'),
-            __DIR__.'/stubs/test.unit.stub' => base_path('stubs/test.unit.stub'),
-            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.create.stub') => base_path('stubs/migration.create.stub'),
-            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.stub') => base_path('stubs/migration.stub'),
-            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.update.stub') => base_path('stubs/migration.update.stub'),
-            realpath(__DIR__.'/../../Routing/Console/stubs/controller.api.stub') => base_path('stubs/controller.api.stub'),
-            realpath(__DIR__.'/../../Routing/Console/stubs/controller.invokable.stub') => base_path('stubs/controller.invokable.stub'),
-            realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.api.stub') => base_path('stubs/controller.model.api.stub'),
-            realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.stub') => base_path('stubs/controller.model.stub'),
-            realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.api.stub') => base_path('stubs/controller.nested.api.stub'),
-            realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.stub') => base_path('stubs/controller.nested.stub'),
-            realpath(__DIR__.'/../../Routing/Console/stubs/controller.plain.stub') => base_path('stubs/controller.plain.stub'),
-            realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => base_path('stubs/controller.stub'),
-        ];
-
-        if (! is_dir(base_path('stubs'))) {
-            (new Filesystem)->makeDirectory(base_path('stubs'));
+        if (! is_dir($stubsPath = $this->laravel->basePath('stubs'))) {
+            (new Filesystem)->makeDirectory($stubsPath);
         }
+
+        $files = [
+            __DIR__.'/stubs/job.queued.stub' => $stubsPath.'/job.queued.stub',
+            __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
+            __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
+            __DIR__.'/stubs/model.pivot.stub' => $stubsPath.'stubs/model.pivot.stub',
+            __DIR__.'/stubs/model.stub' => $stubsPath.'/model.stub',
+            __DIR__.'/stubs/test.stub' => $stubsPath.'/test.stub',
+            __DIR__.'/stubs/test.unit.stub' => $stubsPath.'/test.unit.stub',
+            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.create.stub') => $stubsPath.'/migration.create.stub',
+            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.stub') => $stubsPath.'/migration.stub',
+            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.update.stub') => $stubsPath.'/migration.update.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.api.stub') => $stubsPath.'/controller.api.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.invokable.stub') => $stubsPath.'/controller.invokable.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.api.stub') => $stubsPath.'/controller.model.api.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.stub') => $stubsPath.'/controller.model.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.api.stub') => $stubsPath.'/controller.nested.api.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.stub') => $stubsPath.'/controller.nested.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.plain.stub') => $stubsPath.'/controller.plain.stub',
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => $stubsPath.'/controller.stub',
+        ];
 
         foreach ($files as $from => $to) {
             file_put_contents($to, file_get_contents($from));
