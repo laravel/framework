@@ -70,6 +70,7 @@
         "illuminate/routing": "self.version",
         "illuminate/session": "self.version",
         "illuminate/support": "self.version",
+        "illuminate/testing": "self.version",
         "illuminate/translation": "self.version",
         "illuminate/validation": "self.version",
         "illuminate/view": "self.version"

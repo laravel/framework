@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Foundation\Testing;
+namespace Illuminate\Testing;
 
 use ArrayAccess;
-use Illuminate\Foundation\Testing\Constraints\ArraySubset;
+use Illuminate\Testing\Constraints\ArraySubset;
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\InvalidArgumentException;
 use PHPUnit\Util\InvalidArgumentHelper;
