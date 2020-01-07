@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
-class SupportStrTest extends TestCase
+class SupportStringableTest extends TestCase
 {
     public function testMatch()
     {

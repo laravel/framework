@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 class Stringable
