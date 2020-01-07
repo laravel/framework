@@ -57,7 +57,20 @@ class ControllerMakeCommand extends GeneratorCommand
 
         $stub = $stub ?? '/stubs/controller.plain.stub';
 
-        return __DIR__.$stub;
+        return $this->resolveStubPath($stub);
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = base_path(trim($stub, '/')))
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
