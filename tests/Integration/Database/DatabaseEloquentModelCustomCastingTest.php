@@ -26,25 +26,33 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals('rolyat', $unserializedModel->getAttributes()['reversed']);
         $this->assertEquals('rolyat', $unserializedModel->toArray()['reversed']);
 
+        $model = new TestEloquentModelWithCustomCast;
+
+        $model->address = $address = new Address('110 Kingsbrook St.', 'My Childhood House');
+        $address->lineOne = '117 Spencer St.';
+        $this->assertEquals('117 Spencer St.', $model->getAttributes()['address_line_one']);
+
+        $model = new TestEloquentModelWithCustomCast;
+
         $model->setRawAttributes([
             'address_line_one' => '110 Kingsbrook St.',
-            'address_line_two' => 'My House',
+            'address_line_two' => 'My Childhood House',
         ]);
 
         $this->assertEquals('110 Kingsbrook St.', $model->address->lineOne);
-        $this->assertEquals('My House', $model->address->lineTwo);
+        $this->assertEquals('My Childhood House', $model->address->lineTwo);
 
         $this->assertEquals('110 Kingsbrook St.', $model->toArray()['address_line_one']);
-        $this->assertEquals('My House', $model->toArray()['address_line_two']);
+        $this->assertEquals('My Childhood House', $model->toArray()['address_line_two']);
 
         $model->address->lineOne = '117 Spencer St.';
 
         $this->assertFalse(isset($model->toArray()['address']));
         $this->assertEquals('117 Spencer St.', $model->toArray()['address_line_one']);
-        $this->assertEquals('My House', $model->toArray()['address_line_two']);
+        $this->assertEquals('My Childhood House', $model->toArray()['address_line_two']);
 
         $this->assertEquals('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
-        $this->assertEquals('My House', json_decode($model->toJson(), true)['address_line_two']);
+        $this->assertEquals('My Childhood House', json_decode($model->toJson(), true)['address_line_two']);
 
         $model->address = null;
 
@@ -88,14 +96,14 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->setRawAttributes([
             'address_line_one' => '110 Kingsbrook St.',
-            'address_line_two' => 'My House',
+            'address_line_two' => 'My Childhood House',
         ]);
 
         $this->assertEquals('110 Kingsbrook St.', $model->address->lineOne);
 
         $model->setRawAttributes([
             'address_line_one' => '117 Spencer St.',
-            'address_line_two' => 'My House',
+            'address_line_two' => 'My Childhood House',
         ]);
 
         $this->assertEquals('117 Spencer St.', $model->address->lineOne);

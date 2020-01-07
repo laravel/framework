@@ -703,24 +703,30 @@ trait HasAttributes
      */
     protected function setClassCastableAttribute($key, $value)
     {
+        $caster = $this->resolveCasterClass($key);
+
         if (is_null($value)) {
             $this->attributes = array_merge($this->attributes, array_map(
                 function () {
                 },
-                $this->normalizeCastClassResponse($key, $this->resolveCasterClass($key)->set(
+                $this->normalizeCastClassResponse($key, $caster->set(
                     $this, $key, $this->{$key}, $this->attributes
                 ))
             ));
         } else {
             $this->attributes = array_merge(
                 $this->attributes,
-                $this->normalizeCastClassResponse($key, $this->resolveCasterClass($key)->set(
+                $this->normalizeCastClassResponse($key, $caster->set(
                     $this, $key, $value, $this->attributes
                 ))
             );
         }
 
-        unset($this->classCastCache[$key]);
+        if ($caster instanceof CastsInboundAttributes || is_null($value)) {
+            unset($this->classCastCache[$key]);
+        } else {
+            $this->classCastCache[$key] = $value;
+        }
     }
 
     /**
