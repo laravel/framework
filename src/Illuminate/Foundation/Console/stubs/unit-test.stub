@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use PHPUnit\Framework\TestCase;
 
-class DummyClass extends TestCase
+class {{ class }} extends TestCase
 {
     /**
      * A basic unit test example.
