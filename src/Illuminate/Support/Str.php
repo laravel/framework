@@ -42,6 +42,17 @@ class Str
     protected static $uuidFactory;
 
     /**
+     * Get a new stringable object from the given string.
+     *
+     * @param  string  $string
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function of($string)
+    {
+        return new Stringable($string);
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
