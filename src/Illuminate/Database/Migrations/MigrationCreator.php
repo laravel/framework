@@ -21,7 +21,7 @@ class MigrationCreator
      *
      * @var \Illuminate\Filesystem\Filesystem
      */
-    protected $customStubs;
+    protected $customStubPath;
 
     /**
      * The registered post create hooks.
@@ -34,13 +34,13 @@ class MigrationCreator
      * Create a new migration creator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string  $customStubs
+     * @param  string  $customStubPath
      * @return void
      */
-    public function __construct(Filesystem $files, $customStubs)
+    public function __construct(Filesystem $files, $customStubPath)
     {
         $this->files = $files;
-        $this->customStubs = $customStubs;
+        $this->customStubPath = $customStubPath;
     }
 
     /**
@@ -110,15 +110,15 @@ class MigrationCreator
     protected function getStub($table, $create)
     {
         if (is_null($table)) {
-            $stub = $this->files->exists($customPath = $this->customStubs.'/migration.stub')
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
                             ? $customPath
                             : $this->stubPath().'/migration.stub';
         } elseif ($create) {
-            $stub = $this->files->exists($customPath = $this->customStubs.'/migration.create.stub')
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.stub')
                             ? $customPath
                             : $this->stubPath().'/migration.create.stub';
         } else {
-            $stub = $this->files->exists($customPath = $this->customStubs.'/migration.update.stub')
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update.stub')
                             ? $customPath
                             : $this->stubPath().'/migration.update.stub';
         }
