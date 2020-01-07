@@ -17,6 +17,13 @@ class MigrationCreator
     protected $files;
 
     /**
+     * The custom app stubs directory.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    protected $customStubs;
+
+    /**
      * The registered post create hooks.
      *
      * @var array
@@ -27,11 +34,13 @@ class MigrationCreator
      * Create a new migration creator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  string  $customStubs
      * @return void
      */
-    public function __construct(Filesystem $files)
+    public function __construct(Filesystem $files, $customStubs)
     {
         $this->files = $files;
+        $this->customStubs = $customStubs;
     }
 
     /**
@@ -101,15 +110,15 @@ class MigrationCreator
     protected function getStub($table, $create)
     {
         if (is_null($table)) {
-            $stub = file_exists($customPath = base_path('stubs/migration.stub'))
+            $stub = $this->files->exists($customPath = $this->customStubs.'/migration.stub')
                             ? $customPath
                             : $this->stubPath().'/migration.stub';
         } elseif ($create) {
-            $stub = file_exists($customPath = base_path('stubs/migration.create.stub'))
+            $stub = $this->files->exists($customPath = $this->customStubs.'/migration.create.stub')
                             ? $customPath
                             : $this->stubPath().'/migration.create.stub';
         } else {
-            $stub = file_exists($customPath = base_path('stubs/migration.update.stub'))
+            $stub = $this->files->exists($customPath = $this->customStubs.'/migration.update.stub')
                             ? $customPath
                             : $this->stubPath().'/migration.update.stub';
         }
