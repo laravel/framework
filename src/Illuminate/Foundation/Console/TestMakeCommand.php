@@ -36,7 +36,7 @@ class TestMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('unit')
-                    ? $this->resolveStubPath('/stubs/unit-test.stub')
+                    ? $this->resolveStubPath('/stubs/test.unit.stub')
                     : $this->resolveStubPath('/stubs/test.stub');
     }
 
