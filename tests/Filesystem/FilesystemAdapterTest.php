@@ -271,4 +271,34 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
     }
+
+    public function testPutFile()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $uploadedFile = new UploadedFile($filePath, 'org.txt', null, null, true);
+
+        $storagePath = $filesystemAdapter->putFile('/', $uploadedFile);
+
+        $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
+
+        $this->assertFileExists($filePath);
+
+        $filesystemAdapter->assertExists($storagePath);
+    }
+
+    public function testPutFileWithAbsoluteFilePath()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $storagePath = $filesystemAdapter->putFile('/', $filePath);
+
+        $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
+
+        $filesystemAdapter->assertExists($storagePath);
+    }
 }
