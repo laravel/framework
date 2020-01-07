@@ -1,10 +1,10 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class DummyClass extends Pivot
+class {{ class }} extends Pivot
 {
     //
 }
