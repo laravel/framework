@@ -48,6 +48,7 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
+use Illuminate\Foundation\Console\StubPublishCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
@@ -145,6 +146,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
         'Serve' => 'command.serve',
+        'StubPublish' => 'command.stub.publish',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
     ];
@@ -865,6 +867,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.serve', function () {
             return new ServeCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerStubPublishCommand()
+    {
+        $this->app->singleton('command.stub.publish', function () {
+            return new StubPublishCommand;
         });
     }
 
