@@ -171,9 +171,9 @@ trait ManagesTransactions
             $this->getPdo()->commit();
         }
 
-        $this->fireConnectionEvent('committed');
-
         $this->transactions = max(0, $this->transactions - 1);
+
+        $this->fireConnectionEvent('committed');
     }
 
     /**
