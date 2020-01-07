@@ -8,7 +8,7 @@
 ### Added
 - Added `withoutMix()` and `withMix()` test helpers ([#30900](https://github.com/laravel/framework/pull/30900))
 - Added `validateWithBag()` macro to `Request` ([#30896](https://github.com/laravel/framework/pull/30896))
-- Added PHPUnit 9 support ([#30947](https://github.com/laravel/framework/pull/30947))
+- Added PHPUnit 9 support ([#30947](https://github.com/laravel/framework/pull/30947), [#30989](https://github.com/laravel/framework/pull/30989))
 - Added `exclude_if` and `exclude_unless` validation rules ([#30835](https://github.com/laravel/framework/pull/30835), [c0fdb56](https://github.com/laravel/framework/commit/c0fdb566831b7ebf34a15bbdfec81dd0039c76f0))
 - Added generated columns (virtual/stored) support for PostgreSQL ([#30971](https://github.com/laravel/framework/pull/30971))
 - Added `mixin` support to Eloquent builder ([#30978](https://github.com/laravel/framework/pull/30978), [28fa74e](https://github.com/laravel/framework/commit/28fa74e8222a57118ae1b590101a35f63b964f81))
@@ -24,7 +24,6 @@
 - Used `league/commonmark` instead of `erusev/parsedown` for mail markdown ([#30982](https://github.com/laravel/framework/pull/30982))
 - Regenerate token on logout ([b2af428](https://github.com/laravel/framework/commit/b2af428e60188ea55fb06f3a1e0b0b0c690bbe86))
 - Make `RedisQueue::getConnection()` public ([#31016](https://github.com/laravel/framework/pull/31016))
-- Delete dependency `graham-campbell/testbench-core` ([#30989](https://github.com/laravel/framework/pull/30989))
 - Resolve `Faker\Generator` out of the container if it is bound ([#30992](https://github.com/laravel/framework/pull/30992))
 
 ### Fixed
