@@ -23,7 +23,7 @@ class Stringable
      * @param  string  $value
      * @return void
      */
-    public function __construct($value)
+    public function __construct($value = '')
     {
         $this->value = (string) $value;
     }
@@ -101,6 +101,17 @@ class Stringable
     }
 
     /**
+     * Get the trailing name component of the path.
+     *
+     * @param  string  $suffix
+     * @return static
+     */
+    public function basename($suffix = '')
+    {
+        return new static(basename($this->value, $suffix));
+    }
+
+    /**
      * Get the portion of a string before the first occurrence of a given value.
      *
      * @param  string  $search
@@ -155,6 +166,17 @@ class Stringable
     }
 
     /**
+     * Get the parent directory's path.
+     *
+     * @param  int  $levels
+     * @return static
+     */
+    public function dirname($levels = 1)
+    {
+        return new static(dirname($this->value, $levels));
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string|array  $needles
@@ -181,11 +203,11 @@ class Stringable
      *
      * @param  string  $delimiter
      * @param  int  $limit
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function explode($delimiter, $limit = PHP_INT_MAX)
     {
-        return explode($delimiter, $this->value, $limit);
+        return collect(explode($delimiter, $this->value, $limit));
     }
 
     /**
@@ -274,15 +296,37 @@ class Stringable
     }
 
     /**
-     * Limit the number of words in a string.
+     * Get the string matching the given pattern.
      *
-     * @param  int  $words
-     * @param  string  $end
-     * @return static
+     * @param  string  $pattern
+     * @return static|null
      */
-    public function words($words = 100, $end = '...')
+    public function match($pattern)
     {
-        return new static(Str::words($this->value, $words, $end));
+        preg_match($pattern, $this->value, $matches);
+
+        if (! $matches) {
+            return new static;
+        }
+
+        return new static($matches[1] ?? $matches[0]);
+    }
+
+    /**
+     * Get the string matching the given pattern.
+     *
+     * @param  string  $pattern
+     * @return static|null
+     */
+    public function matchAll($pattern)
+    {
+        preg_match_all($pattern, $this->value, $matches);
+
+        if (empty($matches[0])) {
+            return collect();
+        }
+
+        return collect($matches[1] ?? $matches[0]);
     }
 
     /**
@@ -498,6 +542,33 @@ class Stringable
     public function ucfirst()
     {
         return new static(Str::ucfirst($this->value));
+    }
+
+    /**
+     * Execute the given callback if the string is empty.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function whenEmpty($callback)
+    {
+        if ($this->isEmpty()) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Limit the number of words in a string.
+     *
+     * @param  int  $words
+     * @param  string  $end
+     * @return static
+     */
+    public function words($words = 100, $end = '...')
+    {
+        return new static(Str::words($this->value, $words, $end));
     }
 
     /**
