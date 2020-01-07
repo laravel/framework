@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
@@ -13,6 +12,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrator
 {
@@ -61,7 +61,7 @@ class Migrator
     /**
      * The output interface implementation.
      *
-     * @var \Illuminate\Console\OutputStyle
+     * @var \Symfony\Component\Console\Output\OutputInterface
      */
     protected $output;
 
@@ -173,8 +173,8 @@ class Migrator
      * Run "up" a migration instance.
      *
      * @param  string  $file
-     * @param  int     $batch
-     * @param  bool    $pretend
+     * @param  int  $batch
+     * @param  bool  $pretend
      * @return void
      */
     protected function runUp($file, $batch, $pretend)
@@ -209,7 +209,7 @@ class Migrator
     /**
      * Rollback the last migration operation.
      *
-     * @param  array|string $paths
+     * @param  array|string  $paths
      * @param  array  $options
      * @return array
      */
@@ -288,7 +288,7 @@ class Migrator
     /**
      * Rolls all of the currently applied migrations back.
      *
-     * @param  array|string $paths
+     * @param  array|string  $paths
      * @param  bool  $pretend
      * @return array
      */
@@ -335,7 +335,7 @@ class Migrator
      *
      * @param  string  $file
      * @param  object  $migration
-     * @param  bool    $pretend
+     * @param  bool  $pretend
      * @return void
      */
     protected function runDown($file, $migration, $pretend)
@@ -468,7 +468,7 @@ class Migrator
     /**
      * Require in all the migration files in a given path.
      *
-     * @param  array   $files
+     * @param  array  $files
      * @return void
      */
     public function requireFiles(array $files)
@@ -518,6 +518,24 @@ class Migrator
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Execute the given callback using the given connection as the default connection.
+     *
+     * @param  string  $name
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function usingConnection($name, callable $callback)
+    {
+        $previousConnection = $this->resolver->getDefaultConnection();
+
+        $this->setConnection($name);
+
+        return tap($callback(), function () use ($previousConnection) {
+            $this->setConnection($previousConnection);
+        });
     }
 
     /**
@@ -598,10 +616,10 @@ class Migrator
     /**
      * Set the output implementation that should be used by the console.
      *
-     * @param  \Illuminate\Console\OutputStyle  $output
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return $this
      */
-    public function setOutput(OutputStyle $output)
+    public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
 
@@ -624,7 +642,7 @@ class Migrator
     /**
      * Fire the given event for the migration.
      *
-     * @param  \Illuminate\Contracts\Database\Events\MigrationEvent $event
+     * @param  \Illuminate\Contracts\Database\Events\MigrationEvent  $event
      * @return void
      */
     public function fireMigrationEvent($event)

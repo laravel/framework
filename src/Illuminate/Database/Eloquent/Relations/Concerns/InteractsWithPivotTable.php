@@ -23,7 +23,7 @@ trait InteractsWithPivotTable
      * Each existing model is detached, and non existing ones are attached.
      *
      * @param  mixed  $ids
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return array
      */
     public function toggle($ids, $touch = true)
@@ -85,7 +85,7 @@ trait InteractsWithPivotTable
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
-     * @param  bool   $detaching
+     * @param  bool  $detaching
      * @return array
      */
     public function sync($ids, $detaching = true)
@@ -153,7 +153,7 @@ trait InteractsWithPivotTable
      *
      * @param  array  $records
      * @param  array  $current
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return array
      */
     protected function attachNew(array $records, array $current, $touch = true)
@@ -187,7 +187,7 @@ trait InteractsWithPivotTable
      *
      * @param  mixed  $id
      * @param  array  $attributes
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return int
      */
     public function updateExistingPivot($id, array $attributes, $touch = true)
@@ -216,7 +216,7 @@ trait InteractsWithPivotTable
      *
      * @param  mixed  $id
      * @param  array  $attributes
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return int
      */
     protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch)
@@ -244,7 +244,7 @@ trait InteractsWithPivotTable
      *
      * @param  mixed  $id
      * @param  array  $attributes
-     * @param  bool   $touch
+     * @param  bool  $touch
      * @return void
      */
     public function attach($id, array $attributes = [], $touch = true)
@@ -328,10 +328,10 @@ trait InteractsWithPivotTable
     /**
      * Create a full attachment record payload.
      *
-     * @param  int    $key
+     * @param  int  $key
      * @param  mixed  $value
      * @param  array  $attributes
-     * @param  bool   $hasTimestamps
+     * @param  bool  $hasTimestamps
      * @return array
      */
     protected function formatAttachRecord($key, $value, $attributes, $hasTimestamps)
@@ -361,7 +361,7 @@ trait InteractsWithPivotTable
     /**
      * Create a new pivot attachment record.
      *
-     * @param  int   $id
+     * @param  int  $id
      * @param  bool  $timed
      * @return array
      */
@@ -389,7 +389,7 @@ trait InteractsWithPivotTable
      * Set the creation and update timestamps on an attach record.
      *
      * @param  array  $record
-     * @param  bool   $exists
+     * @param  bool  $exists
      * @return array
      */
     protected function addTimestampsToAttachment(array $record, $exists = false)
@@ -506,7 +506,7 @@ trait InteractsWithPivotTable
      * Create a new pivot model instance.
      *
      * @param  array  $attributes
-     * @param  bool   $exists
+     * @param  bool  $exists
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     public function newPivot(array $attributes = [], $exists = false)
@@ -654,7 +654,7 @@ trait InteractsWithPivotTable
     /**
      * Cast the given pivot attributes.
      *
-     * @param  array $attributes
+     * @param  array  $attributes
      * @return array
      */
     protected function castAttributes($attributes)
@@ -667,7 +667,7 @@ trait InteractsWithPivotTable
     /**
      * Converts a given value to a given type value.
      *
-     * @param  string $type
+     * @param  string  $type
      * @param  mixed  $value
      * @return mixed
      */

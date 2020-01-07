@@ -50,6 +50,6 @@ class SessionTableCommandTestStub extends SessionTableCommand
 {
     public function call($command, array $arguments = [])
     {
-        //
+        return 0;
     }
 }

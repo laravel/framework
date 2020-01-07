@@ -547,6 +547,20 @@ class RedisConnectionTest extends TestCase
         );
     }
 
+    public function testMacroable()
+    {
+        Connection::macro('foo', function () {
+            return 'foo';
+        });
+
+        foreach ($this->connections() as $redis) {
+            $this->assertSame(
+                'foo',
+                $redis->foo()
+            );
+        }
+    }
+
     public function connections()
     {
         $connections = [
@@ -554,8 +568,8 @@ class RedisConnectionTest extends TestCase
             'phpredis' => $this->redis['phpredis']->connection(),
         ];
 
-        $host = getenv('REDIS_HOST') ?: '127.0.0.1';
-        $port = getenv('REDIS_PORT') ?: 6379;
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
 
         $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
             'cluster' => false,

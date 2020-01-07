@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
@@ -12,12 +13,13 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * @mixin \Illuminate\Http\Response
  */
-class TestResponse
+class TestResponse implements ArrayAccess
 {
     use Tappable, Macroable {
         __call as macroCall;
@@ -558,7 +560,7 @@ class TestResponse
      * Assert that the response does not contain the given JSON fragment.
      *
      * @param  array  $data
-     * @param  bool   $exact
+     * @param  bool  $exact
      * @return $this
      */
     public function assertJsonMissing(array $data, $exact = false)
@@ -820,7 +822,7 @@ class TestResponse
     /**
      * Assert that the response view equals the given value.
      *
-     * @param  string $value
+     * @param  string  $value
      * @return $this
      */
     public function assertViewIs($value)
@@ -850,11 +852,11 @@ class TestResponse
         if (is_null($value)) {
             PHPUnit::assertArrayHasKey($key, $this->original->gatherData());
         } elseif ($value instanceof Closure) {
-            PHPUnit::assertTrue($value($this->original->gatherData()[$key]));
+            PHPUnit::assertTrue($value(Arr::get($this->original->gatherData(), $key)));
         } elseif ($value instanceof Model) {
-            PHPUnit::assertTrue($value->is($this->original->gatherData()[$key]));
+            PHPUnit::assertTrue($value->is(Arr::get($this->original->gatherData(), $key)));
         } else {
-            PHPUnit::assertEquals($value, $this->original->gatherData()[$key]);
+            PHPUnit::assertEquals($value, Arr::get($this->original->gatherData(), $key));
         }
 
         return $this;
@@ -914,11 +916,21 @@ class TestResponse
      */
     protected function ensureResponseHasView()
     {
-        if (! isset($this->original) || ! $this->original instanceof View) {
+        if (! $this->responseHasView()) {
             return PHPUnit::fail('The response is not a view.');
         }
 
         return $this;
+    }
+
+    /**
+     * Determine if the original response is a view.
+     *
+     * @return bool
+     */
+    protected function responseHasView()
+    {
+        return isset($this->original) && $this->original instanceof View;
     }
 
     /**
@@ -1203,6 +1215,59 @@ class TestResponse
     public function __isset($key)
     {
         return isset($this->baseResponse->{$key});
+    }
+
+    /**
+     * Determine if the given offset exists.
+     *
+     * @param  string  $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return $this->responseHasView()
+                    ? isset($this->original->gatherData()[$key])
+                    : isset($this->json()[$offset]);
+    }
+
+    /**
+     * Get the value for a given offset.
+     *
+     * @param  string  $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->responseHasView()
+                    ? $this->viewData($offset)
+                    : $this->json()[$offset];
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param  string  $offset
+     * @param  mixed  $value
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new LogicException('Response data may not be mutated using array access.');
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param  string  $offset
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function offsetUnset($offset)
+    {
+        throw new LogicException('Response data may not be mutated using array access.');
     }
 
     /**

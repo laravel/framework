@@ -94,7 +94,6 @@ class DatabaseEloquentModelTest extends TestCase
     public function testDirtyOnCastOrDateAttributes()
     {
         $model = new EloquentModelCastingStub;
-        $model->setDateFormat('Y-m-d H:i:s');
         $model->boolAttribute = 1;
         $model->foo = 1;
         $model->bar = '2017-03-18';
@@ -114,6 +113,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty('boolAttribute'));
         $this->assertFalse($model->isDirty('dateAttribute'));
         $this->assertTrue($model->isDirty('datetimeAttribute'));
+    }
+
+    public function testDirtyOnCastedObjects()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'objectAttribute'     => '["one", "two", "three"]',
+            'collectionAttribute' => '["one", "two", "three"]',
+        ]);
+        $model->syncOriginal();
+
+        $model->objectAttribute = ['one', 'two', 'three'];
+        $model->collectionAttribute = ['one', 'two', 'three'];
+
+        $this->assertFalse($model->isDirty());
+        $this->assertFalse($model->isDirty('objectAttribute'));
+        $this->assertFalse($model->isDirty('collectionAttribute'));
     }
 
     public function testCleanAttributes()
@@ -1300,8 +1316,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($clone->exists);
         $this->assertSame('taylor', $clone->first);
         $this->assertSame('otwell', $clone->last);
-        $this->assertObjectNotHasAttribute('created_at', $clone);
-        $this->assertObjectNotHasAttribute('updated_at', $clone);
+        $this->assertArrayNotHasKey('created_at', $clone->getAttributes());
+        $this->assertArrayNotHasKey('updated_at', $clone->getAttributes());
         $this->assertEquals(['bar'], $clone->foo);
     }
 
@@ -2374,6 +2390,11 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 }
 

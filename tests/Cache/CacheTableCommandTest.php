@@ -50,6 +50,6 @@ class CacheTableCommandTestStub extends CacheTableCommand
 {
     public function call($command, array $arguments = [])
     {
-        //
+        return 0;
     }
 }

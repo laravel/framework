@@ -135,7 +135,7 @@ trait BuildsQueries
     /**
      * Execute the query and get the first result.
      *
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|object|static|null
      */
     public function first($columns = ['*'])
@@ -213,8 +213,8 @@ trait BuildsQueries
      * Create a new simple paginator instance.
      *
      * @param  \Illuminate\Support\Collection  $items
-     * @param  int $perPage
-     * @param  int $currentPage
+     * @param  int  $perPage
+     * @param  int  $currentPage
      * @param  array  $options
      * @return \Illuminate\Pagination\Paginator
      */

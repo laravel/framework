@@ -72,7 +72,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * Push a new job onto the queue.
      *
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string|null  $queue
      * @return mixed
      */
@@ -88,7 +88,7 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array   $options
+     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
@@ -101,7 +101,7 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed   $data
+     * @param  mixed  $data
      * @param  string|null  $queue
      * @return void
      */
@@ -115,8 +115,8 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Push an array of jobs onto the queue.
      *
-     * @param  array   $jobs
-     * @param  mixed   $data
+     * @param  array  $jobs
+     * @param  mixed  $data
      * @param  string|null  $queue
      * @return mixed
      */
@@ -189,7 +189,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      *
-     * @throws \Exception|\Throwable
+     * @throws \Throwable
      */
     public function pop($queue = null)
     {
@@ -291,7 +291,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string  $id
      * @return void
      *
-     * @throws \Exception|\Throwable
+     * @throws \Throwable
      */
     public function deleteReserved($queue, $id)
     {
