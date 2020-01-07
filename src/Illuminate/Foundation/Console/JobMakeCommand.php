@@ -37,7 +37,7 @@ class JobMakeCommand extends GeneratorCommand
     {
         return $this->option('sync')
                         ? $this->resolveStubPath('/stubs/job.stub')
-                        : $this->resolveStubPath('/stubs/job-queued.stub');
+                        : $this->resolveStubPath('/stubs/job.queued.stub');
     }
 
     /**
