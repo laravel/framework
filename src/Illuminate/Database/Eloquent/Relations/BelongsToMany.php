@@ -198,6 +198,8 @@ class BelongsToMany extends Relation
      */
     public function addConstraints()
     {
+        $this->performJoin();
+
         if (static::$constraints) {
             $this->addWhereConstraints();
         }
@@ -343,6 +345,13 @@ class BelongsToMany extends Relation
         $this->using = $class;
         $this->pivotTable = (new $class)->getTable();
         $this->pivotQuery = $this->newPivotStatement();
+
+        //if the method is called after the constructor ran, which possibly sets the query without the needed parameters
+        //for "performJoins", reinitialize the query and call addConstraints
+        if($this->query){
+            $this->query = $this->related->newModelQuery();
+            $this->addConstraints();
+        }
 
         return $this;
     }
@@ -656,8 +665,6 @@ class BelongsToMany extends Relation
      */
     public function get($columns = ['*'])
     {
-        $this->performJoin();
-
         // First we'll add the proper select columns onto the query so it is run with
         // the proper columns. Then, we will get the results and hydrate out pivot
         // models with the result of those columns as a separate model relation.
