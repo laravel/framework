@@ -396,7 +396,7 @@ class Mailer implements MailerContract, MailQueueContract
             $view->onQueue($queue);
         }
 
-        return $view->queue($this->queue);
+        return $view->mailer($this->name)->queue($this->queue);
     }
 
     /**
@@ -441,7 +441,9 @@ class Mailer implements MailerContract, MailQueueContract
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->later($delay, is_null($queue) ? $this->queue : $queue);
+        return $view->mailer($this->name)->later(
+            $delay, is_null($queue) ? $this->queue : $queue
+        );
     }
 
     /**

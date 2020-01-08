@@ -65,4 +65,12 @@ interface Mailable
      * @return $this
      */
     public function locale($locale);
+
+    /**
+     * Set the name of the mailer that should be used to send the message.
+     *
+     * @param  string  $mailer
+     * @return $this
+     */
+    public function mailer($mailer);
 }
