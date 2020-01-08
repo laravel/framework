@@ -85,7 +85,7 @@ class Stringable
      */
     public function append(...$values)
     {
-        return new static($this->value . implode('', $values));
+        return new static($this->value.implode('', $values));
     }
 
     /**
@@ -304,7 +304,7 @@ class Stringable
     {
         preg_match($pattern, $this->value, $matches);
 
-        if (!$matches) {
+        if (! $matches) {
             return new static;
         }
 
@@ -369,7 +369,7 @@ class Stringable
      */
     public function prepend(...$values)
     {
-        return new static(implode('', $values) . $this->value);
+        return new static(implode('', $values).$this->value);
     }
 
     /**
