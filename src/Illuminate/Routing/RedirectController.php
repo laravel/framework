@@ -19,9 +19,11 @@ class RedirectController extends Controller
     {
         $parameters = collect($request->route()->parameters());
 
-        $status = $parameters->pop();
+        $status = $parameters->get('status');
 
-        $destination = $parameters->pop();
+        $destination = $parameters->get('destination');
+
+        $parameters->forget('status')->forget('destination');
 
         $route = (new Route('GET', $destination, [
             'as' => 'laravel_route_redirect_destination',

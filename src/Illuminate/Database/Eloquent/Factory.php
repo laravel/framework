@@ -69,29 +69,15 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Define a class with a given short-name.
-     *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  callable  $attributes
-     * @return $this
-     */
-    public function defineAs($class, $name, callable $attributes)
-    {
-        return $this->define($class, $attributes, $name);
-    }
-
-    /**
      * Define a class with a given set of attributes.
      *
      * @param  string  $class
      * @param  callable  $attributes
-     * @param  string  $name
      * @return $this
      */
-    public function define($class, callable $attributes, $name = 'default')
+    public function define($class, callable $attributes)
     {
-        $this->definitions[$class][$name] = $attributes;
+        $this->definitions[$class] = $attributes;
 
         return $this;
     }
@@ -144,7 +130,7 @@ class Factory implements ArrayAccess
      *
      * @param  string  $class
      * @param  callable  $callback
-     * @param  string $name
+     * @param  string  $name
      * @return $this
      */
     public function afterCreating($class, callable $callback, $name = 'default')
@@ -180,19 +166,6 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Create an instance of the given model and type and persist it to the database.
-     *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  array  $attributes
-     * @return mixed
-     */
-    public function createAs($class, $name, array $attributes = [])
-    {
-        return $this->of($class, $name)->create($attributes);
-    }
-
-    /**
      * Create an instance of the given model.
      *
      * @param  string  $class
@@ -205,43 +178,16 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Create an instance of the given model and type.
-     *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  array  $attributes
-     * @return mixed
-     */
-    public function makeAs($class, $name, array $attributes = [])
-    {
-        return $this->of($class, $name)->make($attributes);
-    }
-
-    /**
-     * Get the raw attribute array for a given named model.
-     *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  array  $attributes
-     * @return array
-     */
-    public function rawOf($class, $name, array $attributes = [])
-    {
-        return $this->raw($class, $attributes, $name);
-    }
-
-    /**
      * Get the raw attribute array for a given model.
      *
      * @param  string  $class
      * @param  array  $attributes
-     * @param  string  $name
      * @return array
      */
-    public function raw($class, array $attributes = [], $name = 'default')
+    public function raw($class, array $attributes = [])
     {
         return array_merge(
-            call_user_func($this->definitions[$class][$name], $this->faker), $attributes
+            call_user_func($this->definitions[$class], $this->faker), $attributes
         );
     }
 
@@ -249,13 +195,12 @@ class Factory implements ArrayAccess
      * Create a builder for the given model.
      *
      * @param  string  $class
-     * @param  string  $name
      * @return \Illuminate\Database\Eloquent\FactoryBuilder
      */
-    public function of($class, $name = 'default')
+    public function of($class)
     {
         return new FactoryBuilder(
-            $class, $name, $this->definitions, $this->states,
+            $class, $this->definitions, $this->states,
             $this->afterMaking, $this->afterCreating, $this->faker
         );
     }

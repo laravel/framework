@@ -110,6 +110,44 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Cache values as they're enumerated.
+     *
+     * @return static
+     */
+    public function remember()
+    {
+        $iterator = $this->getIterator();
+
+        $iteratorIndex = 0;
+
+        $cache = [];
+
+        return new static(function () use ($iterator, &$iteratorIndex, &$cache) {
+            for ($index = 0; true; $index++) {
+                if (array_key_exists($index, $cache)) {
+                    yield $cache[$index][0] => $cache[$index][1];
+
+                    continue;
+                }
+
+                if ($iteratorIndex < $index) {
+                    $iterator->next();
+
+                    $iteratorIndex++;
+                }
+
+                if (! $iterator->valid()) {
+                    break;
+                }
+
+                $cache[$index] = [$iterator->key(), $iterator->current()];
+
+                yield $cache[$index][0] => $cache[$index][1];
+            }
+        });
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback
@@ -123,7 +161,7 @@ class LazyCollection implements Enumerable
     /**
      * Get the median of a given key.
      *
-     * @param  string|array|null $key
+     * @param  string|array|null  $key
      * @return mixed
      */
     public function median($key = null)
@@ -980,12 +1018,23 @@ class LazyCollection implements Enumerable
     /**
      * Sort through each item with a callback.
      *
-     * @param  callable|null  $callback
+     * @param  callable|null|int  $callback
      * @return static
      */
-    public function sort(callable $callback = null)
+    public function sort($callback = null)
     {
         return $this->passthru('sort', func_get_args());
+    }
+
+    /**
+     * Sort items in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortDesc($options = SORT_REGULAR)
+    {
+        return $this->passthru('sortDesc', func_get_args());
     }
 
     /**
@@ -1028,7 +1077,7 @@ class LazyCollection implements Enumerable
     /**
      * Sort the collection keys in descending order.
      *
-     * @param  int $options
+     * @param  int  $options
      * @return static
      */
     public function sortKeysDesc($options = SORT_REGULAR)

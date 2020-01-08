@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -49,7 +49,7 @@ trait MakesHttpRequests
     /**
      * Define additional headers to be sent with the request.
      *
-     * @param  array $headers
+     * @param  array  $headers
      * @return $this
      */
     public function withHeaders(array $headers)
@@ -62,8 +62,8 @@ trait MakesHttpRequests
     /**
      * Add a header to be sent with the request.
      *
-     * @param  string $name
-     * @param  string $value
+     * @param  string  $name
+     * @param  string  $value
      * @return $this
      */
     public function withHeader(string $name, string $value)

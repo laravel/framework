@@ -35,11 +35,22 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('unit')) {
-            return __DIR__.'/stubs/unit-test.stub';
-        }
+        return $this->option('unit')
+                    ? $this->resolveStubPath('/stubs/test.unit.stub')
+                    : $this->resolveStubPath('/stubs/test.stub');
+    }
 
-        return __DIR__.'/stubs/test.stub';
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**

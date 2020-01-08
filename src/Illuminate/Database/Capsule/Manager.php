@@ -112,7 +112,7 @@ class Manager
     /**
      * Register a connection with the manager.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @param  string  $name
      * @return void
      */
@@ -192,7 +192,7 @@ class Manager
      * Dynamically pass methods to the default connection.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public static function __callStatic($method, $parameters)

@@ -13,6 +13,8 @@ class Argon2IdHasher extends ArgonHasher
      * @param  string  $hashedValue
      * @param  array  $options
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function check($value, $hashedValue, array $options = [])
     {

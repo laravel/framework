@@ -19,9 +19,8 @@ trait Macroable
     /**
      * Register a custom macro.
      *
-     * @param  string $name
+     * @param  string  $name
      * @param  object|callable  $macro
-     *
      * @return void
      */
     public static function macro($name, $macro)

@@ -3,8 +3,8 @@
 namespace Illuminate\View\Engines;
 
 use ErrorException;
-use Exception;
 use Illuminate\View\Compilers\CompilerInterface;
+use Throwable;
 
 class CompilerEngine extends PhpEngine
 {
@@ -37,7 +37,7 @@ class CompilerEngine extends PhpEngine
      * Get the evaluated contents of the view.
      *
      * @param  string  $path
-     * @param  array   $data
+     * @param  array  $data
      * @return string
      */
     public function get($path, array $data = [])
@@ -66,13 +66,13 @@ class CompilerEngine extends PhpEngine
     /**
      * Handle a view exception.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @param  int  $obLevel
      * @return void
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
-    protected function handleViewException(Exception $e, $obLevel)
+    protected function handleViewException(Throwable $e, $obLevel)
     {
         $e = new ErrorException($this->getMessage($e), 0, 1, $e->getFile(), $e->getLine(), $e);
 
@@ -82,10 +82,10 @@ class CompilerEngine extends PhpEngine
     /**
      * Get the exception message for an exception.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return string
      */
-    protected function getMessage(Exception $e)
+    protected function getMessage(Throwable $e)
     {
         return $e->getMessage().' (View: '.realpath(last($this->lastCompiled)).')';
     }

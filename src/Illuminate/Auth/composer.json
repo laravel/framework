@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2.5",
         "illuminate/contracts": "^7.0",
         "illuminate/http": "^7.0",
         "illuminate/queue": "^7.0",
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "7.0-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "suggest": {

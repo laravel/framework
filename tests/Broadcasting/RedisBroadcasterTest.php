@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
+use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +22,11 @@ class RedisBroadcasterTest extends TestCase
         parent::setUp();
 
         $this->broadcaster = m::mock(RedisBroadcaster::class)->makePartial();
+        $container = Container::setInstance(new Container);
+
+        $container->singleton('config', function () {
+            return $this->createConfig();
+        });
     }
 
     protected function tearDown(): void
@@ -137,6 +144,20 @@ class RedisBroadcasterTest extends TestCase
                 'c' => 'd',
             ])
         );
+    }
+
+    /**
+     * Create a new config repository instance.
+     *
+     * @return \Illuminate\Config\Repository
+     */
+    protected function createConfig()
+    {
+        return new Config([
+            'redis' => [
+                'options' => ['prefix' => 'laravel_database_'],
+            ],
+        ]);
     }
 
     /**

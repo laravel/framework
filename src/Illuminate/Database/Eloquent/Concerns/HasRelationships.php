@@ -673,9 +673,7 @@ trait HasRelationships
 
                 $this->$relation->touchOwners();
             } elseif ($this->$relation instanceof Collection) {
-                $this->$relation->each(function (Model $relation) {
-                    $relation->touchOwners();
-                });
+                $this->$relation->each->touchOwners();
             }
         }
     }
@@ -792,6 +790,30 @@ trait HasRelationships
     public function setRelations(array $relations)
     {
         $this->relations = $relations;
+
+        return $this;
+    }
+
+    /**
+     * Duplicate the instance and unset all the loaded relations.
+     *
+     * @return $this
+     */
+    public function withoutRelations()
+    {
+        $model = clone $this;
+
+        return $model->unsetRelations();
+    }
+
+    /**
+     * Unset all the loaded relations for the instance.
+     *
+     * @return $this
+     */
+    public function unsetRelations()
+    {
+        $this->relations = [];
 
         return $this;
     }

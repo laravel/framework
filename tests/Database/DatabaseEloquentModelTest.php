@@ -94,7 +94,6 @@ class DatabaseEloquentModelTest extends TestCase
     public function testDirtyOnCastOrDateAttributes()
     {
         $model = new EloquentModelCastingStub;
-        $model->setDateFormat('Y-m-d H:i:s');
         $model->boolAttribute = 1;
         $model->foo = 1;
         $model->bar = '2017-03-18';
@@ -114,6 +113,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty('boolAttribute'));
         $this->assertFalse($model->isDirty('dateAttribute'));
         $this->assertTrue($model->isDirty('datetimeAttribute'));
+    }
+
+    public function testDirtyOnCastedObjects()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'objectAttribute'     => '["one", "two", "three"]',
+            'collectionAttribute' => '["one", "two", "three"]',
+        ]);
+        $model->syncOriginal();
+
+        $model->objectAttribute = ['one', 'two', 'three'];
+        $model->collectionAttribute = ['one', 'two', 'three'];
+
+        $this->assertFalse($model->isDirty());
+        $this->assertFalse($model->isDirty('objectAttribute'));
+        $this->assertFalse($model->isDirty('collectionAttribute'));
     }
 
     public function testCleanAttributes()
@@ -1300,8 +1316,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($clone->exists);
         $this->assertSame('taylor', $clone->first);
         $this->assertSame('otwell', $clone->last);
-        $this->assertObjectNotHasAttribute('created_at', $clone);
-        $this->assertObjectNotHasAttribute('updated_at', $clone);
+        $this->assertArrayNotHasKey('created_at', $clone->getAttributes());
+        $this->assertArrayNotHasKey('updated_at', $clone->getAttributes());
         $this->assertEquals(['bar'], $clone->foo);
     }
 
@@ -1940,6 +1956,85 @@ class DatabaseEloquentModelTest extends TestCase
             Model::isIgnoringTouch(EloquentModelWithoutTimestamps::class)
         );
     }
+
+    /**
+     * Test that the getOriginal method on an Eloquent model also uses the casts array.
+     *
+     * @param void
+     * @return void
+     */
+    public function testGetOriginalCastsAttributes()
+    {
+        $model = new EloquentModelCastingStub();
+        $model->intAttribute = '1';
+        $model->floatAttribute = '0.1234';
+        $model->stringAttribute = 432;
+        $model->boolAttribute = '1';
+        $model->booleanAttribute = '0';
+        $stdClass = new stdClass;
+        $stdClass->json_key = 'json_value';
+        $model->objectAttribute = $stdClass;
+        $array = [
+            'foo' => 'bar',
+        ];
+        $collection = collect($array);
+        $model->arrayAttribute = $array;
+        $model->jsonAttribute = $array;
+        $model->collectionAttribute = $collection;
+
+        $model->syncOriginal();
+
+        $model->intAttribute = 2;
+        $model->floatAttribute = 0.443;
+        $model->stringAttribute = '12';
+        $model->boolAttribute = true;
+        $model->booleanAttribute = false;
+        $model->objectAttribute = $stdClass;
+        $model->arrayAttribute = [
+            'foo' => 'bar2',
+        ];
+        $model->jsonAttribute = [
+            'foo' => 'bar2',
+        ];
+        $model->collectionAttribute = collect([
+            'foo' => 'bar2',
+        ]);
+
+        $this->assertIsInt($model->getOriginal('intAttribute'));
+        $this->assertEquals(1, $model->getOriginal('intAttribute'));
+        $this->assertEquals(2, $model->intAttribute);
+        $this->assertEquals(2, $model->getAttribute('intAttribute'));
+
+        $this->assertIsFloat($model->getOriginal('floatAttribute'));
+        $this->assertEquals(0.1234, $model->getOriginal('floatAttribute'));
+        $this->assertEquals(0.443, $model->floatAttribute);
+
+        $this->assertIsString($model->getOriginal('stringAttribute'));
+        $this->assertEquals('432', $model->getOriginal('stringAttribute'));
+        $this->assertEquals('12', $model->stringAttribute);
+
+        $this->assertIsBool($model->getOriginal('boolAttribute'));
+        $this->assertTrue($model->getOriginal('boolAttribute'));
+        $this->assertTrue($model->boolAttribute);
+
+        $this->assertIsBool($model->getOriginal('booleanAttribute'));
+        $this->assertFalse($model->getOriginal('booleanAttribute'));
+        $this->assertFalse($model->booleanAttribute);
+
+        $this->assertEquals($stdClass, $model->getOriginal('objectAttribute'));
+        $this->assertEquals($model->getAttribute('objectAttribute'), $model->getOriginal('objectAttribute'));
+
+        $this->assertEquals($array, $model->getOriginal('arrayAttribute'));
+        $this->assertEquals(['foo' => 'bar'], $model->getOriginal('arrayAttribute'));
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('arrayAttribute'));
+
+        $this->assertEquals($array, $model->getOriginal('jsonAttribute'));
+        $this->assertEquals(['foo' => 'bar'], $model->getOriginal('jsonAttribute'));
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('jsonAttribute'));
+
+        $this->assertEquals(['foo' => 'bar'], $model->getOriginal('collectionAttribute')->toArray());
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
+    }
 }
 
 class EloquentTestObserverStub
@@ -2295,6 +2390,11 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 }
 

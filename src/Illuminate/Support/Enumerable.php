@@ -61,7 +61,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the median of a given key.
      *
-     * @param  string|array|null $key
+     * @param  string|array|null  $key
      * @return mixed
      */
     public function median($key = null);
@@ -755,10 +755,18 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Sort through each item with a callback.
      *
-     * @param  callable|null  $callback
+     * @param  callable|null|int  $callback
      * @return static
      */
-    public function sort(callable $callback = null);
+    public function sort($callback = null);
+
+    /**
+     * Sort items in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortDesc($options = SORT_REGULAR);
 
     /**
      * Sort the collection using the given callback.
@@ -791,7 +799,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Sort the collection keys in descending order.
      *
-     * @param  int $options
+     * @param  int  $options
      * @return static
      */
     public function sortKeysDesc($options = SORT_REGULAR);
@@ -823,7 +831,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Pass the enumerable to the given callback and return the result.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return mixed
      */
     public function pipe(callable $callback);

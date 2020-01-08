@@ -98,6 +98,44 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $this->assertFalse($repo->exists($user, 'wrong-token'));
     }
 
+    public function testRecentlyCreatedReturnsFalseIfNoRowFoundForUser()
+    {
+        $repo = $this->getRepo();
+        $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
+        $query->shouldReceive('first')->once()->andReturn(null);
+        $user = m::mock(CanResetPassword::class);
+        $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
+
+        $this->assertFalse($repo->recentlyCreatedToken($user));
+    }
+
+    public function testRecentlyCreatedReturnsTrueIfRecordIsRecentlyCreated()
+    {
+        $repo = $this->getRepo();
+        $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
+        $date = Carbon::now()->subSeconds(59)->toDateTimeString();
+        $query->shouldReceive('first')->once()->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
+        $user = m::mock(CanResetPassword::class);
+        $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
+
+        $this->assertTrue($repo->recentlyCreatedToken($user));
+    }
+
+    public function testRecentlyCreatedReturnsFalseIfValidRecordExists()
+    {
+        $repo = $this->getRepo();
+        $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
+        $date = Carbon::now()->subSeconds(61)->toDateTimeString();
+        $query->shouldReceive('first')->once()->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
+        $user = m::mock(CanResetPassword::class);
+        $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
+
+        $this->assertFalse($repo->recentlyCreatedToken($user));
+    }
+
     public function testDeleteMethodDeletesByToken()
     {
         $repo = $this->getRepo();

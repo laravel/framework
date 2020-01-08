@@ -35,6 +35,13 @@ interface PasswordBroker
     const INVALID_TOKEN = 'passwords.token';
 
     /**
+     * Constant representing a throttled reset attempt.
+     *
+     * @var string
+     */
+    const RESET_THROTTLED = 'passwords.throttled';
+
+    /**
      * Send a password reset link to a user.
      *
      * @param  array  $credentials
@@ -45,7 +52,7 @@ interface PasswordBroker
     /**
      * Reset the password for the given token.
      *
-     * @param  array     $credentials
+     * @param  array  $credentials
      * @param  \Closure  $callback
      * @return mixed
      */

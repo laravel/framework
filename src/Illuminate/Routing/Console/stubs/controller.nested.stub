@@ -1,21 +1,21 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
-use DummyFullModelClass;
-use DummyRootNamespaceHttp\Controllers\Controller;
+use {{ namespacedModel }};
+use {{ rootNamespace }}Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use ParentDummyFullModelClass;
+use {{ namespacedParentModel }};
 
-class DummyClass extends Controller
+class {{ class }} extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
+     * @param  \{{ namespacedParentModel }}  ${{ parentModelVariable }}
      * @return \Illuminate\Http\Response
      */
-    public function index(ParentDummyModelClass $ParentDummyModelVariable)
+    public function index({{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -23,10 +23,10 @@ class DummyClass extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
+     * @param  \{{ namespacedParentModel }}  ${{ parentModelVariable }}
      * @return \Illuminate\Http\Response
      */
-    public function create(ParentDummyModelClass $ParentDummyModelVariable)
+    public function create({{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -35,10 +35,10 @@ class DummyClass extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
+     * @param  \{{ namespacedParentModel }}  ${{ parentModelVariable }}
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, ParentDummyModelClass $ParentDummyModelVariable)
+    public function store(Request $request, {{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -46,11 +46,11 @@ class DummyClass extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
-     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @param  \{{ namespacedParentModel }}  ${{ parentModelVariable }}
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return \Illuminate\Http\Response
      */
-    public function show(ParentDummyModelClass $ParentDummyModelVariable, DummyModelClass $DummyModelVariable)
+    public function show({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -58,11 +58,11 @@ class DummyClass extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
-     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @param  \{{ namespacedParentModel }}  ${{ parentModelVariable }}
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return \Illuminate\Http\Response
      */
-    public function edit(ParentDummyModelClass $ParentDummyModelVariable, DummyModelClass $DummyModelVariable)
+    public function edit({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -71,11 +71,11 @@ class DummyClass extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
-     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @param  \{{ namespacedParentModel }}  ${{ parentModelVariable }}
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ParentDummyModelClass $ParentDummyModelVariable, DummyModelClass $DummyModelVariable)
+    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
     {
         //
     }
@@ -83,11 +83,11 @@ class DummyClass extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \ParentDummyFullModelClass  $ParentDummyModelVariable
-     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @param  \{{ namespacedParentModel }}  ${{ parentModelVariable }}
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ParentDummyModelClass $ParentDummyModelVariable, DummyModelClass $DummyModelVariable)
+    public function destroy({{ parentModel }} ${{ parentModelVariable }}, {{ model }} ${{ modelVariable }})
     {
         //
     }

@@ -46,6 +46,7 @@ abstract class GeneratorCommand extends Command
      * Execute the console command.
      *
      * @return bool|null
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
@@ -153,6 +154,7 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $name
      * @return string
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function buildClass($name)
@@ -171,11 +173,19 @@ abstract class GeneratorCommand extends Command
      */
     protected function replaceNamespace(&$stub, $name)
     {
-        $stub = str_replace(
+        $searches = [
             ['DummyNamespace', 'DummyRootNamespace', 'NamespacedDummyUserModel'],
-            [$this->getNamespace($name), $this->rootNamespace(), $this->userProviderModel()],
-            $stub
-        );
+            ['{{ namespace }}', '{{ rootNamespace }}', '{{ namespacedUserModel }}'],
+            ['{{namespace}}', '{{rootNamespace}}', '{{namespacedUserModel}}'],
+        ];
+
+        foreach ($searches as $search) {
+            $stub = str_replace(
+                $search,
+                [$this->getNamespace($name), $this->rootNamespace(), $this->userProviderModel()],
+                $stub
+            );
+        }
 
         return $this;
     }
@@ -202,7 +212,7 @@ abstract class GeneratorCommand extends Command
     {
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
 
-        return str_replace('DummyClass', $class, $stub);
+        return str_replace(['DummyClass', '{{ class }}', '{{class}}'], $class, $stub);
     }
 
     /**

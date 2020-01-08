@@ -11,6 +11,7 @@ use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -32,7 +33,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '7.0-dev';
+    const VERSION = '7.x-dev';
 
     /**
      * The base path for the Laravel installation.
@@ -131,6 +132,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @var string
      */
     protected $environmentFile = '.env';
+
+    /**
+     * Indicates if the application is running in the console.
+     *
+     * @var bool|null
+     */
+    protected $isRunningInConsole;
 
     /**
      * The application namespace.
@@ -552,11 +560,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function runningInConsole()
     {
-        if (Env::get('APP_RUNNING_IN_CONSOLE') !== null) {
-            return Env::get('APP_RUNNING_IN_CONSOLE') === true;
+        if ($this->isRunningInConsole === null) {
+            $this->isRunningInConsole = Env::get('APP_RUNNING_IN_CONSOLE') ?? (\PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg');
         }
 
-        return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
+        return $this->isRunningInConsole;
     }
 
     /**
@@ -578,7 +586,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $providers = Collection::make($this->config['app.providers'])
                         ->partition(function ($provider) {
-                            return Str::startsWith($provider, 'Illuminate\\');
+                            return strpos($provider, 'Illuminate\\') === 0;
                         });
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
@@ -591,7 +599,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Register a service provider with the application.
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
-     * @param  bool   $force
+     * @param  bool  $force
      * @return \Illuminate\Support\ServiceProvider
      */
     public function register($provider, $force = false)
@@ -1000,12 +1008,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Throw an HttpException with the given data.
      *
-     * @param  int     $code
+     * @param  int  $code
      * @param  string  $message
-     * @param  array   $headers
+     * @param  array  $headers
      * @return void
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function abort($code, $message = '', array $headers = [])
     {
@@ -1127,7 +1136,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this['translator']->setLocale($locale);
 
-        $this['events']->dispatch(new Events\LocaleUpdated($locale));
+        $this['events']->dispatch(new LocaleUpdated($locale));
     }
 
     /**
@@ -1178,6 +1187,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             'queue.failer'         => [\Illuminate\Queue\Failed\FailedJobProviderInterface::class],
             'redirect'             => [\Illuminate\Routing\Redirector::class],
             'redis'                => [\Illuminate\Redis\RedisManager::class, \Illuminate\Contracts\Redis\Factory::class],
+            'redis.connection'     => [\Illuminate\Redis\Connections\Connection::class, \Illuminate\Contracts\Redis\Connection::class],
             'request'              => [\Illuminate\Http\Request::class, \Symfony\Component\HttpFoundation\Request::class],
             'router'               => [\Illuminate\Routing\Router::class, \Illuminate\Contracts\Routing\Registrar::class, \Illuminate\Contracts\Routing\BindingRegistrar::class],
             'session'              => [\Illuminate\Session\SessionManager::class],
