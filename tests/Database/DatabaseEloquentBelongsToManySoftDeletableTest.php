@@ -62,7 +62,7 @@ class DatabaseEloquentBelongsToManySoftDeletableTest extends DatabaseTestCase
         DB::table('members')->insert([
             ['id' => 1, 'name' => 'Testmember 1'],
             ['id' => 2, 'name' => 'Testmember 2'],
-            ['id' => 3, 'name' => 'Testmember 3']
+            ['id' => 3, 'name' => 'Testmember 3'],
         ]);
     }
 
@@ -238,14 +238,13 @@ class DatabaseEloquentBelongsToManySoftDeletableTest extends DatabaseTestCase
     {
         return [
             [BelongsToManySoftDeletableTestTestGroup::class],
-            [BelongsToManySoftDeletableTestUsingTestGroup::class]
+            [BelongsToManySoftDeletableTestUsingTestGroup::class],
         ];
     }
 }
 
 class BelongsToManySoftDeletableTestTestGroup extends Eloquent
 {
-
     use SoftDeletes;
     protected $table = 'groups';
     protected $fillable = ['id', 'name'];
@@ -265,7 +264,6 @@ class BelongsToManySoftDeletableTestTestGroup extends Eloquent
 
 class BelongsToManySoftDeletableTestUsingTestGroup extends Eloquent
 {
-
     use SoftDeletes;
     protected $table = 'groups';
     protected $fillable = ['id', 'name'];
@@ -309,11 +307,13 @@ class BelongsToManySoftDeletableTestTestGroupMember extends Pivot implements Sof
     protected $fillable = ['id', 'group_id', 'member_id'];
     public $timestamps = false;
 
-    public function groups(){
+    public function groups()
+    {
         return $this->hasMany(BelongsToManySoftDeletableTestTestGroup::class);
     }
 
-    public function members(){
+    public function members()
+    {
         return $this->hasMany(BelongsToManySoftDeletableTestTestMember::class);
     }
 }

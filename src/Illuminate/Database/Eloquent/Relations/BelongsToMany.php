@@ -120,14 +120,14 @@ class BelongsToMany extends Relation
     protected $accessor = 'pivot';
 
     /**
-     * Name of the pivot table
+     * Name of the pivot table.
      *
      * @var string
      */
     protected $pivotTable;
 
     /**
-     * Instance of the pivot query used to query the m:n relationship
+     * Instance of the pivot query used to query the m:n relationship.
      *
      * @var Builder
      */
@@ -211,9 +211,10 @@ class BelongsToMany extends Relation
      * If this steps are executed before everything is configured the resulting join may still contain where clauses
      * of scopes which are disabled later in the process.
      */
-    protected function configureQuery(){
+    protected function configureQuery()
+    {
         $this->query->applyScopes();
-        if($this->using){
+        if($this->using)  {
             $this->pivotQuery->applyScopes();
         }
 
@@ -237,10 +238,10 @@ class BelongsToMany extends Relation
 
         $key = $baseTable.'.'.$this->relatedKey;
 
-        if($this->using){
+        if($this->using) {
             $query->joinSub($this->pivotQuery, $this->pivotTable, $key, '=', $this->getQualifiedRelatedPivotKeyName());
         }
-        else{
+        else {
             $query->join($this->table, $key, '=', $this->getQualifiedRelatedPivotKeyName());
         }
 
@@ -363,7 +364,7 @@ class BelongsToMany extends Relation
 
         //if the method is called after the constructor ran, which possibly sets the query without the needed parameters
         //for "performJoins", reinitialize the query and call addConstraints
-        if($this->query){
+        if ($this->query) {
             $this->query = $this->related->newModelQuery();
             $this->addConstraints();
         }
@@ -779,7 +780,8 @@ class BelongsToMany extends Relation
      * @param  string  $columns
      * @return int
      */
-    public function count($columns = '*'){
+    public function count($columns = '*')
+    {
         $this->configureQuery();
         return parent::count($columns);
     }
@@ -1275,9 +1277,10 @@ class BelongsToMany extends Relation
             if ($result === $this->pivotQuery) {
                 return $this;
             }
-        } else{
+        } else {
             $result = parent::__call($method, $parameters);
         }
+        
         return $result;
     }
 }

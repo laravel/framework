@@ -277,7 +277,7 @@ trait InteractsWithPivotTable
         $idsToAttach = $this->parseIds($id);
 
         //check if pivot model uses soft deleting
-        if(is_subclass_of($this->using, SoftDeletable::class)) {
+        if (is_subclass_of($this->using, SoftDeletable::class)) {
             // find the trashed pivots
             $pivots = $this->newPivotQuery()->onlyTrashed()->whereIn($this->getRelatedPivotKeyName(), $idsToAttach)->get();
             $restoredIds = [];
@@ -492,12 +492,12 @@ trait InteractsWithPivotTable
     protected function getCurrentlyAttachedPivots()
     {
         return $this->currentlyAttached ?: $this->newPivotQuery()->get()->map(function ($record) {
-            if($this->using) {
+            if ($this->using) {
                 $pivot = $record;
+            } else {
+                $pivot = Pivot::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
             }
-            else{
-                $pivot = Pivot::fromRawAttributes($this->parent, (array)$record, $this->getTable(), true);
-            }
+
             return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
         });
     }
@@ -536,10 +536,9 @@ trait InteractsWithPivotTable
      */
     public function newPivotStatement()
     {
-        if($this->using){
+        if ($this->using) {
             return ($this->using)::query();
-        }
-        else{
+        } else {
             return $this->query->getQuery()->newQuery()->from($this->table);
         }
     }
