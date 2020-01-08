@@ -133,7 +133,7 @@ class HashCaster implements CastsInboundAttributes
         $this->algorithm = $algorithm;
     }
 
-    public function set($model, $key, $value, $attributes)
+    public function toDatabase($model, $key, $value, $attributes)
     {
         return [$key => hash($this->algorithm, $value)];
     }

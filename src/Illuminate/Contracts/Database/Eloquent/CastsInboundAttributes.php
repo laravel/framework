@@ -13,5 +13,5 @@ interface CastsInboundAttributes
      * @param  array  $attributes
      * @return array
      */
-    public function set($model, string $key, $value, array $attributes);
+    public function toDatabase($model, string $key, $value, array $attributes);
 }
