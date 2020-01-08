@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\TestCase;
 
@@ -120,6 +121,40 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertCount(1, $country);
     }
 
+    public function testFindMethod()
+    {
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+                                 ->posts()->createMany([
+                                     ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                                     ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+                                 ]);
+
+        $country = HasManyThroughTestCountry::first();
+        $post = $country->posts()->find(1);
+
+        $this->assertNotNull($post);
+        $this->assertSame('A title', $post->title);
+
+        $this->assertCount(2, $country->posts()->find([1, 2]));
+        $this->assertCount(2, $country->posts()->find(new Collection([1, 2])));
+    }
+
+    public function testFindManyMethod()
+    {
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+                                 ->posts()->createMany([
+                                     ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                                     ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+                                 ]);
+
+        $country = HasManyThroughTestCountry::first();
+
+        $this->assertCount(2, $country->posts()->findMany([1, 2]));
+        $this->assertCount(2, $country->posts()->findMany(new Collection([1, 2])));
+    }
+
     public function testFirstOrFailThrowsAnException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -140,6 +175,30 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                                  ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail(1);
+    }
+
+    public function testFindOrFailWithManyThrowsAnException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+                                 ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrFail([1, 2]);
+    }
+
+    public function testFindOrFailWithManyUsingCollectionThrowsAnException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+                                 ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrFail(new Collection([1, 2]));
     }
 
     public function testFirstRetrievesFirstRecord()
@@ -195,7 +254,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'laravel_through_key', ], array_keys($post->getAttributes()));
+                'laravel_through_key',
+            ], array_keys($post->getAttributes()));
         });
     }
 
@@ -236,7 +296,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'laravel_through_key', ], array_keys($post->getAttributes()));
+                'laravel_through_key',
+            ], array_keys($post->getAttributes()));
         }
     }
 
@@ -255,7 +316,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'laravel_through_key', ], array_keys($post->getAttributes()));
+                'laravel_through_key',
+            ], array_keys($post->getAttributes()));
         });
     }
 
@@ -288,9 +350,9 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
                                  ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
                                  ->posts()->createMany([
-                ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
-                ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
-            ]);
+                                     ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                                     ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+                                 ]);
     }
 
     protected function seedDataExtended()
@@ -319,11 +381,11 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     protected function seedDefaultData()
     {
         HasManyThroughDefaultTestCountry::create(['id' => 1, 'name' => 'United States of America'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com'])
-                                 ->posts()->createMany([
-                ['title' => 'A title', 'body' => 'A body'],
-                ['title' => 'Another title', 'body' => 'Another body'],
-            ]);
+                                        ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com'])
+                                        ->posts()->createMany([
+                                            ['title' => 'A title', 'body' => 'A body'],
+                                            ['title' => 'Another title', 'body' => 'Another body'],
+                                        ]);
     }
 
     /**

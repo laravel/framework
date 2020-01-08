@@ -162,7 +162,7 @@ class EncryptCookies
     /**
      * Determine whether encryption has been disabled for the given cookie.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function isDisabled($name)

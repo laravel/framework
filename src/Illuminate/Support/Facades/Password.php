@@ -7,8 +7,6 @@ use Illuminate\Contracts\Auth\PasswordBroker;
 /**
  * @method static string sendResetLink(array $credentials)
  * @method static mixed reset(array $credentials, \Closure $callback)
- * @method static void validator(\Closure $callback)
- * @method static bool validateNewPassword(array $credentials)
  *
  * @see \Illuminate\Auth\Passwords\PasswordBroker
  */

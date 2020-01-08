@@ -234,6 +234,27 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([], false);
     }
 
+    public function testWithoutRelations()
+    {
+        $original = new EloquentNoTouchingModelStub;
+
+        $original->setRelation('foo', 'baz');
+
+        $this->assertEquals('baz', $original->getRelation('foo'));
+
+        $model = $original->withoutRelations();
+
+        $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertTrue($original->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('foo'));
+
+        $model = $original->unsetRelations();
+
+        $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertFalse($original->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('foo'));
+    }
+
     public function testMacroable()
     {
         Relation::macro('foo', function () {

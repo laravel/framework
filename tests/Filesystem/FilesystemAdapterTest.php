@@ -2,12 +2,15 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use GuzzleHttp\Psr7\Stream;
 use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -26,6 +29,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
         $filesystem->deleteDir(basename($this->tempDir));
+        m::close();
     }
 
     public function testResponse()
@@ -84,6 +88,12 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertTrue($filesystemAdapter->exists('file.txt'));
+    }
+
+    public function testMissing()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $this->assertTrue($filesystemAdapter->missing('file.txt'));
     }
 
     public function testPath()
@@ -217,5 +227,78 @@ class FilesystemAdapterTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->writeStream('file.txt', 'foo bar');
+    }
+
+    public function testPutWithStreamInterface()
+    {
+        file_put_contents($this->tempDir.'/foo.txt', 'some-data');
+        $spy = m::spy($this->filesystem);
+
+        $filesystemAdapter = new FilesystemAdapter($spy);
+        $stream = new Stream(fopen($this->tempDir.'/foo.txt', 'r'));
+        $filesystemAdapter->put('bar.txt', $stream);
+
+        $spy->shouldHaveReceived('putStream');
+        $this->assertEquals('some-data', $filesystemAdapter->get('bar.txt'));
+    }
+
+    public function testPutFileAs()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $uploadedFile = new UploadedFile($filePath, 'org.txt', null, null, true);
+
+        $storagePath = $filesystemAdapter->putFileAs('/', $uploadedFile, 'new.txt');
+
+        $this->assertSame('new.txt', $storagePath);
+
+        $this->assertFileExists($filePath);
+
+        $filesystemAdapter->assertExists($storagePath);
+
+        $this->assertSame('uploaded file content', $filesystemAdapter->read($storagePath));
+    }
+
+    public function testPutFileAsWithAbsoluteFilePath()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $storagePath = $filesystemAdapter->putFileAs('/', $filePath, 'new.txt');
+
+        $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
+    }
+
+    public function testPutFile()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $uploadedFile = new UploadedFile($filePath, 'org.txt', null, null, true);
+
+        $storagePath = $filesystemAdapter->putFile('/', $uploadedFile);
+
+        $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
+
+        $this->assertFileExists($filePath);
+
+        $filesystemAdapter->assertExists($storagePath);
+    }
+
+    public function testPutFileWithAbsoluteFilePath()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $storagePath = $filesystemAdapter->putFile('/', $filePath);
+
+        $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
+
+        $filesystemAdapter->assertExists($storagePath);
     }
 }

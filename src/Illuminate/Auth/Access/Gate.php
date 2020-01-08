@@ -144,7 +144,7 @@ class Gate implements GateContract
      *
      * @param  string  $name
      * @param  string  $class
-     * @param  array|null   $abilities
+     * @param  array|null  $abilities
      * @return $this
      */
     public function resource($name, $class, array $abilities = null)
@@ -379,7 +379,7 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  \Closure|string|array  $class
-     * @param  string|null $method
+     * @param  string|null  $method
      * @return bool
      */
     protected function canBeCalledWithUser($user, $class, $method = null)

@@ -91,6 +91,17 @@ class QueryBuilderTest extends DatabaseTestCase
         );
     }
 
+    public function testWhereValueSubQuery()
+    {
+        $subQuery = function ($query) {
+            $query->selectRaw("'Sub query value'");
+        };
+
+        $this->assertTrue(DB::table('posts')->where($subQuery, 'Sub query value')->exists());
+        $this->assertFalse(DB::table('posts')->where($subQuery, 'Does not match')->exists());
+        $this->assertTrue(DB::table('posts')->where($subQuery, '!=', 'Does not match')->exists());
+    }
+
     public function testWhereDate()
     {
         $this->assertSame(1, DB::table('posts')->whereDate('created_at', '2018-01-02')->count());

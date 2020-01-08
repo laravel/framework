@@ -4,9 +4,9 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
-use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\Constraints\HasInDatabase;
+use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
 trait InteractsWithDatabase
@@ -49,6 +49,25 @@ trait InteractsWithDatabase
 
     /**
      * Assert the given record has been deleted.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @param  array  $data
+     * @param  string|null  $connection
+     * @return $this
+     */
+    protected function assertDeleted($table, array $data = [], $connection = null)
+    {
+        if ($table instanceof Model) {
+            return $this->assertDatabaseMissing($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
+        }
+
+        $this->assertDatabaseMissing($table, $data, $connection);
+
+        return $this;
+    }
+
+    /**
+     * Assert the given record has been "soft deleted".
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data

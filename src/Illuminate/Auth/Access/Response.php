@@ -45,8 +45,8 @@ class Response implements Arrayable
     /**
      * Create a new "allow" Response.
      *
-     * @param string|null $message
-     * @param mixed $code
+     * @param  string|null  $message
+     * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
     public static function allow($message = null, $code = null)
@@ -57,8 +57,8 @@ class Response implements Arrayable
     /**
      * Create a new "deny" Response.
      *
-     * @param string|null $message
-     * @param mixed $code
+     * @param  string|null  $message
+     * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
     public static function deny($message = null, $code = null)
