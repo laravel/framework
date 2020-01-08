@@ -80,7 +80,7 @@ class Stringable
     /**
      * Append the given values to the string.
      *
-     * @param  dynamic  $values
+     * @param  array  $values
      * @return static
      */
     public function append(...$values)
@@ -364,7 +364,7 @@ class Stringable
     /**
      * Prepend the given values to the string.
      *
-     * @param  dynamic  $values
+     * @param  array  $values
      * @return static
      */
     public function prepend(...$values)
