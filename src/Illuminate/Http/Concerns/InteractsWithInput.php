@@ -54,8 +54,8 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        if (Str::startsWith($header, 'Bearer ')) {
-            return Str::substr($header, 7);
+        if (Str::startsWith($header, $prefix = 'Bearer ')) {
+            return Str::after($header, $prefix);
         }
     }
 
