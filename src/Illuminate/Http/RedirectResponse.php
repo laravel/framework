@@ -227,8 +227,8 @@ class RedirectResponse extends BaseRedirectResponse
             return $this->macroCall($method, $parameters);
         }
 
-        if (Str::startsWith($method, 'with')) {
-            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+        if (Str::startsWith($method, $prefix = 'with')) {
+            return $this->with(Str::snake(Str::after($method, $prefix)), $parameters[0]);
         }
 
         static::throwBadMethodCallException($method);
