@@ -133,6 +133,13 @@ class Mailable implements MailableContract, Renderable
     public $callbacks = [];
 
     /**
+     * The name of the mailer that should send the message.
+     *
+     * @var string
+     */
+    public $mailer;
+
+    /**
      * The callback that should be invoked while building the view data.
      *
      * @var callable
@@ -151,7 +158,7 @@ class Mailable implements MailableContract, Renderable
             Container::getInstance()->call([$this, 'build']);
 
             $mailer = $mailer instanceof MailFactory
-                            ? $mailer->mailer($this->mailer())
+                            ? $mailer->mailer($this->mailer)
                             : $mailer;
 
             return $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
@@ -814,13 +821,16 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Get the name of the mailer that should send the message.
+     * Set the name of the mailer that should send the message.
      *
+     * @param  string  $mailer
      * @return string
      */
-    public function mailer()
+    public function mailer($mailer)
     {
-        //
+        $this->mailer = $mailer;
+
+        return $this;
     }
 
     /**

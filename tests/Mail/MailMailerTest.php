@@ -196,7 +196,7 @@ class MailMailerTest extends TestCase
 
     protected function getMailer($events = null)
     {
-        return new Mailer(m::mock(Factory::class), m::mock(Swift_Mailer::class), $events);
+        return new Mailer('smtp', m::mock(Factory::class), m::mock(Swift_Mailer::class), $events);
     }
 
     public function setSwiftMailer($mailer)
@@ -212,7 +212,7 @@ class MailMailerTest extends TestCase
 
     protected function getMocks()
     {
-        return [m::mock(Factory::class), m::mock(Swift_Mailer::class)];
+        return ['smtp', m::mock(Factory::class), m::mock(Swift_Mailer::class)];
     }
 }
 

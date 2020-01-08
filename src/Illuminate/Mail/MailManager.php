@@ -115,6 +115,7 @@ class MailManager implements FactoryContract
         // on the mailer. This allows us to resolve mailer classes via containers
         // for maximum testability on said classes instead of passing Closures.
         $mailer = new Mailer(
+            $name,
             $this->app['view'],
             $this->createSwiftMailer($config),
             $this->app['events']
