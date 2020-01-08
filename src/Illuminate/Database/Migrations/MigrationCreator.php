@@ -19,7 +19,7 @@ class MigrationCreator
     /**
      * The custom app stubs directory.
      *
-     * @var \Illuminate\Filesystem\Filesystem
+     * @var string
      */
     protected $customStubPath;
 
