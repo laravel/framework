@@ -4,8 +4,8 @@ namespace Illuminate\Mail;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection;
@@ -142,13 +142,17 @@ class Mailable implements MailableContract, Renderable
     /**
      * Send the message using the given mailer.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer  $mailer
      * @return void
      */
-    public function send(MailerContract $mailer)
+    public function send($mailer)
     {
         return $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
+
+            $mailer = $mailer instanceof MailFactory
+                            ? $mailer->mailer($this->mailer())
+                            : $mailer;
 
             return $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
                 $this->buildFrom($message)
@@ -807,6 +811,16 @@ class Mailable implements MailableContract, Renderable
                 ->all();
 
         return $this;
+    }
+
+    /**
+     * Get the name of the mailer that should send the message.
+     *
+     * @return string
+     */
+    public function mailer()
+    {
+        //
     }
 
     /**

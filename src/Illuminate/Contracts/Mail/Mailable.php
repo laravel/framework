@@ -9,10 +9,10 @@ interface Mailable
     /**
      * Send the message using the given mailer.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer  $mailer
      * @return void
      */
-    public function send(Mailer $mailer);
+    public function send($mailer);
 
     /**
      * Queue the given message.
