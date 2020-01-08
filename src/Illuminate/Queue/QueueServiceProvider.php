@@ -256,8 +256,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerOpisSecurityKey()
     {
-        if (Str::startsWith($key = $this->app['config']->get('app.key'), 'base64:')) {
-            $key = base64_decode(substr($key, 7));
+        if (Str::startsWith($key = $this->app['config']->get('app.key'), $prefix = 'base64:')) {
+            $key = base64_decode(Str::after($key, $prefix));
         }
 
         SerializableClosure::setSecretKey($key);
