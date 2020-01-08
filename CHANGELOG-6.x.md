@@ -1,14 +1,22 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.9.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.10.0...6.x)
+
+
+## [v6.10.0 (2020-01-07)](https://github.com/laravel/framework/compare/v6.9.0...v6.10.0)
 
 ### Added
 - Added `withoutMix()` and `withMix()` test helpers ([#30900](https://github.com/laravel/framework/pull/30900))
 - Added `validateWithBag()` macro to `Request` ([#30896](https://github.com/laravel/framework/pull/30896))
-- Added PHPUnit 9 support ([#30947](https://github.com/laravel/framework/pull/30947))
+- Added PHPUnit 9 support ([#30947](https://github.com/laravel/framework/pull/30947), [#30989](https://github.com/laravel/framework/pull/30989))
 - Added `exclude_if` and `exclude_unless` validation rules ([#30835](https://github.com/laravel/framework/pull/30835), [c0fdb56](https://github.com/laravel/framework/commit/c0fdb566831b7ebf34a15bbdfec81dd0039c76f0))
 - Added generated columns (virtual/stored) support for PostgreSQL ([#30971](https://github.com/laravel/framework/pull/30971))
 - Added `mixin` support to Eloquent builder ([#30978](https://github.com/laravel/framework/pull/30978), [28fa74e](https://github.com/laravel/framework/commit/28fa74e8222a57118ae1b590101a35f63b964f81))
+- Make the Redis Connection `Macroable` ([#31020](https://github.com/laravel/framework/pull/31020))
+- Added `PackageManifest::config()` method ([#31039](https://github.com/laravel/framework/pull/31039), [9b73540](https://github.com/laravel/framework/commit/9b73540cbe7ebb67b0a0a127743791511e5ae8fe))
+- Added `redis.connection` aliases in container ([#31034](https://github.com/laravel/framework/pull/31034))
+- Extracted `CallsCommands` feature from `Illuminate\Console\Command` ([#31026](https://github.com/laravel/framework/pull/31026), [ef72716](https://github.com/laravel/framework/commit/ef72716db85f36e003fb92d2625adabbf94d5afe))
+- Allowed absolute file path for `Storage::putFile()` ([#31040](https://github.com/laravel/framework/pull/31040))
 
 ### Changed
 - Handled passing too many arguments to `@slot` ([#30893](https://github.com/laravel/framework/pull/30893), [878f159](https://github.com/laravel/framework/commit/878f15922523e748bfbfdf50f40269f8ffe20d9d))
@@ -16,28 +24,30 @@
 - Used `league/commonmark` instead of `erusev/parsedown` for mail markdown ([#30982](https://github.com/laravel/framework/pull/30982))
 - Regenerate token on logout ([b2af428](https://github.com/laravel/framework/commit/b2af428e60188ea55fb06f3a1e0b0b0c690bbe86))
 - Make `RedisQueue::getConnection()` public ([#31016](https://github.com/laravel/framework/pull/31016))
+- Resolve `Faker\Generator` out of the container if it is bound ([#30992](https://github.com/laravel/framework/pull/30992))
 
 ### Fixed
 - Fixed `float` database types in `Blueprint` ([#30891](https://github.com/laravel/framework/pull/30891))
 - Fixed code that depended on `getenv()` ([#30924](https://github.com/laravel/framework/pull/30924))
 - Prevented making actual pdo connections while reconnecting ([#30998](https://github.com/laravel/framework/pull/30998))
 - Fixed `exclude_if` \ `exclude_unless` validation rules for nested data ([#31006](https://github.com/laravel/framework/pull/31006))
+- Update `dev-master` branch aliases from `6.0-dev` to `6.x-dev` ([d06cc79](https://github.com/laravel/framework/commit/d06cc79d92c18b0ff423466554eeed0aea09ae51))
+- Utilize Symfony’s PSR Factory. Fixed [#31017](https://github.com/laravel/framework/issues/31017) ([#31018](https://github.com/laravel/framework/pull/31018), [#31027](https://github.com/laravel/framework/pull/31027))
+- Used model connection by default in the database validators ([#31037](https://github.com/laravel/framework/pull/31037))
 
 ### Optimization
 - Optimize Service Provider registration ([#30960](https://github.com/laravel/framework/pull/30960))
 - Optimize `runningInConsole` method ([#30922](https://github.com/laravel/framework/pull/30922))
+- Delay instantiation of translator and view factory ([#31009](https://github.com/laravel/framework/pull/31009))
 
 ### Deprecated
 - Deprecate `PendingMail::sendNow()` and remove unneeded check ([#30999](https://github.com/laravel/framework/pull/30999))
 
+### Reverted
+- Reverted [TransactionCommitted event doesn’t contain transaction level I’d expect it to](https://github.com/laravel/framework/pull/30883) ([#31051](https://github.com/laravel/framework/pull/31051))
+
 ### Refactoring
 - Refactoring of `BladeCompiler::compileString()` method ([08887f9](https://github.com/laravel/framework/commit/08887f99d05bb85affd3cbc6f7fdbc32a9297eea))
-
-### TODO
-- Bring in array subset code directly ([#30989](https://github.com/laravel/framework/pull/30989))
-- Resolve Faker\Generator out of the container if it is bound ([#30992](https://github.com/laravel/framework/pull/30992))
-- Utilize Symfony’s PSR Factory ([#31018](https://github.com/laravel/framework/pull/31018))
-- Added missing class exists checks ([#31027](https://github.com/laravel/framework/pull/31027))
 
 
 ## [v6.9.0 (2019-12-19)](https://github.com/laravel/framework/compare/v6.8.0...v6.9.0)
