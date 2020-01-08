@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use Postmark\ThrowExceptionOnFailurePlugin;
 use Postmark\Transport as PostmarkTransport;
 use Psr\Log\LoggerInterface;
+use Swift_DependencyContainer;
 use Swift_Mailer;
 use Swift_SendmailTransport as SendmailTransport;
 use Swift_SmtpTransport as SmtpTransport;
@@ -143,8 +144,8 @@ class MailManager implements FactoryContract
     {
         if ($config['domain'] ?? false) {
             Swift_DependencyContainer::getInstance()
-                            ->register('mime.idgenerator.idright')
-                            ->asValue($config['domain']);
+                ->register('mime.idgenerator.idright')
+                ->asValue($config['domain']);
         }
 
         return new Swift_Mailer($this->createTransport($config));
@@ -162,13 +163,13 @@ class MailManager implements FactoryContract
         // assume an application is still using the legacy mail configuration file
         // format and use the "mail.driver" configuration option instead for BC.
         $transport = $config['transport'] ??
-                     $this->app['config']['mail.driver'];
+            $this->app['config']['mail.driver'];
 
         if (isset($this->customCreators[$transport])) {
             return call_user_func($this->customCreators[$transport], $config);
         }
 
-        if (! method_exists($this, $method = 'create'.ucfirst($transport).'Transport')) {
+        if (!method_exists($this, $method = 'create' . ucfirst($transport) . 'Transport')) {
             throw new InvalidArgumentException("Unsupported mail transport [{$config['transport']}].");
         }
 
@@ -187,10 +188,11 @@ class MailManager implements FactoryContract
         // for delivering mail such as Sendgrid, Amazon SES, or a custom server
         // a developer has available. We will just pass this configured host.
         $transport = new SmtpTransport(
-            $config['host'], $config['port']
+            $config['host'],
+            $config['port']
         );
 
-        if (! empty($config['encryption'])) {
+        if (!empty($config['encryption'])) {
             $transport->setEncryption($config['encryption']);
         }
 
@@ -268,7 +270,7 @@ class MailManager implements FactoryContract
      */
     protected function addSesCredentials(array $config)
     {
-        if (! empty($config['key']) && ! empty($config['secret'])) {
+        if (!empty($config['key']) && !empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
@@ -354,7 +356,9 @@ class MailManager implements FactoryContract
     protected function guzzle(array $config)
     {
         return new HttpClient(Arr::add(
-            $config['guzzle'] ?? [], 'connect_timeout', 60
+            $config['guzzle'] ?? [],
+            'connect_timeout',
+            60
         ));
     }
 
@@ -371,7 +375,7 @@ class MailManager implements FactoryContract
         $address = Arr::get($config, $type);
 
         if (is_array($address) && isset($address['address'])) {
-            $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
+            $mailer->{'always' . Str::studly($type)}($address['address'], $address['name']);
         }
     }
 
@@ -387,8 +391,8 @@ class MailManager implements FactoryContract
         // the entire mail configuration file as the "driver" config in order to
         // provide "BC" for any Laravel <= 6.x style mail configuration files.
         return $this->app['config']['mail.driver']
-                    ? $this->app['config']['mail']
-                    : $this->app['config']["mail.mailers.{$name}"];
+            ? $this->app['config']['mail']
+            : $this->app['config']["mail.mailers.{$name}"];
     }
 
     /**
@@ -402,7 +406,7 @@ class MailManager implements FactoryContract
         // that as the default driver in order to provide support for old styles
         // of the Laravel mail configuration file for backwards compatibility.
         return $this->app['config']['mail.driver'] ??
-               $this->app['config']['mail.default'];
+            $this->app['config']['mail.default'];
     }
 
     /**
