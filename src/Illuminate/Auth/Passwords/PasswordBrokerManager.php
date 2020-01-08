@@ -82,9 +82,7 @@ class PasswordBrokerManager implements FactoryContract
      */
     protected function createTokenRepository(array $config)
     {
-        $key = $this->app['config']['app.key'];
-        
-        if (Str::startsWith($key, $prefix = 'base64:')) {
+        if (Str::startsWith($key = $this->app['config']->get('app.key'), $prefix = 'base64:')) {
             $key = base64_decode(Str::after($key, $prefix));
         }
 
