@@ -141,12 +141,12 @@ class HashCaster implements CastsInboundAttributes
 
 class ReverseCaster implements CastsAttributes
 {
-    public function get($model, $key, $value, $attributes)
+    public function fromDatabase($model, $key, $value, $attributes)
     {
         return strrev($value);
     }
 
-    public function set($model, $key, $value, $attributes)
+    public function toDatabase($model, $key, $value, $attributes)
     {
         return [$key => strrev($value)];
     }
@@ -154,12 +154,12 @@ class ReverseCaster implements CastsAttributes
 
 class AddressCaster implements CastsAttributes
 {
-    public function get($model, $key, $value, $attributes)
+    public function fromDatabase($model, $key, $value, $attributes)
     {
         return new Address($attributes['address_line_one'], $attributes['address_line_two']);
     }
 
-    public function set($model, $key, $value, $attributes)
+    public function toDatabase($model, $key, $value, $attributes)
     {
         return ['address_line_one' => $value->lineOne, 'address_line_two' => $value->lineTwo];
     }
@@ -167,12 +167,12 @@ class AddressCaster implements CastsAttributes
 
 class JsonCaster implements CastsAttributes
 {
-    public function get($model, $key, $value, $attributes)
+    public function fromDatabase($model, $key, $value, $attributes)
     {
         return json_decode($value, true);
     }
 
-    public function set($model, $key, $value, $attributes)
+    public function toDatabase($model, $key, $value, $attributes)
     {
         return json_encode($value);
     }

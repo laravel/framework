@@ -13,7 +13,7 @@ interface CastsAttributes
      * @param  array  $attributes
      * @return mixed
      */
-    public function get($model, string $key, $value, array $attributes);
+    public function fromDatabase($model, string $key, $value, array $attributes);
 
     /**
      * Transform the attribute to its underlying model values.
@@ -24,5 +24,5 @@ interface CastsAttributes
      * @param  array  $attributes
      * @return array
      */
-    public function set($model, string $key, $value, array $attributes);
+    public function toDatabase($model, string $key, $value, array $attributes);
 }
