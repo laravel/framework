@@ -6,7 +6,6 @@ use Aws\Ses\SesClient;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
-use Illuminate\Mail\TransportManager;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
