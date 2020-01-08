@@ -242,7 +242,7 @@ class MailManager implements FactoryContract
     protected function createSendmailTransport(array $config)
     {
         return new SendmailTransport(
-            $config['sendmail'] ?? $this->app['config']->get('mail.sendmail')
+            $config['path'] ?? $this->app['config']->get('mail.sendmail')
         );
     }
 
@@ -331,7 +331,7 @@ class MailManager implements FactoryContract
 
         if ($logger instanceof LogManager) {
             $logger = $logger->channel(
-                $config['log_channel'] ?? $this->app['config']->get('mail.log_channel')
+                $config['channel'] ?? $this->app['config']->get('mail.log_channel')
             );
         }
 
