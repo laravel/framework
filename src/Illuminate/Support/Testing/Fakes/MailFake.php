@@ -11,6 +11,13 @@ use PHPUnit\Framework\Assert as PHPUnit;
 class MailFake implements Mailer, MailQueue
 {
     /**
+     * The mailer currently being used to send a message.
+     *
+     * @var string
+     */
+    protected $currentMailer;
+
+    /**
      * All of the mailables that have been sent.
      *
      * @var array
@@ -241,6 +248,19 @@ class MailFake implements Mailer, MailQueue
     }
 
     /**
+     * Get a mailer instance by name.
+     *
+     * @param  string|null  $name
+     * @return \Illuminate\Mail\Mailer
+     */
+    public function mailer($name = null)
+    {
+        $this->currentMailer = $name;
+
+        return $this;
+    }
+
+    /**
      * Begin the process of mailing a mailable class instance.
      *
      * @param  mixed  $users
@@ -288,6 +308,10 @@ class MailFake implements Mailer, MailQueue
             return;
         }
 
+        $view->mailer($this->currentMailer);
+
+        $this->currentMailer = null;
+
         if ($view instanceof ShouldQueue) {
             return $this->queue($view, $data);
         }
@@ -307,6 +331,10 @@ class MailFake implements Mailer, MailQueue
         if (! $view instanceof Mailable) {
             return;
         }
+
+        $view->mailer($this->currentMailer);
+
+        $this->currentMailer = null;
 
         $this->queuedMailables[] = $view;
     }

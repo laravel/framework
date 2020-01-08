@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Mail;
 use Aws\Ses\SesClient;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
+use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesTransport;
-use Illuminate\Mail\TransportManager;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Swift_Message;
@@ -17,6 +17,7 @@ class MailSesTransportTest extends TestCase
     public function testGetTransport()
     {
         $container = new Container();
+
         $container->singleton('config', function () {
             return new Repository([
                 'services.ses' => [
@@ -27,10 +28,10 @@ class MailSesTransportTest extends TestCase
             ]);
         });
 
-        $manager = new TransportManager($container);
+        $manager = new MailManager($container);
 
         /** @var SesTransport $transport */
-        $transport = $manager->driver('ses');
+        $transport = $manager->createTransport(['transport' => 'ses']);
 
         /** @var SesClient $ses */
         $ses = $transport->ses();

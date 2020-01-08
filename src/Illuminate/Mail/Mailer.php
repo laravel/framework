@@ -22,6 +22,13 @@ class Mailer implements MailerContract, MailQueueContract
     use Macroable;
 
     /**
+     * The name that is configured for the mailer.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * The view factory instance.
      *
      * @var \Illuminate\Contracts\View\Factory
@@ -80,13 +87,15 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Create a new Mailer instance.
      *
+     * @param  string  $name
      * @param  \Illuminate\Contracts\View\Factory  $views
      * @param  \Swift_Mailer  $swift
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      * @return void
      */
-    public function __construct(Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
+    public function __construct(string $name, Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
     {
+        $this->name = $name;
         $this->views = $views;
         $this->swift = $swift;
         $this->events = $events;
@@ -273,8 +282,8 @@ class Mailer implements MailerContract, MailQueueContract
     protected function sendMailable(MailableContract $mailable)
     {
         return $mailable instanceof ShouldQueue
-                        ? $mailable->queue($this->queue)
-                        : $mailable->send($this);
+                        ? $mailable->mailer($this->name)->queue($this->queue)
+                        : $mailable->mailer($this->name)->send($this);
     }
 
     /**
@@ -387,7 +396,7 @@ class Mailer implements MailerContract, MailQueueContract
             $view->onQueue($queue);
         }
 
-        return $view->queue($this->queue);
+        return $view->mailer($this->name)->queue($this->queue);
     }
 
     /**
@@ -432,7 +441,9 @@ class Mailer implements MailerContract, MailQueueContract
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->later($delay, is_null($queue) ? $this->queue : $queue);
+        return $view->mailer($this->name)->later(
+            $delay, is_null($queue) ? $this->queue : $queue
+        );
     }
 
     /**

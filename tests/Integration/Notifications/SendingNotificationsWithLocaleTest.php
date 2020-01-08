@@ -75,7 +75,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::send($user, new GreetingMailNotification);
 
         $this->assertStringContainsString('hello',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
     }
 
@@ -89,7 +89,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
     }
 
@@ -109,11 +109,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::send($users, (new GreetingMailNotification)->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[1]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[1]->getBody()
         );
     }
 
@@ -127,7 +127,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotificationWithMailable);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
     }
 
@@ -147,11 +147,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $user->notify((new GreetingMailNotification)->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
 
         $this->assertRegExp('/dans (1|un) jour/',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
 
         $this->assertTrue($this->app->isLocale('en'));
@@ -169,7 +169,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $recipient->notify(new GreetingMailNotification);
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
     }
 
@@ -194,13 +194,13 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
         $this->assertStringContainsString('hola',
-            app('swift.transport')->messages()[1]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[1]->getBody()
         );
         $this->assertStringContainsString('hello',
-            app('swift.transport')->messages()[2]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[2]->getBody()
         );
     }
 
@@ -216,7 +216,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
     }
 
@@ -232,7 +232,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mailer')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
     }
 }
