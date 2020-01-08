@@ -13,15 +13,16 @@ class MailLogTransportTest extends TestCase
 {
     public function testGetLogTransportWithConfiguredChannel()
     {
+        $this->app['config']->set('mail.driver', 'log');
+
         $this->app['config']->set('mail.log_channel', 'mail');
+
         $this->app['config']->set('logging.channels.mail', [
             'driver' => 'single',
             'path' => 'mail.log',
         ]);
 
-        $manager = $this->app['swift.transport'];
-
-        $transport = $manager->driver('log');
+        $transport = app('mailer')->getSwiftMailer()->getTransport();
         $this->assertInstanceOf(LogTransport::class, $transport);
 
         $logger = $transport->logger();
@@ -34,10 +35,11 @@ class MailLogTransportTest extends TestCase
 
     public function testGetLogTransportWithPsrLogger()
     {
+        $this->app['config']->set('mail.driver', 'log');
         $logger = $this->app->instance('log', new NullLogger());
 
-        $manager = $this->app['swift.transport'];
+        $transportLogger = app('mailer')->getSwiftMailer()->getTransport()->logger();
 
-        $this->assertEquals($logger, $manager->driver('log')->logger());
+        $this->assertEquals($logger, $transportLogger);
     }
 }
