@@ -115,6 +115,17 @@ class MailMailableTest extends TestCase
 
         $this->assertSame($expected, $mailable->buildViewData());
     }
+
+    public function testMailerMayBeSet()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->mailer('array');
+
+        $mailable = unserialize(serialize($mailable));
+
+        $this->assertEquals('array', $mailable->mailer);
+    }
 }
 
 class WelcomeMailableStub extends Mailable

@@ -824,7 +824,7 @@ class Mailable implements MailableContract, Renderable
      * Set the name of the mailer that should send the message.
      *
      * @param  string  $mailer
-     * @return string
+     * @return $this
      */
     public function mailer($mailer)
     {
