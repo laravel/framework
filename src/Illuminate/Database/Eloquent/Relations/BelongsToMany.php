@@ -214,7 +214,7 @@ class BelongsToMany extends Relation
     protected function configureQuery()
     {
         $this->query->applyScopes();
-        if($this->using)  {
+        if ($this->using) {
             $this->pivotQuery->applyScopes();
         }
 
@@ -238,10 +238,9 @@ class BelongsToMany extends Relation
 
         $key = $baseTable.'.'.$this->relatedKey;
 
-        if($this->using) {
+        if ($this->using) {
             $query->joinSub($this->pivotQuery, $this->pivotTable, $key, '=', $this->getQualifiedRelatedPivotKeyName());
-        }
-        else {
+        } else {
             $query->join($this->table, $key, '=', $this->getQualifiedRelatedPivotKeyName());
         }
 
@@ -783,6 +782,7 @@ class BelongsToMany extends Relation
     public function count($columns = '*')
     {
         $this->configureQuery();
+
         return parent::count($columns);
     }
 
@@ -1280,7 +1280,7 @@ class BelongsToMany extends Relation
         } else {
             $result = parent::__call($method, $parameters);
         }
-        
+
         return $result;
     }
 }
