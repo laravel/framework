@@ -108,6 +108,8 @@ class Markdown
             'allow_unsafe_links' => false,
         ], $environment);
 
+        $text = preg_replace("/^\\h+/m", '', $text->toHtml());
+
         return new HtmlString($converter->convertToHtml($text));
     }
 
