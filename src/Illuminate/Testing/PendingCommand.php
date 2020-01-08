@@ -1,9 +1,10 @@
 <?php
 
-namespace Illuminate\Foundation\Testing;
+namespace Illuminate\Testing;
 
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Contracts\Container\Container;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -22,7 +23,7 @@ class PendingCommand
     /**
      * The application instance.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $app;
 
@@ -58,12 +59,12 @@ class PendingCommand
      * Create a new pending console command run.
      *
      * @param  \PHPUnit\Framework\TestCase  $test
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Container\Container  $app
      * @param  string  $command
      * @param  array  $parameters
      * @return void
      */
-    public function __construct(PHPUnitTestCase $test, $app, $command, $parameters)
+    public function __construct(PHPUnitTestCase $test, Container $app, $command, $parameters)
     {
         $this->app = $app;
         $this->test = $test;
@@ -133,7 +134,7 @@ class PendingCommand
         $this->mockConsoleOutput();
 
         try {
-            $exitCode = $this->app[Kernel::class]->call($this->command, $this->parameters);
+            $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters);
         } catch (NoMatchingExpectationException $e) {
             if ($e->getMethodName() === 'askQuestion') {
                 $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');

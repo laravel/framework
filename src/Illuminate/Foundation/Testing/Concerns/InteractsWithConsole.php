@@ -4,8 +4,8 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Foundation\Testing\PendingCommand;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\PendingCommand;
 
 trait InteractsWithConsole
 {
