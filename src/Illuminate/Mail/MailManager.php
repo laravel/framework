@@ -169,7 +169,7 @@ class MailManager implements FactoryContract
             return call_user_func($this->customCreators[$transport], $config);
         }
 
-        if (!method_exists($this, $method = 'create' . ucfirst($transport) . 'Transport')) {
+        if (! method_exists($this, $method = 'create'.ucfirst($transport).'Transport')) {
             throw new InvalidArgumentException("Unsupported mail transport [{$config['transport']}].");
         }
 
@@ -192,7 +192,7 @@ class MailManager implements FactoryContract
             $config['port']
         );
 
-        if (!empty($config['encryption'])) {
+        if (! empty($config['encryption'])) {
             $transport->setEncryption($config['encryption']);
         }
 
@@ -270,7 +270,7 @@ class MailManager implements FactoryContract
      */
     protected function addSesCredentials(array $config)
     {
-        if (!empty($config['key']) && !empty($config['secret'])) {
+        if (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
@@ -375,7 +375,7 @@ class MailManager implements FactoryContract
         $address = Arr::get($config, $type);
 
         if (is_array($address) && isset($address['address'])) {
-            $mailer->{'always' . Str::studly($type)}($address['address'], $address['name']);
+            $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
         }
     }
 
