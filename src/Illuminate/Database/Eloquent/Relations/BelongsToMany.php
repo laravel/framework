@@ -198,11 +198,26 @@ class BelongsToMany extends Relation
      */
     public function addConstraints()
     {
-        $this->performJoin();
-
         if (static::$constraints) {
             $this->addWhereConstraints();
         }
+    }
+
+    /**
+     * Create the joins and apply the scopes.
+     *
+     * This method should be called when the query is finally configured and ready to be executed.
+     *
+     * If this steps are executed before everything is configured the resulting join may still contain where clauses
+     * of scopes which are disabled later in the process.
+     */
+    protected function configureQuery(){
+        $this->query->applyScopes();
+        if($this->using){
+            $this->pivotQuery->applyScopes();
+        }
+
+        $this->performJoin();
     }
 
     /**
@@ -665,17 +680,15 @@ class BelongsToMany extends Relation
      */
     public function get($columns = ['*'])
     {
+        $this->configureQuery();
+
         // First we'll add the proper select columns onto the query so it is run with
         // the proper columns. Then, we will get the results and hydrate out pivot
         // models with the result of those columns as a separate model relation.
-        $builder = $this->query->applyScopes();
-        if($this->using){
-            $this->pivotQuery->applyScopes();
-        }
 
-        $columns = $builder->getQuery()->columns ? [] : $columns;
+        $columns = $this->query->getQuery()->columns ? [] : $columns;
 
-        $models = $builder->addSelect(
+        $models = $this->query->addSelect(
             $this->shouldSelect($columns)
         )->getModels();
 
@@ -685,7 +698,7 @@ class BelongsToMany extends Relation
         // have been specified as needing to be eager loaded. This will solve the
         // n + 1 query problem for the developer and also increase performance.
         if (count($models) > 0) {
-            $models = $builder->eagerLoadRelations($models);
+            $models = $this->query->eagerLoadRelations($models);
         }
 
         return $this->related->newCollection($models);
@@ -733,6 +746,7 @@ class BelongsToMany extends Relation
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
+        $this->configureQuery();
         $this->query->addSelect($this->shouldSelect($columns));
 
         return tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
@@ -751,11 +765,23 @@ class BelongsToMany extends Relation
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
+        $this->configureQuery();
         $this->query->addSelect($this->shouldSelect($columns));
 
         return tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), function ($paginator) {
             $this->hydratePivotRelation($paginator->items());
         });
+    }
+
+    /**
+     * Retrieve the "count" result of the query.
+     *
+     * @param  string  $columns
+     * @return int
+     */
+    public function count($columns = '*'){
+        $this->configureQuery();
+        return parent::count($columns);
     }
 
     /**
@@ -767,6 +793,7 @@ class BelongsToMany extends Relation
      */
     public function chunk($count, callable $callback)
     {
+        $this->configureQuery();
         $this->query->addSelect($this->shouldSelect());
 
         return $this->query->chunk($count, function ($results) use ($callback) {
@@ -787,6 +814,7 @@ class BelongsToMany extends Relation
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
     {
+        $this->configureQuery();
         $this->query->addSelect($this->shouldSelect());
 
         $column = $column ?? $this->getRelated()->qualifyColumn(
@@ -827,6 +855,7 @@ class BelongsToMany extends Relation
      */
     public function cursor()
     {
+        $this->configureQuery();
         $this->query->addSelect($this->shouldSelect());
 
         return $this->query->cursor()->map(function ($model) {

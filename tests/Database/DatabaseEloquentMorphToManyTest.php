@@ -99,7 +99,6 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('getMorphClass')->andReturn(get_class($related));
 
-        $builder->shouldReceive('join')->once()->with('taggables', 'tags.id', '=', 'taggables.tag_id');
         $builder->shouldReceive('where')->once()->with('taggables.taggable_id', '=', 1);
         $builder->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($parent));
 
