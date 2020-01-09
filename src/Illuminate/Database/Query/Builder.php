@@ -1624,7 +1624,7 @@ class Builder
      */
     public function dynamicWhere($method, $parameters)
     {
-        $finder = substr($method, 5);
+        $finder = Str::after($method, 'where');
 
         $segments = preg_split(
             '/(And|Or)(?=[A-Z])/', $finder, -1, PREG_SPLIT_DELIM_CAPTURE
