@@ -41,7 +41,7 @@ class Arr
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @return array
      */
     public static function collapse($array)
@@ -64,7 +64,7 @@ class Arr
     /**
      * Cross join the given arrays, returning all possible permutations.
      *
-     * @param  array  ...$arrays
+     * @param  iterable  ...$arrays
      * @return array
      */
     public static function crossJoin(...$arrays)
@@ -102,7 +102,7 @@ class Arr
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @param  string  $prepend
      * @return array
      */
@@ -154,7 +154,7 @@ class Arr
     /**
      * Return the first element in an array passing a given truth test.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @param  callable|null  $callback
      * @param  mixed  $default
      * @return mixed
@@ -200,7 +200,7 @@ class Arr
     /**
      * Flatten a multi-dimensional array into a single level.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @param  int  $depth
      * @return array
      */
@@ -372,7 +372,7 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @param  string|array  $value
      * @param  string|array|null  $key
      * @return array
