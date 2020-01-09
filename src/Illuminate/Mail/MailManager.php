@@ -254,9 +254,13 @@ class MailManager implements FactoryContract
      */
     protected function createSesTransport(array $config)
     {
-        $config = array_merge($this->app['config']->get($config['service'] ?? 'services.ses', []), [
-            'version' => 'latest', 'service' => 'email',
-        ]);
+        if (! isset($config['secret'])) {
+            $config = array_merge($this->app['config']->get('services.ses', []), [
+                'version' => 'latest', 'service' => 'email',
+            ]);
+        }
+
+        $config = Arr::except($config, ['transport']);
 
         return new SesTransport(
             new SesClient($this->addSesCredentials($config)),
@@ -297,7 +301,9 @@ class MailManager implements FactoryContract
      */
     protected function createMailgunTransport(array $config)
     {
-        $config = $this->app['config']->get($config['service'] ?? 'services.mailgun', []);
+        if (! isset($config['secret'])) {
+            $config = $this->app['config']->get('services.mailgun', []);
+        }
 
         return new MailgunTransport(
             $this->guzzle($config),
