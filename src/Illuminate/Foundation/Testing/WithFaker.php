@@ -45,7 +45,7 @@ trait WithFaker
     {
         $locale = $locale ?? config('app.faker_locale', Factory::DEFAULT_LOCALE);
 
-        if ($this->app->bound(Generator::class)) {
+        if (isset($this->app) && $this->app->bound(Generator::class)) {
             return $this->app->make(Generator::class, [$locale]);
         }
 
