@@ -161,7 +161,34 @@ abstract class GeneratorCommand extends Command
     {
         $stub = $this->files->get($this->getStub());
 
-        return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+        return $this->replaceStrictTypes($stub)->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+    }
+
+    /**
+     * Adds declare(strict_types = 1); or removes its placeholder
+     *
+     * @param  string  $stub
+     * @return $this
+     */
+    protected function replaceStrictTypes(&$stub)
+    {
+        $stub = str_replace('DummyStrictTypes', $this->getStrictTypes(), $stub);
+
+        return $this;
+    }
+
+    /**
+     * Gets the strict_types value according to 'strict' command option.
+     *
+     * @return string
+     */
+    protected function getStrictTypes()
+    {
+        if ($this->hasOption('strict') && $this->option('strict')) {
+            return "declare(strict_types = 1);\n";
+        }
+
+        return '';
     }
 
     /**

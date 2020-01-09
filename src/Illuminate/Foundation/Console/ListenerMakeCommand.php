@@ -105,8 +105,8 @@ class ListenerMakeCommand extends GeneratorCommand
     {
         return [
             ['event', 'e', InputOption::VALUE_OPTIONAL, 'The event class being listened for'],
-
             ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued'],
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
         ];
     }
 }

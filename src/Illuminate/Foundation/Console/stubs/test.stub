@@ -1,5 +1,5 @@
 <?php
-
+DummyStrictTypes
 namespace DummyNamespace;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;

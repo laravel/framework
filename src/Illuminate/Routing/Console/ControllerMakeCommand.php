@@ -182,6 +182,7 @@ class ControllerMakeCommand extends GeneratorCommand
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
         ];
     }
 }

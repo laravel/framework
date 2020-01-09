@@ -139,6 +139,7 @@ class PolicyMakeCommand extends GeneratorCommand
     {
         return [
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
         ];
     }
 }

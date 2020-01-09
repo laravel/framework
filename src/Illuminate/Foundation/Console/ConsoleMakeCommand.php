@@ -85,6 +85,7 @@ class ConsoleMakeCommand extends GeneratorCommand
     {
         return [
             ['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned', 'command:name'],
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
         ];
     }
 }

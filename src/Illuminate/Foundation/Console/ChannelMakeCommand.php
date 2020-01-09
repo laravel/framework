@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class ChannelMakeCommand extends GeneratorCommand
 {
@@ -61,5 +62,17 @@ class ChannelMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Broadcasting';
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
+        ];
     }
 }

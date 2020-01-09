@@ -1,5 +1,5 @@
 <?php
-
+DummyStrictTypes
 use Illuminate\Database\Seeder;
 
 class DummyClass extends Seeder

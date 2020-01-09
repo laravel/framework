@@ -59,6 +59,7 @@ class JobMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
             ['sync', null, InputOption::VALUE_NONE, 'Indicates that job should be synchronous'],
         ];
     }

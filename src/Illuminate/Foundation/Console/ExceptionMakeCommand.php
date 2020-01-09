@@ -77,8 +77,8 @@ class ExceptionMakeCommand extends GeneratorCommand
     {
         return [
             ['render', null, InputOption::VALUE_NONE, 'Create the exception with an empty render method'],
-
             ['report', null, InputOption::VALUE_NONE, 'Create the exception with an empty report method'],
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
         ];
     }
 }

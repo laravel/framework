@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class EventMakeCommand extends GeneratorCommand
 {
@@ -57,5 +58,17 @@ class EventMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Events';
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
+        ];
     }
 }

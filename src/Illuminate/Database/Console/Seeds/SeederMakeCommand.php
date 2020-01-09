@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Seeds;
 
+use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
@@ -92,5 +93,17 @@ class SeederMakeCommand extends GeneratorCommand
     protected function qualifyClass($name)
     {
         return $name;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
+        ];
     }
 }

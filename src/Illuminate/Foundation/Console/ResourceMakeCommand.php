@@ -86,6 +86,7 @@ class ResourceMakeCommand extends GeneratorCommand
     {
         return [
             ['collection', 'c', InputOption::VALUE_NONE, 'Create a resource collection'],
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
         ];
     }
 }

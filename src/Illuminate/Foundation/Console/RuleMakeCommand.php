@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class RuleMakeCommand extends GeneratorCommand
 {
@@ -46,5 +47,17 @@ class RuleMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Rules';
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['strict', null, InputOption::VALUE_NONE, 'Add strict_types declaration to class'],
+        ];
     }
 }
