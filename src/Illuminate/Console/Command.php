@@ -380,7 +380,7 @@ class Command extends SymfonyCommand
      * @param  bool  $multiple
      * @return string
      */
-    public function choice($question, array $choices, $default = null, $attempts = null, bool $multiple = false)
+    public function choice($question, array $choices, $default = null, $attempts = null, $multiple = false)
     {
         $question = new ChoiceQuestion($question, $choices, $default);
 
