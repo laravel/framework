@@ -276,7 +276,7 @@ trait InteractsWithPivotTable
     {
         $idsToAttach = $this->parseIds($id);
 
-        //check if pivot model uses soft deleting
+        // check if pivot model uses soft deleting
         if (is_subclass_of($this->using, SoftDeletable::class)) {
             // find the trashed pivots
             $pivots = $this->newPivotQuery()->onlyTrashed()->whereIn($this->getRelatedPivotKeyName(), $idsToAttach)->get();

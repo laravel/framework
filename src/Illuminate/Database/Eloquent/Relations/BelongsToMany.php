@@ -210,6 +210,8 @@ class BelongsToMany extends Relation
      *
      * If this steps are executed before everything is configured the resulting join may still contain where clauses
      * of scopes which are disabled later in the process.
+     *
+     * @return void
      */
     protected function configureQuery()
     {
