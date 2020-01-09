@@ -210,7 +210,7 @@ class Factory implements FactoryContract
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
         else {
-            $prefix = "raw|";
+            $prefix = 'raw|';
             $result = Str::startsWith($empty, $prefix)
                         ? Str::after($empty, $prefix)
                         : $this->make($empty)->render();
