@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class CommandTest extends TestCase
 {
@@ -111,5 +112,31 @@ class CommandTest extends TestCase
         $command->setOutput($output);
 
         $command->info('foo');
+    }
+
+    public function testChoiceIsSingleSelectByDefault()
+    {
+        $output = m::mock(OutputStyle::class);
+        $output->shouldReceive('askQuestion')->once()->withArgs(function (ChoiceQuestion $question) {
+            return $question->isMultiselect() === false;
+        });
+
+        $command = new Command;
+        $command->setOutput($output);
+
+        $command->choice('Do you need further help?', ['yes', 'no']);
+    }
+
+    public function testChoiceWithMultiselect()
+    {
+        $output = m::mock(OutputStyle::class);
+        $output->shouldReceive('askQuestion')->once()->withArgs(function (ChoiceQuestion $question) {
+            return $question->isMultiselect() === true;
+        });
+
+        $command = new Command;
+        $command->setOutput($output);
+
+        $command->choice('Select all that apply.', ['option-1', 'option-2', 'option-3'], null, null, true);
     }
 }
