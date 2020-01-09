@@ -249,11 +249,12 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Amazon SES Swift Transport driver.
      *
+     * @param  array  $config
      * @return \Illuminate\Mail\Transport\SesTransport
      */
-    protected function createSesTransport()
+    protected function createSesTransport(array $config)
     {
-        $config = array_merge($this->app['config']->get('services.ses', []), [
+        $config = array_merge($this->app['config']->get($config['service'] ?? 'services.ses', []), [
             'version' => 'latest', 'service' => 'email',
         ]);
 
@@ -291,11 +292,12 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Mailgun Swift Transport driver.
      *
+     * @param  array  $config
      * @return \Illuminate\Mail\Transport\MailgunTransport
      */
-    protected function createMailgunTransport()
+    protected function createMailgunTransport(array $config)
     {
-        $config = $this->app['config']->get('services.mailgun', []);
+        $config = $this->app['config']->get($config['service'] ?? 'services.mailgun', []);
 
         return new MailgunTransport(
             $this->guzzle($config),
@@ -308,12 +310,13 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Postmark Swift Transport driver.
      *
+     * @param  array  $config
      * @return \Swift_Transport
      */
-    protected function createPostmarkTransport()
+    protected function createPostmarkTransport(array $config)
     {
         return tap(new PostmarkTransport(
-            $this->app['config']->get('services.postmark.token')
+            $config['token'] ?? $this->app['config']->get('services.postmark.token')
         ), function ($transport) {
             $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
         });
