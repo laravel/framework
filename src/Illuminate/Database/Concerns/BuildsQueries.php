@@ -151,9 +151,15 @@ trait BuildsQueries
      * @param  callable|null  $default
      * @return mixed|$this
      */
-    public function when($value, $callback, $default = null)
+    public function when($value, $callback = null, $default = null)
     {
-        if ($value) {
+        if (is_array($value)) {
+           $result = $this;
+           foreach ($value as $subWhen) {
+               $result = $result->when($subWhen[0], $subWhen[1]);
+           }
+           return $result;
+        } elseif ($value) {
             return $callback($this, $value) ?: $this;
         } elseif ($default) {
             return $default($this, $value) ?: $this;

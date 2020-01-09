@@ -220,6 +220,32 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2, 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testWhenCallbackArray()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $callback2 = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('id', '=', 2);
+        };
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when([
+            [true, $callback],
+            [true, $callback2]
+        ])->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->when(false, $callback)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
     public function testUnlessCallback()
     {
         $callback = function ($query, $condition) {
