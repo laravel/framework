@@ -158,6 +158,7 @@ trait BuildsQueries
            foreach ($value as $subWhen) {
                $result = $result->when($subWhen[0], $subWhen[1]);
            }
+
            return $result;
         } elseif ($value) {
             return $callback($this, $value) ?: $this;

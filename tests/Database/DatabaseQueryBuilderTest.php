@@ -237,7 +237,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->when([
             [true, $callback],
-            [true, $callback2]
+            [true, $callback2],
         ])->where('email', 'foo');
         $this->assertSame('select * from "users" where "id" = ? and "id" = ? and "email" = ?', $builder->toSql());
 
