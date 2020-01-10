@@ -64,6 +64,33 @@ class EloquentWhereTest extends DatabaseTestCase
             )
         );
     }
+
+    public function testFirstWhere()
+    {
+        /** @var UserWhereTest $firstUser */
+        $firstUser = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        /** @var UserWhereTest $secondUser */
+        $secondUser = UserWhereTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => 'test-address1',
+        ]);
+
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhere('name', '=', $firstUser->name)));
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhere('name', $firstUser->name)));
+        $this->assertTrue($firstUser->is(UserWhereTest::where('name', $firstUser->name)->firstWhere('email', $firstUser->email)));
+        $this->assertNull(UserWhereTest::where('name', $firstUser->name)->firstWhere('email', $secondUser->email));
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhere(['name' => 'test-name', 'email' => 'test-email'])));
+        $this->assertNull(UserWhereTest::firstWhere(['name' => 'test-name', 'email' => 'test-email1']));
+        $this->assertTrue($secondUser->is(
+            UserWhereTest::firstWhere(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or'))
+        );
+    }
 }
 
 class UserWhereTest extends Model
