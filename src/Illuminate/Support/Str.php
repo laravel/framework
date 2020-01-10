@@ -61,7 +61,17 @@ class Str
      */
     public static function afterLast($subject, $search)
     {
-        return $search === '' ? $subject : array_reverse(explode($search, $subject))[0];
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strrpos($subject, (string) $search);
+
+        if ($position === false) {
+            return $subject;
+        }
+
+        return substr($subject, $position + strlen($search));
     }
 
     /**
