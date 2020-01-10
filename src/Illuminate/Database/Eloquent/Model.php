@@ -948,6 +948,16 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     }
 
     /**
+     * Begin querying the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function u()
+    {
+        return static::query();
+    }
+
+    /**
      * Get a new query builder for the model's table.
      *
      * @return \Illuminate\Database\Eloquent\Builder
