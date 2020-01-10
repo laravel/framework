@@ -150,6 +150,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('te', Str::afterLast('yv0et0te', '0'));
         $this->assertSame('te', Str::afterLast('yv0et0te', 0));
         $this->assertSame('te', Str::afterLast('yv2et2te', 2));
+        $this->assertSame('foo', Str::afterLast('----foo', '---'));
     }
 
     public function testStrContains()
