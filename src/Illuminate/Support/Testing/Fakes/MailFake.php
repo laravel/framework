@@ -86,7 +86,10 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNothingSent()
     {
-        PHPUnit::assertEmpty($this->mailables, 'Mailables were sent unexpectedly.');
+        $mailableNames = collect($this->mailables)->values()->map(function ($mailable) {
+            return get_class($mailable);
+        })->join(', ');
+        PHPUnit::assertEmpty($this->mailables, 'The following Mailables were sent unexpectedly: ' . $mailableNames);
     }
 
     /**

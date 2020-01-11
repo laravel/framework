@@ -137,7 +137,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertNothingSent();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('Mailables were sent unexpectedly.'));
+            $this->assertThat($e, new ExceptionMessage('The following Mailables were sent unexpectedly: Illuminate\Tests\Support\MailableStub'));
         }
     }
 }
