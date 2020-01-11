@@ -140,6 +140,20 @@ class SupportTestingMailFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('The following Mailables were sent unexpectedly: Illuminate\Tests\Support\MailableStub'));
         }
     }
+
+    public function testAssertNothingQueued()
+    {
+        $this->fake->assertNothingQueued();
+
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        try {
+            $this->fake->assertNothingQueued();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The following Mailables were queued unexpectedly: Illuminate\Tests\Support\MailableStub'));
+        }
+    }
 }
 
 class MailableStub extends Mailable implements MailableContract
