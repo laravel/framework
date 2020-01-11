@@ -1159,7 +1159,7 @@ class TestResponse implements ArrayAccess
     /**
      * Dump the session errors from the response.
      *
-     * @param string $errorBag
+     * @param  string  $errorBag
      * @return $this
      */
     public function dumpErrors($errorBag = 'default')
