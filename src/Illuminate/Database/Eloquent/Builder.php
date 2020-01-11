@@ -1271,6 +1271,19 @@ class Builder
     }
 
     /**
+     * Apply query-time casts to the model instance.
+     *
+     * @param  array  $casts
+     * @return $this
+     */
+    public function withCasts($casts)
+    {
+        $this->model->mergeCasts($casts);
+
+        return $this;
+    }
+
+    /**
      * Get the given macro by name.
      *
      * @param  string  $name

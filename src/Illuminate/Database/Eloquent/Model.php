@@ -421,6 +421,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
 
         $model->setTable($this->getTable());
 
+        $model->mergeCasts($this->casts);
+
         return $model;
     }
 

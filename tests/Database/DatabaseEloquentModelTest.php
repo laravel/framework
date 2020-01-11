@@ -206,6 +206,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('test', $newInstance->getTable());
     }
 
+    public function testNewInstanceReturnsNewInstanceWithMergedCasts()
+    {
+        $model = new EloquentModelStub;
+        $model->mergeCasts(['foo' => 'date']);
+        $newInstance = $model->newInstance();
+
+        $this->assertArrayHasKey('foo', $newInstance->getCasts());
+        $this->assertEquals('date', $newInstance->getCasts()['foo']);
+    }
+
     public function testCreateMethodSavesNewModel()
     {
         $_SERVER['__eloquent.saved'] = false;
@@ -1768,6 +1778,18 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->floatAttribute = NAN;
         $this->assertNan($model->floatAttribute);
+    }
+
+    public function testMergeCastsMergesCasts()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $castCount = count($model->getCasts());
+        $this->assertArrayNotHasKey('foo', $model->getCasts());
+
+        $model->mergeCasts(['foo' => 'date']);
+        $this->assertEquals($castCount + 1, count($model->getCasts()));
+        $this->assertArrayHasKey('foo', $model->getCasts());
     }
 
     public function testUpdatingNonExistentModelFails()
