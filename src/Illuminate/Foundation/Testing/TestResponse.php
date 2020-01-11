@@ -1157,6 +1157,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Dump the session errors from the response.
+     *
+     * @param string $errorBag
+     * @return $this
+     */
+    public function dumpErrors($errorBag = 'default')
+    {
+        if ($errors = $this->session()->get('errors')) {
+            dump($errors->getBag($errorBag)->getMessages());
+        }
+
+        return $this;
+    }
+
+    /**
      * Dump the headers from the response.
      *
      * @return $this
