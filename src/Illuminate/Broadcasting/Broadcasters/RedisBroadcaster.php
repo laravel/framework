@@ -115,7 +115,7 @@ class RedisBroadcaster extends Broadcaster
 
         $connection->eval($this->broadcastMultipleChannelsScript(), 0, $payload, ...$channels);
     }
-    
+
     /**
      * Get the Lua script for broadcasting to multiple channels.
      *
