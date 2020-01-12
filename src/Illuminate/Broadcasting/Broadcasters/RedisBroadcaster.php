@@ -113,7 +113,7 @@ class RedisBroadcaster extends Broadcaster
             'socket' => Arr::pull($payload, 'socket'),
         ]);
 
-        $connection->eval($this->broadcastMultipleChannelsScript(), 0, $payload, ...$channels);
+        $connection->eval($this->broadcastMultipleChannelsScript(), 0, $payload, ...$this->formatChannels($channels));
     }
 
     /**
