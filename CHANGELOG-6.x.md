@@ -1,6 +1,22 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.10.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.10.1...6.x)
+
+### Added
+- Added `Illuminate\Database\Eloquent\Builder::firstWhere()` method ([#31089](https://github.com/laravel/framework/pull/31089)) 
+
+### Fixed
+- Fixed undefined property in `WithFaker::makeFaker()` ([#31083](https://github.com/laravel/framework/pull/31083))
+- Fixed `Str::afterLast()` method ([#31095](https://github.com/laravel/framework/pull/31095))
+
+### Changed
+- Remove all indentation in blade templates ([917ee51](https://github.com/laravel/framework/commit/917ee514d4bbd4162b6ddb385c643df97dcfa7d3))
+
+
+## [v6.10.1 (2020-01-08)](https://github.com/laravel/framework/compare/v6.10.0...v6.10.1)
+
+### Changed
+- Updated some blade templates ([f17e347](https://github.com/laravel/framework/commit/f17e347b15e8d27b4e775a8f961bda083326ee8f))
 
 
 ## [v6.10.0 (2020-01-07)](https://github.com/laravel/framework/compare/v6.9.0...v6.10.0)
