@@ -60,6 +60,7 @@ class Event extends Facade
             static::swap($originalDispatcher);
 
             Model::setEventDispatcher($originalDispatcher);
+            Cache::refreshEventDispatcher();
         });
     }
 

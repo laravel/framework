@@ -57,13 +57,17 @@ class SupportFacadesEventTest extends TestCase
 
     public function testFakeForSwapsDispatchers()
     {
-        Event::fakeFor(function () {
+        $arrayRepository = Cache::store('array');
+
+        Event::fakeFor(function () use ($arrayRepository) {
             $this->assertInstanceOf(EventFake::class, Event::getFacadeRoot());
             $this->assertInstanceOf(EventFake::class, Model::getEventDispatcher());
+            $this->assertInstanceOf(EventFake::class, $arrayRepository->getEventDispatcher());
         });
 
         $this->assertSame($this->events, Event::getFacadeRoot());
         $this->assertSame($this->events, Model::getEventDispatcher());
+        $this->assertSame($this->events, $arrayRepository->getEventDispatcher());
     }
 
     public function testFakeSwapsDispatchersInResolvedCacheRepositories()
