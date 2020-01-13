@@ -137,7 +137,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertNothingSent();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The following Mailables were sent unexpectedly: Illuminate\Tests\Support\MailableStub'));
+            $this->assertThat($e, new ExceptionMessage('The following mailables were sent unexpectedly: Illuminate\Tests\Support\MailableStub'));
         }
     }
 
@@ -151,7 +151,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertNothingQueued();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The following Mailables were queued unexpectedly: Illuminate\Tests\Support\MailableStub'));
+            $this->assertThat($e, new ExceptionMessage('The following mailables were queued unexpectedly: Illuminate\Tests\Support\MailableStub'));
         }
     }
 }

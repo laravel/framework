@@ -89,7 +89,8 @@ class MailFake implements Mailer, MailQueue
         $mailableNames = collect($this->mailables)->map(function ($mailable) {
             return get_class($mailable);
         })->join(', ');
-        PHPUnit::assertEmpty($this->mailables, 'The following Mailables were sent unexpectedly: ' . $mailableNames);
+
+        PHPUnit::assertEmpty($this->mailables, 'The following mailables were sent unexpectedly: '.$mailableNames);
     }
 
     /**
@@ -151,7 +152,8 @@ class MailFake implements Mailer, MailQueue
         $mailableNames = collect($this->queuedMailables)->map(function ($mailable) {
             return get_class($mailable);
         })->join(', ');
-        PHPUnit::assertEmpty($this->queuedMailables, 'The following Mailables were queued unexpectedly: ' . $mailableNames);
+
+        PHPUnit::assertEmpty($this->queuedMailables, 'The following mailables were queued unexpectedly: '.$mailableNames);
     }
 
     /**
