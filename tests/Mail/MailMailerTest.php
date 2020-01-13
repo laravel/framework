@@ -145,6 +145,23 @@ class MailMailerTest extends TestCase
         });
     }
 
+    public function testGlobalReturnPathIsRespectedOnAllMessages()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMailer();
+        $view = m::mock(stdClass::class);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $this->setSwiftMailer($mailer);
+        $mailer->alwaysReturnPath('taylorotwell@gmail.com');
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
+            $this->assertEquals('taylorotwell@gmail.com', $message->getReturnPath());
+        });
+        $mailer->send('foo', ['data'], function ($m) {
+            //
+        });
+    }
+
     public function testFailedRecipientsAreAppendedAndCanBeRetrieved()
     {
         unset($_SERVER['__mailer.test']);

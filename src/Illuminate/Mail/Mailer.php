@@ -64,6 +64,13 @@ class Mailer implements MailerContract, MailQueueContract
     protected $replyTo;
 
     /**
+     * The global return path address.
+     *
+     * @var array
+     */
+    protected $returnPath;
+
+    /**
      * The global to address and name.
      *
      * @var array
@@ -123,6 +130,17 @@ class Mailer implements MailerContract, MailQueueContract
     public function alwaysReplyTo($address, $name = null)
     {
         $this->replyTo = compact('address', 'name');
+    }
+
+    /**
+     * Set the global return path address.
+     *
+     * @param  string  $address
+     * @return void
+     */
+    public function alwaysReturnPath($address)
+    {
+        $this->returnPath = compact('address');
     }
 
     /**
@@ -480,6 +498,13 @@ class Mailer implements MailerContract, MailQueueContract
         // they create a new message. We will just go ahead and push this address.
         if (! empty($this->replyTo['address'])) {
             $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
+        }
+
+        // When a global return path address was specified we will set this on every message
+        // instance so the developer does not have to repeat themselves every time
+        // they create a new message. We will just go ahead and push this address.
+        if (! empty($this->returnPath['address'])) {
+            $message->returnPath($this->returnPath['address']);
         }
 
         return $message;
