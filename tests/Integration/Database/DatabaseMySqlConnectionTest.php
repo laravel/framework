@@ -1,13 +1,13 @@
 <?php
 
-namespace Illuminate\Database;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
 
-class EloquentMySqlConnectionTest extends TestCase
+class DatabaseMySqlConnectionTest extends TestCase
 {
     const TABLE = 'player';
     const FLOAT_COL = 'float_col';
@@ -36,6 +36,10 @@ class EloquentMySqlConnectionTest extends TestCase
     {
         parent::setUp();
 
+        if (! isset($_ENV['CI'])) {
+            $this->markTestSkipped('This test is only executed on CI.');
+        }
+
         if (! Schema::hasTable(self::TABLE)) {
             Schema::create(self::TABLE, function (Blueprint $table) {
                 $table->json(self::JSON_COL)->nullable();
@@ -61,6 +65,7 @@ class EloquentMySqlConnectionTest extends TestCase
     public function testJsonFloatComparison(float $value, string $operator, bool $shouldMatch): void
     {
         DB::table(self::TABLE)->insert([self::JSON_COL => '{"rank":'.self::FLOAT_VAL.'}']);
+
         $this->assertSame(
             $shouldMatch,
             DB::table(self::TABLE)->where(self::JSON_COL.'->rank', $operator, $value)->exists(),
@@ -86,6 +91,7 @@ class EloquentMySqlConnectionTest extends TestCase
     public function testFloatValueStoredCorrectly(): void
     {
         DB::table(self::TABLE)->insert([self::FLOAT_COL => self::FLOAT_VAL]);
+
         $this->assertEquals(self::FLOAT_VAL, DB::table(self::TABLE)->value(self::FLOAT_COL));
     }
 }
