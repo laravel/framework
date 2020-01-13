@@ -47,7 +47,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
             // Next we will set all of the global addresses on this mailer, which allows
             // for easy unification of all "from" addresses as well as easy debugging
             // of sent messages since they get be sent into a single email address.
-            foreach (['from', 'reply_to', 'to'] as $type) {
+            foreach (['from', 'reply_to', 'to', 'return_path'] as $type) {
                 $this->setGlobalAddress($mailer, $config, $type);
             }
 
