@@ -77,9 +77,10 @@ class HasInDatabase extends Constraint
     {
         $query = $this->database->table($table);
 
-        $key = array_key_first($this->data);
-        $value = $this->data[$key];
-        $similarResults = $query->where($key, $value)->limit($this->show)->get();
+        $similarResults = $query->where(
+            array_key_first($this->data),
+            $this->data[array_key_first($this->data)]
+        )->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {
             $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT);
@@ -89,7 +90,7 @@ class HasInDatabase extends Constraint
             $results = $query->limit($this->show)->get();
 
             if ($results->isEmpty()) {
-                return 'The table is empty';
+                return 'The table is empty.';
             }
 
             $description = 'Found: '.json_encode($results, JSON_PRETTY_PRINT);
