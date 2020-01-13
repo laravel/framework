@@ -278,6 +278,15 @@ class CacheManager implements FactoryContract
     }
 
     /**
+     * Refreshes the event dispatcher of all resolved repositories
+     * with the currently bound event dispatcher implementation.
+     */
+    public function refreshEventDispatcher()
+    {
+        array_map([$this, 'setEventDispatcher'], $this->stores);
+    }
+
+    /**
      * Get the cache prefix.
      *
      * @param  array  $config

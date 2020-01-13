@@ -2,9 +2,14 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Testing\Fakes\EventFake;
@@ -23,6 +28,9 @@ class SupportFacadesEventTest extends TestCase
 
         $container = new Container;
         $container->instance('events', $this->events);
+        $container->alias('events', DispatcherContract::class);
+        $container->instance('cache', new CacheManager($container));
+        $container->instance('config', new ConfigRepository($this->getCacheConfig()));
 
         Facade::setFacadeApplication($container);
     }
@@ -56,6 +64,33 @@ class SupportFacadesEventTest extends TestCase
 
         $this->assertSame($this->events, Event::getFacadeRoot());
         $this->assertSame($this->events, Model::getEventDispatcher());
+    }
+
+    public function testFakeSwapsDispatchersInResolvedCacheRepositories()
+    {
+        $arrayRepository = Cache::store('array');
+
+        $this->events->shouldReceive('dispatch')->once();
+        $arrayRepository->get('foo');
+
+        Event::fake();
+
+        $arrayRepository->get('bar');
+
+        Event::assertDispatched(CacheMissed::class);
+    }
+
+    protected function getCacheConfig()
+    {
+        return [
+            'cache' => [
+                'stores' => [
+                    'array' => [
+                        'driver' => 'array'
+                    ]
+                ]
+            ]
+        ];
     }
 }
 
