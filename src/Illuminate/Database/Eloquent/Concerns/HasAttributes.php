@@ -483,6 +483,17 @@ trait HasAttributes
     }
 
     /**
+     * Merge new casts with existing casts on the model.
+     *
+     * @param  array  $casts
+     * @return void
+     */
+    public function mergeCasts($casts)
+    {
+        $this->casts = array_merge($this->casts, $casts);
+    }
+
+    /**
      * Cast an attribute to a native PHP type.
      *
      * @param  string  $key
