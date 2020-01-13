@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Foundation\Testing\Constraints\ArraySubset;
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\InvalidArgumentException;
+use PHPUnit\Runner\Version;
 use PHPUnit\Util\InvalidArgumentHelper;
 
 if (class_exists(Version::class) && (int) Version::series()[0] >= 8) {
