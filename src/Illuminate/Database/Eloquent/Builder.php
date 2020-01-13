@@ -1169,6 +1169,19 @@ class Builder
     }
 
     /**
+     * Apply query-time casts to the model instance.
+     *
+     * @param  array  $casts
+     * @return $this
+     */
+    public function withCasts($casts)
+    {
+        $this->model->mergeCasts($casts);
+
+        return $this;
+    }
+
+    /**
      * Get the underlying query builder instance.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -1268,19 +1281,6 @@ class Builder
     public function qualifyColumn($column)
     {
         return $this->model->qualifyColumn($column);
-    }
-
-    /**
-     * Apply query-time casts to the model instance.
-     *
-     * @param  array  $casts
-     * @return $this
-     */
-    public function withCasts($casts)
-    {
-        $this->model->mergeCasts($casts);
-
-        return $this;
     }
 
     /**
