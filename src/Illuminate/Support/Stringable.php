@@ -523,7 +523,7 @@ class Stringable
     }
 
     /**
-     * Trim the string of the given characeters.
+     * Trim the string of the given characters.
      *
      * @param  string  $characters
      * @return static
