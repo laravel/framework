@@ -1150,7 +1150,14 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             static::newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
         );
 
-        $this->load(collect($this->relations)->except('pivot')->keys()->toArray());
+        $actualRelations = collect();
+        foreach ($this->relations as $relation) {
+            if (!($relation instanceof Pivot)) {
+                $actualRelations->add($relation);
+            }
+        }
+
+        $this->load($actualRelations->keys()->toArray());
 
         $this->syncOriginal();
 
