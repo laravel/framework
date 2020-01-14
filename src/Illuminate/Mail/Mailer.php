@@ -500,9 +500,6 @@ class Mailer implements MailerContract, MailQueueContract
             $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
         }
 
-        // When a global return path address was specified we will set this on every message
-        // instance so the developer does not have to repeat themselves every time
-        // they create a new message. We will just go ahead and push this address.
         if (! empty($this->returnPath['address'])) {
             $message->returnPath($this->returnPath['address']);
         }
