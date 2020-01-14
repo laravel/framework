@@ -1754,7 +1754,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        if (strlen($value) > 256) {
+        if (strlen($value) > 254) {
             return false;
         }
 
@@ -1765,7 +1765,7 @@ trait ValidatesAttributes
 
         // ToDo get TLDs from https://data.iana.org/TLD/tlds-alpha-by-domain.txt and compare first label with them
         foreach ($labels as $l) {
-            if (!preg_match("/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9]|)$/D", $l)) {
+            if (! preg_match("/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9]|)$/D", $l)) {
                 return false;
             }
         }

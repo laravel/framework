@@ -2293,7 +2293,7 @@ class ValidationValidatorTest extends TestCase
             ['a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.com'],
             ['1-1.com'],
             ['labels-with-less-than-sixty-four-64-characters-considered-valid.com'],
-            [str_repeat(str_repeat('a', 62).".", 4) . 'com'],
+            [str_repeat(str_repeat('a', 61).".", 4) . 'co.uk'],   // 254 characters
             ['xn--mnich-kva.com']
         ];
     }
