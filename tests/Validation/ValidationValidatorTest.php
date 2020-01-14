@@ -2269,6 +2269,50 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    /** @dataProvider validDomainNames */
+    public function testValidateDomainNameWithValidDomainNames($validDomainName)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['domain' =>  $validDomainName], ['domain' => 'domain_name']);
+        $this->assertTrue($v->passes());
+    }
+
+    /** @dataProvider invalidDomainNames */
+    public function testValidateDomainNameWithInvalidDomainNames($invalidDomainName)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['domain' =>  $invalidDomainName], ['domain' => 'domain_name']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function validDomainNames()
+    {
+        return [
+            ['example.com'],
+            ['sub.example.com'],
+            ['a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.com'],
+            ['1-1.com'],
+            ['labels-with-less-than-sixty-four-64-characters-considered-valid.com'],
+            [str_repeat(str_repeat('a', 62).".", 4) . 'com'],
+            ['xn--mnich-kva.com']
+        ];
+    }
+
+    public function invalidDomainNames()
+    {
+        return [
+            ['com'],
+            ['.com'],
+            ['.a.com'],
+            ['-1.com'],
+            ['1-.com'],
+            ['1_1.com'],
+            ['1&1.com'],
+            ['labels-with-more-than-sixty-four-64-characters-considered-invalid.com'],
+            [str_repeat(str_repeat('a', 62).".", 4) . 'co.uk'], // more than 256chars
+        ];
+    }
+
     public function testValidateEmail()
     {
         $trans = $this->getIlluminateArrayTranslator();
