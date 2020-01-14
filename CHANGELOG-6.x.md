@@ -1,16 +1,24 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.10.1...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.11.0...6.x)
+
+
+## [v6.11.0 (2020-01-14)](https://github.com/laravel/framework/compare/v6.10.1...v6.11.0)
 
 ### Added
 - Added `Illuminate\Database\Eloquent\Builder::firstWhere()` method ([#31089](https://github.com/laravel/framework/pull/31089)) 
+- Redis Broadcaster: Broadcast to multiple channels at once ([#31108](https://github.com/laravel/framework/pull/31108))
 
 ### Fixed
 - Fixed undefined property in `WithFaker::makeFaker()` ([#31083](https://github.com/laravel/framework/pull/31083))
 - Fixed `Str::afterLast()` method ([#31095](https://github.com/laravel/framework/pull/31095))
+- Fixed insert float into MySQL with PHP 7.3 ([#31100](https://github.com/laravel/framework/pull/31100))
+- Fixed refresh on Model with customized pivot attribute name ([#31125](https://github.com/laravel/framework/pull/31125), [678b26b](https://github.com/laravel/framework/commit/678b26b1a9cd0d8a6bef85932420e67a1b20e677))
 
 ### Changed
 - Remove all indentation in blade templates ([917ee51](https://github.com/laravel/framework/commit/917ee514d4bbd4162b6ddb385c643df97dcfa7d3))
+- Added mailable names to assertion messages in `MailFake::assertNothingSent()` and `MailFake::assertNothingQueued()` ([#31106](https://github.com/laravel/framework/pull/31106))
+- Search for similar results in `assertDatabaseHas()` ([#31042](https://github.com/laravel/framework/pull/31042), [2103eb7](https://github.com/laravel/framework/commit/2103eb7ccfbb6798e9078d82e0ebffcf87d95b14))
 
 
 ## [v6.10.1 (2020-01-08)](https://github.com/laravel/framework/compare/v6.10.0...v6.10.1)
