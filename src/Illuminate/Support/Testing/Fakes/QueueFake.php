@@ -69,10 +69,17 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
-     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     * Assert if a job satisfying an optional truth-test callback was pushed with a given chain of jobs.
+     *
+     * The callback is only applied to the first job.
+     *
+     * If specific properties of the chained jobs need to be verified, $expectedChain also accepts
+     * an array of Queueables.
+     *
+     * @see \Illuminate\Bus\Queueable
      *
      * @param  string $job
-     * @param  array $expectedChain
+     * @param  string[]|object[] $expectedChain  An array of class names or Queueables.
      * @param  callable|null $callback
      * @return void
      */
@@ -97,7 +104,7 @@ class QueueFake extends QueueManager implements Queue
      * Assert if a job was pushed with chained jobs based on a truth-test callback.
      *
      * @param  string $job
-     * @param  array $expectedChain
+     * @param  object[] $expectedChain
      * @param  callable|null $callback
      * @return void
      */
@@ -119,7 +126,7 @@ class QueueFake extends QueueManager implements Queue
      * Assert if a job was pushed with chained jobs based on a truth-test callback.
      *
      * @param  string $job
-     * @param  array $expectedChain
+     * @param  string[] $expectedChain
      * @param  callable|null $callback
      * @return void
      */
