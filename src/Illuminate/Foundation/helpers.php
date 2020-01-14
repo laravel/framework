@@ -234,7 +234,6 @@ if (! function_exists('cache')) {
      */
     function cache(...$arguments)
     {
-
         if (empty($arguments)) {
             return app('cache');
         }
