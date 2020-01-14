@@ -1742,7 +1742,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is a valid URL.
+     * Validate that an attribute is a valid Domain Name according to RFC1035.
      *
      * @param  string  $attribute
      * @param  mixed  $value
