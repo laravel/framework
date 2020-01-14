@@ -1151,9 +1151,9 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         );
 
         $actualRelations = collect();
-        foreach ($this->relations as $relation) {
+        foreach ($this->relations as $key => $relation) {
             if (!($relation instanceof Pivot)) {
-                $actualRelations->add($relation);
+                $actualRelations->put($key, $relation);
             }
         }
 
