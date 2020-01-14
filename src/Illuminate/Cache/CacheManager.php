@@ -268,7 +268,7 @@ class CacheManager implements FactoryContract
      */
     protected function addEventDispatcher(Repository $repository)
     {
-        if (!$this->app->bound(DispatcherContract::class)) {
+        if (! $this->app->bound(DispatcherContract::class)) {
             return;
         }
 

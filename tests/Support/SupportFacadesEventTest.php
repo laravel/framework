@@ -90,10 +90,10 @@ class SupportFacadesEventTest extends TestCase
             'cache' => [
                 'stores' => [
                     'array' => [
-                        'driver' => 'array'
-                    ]
-                ]
-            ]
+                        'driver' => 'array',
+                    ],
+                ],
+            ],
         ];
     }
 }
