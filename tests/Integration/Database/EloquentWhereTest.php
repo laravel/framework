@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -89,6 +90,33 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertNull(UserWhereTest::firstWhere(['name' => 'test-name', 'email' => 'test-email1']));
         $this->assertTrue($secondUser->is(
             UserWhereTest::firstWhere(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or'))
+        );
+    }
+
+    public function testFirstWhereOrFail()
+    {
+        /** @var UserWhereTest $firstUser */
+        $firstUser = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        /** @var UserWhereTest $secondUser */
+        $secondUser = UserWhereTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => 'test-address1',
+        ]);
+
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhereOrFail('name', '=', $firstUser->name)));
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhereOrFail('name', $firstUser->name)));
+        $this->assertTrue($firstUser->is(UserWhereTest::where('name', $firstUser->name)->firstWhereOrFail('email', $firstUser->email)));
+        $this->expectException(ModelNotFoundException::class);
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhereOrFail(['name' => 'test-name', 'email' => 'test-email'])));
+        $this->expectException(ModelNotFoundException::class);
+        $this->assertTrue($secondUser->is(
+            UserWhereTest::firstWhereOrFail(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or'))
         );
     }
 }
