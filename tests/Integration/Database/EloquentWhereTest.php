@@ -112,9 +112,15 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertTrue($firstUser->is(UserWhereTest::firstWhereOrFail('name', '=', $firstUser->name)));
         $this->assertTrue($firstUser->is(UserWhereTest::firstWhereOrFail('name', $firstUser->name)));
         $this->assertTrue($firstUser->is(UserWhereTest::where('name', $firstUser->name)->firstWhereOrFail('email', $firstUser->email)));
+
         $this->expectException(ModelNotFoundException::class);
+        UserWhereTest::where('name', $firstUser->name)->firstWhereOrFail('email', $secondUser->email);
+
         $this->assertTrue($firstUser->is(UserWhereTest::firstWhereOrFail(['name' => 'test-name', 'email' => 'test-email'])));
+
         $this->expectException(ModelNotFoundException::class);
+        UserWhereTest::firstWhereOrFail(['name' => 'test-name', 'email' => 'test-email1']);
+
         $this->assertTrue($secondUser->is(
             UserWhereTest::firstWhereOrFail(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or'))
         );
