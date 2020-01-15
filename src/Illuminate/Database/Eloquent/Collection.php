@@ -237,7 +237,11 @@ class Collection extends BaseCollection implements QueueableCollection
         $dictionary = $this->getDictionary();
 
         foreach ($items as $item) {
-            $dictionary[$item->getKey()] = $item;
+            if (is_null($key = $item->getKey())) {
+                $dictionary[] = $item;
+            } else {
+                $dictionary[$key] = $item;
+            }
         }
 
         return new static(array_values($dictionary));
@@ -399,7 +403,7 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Get a dictionary keyed by primary keys.
+     * Get a dictionary keyed by primary keys if they exist.
      *
      * @param  \ArrayAccess|array|null  $items
      * @return array
@@ -411,7 +415,11 @@ class Collection extends BaseCollection implements QueueableCollection
         $dictionary = [];
 
         foreach ($items as $value) {
-            $dictionary[$value->getKey()] = $value;
+            if (is_null($key = $value->getKey())) {
+                $dictionary[] = $value;
+            } else {
+                $dictionary[$key] = $value;
+            }
         }
 
         return $dictionary;

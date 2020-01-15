@@ -179,9 +179,47 @@ class DatabaseEloquentCollectionTest extends TestCase
         $three = m::mock(Model::class);
         $three->shouldReceive('getKey')->andReturn(3);
 
+        $four = m::mock(Model::class);
+        $four->shouldReceive('getKey')->andReturnNull();
+
+        $five = m::mock(Model::class);
+        $five->shouldReceive('getKey')->andReturn('five');
+
+        $c = new Collection([$one, $two, $three, $four, $five]);
+
+        $this->assertEquals([1, 2, 3, null, 'five'], $c->modelKeys());
+    }
+
+    public function testCollectionReturnsDictionaryKeyedByPrimaryKey()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturn(2);
+
+        $three = m::mock(Model::class);
+        $three->shouldReceive('getKey')->andReturn(3);
+
         $c = new Collection([$one, $two, $three]);
 
-        $this->assertEquals([1, 2, 3], $c->modelKeys());
+        $this->assertEquals([1 => $one, 2 => $two, 3 => $three], $c->getDictionary());
+    }
+
+    public function testCollectionReturnsDictionaryWhenKeysAreNull()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturnNull();
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturnNull();
+
+        $three = m::mock(Model::class);
+        $three->shouldReceive('getKey')->andReturnNull();
+
+        $c = new Collection([$one, $two, $three]);
+
+        $this->assertEquals([$one, $two, $three], $c->getDictionary());
     }
 
     public function testCollectionMergesWithGivenCollection()
@@ -199,6 +237,28 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c2 = new Collection([$two, $three]);
 
         $this->assertEquals(new Collection([$one, $two, $three]), $c1->merge($c2));
+    }
+
+    public function testCollectionElementsWithNullKeysMergesWithGivenCollection()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturnNull();
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturnNull();
+
+        $three = m::mock(Model::class);
+        $three->shouldReceive('getKey')->andReturnNull();
+
+        $c1 = new Collection([$one, $two]);
+        $c2 = new Collection([$three]);
+
+        $this->assertEquals(new Collection([$one, $two, $three]), $c1->merge($c2));
+
+        $c1 = new Collection([$one, $two]);
+        $c2 = new Collection([$two, $three]);
+
+        $this->assertEquals(new Collection([$one, $two, $two, $three]), $c1->merge($c2));
     }
 
     public function testMap()
