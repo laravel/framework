@@ -198,7 +198,7 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->laravel->call([$this, 'handle']);
+        return $this->laravel->call([$this, 'handle']) ?? 0;
     }
 
     /**
