@@ -227,7 +227,7 @@ if (! function_exists('cache')) {
      * If an array is passed, we'll assume you want to put to the cache.
      *
      * @param string|array|null $key
-     * @param \Illuminate\Support\Carbon|integer $expiration
+     * @param \Illuminate\Support\Carbon|int $expiration
      * @return mixed|\Illuminate\Cache\CacheManager
      *
      * @throws \Exception
