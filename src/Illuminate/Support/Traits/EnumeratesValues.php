@@ -626,7 +626,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Create a collection of all elements that do not pass a given truth test.
+     * Create a collection of all elements that pass a given truth test.
      *
      * @param  callable|mixed  $callback
      * @return static
