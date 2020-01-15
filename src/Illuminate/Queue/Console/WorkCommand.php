@@ -154,7 +154,7 @@ class WorkCommand extends Command
      * Write the status output for the queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  string $status
+     * @param  string  $status
      * @return void
      */
     protected function writeOutput(Job $job, $status)

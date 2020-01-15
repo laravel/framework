@@ -83,7 +83,7 @@ class WipeCommand extends Command
     /**
      * Drop all of the database types.
      *
-     * @param string $database
+     * @param  string  $database
      * @return void
      */
     protected function dropAllTypes($database)

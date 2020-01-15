@@ -34,7 +34,7 @@ class Env
     /**
      * Enable the putenv adapter.
      *
-     * @var bool
+     * @return void
      */
     public static function enablePutenv()
     {
@@ -46,7 +46,7 @@ class Env
     /**
      * Disable the putenv adapter.
      *
-     * @var bool
+     * @return void
      */
     public static function disablePutenv()
     {
@@ -92,7 +92,7 @@ class Env
      * Gets the value of an environment variable.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public static function get($key, $default = null)

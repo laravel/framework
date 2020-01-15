@@ -56,6 +56,42 @@ class FoundationTestResponseTest extends TestCase
         $response->assertViewHas('foo', $model);
     }
 
+    public function testAssertViewHasWithClosure()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar'],
+        ]);
+
+        $response->assertViewHas('foo', function ($value) {
+            return $value === 'bar';
+        });
+    }
+
+    public function testAssertViewHasWithValue()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar'],
+        ]);
+
+        $response->assertViewHas('foo', 'bar');
+    }
+
+    public function testAssertViewHasWithNestedValue()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => [
+                'foo' => [
+                    'nested' => 'bar',
+                ],
+            ],
+        ]);
+
+        $response->assertViewHas('foo.nested', 'bar');
+    }
+
     public function testAssertSeeInOrder()
     {
         $response = $this->makeMockResponse([
@@ -703,10 +739,9 @@ class FoundationTestResponseTest extends TestCase
     {
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
-            ));
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]));
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -727,10 +762,9 @@ class FoundationTestResponseTest extends TestCase
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
-            ));
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]));
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
@@ -744,10 +778,9 @@ class FoundationTestResponseTest extends TestCase
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
-                    'foo' => [],
-                    'bar' => ['one', 'two'],
-                ]]
-            ));
+                'foo' => [],
+                'bar' => ['one', 'two'],
+            ]]));
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);

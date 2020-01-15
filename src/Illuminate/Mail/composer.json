@@ -16,10 +16,11 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "erusev/parsedown": "^1.7",
         "illuminate/container": "^6.0",
         "illuminate/contracts": "^6.0",
         "illuminate/support": "^6.0",
+        "league/commonmark": "^1.1",
+        "league/commonmark-ext-table": "^2.1",
         "psr/log": "^1.0",
         "swiftmailer/swiftmailer": "^6.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.1"
@@ -31,7 +32,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.0-dev"
+            "dev-master": "6.x-dev"
         }
     },
     "suggest": {

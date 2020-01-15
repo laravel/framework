@@ -19,6 +19,9 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void forget(string $event)
  * @method static void forgetPushed()
  * @method static \Illuminate\Events\Dispatcher setQueueResolver(callable $resolver)
+ * @method static void assertDispatched(string $event, callable|int $callback = null)
+ * @method static void assertDispatchedTimes(string $event, int $times = 1)
+ * @method static void assertNotDispatched(string $event, callable|int $callback = null)
  *
  * @see \Illuminate\Events\Dispatcher
  */

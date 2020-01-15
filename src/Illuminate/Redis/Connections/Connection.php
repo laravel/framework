@@ -7,9 +7,14 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 use Illuminate\Redis\Limiters\DurationLimiterBuilder;
+use Illuminate\Support\Traits\Macroable;
 
 abstract class Connection
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The Redis client.
      *
@@ -208,6 +213,10 @@ abstract class Connection
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->command($method, $parameters);
     }
 }

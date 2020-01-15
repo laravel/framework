@@ -60,7 +60,7 @@ interface Filesystem
      * Write a new file using a stream.
      *
      * @param  string  $path
-     * @param  resource $resource
+     * @param  resource  $resource
      * @param  array  $options
      * @return bool
      *
