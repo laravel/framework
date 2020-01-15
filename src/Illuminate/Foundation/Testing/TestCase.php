@@ -111,7 +111,7 @@ abstract class TestCase extends BaseTestCase
     {
         $uses = array_flip(class_uses_recursive(static::class));
 
-        foreach($uses as $trait) {
+        foreach ($uses as $trait) {
             $bootMethod = $method = 'setUp'.class_basename($trait);
 
             if (method_exists(static::class, $bootMethod)) {
