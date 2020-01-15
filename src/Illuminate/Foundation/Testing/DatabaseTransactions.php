@@ -9,7 +9,7 @@ trait DatabaseTransactions
      *
      * @return void
      */
-    public function beginDatabaseTransaction()
+    public function setUpDatabaseTransactions()
     {
         $database = $this->app->make('db');
 
@@ -25,6 +25,17 @@ trait DatabaseTransactions
                 $connection->disconnect();
             }
         });
+    }
+
+    /**
+     * Handle database transactions on the specified connections.
+     *
+     * @deprecated in favor of setUpDatabaseTransactions()
+     * @return void
+     */
+    public function beginDatabaseTransaction()
+    {
+        $this->setUpDatabaseTransactions();
     }
 
     /**

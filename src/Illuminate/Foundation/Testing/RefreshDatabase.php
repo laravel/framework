@@ -11,11 +11,22 @@ trait RefreshDatabase
      *
      * @return void
      */
-    public function refreshDatabase()
+    public function setUpRefreshDatabase()
     {
         $this->usingInMemoryDatabase()
-                        ? $this->refreshInMemoryDatabase()
-                        : $this->refreshTestDatabase();
+            ? $this->refreshInMemoryDatabase()
+            : $this->refreshTestDatabase();
+    }
+
+    /**
+     * Define hooks to migrate the database before and after each test.
+     *
+     * @deprecated in favor of setUpRefreshDatabase()
+     * @return void
+     */
+    public function refreshDatabase()
+    {
+        $this->setUpRefreshDatabase();
     }
 
     /**

@@ -11,12 +11,23 @@ trait WithoutMiddleware
      *
      * @throws \Exception
      */
-    public function disableMiddlewareForAllTests()
+    public function setUpWithoutMiddleware()
     {
         if (method_exists($this, 'withoutMiddleware')) {
             $this->withoutMiddleware();
         } else {
             throw new Exception('Unable to disable middleware. MakesHttpRequests trait not used.');
         }
+    }
+
+    /**
+     * Prevent all middleware from being executed for this test class.
+     *
+     * @deprecated in favor of setUpWithoutMiddleware()
+     * @throws \Exception
+     */
+    public function disableMiddlewareForAllTests()
+    {
+        $this->setUpWithoutMiddleware();
     }
 }

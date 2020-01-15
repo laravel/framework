@@ -11,7 +11,7 @@ trait DatabaseMigrations
      *
      * @return void
      */
-    public function runDatabaseMigrations()
+    public function setUpDatabaseMigrations()
     {
         $this->artisan('migrate:fresh');
 
@@ -22,5 +22,16 @@ trait DatabaseMigrations
 
             RefreshDatabaseState::$migrated = false;
         });
+    }
+
+    /**
+     * Define hooks to migrate the database before and after each test.
+     *
+     * @deprecated in favor of setUpDatabaseMigrations()
+     * @return void
+     */
+    public function runDatabaseMigrations()
+    {
+        $this->setUpDatabaseMigrations();
     }
 }
