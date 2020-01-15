@@ -2,7 +2,11 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
+use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\Validator;
@@ -105,5 +109,46 @@ class ValidationFactoryTest extends TestCase
 
         $validator = $factory->make(['bar' => ['baz']], ['bar' => 'foo']);
         $this->assertTrue($validator->passes());
+    }
+
+    public function testContractInheritedValidatorExtension()
+    {
+        $factory = new Factory(
+            $this->getIlluminateArrayTranslator(),
+            $this->getContainer()
+        );
+
+        $factory->extend('foo', FooRule::class);
+
+        $validator = $factory->make(['foo' => false], ['foo' => ['foo']]);
+
+        $this->assertSame(['foo' => FooRule::class], $validator->extensions);
+        $this->assertTrue($validator->fails());
+        $this->assertSame('foo!', $validator->errors()->first());
+    }
+
+    public function getIlluminateArrayTranslator()
+    {
+        return new Translator(
+            new ArrayLoader(), 'en'
+        );
+    }
+
+    public function getContainer()
+    {
+        return new Container();
+    }
+}
+
+class FooRule implements Rule
+{
+    public function passes($attribute, $value)
+    {
+        return $value === true;
+    }
+
+    public function message()
+    {
+        return 'foo!';
     }
 }

@@ -19,7 +19,7 @@ interface Factory
      * Register a custom validator extension.
      *
      * @param  string  $rule
-     * @param  \Closure|string  $extension
+     * @param  \Closure|\Illuminate\Contracts\Validation\Rule|string  $extension
      * @param  string|null  $message
      * @return void
      */

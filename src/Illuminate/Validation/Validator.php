@@ -275,6 +275,8 @@ class Validator implements ValidatorContract
      * Determine if the data passes the validation rules.
      *
      * @return bool
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function passes()
     {
@@ -323,6 +325,8 @@ class Validator implements ValidatorContract
      * Determine if the data fails the validation rules.
      *
      * @return bool
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function fails()
     {
@@ -409,6 +413,8 @@ class Validator implements ValidatorContract
      * @param  string  $attribute
      * @param  string  $rule
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function validateAttribute($attribute, $rule)
     {
@@ -444,7 +450,7 @@ class Validator implements ValidatorContract
         // attribute is invalid and we will add a failure message for this failing attribute.
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
-        if ($rule instanceof RuleContract) {
+        if ($this->isRuleable($rule, $attribute)) {
             return $validatable
                     ? $this->validateUsingCustomRule($attribute, $value, $rule)
                     : null;
@@ -607,6 +613,22 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Checking if the rule is an instance of Rule contract.
+     *
+     * @param  string  $rule
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function isRuleable($rule, $attribute)
+    {
+        return $rule instanceof RuleContract ||
+            (
+                isset($this->extensions[$attribute]) &&
+                is_subclass_of($this->extensions[$attribute], RuleContract::class)
+            );
+    }
+
+    /**
      * Determine if it's a necessary presence validation.
      *
      * This is to avoid possible database type comparison errors.
@@ -627,9 +649,13 @@ class Validator implements ValidatorContract
      * @param  mixed  $value
      * @param  \Illuminate\Contracts\Validation\Rule  $rule
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function validateUsingCustomRule($attribute, $value, $rule)
     {
+        $rule = $this->normalizeRuleInstance($attribute, $rule);
+
         if (! $rule->passes($attribute, $value)) {
             $this->failedRules[$attribute][get_class($rule)] = [];
 
@@ -669,12 +695,30 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Getting a Rule instance.
+     *
+     * @param  string  $attribute
+     * @param  \Illuminate\Contracts\Validation\Rule  $rule
+     * @return \Illuminate\Contracts\Validation\Rule
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function normalizeRuleInstance($attribute, $rule)
+    {
+        return $rule instanceof RuleContract
+            ? $rule
+            : $this->container->make($this->extensions[$attribute]);
+    }
+
+    /**
      * Add a failed rule and error message to the collection.
      *
      * @param  string  $attribute
      * @param  string  $rule
      * @param  array  $parameters
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function addFailure($attribute, $rule, $parameters = [])
     {
