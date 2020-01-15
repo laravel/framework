@@ -3,12 +3,14 @@
 namespace Illuminate\View;
 
 use Closure;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 
-abstract class Component
+abstract class Component implements Renderable
 {
     /**
      * That properties / methods that should not be exposed to the component.
@@ -115,6 +117,17 @@ abstract class Component
             'view',
             'data',
             'withAttributes',
+            'render',
         ], $this->except);
+    }
+
+    /**
+     * Get the evaluated contents of the object.
+     *
+     * @return string
+     */
+    public function render()
+    {
+        return (string) View::make($this->view(), $this->data());
     }
 }
