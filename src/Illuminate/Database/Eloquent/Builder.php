@@ -262,7 +262,7 @@ class Builder
     {
         return $this->where($column, $operator, $value, $boolean)->firstOrFail();
     }
-    
+
     /**
      * Add an "or where" clause to the query.
      *
