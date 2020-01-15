@@ -130,7 +130,7 @@ abstract class ServiceProvider
     }
 
     /**
-     * Register a database migration path.
+     * Register database migration paths.
      *
      * @param  array|string  $paths
      * @return void
@@ -145,7 +145,7 @@ abstract class ServiceProvider
     }
 
     /**
-     * Register an Eloquent model factory path.
+     * Register Eloquent model factory paths.
      *
      * @param  array|string  $paths
      * @return void
