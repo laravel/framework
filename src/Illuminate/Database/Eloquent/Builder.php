@@ -250,7 +250,7 @@ class Builder
     }
 
     /**
-     * Add a basic where clause to the query, and return the first result.
+     * Add a basic where clause to the query, and return the first result or throw an exception.
      *
      * @param  \Closure|string|array  $column
      * @param  mixed  $operator
