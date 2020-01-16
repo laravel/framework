@@ -2,7 +2,7 @@
 
 namespace Illuminate\View;
 
-class BindingsAssessor
+class ViewBindingsAssessor
 {
     public const VIEW = 'view';
     public const PHP_ENGINE = 'php';
