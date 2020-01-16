@@ -559,6 +559,16 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get the event dispatcher instance.
+     *
+     * @return  \Illuminate\Contracts\Events\Dispatcher  $events
+     */
+    public function getEventDispatcher()
+    {
+        return $this->events;
+    }
+
+    /**
      * Determine if a cached value exists.
      *
      * @param  string  $key
