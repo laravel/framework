@@ -34,7 +34,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerFactory()
     {
-        $this->app->singleton('view', function ($app) {
+        $this->app->singleton(ViewBindingsAssessor::VIEW, function ($app) {
             // Next we need to grab the engine resolver instance that will be used by the
             // environment. The resolver will be used by an environment to get each of
             // the various engine implementations such as plain PHP or Blade engine.
@@ -75,7 +75,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerViewFinder()
     {
-        $this->app->bind('view.finder', function ($app) {
+        $this->app->bind(ViewBindingsAssessor::VIEW_FINDER, function ($app) {
             return new FileViewFinder($app['files'], $app['config']['view.paths']);
         });
     }
@@ -87,7 +87,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerBladeCompiler()
     {
-        $this->app->singleton('blade.compiler', function () {
+        $this->app->singleton(ViewBindingsAssessor::BLADE_COMPILER, function () {
             return new BladeCompiler(
                 $this->app['files'], $this->app['config']['view.compiled']
             );
@@ -101,7 +101,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerEngineResolver()
     {
-        $this->app->singleton('view.engine.resolver', function () {
+        $this->app->singleton(ViewBindingsAssessor::VIEW_ENGINE_RESOLVER, function () {
             $resolver = new EngineResolver;
 
             // Next, we will register the various view engines with the resolver so that the
@@ -123,7 +123,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerFileEngine($resolver)
     {
-        $resolver->register('file', function () {
+        $resolver->register(ViewBindingsAssessor::FILE_ENGINE, function () {
             return new FileEngine;
         });
     }
@@ -136,7 +136,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerPhpEngine($resolver)
     {
-        $resolver->register('php', function () {
+        $resolver->register(ViewBindingsAssessor::PHP_ENGINE, function () {
             return new PhpEngine;
         });
     }
@@ -149,7 +149,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerBladeEngine($resolver)
     {
-        $resolver->register('blade', function () {
+        $resolver->register(ViewBindingsAssessor::BLADE_ENGINE, function () {
             return new CompilerEngine($this->app['blade.compiler']);
         });
     }
