@@ -47,6 +47,7 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 8) {
             PHPUnit::assertThat($array, $constraint, $msg);
         }
     }
+} else {
     /**
      * @internal This class is not meant to be used or overwritten outside the framework itself.
      */
