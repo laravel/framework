@@ -46,6 +46,15 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         Container::setInstance(null);
     }
 
+    public function testComponentsCanBeCompiledWithHyphenAttributes()
+    {
+        $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<x-alert class="bar" wire:model="foo" x-on:click="bar" @click="baz" />');
+
+        $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+<?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo','x-on:click' => 'bar','@click' => 'baz']); ?>
+@endcomponent", trim($result));
+    }
+
     public function testSelfClosingComponentsCanBeCompiledWithDataAndAttributes()
     {
         $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<x-alert title="foo" class="bar" wire:model="foo" />');
