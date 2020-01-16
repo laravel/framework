@@ -67,7 +67,7 @@ class ComponentAttributeBag implements ArrayAccess
     public function merge(array $attributeDefaults = [])
     {
         return new static(
-            collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
+            array_merge($attributeDefaults, collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
                 if ($value === true) {
                     return $key;
                 }
@@ -76,7 +76,7 @@ class ComponentAttributeBag implements ArrayAccess
                                 ->filter()
                                 ->unique()
                                 ->join(' ');
-            })->filter()->all()
+            })->filter()->all())
         );
     }
 
