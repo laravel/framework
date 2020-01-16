@@ -135,6 +135,14 @@ abstract class TestCase extends BaseTestCase
             $this->setUpFaker();
         }
 
+        foreach($uses as $trait) {
+            $bootMethod = $method = 'setUp'.class_basename($trait);
+
+            if (method_exists(static::class, $bootMethod)) {
+                $this->{$method}();
+            }
+        }
+
         return $uses;
     }
 
