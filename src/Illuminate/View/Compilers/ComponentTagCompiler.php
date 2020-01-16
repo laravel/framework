@@ -75,7 +75,7 @@ class ComponentTagCompiler
                 (?<attributes>
                     (?:
                         \s+
-                        [\w\-:\.]+
+                        [^\s\=]+
                         (
                             =
                             (?:
@@ -116,7 +116,7 @@ class ComponentTagCompiler
                 (?<attributes>
                     (?:
                         \s+
-                        [\w\-:\.]+
+                        [^\s\=]+
                         (
                             =
                             (?:
@@ -248,7 +248,7 @@ class ComponentTagCompiler
         $attributeString = $this->parseBindAttributes($attributeString);
 
         $pattern = '/
-            (?<attribute>[\w\.:-]+)
+            (?<attribute>[^\s\=]+)
             (
                 =
                 (?<value>
@@ -268,7 +268,7 @@ class ComponentTagCompiler
         }
 
         return collect($matches)->mapWithKeys(function ($match) {
-            $attribute = Str::camel($match['attribute']);
+            $attribute = $match['attribute'];
             $value = $match['value'] ?? null;
 
             if (is_null($value)) {
@@ -300,7 +300,7 @@ class ComponentTagCompiler
         $pattern = "/
             (?:^|\s+)   # start of the string or whitespace between attributes
             :           # attribute needs to start with a semicolon
-            ([\w-]+)    # match the actual attribute name
+            ([^\s\=]+)    # match the actual attribute name
             =           # only match attributes that have a value
         /xm";
 
