@@ -1174,6 +1174,23 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Dump the session from the response.
+     *
+     * @param  array  $keys
+     * @return $this
+     */
+    public function dumpSession($keys = null)
+    {
+        if (is_array($keys)) {
+            dump($this->session()->only($keys));
+        } else {
+            dump($this->session()->all());
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the streamed content from the response.
      *
      * @return string

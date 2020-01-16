@@ -38,6 +38,7 @@ class Event extends Facade
         static::swap($fake = new EventFake(static::getFacadeRoot(), $eventsToFake));
 
         Model::setEventDispatcher($fake);
+        Cache::refreshEventDispatcher();
 
         return $fake;
     }
@@ -59,6 +60,7 @@ class Event extends Facade
             static::swap($originalDispatcher);
 
             Model::setEventDispatcher($originalDispatcher);
+            Cache::refreshEventDispatcher();
         });
     }
 
