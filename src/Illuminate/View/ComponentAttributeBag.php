@@ -95,11 +95,11 @@ class ComponentAttributeBag implements ArrayAccess
      * Merge additional attributes / values into the attribute bag.
      *
      * @param  array  $attributes
-     * @return static
+     * @return \Illuminate\Support\HtmlString
      */
     public function __invoke(array $attributeDefaults = [])
     {
-        return $this->merge($attributeDefaults);
+        return new HtmlString((string) $this->merge($attributeDefaults));
     }
 
     /**
@@ -154,12 +154,10 @@ class ComponentAttributeBag implements ArrayAccess
      */
     public function __toString()
     {
-        return (string) new HtmlString(
-            collect($this->attributes)->map(function ($value, $key) {
-                return $value === true
-                        ? $key
-                        : $key.'="'.str_replace('"', '\\"', trim($value)).'"';
-            })->implode(' ')
-        );
+        return collect($this->attributes)->map(function ($value, $key) {
+            return $value === true
+                    ? $key
+                    : $key.'="'.str_replace('"', '\\"', trim($value)).'"';
+        })->implode(' ');
     }
 }
