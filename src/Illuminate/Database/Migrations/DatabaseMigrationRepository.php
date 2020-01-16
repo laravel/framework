@@ -165,8 +165,14 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     public function repositoryExists()
     {
         $schema = $this->getConnection()->getSchemaBuilder();
-
-        return $schema->hasTable($this->table);
+    
+        $table = $this->table;
+        if (strstr($table, '.') !== false) {
+            $arrTable = explode('.', $table);
+            $table = end($arrTable);
+        }
+        
+        return $schema->hasTable($table);
     }
 
     /**
