@@ -259,14 +259,17 @@ class CacheManager implements FactoryContract
     public function repository(Store $store)
     {
         return tap(new Repository($store), function ($repository) {
-            $this->addEventDispatcher($repository);
+            $this->setEventDispatcher($repository);
         });
     }
 
     /**
-     * @param Repository $repository
+     * Set the event dispatcher on the given repository instance.
+     *
+     * @param  \Illuminate\Cache\Repository  $repository
+     * @return void
      */
-    protected function addEventDispatcher(Repository $repository)
+    protected function setEventDispatcher(Repository $repository)
     {
         if (! $this->app->bound(DispatcherContract::class)) {
             return;
@@ -278,12 +281,13 @@ class CacheManager implements FactoryContract
     }
 
     /**
-     * Refreshes the event dispatcher of all resolved repositories
-     * with the currently bound event dispatcher implementation.
+     * Re-set the event dispatcher on all resolved cache repositories.
+     *
+     * @return void
      */
     public function refreshEventDispatcher()
     {
-        array_map([$this, 'addEventDispatcher'], $this->stores);
+        array_map([$this, 'setEventDispatcher'], $this->stores);
     }
 
     /**
