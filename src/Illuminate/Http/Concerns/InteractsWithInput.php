@@ -224,6 +224,17 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input as a boolean value.
+     *
+     * @param  string|null  $key
+     * @return bool
+     */
+    public function boolean($key = null)
+    {
+        return filter_var($this->input($key, false), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
      * Get a subset containing the provided keys with values from the input data.
      *
      * @param  array|mixed  $keys
