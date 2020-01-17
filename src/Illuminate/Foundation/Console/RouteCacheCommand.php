@@ -61,7 +61,7 @@ class RouteCacheCommand extends Command
         }
 
         $symfonyRoutes = new SymfonyRouteCollection();
-        $actions = [];
+        $attributes = [];
 
         foreach ($routes as $route) {
             $route->prepareForSerialization();
@@ -69,11 +69,16 @@ class RouteCacheCommand extends Command
             $name = $route->getName() ?? Str::random();
 
             $symfonyRoutes->add($name, $route->toSymfonyRoute());
-            $actions[$name] = $route->getAction();
+            $attributes[$name] = [
+                'uri' => $route->uri(),
+                'action' => $route->getAction(),
+            ];
         }
 
+        $compiled = (new CompiledUrlMatcherDumper($symfonyRoutes))->getCompiledRoutes();
+
         $this->files->put(
-            $this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile($symfonyRoutes, $actions)
+            $this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile(compact('compiled', 'attributes'))
         );
 
         $this->info('Routes cached successfully!');
@@ -107,17 +112,11 @@ class RouteCacheCommand extends Command
     /**
      * Build the route cache file.
      *
-     * @param  \Symfony\Component\Routing\RouteCollection  $routes
-     * @param  array  $actions
+     * @param  array  $routes
      * @return string
      */
-    protected function buildRouteCacheFile(SymfonyRouteCollection $routes, array $actions)
+    protected function buildRouteCacheFile(array $routes)
     {
-        $routes = [
-            'compiled' => (new CompiledUrlMatcherDumper($routes))->getCompiledRoutes(),
-            'actions' => $actions,
-        ];
-
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
         return str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
