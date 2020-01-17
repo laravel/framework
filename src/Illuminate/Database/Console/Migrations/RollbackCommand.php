@@ -47,12 +47,12 @@ class RollbackCommand extends BaseCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
         if (! $this->confirmToProceed()) {
-            return;
+            return 1;
         }
 
         $this->migrator->usingConnection($this->option('database'), function () {
@@ -63,6 +63,8 @@ class RollbackCommand extends BaseCommand
                 ]
             );
         });
+
+        return 0;
     }
 
     /**
