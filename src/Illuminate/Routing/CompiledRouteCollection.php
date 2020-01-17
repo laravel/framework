@@ -31,8 +31,8 @@ class CompiledRouteCollection
      */
     public function __construct(array $routes)
     {
-        $this->compiledRoutes = $routes['compiled'];
-        $this->attributes = $routes['attributes'];
+        $this->compiledRoutes = $routes['compiled'] ?? [];
+        $this->attributes = $routes['attributes'] ?? [];
     }
 
     /**
