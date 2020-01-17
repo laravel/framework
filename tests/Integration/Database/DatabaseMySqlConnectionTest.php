@@ -36,7 +36,7 @@ class DatabaseMySqlConnectionTest extends TestCase
     {
         parent::setUp();
 
-        if (! isset($_ENV['CI'])) {
+        if (! isset($_SERVER['CI'])) {
             $this->markTestSkipped('This test is only executed on CI.');
         }
 
