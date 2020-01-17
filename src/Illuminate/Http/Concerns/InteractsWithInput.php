@@ -227,11 +227,12 @@ trait InteractsWithInput
      * Retrieve input as a boolean value.
      *
      * @param  string|null  $key
+     * @param  boolean  $default
      * @return bool
      */
-    public function boolean($key = null)
+    public function boolean($key = null, $default = false)
     {
-        return filter_var($this->input($key, false), FILTER_VALIDATE_BOOLEAN);
+        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 
     /**
