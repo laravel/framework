@@ -232,7 +232,7 @@ trait InteractsWithInput
      */
     public function boolean($key = null, $default = false)
     {
-        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
