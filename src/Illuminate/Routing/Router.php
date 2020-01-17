@@ -55,6 +55,13 @@ class Router implements BindingRegistrar, RegistrarContract
     protected $routes;
 
     /**
+     * The compiled route collection instance.
+     *
+     * @var \Illuminate\Routing\CompiledRouteCollection
+     */
+    protected $compiledRoutes;
+
+    /**
      * The currently dispatched route instance.
      *
      * @var \Illuminate\Routing\Route|null
@@ -632,7 +639,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function findRoute($request)
     {
-        $this->current = $route = $this->routes->match($request);
+        $this->current = $route = ($this->compiledRoutes ?? $this->routes)->match($request)
+            ->setRouter($this)
+            ->setContainer($this->container);
 
         $this->container->instance(Route::class, $route);
 
@@ -1199,6 +1208,17 @@ class Router implements BindingRegistrar, RegistrarContract
         $this->routes = $routes;
 
         $this->container->instance('routes', $this->routes);
+    }
+
+    /**
+     * Set the compiled route collection instance.
+     *
+     * @param  array  $routes
+     * @return void
+     */
+    public function setCompiledRoutes(array $routes)
+    {
+        $this->compiledRoutes = new CompiledRouteCollection($routes);
     }
 
     /**
