@@ -161,11 +161,11 @@ class FilesystemAdapter implements CloudFilesystemContract
         ]);
 
         $response->setCallback(function () use ($path) {
+            ob_end_flush();
             $stream = $this->readStream($path);
-            while (! feof($stream)) {
-                echo fread($stream, 4096);
-            }
+            fpassthru($stream);
             fclose($stream);
+            ob_start();
         });
 
         return $response;
