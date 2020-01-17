@@ -17,11 +17,11 @@ class CompiledRouteCollection
     protected $compiledRoutes;
 
     /**
-     * An array of the route actions keyed by name.
+     * An array of the route attributes keyed by route name.
      *
      * @var array
      */
-    protected $actions;
+    protected $attributes;
 
     /**
      * Create a new CompiledRouteCollection instance.
@@ -32,7 +32,7 @@ class CompiledRouteCollection
     public function __construct(array $routes)
     {
         $this->compiledRoutes = $routes['compiled'];
-        $this->actions = $routes['actions'];
+        $this->attributes = $routes['attributes'];
     }
 
     /**
@@ -50,9 +50,10 @@ class CompiledRouteCollection
 
         if ($attributes = $matcher->matchRequest($request)) {
             $name = $attributes['_route'];
-            $action = $this->actions[$name];
+            $uri = $this->attributes[$name]['uri'];
+            $action = $this->attributes[$name]['action'];
 
-            $route = new Route([$request->method()], $context->getPathInfo(), $action);
+            $route = new Route([$request->method()], $uri, $action);
 
             if (! is_null($route)) {
                 return $route->bind($request);
