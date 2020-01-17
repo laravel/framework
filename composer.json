@@ -88,7 +88,7 @@
         "moontoast/math": "^1.1",
         "orchestra/testbench-core": "^5.0",
         "pda/pheanstalk": "^4.0",
-        "phpunit/phpunit": "^8.4|^9.0",
+        "phpunit/phpunit": "^7.5.15|^8.4|^9.0",
         "predis/predis": "^1.1.1",
         "symfony/cache": "^5.0"
     },
