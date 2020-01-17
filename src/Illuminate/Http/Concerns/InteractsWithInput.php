@@ -227,7 +227,7 @@ trait InteractsWithInput
      * Retrieve input as a boolean value.
      *
      * @param  string|null  $key
-     * @param  boolean  $default
+     * @param  bool  $default
      * @return bool
      */
     public function boolean($key = null, $default = false)
