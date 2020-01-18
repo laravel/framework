@@ -599,13 +599,15 @@ class UrlGenerator implements UrlGeneratorContract
      * Set the default named parameters used by the URL generator.
      *
      * @param  array  $defaults
-     * @param  string  $namePrefix
+     * @param  string|null  $namePrefix
      * @return void
      */
-    public function defaults(array $defaults, $namePrefix = '')
+    public function defaults(array $defaults, $namePrefix = null)
     {
         $this->routeUrl()->defaults($defaults);
-        $this->defaultRouteNamePrefix = $namePrefix;
+        if(! is_null($namePrefix)){
+            $this->defaultRouteNamePrefix = $namePrefix;
+        }
     }
 
     /**
