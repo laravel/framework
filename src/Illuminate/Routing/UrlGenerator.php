@@ -420,7 +420,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function route($name, $parameters = [], $absolute = true)
     {
-        $name = $this->defaultNamePrefix.$name;
+        $name = $this->defaultRouteNamePrefix.$name;
         if (! is_null($route = $this->routes->getByName($name))) {
             return $this->toRoute($route, $parameters, $absolute);
         }
