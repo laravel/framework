@@ -15,6 +15,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
  * @method static \Illuminate\Routing\RouteRegistrar where(array  $where)
  * @method static \Illuminate\Routing\PendingResourceRegistration resource(string $name, string $controller, array $options = [])
+ * @method static void resources(array $resources)
  * @method static \Illuminate\Routing\PendingResourceRegistration apiResource(string $name, string $controller, array $options = [])
  * @method static void apiResources(array $resources, array $options = [])
  * @method static \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
