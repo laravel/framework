@@ -602,7 +602,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string  $namePrefix
      * @return void
      */
-    public function defaults(array $defaults, string $namePrefix = '')
+    public function defaults(array $defaults, $namePrefix = '')
     {
         $this->routeUrl()->defaults($defaults);
         $this->defaultRouteNamePrefix = $namePrefix;
