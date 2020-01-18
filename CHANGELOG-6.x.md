@@ -2,6 +2,16 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.11.0...6.x)
 
+### Added
+- Added `ServiceProvider::loadFactoriesFrom()` method ([#31133](https://github.com/laravel/framework/pull/31133))
+- Added `TestResponse::dumpSession()` method ([#31131](https://github.com/laravel/framework/pull/31131))
+- Added `Str::isUuid()` method ([#31148](https://github.com/laravel/framework/pull/31148))
+- Restored phpunit 7 support ([#31113](https://github.com/laravel/framework/pull/31113))
+- Added `Request::boolean()` method ([#31160](https://github.com/laravel/framework/pull/31160))
+
+### TODO
+- Replace Event Dispatcher in resolved cache repositories when `Event::fake()` is used ([#31119](https://github.com/laravel/framework/pull/31119), [0a70beb](https://github.com/laravel/framework/commit/0a70bebd5ecfd51185a312bbfb60ee7f8ff7eb09))
+
 
 ## [v6.11.0 (2020-01-14)](https://github.com/laravel/framework/compare/v6.10.1...v6.11.0)
 
