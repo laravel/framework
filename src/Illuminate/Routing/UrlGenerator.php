@@ -605,7 +605,7 @@ class UrlGenerator implements UrlGeneratorContract
     public function defaults(array $defaults, $namePrefix = null)
     {
         $this->routeUrl()->defaults($defaults);
-        if(! is_null($namePrefix)){
+        if (! is_null($namePrefix)){
             $this->defaultRouteNamePrefix = $namePrefix;
         }
     }
