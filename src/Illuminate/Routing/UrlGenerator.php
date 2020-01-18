@@ -422,7 +422,7 @@ class UrlGenerator implements UrlGeneratorContract
     {
         if (! is_null($route = $this->routes->getByName($name))) {
             return $this->toRoute($route, $parameters, $absolute);
-        } elseif (! is_null($route = $this->routes->getByName($this->defaultRouteNamePrefix.$name))) {
+        } elseif ($this->defaultRouteNamePrefix !== '' && ! is_null($route = $this->routes->getByName($this->defaultRouteNamePrefix.$name))) {
             return $this->toRoute($route, $parameters, $absolute);
         }
 
@@ -601,20 +601,10 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  array  $defaults
      * @return void
      */
-    public function defaults(array $defaults)
+    public function defaults(array $defaults, string $namePrefix = '')
     {
         $this->routeUrl()->defaults($defaults);
-    }
-
-    /**
-     * Set the default prefix of named routes used by the URL generator.
-     *
-     * @param  string  $prefix
-     * @return void
-     */
-    public function defaultNamePrefix(string $prefix)
-    {
-        $this->defaultRouteNamePrefix = $prefix;
+        $this->defaultRouteNamePrefix = $namePrefix;
     }
 
     /**
