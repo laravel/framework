@@ -54,6 +54,13 @@ class UrlGenerator implements UrlGeneratorContract
     protected $forceScheme;
 
     /**
+     * The default prefix for named routes.
+     *
+     * @var string
+     */
+    protected $defaultRouteNamePrefix = '';
+
+    /**
      * A cached copy of the URL root for the current request.
      *
      * @var string|null
@@ -413,6 +420,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function route($name, $parameters = [], $absolute = true)
     {
+        $name = $this->defaultNamePrefix.$name;
         if (! is_null($route = $this->routes->getByName($name))) {
             return $this->toRoute($route, $parameters, $absolute);
         }
@@ -595,6 +603,17 @@ class UrlGenerator implements UrlGeneratorContract
     public function defaults(array $defaults)
     {
         $this->routeUrl()->defaults($defaults);
+    }
+
+    /**
+     * Set the default prefix of named routes used by the URL generator.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function defaultNamePrefix(string $prefix)
+    {
+        $this->defaultRouteNamePrefix = $prefix;
     }
 
     /**
