@@ -34,8 +34,7 @@ class RedisLock extends Lock
      */
     public function acquire()
     {
-        if ($this->seconds > 0)
-        {
+        if ($this->seconds > 0) {
             // Use the atomic operations EX NX to avoid deadlock (Redis version >= 2.6.12)
             $result = $this->redis->set($this->name, $this->owner, 'EX', $this->seconds, 'NX');
 
