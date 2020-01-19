@@ -183,10 +183,10 @@ class EloquentFactoryBuilderTest extends TestCase
                 'name' => 'Taylor',
             ],
             [
-                'name' => 'John'
+                'name' => 'John',
             ],
             [
-                'name' => 'Doe'
+                'name' => 'Doe',
             ],
         ]);
         $this->assertInstanceOf(Collection::class, $users);

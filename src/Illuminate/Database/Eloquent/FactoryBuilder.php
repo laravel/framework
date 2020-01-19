@@ -201,6 +201,7 @@ class FactoryBuilder
         $instances = array_map(function ($attribute) {
             return $this->create($attribute);
         }, $records);
+
         return new Collection($instances);
     }
 
