@@ -30,18 +30,19 @@ class RedisLock extends Lock
     /**
      * Attempt to acquire the lock.
      * use set Ex NX to make the operation atomic, to avoid deadlock
-     * Redis version >= 2.6.12
+     * Redis version >= 2.6.12.
      *
      * @return bool
      */
     public function acquire()
     {
-        if ($this->seconds > 0)
-        {
+        if ($this->seconds > 0) {
             $result = $this->redis->set($this->name, $this->owner, 'EX', $this->seconds, 'NX');
+
             return $result == 'OK';
         } else {
             $result = $this->redis->setnx($this->name, $this->owner);
+
             return $result === 1;
         }
     }
