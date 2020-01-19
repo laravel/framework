@@ -1985,7 +1985,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
         $model->options = 'foo';
-        $model->setJsonAttribute('options', function($options) {
+        $model->setJsonAttribute('options', function ($options) {
             $options['foo'] = 'bar2';
 
             return $options;
@@ -1994,7 +1994,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model = new EloquentModelStub;
         $model->options = ['foo' => 'bar'];
-        $model->setJsonAttribute('options', function($options) {
+        $model->setJsonAttribute('options', function ($options) {
             $options['foo'] = 'bar2';
 
             return $options;
@@ -2002,7 +2002,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['foo' => 'bar2'], $model->options);
 
         $model = new EloquentModelStub;
-        $model->setJsonAttribute('options', function($options) {
+        $model->setJsonAttribute('options', function ($options) {
             $options['foo'] = 'bar2';
 
             return $options;
