@@ -1256,4 +1256,34 @@ trait HasAttributes
 
         return $matches[1];
     }
+
+    /**
+     * Manipulate a given attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $callable
+     * @return mixed
+     */
+    public function manipulateAttribute($key, callable $callable)
+    {
+        $value = $this->getAttribute($key);
+        $value = call_user_func($callable, $value);
+        return $this->setAttribute($key, $value);
+    }
+
+    /**
+     * Set a given json attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $callable
+     * @return mixed
+     */
+    public function setJsonAttribute($key, callable $callable)
+    {
+        if (! is_array($this->getAttribute($key)) && ! is_null($this->getAttribute($key))) {
+            return $this;
+        }
+
+        return $this->manipulateAttribute($key, $callable);
+    }
 }

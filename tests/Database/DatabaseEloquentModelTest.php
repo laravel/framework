@@ -1957,6 +1957,58 @@ class DatabaseEloquentModelTest extends TestCase
             Model::isIgnoringTouch(EloquentModelWithoutTimestamps::class)
         );
     }
+
+    public function testAttributeManipulationFunction()
+    {
+        $model = new EloquentModelStub;
+        $model->foo = 'bar';
+        $model->manipulateAttribute('foo', function($value) {
+            return $value.'bar';
+        });
+        $this->assertEquals('barbar', $model->foo);
+
+        $model = new EloquentModelStub;
+        $model->foo = 1;
+        $model->manipulateAttribute('foo', function($value) {
+            return ($value+1);
+        });
+        $this->assertEquals(2, $model->foo);
+
+        $model = new EloquentModelStub;
+        $model->manipulateAttribute('foo', function($value) {
+            return 'bar';
+        });
+        $this->assertEquals('bar', $model->foo);
+    }
+
+    public function testJsonAttributeManipulation()
+    {
+        $model = new EloquentModelStub;
+        $model->options = 'foo';
+        $model->setJsonAttribute('options', function($options) {
+            $options['foo'] = 'bar2';
+
+            return $options;
+        });
+        $this->assertEquals('foo', $model->options);
+
+        $model = new EloquentModelStub;
+        $model->options = ['foo' => 'bar'];
+        $model->setJsonAttribute('options', function($options) {
+            $options['foo'] = 'bar2';
+
+            return $options;
+        });
+        $this->assertEquals(['foo' => 'bar2'], $model->options);
+
+        $model = new EloquentModelStub;
+        $model->setJsonAttribute('options', function($options) {
+            $options['foo'] = 'bar2';
+
+            return $options;
+        });
+        $this->assertEquals(['foo' => 'bar2'], $model->options);
+    }
 }
 
 class EloquentTestObserverStub
