@@ -1970,7 +1970,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $model->foo = 1;
         $model->manipulateAttribute('foo', function ($value) {
-            return $value+1;
+            return $value + 1;
         });
         $this->assertEquals(2, $model->foo);
 
