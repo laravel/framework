@@ -1268,6 +1268,7 @@ trait HasAttributes
     {
         $value = $this->getAttribute($key);
         $value = call_user_func($callable, $value);
+
         return $this->setAttribute($key, $value);
     }
 

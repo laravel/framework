@@ -1962,20 +1962,20 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
         $model->foo = 'bar';
-        $model->manipulateAttribute('foo', function($value) {
+        $model->manipulateAttribute('foo', function ($value) {
             return $value.'bar';
         });
         $this->assertEquals('barbar', $model->foo);
 
         $model = new EloquentModelStub;
         $model->foo = 1;
-        $model->manipulateAttribute('foo', function($value) {
+        $model->manipulateAttribute('foo', function ($value) {
             return ($value+1);
         });
         $this->assertEquals(2, $model->foo);
 
         $model = new EloquentModelStub;
-        $model->manipulateAttribute('foo', function($value) {
+        $model->manipulateAttribute('foo', function ($value) {
             return 'bar';
         });
         $this->assertEquals('bar', $model->foo);
