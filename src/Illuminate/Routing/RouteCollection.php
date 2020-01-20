@@ -10,6 +10,8 @@ use Illuminate\Support\Arr;
 use IteratorAggregate;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\RequestContext;
 
 class RouteCollection implements Countable, IteratorAggregate
 {
@@ -19,6 +21,13 @@ class RouteCollection implements Countable, IteratorAggregate
      * @var array
      */
     protected $routes = [];
+
+    /**
+     * An array of the compiled Symfony routes.
+     *
+     * @var array
+     */
+    protected $compiledRoutes = [];
 
     /**
      * A flattened array of all of the routes.
@@ -156,12 +165,16 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function match(Request $request)
     {
-        $routes = $this->get($request->getMethod());
+        if ($this->compiledRoutes) {
+            $route = $this->matchAgainstCompiledRoutes($request);
+        } else {
+            $routes = $this->get($request->getMethod());
 
-        // First, we will see if we can find a matching route for this current request
-        // method. If we can, great, we can just return it so that it can be called
-        // by the consumer. Otherwise we will check for routes with another verb.
-        $route = $this->matchAgainstRoutes($routes, $request);
+            // First, we will see if we can find a matching route for this current request
+            // method. If we can, great, we can just return it so that it can be called
+            // by the consumer. Otherwise we will check for routes with another verb.
+            $route = $this->matchAgainstRoutes($routes, $request);
+        }
 
         if (! is_null($route)) {
             return $route->bind($request);
@@ -196,6 +209,22 @@ class RouteCollection implements Countable, IteratorAggregate
         return $routes->merge($fallbacks)->first(function (Route $route) use ($request, $includingMethod) {
             return $route->matches($request, $includingMethod);
         });
+    }
+
+    /**
+     * Determine if a route in the compiled array matches the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Routing\Route|null
+     */
+    protected function matchAgainstCompiledRoutes($request)
+    {
+        $context = (new RequestContext())->fromRequest($request);
+        $matcher = new CompiledUrlMatcher($this->compiledRoutes, $context);
+
+        if ($result = $matcher->matchRequest($request)) {
+            return $this->getByName($result['_route']);
+        }
     }
 
     /**
@@ -335,6 +364,17 @@ class RouteCollection implements Countable, IteratorAggregate
     public function getRoutesByName()
     {
         return $this->nameList;
+    }
+
+    /**
+     * Set the compiled routes from the cached file.
+     *
+     * @param  array  $compiledRoutes
+     * @return void
+     */
+    public function setCompiledRoutes(array $compiledRoutes)
+    {
+        $this->compiledRoutes = $compiledRoutes;
     }
 
     /**
