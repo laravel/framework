@@ -198,11 +198,9 @@ class FactoryBuilder
      */
     public function createMany(iterable $records)
     {
-        $instances = array_map(function ($attribute) {
+        return (new $this->class)->newCollection(array_map(function ($attribute) {
             return $this->create($attribute);
-        }, $records);
-
-        return new Collection($instances);
+        }, $records));
     }
 
     /**
