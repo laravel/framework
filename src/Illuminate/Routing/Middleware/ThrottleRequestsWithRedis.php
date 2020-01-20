@@ -46,7 +46,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  int|string  $maxAttempts
-     * @param  float|int  $decayMinutes
+     * @param  float|int|string  $decayMinutes
      * @param  string  $prefix
      * @return mixed
      *
@@ -57,6 +57,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
         $key = $prefix.$this->resolveRequestSignature($request);
 
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
+        $decayMinutes = $this->resolveDecayMinutes($request, $decayMinutes);
 
         if ($this->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
             throw $this->buildException($key, $maxAttempts);

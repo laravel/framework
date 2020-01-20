@@ -38,7 +38,7 @@ class ThrottleRequests
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  int|string  $maxAttempts
-     * @param  float|int  $decayMinutes
+     * @param  float|int|string  $decayMinutes
      * @param  string  $prefix
      * @return \Symfony\Component\HttpFoundation\Response
      *
@@ -49,6 +49,7 @@ class ThrottleRequests
         $key = $prefix.$this->resolveRequestSignature($request);
 
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
+        $decayMinutes = $this->resolveDecayMinutes($request, $decayMinutes);
 
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
             throw $this->buildException($key, $maxAttempts);
@@ -82,6 +83,26 @@ class ThrottleRequests
         }
 
         return (int) $maxAttempts;
+    }
+
+    /**
+     * Resolve the decay minutes if the user is authenticated or not.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  float|int|string  $decayMinutes
+     * @return float
+     */
+    protected function resolveDecayMinutes($request, $decayMinutes)
+    {
+        if (Str::contains($decayMinutes, '|')) {
+            $decayMinutes = explode('|', $decayMinutes, 2)[$request->user() ? 1 : 0];
+        }
+
+        if (! is_numeric($decayMinutes) && $request->user()) {
+            $decayMinutes = $request->user()->{$decayMinutes};
+        }
+
+        return (float) $decayMinutes;
     }
 
     /**
