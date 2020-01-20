@@ -196,7 +196,7 @@ class SqlServerGrammar extends Grammar
         return $dropExistingConstraintsSql.'alter table '.$this->wrapTable($blueprint).' drop column '.implode(', ', $columns);
     }
 
-	/**
+    /**
      * Compile a drop default constraint command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
