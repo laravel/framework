@@ -556,7 +556,7 @@ class RedisConnectionTest extends TestCase
 
             foreach ($initialKeys as $k => $key) {
                 $redis->set($key, 'test');
-                $initialKeys[$k] = $this->getPrefix($redis->client()) . $key;
+                $initialKeys[$k] = $this->getPrefix($redis->client()).$key;
             }
 
             $iterator = null;
@@ -602,7 +602,7 @@ class RedisConnectionTest extends TestCase
 
         return $client->getOptions()->prefix;
     }
-  
+
     public function testMacroable()
     {
         Connection::macro('foo', function () {
