@@ -424,7 +424,7 @@ class RouteCollection implements Countable, IteratorAggregate
             // and re-add the route to the collection. This way we can
             // add the route to the Symfony route collection.
             if (! $name = $route->getName()) {
-                $route->name($name = Str::random());
+                $route->name($name = 'generated::'.Str::random());
 
                 $this->add($route);
             }
