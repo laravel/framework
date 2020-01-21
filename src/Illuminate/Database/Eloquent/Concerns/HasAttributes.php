@@ -1256,4 +1256,22 @@ trait HasAttributes
 
         return $matches[1];
     }
+
+    /**
+     * Dynamic setter for attributes.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return $this
+     */
+    protected function dynamicSet($method, $parameters)
+    {
+        $attribute = Str::snake(
+            substr($method, 3)
+        );
+
+        $this->{$attribute} = $parameters[0];
+
+        return $this;
+    }
 }

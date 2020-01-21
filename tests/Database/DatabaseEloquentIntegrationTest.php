@@ -1592,6 +1592,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse(Model::isIgnoringTouch());
     }
 
+    public function testDynamicSet()
+    {
+        $model = new EloquentTestUser;
+
+        $model->setEmail('taylorotwell@gmail.com');
+        $this->assertSame('taylorotwell@gmail.com', $model->email);
+
+        $model->setFullName('taylor otwell');
+        $this->assertSame('taylor otwell', $model->full_name);
+        $this->assertNull($model->fullname);
+
+        $model->setFullname('taylor otwell');
+        $this->assertSame('taylor otwell', $model->fullname);
+    }
+
     /**
      * Helpers...
      */
