@@ -251,7 +251,7 @@ class Filesystem
     }
 
     /**
-     * Create a hard link to the target file or directory.
+     * Create a symlink to the target file or directory. On Windows, a hard link is created if the target is a file.
      *
      * @param  string  $target
      * @param  string  $link
