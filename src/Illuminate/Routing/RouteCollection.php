@@ -7,11 +7,14 @@ use Countable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use IteratorAggregate;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection as SymfonyRouteCollection;
 
 class RouteCollection implements Countable, IteratorAggregate
 {
@@ -395,5 +398,42 @@ class RouteCollection implements Countable, IteratorAggregate
     public function count()
     {
         return count($this->getRoutes());
+    }
+
+    /**
+     * Return the CompiledUrlMatcherDumper instance for the route collection.
+     *
+     * @return \Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper
+     */
+    public function dumper()
+    {
+        return new CompiledUrlMatcherDumper($this->toSymfonyRouteCollection());
+    }
+
+    /**
+     * Convert the collection to a Symfony RouteCollection instance.
+     *
+     * @return \Symfony\Component\Routing\RouteCollection
+     */
+    public function toSymfonyRouteCollection()
+    {
+        $symfonyRoutes = new SymfonyRouteCollection();
+
+        foreach ($this->getRoutes() as $route) {
+            // If the route doesn't have a name, we'll generate one for it
+            // and re-add the route to the collection. This way we can
+            // add the route to the Symfony route collection.
+            if (! $name = $route->getName()) {
+                $route->name($name = Str::random());
+
+                $this->add($route);
+            }
+
+            $symfonyRoutes->add($name, $route->toSymfonyRoute());
+        }
+
+        $this->refreshNameLookups();
+
+        return $symfonyRoutes;
     }
 }
