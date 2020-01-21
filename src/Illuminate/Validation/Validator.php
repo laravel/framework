@@ -990,7 +990,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Register an array of custom implicit validator extensions.
+     * Register an array of custom dependent validator extensions.
      *
      * @param  array  $extensions
      * @return void

@@ -191,6 +191,19 @@ class FactoryBuilder
     }
 
     /**
+     * Create a collection of models and persist them to the database.
+     *
+     * @param iterable  $records
+     * @return mixed
+     */
+    public function createMany(iterable $records)
+    {
+        return (new $this->class)->newCollection(array_map(function ($attribute) {
+            return $this->create($attribute);
+        }, $records));
+    }
+
+    /**
      * Set the connection name on the results and store them.
      *
      * @param  \Illuminate\Support\Collection  $results

@@ -819,7 +819,11 @@ trait ValidatesAttributes
         [$connection, $table] = Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
 
         if (Str::contains($table, '\\') && class_exists($table) && is_a($table, Model::class, true)) {
-            $table = (new $table)->getTable();
+            $model = new $table;
+
+            $table = $model->getTable();
+
+            $connection = $connection ?? $model->getConnectionName();
         }
 
         return [$connection, $table];
@@ -1746,11 +1750,7 @@ trait ValidatesAttributes
      */
     public function validateUuid($attribute, $value)
     {
-        if (! is_string($value)) {
-            return false;
-        }
-
-        return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
+        return Str::isUuid($value);
     }
 
     /**

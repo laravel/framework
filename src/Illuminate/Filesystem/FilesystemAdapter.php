@@ -162,7 +162,11 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         $response->setCallback(function () use ($path) {
             $stream = $this->readStream($path);
-            fpassthru($stream);
+
+            while (! feof($stream)) {
+                echo fread($stream, 2048);
+            }
+
             fclose($stream);
         });
 
@@ -228,12 +232,14 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Store the uploaded file on the disk.
      *
      * @param  string  $path
-     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string  $file
      * @param  array  $options
      * @return string|false
      */
     public function putFile($path, $file, $options = [])
     {
+        $file = is_string($file) ? new File($file) : $file;
+
         return $this->putFileAs($path, $file, $file->hashName(), $options);
     }
 
