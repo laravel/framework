@@ -1209,13 +1209,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function setCompiledRoutes(array $routes)
     {
-        foreach ($routes['attributes'] as ['methods' => $methods, 'uri' => $uri, 'action' => $action]) {
-            $this->routes->add($this->newRoute($methods, $uri, $action));
-        }
-
-        $this->routes->setCompiledRoutes($routes['compiled']);
-
-        $this->container->instance('routes', $this->routes);
+        $this->routes->setCompiledRoutes($routes);
     }
 
     /**
