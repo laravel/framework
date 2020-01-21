@@ -95,7 +95,7 @@ class ConfigurationUrlParser
     {
         $path = $url['path'] ?? null;
 
-        return $path ? substr($path, 1) : null;
+        return $path && $path !== '/' ? substr($path, 1) : null;
     }
 
     /**
