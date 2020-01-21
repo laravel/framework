@@ -6,9 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
-use Illuminate\Support\Str;
-use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
-use Symfony\Component\Routing\RouteCollection as SymfonyRouteCollection;
 
 class RouteCacheCommand extends Command
 {
@@ -61,24 +58,11 @@ class RouteCacheCommand extends Command
             return $this->error("Your application doesn't have any routes.");
         }
 
-        $symfonyRoutes = new SymfonyRouteCollection();
-
-        foreach ($routes as &$route) {
+        foreach ($routes as $route) {
             $route->prepareForSerialization();
-
-            // If the route doesn't have a name, we'll generate one for it
-            // and re-add the route to the collection. This way we can
-            // add the route to the Symfony route collection.
-            if (! $name = $route->getName()) {
-                $route->name($name = Str::random());
-
-                $routes->add($route);
-            }
-
-            $symfonyRoutes->add($name, $route->toSymfonyRoute());
         }
 
-        $compiled = (new CompiledUrlMatcherDumper($symfonyRoutes))->getCompiledRoutes();
+        $compiled = $routes->dumper()->getCompiledRoutes();
 
         $this->files->put(
             $this->laravel->getCachedRoutesPath(),
