@@ -564,6 +564,10 @@ class RedisConnectionTest extends TestCase
             do {
                 [$cursor, $returnedKeys] = $redis->scan($iterator);
 
+                if (!is_array($returnedKeys)) {
+                    $returnedKeys = [$returnedKeys];
+                }
+
                 foreach ($returnedKeys as $returnedKey) {
                     $this->assertTrue(in_array($returnedKey, $initialKeys));
                 }
@@ -583,12 +587,10 @@ class RedisConnectionTest extends TestCase
             $iterator = null;
 
             do {
-                [$cursor, $returnedKeys] = $redis->scan($iterator);
+                $returned = $redis->scan($iterator);
 
                 if ($redis->client()->getOption(Redis::OPT_SCAN) === Redis::SCAN_RETRY) {
-                    $this->assertNotFalse($returnedKeys);
-                } else {
-                    $this->assertFalse($returnedKeys);
+                    $this->assertEmpty($returned);
                 }
             } while ($iterator > 0);
         }
