@@ -564,7 +564,7 @@ class RedisConnectionTest extends TestCase
             do {
                 [$cursor, $returnedKeys] = $redis->scan($iterator);
 
-                if (!is_array($returnedKeys)) {
+                if (! is_array($returnedKeys)) {
                     $returnedKeys = [$returnedKeys];
                 }
 
