@@ -430,7 +430,6 @@ class RouteCollection implements Countable, IteratorAggregate
             }
 
             $symfonyRoutes->add($name, $route->toSymfonyRoute());
-
         }
 
         $this->refreshNameLookups();
