@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Str;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\RouteCollection as SymfonyRouteCollection;
@@ -82,7 +81,7 @@ class RouteCacheCommand extends Command
 
         $this->files->put(
             $this->laravel->getCachedRoutesPath(),
-            $this->buildRouteCacheFile($routes, compact('compiled', 'attributes'))
+            $this->buildRouteCacheFile(compact('compiled', 'attributes'))
         );
 
         $this->info('Routes cached successfully!');
@@ -116,17 +115,13 @@ class RouteCacheCommand extends Command
     /**
      * Build the route cache file.
      *
-     * @param  \Illuminate\Routing\RouteCollection  $routes
-     * @param  array  $compiledRoutes
+     * @param  array  $routes
      * @return string
      */
-    protected function buildRouteCacheFile(RouteCollection $routes, array $compiledRoutes)
+    protected function buildRouteCacheFile(array $routes)
     {
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-        $replaced = str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
-        $replaced = str_replace('{{compiledRoutes}}', base64_encode(serialize($compiledRoutes)), $replaced);
-
-        return $replaced;
+        return str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
     }
 }

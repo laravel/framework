@@ -12,5 +12,5 @@
 */
 
 app('router')->setCompiledRoutes(
-    unserialize(base64_decode('{{compiledRoutes}}'))
+    unserialize(base64_decode('{{routes}}'))
 );
