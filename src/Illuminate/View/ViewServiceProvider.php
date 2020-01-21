@@ -87,10 +87,8 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerBladeCompiler()
     {
-        $this->app->singleton('blade.compiler', function () {
-            return new BladeCompiler(
-                $this->app['files'], $this->app['config']['view.compiled']
-            );
+        $this->app->singleton('blade.compiler', function ($app) {
+            return new BladeCompiler($app['files'], $app['config']['view.compiled']);
         });
     }
 
