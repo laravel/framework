@@ -11,6 +11,7 @@
 |
 */
 
-app('router')->setCompiledRoutes(
-    unserialize(base64_decode('{{compiledRoutes}}'))
-);
+return [
+    'compiled' => [{{compiledRoutes}}],
+    'attributes' => unserialize(base64_decode('{{attributes}}')),
+];

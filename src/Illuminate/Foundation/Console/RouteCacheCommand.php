@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Str;
+use ReflectionMethod;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\RouteCollection as SymfonyRouteCollection;
 
@@ -78,11 +79,14 @@ class RouteCacheCommand extends Command
             ];
         }
 
-        $compiled = (new CompiledUrlMatcherDumper($symfonyRoutes))->getCompiledRoutes();
+        $method = new ReflectionMethod(CompiledUrlMatcherDumper::class, 'generateCompiledRoutes');
+        $method->setAccessible(true);
+
+        $compiled = $method->invoke(new CompiledUrlMatcherDumper($symfonyRoutes));
 
         $this->files->put(
             $this->laravel->getCachedRoutesPath(),
-            $this->buildRouteCacheFile($routes, compact('compiled', 'attributes'))
+            $this->buildRouteCacheFile($compiled, $attributes)
         );
 
         $this->info('Routes cached successfully!');
@@ -116,16 +120,16 @@ class RouteCacheCommand extends Command
     /**
      * Build the route cache file.
      *
-     * @param  \Illuminate\Routing\RouteCollection  $routes
-     * @param  array  $compiledRoutes
+     * @param  string  $compiledRoutes
+     * @param  array  $attributes
      * @return string
      */
-    protected function buildRouteCacheFile(RouteCollection $routes, array $compiledRoutes)
+    protected function buildRouteCacheFile(string $compiledRoutes, array $attributes)
     {
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-        $replaced = str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
-        $replaced = str_replace('{{compiledRoutes}}', base64_encode(serialize($compiledRoutes)), $replaced);
+        $replaced = str_replace('{{compiledRoutes}}', $compiledRoutes, $stub);
+        $replaced = str_replace('{{attributes}}', base64_encode(serialize($attributes)), $replaced);
 
         return $replaced;
     }
