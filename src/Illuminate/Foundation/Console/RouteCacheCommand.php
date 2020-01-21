@@ -70,10 +70,11 @@ class RouteCacheCommand extends Command
             $name = $route->getName() ?? Str::random();
 
             $symfonyRoutes->add($name, $route->toSymfonyRoute());
+
             $attributes[$name] = [
                 'methods' => $route->methods(),
                 'uri' => $route->uri(),
-                'action' => $route->getAction(),
+                'action' => $route->getAction() + ['as' => $name],
             ];
         }
 
