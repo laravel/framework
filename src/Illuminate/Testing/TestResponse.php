@@ -416,10 +416,13 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is contained within the response text.
      *
      * @param  string  $value
+     * @param  bool  $escaped
      * @return $this
      */
-    public function assertSeeText($value)
+    public function assertSeeText($value, $escaped = true)
     {
+        $value = $escaped ? e($value) : $value;
+
         PHPUnit::assertStringContainsString((string) $value, strip_tags($this->getContent()));
 
         return $this;
