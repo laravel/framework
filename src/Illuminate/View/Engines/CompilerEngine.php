@@ -23,14 +23,23 @@ class CompilerEngine extends PhpEngine
     protected $lastCompiled = [];
 
     /**
+     * Flag to check expired views.
+     *
+     * @var bool
+     */
+    protected $checkExpiredViews;
+
+    /**
      * Create a new Blade view engine instance.
      *
      * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
+     * @param  bool  $checkExpiredViews
      * @return void
      */
-    public function __construct(CompilerInterface $compiler)
+    public function __construct(CompilerInterface $compiler, $checkExpiredViews = true)
     {
         $this->compiler = $compiler;
+        $this->checkExpiredViews = $checkExpiredViews;
     }
 
     /**
@@ -47,7 +56,7 @@ class CompilerEngine extends PhpEngine
         // If this given view has expired, which means it has simply been edited since
         // it was last compiled, we will re-compile the views so we can evaluate a
         // fresh copy of the view. We'll pass the compiler the path of the view.
-        if ($this->compiler->isExpired($path)) {
+        if ($this->checkExpiredViews && $this->compiler->isExpired($path)) {
             $this->compiler->compile($path);
         }
 
