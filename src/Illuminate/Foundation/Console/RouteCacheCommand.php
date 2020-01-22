@@ -109,7 +109,7 @@ class RouteCacheCommand extends Command
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
         $replaced = str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
-        $replaced = str_replace('{{compiledRoutes}}', base64_encode(serialize($compiledRoutes)), $replaced);
+        $replaced = str_replace('{{compiledRoutes}}', var_export($compiledRoutes, true), $replaced);
 
         return $replaced;
     }
