@@ -134,6 +134,15 @@ class TestResponseTest extends TestCase
         $response->assertSeeText('foobar');
     }
 
+    public function testAssertSeeTextEscaped()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php',
+        ]);
+
+        $response->assertSeeText('laravel & php');
+    }
+
     public function testAssertSeeTextInOrder()
     {
         $response = $this->makeMockResponse([
