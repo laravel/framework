@@ -122,6 +122,7 @@ class Worker
             $job = $this->getNextJob(
                 $this->manager->connection($connectionName), $queue
             );
+            sleep(5);
 
             if ($this->supportsAsyncSignals()) {
                 $this->registerTimeoutHandler($job, $options);
@@ -135,6 +136,8 @@ class Worker
             } else {
                 $this->sleep($options->sleep);
             }
+
+            $this->resetTimeoutHandler();
 
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
@@ -168,6 +171,16 @@ class Worker
         pcntl_alarm(
             max($this->timeoutForJob($job, $options), 0)
         );
+    }
+
+    /**
+     * Reset the worker timeout handler.
+     *
+     * @return void
+     */
+    protected function resetTimeoutHandler()
+    {
+        pcntl_alarm(0);
     }
 
     /**
