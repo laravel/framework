@@ -122,7 +122,6 @@ class Worker
             $job = $this->getNextJob(
                 $this->manager->connection($connectionName), $queue
             );
-            sleep(5);
 
             if ($this->supportsAsyncSignals()) {
                 $this->registerTimeoutHandler($job, $options);
