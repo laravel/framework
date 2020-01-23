@@ -62,11 +62,11 @@ class RouteCacheCommand extends Command
             $route->prepareForSerialization();
         }
 
-        $compiled = $routes->dumper()->getCompiledRoutes();
+        $compiled = $routes->compile();
 
         $this->files->put(
             $this->laravel->getCachedRoutesPath(),
-            $this->buildRouteCacheFile($routes, $compiled)
+            $this->buildRouteCacheFile($compiled)
         );
 
         $this->info('Routes cached successfully!');
@@ -100,17 +100,13 @@ class RouteCacheCommand extends Command
     /**
      * Build the route cache file.
      *
-     * @param  \Illuminate\Routing\RouteCollection  $routes
      * @param  array  $compiledRoutes
      * @return string
      */
-    protected function buildRouteCacheFile(RouteCollection $routes, array $compiledRoutes)
+    protected function buildRouteCacheFile(array $compiledRoutes)
     {
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-        $replaced = str_replace('{{routes}}', base64_encode(serialize($routes)), $stub);
-        $replaced = str_replace('{{compiledRoutes}}', var_export($compiledRoutes, true), $replaced);
-
-        return $replaced;
+        return str_replace('{{compiledRoutes}}', var_export($compiledRoutes, true), $stub);
     }
 }

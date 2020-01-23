@@ -632,7 +632,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function findRoute($request)
     {
-        $this->current = $route = $this->routes->match($request);
+        $this->current = $route = $this->routes->match($request)
+            ->setRouter($this)
+            ->setContainer($this->container);
 
         $this->container->instance(Route::class, $route);
 

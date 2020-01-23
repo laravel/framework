@@ -223,10 +223,12 @@ class RouteCollection implements Countable, IteratorAggregate
     protected function matchAgainstCompiledRoutes($request)
     {
         $context = (new RequestContext())->fromRequest($request);
-        $matcher = new CompiledUrlMatcher($this->compiledRoutes, $context);
+        $matcher = new CompiledUrlMatcher($this->compiledRoutes['compiled'], $context);
 
         if ($result = $matcher->matchRequest($request)) {
-            return $this->getByName($result['_route']);
+            $attributes = $this->compiledRoutes['attributes'][$result['_route']];
+
+            return new Route($attributes['methods'], $attributes['uri'], $attributes['action']);
         }
     }
 
@@ -398,6 +400,28 @@ class RouteCollection implements Countable, IteratorAggregate
     public function count()
     {
         return count($this->getRoutes());
+    }
+
+    /**
+     * Compile the routes for caching.
+     *
+     * @return array
+     */
+    public function compile()
+    {
+        $compiled = $this->dumper()->getCompiledRoutes();
+
+        $attributes = [];
+
+        foreach ($this->getRoutes() as $route) {
+            $attributes[$route->getName()] = [
+                'methods' => $route->methods(),
+                'uri' => $route->uri(),
+                'action' => $route->getAction(),
+            ];
+        }
+
+        return compact('compiled', 'attributes');
     }
 
     /**
