@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -847,7 +848,8 @@ class User extends Model
         return $this->belongsToMany(Post::class, 'users_posts', 'user_uuid', 'post_uuid', 'uuid', 'uuid')
             ->using(UserPostPivot::class)
             ->withPivot('is_draft')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->withSoftDeletes();
     }
 }
 
@@ -976,11 +978,15 @@ class TagWithCustomPivot extends Model
 
 class UserPostPivot extends Pivot
 {
+    use SoftDeletes;
+
     protected $table = 'users_posts';
 }
 
 class PostTagPivot extends Pivot
 {
+    use SoftDeletes;
+
     protected $table = 'posts_tags';
     protected $dateFormat = 'U';
 }
