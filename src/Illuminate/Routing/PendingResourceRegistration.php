@@ -141,7 +141,7 @@ class PendingResourceRegistration
     }
 
     /**
-     * Set a middleware to the resource.
+     * Add middleware to the resource routes.
      *
      * @param  mixed  $middleware
      * @return \Illuminate\Routing\PendingResourceRegistration
@@ -154,7 +154,7 @@ class PendingResourceRegistration
     }
 
     /**
-     * Set the shallow option for a resource.
+     * Indicate that the resource routes should have "shallow" nesting.
      *
      * @param  bool  $shallow
      * @return \Illuminate\Routing\PendingResourceRegistration
