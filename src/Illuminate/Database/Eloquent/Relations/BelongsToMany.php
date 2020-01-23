@@ -1086,15 +1086,21 @@ class BelongsToMany extends Relation
         $this->macro('withoutTrashed', function () {
             $this->query->withoutGlobalScopes(['withTrashed', 'onlyTrashed'])
                 ->whereNull($this->getQualifiedDeletedAtColumnName());
+
+            return $this;
         });
 
         $this->macro('withTrashed', function () {
             $this->query->withoutGlobalScopes(['withoutTrashed', 'onlyTrashed']);
+
+            return $this;
         });
 
         $this->macro('onlyTrashed', function () {
             $this->query->withoutGlobalScopes(['withoutTrashed', 'withTrashed'])
                 ->whereNotNull($this->getQualifiedDeletedAtColumnName());
+
+            return $this;
         });
 
         $this->withoutTrashed();
