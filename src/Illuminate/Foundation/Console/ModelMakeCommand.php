@@ -125,9 +125,9 @@ class ModelMakeCommand extends GeneratorCommand
         $modelName = $this->qualifyClass($this->getNameInput());
 
         $this->call('make:controller', array_filter([
-            'name'    => "{$controller}Controller",
+            'name'  => "{$controller}Controller",
             '--model' => $this->option('resource') ? $modelName : null,
-            '--api'   => $this->option('api'),
+            '--api' => $this->option('api'),
         ]));
     }
 
