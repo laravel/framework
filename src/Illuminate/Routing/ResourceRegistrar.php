@@ -230,7 +230,6 @@ class ResourceRegistrar
      */
     protected function addResourceShow($name, $base, $controller, $options)
     {
-
         $name = $this->getNameWithShallowness($name, $options);
 
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
