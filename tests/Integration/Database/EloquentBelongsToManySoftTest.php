@@ -93,7 +93,7 @@ class EloquentBelongsToManySoftTest extends DatabaseTestCase
         $this->assertEquals(
             [
                 'post_id' => '1', 'tag_id' => '1', 'flag' => 'taylor',
-                'created_at' => '2017-10-10 10:10:10', 'updated_at' => '2017-10-10 10:10:10', 'deleted_at' => null
+                'created_at' => '2017-10-10 10:10:10', 'updated_at' => '2017-10-10 10:10:10', 'deleted_at' => null,
             ],
             $post->tags[0]->pivot->toArray()
         );
@@ -146,7 +146,7 @@ class EloquentBelongsToManySoftTest extends DatabaseTestCase
         $this->assertEquals([
             'post_id' => '1',
             'tag_id' => '1',
-            'deleted_at' => null
+            'deleted_at' => null,
         ], $post->tagsWithCustomAccessor[0]->tag->toArray());
 
         $pivot = $post->tagsWithCustomPivot[0]->pivot;

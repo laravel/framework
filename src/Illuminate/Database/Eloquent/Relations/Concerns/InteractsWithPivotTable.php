@@ -442,11 +442,11 @@ trait InteractsWithPivotTable
             // Once we have all of the conditions set on the statement, we are ready
             // to run the delete on the pivot table. Then, if the touch parameter
             // is true, we will go ahead and touch all related models to sync.
-            if($this->withSoftDeletes) {
+            if ($this->withSoftDeletes) {
                 $fresh = now();
 
                 $attributes = [
-                    $this->deletedAt() => $fresh
+                    $this->deletedAt() => $fresh,
                 ];
 
                 if ($this->hasPivotColumn($this->updatedAt())) {
