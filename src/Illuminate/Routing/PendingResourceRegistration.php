@@ -154,6 +154,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Set the shallow option for a resource.
+     *
+     * @param  bool  $shallow
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function shallow($shallow = true)
+    {
+        $this->options['shallow'] = $shallow;
+
+        return $this;
+    }
+
+    /**
      * Register the resource route.
      *
      * @return \Illuminate\Routing\RouteCollection
