@@ -1083,7 +1083,21 @@ class BelongsToMany extends Relation
 
         $this->pivotDeletedAt = $deletedAt;
 
-        $this->query->whereNull($this->getQualifiedDeletedAtColumnName());
+        $this->macro('withoutTrashed', function () {
+            $this->query->withoutGlobalScopes(['withTrashed', 'onlyTrashed'])
+                ->whereNull($this->getQualifiedDeletedAtColumnName());
+        });
+
+        $this->macro('withTrashed', function () {
+            $this->query->withoutGlobalScopes(['withoutTrashed', 'onlyTrashed']);
+        });
+
+        $this->macro('onlyTrashed', function () {
+            $this->query->withoutGlobalScopes(['withoutTrashed', 'withTrashed'])
+                ->whereNotNull($this->getQualifiedDeletedAtColumnName());
+        });
+
+        $this->withoutTrashed();
 
         return $this->withPivot($this->deletedAt());
     }
