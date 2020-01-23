@@ -230,6 +230,9 @@ class ResourceRegistrar
      */
     protected function addResourceShow($name, $base, $controller, $options)
     {
+
+        $name = $this->getNameWithShallowness($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'show', $options);
@@ -248,6 +251,8 @@ class ResourceRegistrar
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
+        $name = $this->getNameWithShallowness($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
@@ -266,6 +271,8 @@ class ResourceRegistrar
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
     {
+        $name = $this->getNameWithShallowness($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'update', $options);
@@ -284,6 +291,8 @@ class ResourceRegistrar
      */
     protected function addResourceDestroy($name, $base, $controller, $options)
     {
+        $name = $this->getNameWithShallowness($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
@@ -399,6 +408,22 @@ class ResourceRegistrar
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
         return trim(sprintf('%s%s.%s', $prefix, $name, $method), '.');
+    }
+
+    /**
+     * Get the name for a given resource with shallowness applied when needed.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @return string
+     */
+    protected function getNameWithShallowness($name, $options)
+    {
+        if (isset($options['shallow']) && $options['shallow']) {
+            return last(explode(".", $name));
+        } else {
+            return $name;
+        }
     }
 
     /**
