@@ -1083,7 +1083,9 @@ class BelongsToMany extends Relation
 
         $this->pivotDeletedAt = $deletedAt;
 
-        return $this->withPivot($this->deletedAt())->wherePivot($this->deletedAt(), '=', null);
+        $this->query->whereNull($this->getQualifiedColumnName($this->deletedAt()));
+
+        return $this->withPivot($this->deletedAt());
     }
 
     /**
@@ -1133,7 +1135,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedForeignPivotKeyName()
     {
-        return $this->table.'.'.$this->foreignPivotKey;
+        return $this->getQualifiedColumnName($this->foreignPivotKey);
     }
 
     /**
@@ -1153,7 +1155,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedRelatedPivotKeyName()
     {
-        return $this->table.'.'.$this->relatedPivotKey;
+        return $this->getQualifiedColumnName($this->relatedPivotKey);
     }
 
     /**
@@ -1194,6 +1196,17 @@ class BelongsToMany extends Relation
     public function getTable()
     {
         return $this->table;
+    }
+
+    /**
+     * Get the fully qualified column name.
+     *
+     * @param string $column
+     * @return string
+     */
+    public function getQualifiedColumnName($column)
+    {
+        return $this->table . '.' . $column;
     }
 
     /**

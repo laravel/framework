@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection as BaseCollection;
 
 trait InteractsWithPivotTable
@@ -191,7 +192,7 @@ trait InteractsWithPivotTable
      */
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {
-        if ($this->using) {
+        if ($this->using && empty($this->pivotWheres) && empty($this->pivotWhereIns)) {
             return $this->updateExistingPivotUsingCustomClass($id, $attributes, $touch);
         }
 
@@ -563,6 +564,10 @@ trait InteractsWithPivotTable
 
         foreach ($this->pivotWhereIns as $arguments) {
             call_user_func_array([$query, 'whereIn'], $arguments);
+        }
+
+        if ($this->withSoftDeletes) {
+            $query->whereNull($this->deletedAt());
         }
 
         return $query->where($this->foreignPivotKey, $this->parent->{$this->parentKey});
