@@ -38,7 +38,7 @@ trait InteractsWithPivotTable
         // checking which of the given ID/records is in the list of current records
         // and removing all of those rows from this "intermediate" joining table.
         $detach = array_values(array_intersect(
-            $this->newPivotQueryForSelection()->pluck($this->relatedPivotKey)->all(),
+            $this->newPivotQueryWithoutTrashed()->pluck($this->relatedPivotKey)->all(),
             array_keys($records)
         ));
 
@@ -566,7 +566,7 @@ trait InteractsWithPivotTable
      */
     protected function getCurrentlyAttachedPivots()
     {
-        return $this->currentlyAttached ?: $this->newPivotQueryForSelection()->get()->map(function ($record) {
+        return $this->currentlyAttached ?: $this->newPivotQueryWithoutTrashed()->get()->map(function ($record) {
             $class = $this->using ? $this->using : Pivot::class;
 
             return (new $class)->setRawAttributes((array) $record, true);
@@ -646,7 +646,7 @@ trait InteractsWithPivotTable
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function newPivotQueryForSelection()
+    protected function newPivotQueryWithoutTrashed()
     {
         return $this->newPivotQuery()->when($this->withSoftDeletes, function (Builder $query) {
             $query->whereNull($this->deletedAt());
