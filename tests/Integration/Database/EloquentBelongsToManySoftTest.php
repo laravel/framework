@@ -827,6 +827,54 @@ class EloquentBelongsToManySoftTest extends DatabaseTestCase
         $user->postsWithCustomPivot()->updateExistingPivot($post2->uuid, ['is_draft' => 0]);
         $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
     }
+
+    public function testWithTrashedMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+
+        $post->tags()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->tags()->withTrashed()->pluck('name')
+        );
+    }
+
+    public function testOnlyTrashedMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+
+        $post->tags()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag2->id])->pluck('name'),
+            $post->tags()->onlyTrashed()->pluck('name')
+        );
+    }
 }
 
 class User extends Model
