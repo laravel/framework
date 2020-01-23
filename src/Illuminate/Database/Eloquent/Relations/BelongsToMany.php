@@ -91,6 +91,13 @@ class BelongsToMany extends Relation
     public $withTimestamps = false;
 
     /**
+     * Indicates if soft deletes are available on the pivot table.
+     *
+     * @var bool
+     */
+    public $withSoftDeletes = false;
+
+    /**
      * The custom pivot table column for the created_at timestamp.
      *
      * @var string
@@ -103,6 +110,13 @@ class BelongsToMany extends Relation
      * @var string
      */
     protected $pivotUpdatedAt;
+
+    /**
+     * The custom pivot table column for the deleted_at timestamp.
+     *
+     * @var string
+     */
+    protected $pivotDeletedAt;
 
     /**
      * The class name of the custom pivot model to use for the relationship.
@@ -1058,6 +1072,21 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Specify that the pivot table has delete timestamp.
+     *
+     * @param  mixed  $deletedAt
+     * @return $this
+     */
+    public function withSoftDeletes($deletedAt = 'deleted_at')
+    {
+        $this->withSoftDeletes = true;
+
+        $this->pivotDeletedAt = $deletedAt;
+
+        return $this->withPivot($this->deletedAt())->wherePivot($this->deletedAt(), '=', null);
+    }
+
+    /**
      * Get the name of the "created at" column.
      *
      * @return string
@@ -1075,6 +1104,16 @@ class BelongsToMany extends Relation
     public function updatedAt()
     {
         return $this->pivotUpdatedAt ?: $this->parent->getUpdatedAtColumn();
+    }
+
+    /**
+     * Get the name of the "deleted at" column.
+     *
+     * @return string
+     */
+    public function deletedAt()
+    {
+        return $this->pivotDeletedAt;
     }
 
     /**

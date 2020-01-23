@@ -191,7 +191,7 @@ trait InteractsWithPivotTable
      */
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {
-        if ($this->using && empty($this->pivotWheres) && empty($this->pivotWhereIns)) {
+        if ($this->using) {
             return $this->updateExistingPivotUsingCustomClass($id, $attributes, $touch);
         }
 
@@ -442,7 +442,21 @@ trait InteractsWithPivotTable
             // Once we have all of the conditions set on the statement, we are ready
             // to run the delete on the pivot table. Then, if the touch parameter
             // is true, we will go ahead and touch all related models to sync.
-            $results = $query->delete();
+            if($this->withSoftDeletes) {
+                $fresh = now();
+
+                $attributes = [
+                    $this->deletedAt() => $fresh
+                ];
+
+                if ($this->hasPivotColumn($this->updatedAt())) {
+                    $attributes[$this->updatedAt()] = $fresh;
+                }
+
+                $results = $query->update($attributes);
+            } else {
+                $results = $query->delete();
+            }
         }
 
         if ($touch) {
