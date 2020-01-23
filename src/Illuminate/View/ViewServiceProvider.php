@@ -150,7 +150,7 @@ class ViewServiceProvider extends ServiceProvider
         $resolver->register('blade', function () {
             return new CompilerEngine(
                 $this->app['blade.compiler'],
-                $this->app['config']['view.expires'] ?: true
+                $this->app['config']['view.expires'] ?? true
             );
         });
     }
