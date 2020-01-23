@@ -345,7 +345,7 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('tasks.show'));
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.tasks.show'));
     }
-    
+
     public function testCanExcludeMethodsOnRegisteredApiResource()
     {
         $this->router->apiResource('users', RouteRegistrarControllerStub::class)

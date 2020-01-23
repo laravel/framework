@@ -420,7 +420,7 @@ class ResourceRegistrar
     protected function getNameWithShallowness($name, $options)
     {
         if (isset($options['shallow']) && $options['shallow']) {
-            return last(explode(".", $name));
+            return last(explode('.', $name));
         } else {
             return $name;
         }

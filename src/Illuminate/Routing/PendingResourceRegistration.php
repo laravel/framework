@@ -156,7 +156,7 @@ class PendingResourceRegistration
     /**
      * Set the shallow option for a resource.
      *
-     * @param  boolean  $shallow
+     * @param  bool  $shallow
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function shallow($shallow = true)
