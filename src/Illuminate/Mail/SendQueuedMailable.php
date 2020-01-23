@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail;
 
+use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
 
 class SendQueuedMailable
 {
@@ -44,12 +44,12 @@ class SendQueuedMailable
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  \Illuminate\Contracts\Mail\Factory  $factory
      * @return void
      */
-    public function handle(MailerContract $mailer)
+    public function handle(MailFactory $factory)
     {
-        $this->mailable->send($mailer);
+        $this->mailable->send($factory);
     }
 
     /**

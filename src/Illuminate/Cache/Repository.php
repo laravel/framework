@@ -548,6 +548,16 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get the event dispatcher instance.
+     *
+     * @return  \Illuminate\Contracts\Events\Dispatcher
+     */
+    public function getEventDispatcher()
+    {
+        return $this->events;
+    }
+
+    /**
      * Set the event dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events

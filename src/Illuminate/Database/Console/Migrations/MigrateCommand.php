@@ -52,12 +52,12 @@ class MigrateCommand extends BaseCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
         if (! $this->confirmToProceed()) {
-            return;
+            return 1;
         }
 
         $this->migrator->usingConnection($this->option('database'), function () {
@@ -79,6 +79,8 @@ class MigrateCommand extends BaseCommand
                 $this->call('db:seed', ['--force' => true]);
             }
         });
+
+        return 0;
     }
 
     /**

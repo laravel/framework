@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Testing\Constraints;
+namespace Illuminate\Testing\Constraints;
 
 use PHPUnit\Framework\Constraint\Constraint;
 use ReflectionClass;

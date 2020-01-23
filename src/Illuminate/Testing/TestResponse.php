@@ -1,18 +1,18 @@
 <?php
 
-namespace Illuminate\Foundation\Testing;
+namespace Illuminate\Testing;
 
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\Assert as PHPUnit;
-use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use Illuminate\Testing\Assert as PHPUnit;
+use Illuminate\Testing\Constraints\SeeInOrder;
 use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -416,10 +416,13 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is contained within the response text.
      *
      * @param  string  $value
+     * @param  bool  $escaped
      * @return $this
      */
-    public function assertSeeText($value)
+    public function assertSeeText($value, $escaped = true)
     {
+        $value = $escaped ? e($value) : $value;
+
         PHPUnit::assertStringContainsString((string) $value, strip_tags($this->getContent()));
 
         return $this;
@@ -1169,6 +1172,23 @@ class TestResponse implements ArrayAccess
     public function dumpHeaders()
     {
         dump($this->headers->all());
+
+        return $this;
+    }
+
+    /**
+     * Dump the session from the response.
+     *
+     * @param  array  $keys
+     * @return $this
+     */
+    public function dumpSession($keys = null)
+    {
+        if (is_array($keys)) {
+            dump($this->session()->only($keys));
+        } else {
+            dump($this->session()->all());
+        }
 
         return $this;
     }

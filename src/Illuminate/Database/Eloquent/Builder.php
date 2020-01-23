@@ -236,6 +236,20 @@ class Builder
     }
 
     /**
+     * Add a basic where clause to the query, and return the first result.
+     *
+     * @param  \Closure|string|array  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->first();
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|array|string  $column
@@ -1090,9 +1104,9 @@ class Builder
         $results = [];
 
         foreach ($relations as $name => $constraints) {
-            // If the "name" value is a numeric key, we can assume that no
-            // constraints have been specified. We'll just put an empty
-            // Closure there, so that we can treat them all the same.
+            // If the "name" value is a numeric key, we can assume that no constraints
+            // have been specified. We will just put an empty Closure there so that
+            // we can treat these all the same while we are looping through them.
             if (is_numeric($name)) {
                 $name = $constraints;
 
@@ -1152,6 +1166,19 @@ class Builder
         }
 
         return $results;
+    }
+
+    /**
+     * Apply query-time casts to the model instance.
+     *
+     * @param  array  $casts
+     * @return $this
+     */
+    public function withCasts($casts)
+    {
+        $this->model->mergeCasts($casts);
+
+        return $this;
     }
 
     /**

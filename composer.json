@@ -70,6 +70,7 @@
         "illuminate/routing": "self.version",
         "illuminate/session": "self.version",
         "illuminate/support": "self.version",
+        "illuminate/testing": "self.version",
         "illuminate/translation": "self.version",
         "illuminate/validation": "self.version",
         "illuminate/view": "self.version"
@@ -87,7 +88,7 @@
         "moontoast/math": "^1.1",
         "orchestra/testbench-core": "^5.0",
         "pda/pheanstalk": "^4.0",
-        "phpunit/phpunit": "^8.4|^9.0",
+        "phpunit/phpunit": "^7.5.15|^8.4|^9.0",
         "predis/predis": "^1.1.1",
         "symfony/cache": "^5.0"
     },

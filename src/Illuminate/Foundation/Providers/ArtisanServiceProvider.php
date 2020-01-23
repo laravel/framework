@@ -38,7 +38,6 @@ use Illuminate\Foundation\Console\OptimizeClearCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
-use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
@@ -48,6 +47,7 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
+use Illuminate\Foundation\Console\StubPublishCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
@@ -92,7 +92,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Optimize' => 'command.optimize',
         'OptimizeClear' => 'command.optimize.clear',
         'PackageDiscover' => 'command.package.discover',
-        'Preset' => 'command.preset',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
         'QueueForget' => 'command.queue.forget',
@@ -145,6 +144,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
         'Serve' => 'command.serve',
+        'StubPublish' => 'command.stub.publish',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
     ];
@@ -589,18 +589,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerPresetCommand()
-    {
-        $this->app->singleton('command.preset', function () {
-            return new PresetCommand;
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerProviderMakeCommand()
     {
         $this->app->singleton('command.provider.make', function ($app) {
@@ -865,6 +853,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.serve', function () {
             return new ServeCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerStubPublishCommand()
+    {
+        $this->app->singleton('command.stub.publish', function () {
+            return new StubPublishCommand;
         });
     }
 

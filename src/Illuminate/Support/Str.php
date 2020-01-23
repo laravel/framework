@@ -42,6 +42,17 @@ class Str
     protected static $uuidFactory;
 
     /**
+     * Get a new stringable object from the given string.
+     *
+     * @param  string  $string
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function of($string)
+    {
+        return new Stringable($string);
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
@@ -62,7 +73,17 @@ class Str
      */
     public static function afterLast($subject, $search)
     {
-        return $search === '' ? $subject : array_reverse(explode($search, $subject))[0];
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strrpos($subject, (string) $search);
+
+        if ($position === false) {
+            return $subject;
+        }
+
+        return substr($subject, $position + strlen($search));
     }
 
     /**
@@ -241,6 +262,21 @@ class Str
     public static function isAscii($value)
     {
         return ASCII::is_ascii($value);
+    }
+
+    /**
+     * Determine if a given string is a valid UUID.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isUuid($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
     }
 
     /**

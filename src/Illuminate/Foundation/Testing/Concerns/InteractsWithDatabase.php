@@ -4,9 +4,9 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
-use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\Constraints\HasInDatabase;
+use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
 trait InteractsWithDatabase

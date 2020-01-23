@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Foundation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
@@ -14,7 +14,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class FoundationTestResponseTest extends TestCase
+class TestResponseTest extends TestCase
 {
     public function testAssertViewIs()
     {
@@ -132,6 +132,15 @@ class FoundationTestResponseTest extends TestCase
         ]);
 
         $response->assertSeeText('foobar');
+    }
+
+    public function testAssertSeeTextEscaped()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'laravel &amp; php',
+        ]);
+
+        $response->assertSeeText('laravel & php');
     }
 
     public function testAssertSeeTextInOrder()
