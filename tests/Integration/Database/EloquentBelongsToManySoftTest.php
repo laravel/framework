@@ -875,6 +875,72 @@ class EloquentBelongsToManySoftTest extends DatabaseTestCase
             $post->tags()->onlyTrashed()->pluck('name')
         );
     }
+
+    public function testRestoreMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+
+        $post->tags()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag2->id])->pluck('name'),
+            $post->tags()->onlyTrashed()->pluck('name')
+        );
+
+        $output = $post->tags()->restore([$tag2->id]);
+
+        $this->assertEquals(1, $output);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+    }
+
+    public function testRestoreMethodWithCustomPivotClass()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithCustomPivot()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tagsWithCustomPivot')->tagsWithCustomPivot->pluck('name')
+        );
+
+        $post->tagsWithCustomPivot()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag2->id])->pluck('name'),
+            $post->tagsWithCustomPivot()->onlyTrashed()->pluck('name')
+        );
+
+        $output = $post->tagsWithCustomPivot()->restore([$tag2->id]);
+
+        $this->assertEquals(1, $output);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tagsWithCustomPivot')->tagsWithCustomPivot->pluck('name')
+        );
+    }
 }
 
 class User extends Model
