@@ -363,13 +363,6 @@ class BelongsToMany extends Relation
         $this->pivotTable = (new $class)->getTable();
         $this->pivotQuery = $this->newPivotStatement();
 
-        //if the method is called after the constructor ran, which possibly sets the query without the needed parameters
-        //for "performJoins", reinitialize the query and call addConstraints
-        if ($this->query) {
-            $this->query = $this->related->newModelQuery();
-            $this->addConstraints();
-        }
-
         return $this;
     }
 
