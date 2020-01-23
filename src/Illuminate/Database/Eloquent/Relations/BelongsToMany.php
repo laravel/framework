@@ -1216,7 +1216,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedColumnName($column)
     {
-        return $this->table . '.' . $column;
+        return $this->table.'.'.$column;
     }
 
     /**
