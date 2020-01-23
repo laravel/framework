@@ -162,7 +162,11 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         $response->setCallback(function () use ($path) {
             $stream = $this->readStream($path);
-            fpassthru($stream);
+
+            while (! feof($stream)) {
+                echo fread($stream, 2048);
+            }
+
             fclose($stream);
         });
 

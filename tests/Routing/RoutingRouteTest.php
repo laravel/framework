@@ -1201,6 +1201,41 @@ class RoutingRouteTest extends TestCase
         $router->dispatch(Request::create('/'));
     }
 
+    public function testShallowResourceRouting()
+    {
+        $router = $this->getRouter();
+        $router->resource('foo.bar', 'FooController', ['shallow' => true]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('foo/{foo}/bar', $routes[0]->uri());
+        $this->assertSame('foo/{foo}/bar/create', $routes[1]->uri());
+        $this->assertSame('foo/{foo}/bar', $routes[2]->uri());
+
+        $this->assertSame('bar/{bar}', $routes[3]->uri());
+        $this->assertSame('bar/{bar}/edit', $routes[4]->uri());
+        $this->assertSame('bar/{bar}', $routes[5]->uri());
+        $this->assertSame('bar/{bar}', $routes[6]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController');
+        $router->resource('foo.bar.baz', 'FooController', ['shallow' => true]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertSame('foo', $routes[0]->uri());
+        $this->assertSame('foo/create', $routes[1]->uri());
+        $this->assertSame('foo', $routes[2]->uri());
+        $this->assertSame('foo/{foo}', $routes[3]->uri());
+        $this->assertSame('foo/{foo}/edit', $routes[4]->uri());
+        $this->assertSame('foo/{foo}', $routes[5]->uri());
+        $this->assertSame('foo/{foo}', $routes[6]->uri());
+
+        $this->assertSame('foo/{foo}/bar/{bar}/baz', $routes[7]->uri());
+        $this->assertSame('foo/{foo}/bar/{bar}/baz/create', $routes[8]->uri());
+        $this->assertSame('foo/{foo}/bar/{bar}/baz', $routes[9]->uri());
+    }
+
     public function testResourceRouting()
     {
         $router = $this->getRouter();

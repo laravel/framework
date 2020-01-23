@@ -222,8 +222,8 @@ trait QueriesRelationships
                         };
                     }
 
-                    $query->where($relation->getMorphType(), '=', (new $type)->getMorphClass())
-                        ->whereHas($belongsTo, $callback, $operator, $count);
+                    $query->where($this->query->from.'.'.$relation->getMorphType(), '=', (new $type)->getMorphClass())
+                                ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
         }, null, null, $boolean);
