@@ -1083,7 +1083,7 @@ class BelongsToMany extends Relation
 
         $this->pivotDeletedAt = $deletedAt;
 
-        $this->query->whereNull($this->getQualifiedColumnName($this->deletedAt()));
+        $this->query->whereNull($this->getQualifiedDeletedAtColumnName());
 
         return $this->withPivot($this->deletedAt());
     }
@@ -1116,6 +1116,16 @@ class BelongsToMany extends Relation
     public function deletedAt()
     {
         return $this->pivotDeletedAt;
+    }
+
+    /**
+     * Get the fully qualified deleted at column name.
+     *
+     * @return string
+     */
+    public function getQualifiedDeletedAtColumnName()
+    {
+        return $this->getQualifiedColumnName($this->pivotDeletedAt);
     }
 
     /**
