@@ -941,6 +941,30 @@ class EloquentBelongsToManySoftTest extends DatabaseTestCase
             $post->load('tagsWithCustomPivot')->tagsWithCustomPivot->pluck('name')
         );
     }
+
+    public function testForceDetachMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->sync([$tag->id, $tag2->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+
+        $post->tags()->forceDetach([$tag->id, $tag3->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag2->id, $tag4->id])->pluck('name'),
+            $post->tags()->withTrashed()->pluck('name')
+        );
+    }
 }
 
 class User extends Model

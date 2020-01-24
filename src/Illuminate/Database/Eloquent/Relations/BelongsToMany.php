@@ -13,6 +13,7 @@ use InvalidArgumentException;
  * @method self withoutTrashed() Show only non-trashed records
  * @method self withTrashed() Show all records
  * @method self onlyTrashed() Show only trashed records
+ * @method int forceDetach(\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids, bool  $touch) Show only trashed records
  */
 class BelongsToMany extends Relation
 {
@@ -1112,6 +1113,14 @@ class BelongsToMany extends Relation
             })->withoutGlobalScopes(['withoutTrashed']);
 
             return $this;
+        });
+
+        $this->macro('forceDetach', function ($ids = null, $touch = true) {
+            $this->withSoftDeletes = false;
+
+            return tap($this->detach($ids, $touch), function () {
+                $this->withSoftDeletes = true;
+            });
         });
 
         return $this->withPivot($this->deletedAt())->withoutTrashed();
