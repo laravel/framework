@@ -115,6 +115,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertStringContainsString('alter table "users" drop column "foo", "bar"', $statements[0]);
     }
 
+    public function testDropColumnDropsCreatesSqlToDropDefaultConstraints(){
+        $blueprint = new Blueprint('foo');
+        $blueprint->dropColumn('bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals("DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[foo] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM SYS.COLUMNS WHERE [object_id] = OBJECT_ID('[dbo].[foo]') AND [name] in ('bar');EXEC(@sql);alter table \"foo\" drop column \"bar\"", $statements[0]);
+    }
+
     public function testDropPrimary()
     {
         $blueprint = new Blueprint('users');
