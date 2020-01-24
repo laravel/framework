@@ -14,6 +14,7 @@ use InvalidArgumentException;
  * @method self withTrashed() Show all records
  * @method self onlyTrashed() Show only trashed records
  * @method int forceDetach(\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids, bool  $touch) Show only trashed records
+ * @method int syncWithForceDetaching(mixed  $ids) Show only trashed records
  */
 class BelongsToMany extends Relation
 {
@@ -1119,6 +1120,14 @@ class BelongsToMany extends Relation
             $this->withSoftDeletes = false;
 
             return tap($this->detach($ids, $touch), function () {
+                $this->withSoftDeletes = true;
+            });
+        });
+
+        $this->macro('syncWithForceDetaching', function ($ids) {
+            $this->withSoftDeletes = false;
+
+            return tap($this->sync($ids), function () {
                 $this->withSoftDeletes = true;
             });
         });
