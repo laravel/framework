@@ -2,14 +2,20 @@
 
 namespace Illuminate\Routing;
 
+use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
+use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
+use Illuminate\Contracts\View\Factory as ViewFactoryContract;
+use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Support\ServiceProvider;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Response as NyholmPsrResponse;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Response as PsrResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
-use Illuminate\Contracts\View\Factory as ViewFactoryContract;
-use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
-use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Zend\Diactoros\Response as ZendPsrResponse;
+use Zend\Diactoros\ServerRequestFactory;
 
 class RoutingServiceProvider extends ServiceProvider
 {
@@ -56,12 +62,14 @@ class RoutingServiceProvider extends ServiceProvider
             // and all the registered routes will be available to the generator.
             $app->instance('routes', $routes);
 
-            $url = new UrlGenerator(
+            return new UrlGenerator(
                 $routes, $app->rebinding(
                     'request', $this->requestRebinder()
                 ), $app['config']['app.asset_url']
             );
+        });
 
+        $this->app->extend('url', function (UrlGeneratorContract $url, $app) {
             // Next we will set a few service resolvers on the URL generator so it can
             // get the information it needs to function. This just provides some of
             // the convenience features to this URL generator like "signed" URLs.
@@ -125,7 +133,18 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrRequest()
     {
         $this->app->bind(ServerRequestInterface::class, function ($app) {
-            return (new DiactorosFactory)->createRequest($app->make('request'));
+            if (class_exists(Psr17Factory::class) && class_exists(PsrHttpFactory::class)) {
+                $psr17Factory = new Psr17Factory;
+
+                return (new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
+                    ->createRequest($app->make('request'));
+            }
+
+            if (class_exists(ServerRequestFactory::class) && class_exists(DiactorosFactory::class)) {
+                return (new DiactorosFactory)->createRequest($app->make('request'));
+            }
+
+            throw new Exception('Unable to resolve PSR request. Please install symfony/psr-http-message-bridge and nyholm/psr7.');
         });
     }
 
@@ -137,7 +156,15 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrResponse()
     {
         $this->app->bind(ResponseInterface::class, function () {
-            return new PsrResponse;
+            if (class_exists(NyholmPsrResponse::class)) {
+                return new NyholmPsrResponse;
+            }
+
+            if (class_exists(ZendPsrResponse::class)) {
+                return new ZendPsrResponse;
+            }
+
+            throw new Exception('Unable to resolve PSR response. Please install nyholm/psr7.');
         });
     }
 

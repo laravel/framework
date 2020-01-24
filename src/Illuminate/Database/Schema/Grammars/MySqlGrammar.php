@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use RuntimeException;
-use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Fluent;
+use RuntimeException;
 
 class MySqlGrammar extends Grammar
 {
@@ -346,8 +346,8 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a rename index command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
-     * @param  \Illuminate\Support\Fluent $command
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command)

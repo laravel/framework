@@ -2,10 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Auth\ApiAuthenticationWithEloquentTest;
 
+use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Auth\User as FoundationUser;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Database\QueryException;
 
 class ApiAuthenticationWithEloquentTest extends TestCase
 {
@@ -30,7 +31,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
         ]);
     }
 
-    public function test_authentication_via_api_with_eloquent_using_wrong_database_credentials_should_not_cause_infinite_loop()
+    public function testAuthenticationViaApiWithEloquentUsingWrongDatabaseCredentialsShouldNotCauseInfiniteLoop()
     {
         Route::get('/auth', function () {
             return 'success';
@@ -38,7 +39,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
         $this->expectException(QueryException::class);
 
-        $this->expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES) (SQL: select * from `users` where `api_token` = whatever limit 1)");
+        $this->expectExceptionMessage("Access denied for user 'root'@'localhost'");
 
         try {
             $this->withoutExceptionHandling()->get('/auth', ['Authorization' => 'Bearer whatever']);
@@ -52,7 +53,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
     }
 }
 
-class User extends \Illuminate\Foundation\Auth\User
+class User extends FoundationUser
 {
     //
 }

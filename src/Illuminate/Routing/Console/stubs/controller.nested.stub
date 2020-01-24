@@ -3,9 +3,9 @@
 namespace DummyNamespace;
 
 use DummyFullModelClass;
-use ParentDummyFullModelClass;
-use Illuminate\Http\Request;
 use DummyRootNamespaceHttp\Controllers\Controller;
+use Illuminate\Http\Request;
+use ParentDummyFullModelClass;
 
 class DummyClass extends Controller
 {

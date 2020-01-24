@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {

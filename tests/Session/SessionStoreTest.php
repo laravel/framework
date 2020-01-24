@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Session;
 
-use Mockery as m;
-use ReflectionClass;
-use Illuminate\Support\Str;
-use SessionHandlerInterface;
-use Illuminate\Session\Store;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Session\Store;
+use Illuminate\Support\Str;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
@@ -25,8 +25,8 @@ class SessionStoreTest extends TestCase
         $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(['foo' => 'bar', 'bagged' => ['name' => 'taylor']]));
         $session->start();
 
-        $this->assertEquals('bar', $session->get('foo'));
-        $this->assertEquals('baz', $session->get('bar', 'baz'));
+        $this->assertSame('bar', $session->get('foo'));
+        $this->assertSame('baz', $session->get('bar', 'baz'));
         $this->assertTrue($session->has('foo'));
         $this->assertFalse($session->has('bar'));
         $this->assertTrue($session->isStarted());
@@ -72,7 +72,7 @@ class SessionStoreTest extends TestCase
         $this->assertNotSame(['a'], $session->getId());
 
         $session->setId('wrong');
-        $this->assertNotEquals('wrong', $session->getId());
+        $this->assertNotSame('wrong', $session->getId());
     }
 
     public function testSessionInvalidate()
@@ -229,14 +229,14 @@ class SessionStoreTest extends TestCase
         $session->flashInput(['foo' => 'bar', 'bar' => 0]);
 
         $this->assertTrue($session->hasOldInput('foo'));
-        $this->assertEquals('bar', $session->getOldInput('foo'));
+        $this->assertSame('bar', $session->getOldInput('foo'));
         $this->assertEquals(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
 
         $session->ageFlashData();
 
         $this->assertTrue($session->hasOldInput('foo'));
-        $this->assertEquals('bar', $session->getOldInput('foo'));
+        $this->assertSame('bar', $session->getOldInput('foo'));
         $this->assertEquals(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
     }
@@ -249,14 +249,14 @@ class SessionStoreTest extends TestCase
         $session->flash('baz');
 
         $this->assertTrue($session->has('foo'));
-        $this->assertEquals('bar', $session->get('foo'));
+        $this->assertSame('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
         $this->assertTrue($session->get('baz'));
 
         $session->ageFlashData();
 
         $this->assertTrue($session->has('foo'));
-        $this->assertEquals('bar', $session->get('foo'));
+        $this->assertSame('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
 
         $session->ageFlashData();
@@ -272,7 +272,7 @@ class SessionStoreTest extends TestCase
         $session->now('bar', 0);
 
         $this->assertTrue($session->has('foo'));
-        $this->assertEquals('bar', $session->get('foo'));
+        $this->assertSame('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
 
         $session->ageFlashData();
@@ -330,8 +330,8 @@ class SessionStoreTest extends TestCase
         $session->put('foo', 'bar');
         $session->put('qu', 'ux');
         $session->replace(['foo' => 'baz']);
-        $this->assertEquals('baz', $session->get('foo'));
-        $this->assertEquals('ux', $session->get('qu'));
+        $this->assertSame('baz', $session->get('foo'));
+        $this->assertSame('ux', $session->get('qu'));
     }
 
     public function testRemove()
@@ -340,7 +340,7 @@ class SessionStoreTest extends TestCase
         $session->put('foo', 'bar');
         $pulled = $session->remove('foo');
         $this->assertFalse($session->has('foo'));
-        $this->assertEquals('bar', $pulled);
+        $this->assertSame('bar', $pulled);
     }
 
     public function testClear()
@@ -459,8 +459,8 @@ class SessionStoreTest extends TestCase
         $result = $session->remember('foo', function () {
             return 'bar';
         });
-        $this->assertEquals('bar', $session->get('foo'));
-        $this->assertEquals('bar', $result);
+        $this->assertSame('bar', $session->get('foo'));
+        $this->assertSame('bar', $result);
     }
 
     public function getSession()

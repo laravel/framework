@@ -2,22 +2,24 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use ArrayAccess;
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Traits\Tappable;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Foundation\Testing\Assert as PHPUnit;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
+use LogicException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * @mixin \Illuminate\Http\Response
  */
-class TestResponse
+class TestResponse implements ArrayAccess
 {
     use Tappable, Macroable {
         __call as macroCall;
@@ -85,6 +87,38 @@ class TestResponse
             $this->isOk(),
             'Response status code ['.$this->getStatusCode().'] does not match expected 200 status code.'
         );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has a 201 status code.
+     *
+     * @return $this
+     */
+    public function assertCreated()
+    {
+        $actual = $this->getStatusCode();
+
+        PHPUnit::assertTrue(
+            201 === $actual,
+            'Response status code ['.$actual.'] does not match expected 201 status code.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has the given status code and no content.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function assertNoContent($status = 204)
+    {
+        $this->assertStatus($status);
+
+        PHPUnit::assertEmpty($this->getContent(), 'Response content is not empty.');
 
         return $this;
     }
@@ -465,6 +499,25 @@ class TestResponse
     }
 
     /**
+     * Assert that the expected value exists at the given path in the response.
+     *
+     * @param  string  $path
+     * @param  mixed  $expect
+     * @param  bool  $strict
+     * @return $this
+     */
+    public function assertJsonPath($path, $expect, $strict = false)
+    {
+        if ($strict) {
+            PHPUnit::assertSame($expect, $this->json($path));
+        } else {
+            PHPUnit::assertEquals($expect, $this->json($path));
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data
@@ -512,7 +565,7 @@ class TestResponse
      * Assert that the response does not contain the given JSON fragment.
      *
      * @param  array  $data
-     * @param  bool   $exact
+     * @param  bool  $exact
      * @return $this
      */
     public function assertJsonMissing(array $data, $exact = false)
@@ -652,15 +705,16 @@ class TestResponse
      * Assert that the response has the given JSON validation errors.
      *
      * @param  string|array  $errors
+     * @param  string  $responseKey
      * @return $this
      */
-    public function assertJsonValidationErrors($errors)
+    public function assertJsonValidationErrors($errors, $responseKey = 'errors')
     {
         $errors = Arr::wrap($errors);
 
         PHPUnit::assertNotEmpty($errors, 'No validation errors were provided.');
 
-        $jsonErrors = $this->json()['errors'] ?? [];
+        $jsonErrors = $this->json()[$responseKey] ?? [];
 
         $errorMessage = $jsonErrors
                 ? 'Response has the following JSON validation errors:'.
@@ -700,9 +754,10 @@ class TestResponse
      * Assert that the response has no JSON validation errors for the given keys.
      *
      * @param  string|array|null  $keys
+     * @param  string  $responseKey
      * @return $this
      */
-    public function assertJsonMissingValidationErrors($keys = null)
+    public function assertJsonMissingValidationErrors($keys = null, $responseKey = 'errors')
     {
         if ($this->getContent() === '') {
             PHPUnit::assertTrue(true);
@@ -712,13 +767,13 @@ class TestResponse
 
         $json = $this->json();
 
-        if (! array_key_exists('errors', $json)) {
-            PHPUnit::assertArrayNotHasKey('errors', $json);
+        if (! array_key_exists($responseKey, $json)) {
+            PHPUnit::assertArrayNotHasKey($responseKey, $json);
 
             return $this;
         }
 
-        $errors = $json['errors'];
+        $errors = $json[$responseKey];
 
         if (is_null($keys) && count($errors) > 0) {
             PHPUnit::fail(
@@ -772,7 +827,7 @@ class TestResponse
     /**
      * Assert that the response view equals the given value.
      *
-     * @param  string $value
+     * @param  string  $value
      * @return $this
      */
     public function assertViewIs($value)
@@ -802,11 +857,11 @@ class TestResponse
         if (is_null($value)) {
             PHPUnit::assertArrayHasKey($key, $this->original->gatherData());
         } elseif ($value instanceof Closure) {
-            PHPUnit::assertTrue($value($this->original->gatherData()[$key]));
+            PHPUnit::assertTrue($value(Arr::get($this->original->gatherData(), $key)));
         } elseif ($value instanceof Model) {
-            PHPUnit::assertTrue($value->is($this->original->gatherData()[$key]));
+            PHPUnit::assertTrue($value->is(Arr::get($this->original->gatherData(), $key)));
         } else {
-            PHPUnit::assertEquals($value, $this->original->gatherData()[$key]);
+            PHPUnit::assertEquals($value, Arr::get($this->original->gatherData(), $key));
         }
 
         return $this;
@@ -1114,6 +1169,23 @@ class TestResponse
     }
 
     /**
+     * Dump the session from the response.
+     *
+     * @param  array  $keys
+     * @return $this
+     */
+    public function dumpSession($keys = null)
+    {
+        if (is_array($keys)) {
+            dump($this->session()->only($keys));
+        } else {
+            dump($this->session()->all());
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the streamed content from the response.
      *
      * @return string
@@ -1155,6 +1227,55 @@ class TestResponse
     public function __isset($key)
     {
         return isset($this->baseResponse->{$key});
+    }
+
+    /**
+     * Determine if the given offset exists.
+     *
+     * @param  string  $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->json()[$offset]);
+    }
+
+    /**
+     * Get the value for a given offset.
+     *
+     * @param  string  $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->json()[$offset];
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param  string  $offset
+     * @param  mixed  $value
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new LogicException('Response data may not be mutated using array access.');
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param  string  $offset
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function offsetUnset($offset)
+    {
+        throw new LogicException('Response data may not be mutated using array access.');
     }
 
     /**

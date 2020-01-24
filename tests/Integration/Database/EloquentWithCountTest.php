@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentWithCountTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -36,7 +36,7 @@ class EloquentWithCountTest extends DatabaseTestCase
         });
     }
 
-    public function test_it_basic()
+    public function testItBasic()
     {
         $one = Model1::create();
         $two = $one->twos()->Create();
@@ -53,7 +53,7 @@ class EloquentWithCountTest extends DatabaseTestCase
         ], $results->get()->toArray());
     }
 
-    public function test_global_scopes()
+    public function testGlobalScopes()
     {
         $one = Model1::create();
         $one->fours()->create();

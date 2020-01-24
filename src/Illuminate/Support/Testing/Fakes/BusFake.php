@@ -2,17 +2,47 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class BusFake implements Dispatcher
 {
+    /**
+     * The original Bus dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
+     * The job types that should be intercepted instead of dispatched.
+     *
+     * @var array
+     */
+    protected $jobsToFake;
+
     /**
      * The commands that have been dispatched.
      *
      * @var array
      */
     protected $commands = [];
+
+    /**
+     * Create a new bus fake instance.
+     *
+     * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
+     * @param  array|string  $jobsToFake
+     * @return void
+     */
+    public function __construct(Dispatcher $dispatcher, $jobsToFake = [])
+    {
+        $this->dispatcher = $dispatcher;
+
+        $this->jobsToFake = Arr::wrap($jobsToFake);
+    }
 
     /**
      * Assert if a job was dispatched based on a truth-test callback.
@@ -40,7 +70,7 @@ class BusFake implements Dispatcher
      * @param  int  $times
      * @return void
      */
-    protected function assertDispatchedTimes($command, $times = 1)
+    public function assertDispatchedTimes($command, $times = 1)
     {
         PHPUnit::assertTrue(
             ($count = $this->dispatched($command)->count()) === $times,
@@ -104,7 +134,11 @@ class BusFake implements Dispatcher
      */
     public function dispatch($command)
     {
-        return $this->dispatchNow($command);
+        if ($this->shouldFakeJob($command)) {
+            $this->commands[get_class($command)][] = $command;
+        } else {
+            return $this->dispatcher->dispatch($command);
+        }
     }
 
     /**
@@ -116,7 +150,31 @@ class BusFake implements Dispatcher
      */
     public function dispatchNow($command, $handler = null)
     {
-        $this->commands[get_class($command)][] = $command;
+        if ($this->shouldFakeJob($command)) {
+            $this->commands[get_class($command)][] = $command;
+        } else {
+            return $this->dispatcher->dispatchNow($command, $handler);
+        }
+    }
+
+    /**
+     * Determine if an command should be faked or actually dispatched.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    protected function shouldFakeJob($command)
+    {
+        if (empty($this->jobsToFake)) {
+            return true;
+        }
+
+        return collect($this->jobsToFake)
+            ->filter(function ($job) use ($command) {
+                return $job instanceof Closure
+                            ? $job($command)
+                            : $job === get_class($command);
+            })->isNotEmpty();
     }
 
     /**
@@ -127,6 +185,8 @@ class BusFake implements Dispatcher
      */
     public function pipeThrough(array $pipes)
     {
+        $this->dispatcher->pipeThrough($pipes);
+
         return $this;
     }
 
@@ -138,7 +198,7 @@ class BusFake implements Dispatcher
      */
     public function hasCommandHandler($command)
     {
-        return false;
+        return $this->dispatcher->hasCommandHandler($command);
     }
 
     /**
@@ -149,7 +209,7 @@ class BusFake implements Dispatcher
      */
     public function getCommandHandler($command)
     {
-        return false;
+        return $this->dispatcher->getCommandHandler($command);
     }
 
     /**
@@ -160,6 +220,8 @@ class BusFake implements Dispatcher
      */
     public function map(array $map)
     {
+        $this->dispatcher->map($map);
+
         return $this;
     }
 }

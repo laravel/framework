@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Pipeline;
 
-use RuntimeException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Pipeline\Pipeline;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PipelineTest extends TestCase
 {
@@ -25,39 +24,12 @@ class PipelineTest extends TestCase
                         return $piped;
                     });
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.two']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $_SERVER['__test.pipe.two']);
 
         unset($_SERVER['__test.pipe.one']);
         unset($_SERVER['__test.pipe.two']);
-    }
-
-    public function testMultiplePipelinesBackAndForthExecutionOrder()
-    {
-        $pipeTwo = function ($piped, $next) {
-            $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_forward2';
-
-            $value = $next($piped);
-
-            $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_backward2';
-
-            return $value;
-        };
-
-        $result = (new Pipeline(new Container))
-            ->send('foo')
-            ->through([PipelineTestPipeBack::class, $pipeTwo])
-            ->then(function ($piped) {
-                $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_core';
-
-                return $piped;
-            });
-
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('forward1_forward2_core_backward2_backward1', $_SERVER['__test.pipeline']);
-
-        unset($_SERVER['__test.pipeline']);
     }
 
     public function testPipelineUsageWithObjects()
@@ -69,8 +41,8 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -86,60 +58,10 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
-    }
-
-    public function testPipelineUsageWithResponsableObjects()
-    {
-        $result = (new Pipeline(new Container))
-            ->send('foo')
-            ->through([new PipelineTestPipeResponsable])
-            ->then(
-                function ($piped) {
-                    return $piped;
-                }
-            );
-
-        $this->assertEquals('bar', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.responsable']);
-
-        unset($_SERVER['__test.pipe.responsable']);
-    }
-
-    public function testNextLayersOfOnionAreNotRunWhenOneLayerReturnsEarly()
-    {
-        $returnEarly = function ($piped, $next) {
-            $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_forward2';
-
-            return 'value_from_pipe';
-        };
-
-        $notCalled = function ($piped, $next) {
-            $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_not_called';
-
-            $value = $next($piped);
-
-            $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_not_called';
-
-            return $value;
-        };
-
-        $result = (new Pipeline(new Container))
-            ->send('foo')
-            ->through([PipelineTestPipeBack::class, $returnEarly, $notCalled])
-            ->then(function ($piped) {
-                $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'not_called';
-
-                return $piped;
-            });
-
-        $this->assertEquals('value_from_pipe', $result);
-        $this->assertEquals('forward1_forward2_backward1', $_SERVER['__test.pipeline']);
-
-        unset($_SERVER['__test.pipeline']);
     }
 
     public function testPipelineUsageWithCallable()
@@ -159,7 +81,17 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+
+        $result = (new Pipeline(new Container))
+            ->send('bar')
+            ->through($function)
+            ->thenReturn();
+
+        $this->assertEquals('bar', $result);
         $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
@@ -176,8 +108,8 @@ class PipelineTest extends TestCase
                 }
             );
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
     }
@@ -193,36 +125,22 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
         $this->assertEquals($parameters, $_SERVER['__test.pipe.parameters']);
 
         unset($_SERVER['__test.pipe.parameters']);
     }
 
-    public function testItCanWorkWithNoPipe()
-    {
-        $result = (new Pipeline(new Container))
-            ->send('foo')
-            ->through([])
-            ->thenReturn();
-
-        $this->assertEquals('foo', $result);
-    }
-
     public function testPipelineViaChangesTheMethodBeingCalledOnThePipes()
     {
-        $piped = function ($piped, $next) {
-            return $next($piped) + 1;
-        };
-
         $pipelineInstance = new Pipeline(new Container);
-        $result = $pipelineInstance->send(0)
-            ->through([PipelineTestPipeOne::class, new PipelineTestPipeDifferent, $piped])
+        $result = $pipelineInstance->send('data')
+            ->through(PipelineTestPipeOne::class)
             ->via('differentMethod')
             ->then(function ($piped) {
-                return $piped + 1;
+                return $piped;
             });
-        $this->assertEquals(4, $result);
+        $this->assertSame('data', $result);
     }
 
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
@@ -244,24 +162,10 @@ class PipelineTest extends TestCase
                     ->through([PipelineTestPipeOne::class])
                     ->thenReturn();
 
-        $this->assertEquals('foo', $result);
-        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('foo', $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
-    }
-}
-
-class PipelineTestPipeBack
-{
-    public function handle($piped, $next)
-    {
-        $_SERVER['__test.pipeline'] = 'forward1';
-
-        $value = $next($piped);
-
-        $_SERVER['__test.pipeline'] = $_SERVER['__test.pipeline'].'_backward1';
-
-        return $value;
     }
 }
 
@@ -276,23 +180,7 @@ class PipelineTestPipeOne
 
     public function differentMethod($piped, $next)
     {
-        return $next($piped) + 1;
-    }
-}
-
-class PipelineTestPipeDifferent
-{
-    public function differentMethod($piped, $next)
-    {
-        return $next($piped) + 1;
-    }
-}
-
-class PipeResponsable implements Responsable
-{
-    public function toResponse($request)
-    {
-        return 'bar';
+        return $next($piped);
     }
 }
 
@@ -303,16 +191,6 @@ class PipelineTestPipeTwo
         $_SERVER['__test.pipe.one'] = $piped;
 
         return $next($piped);
-    }
-}
-
-class PipelineTestPipeResponsable
-{
-    public function handle($piped, $next)
-    {
-        $_SERVER['__test.pipe.responsable'] = $piped;
-
-        return new PipeResponsable;
     }
 }
 

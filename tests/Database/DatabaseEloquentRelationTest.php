@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use Mockery as m;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
@@ -234,6 +234,27 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([], false);
     }
 
+    public function testWithoutRelations()
+    {
+        $original = new EloquentNoTouchingModelStub;
+
+        $original->setRelation('foo', 'baz');
+
+        $this->assertEquals('baz', $original->getRelation('foo'));
+
+        $model = $original->withoutRelations();
+
+        $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertTrue($original->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('foo'));
+
+        $model = $original->unsetRelations();
+
+        $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertFalse($original->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('foo'));
+    }
+
     public function testMacroable()
     {
         Relation::macro('foo', function () {
@@ -244,7 +265,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $relation = new EloquentRelationStub($model->newQuery(), $model);
 
         $result = $relation->foo();
-        $this->assertEquals('foo', $result);
+        $this->assertSame('foo', $result);
     }
 }
 

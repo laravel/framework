@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 
 /**
@@ -21,7 +21,7 @@ class EloquentCollectionFreshTest extends DatabaseTestCase
         });
     }
 
-    public function test_eloquent_collection_fresh()
+    public function testEloquentCollectionFresh()
     {
         User::insert([
             ['email' => 'laravel@framework.com'],

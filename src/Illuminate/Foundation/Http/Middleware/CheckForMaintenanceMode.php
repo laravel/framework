@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Symfony\Component\HttpFoundation\IpUtils;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Exceptions\MaintenanceModeException;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class CheckForMaintenanceMode
 {
@@ -42,6 +42,7 @@ class CheckForMaintenanceMode
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Illuminate\Foundation\Http\Exceptions\MaintenanceModeException
      */
     public function handle($request, Closure $next)
     {

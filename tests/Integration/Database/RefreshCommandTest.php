@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 class RefreshCommandTest extends DatabaseTestCase
 {
-    public function test_refresh_without_realpath()
+    public function testRefreshWithoutRealpath()
     {
         $this->app->setBasePath(__DIR__);
 
@@ -17,7 +17,7 @@ class RefreshCommandTest extends DatabaseTestCase
         $this->migrate_refresh_with($options);
     }
 
-    public function test_refresh_with_realpath()
+    public function testRefreshWithRealpath()
     {
         $options = [
             '--path' => realpath(__DIR__.'/stubs/'),

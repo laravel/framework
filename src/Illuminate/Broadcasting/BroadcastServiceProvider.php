@@ -2,10 +2,10 @@
 
 namespace Illuminate\Broadcasting;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\ServiceProvider;
 
 class BroadcastServiceProvider extends ServiceProvider implements DeferrableProvider
 {

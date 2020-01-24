@@ -3,15 +3,15 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Exception;
-use ReflectionClass;
-use ReflectionFunction;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
+use Illuminate\Contracts\Routing\BindingRegistrar;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Contracts\Routing\BindingRegistrar;
+use ReflectionClass;
+use ReflectionFunction;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 
 abstract class Broadcaster implements BroadcasterContract
 {
@@ -261,7 +261,7 @@ abstract class Broadcaster implements BroadcasterContract
      * Normalize the given callback into a callable.
      *
      * @param  mixed  $callback
-     * @return callable|\Closure
+     * @return \Closure|callable
      */
     protected function normalizeChannelHandlerToCallable($callback)
     {

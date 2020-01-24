@@ -2,12 +2,12 @@
 
 namespace Illuminate\Database;
 
-use PDO;
+use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\ConfigurationUrlParser;
-use Illuminate\Database\Connectors\ConnectionFactory;
+use PDO;
 
 /**
  * @mixin \Illuminate\Database\Connection
@@ -256,8 +256,8 @@ class DatabaseManager implements ConnectionResolverInterface
         $fresh = $this->makeConnection($name);
 
         return $this->connections[$name]
-                                ->setPdo($fresh->getPdo())
-                                ->setReadPdo($fresh->getReadPdo());
+                                ->setPdo($fresh->getRawPdo())
+                                ->setReadPdo($fresh->getRawReadPdo());
     }
 
     /**
@@ -307,7 +307,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Register an extension connection resolver.
      *
-     * @param  string    $name
+     * @param  string  $name
      * @param  callable  $resolver
      * @return void
      */
@@ -341,7 +341,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * Dynamically pass methods to the default connection.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

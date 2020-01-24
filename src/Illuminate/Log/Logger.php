@@ -3,12 +3,12 @@
 namespace Illuminate\Log;
 
 use Closure;
-use RuntimeException;
-use Psr\Log\LoggerInterface;
-use Illuminate\Log\Events\MessageLogged;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Log\Events\MessageLogged;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class Logger implements LoggerInterface
 {
@@ -198,7 +198,7 @@ class Logger implements LoggerInterface
      *
      * @param  string  $level
      * @param  string  $message
-     * @param  array   $context
+     * @param  array  $context
      * @return void
      */
     protected function fireLogEvent($level, $message, array $context = [])

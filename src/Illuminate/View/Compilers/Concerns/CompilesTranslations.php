@@ -18,7 +18,7 @@ trait CompilesTranslations
             return "<?php \$__env->startTranslation{$expression}; ?>";
         }
 
-        return "<?php echo app('translator')->getFromJson{$expression}; ?>";
+        return "<?php echo app('translator')->get{$expression}; ?>";
     }
 
     /**

@@ -2,13 +2,15 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Events\NotificationSending;
+use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Localizable;
 
 class NotificationSender
 {
@@ -144,7 +146,7 @@ class NotificationSender
         $response = $this->manager->driver($channel)->send($notifiable, $notification);
 
         $this->events->dispatch(
-            new Events\NotificationSent($notifiable, $notification, $channel, $response)
+            new NotificationSent($notifiable, $notification, $channel, $response)
         );
     }
 
@@ -159,7 +161,7 @@ class NotificationSender
     protected function shouldSendNotification($notifiable, $notification, $channel)
     {
         return $this->events->until(
-            new Events\NotificationSending($notifiable, $notification, $channel)
+            new NotificationSending($notifiable, $notification, $channel)
         ) !== false;
     }
 
@@ -193,6 +195,12 @@ class NotificationSender
                             ->onConnection($notification->connection)
                             ->onQueue($notification->queue)
                             ->delay($notification->delay)
+                            ->through(
+                                array_merge(
+                                    method_exists($notification, 'middleware') ? $notification->middleware() : [],
+                                    $notification->middleware ?? []
+                                )
+                            )
                 );
             }
         }

@@ -67,7 +67,7 @@ class ResourceRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\RouteCollection
      */
     public function register($name, $controller, array $options = [])
@@ -108,7 +108,7 @@ class ResourceRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return void
      */
     protected function prefixedResource($name, $controller, array $options)
@@ -171,7 +171,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceIndex($name, $base, $controller, $options)
@@ -189,7 +189,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceCreate($name, $base, $controller, $options)
@@ -207,7 +207,7 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceStore($name, $base, $controller, $options)
@@ -225,11 +225,13 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceShow($name, $base, $controller, $options)
     {
+        $name = $this->getShallowName($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'show', $options);
@@ -243,11 +245,13 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
+        $name = $this->getShallowName($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
@@ -261,11 +265,13 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
     {
+        $name = $this->getShallowName($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'update', $options);
@@ -279,16 +285,32 @@ class ResourceRegistrar
      * @param  string  $name
      * @param  string  $base
      * @param  string  $controller
-     * @param  array   $options
+     * @param  array  $options
      * @return \Illuminate\Routing\Route
      */
     protected function addResourceDestroy($name, $base, $controller, $options)
     {
+        $name = $this->getShallowName($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
         return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Get the name for a given resource with shallowness applied when applicable.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @return string
+     */
+    protected function getShallowName($name, $options)
+    {
+        return isset($options['shallow']) && $options['shallow']
+                    ? last(explode('.', $name))
+                    : $name;
     }
 
     /**
@@ -316,7 +338,7 @@ class ResourceRegistrar
     /**
      * Get the URI for a nested resource segment array.
      *
-     * @param  array   $segments
+     * @param  array  $segments
      * @return string
      */
     protected function getNestedResourceUri(array $segments)
@@ -354,7 +376,7 @@ class ResourceRegistrar
      * @param  string  $resource
      * @param  string  $controller
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return array
      */
     protected function getResourceAction($resource, $controller, $method, $options)
@@ -375,7 +397,7 @@ class ResourceRegistrar
      *
      * @param  string  $resource
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return string
      */
     protected function getResourceRouteName($resource, $method, $options)
@@ -425,7 +447,7 @@ class ResourceRegistrar
     /**
      * Set the global parameter mapping.
      *
-     * @param  array $parameters
+     * @param  array  $parameters
      * @return void
      */
     public static function setParameters(array $parameters = [])

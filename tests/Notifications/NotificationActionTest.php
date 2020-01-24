@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Action;
+use PHPUnit\Framework\TestCase;
 
 class NotificationActionTest extends TestCase
 {
@@ -11,7 +11,7 @@ class NotificationActionTest extends TestCase
     {
         $action = new Action('Text', 'url');
 
-        $this->assertEquals('Text', $action->text);
-        $this->assertEquals('url', $action->url);
+        $this->assertSame('Text', $action->text);
+        $this->assertSame('url', $action->url);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Routing\Console;
 
+use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 class ControllerMakeCommand extends GeneratorCommand
@@ -176,11 +176,12 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
-            ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
-            ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable controller class.'],
-            ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
             ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller.'],
+            ['force', null, InputOption::VALUE_NONE, 'Create the class even if the controller already exists'],
+            ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable controller class.'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
+            ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
+            ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
         ];
     }
 }

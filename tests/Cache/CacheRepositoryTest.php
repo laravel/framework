@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Cache;
 
-use DateTime;
-use DateInterval;
-use Mockery as m;
 use ArrayIterator;
+use DateInterval;
+use DateTime;
 use DateTimeImmutable;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
 {
@@ -28,7 +28,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
-        $this->assertEquals('bar', $repo->get('foo'));
+        $this->assertSame('bar', $repo->get('foo'));
     }
 
     public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArray()
@@ -49,8 +49,8 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
-        $this->assertEquals('bar', $repo->get('foo', 'bar'));
-        $this->assertEquals('baz', $repo->get('boom', function () {
+        $this->assertSame('bar', $repo->get('foo', 'bar'));
+        $this->assertSame('baz', $repo->get('boom', function () {
             return 'baz';
         }));
     }
@@ -92,7 +92,7 @@ class CacheRepositoryTest extends TestCase
         $result = $repo->remember('foo', 10, function () {
             return 'bar';
         });
-        $this->assertEquals('bar', $result);
+        $this->assertSame('bar', $result);
 
         /*
          * Use Carbon object...
@@ -106,11 +106,11 @@ class CacheRepositoryTest extends TestCase
         $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), function () {
             return 'bar';
         });
-        $this->assertEquals('bar', $result);
+        $this->assertSame('bar', $result);
         $result = $repo->remember('baz', Carbon::now()->addMinutes(10)->subSeconds(2), function () {
             return 'qux';
         });
-        $this->assertEquals('qux', $result);
+        $this->assertSame('qux', $result);
     }
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
@@ -121,7 +121,7 @@ class CacheRepositoryTest extends TestCase
         $result = $repo->rememberForever('foo', function () {
             return 'bar';
         });
-        $this->assertEquals('bar', $result);
+        $this->assertSame('bar', $result);
     }
 
     public function testPuttingMultipleItemsInCache()

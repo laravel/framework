@@ -1,7 +1,6 @@
 ---
-name: "🐛 Bug Report"
+name: "Bug report"
 about: 'Report a general framework issue. Please ensure your Laravel version is still supported: https://laravel.com/docs/releases#support-policy'
-
 ---
 
 - Laravel Version: #.#.#

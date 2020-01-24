@@ -2,13 +2,15 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Redis\RedisManager;
-use Illuminate\Foundation\Application;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Redis\Connections\Connection;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Predis\Client;
+use Redis;
 
 class RedisConnectionTest extends TestCase
 {
@@ -18,14 +20,6 @@ class RedisConnectionTest extends TestCase
     {
         parent::setUp();
         $this->setUpRedis();
-
-        if (! isset($this->redis['phpredis'])) {
-            $this->markTestSkipped('PhpRedis should be enabled to run the tests');
-        }
-
-        if (! isset($this->redis['predis'])) {
-            $this->markTestSkipped('Predis should be enabled to run the tests');
-        }
     }
 
     protected function tearDown(): void
@@ -37,27 +31,27 @@ class RedisConnectionTest extends TestCase
         m::close();
     }
 
-    public function test_it_sets_values_with_expiry()
+    public function testItSetsValuesWithExpiry()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed', 'EX', 5, 'NX');
-            $this->assertEquals('mohamed', $redis->get('one'));
+            $this->assertSame('mohamed', $redis->get('one'));
             $this->assertNotEquals(-1, $redis->ttl('one'));
 
             // It doesn't override when NX mode
             $redis->set('one', 'taylor', 'EX', 5, 'NX');
-            $this->assertEquals('mohamed', $redis->get('one'));
+            $this->assertSame('mohamed', $redis->get('one'));
 
             // It overrides when XX mode
             $redis->set('one', 'taylor', 'EX', 5, 'XX');
-            $this->assertEquals('taylor', $redis->get('one'));
+            $this->assertSame('taylor', $redis->get('one'));
 
             // It fails if XX mode is on and key doesn't exist
             $redis->set('two', 'taylor', 'PX', 5, 'XX');
             $this->assertNull($redis->get('two'));
 
             $redis->set('three', 'mohamed', 'PX', 5000);
-            $this->assertEquals('mohamed', $redis->get('three'));
+            $this->assertSame('mohamed', $redis->get('three'));
             $this->assertNotEquals(-1, $redis->ttl('three'));
             $this->assertNotEquals(-1, $redis->pttl('three'));
 
@@ -65,7 +59,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_deletes_keys()
+    public function testItDeletesKeys()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
@@ -85,7 +79,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_checks_for_existence()
+    public function testItChecksForExistence()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
@@ -100,7 +94,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_expires_keys()
+    public function testItExpiresKeys()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
@@ -121,29 +115,29 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_renames_keys()
+    public function testItRenamesKeys()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
             $redis->rename('one', 'two');
             $this->assertNull($redis->get('one'));
-            $this->assertEquals('mohamed', $redis->get('two'));
+            $this->assertSame('mohamed', $redis->get('two'));
 
             $redis->set('three', 'adam');
             $redis->renamenx('two', 'three');
-            $this->assertEquals('mohamed', $redis->get('two'));
-            $this->assertEquals('adam', $redis->get('three'));
+            $this->assertSame('mohamed', $redis->get('two'));
+            $this->assertSame('adam', $redis->get('three'));
 
             $redis->renamenx('two', 'four');
             $this->assertNull($redis->get('two'));
-            $this->assertEquals('mohamed', $redis->get('four'));
-            $this->assertEquals('adam', $redis->get('three'));
+            $this->assertSame('mohamed', $redis->get('four'));
+            $this->assertSame('adam', $redis->get('three'));
 
             $redis->flushall();
         }
     }
 
-    public function test_it_adds_members_to_sorted_set()
+    public function testItAddsMembersToSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', 1, 'mohamed');
@@ -174,7 +168,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_counts_members_in_sorted_set()
+    public function testItCountsMembersInSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
@@ -187,7 +181,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_increments_score_of_sorted_set()
+    public function testItIncrementsScoreOfSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
@@ -198,37 +192,37 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_sets_key_if_not_exists()
+    public function testItSetsKeyIfNotExists()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('name', 'mohamed');
 
             $this->assertSame(0, $redis->setnx('name', 'taylor'));
-            $this->assertEquals('mohamed', $redis->get('name'));
+            $this->assertSame('mohamed', $redis->get('name'));
 
             $this->assertSame(1, $redis->setnx('boss', 'taylor'));
-            $this->assertEquals('taylor', $redis->get('boss'));
+            $this->assertSame('taylor', $redis->get('boss'));
 
             $redis->flushall();
         }
     }
 
-    public function test_it_sets_hash_field_if_not_exists()
+    public function testItSetsHashFieldIfNotExists()
     {
         foreach ($this->connections() as $redis) {
             $redis->hset('person', 'name', 'mohamed');
 
             $this->assertSame(0, $redis->hsetnx('person', 'name', 'taylor'));
-            $this->assertEquals('mohamed', $redis->hget('person', 'name'));
+            $this->assertSame('mohamed', $redis->hget('person', 'name'));
 
             $this->assertSame(1, $redis->hsetnx('person', 'boss', 'taylor'));
-            $this->assertEquals('taylor', $redis->hget('person', 'boss'));
+            $this->assertSame('taylor', $redis->hget('person', 'boss'));
 
             $redis->flushall();
         }
     }
 
-    public function test_it_calculates_intersection_of_sorted_sets_and_stores()
+    public function testItCalculatesIntersectionOfSortedSetsAndStores()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set1', ['jeffrey' => 1, 'matt' => 2, 'taylor' => 3]);
@@ -257,7 +251,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_calculates_union_of_sorted_sets_and_stores()
+    public function testItCalculatesUnionOfSortedSetsAndStores()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set1', ['jeffrey' => 1, 'matt' => 2, 'taylor' => 3]);
@@ -289,7 +283,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_returns_range_in_sorted_set()
+    public function testItReturnsRangeInSortedSet()
     {
         foreach ($this->connections() as $connector => $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -306,7 +300,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_returns_rev_range_in_sorted_set()
+    public function testItReturnsRevRangeInSortedSet()
     {
         foreach ($this->connections() as $connector => $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -323,7 +317,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_returns_range_by_score_in_sorted_set()
+    public function testItReturnsRangeByScoreInSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -340,7 +334,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_returns_rev_range_by_score_in_sorted_set()
+    public function testItReturnsRevRangeByScoreInSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -357,7 +351,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_returns_rank_in_sorted_set()
+    public function testItReturnsRankInSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -369,7 +363,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_returns_score_in_sorted_set()
+    public function testItReturnsScoreInSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -381,7 +375,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_removes_members_in_sorted_set()
+    public function testItRemovesMembersInSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
@@ -396,7 +390,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_removes_members_by_score_in_sorted_set()
+    public function testItRemovesMembersByScoreInSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
@@ -407,7 +401,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_removes_members_by_rank_in_sorted_set()
+    public function testItRemovesMembersByRankInSortedSet()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
@@ -418,7 +412,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_sets_multiple_hash_fields()
+    public function testItSetsMultipleHashFields()
     {
         foreach ($this->connections() as $redis) {
             $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
@@ -431,7 +425,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_gets_multiple_hash_fields()
+    public function testItGetsMultipleHashFields()
     {
         foreach ($this->connections() as $redis) {
             $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
@@ -448,7 +442,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_gets_multiple_keys()
+    public function testItGetsMultipleKeys()
     {
         $valueSet = ['name' => 'mohamed', 'hobby' => 'diving'];
 
@@ -464,17 +458,17 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_runs_eval()
+    public function testItRunsEval()
     {
         foreach ($this->connections() as $redis) {
             $redis->eval('redis.call("set", KEYS[1], ARGV[1])', 1, 'name', 'mohamed');
-            $this->assertEquals('mohamed', $redis->get('name'));
+            $this->assertSame('mohamed', $redis->get('name'));
 
             $redis->flushall();
         }
     }
 
-    public function test_it_runs_pipes()
+    public function testItRunsPipes()
     {
         foreach ($this->connections() as $redis) {
             $result = $redis->pipeline(function ($pipe) {
@@ -492,7 +486,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_runs_transactions()
+    public function testItRunsTransactions()
     {
         foreach ($this->connections() as $redis) {
             $result = $redis->transaction(function ($pipe) {
@@ -510,7 +504,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_runs_raw_command()
+    public function testItRunsRawCommand()
     {
         foreach ($this->connections() as $redis) {
             $redis->executeRaw(['SET', 'test:raw:1', '1']);
@@ -523,15 +517,15 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_dispatches_query_event()
+    public function testItDispatchesQueryEvent()
     {
         foreach ($this->connections() as $redis) {
             $redis->setEventDispatcher($events = m::mock(Dispatcher::class));
 
             $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
-                $this->assertEquals('get', $event->command);
+                $this->assertSame('get', $event->command);
                 $this->assertEquals(['foobar'], $event->parameters);
-                $this->assertEquals('default', $event->connectionName);
+                $this->assertSame('default', $event->connectionName);
                 $this->assertInstanceOf(Connection::class, $event->connection);
 
                 return true;
@@ -543,16 +537,86 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function test_it_persists_connection()
+    public function testItPersistsConnection()
     {
         if (PHP_ZTS) {
             $this->markTestSkipped('PhpRedis does not support persistent connections with PHP_ZTS enabled.');
         }
 
-        $this->assertEquals(
+        $this->assertSame(
             'laravel',
             $this->connections()['persistent']->getPersistentID()
         );
+    }
+
+    public function testItScansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $initialKeys = ['test:scan:1', 'test:scan:2'];
+
+            foreach ($initialKeys as $k => $key) {
+                $redis->set($key, 'test');
+                $initialKeys[$k] = $this->getPrefix($redis->client()).$key;
+            }
+
+            $iterator = null;
+
+            do {
+                [$cursor, $returnedKeys] = $redis->scan($iterator);
+
+                if (! is_array($returnedKeys)) {
+                    $returnedKeys = [$returnedKeys];
+                }
+
+                foreach ($returnedKeys as $returnedKey) {
+                    $this->assertTrue(in_array($returnedKey, $initialKeys));
+                }
+            } while ($iterator > 0);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testPhpRedisScanOption()
+    {
+        foreach ($this->connections() as $redis) {
+            if ($redis->client() instanceof Client) {
+                continue;
+            }
+
+            $iterator = null;
+
+            do {
+                $returned = $redis->scan($iterator);
+
+                if ($redis->client()->getOption(Redis::OPT_SCAN) === Redis::SCAN_RETRY) {
+                    $this->assertEmpty($returned);
+                }
+            } while ($iterator > 0);
+        }
+    }
+
+    private function getPrefix($client)
+    {
+        if ($client instanceof Redis) {
+            return $client->getOption(Redis::OPT_PREFIX);
+        }
+
+        return $client->getOptions()->prefix;
+    }
+
+    public function testMacroable()
+    {
+        Connection::macro('foo', function () {
+            return 'foo';
+        });
+
+        foreach ($this->connections() as $redis) {
+            $this->assertSame(
+                'foo',
+                $redis->foo()
+            );
+        }
     }
 
     public function connections()
@@ -562,38 +626,60 @@ class RedisConnectionTest extends TestCase
             'phpredis' => $this->redis['phpredis']->connection(),
         ];
 
-        if (extension_loaded('redis')) {
-            $host = getenv('REDIS_HOST') ?: '127.0.0.1';
-            $port = getenv('REDIS_PORT') ?: 6379;
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
 
-            $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
-                'cluster' => false,
-                'default' => [
-                    'url' => "redis://user@$host:$port",
-                    'host' => 'overwrittenByUrl',
-                    'port' => 'overwrittenByUrl',
-                    'database' => 5,
-                    'options' => ['prefix' => 'laravel:'],
-                    'timeout' => 0.5,
-                ],
-            ]);
+        $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'url' => "redis://user@$host:$port",
+                'host' => 'overwrittenByUrl',
+                'port' => 'overwrittenByUrl',
+                'database' => 5,
+                'options' => ['prefix' => 'laravel:'],
+                'timeout' => 0.5,
+            ],
+        ]);
 
-            $persistentPhpRedis = new RedisManager(new Application, 'phpredis', [
-                'cluster' => false,
-                'default' => [
-                    'host' => $host,
-                    'port' => $port,
-                    'database' => 6,
-                    'options' => ['prefix' => 'laravel:'],
-                    'timeout' => 0.5,
-                    'persistent' => true,
-                    'persistent_id' => 'laravel',
-                ],
-            ]);
+        $persistentPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 6,
+                'options' => ['prefix' => 'laravel:'],
+                'timeout' => 0.5,
+                'persistent' => true,
+                'persistent_id' => 'laravel',
+            ],
+        ]);
 
-            $connections[] = $prefixedPhpredis->connection();
-            $connections['persistent'] = $persistentPhpRedis->connection();
-        }
+        $serializerPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 7,
+                'options' => ['serializer' => Redis::SERIALIZER_JSON],
+                'timeout' => 0.5,
+            ],
+        ]);
+
+        $scanRetryPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 8,
+                'options' => ['scan' => Redis::SCAN_RETRY],
+                'timeout' => 0.5,
+            ],
+        ]);
+
+        $connections[] = $prefixedPhpredis->connection();
+        $connections[] = $serializerPhpRedis->connection();
+        $connections[] = $scanRetryPhpRedis->connection();
+        $connections['persistent'] = $persistentPhpRedis->connection();
 
         return $connections;
     }

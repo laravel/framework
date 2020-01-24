@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class PostTooLargeException extends HttpException
 {
     /**
-     * PostTooLargeException constructor.
+     * Create a new "post too large" exception instance.
      *
      * @param  string|null  $message
      * @param  \Exception|null  $previous

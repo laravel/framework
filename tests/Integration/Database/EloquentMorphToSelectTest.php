@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToSelectTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -31,14 +31,14 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($post)->save();
     }
 
-    public function test_select()
+    public function testSelect()
     {
         $comments = Comment::with('commentable:id')->get();
 
         $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
     }
 
-    public function test_select_raw()
+    public function testSelectRaw()
     {
         $comments = Comment::with(['commentable' => function ($query) {
             $query->selectRaw('id');
@@ -47,7 +47,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
         $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
     }
 
-    public function test_select_sub()
+    public function testSelectSub()
     {
         $comments = Comment::with(['commentable' => function ($query) {
             $query->selectSub(function ($query) {
@@ -58,7 +58,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
         $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
     }
 
-    public function test_add_select()
+    public function testAddSelect()
     {
         $comments = Comment::with(['commentable' => function ($query) {
             $query->addSelect('id');
@@ -67,7 +67,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
         $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
     }
 
-    public function test_lazy_loading()
+    public function testLazyLoading()
     {
         $comment = Comment::first();
         $post = $comment->commentable()->select('id')->first();
