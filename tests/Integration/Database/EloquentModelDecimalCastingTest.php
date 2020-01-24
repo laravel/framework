@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelDecimalCastingTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -23,21 +23,21 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         });
     }
 
-    public function test_decimals_are_castable()
+    public function testDecimalsAreCastable()
     {
         $user = TestModel1::create([
             'decimal_field_2' => '12',
             'decimal_field_4' => '1234',
         ]);
 
-        $this->assertEquals('12.00', $user->toArray()['decimal_field_2']);
-        $this->assertEquals('1234.0000', $user->toArray()['decimal_field_4']);
+        $this->assertSame('12.00', $user->toArray()['decimal_field_2']);
+        $this->assertSame('1234.0000', $user->toArray()['decimal_field_4']);
 
         $user->decimal_field_2 = 12;
         $user->decimal_field_4 = '1234';
 
-        $this->assertEquals('12.00', $user->toArray()['decimal_field_2']);
-        $this->assertEquals('1234.0000', $user->toArray()['decimal_field_4']);
+        $this->assertSame('12.00', $user->toArray()['decimal_field_2']);
+        $this->assertSame('1234.0000', $user->toArray()['decimal_field_4']);
 
         $this->assertFalse($user->isDirty());
 

@@ -3,11 +3,11 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
-use JsonSerializable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use JsonSerializable;
 
-class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
+class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
     /**
      * All of the attributes set on the fluent instance.
@@ -33,7 +33,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      * Get an attribute from the fluent instance.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -112,7 +112,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      * Set the value at the given offset.
      *
      * @param  string  $offset
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function offsetSet($offset, $value)
@@ -135,7 +135,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      * Handle dynamic calls to the fluent instance to set attributes.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return $this
      */
     public function __call($method, $parameters)
@@ -160,7 +160,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      * Dynamically set the value of an attribute.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return void
      */
     public function __set($key, $value)

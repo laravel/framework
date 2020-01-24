@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Queue\QueueManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Queue\QueueManager;
-use Illuminate\Contracts\Encryption\Encrypter;
+use stdClass;
 
 class QueueManagerTest extends TestCase
 {

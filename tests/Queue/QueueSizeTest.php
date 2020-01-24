@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Queue;
+use Orchestra\Testbench\TestCase;
 
 class QueueSizeTest extends TestCase
 {

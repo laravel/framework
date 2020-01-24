@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class DatabaseNotification extends Model
 {
     /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
      * Indicates if the IDs are auto-incrementing.
      *
      * @var bool
@@ -39,6 +46,8 @@ class DatabaseNotification extends Model
 
     /**
      * Get the notifiable entity that the notification belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function notifiable()
     {

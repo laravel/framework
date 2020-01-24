@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Eloquent;
 
 use Faker\Generator as Faker;
-use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class FactoryBuilder
 {
@@ -191,6 +191,19 @@ class FactoryBuilder
     }
 
     /**
+     * Create a collection of models and persist them to the database.
+     *
+     * @param iterable  $records
+     * @return mixed
+     */
+    public function createMany(iterable $records)
+    {
+        return (new $this->class)->newCollection(array_map(function ($attribute) {
+            return $this->create($attribute);
+        }, $records));
+    }
+
+    /**
      * Set the connection name on the results and store them.
      *
      * @param  \Illuminate\Support\Collection  $results
@@ -344,10 +357,7 @@ class FactoryBuilder
             return $stateAttributes;
         }
 
-        return call_user_func(
-            $stateAttributes,
-            $this->faker, $attributes
-        );
+        return $stateAttributes($this->faker, $attributes);
     }
 
     /**

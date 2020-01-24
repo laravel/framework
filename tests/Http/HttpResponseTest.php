@@ -2,22 +2,22 @@
 
 namespace Illuminate\Tests\Http;
 
-use Mockery as m;
-use JsonSerializable;
 use BadMethodCallException;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\MessageProvider;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Session\Store;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Renderable;
+use JsonSerializable;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderBag;
-use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HttpResponseTest extends TestCase
@@ -30,33 +30,33 @@ class HttpResponseTest extends TestCase
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new Response(new ArrayableStub);
-        $this->assertEquals('{"foo":"bar"}', $response->getContent());
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
         $response = new Response(new JsonableStub);
-        $this->assertEquals('foo', $response->getContent());
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('foo', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
         $response = new Response(new ArrayableAndJsonableStub);
-        $this->assertEquals('{"foo":"bar"}', $response->getContent());
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
         $response = new Response;
         $response->setContent(['foo' => 'bar']);
-        $this->assertEquals('{"foo":"bar"}', $response->getContent());
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
         $response = new Response(new JsonSerializableStub);
-        $this->assertEquals('{"foo":"bar"}', $response->getContent());
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
         $response = new Response(new ArrayableStub);
-        $this->assertEquals('{"foo":"bar"}', $response->getContent());
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
         $response->setContent('{"foo": "bar"}');
-        $this->assertEquals('{"foo": "bar"}', $response->getContent());
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{"foo": "bar"}', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
     }
 
     public function testRenderablesAreRendered()
@@ -64,7 +64,7 @@ class HttpResponseTest extends TestCase
         $mock = m::mock(Renderable::class);
         $mock->shouldReceive('render')->once()->andReturn('foo');
         $response = new Response($mock);
-        $this->assertEquals('foo', $response->getContent());
+        $this->assertSame('foo', $response->getContent());
     }
 
     public function testHeader()
@@ -72,11 +72,11 @@ class HttpResponseTest extends TestCase
         $response = new Response;
         $this->assertNull($response->headers->get('foo'));
         $response->header('foo', 'bar');
-        $this->assertEquals('bar', $response->headers->get('foo'));
+        $this->assertSame('bar', $response->headers->get('foo'));
         $response->header('foo', 'baz', false);
-        $this->assertEquals('bar', $response->headers->get('foo'));
+        $this->assertSame('bar', $response->headers->get('foo'));
         $response->header('foo', 'baz');
-        $this->assertEquals('baz', $response->headers->get('foo'));
+        $this->assertSame('baz', $response->headers->get('foo'));
     }
 
     public function testWithCookie()
@@ -86,8 +86,8 @@ class HttpResponseTest extends TestCase
         $this->assertEquals($response, $response->withCookie(new Cookie('foo', 'bar')));
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
-        $this->assertEquals('foo', $cookies[0]->getName());
-        $this->assertEquals('bar', $cookies[0]->getValue());
+        $this->assertSame('foo', $cookies[0]->getName());
+        $this->assertSame('bar', $cookies[0]->getValue());
     }
 
     public function testGetOriginalContent()

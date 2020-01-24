@@ -2,11 +2,11 @@
 
 namespace Illuminate\Http;
 
-use JsonSerializable;
-use InvalidArgumentException;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use JsonSerializable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
 class JsonResponse extends BaseJsonResponse
@@ -19,9 +19,9 @@ class JsonResponse extends BaseJsonResponse
      * Constructor.
      *
      * @param  mixed  $data
-     * @param  int    $status
+     * @param  int  $status
      * @param  array  $headers
-     * @param  int    $options
+     * @param  int  $options
      * @return void
      */
     public function __construct($data = null, $status = 200, $headers = [], $options = 0)

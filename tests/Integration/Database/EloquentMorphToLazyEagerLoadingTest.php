@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToLazyEagerLoadingTest;
 
 use DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -46,7 +46,7 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($video)->save();
     }
 
-    public function test_lazy_eager_loading()
+    public function testLazyEagerLoading()
     {
         $comments = Comment::all();
 

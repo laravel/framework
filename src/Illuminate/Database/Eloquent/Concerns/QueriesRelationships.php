@@ -3,25 +3,27 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
-use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 trait QueriesRelationships
 {
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  string|\Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|string  $relation
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
+     *
+     * @throws \RuntimeException
      */
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
     {
@@ -67,7 +69,7 @@ trait QueriesRelationships
      *
      * @param  string  $relations
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -100,7 +102,7 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orHas($relation, $operator = '>=', $count = 1)
@@ -138,7 +140,7 @@ trait QueriesRelationships
      * @param  string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $operator
-     * @param  int     $count
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
@@ -149,10 +151,10 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string    $relation
+     * @param  string  $relation
      * @param  \Closure  $callback
-     * @param  string    $operator
-     * @param  int       $count
+     * @param  string  $operator
+     * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
@@ -175,7 +177,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string    $relation
+     * @param  string  $relation
      * @param  \Closure  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
@@ -220,8 +222,8 @@ trait QueriesRelationships
                         };
                     }
 
-                    $query->where($relation->getMorphType(), '=', (new $type)->getMorphClass())
-                        ->whereHas($belongsTo, $callback, $operator, $count);
+                    $query->where($this->query->from.'.'.$relation->getMorphType(), '=', (new $type)->getMorphClass())
+                                ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
         }, null, null, $boolean);
@@ -390,6 +392,8 @@ trait QueriesRelationships
 
             if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
+
+                $query->bindings['select'] = [];
             }
 
             // Finally we will add the proper result column alias to the query and run the subselect
@@ -445,7 +449,7 @@ trait QueriesRelationships
     /**
      * Add a sub-query count clause to this query.
      *
-     * @param  \Illuminate\Database\Query\Builder $query
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean

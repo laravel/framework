@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use stdClass;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Builder;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseSchemaBuilderTest extends TestCase
 {

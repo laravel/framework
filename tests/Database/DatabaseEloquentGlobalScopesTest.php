@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Capsule\Manager as DB;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
 {
@@ -32,7 +32,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $model = new EloquentGlobalScopesTestModel;
         $query = $model->newQuery();
-        $this->assertEquals('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
         $this->assertEquals([1], $query->getBindings());
     }
 
@@ -40,7 +40,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $model = new EloquentGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScope(ActiveScope::class);
-        $this->assertEquals('select * from "table"', $query->toSql());
+        $this->assertSame('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
 
@@ -48,7 +48,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery();
-        $this->assertEquals('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
+        $this->assertSame('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals([1], $query->getBindings());
     }
 
@@ -56,7 +56,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScope('active_scope');
-        $this->assertEquals('select * from "table" order by "name" asc', $query->toSql());
+        $this->assertSame('select * from "table" order by "name" asc', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
 
@@ -64,11 +64,11 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery();
-        $this->assertEquals('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
+        $this->assertSame('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals([1], $query->getBindings());
 
         $query->withoutGlobalScope('active_scope');
-        $this->assertEquals('select * from "table" order by "name" asc', $query->toSql());
+        $this->assertSame('select * from "table" order by "name" asc', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
 
@@ -76,11 +76,11 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScopes();
-        $this->assertEquals('select * from "table"', $query->toSql());
+        $this->assertSame('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
 
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes();
-        $this->assertEquals('select * from "table"', $query->toSql());
+        $this->assertSame('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
     }
 
@@ -89,11 +89,11 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentClosureGlobalScopesWithOrTestModel;
 
         $query = $model->newQuery();
-        $this->assertEquals('select "email", "password" from "table" where ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertSame('select "email", "password" from "table" where ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals(['taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
 
         $query = $model->newQuery()->where('col1', 'val1')->orWhere('col2', 'val2');
-        $this->assertEquals('select "email", "password" from "table" where ("col1" = ? or "col2" = ?) and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
+        $this->assertSame('select "email", "password" from "table" where ("col1" = ? or "col2" = ?) and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
     }
 
@@ -101,7 +101,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->approved();
 
-        $this->assertEquals('select * from "table" where ("foo" = ? or "bar" = ?) and ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertSame('select * from "table" where ("foo" = ? or "bar" = ?) and ("approved" = ? or "should_approve" = ?)', $query->toSql());
         $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
     }
 
@@ -109,7 +109,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->orApproved();
 
-        $this->assertEquals('select * from "table" where ("foo" = ? or "bar" = ?) or ("approved" = ? or "should_approve" = ?)', $query->toSql());
+        $this->assertSame('select * from "table" where ("foo" = ? or "bar" = ?) or ("approved" = ? or "should_approve" = ?)', $query->toSql());
         $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
     }
 

@@ -3,12 +3,13 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class SendQueuedNotifications implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * The notifiable entities that should receive the notification.
@@ -108,6 +109,20 @@ class SendQueuedNotifications implements ShouldQueue
         }
 
         return $this->notification->retryAfter ?? $this->notification->retryAfter();
+    }
+
+    /**
+     * Get the expiration for the notification.
+     *
+     * @return mixed
+     */
+    public function retryUntil()
+    {
+        if (! method_exists($this->notification, 'retryUntil') && ! isset($this->notification->timeoutAt)) {
+            return;
+        }
+
+        return $this->notification->timeoutAt ?? $this->notification->retryUntil();
     }
 
     /**

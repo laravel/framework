@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Queue;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -36,7 +36,7 @@ class JobChainingTest extends TestCase
         JobChainingTestThirdJob::$ran = false;
     }
 
-    public function test_jobs_can_be_chained_on_success()
+    public function testJobsCanBeChainedOnSuccess()
     {
         JobChainingTestFirstJob::dispatch()->chain([
             new JobChainingTestSecondJob,
@@ -46,7 +46,7 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
-    public function test_jobs_can_be_chained_on_success_using_pending_chain()
+    public function testJobsCanBeChainedOnSuccessUsingPendingChain()
     {
         JobChainingTestFirstJob::withChain([
             new JobChainingTestSecondJob,
@@ -56,7 +56,7 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
-    public function test_jobs_chained_on_explicit_delete()
+    public function testJobsChainedOnExplicitDelete()
     {
         JobChainingTestDeletingJob::dispatch()->chain([
             new JobChainingTestSecondJob,
@@ -66,7 +66,7 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
-    public function test_jobs_can_be_chained_on_success_with_several_jobs()
+    public function testJobsCanBeChainedOnSuccessWithSeveralJobs()
     {
         JobChainingTestFirstJob::dispatch()->chain([
             new JobChainingTestSecondJob,
@@ -78,7 +78,7 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestThirdJob::$ran);
     }
 
-    public function test_jobs_can_be_chained_on_success_using_helper()
+    public function testJobsCanBeChainedOnSuccessUsingHelper()
     {
         dispatch(new JobChainingTestFirstJob)->chain([
             new JobChainingTestSecondJob,
@@ -88,7 +88,7 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
-    public function test_jobs_can_be_chained_via_queue()
+    public function testJobsCanBeChainedViaQueue()
     {
         Queue::connection('sync')->push((new JobChainingTestFirstJob)->chain([
             new JobChainingTestSecondJob,
@@ -98,7 +98,7 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
-    public function test_second_job_is_not_fired_if_first_failed()
+    public function testSecondJobIsNotFiredIfFirstFailed()
     {
         Queue::connection('sync')->push((new JobChainingTestFailingJob)->chain([
             new JobChainingTestSecondJob,
@@ -107,7 +107,7 @@ class JobChainingTest extends TestCase
         $this->assertFalse(JobChainingTestSecondJob::$ran);
     }
 
-    public function test_second_job_is_not_fired_if_first_released()
+    public function testSecondJobIsNotFiredIfFirstReleased()
     {
         Queue::connection('sync')->push((new JobChainingTestReleasingJob)->chain([
             new JobChainingTestSecondJob,
@@ -116,7 +116,7 @@ class JobChainingTest extends TestCase
         $this->assertFalse(JobChainingTestSecondJob::$ran);
     }
 
-    public function test_third_job_is_not_fired_if_second_fails()
+    public function testThirdJobIsNotFiredIfSecondFails()
     {
         Queue::connection('sync')->push((new JobChainingTestFirstJob)->chain([
             new JobChainingTestFailingJob,
@@ -127,52 +127,52 @@ class JobChainingTest extends TestCase
         $this->assertFalse(JobChainingTestThirdJob::$ran);
     }
 
-    public function test_chain_jobs_use_same_config()
+    public function testChainJobsUseSameConfig()
     {
         JobChainingTestFirstJob::dispatch()->allOnQueue('some_queue')->allOnConnection('sync1')->chain([
             new JobChainingTestSecondJob,
             new JobChainingTestThirdJob,
         ]);
 
-        $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
 
-        $this->assertEquals('some_queue', JobChainingTestSecondJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestSecondJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestSecondJob::$usedConnection);
 
-        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestThirdJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestThirdJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestThirdJob::$usedConnection);
     }
 
-    public function test_chain_jobs_use_own_config()
+    public function testChainJobsUseOwnConfig()
     {
         JobChainingTestFirstJob::dispatch()->allOnQueue('some_queue')->allOnConnection('sync1')->chain([
             (new JobChainingTestSecondJob)->onQueue('another_queue')->onConnection('sync2'),
             new JobChainingTestThirdJob,
         ]);
 
-        $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
 
-        $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
-        $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
+        $this->assertSame('another_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertSame('sync2', JobChainingTestSecondJob::$usedConnection);
 
-        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestThirdJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestThirdJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestThirdJob::$usedConnection);
     }
 
-    public function test_chain_jobs_use_default_config()
+    public function testChainJobsUseDefaultConfig()
     {
         JobChainingTestFirstJob::dispatch()->onQueue('some_queue')->onConnection('sync1')->chain([
             (new JobChainingTestSecondJob)->onQueue('another_queue')->onConnection('sync2'),
             new JobChainingTestThirdJob,
         ]);
 
-        $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
-        $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+        $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
+        $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
 
-        $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
-        $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
+        $this->assertSame('another_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertSame('sync2', JobChainingTestSecondJob::$usedConnection);
 
         $this->assertNull(JobChainingTestThirdJob::$usedQueue);
         $this->assertNull(JobChainingTestThirdJob::$usedConnection);

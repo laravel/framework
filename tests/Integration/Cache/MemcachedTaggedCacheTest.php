@@ -9,21 +9,21 @@ use Illuminate\Support\Facades\Cache;
  */
 class MemcachedTaggedCacheTest extends MemcachedIntegrationTest
 {
-    public function test_memcached_can_store_and_retrieve_tagged_cache_items()
+    public function testMemcachedCanStoreAndRetrieveTaggedCacheItems()
     {
         $store = Cache::store('memcached');
 
         $store->tags(['people', 'artists'])->put('John', 'foo', 1);
         $store->tags(['people', 'authors'])->put('Anne', 'bar', 1);
 
-        $this->assertEquals('foo', $store->tags(['people', 'artists'])->get('John'));
-        $this->assertEquals('bar', $store->tags(['people', 'authors'])->get('Anne'));
+        $this->assertSame('foo', $store->tags(['people', 'artists'])->get('John'));
+        $this->assertSame('bar', $store->tags(['people', 'authors'])->get('Anne'));
 
         $store->tags(['people', 'artists'])->put('John', 'baz');
         $store->tags(['people', 'authors'])->put('Anne', 'qux');
 
-        $this->assertEquals('baz', $store->tags(['people', 'artists'])->get('John'));
-        $this->assertEquals('qux', $store->tags(['people', 'authors'])->get('Anne'));
+        $this->assertSame('baz', $store->tags(['people', 'artists'])->get('John'));
+        $this->assertSame('qux', $store->tags(['people', 'authors'])->get('Anne'));
 
         $store->tags('authors')->flush();
         $this->assertNull($store->tags(['people', 'authors'])->get('Anne'));
@@ -32,19 +32,19 @@ class MemcachedTaggedCacheTest extends MemcachedIntegrationTest
         $this->assertNull($store->tags(['people', 'artists'])->get('John'));
     }
 
-    public function test_memcached_can_store_many_tagged_cache_items()
+    public function testMemcachedCanStoreManyTaggedCacheItems()
     {
         $store = Cache::store('memcached');
 
         $store->tags(['people', 'artists'])->putMany(['John' => 'foo', 'Jane' => 'bar'], 1);
 
-        $this->assertEquals('foo', $store->tags(['people', 'artists'])->get('John'));
-        $this->assertEquals('bar', $store->tags(['people', 'artists'])->get('Jane'));
+        $this->assertSame('foo', $store->tags(['people', 'artists'])->get('John'));
+        $this->assertSame('bar', $store->tags(['people', 'artists'])->get('Jane'));
 
         $store->tags(['people', 'artists'])->putMany(['John' => 'baz', 'Jane' => 'qux']);
 
-        $this->assertEquals('baz', $store->tags(['people', 'artists'])->get('John'));
-        $this->assertEquals('qux', $store->tags(['people', 'artists'])->get('Jane'));
+        $this->assertSame('baz', $store->tags(['people', 'artists'])->get('John'));
+        $this->assertSame('qux', $store->tags(['people', 'artists'])->get('Jane'));
 
         $store->tags(['people', 'artists'])->putMany(['John' => 'baz', 'Jane' => 'qux'], -1);
 

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Pagination\Paginator;
+use PHPUnit\Framework\TestCase;
 
 class PaginatorTest extends TestCase
 {
@@ -36,7 +36,7 @@ class PaginatorTest extends TestCase
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test/']);
 
-        $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
+        $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
@@ -44,7 +44,7 @@ class PaginatorTest extends TestCase
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test']);
 
-        $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
+        $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
     public function testItRetrievesThePaginatorOptions()
@@ -53,5 +53,13 @@ class PaginatorTest extends TestCase
             $options = ['path' => 'http://website.com/test']);
 
         $this->assertSame($p->getOptions(), $options);
+    }
+
+    public function testPaginatorReturnsPath()
+    {
+        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
+                                    ['path' => 'http://website.com/test']);
+
+        $this->assertSame($p->path(), 'http://website.com/test');
     }
 }

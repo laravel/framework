@@ -119,27 +119,33 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         if (! is_null($this->cachePath)) {
-            $contents = $this->compileString(
-                $this->files->get($this->getPath())
-            );
+            $contents = $this->compileString($this->files->get($this->getPath()));
 
             if (! empty($this->getPath())) {
-                $tokens = $this->getOpenAndClosingPhpTokens($contents);
-
-                // If the tokens we retrieved from the compiled contents have at least
-                // one opening tag and if that last token isn't the closing tag, we
-                // need to close the statement before adding the path at the end.
-                if ($tokens->isNotEmpty() && $tokens->last() !== T_CLOSE_TAG) {
-                    $contents .= ' ?>';
-                }
-
-                $contents .= "<?php /**PATH {$this->getPath()} ENDPATH**/ ?>";
+                $contents = $this->appendFilePath($contents);
             }
 
             $this->files->put(
                 $this->getCompiledPath($this->getPath()), $contents
             );
         }
+    }
+
+    /**
+     * Append the file path to the compiled string.
+     *
+     * @param  string  $contents
+     * @return string
+     */
+    protected function appendFilePath($contents)
+    {
+        $tokens = $this->getOpenAndClosingPhpTokens($contents);
+
+        if ($tokens->isNotEmpty() && $tokens->last() !== T_CLOSE_TAG) {
+            $contents .= ' ?>';
+        }
+
+        return $contents."<?php /**PATH {$this->getPath()} ENDPATH**/ ?>";
     }
 
     /**
@@ -151,7 +157,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function getOpenAndClosingPhpTokens($contents)
     {
         return collect(token_get_all($contents))
-            ->pluck($tokenNumber = 0)
+            ->pluck(0)
             ->filter(function ($token) {
                 return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
             });
@@ -186,17 +192,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileString($value)
     {
-        if (strpos($value, '@verbatim') !== false) {
-            $value = $this->storeVerbatimBlocks($value);
-        }
+        [$this->footer, $result] = [[], ''];
 
-        $this->footer = [];
-
-        if (strpos($value, '@php') !== false) {
-            $value = $this->storePhpBlocks($value);
-        }
-
-        $result = '';
+        $value = $this->storeUncompiledBlocks($value);
 
         // Here we will loop through all of the tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
@@ -217,6 +215,25 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Store the blocks that do not receive compilation.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function storeUncompiledBlocks($value)
+    {
+        if (strpos($value, '@verbatim') !== false) {
+            $value = $this->storeVerbatimBlocks($value);
+        }
+
+        if (strpos($value, '@php') !== false) {
+            $value = $this->storePhpBlocks($value);
+        }
+
+        return $value;
     }
 
     /**
@@ -326,7 +343,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileExtensions($value)
     {
         foreach ($this->extensions as $compiler) {
-            $value = call_user_func($compiler, $value, $this);
+            $value = $compiler($value, $this);
         }
 
         return $value;
@@ -435,6 +452,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
                     : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
+        $this->directive('unless'.$name, function ($expression) use ($name) {
+            return $expression !== ''
+                ? "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
+                : "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+        });
+
         $this->directive('else'.$name, function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
@@ -504,6 +527,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $name
      * @param  callable  $handler
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function directive($name, callable $handler)
     {

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Notifications\Dispatcher;
+use Illuminate\Support\Str;
 
 trait RoutesNotifications
 {
@@ -48,8 +48,6 @@ trait RoutesNotifications
                 return $this->notifications();
             case 'mail':
                 return $this->email;
-            case 'nexmo':
-                return $this->phone_number;
         }
     }
 }

@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Mailable;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\View;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

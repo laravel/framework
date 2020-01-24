@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Mockery as m;
-use Illuminate\View\Factory;
 use Illuminate\Mail\Markdown;
+use Illuminate\View\Factory;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
@@ -21,7 +21,7 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
-        $viewFactory->shouldReceive('make')->with('mail::themes.default')->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail::themes.default', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
         $result = $markdown->render('view', []);
@@ -37,7 +37,7 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
-        $viewFactory->shouldReceive('make')->with('mail::themes.yaz')->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail::themes.yaz', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
         $result = $markdown->render('view', []);
@@ -54,9 +54,9 @@ class MailMarkdownTest extends TestCase
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->andReturn('text');
 
-        $result = $markdown->renderText('view', []);
+        $result = $markdown->renderText('view', [])->toHtml();
 
-        $this->assertEquals('text', $result);
+        $this->assertSame('text', $result);
     }
 
     public function testParseReturnsParsedMarkdown()
@@ -64,8 +64,8 @@ class MailMarkdownTest extends TestCase
         $viewFactory = m::mock(Factory::class);
         $markdown = new Markdown($viewFactory);
 
-        $result = $markdown->parse('# Something');
+        $result = $markdown->parse('# Something')->toHtml();
 
-        $this->assertEquals('<h1>Something</h1>', $result);
+        $this->assertSame("<h1>Something</h1>\n", $result);
     }
 }
