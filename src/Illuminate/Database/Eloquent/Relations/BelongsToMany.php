@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
+/**
+ * @method self withoutTrashed() Show only non-trashed records
+ * @method self withTrashed() Show all records
+ * @method self onlyTrashed() Show only trashed records
+ */
 class BelongsToMany extends Relation
 {
     use Concerns\InteractsWithPivotTable;
