@@ -34,9 +34,7 @@ trait ManagesTransactions
             // exception back out and let the developer handle an uncaught exceptions.
             catch (Exception $e) {
                 $this->handleTransactionException(
-                    $e,
-                    $currentAttempt,
-                    $attempts
+                    $e, $currentAttempt, $attempts
                 );
 
                 continue;
@@ -50,9 +48,7 @@ trait ManagesTransactions
                 $this->commit();
             } catch (Exception $e) {
                 $this->handleCommitTransactionException(
-                    $e,
-                    $currentAttempt,
-                    $attempts
+                    $e, $currentAttempt, $attempts
                 );
 
                 continue;
