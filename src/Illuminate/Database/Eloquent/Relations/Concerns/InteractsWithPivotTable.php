@@ -12,7 +12,7 @@ trait InteractsWithPivotTable
     /**
      * The cached copy of the currently attached pivot models.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Database\Eloquent\Collection
      */
     private $currentlyAttached;
 
