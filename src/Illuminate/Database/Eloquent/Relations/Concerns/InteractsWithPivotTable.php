@@ -12,9 +12,9 @@ trait InteractsWithPivotTable
     /**
      * The cached copy of the currently attached pivot models.
      *
-     * @var Collection
+     * @var \Illuminate\Support\Collection
      */
-    private $currentlyAttached;
+    protected $currentlyAttached;
 
     /**
      * Toggles a model (or models) from the parent.
