@@ -14,7 +14,7 @@ trait InteractsWithPivotTable
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $currentlyAttached;
+    private $currentlyAttached;
 
     /**
      * Toggles a model (or models) from the parent.
