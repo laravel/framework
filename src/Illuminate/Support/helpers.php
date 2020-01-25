@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
 
@@ -302,6 +304,19 @@ if (! function_exists('last')) {
     function last($array)
     {
         return end($array);
+    }
+}
+
+if (! function_exists('listen')) {
+    /**
+     * Dump executed queries
+     *
+     * @return void
+     */
+    function listen() {
+        DB::listen(function (QueryExecuted $query) {
+            dump(vsprintf(str_replace('?', '%s', $query->sql), $query->bindings));
+        });
     }
 }
 
