@@ -1125,7 +1125,7 @@ class Validator implements ValidatorContract
      * @param  callable|null  $formatter
      * @return $this
      */
-    public function setImplicitAttributesFormatter($formatter)
+    public function setImplicitAttributesFormatter(callable $formatter = null)
     {
         $this->implicitAttributesFormatter = $formatter;
 
