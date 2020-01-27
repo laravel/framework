@@ -35,7 +35,12 @@ class SqlServerGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from sysobjects where type = 'U' and name = ?";
+        return "
+                DECLARE @table nvarchar(255) = ?
+                select objects.*
+                from sys.objects
+                inner join sys.schemas on objects.schema_id = schemas.schema_id
+                where objects.type = 'U' and ( schemas.name + '.' + objects.name = @table or objects.name = @table )";
     }
 
     /**
@@ -46,7 +51,8 @@ class SqlServerGrammar extends Grammar
      */
     public function compileColumnListing($table)
     {
-        return "select col.name from sys.columns as col
+        return "select col.name
+                from sys.columns as col
                 join sys.objects as obj on col.object_id = obj.object_id
                 where obj.type = 'U' and obj.name = '$table'";
     }
