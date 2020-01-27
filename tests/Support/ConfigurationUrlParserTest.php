@@ -352,6 +352,23 @@ class ConfigurationUrlParserTest extends TestCase
                     'password' => 'asdfqwer1234asdf',
                 ],
             ],
+            'Redis example where URL ends with "/" and database is not present'  => [
+                [
+                    'url' => 'redis://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111/',
+                    'host' => '127.0.0.1',
+                    'password' =>  null,
+                    'port' =>  6379,
+                    'database' => 2,
+                ],
+                [
+                    'driver' => 'redis',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 2,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
         ];
     }
 }
