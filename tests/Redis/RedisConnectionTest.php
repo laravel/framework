@@ -9,6 +9,8 @@ use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Predis\Client;
+use Redis;
 
 class RedisConnectionTest extends TestCase
 {
@@ -547,6 +549,62 @@ class RedisConnectionTest extends TestCase
         );
     }
 
+    public function testItScansForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $initialKeys = ['test:scan:1', 'test:scan:2'];
+
+            foreach ($initialKeys as $k => $key) {
+                $redis->set($key, 'test');
+                $initialKeys[$k] = $this->getPrefix($redis->client()).$key;
+            }
+
+            $iterator = null;
+
+            do {
+                [$cursor, $returnedKeys] = $redis->scan($iterator);
+
+                if (! is_array($returnedKeys)) {
+                    $returnedKeys = [$returnedKeys];
+                }
+
+                foreach ($returnedKeys as $returnedKey) {
+                    $this->assertTrue(in_array($returnedKey, $initialKeys));
+                }
+            } while ($iterator > 0);
+
+            $redis->flushAll();
+        }
+    }
+
+    public function testPhpRedisScanOption()
+    {
+        foreach ($this->connections() as $redis) {
+            if ($redis->client() instanceof Client) {
+                continue;
+            }
+
+            $iterator = null;
+
+            do {
+                $returned = $redis->scan($iterator);
+
+                if ($redis->client()->getOption(Redis::OPT_SCAN) === Redis::SCAN_RETRY) {
+                    $this->assertEmpty($returned);
+                }
+            } while ($iterator > 0);
+        }
+    }
+
+    private function getPrefix($client)
+    {
+        if ($client instanceof Redis) {
+            return $client->getOption(Redis::OPT_PREFIX);
+        }
+
+        return $client->getOptions()->prefix;
+    }
+
     public function testMacroable()
     {
         Connection::macro('foo', function () {
@@ -596,7 +654,31 @@ class RedisConnectionTest extends TestCase
             ],
         ]);
 
+        $serializerPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 7,
+                'options' => ['serializer' => Redis::SERIALIZER_JSON],
+                'timeout' => 0.5,
+            ],
+        ]);
+
+        $scanRetryPhpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 8,
+                'options' => ['scan' => Redis::SCAN_RETRY],
+                'timeout' => 0.5,
+            ],
+        ]);
+
         $connections[] = $prefixedPhpredis->connection();
+        $connections[] = $serializerPhpRedis->connection();
+        $connections[] = $scanRetryPhpRedis->connection();
         $connections['persistent'] = $persistentPhpRedis->connection();
 
         return $connections;

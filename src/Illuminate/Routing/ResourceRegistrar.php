@@ -230,6 +230,8 @@ class ResourceRegistrar
      */
     protected function addResourceShow($name, $base, $controller, $options)
     {
+        $name = $this->getShallowName($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'show', $options);
@@ -248,6 +250,8 @@ class ResourceRegistrar
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
+        $name = $this->getShallowName($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
@@ -266,6 +270,8 @@ class ResourceRegistrar
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
     {
+        $name = $this->getShallowName($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'update', $options);
@@ -284,11 +290,27 @@ class ResourceRegistrar
      */
     protected function addResourceDestroy($name, $base, $controller, $options)
     {
+        $name = $this->getShallowName($name, $options);
+
         $uri = $this->getResourceUri($name).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
         return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Get the name for a given resource with shallowness applied when applicable.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @return string
+     */
+    protected function getShallowName($name, $options)
+    {
+        return isset($options['shallow']) && $options['shallow']
+                    ? last(explode('.', $name))
+                    : $name;
     }
 
     /**
