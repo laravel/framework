@@ -240,12 +240,18 @@ class Validator implements ValidatorContract
      *
      * @param  array  $data
      * @return array
+     *
+     * @throws \Illuminate\Validation\InvalidDataException
      */
     public function parseData(array $data)
     {
         $newData = [];
 
         foreach ($data as $key => $value) {
+            if ($key === '*') {
+                throw InvalidDataException::asteriskUsage();
+            }
+
             if (is_array($value)) {
                 $value = $this->parseData($value);
             }

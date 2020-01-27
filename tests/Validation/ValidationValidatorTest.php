@@ -16,6 +16,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\InvalidDataException;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
@@ -5174,6 +5175,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($validator->fails());
         $this->assertSame(['cat' => 'Tom'], $validator->valid());
         $this->assertSame(['mouse' => null], $validator->invalid());
+    }
+
+    public function testValidateFailsWithAsterisksAsDataKeys()
+    {
+        $post = ['data' => [0 => ['date' => '2019-01-24'], 1 => ['date' => 'blah'], '*' => ['date' => 'blah']]];
+
+        $rules = [['data.*.date' => 'required|date']];
+
+        $this->expectException(InvalidDataException::class);
+
+        new Validator($this->getIlluminateArrayTranslator(), $post, $rules);
     }
 
     protected function getTranslator()
