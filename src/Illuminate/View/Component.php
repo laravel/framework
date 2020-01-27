@@ -63,7 +63,7 @@ abstract class Component implements Renderable
                 return [$method->getName() => $this->createVariableFromMethod($method)];
             });
 
-        return $publicProperties->merge($publicMethods)->toArray();
+        return $publicProperties->merge($publicMethods)->all();
     }
 
     /**
