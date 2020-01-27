@@ -100,7 +100,7 @@ class Validator implements ValidatorContract
     /**
      * The callback that should be used to format the attribute.
      *
-     * @var callable
+     * @var callable|null
      */
     protected $implicitAttributesFormatter;
 
@@ -1122,10 +1122,10 @@ class Validator implements ValidatorContract
     /**
      * Set the callback that used to format an implicit attribute..
      *
-     * @param  callable  $formatter
+     * @param  callable|null  $formatter
      * @return $this
      */
-    public function setImplicitAttributesFormatter(callable $formatter)
+    public function setImplicitAttributesFormatter($formatter)
     {
         $this->implicitAttributesFormatter = $formatter;
 

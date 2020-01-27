@@ -36,9 +36,9 @@ class ValidatorTest extends DatabaseTestCase
     {
         $translator = new Translator(new ArrayLoader, 'en');
         $translator->addLines(['validation.string' => ':attribute must be a string!'], 'en');
-        $validator = new Validator($translator, [['name' => 1]],  ['*.name' => 'string']);
+        $validator = new Validator($translator, [['name' => 1]], ['*.name' => 'string']);
 
-        $validator->setImplicitAttributesFormatter(function($attribute){
+        $validator->setImplicitAttributesFormatter(function ($attribute){
             [$line, $attribute] = explode('.', $attribute);
 
             return sprintf('%s at line %d', $attribute, $line + 1);
