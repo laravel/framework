@@ -209,11 +209,12 @@ class Arr
         $result = [];
 
         foreach ($array as $item) {
-            $item = $item instanceof Collection ? $item->all() : $item;
+            $isCollection = $item instanceof Collection;
 
-            if (! is_array($item)) {
+            if (!$isCollection && ! is_array($item)) {
                 $result[] = $item;
             } else {
+                $item = $isCollection ? $item->all() : $item;
                 $values = $depth === 1
                     ? array_values($item)
                     : static::flatten($item, $depth - 1);
