@@ -194,4 +194,16 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertTrue($wannabeOwner->acquire());
     }
+
+    public function testValuesAreNotStoredByReference()
+    {
+        $store = new ArrayStore;
+        $object = new \stdClass;
+        $object->foo = true;
+
+        $store->put('object', $object, 10);
+        $object->bar = true;
+
+        $this->assertObjectNotHasAttribute('bar', $store->get('object'));
+    }
 }
