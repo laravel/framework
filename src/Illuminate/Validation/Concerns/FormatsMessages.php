@@ -250,6 +250,10 @@ trait FormatsMessages
         // an implicit attribute we will display the raw attribute's name and not
         // modify it with any of these replacements before we display the name.
         if (isset($this->implicitAttributes[$primaryAttribute])) {
+            if ($formatter = $this->implicitAttributeFormatter) {
+                return $formatter($attribute);
+            }
+
             return $attribute;
         }
 
