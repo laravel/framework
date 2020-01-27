@@ -102,7 +102,7 @@ class Validator implements ValidatorContract
      *
      * @var callable
      */
-    protected $implicitAttributeFormatter;
+    protected $implicitAttributesFormatter;
 
     /**
      * The cached data for the "distinct" rule.
@@ -1125,9 +1125,9 @@ class Validator implements ValidatorContract
      * @param  callable  $formatter
      * @return $this
      */
-    public function setImplicitAttributeFormatter(callable $formatter)
+    public function setImplicitAttributesFormatter(callable $formatter)
     {
-        $this->implicitAttributeFormatter = $formatter;
+        $this->implicitAttributesFormatter = $formatter;
 
         return $this;
     }
