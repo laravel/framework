@@ -227,8 +227,8 @@ abstract class ServiceProvider
     /**
      * Get the paths to publish.
      *
-     * @param  string  $provider
-     * @param  string  $group
+     * @param  string|null  $provider
+     * @param  string|null  $group
      * @return array
      */
     public static function pathsToPublish($provider = null, $group = null)
