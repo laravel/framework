@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\Contracts\MiddlewareAwareController;
 
 class ControllerDispatcher implements ControllerDispatcherContract
 {
@@ -57,12 +58,12 @@ class ControllerDispatcher implements ControllerDispatcherContract
      */
     public function getMiddleware($controller, $method)
     {
-        if (! method_exists($controller, 'getMiddleware')) {
+        if (! $controller instanceof MiddlewareAwareController) {
             return [];
         }
 
         return collect($controller->getMiddleware())->reject(function ($data) use ($method) {
-            return static::methodExcludedByOptions($method, $data['options']);
+            return static::methodExcludedByOptions($method, $data['options'] ?? []);
         })->pluck('middleware')->all();
     }
 

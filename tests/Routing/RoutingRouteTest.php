@@ -16,6 +16,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Contracts\MiddlewareAwareController;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -309,6 +310,18 @@ class RoutingRouteTest extends TestCase
         });
         $action = $router->getRoutes()->getRoutes()[0]->getAction();
         $this->assertSame('App\\'.RouteTestControllerStub::class.'@index', $action['controller']);
+    }
+
+    public function testMiddlewareAwareRequestHandler()
+    {
+        unset($_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.middleware.class']);
+
+        $router = $this->getRouter();
+        $router->get('foo/bar')->uses(RouteTestHandlerStub::class);
+        $this->assertSame('Hello Handler', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $this->assertTrue($_SERVER['route.test.controller.middleware']);
+        $this->assertSame($_SERVER['route.test.controller.middleware.class'], Response::class);
     }
 
     public function testMiddlewareGroups()
@@ -1765,6 +1778,21 @@ class RouteTestControllerStub extends Controller
     public function index()
     {
         return 'Hello World';
+    }
+}
+
+class RouteTestHandlerStub implements MiddlewareAwareController
+{
+    public function getMiddleware()
+    {
+        return [
+            ['middleware' => RouteTestControllerMiddleware::class],
+        ];
+    }
+
+    public function __invoke()
+    {
+        return 'Hello Handler';
     }
 }
 

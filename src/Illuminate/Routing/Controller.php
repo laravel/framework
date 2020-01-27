@@ -3,8 +3,9 @@
 namespace Illuminate\Routing;
 
 use BadMethodCallException;
+use Illuminate\Routing\Contracts\MiddlewareAwareController;
 
-abstract class Controller
+abstract class Controller implements MiddlewareAwareController
 {
     /**
      * The middleware registered on the controller.
