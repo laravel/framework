@@ -402,10 +402,10 @@ trait EnumeratesValues
     /**
      * Apply the callback if the value is truthy.
      *
-     * @param  bool|mixed  $value
+     * @param  mixed  $value
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function when($value, callable $callback, callable $default = null)
     {
@@ -423,7 +423,7 @@ trait EnumeratesValues
      *
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function whenEmpty(callable $callback, callable $default = null)
     {
@@ -435,7 +435,7 @@ trait EnumeratesValues
      *
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function whenNotEmpty(callable $callback, callable $default = null)
     {
@@ -448,7 +448,7 @@ trait EnumeratesValues
      * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function unless($value, callable $callback, callable $default = null)
     {
@@ -460,7 +460,7 @@ trait EnumeratesValues
      *
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function unlessEmpty(callable $callback, callable $default = null)
     {
@@ -472,7 +472,7 @@ trait EnumeratesValues
      *
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function unlessNotEmpty(callable $callback, callable $default = null)
     {
@@ -628,7 +628,7 @@ trait EnumeratesValues
     /**
      * Create a collection of all elements that do not pass a given truth test.
      *
-     * @param  callable|mixed  $callback
+     * @param  mixed  $callback
      * @return static
      */
     public function reject($callback = true)

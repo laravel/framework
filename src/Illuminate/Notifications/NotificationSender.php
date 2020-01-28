@@ -64,7 +64,7 @@ class NotificationSender
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  mixed  $notifiables
      * @param  mixed  $notification
      * @return void
      */
@@ -82,7 +82,7 @@ class NotificationSender
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  mixed  $notifiables
      * @param  mixed  $notification
      * @param  array|null  $channels
      * @return void

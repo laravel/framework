@@ -249,7 +249,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function when($value, callable $callback, callable $default = null);
 
@@ -258,7 +258,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function whenEmpty(callable $callback, callable $default = null);
 
@@ -267,7 +267,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function whenNotEmpty(callable $callback, callable $default = null);
 
@@ -277,7 +277,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function unless($value, callable $callback, callable $default = null);
 
@@ -286,7 +286,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function unlessEmpty(callable $callback, callable $default = null);
 
@@ -295,7 +295,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  callable  $callback
      * @param  callable  $default
-     * @return static|mixed
+     * @return mixed
      */
     public function unlessNotEmpty(callable $callback, callable $default = null);
 
@@ -664,7 +664,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @return static|mixed
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -840,7 +840,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Create a collection of all elements that do not pass a given truth test.
      *
-     * @param  callable|mixed  $callback
+     * @param  mixed  $callback
      * @return static
      */
     public function reject($callback = true);

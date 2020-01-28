@@ -9,7 +9,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static mixed dispatch($command)
  * @method static mixed dispatchNow($command, $handler = null)
  * @method static bool hasCommandHandler($command)
- * @method static bool|mixed getCommandHandler($command)
+ * @method static mixed getCommandHandler($command)
  * @method static \Illuminate\Contracts\Bus\Dispatcher pipeThrough(array $pipes)
  * @method static \Illuminate\Contracts\Bus\Dispatcher map(array $map)
  * @method static void assertDispatched(string $command, callable|int $callback = null)

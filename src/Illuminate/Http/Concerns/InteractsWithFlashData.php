@@ -29,7 +29,7 @@ trait InteractsWithFlashData
     /**
      * Flash only some of the input to the session.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return void
      */
     public function flashOnly($keys)
@@ -42,7 +42,7 @@ trait InteractsWithFlashData
     /**
      * Flash only some of the input to the session.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return void
      */
     public function flashExcept($keys)

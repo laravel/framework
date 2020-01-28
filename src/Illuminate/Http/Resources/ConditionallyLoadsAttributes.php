@@ -97,7 +97,7 @@ trait ConditionallyLoadsAttributes
      * @param  bool  $condition
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     * @return mixed
      */
     protected function when($condition, $value, $default = null)
     {
@@ -112,7 +112,7 @@ trait ConditionallyLoadsAttributes
      * Merge a value into the array.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Http\Resources\MergeValue|mixed
+     * @return \Illuminate\Http\Resources\MergeValue|\Illuminate\Http\Resources\MissingValue
      */
     protected function merge($value)
     {
@@ -124,7 +124,7 @@ trait ConditionallyLoadsAttributes
      *
      * @param  bool  $condition
      * @param  mixed  $value
-     * @return \Illuminate\Http\Resources\MergeValue|mixed
+     * @return \Illuminate\Http\Resources\MergeValue|\Illuminate\Http\Resources\MissingValue
      */
     protected function mergeWhen($condition, $value)
     {
@@ -150,7 +150,7 @@ trait ConditionallyLoadsAttributes
      * @param  string  $relationship
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     * @return mixed
      */
     protected function whenLoaded($relationship, $value = null, $default = null)
     {
@@ -179,7 +179,7 @@ trait ConditionallyLoadsAttributes
      * @param  string  $table
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     * @return mixed
      */
     protected function whenPivotLoaded($table, $value, $default = null)
     {
@@ -193,7 +193,7 @@ trait ConditionallyLoadsAttributes
      * @param  string  $table
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     * @return mixed
      */
     protected function whenPivotLoadedAs($accessor, $table, $value, $default = null)
     {

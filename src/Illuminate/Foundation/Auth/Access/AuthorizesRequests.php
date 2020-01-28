@@ -26,7 +26,7 @@ trait AuthorizesRequests
     /**
      * Authorize a given action for a user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  mixed  $ability
      * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response

@@ -7,8 +7,8 @@ use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 /**
- * @method static void send(\Illuminate\Support\Collection|array|mixed $notifiables, $notification)
- * @method static void sendNow(\Illuminate\Support\Collection|array|mixed $notifiables, $notification)
+ * @method static void send(mixed $notifiables, $notification)
+ * @method static void sendNow(mixed $notifiables, $notification)
  * @method static mixed channel(string|null $name = null)
  * @method static \Illuminate\Notifications\ChannelManager locale(string|null $locale)
  * @method static void assertSentTo(mixed $notifiable, string $notification, callable $callback = null)

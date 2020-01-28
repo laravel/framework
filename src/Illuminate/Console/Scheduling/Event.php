@@ -389,7 +389,7 @@ class Event
     /**
      * E-mail the results of the scheduled operation.
      *
-     * @param  array|mixed  $addresses
+     * @param  mixed  $addresses
      * @param  bool  $onlyIfOutputExists
      * @return $this
      *
@@ -409,7 +409,7 @@ class Event
     /**
      * E-mail the results of the scheduled operation if it produces output.
      *
-     * @param  array|mixed  $addresses
+     * @param  mixed  $addresses
      * @return $this
      *
      * @throws \LogicException
@@ -422,7 +422,7 @@ class Event
     /**
      * E-mail the results of the scheduled operation if it fails.
      *
-     * @param  array|mixed  $addresses
+     * @param  mixed  $addresses
      * @return $this
      */
     public function emailOutputOnFailure($addresses)
@@ -596,7 +596,7 @@ class Event
     /**
      * Limit the environments the command should run in.
      *
-     * @param  array|mixed  $environments
+     * @param  mixed  $environments
      * @return $this
      */
     public function environments($environments)

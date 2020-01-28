@@ -326,7 +326,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param  \Illuminate\Support\Collection|mixed  $keys
+     * @param  mixed  $keys
      * @return static
      */
     public function except($keys)
@@ -865,7 +865,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @return static|mixed
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */

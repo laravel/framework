@@ -812,7 +812,7 @@ class LazyCollection implements Enumerable
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @return static|mixed
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */

@@ -475,7 +475,7 @@ class Builder
      *
      * @param  \Closure|array  $columns
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     * @return mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null)
     {
@@ -892,7 +892,7 @@ class Builder
      * Call the given local model scopes.
      *
      * @param  array|string  $scopes
-     * @return static|mixed
+     * @return static
      */
     public function scopes($scopes)
     {
