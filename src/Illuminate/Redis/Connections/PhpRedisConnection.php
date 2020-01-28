@@ -302,6 +302,22 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Returns the score of member in the sorted set at key
+     *
+     * @param $key
+     * @param $member
+     * @return int
+     */
+    public function zscore($key, $member)
+    {
+        $key = $this->applyPrefix($key);
+
+        $result = $this->executeRaw(array_merge(['zscore', $key, $member]));
+
+        return $result !== false ? $result : null;
+    }
+
+    /**
      * Execute commands in a pipeline.
      *
      * @param  callable|null  $callback
@@ -424,6 +440,28 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function executeRaw(array $parameters)
     {
+        if ($this->client->getOption(Redis::OPT_SERIALIZER)) {
+            $method = array_shift($parameters);
+
+            $options = [];
+            $args = [];
+            while (!empty($parameters)) {
+                if((in_array($parameters[0], ['NX', 'XX', 'CH', 'INCR']))){
+                    $args[] = array_shift($parameters);
+                    continue;
+                }
+
+                if (!empty($args)) {
+                    $options[] = $args;
+                    $args = [];
+                }
+
+                $options[] = array_shift($parameters);
+            }
+
+            return $this->command($method, $options);
+        }
+
         return $this->command('rawCommand', $parameters);
     }
 

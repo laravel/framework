@@ -676,6 +676,21 @@ class RedisConnectionTest extends TestCase
             ],
         ]);
 
+        if(defined('Redis::COMPRESSION_LZF')){
+            $withCompressionPhpRedis = new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 9,
+                    'options' => ['compression' => Redis::COMPRESSION_LZF],
+                    'timeout' => 0.5,
+                ],
+            ]);
+
+            $connections[] = $withCompressionPhpRedis->connection();
+        }
+
         $connections[] = $prefixedPhpredis->connection();
         $connections[] = $serializerPhpRedis->connection();
         $connections[] = $scanRetryPhpRedis->connection();

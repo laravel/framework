@@ -98,8 +98,16 @@ class PhpRedisConnector implements Connector
                 $client->setOption(Redis::OPT_READ_TIMEOUT, $config['read_timeout']);
             }
 
-            if (! empty($options['serializer'])) {
-                $client->setOption(Redis::OPT_SERIALIZER, $options['serializer']);
+            if (! empty($config['serializer'])) {
+                $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
+            }
+
+            if (! empty($config['compression'])) {
+                $client->setOption(Redis::OPT_COMPRESSION, $config['compression']);
+
+                if (! empty($config['compression_level'])) {
+                    $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $config['compression_level']);
+                }
             }
 
             if (! empty($config['scan'])) {
@@ -162,6 +170,14 @@ class PhpRedisConnector implements Connector
 
             if (! empty($options['serializer'])) {
                 $client->setOption(RedisCluster::OPT_SERIALIZER, $options['serializer']);
+            }
+
+            if (! empty($options['compression'])) {
+                $client->setOption(RedisCluster::OPT_COMPRESSION, $options['compression']);
+
+                if (! empty($options['compression_level'])) {
+                    $client->setOption(RedisCluster::OPT_COMPRESSION_LEVEL, $options['compression_level']);
+                }
             }
 
             if (! empty($config['scan'])) {
