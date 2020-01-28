@@ -94,7 +94,7 @@ class BroadcastManager implements FactoryContract
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      * @return \Illuminate\Broadcasting\PendingBroadcast|void
      */
     public function event($event = null)

@@ -1139,7 +1139,7 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed|array
+     * @return mixed
      */
     public function getOriginal($key = null, $default = null)
     {
@@ -1157,7 +1157,7 @@ trait HasAttributes
     /**
      * Get a subset of the model's attributes.
      *
-     * @param  array|mixed  $attributes
+     * @param  mixed  $attributes
      * @return array
      */
     public function only($attributes)

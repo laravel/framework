@@ -894,7 +894,7 @@ class Builder
      * Call the given local model scopes.
      *
      * @param  array|string  $scopes
-     * @return static|mixed
+     * @return mixed
      */
     public function scopes($scopes)
     {

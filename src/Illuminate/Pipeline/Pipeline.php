@@ -65,7 +65,7 @@ class Pipeline implements PipelineContract
     /**
      * Set the array of pipes.
      *
-     * @param  array|mixed  $pipes
+     * @param  mixed  $pipes
      * @return $this
      */
     public function through($pipes)

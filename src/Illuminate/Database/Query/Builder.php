@@ -218,7 +218,7 @@ class Builder
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed  $columns
+     * @param  mixed  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -350,7 +350,7 @@ class Builder
     /**
      * Add a new select column to the query.
      *
-     * @param  array|mixed  $column
+     * @param  mixed  $column
      * @return $this
      */
     public function addSelect($column)
@@ -2098,7 +2098,7 @@ class Builder
      *
      * @param  int|string  $id
      * @param  array  $columns
-     * @return mixed|static
+     * @return mixed
      */
     public function find($id, $columns = ['*'])
     {

@@ -248,8 +248,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  bool  $value
      * @param  callable  $callback
-     * @param  callable  $default
-     * @return static|mixed
+     * @param  callable|null  $default
+     * @return mixed
      */
     public function when($value, callable $callback, callable $default = null);
 
@@ -257,8 +257,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Apply the callback if the collection is empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
-     * @return static|mixed
+     * @param  callable|null  $default
+     * @return mixed
      */
     public function whenEmpty(callable $callback, callable $default = null);
 
@@ -266,8 +266,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Apply the callback if the collection is not empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
-     * @return static|mixed
+     * @param  callable|null  $default
+     * @return mixed
      */
     public function whenNotEmpty(callable $callback, callable $default = null);
 
@@ -276,8 +276,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  bool  $value
      * @param  callable  $callback
-     * @param  callable  $default
-     * @return static|mixed
+     * @param  callable|null  $default
+     * @return mixed
      */
     public function unless($value, callable $callback, callable $default = null);
 
@@ -285,8 +285,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Apply the callback unless the collection is empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
-     * @return static|mixed
+     * @param  callable|null  $default
+     * @return mixed
      */
     public function unlessEmpty(callable $callback, callable $default = null);
 
@@ -294,8 +294,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Apply the callback unless the collection is not empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
-     * @return static|mixed
+     * @param  callable|null  $default
+     * @return mixed
      */
     public function unlessNotEmpty(callable $callback, callable $default = null);
 
@@ -446,7 +446,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
-     * @param  string  $glue
+     * @param  string|null  $glue
      * @return string
      */
     public function implode($value, $glue = null);
@@ -664,7 +664,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @return static|mixed
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -714,7 +714,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Shuffle the items in the collection.
      *
-     * @param  int  $seed
+     * @param  int|null  $seed
      * @return static
      */
     public function shuffle($seed = null);
@@ -731,7 +731,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get a slice of items from the enumerable.
      *
      * @param  int  $offset
-     * @param  int  $length
+     * @param  int|null  $length
      * @return static
      */
     public function slice($offset, $length = null);
@@ -848,7 +848,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Create a collection of all elements that do not pass a given truth test.
      *
-     * @param  callable|mixed  $callback
+     * @param  mixed  $callback
      * @return static
      */
     public function reject($callback = true);

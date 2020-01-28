@@ -326,7 +326,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param  \Illuminate\Support\Collection|mixed  $keys
+     * @param  mixed  $keys
      * @return static
      */
     public function except($keys)

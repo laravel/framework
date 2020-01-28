@@ -112,7 +112,7 @@ trait ConditionallyLoadsAttributes
      * Merge a value into the array.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Http\Resources\MergeValue|mixed
+     * @return \Illuminate\Http\Resources\MergeValue|\Illuminate\Http\Resources\MissingValue
      */
     protected function merge($value)
     {
@@ -124,7 +124,7 @@ trait ConditionallyLoadsAttributes
      *
      * @param  bool  $condition
      * @param  mixed  $value
-     * @return \Illuminate\Http\Resources\MergeValue|mixed
+     * @return \Illuminate\Http\Resources\MergeValue|\Illuminate\Http\Resources\MissingValue
      */
     protected function mergeWhen($condition, $value)
     {
