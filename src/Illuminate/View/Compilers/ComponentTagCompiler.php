@@ -219,7 +219,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x-[\w\-]*\s*>/", '@endcomponent', $value);
+        return preg_replace("/<\/\s*x-[\w\-]*\s*>/", '@endcomponentClass', $value);
     }
 
     /**

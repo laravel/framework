@@ -31,8 +31,19 @@ class BladeComponentsTest extends AbstractBladeTestCase
 <?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
 <?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
 <?php endif; ?>
+<?php echo $__env->renderComponent(); ?>', $this->compiler->compileString('@endcomponent'));
+    }
+
+    public function testEndComponentClassesAreCompiled()
+    {
+        $this->compiler->newComponentHash('foo');
+
+        $this->assertSame('<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
+<?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
+<?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
+<?php endif; ?>
 <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>', $this->compiler->compileString('@endcomponent'));
+<?php endif; ?>', $this->compiler->compileString('@endcomponentClass'));
     }
 
     public function testSlotsAreCompiled()
