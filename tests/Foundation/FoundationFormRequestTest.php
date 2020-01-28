@@ -10,6 +10,7 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Validation\Factory as ValidationFactory;
@@ -113,6 +114,16 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
 
         $this->assertEquals(['name' => 'Adam'], $request->all());
+    }
+
+    public function testValidatedExceptMethodReturnsTheValidatedDataWithoutTheSpecifiedKeys()
+    {
+        $request = $this->createRequest(['name' => 'Rory', 'unwanted' => 'extras']);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['name' => 'Rory'], $request->validatedExcept('unwanted'));
+
     }
 
     /**
