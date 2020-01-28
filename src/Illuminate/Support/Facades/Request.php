@@ -62,7 +62,7 @@ namespace Illuminate\Support\Facades;
  * @method static string userAgent()
  * @method static \Illuminate\Http\Request merge(array $input)
  * @method static \Illuminate\Http\Request replace(array $input)
- * @method static mixed json(string|null $key = null, mixed $default = null)
+ * @method static \Symfony\Component\HttpFoundation\ParameterBag|mixed json(string|null $key = null, mixed $default = null)
  * @method static \Illuminate\Http\Request createFrom(\Illuminate\Http\Request $from, \Illuminate\Http\Request|null $to = null)
  * @method static \Illuminate\Http\Request createFromBase(\Symfony\Component\HttpFoundation\Request $request)
  * @method static \Illuminate\Http\Request duplicate(array|null $query = null, array|null $request = null, array|null $attributes = null, array|null $cookies = null, array|null $files = null, array|null $server = null)
