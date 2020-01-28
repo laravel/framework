@@ -2480,17 +2480,17 @@ class SupportCollectionTest extends TestCase
     public function testKeyByArray($collection)
     {
         $data = new $collection([
-            'foo' => ['method' => ['GET', 'HEAD']],
-            'bar' => ['method' => ['GET']],
-            'baz' => ['method' => ['POST']],
+            'foo' => ['methods' => ['GET', 'HEAD']],
+            'bar' => ['methods' => ['GET']],
+            'baz' => ['methods' => ['POST']],
         ]);
 
-        $result = $data->keyBy('method');
+        $result = $data->keyBy('methods');
 
         $this->assertEquals([
-            'GET' => ['foo' => ['method' => ['GET', 'HEAD']], 'bar' => ['method' => ['GET']]],
-            'HEAD' => ['foo' => ['method' => ['GET', 'HEAD']]],
-            'POST' => ['baz' => ['method' => ['POST']]],
+            'GET' => ['foo' => ['methods' => ['GET', 'HEAD']], 'bar' => ['method' => ['GET']]],
+            'HEAD' => ['foo' => ['methods' => ['GET', 'HEAD']]],
+            'POST' => ['baz' => ['methods' => ['POST']]],
         ], $result->all());
     }
 
