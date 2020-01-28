@@ -41,6 +41,8 @@ class Ruleset implements Arrayable
      */
     protected function parseArguments($arguments = [])
     {
+        $arguments = array_values($arguments);
+
         if (empty($arguments)) {
             return '';
         }
