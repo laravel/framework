@@ -440,31 +440,56 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function executeRaw(array $parameters)
     {
-        if ($this->client->getOption(Redis::OPT_SERIALIZER)) {
-            $method = array_shift($parameters);
-
-            $options = [];
-            $args = [];
-            while (! empty($parameters)) {
-                if ((in_array($parameters[0], ['NX', 'XX', 'CH', 'INCR']))) {
-                    $args[] = array_shift($parameters);
-
-                    continue;
-                }
-
-                if (! empty($args)) {
-                    $options[] = $args;
-                    $args = [];
-                }
-
-                $options[] = array_shift($parameters);
-            }
-
-            return $this->command($method, $options);
+        if ($this->shouldExecuteAsRaw()) {
+            return $this->command('rawCommand', $parameters);
         }
 
-        return $this->command('rawCommand', $parameters);
+        return $this->rearrangeParametersAndRunCommand($parameters);
     }
+
+    /**
+     * Phpredis requires second argument "options" to be an array (when using special NX XX CH INCR modifiers).
+     * Note that there can be more than one special modifier per command.
+     *
+     * @param  array  $parameters
+     * @return mixed
+     */
+    private function rearrangeParametersAndRunCommand($parameters)
+    {
+        $specialMethods = ['NX', 'XX', 'CH', 'INCR'];
+        $options = [];
+        $args = [];
+
+        $method = array_shift($parameters);
+
+        while (! empty($parameters)) {
+            if ((in_array($parameters[0], $specialMethods, true))) {
+                $args[] = array_shift($parameters);
+
+                continue;
+            }
+
+            if (! empty($args)) {
+                $options[] = $args;
+                $args = [];
+            }
+
+            $options[] = array_shift($parameters);
+        }
+
+        return $this->command($method, $options);
+    }
+
+    /**
+     * If config option 'serializer' is set, we cannot rely on rawCommand.
+     *
+     * @return boolean
+     */
+    private function shouldExecuteAsRaw()
+    {
+        return $this->client->getOption(Redis::OPT_SERIALIZER) === 0;
+    }
+
 
     /**
      * Run a command against the Redis database.
