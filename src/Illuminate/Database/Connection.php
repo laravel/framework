@@ -904,7 +904,7 @@ class Connection implements ConnectionInterface
 
             $this->doctrineConnection = new DoctrineConnection(array_filter([
                 'pdo' => $this->getPdo(),
-                'dbname' => $this->getConfig('database'),
+                'dbname' => $this->getDatabaseName(),
                 'driver' => $driver->getName(),
                 'serverVersion' => $this->getConfig('server_version'),
             ]), $driver);
