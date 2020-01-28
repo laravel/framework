@@ -294,7 +294,7 @@ class Str
      * Return the length of the given string.
      *
      * @param  string  $value
-     * @param  string  $encoding
+     * @param  string|null  $encoding
      * @return int
      */
     public static function length($value, $encoding = null)
