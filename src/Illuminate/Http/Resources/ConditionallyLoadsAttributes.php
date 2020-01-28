@@ -97,7 +97,7 @@ trait ConditionallyLoadsAttributes
      * @param  bool  $condition
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return mixed
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function when($condition, $value, $default = null)
     {
@@ -150,7 +150,7 @@ trait ConditionallyLoadsAttributes
      * @param  string  $relationship
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return mixed
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenLoaded($relationship, $value = null, $default = null)
     {
@@ -179,7 +179,7 @@ trait ConditionallyLoadsAttributes
      * @param  string  $table
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return mixed
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenPivotLoaded($table, $value, $default = null)
     {

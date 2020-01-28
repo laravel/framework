@@ -475,7 +475,7 @@ class Builder
      *
      * @param  \Closure|array  $columns
      * @param  \Closure|null  $callback
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null)
     {
