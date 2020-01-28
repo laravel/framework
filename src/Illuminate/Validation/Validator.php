@@ -250,14 +250,9 @@ class Validator implements ValidatorContract
                 $value = $this->parseData($value);
             }
 
-            // If the data key contains a dot, we will replace it with another character
-            // sequence so it doesn't interfere with dot processing when working with
-            // array based validation rules plus Arr::dot later in the validations.
-            if (Str::contains($key, '.')) {
-                $newData[str_replace('.', '->', $key)] = $value;
-            } else {
-                $newData[$key] = $value;
-            }
+            $key = str_replace(['.', '*'], ['->', '__asterisk__'], $key);
+
+            $newData[$key] = $value;
         }
 
         return $newData;
@@ -688,6 +683,8 @@ class Validator implements ValidatorContract
         if (! $this->messages) {
             $this->passes();
         }
+
+        $attribute = str_replace('__asterisk__', '*', $attribute);
 
         if (in_array($rule, $this->excludeRules)) {
             return $this->excludeAttribute($attribute);

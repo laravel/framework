@@ -99,21 +99,31 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" drop column "foo"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "foo"', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn(['foo', 'bar']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" drop column "foo", "bar"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "foo", "bar"', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn('foo', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" drop column "foo", "bar"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "foo", "bar"', $statements[0]);
+    }
+
+    public function testDropColumnDropsCreatesSqlToDropDefaultConstraints()
+    {
+        $blueprint = new Blueprint('foo');
+        $blueprint->dropColumn('bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals("DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[foo] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM SYS.COLUMNS WHERE [object_id] = OBJECT_ID('[dbo].[foo]') AND [name] in ('bar');EXEC(@sql);alter table \"foo\" drop column \"bar\"", $statements[0]);
     }
 
     public function testDropPrimary()
@@ -173,7 +183,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
     }
 
     public function testDropTimestampsTz()
@@ -183,7 +193,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
     }
 
     public function testDropMorphs()
@@ -193,8 +203,8 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);
-        $this->assertSame('drop index "photos_imageable_type_imageable_id_index" on "photos"', $statements[0]);
-        $this->assertSame('alter table "photos" drop column "imageable_type", "imageable_id"', $statements[1]);
+        $this->assertEquals('drop index "photos_imageable_type_imageable_id_index" on "photos"', $statements[0]);
+        $this->assertStringContainsString('alter table "photos" drop column "imageable_type", "imageable_id"', $statements[1]);
     }
 
     public function testRenameTable()

@@ -5203,6 +5203,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['mouse' => null], $validator->invalid());
     }
 
+    public function testValidateFailsWithAsterisksAsDataKeys()
+    {
+        $post = ['data' => [0 => ['date' => '2019-01-24'], 1 => ['date' => 'blah'], '*' => ['date' => 'blah']]];
+
+        $rules = ['data.*.date' => 'required|date'];
+
+        $validator = new Validator($this->getIlluminateArrayTranslator(), $post, $rules);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['data.1.date' => ['validation.date'], 'data.*.date' => ['validation.date']], $validator->messages()->toArray());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

@@ -135,4 +135,17 @@ for i = 2, #ARGV do
 end
 LUA;
     }
+
+    /**
+     * Format the channel array into an array of strings.
+     *
+     * @param  array  $channels
+     * @return array
+     */
+    protected function formatChannels(array $channels)
+    {
+        return array_map(function ($channel) {
+            return $this->prefix.$channel;
+        }, parent::formatChannels($channels));
+    }
 }
