@@ -34,13 +34,11 @@ class RedisLock extends Lock
      */
     public function acquire()
     {
-        $result = $this->redis->setnx($this->name, $this->owner);
-
-        if ($result === 1 && $this->seconds > 0) {
-            $this->redis->expire($this->name, $this->seconds);
+        if ($this->seconds > 0) {
+            return $this->redis->set($this->name, $this->owner, 'EX', $this->seconds, 'NX') == true;
+        } else {
+            return $this->redis->setnx($this->name, $this->owner) === 1;
         }
-
-        return $result === 1;
     }
 
     /**

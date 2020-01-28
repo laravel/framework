@@ -60,7 +60,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->createSeeder();
         }
 
-        if ($this->option('controller') || $this->option('resource')) {
+        if ($this->option('controller') || $this->option('resource') || $this->option('api')) {
             $this->createController();
         }
     }
@@ -124,10 +124,11 @@ class ModelMakeCommand extends GeneratorCommand
 
         $modelName = $this->qualifyClass($this->getNameInput());
 
-        $this->call('make:controller', [
-            'name' => "{$controller}Controller",
-            '--model' => $this->option('resource') ? $modelName : null,
-        ]);
+        $this->call('make:controller', array_filter([
+            'name'  => "{$controller}Controller",
+            '--model' => $this->option('resource') || $this->option('api') ? $modelName : null,
+            '--api' => $this->option('api'),
+        ]));
     }
 
     /**
@@ -160,6 +161,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder file for the model'],
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+            ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
         ];
     }
 }

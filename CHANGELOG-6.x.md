@@ -1,6 +1,9 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.11.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.12.0...6.x)
+
+
+## [v6.12.0 (2020-01-21)](https://github.com/laravel/framework/compare/v6.11.0...v6.12.0)
 
 ### Added
 - Added `ServiceProvider::loadFactoriesFrom()` method ([#31133](https://github.com/laravel/framework/pull/31133))
@@ -8,8 +11,18 @@
 - Added `Str::isUuid()` method ([#31148](https://github.com/laravel/framework/pull/31148))
 - Restored phpunit 7 support ([#31113](https://github.com/laravel/framework/pull/31113))
 - Added `Request::boolean()` method ([#31160](https://github.com/laravel/framework/pull/31160))
+- Added `Database\Eloquent\FactoryBuilder::createMany()` ([#31171](https://github.com/laravel/framework/pull/31171), [6553d59](https://github.com/laravel/framework/commit/6553d5923959bd947b49eb089053cd430d8968d4))
+- Added missing options for PhpRedis ([#31182](https://github.com/laravel/framework/pull/31182))
 
-### TODO
+### Fixed
+- Fixed `Cache\RedisLock::acquire()` ([#31168](https://github.com/laravel/framework/pull/31168), [8683a3d](https://github.com/laravel/framework/commit/8683a3d721f92e512a83a3e5feb3d0a9bb682560))
+- Fixed database url parsing for connections with no database specified ([#31185](https://github.com/laravel/framework/pull/31185))
+- Prevent ambiguous column with table name prefix ([#31174](https://github.com/laravel/framework/pull/31174))
+
+### Optimization
+- Fixed memory usage on downloading large files ([#31163](https://github.com/laravel/framework/pull/31163))
+
+### Changed
 - Replace Event Dispatcher in resolved cache repositories when `Event::fake()` is used ([#31119](https://github.com/laravel/framework/pull/31119), [0a70beb](https://github.com/laravel/framework/commit/0a70bebd5ecfd51185a312bbfb60ee7f8ff7eb09))
 
 

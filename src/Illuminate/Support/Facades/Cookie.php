@@ -25,7 +25,7 @@ class Cookie extends Facade
     /**
      * Retrieve a cookie from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $default
      * @return string|array|null
      */

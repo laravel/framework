@@ -11,13 +11,6 @@ use Illuminate\Support\Collection as BaseCollection;
 trait InteractsWithPivotTable
 {
     /**
-     * The cached copy of the currently attached pivot models.
-     *
-     * @var Collection
-     */
-    private $currentlyAttached;
-
-    /**
      * Toggles a model (or models) from the parent.
      *
      * Each existing model is detached, and non existing ones are attached.
@@ -566,7 +559,7 @@ trait InteractsWithPivotTable
      */
     protected function getCurrentlyAttachedPivots()
     {
-        return $this->currentlyAttached ?: $this->newPivotQueryWithoutTrashed()->get()->map(function ($record) {
+        return $this->newPivotQueryWithoutTrashed()->get()->map(function ($record) {
             $class = $this->using ? $this->using : Pivot::class;
 
             return (new $class)->setRawAttributes((array) $record, true);
