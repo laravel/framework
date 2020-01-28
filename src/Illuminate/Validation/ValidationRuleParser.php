@@ -85,6 +85,8 @@ class ValidationRuleParser
     {
         if (is_string($rule)) {
             return explode('|', $rule);
+        } elseif ($rule instanceof Ruleset) {
+            return $this->explodeExplicitRule($rule->toArray());
         } elseif (is_object($rule)) {
             return [$this->prepareRule($rule)];
         }

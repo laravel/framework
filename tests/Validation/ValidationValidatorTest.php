@@ -19,6 +19,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Ruleset;
 use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
@@ -5201,6 +5202,23 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($validator->fails());
         $this->assertSame(['cat' => 'Tom'], $validator->valid());
         $this->assertSame(['mouse' => null], $validator->invalid());
+    }
+
+    public function testRulesetConvertsToArray()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['foo' => 'bar'],
+            ['foo' => Ruleset::string()->min(3)]
+        );
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['foo' => 'b'],
+            ['foo' => Ruleset::string()->min(3)]
+        );
+        $this->assertTrue($validator->fails());
     }
 
     protected function getTranslator()
