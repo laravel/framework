@@ -490,7 +490,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         return $this->client->getOption(Redis::OPT_SERIALIZER) === 0;
     }
 
-
     /**
      * Run a command against the Redis database.
      *
