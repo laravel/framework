@@ -30,8 +30,6 @@ class RouteBinding
      * @param  \Illuminate\Container\Container  $container
      * @param  string  $binding
      * @return \Closure
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     protected static function createClassBinding($container, $binding)
     {
@@ -54,6 +52,8 @@ class RouteBinding
      * @param  string  $class
      * @param  \Closure|null  $callback
      * @return \Closure
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public static function forModel($container, $class, $callback = null)
     {
