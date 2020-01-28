@@ -118,7 +118,18 @@ abstract class Component implements Renderable
             'data',
             'withAttributes',
             'render',
+            'shouldRender',
         ], $this->except);
+    }
+
+    /**
+     * Determine if the component should be rendered.
+     *
+     * @return bool
+     */
+    public function shouldRender()
+    {
+        return true;
     }
 
     /**
