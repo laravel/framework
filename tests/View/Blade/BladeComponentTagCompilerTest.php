@@ -29,7 +29,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertEquals("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes([]); ?>
-@endcomponent</div>", trim($result));
+@endcomponentClass</div>", trim($result));
     }
 
     public function testClassNamesCanBeGuessed()
@@ -52,7 +52,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo','x-on:click' => 'bar','@click' => 'baz']); ?>
-@endcomponent", trim($result));
+@endcomponentClass", trim($result));
     }
 
     public function testSelfClosingComponentsCanBeCompiledWithDataAndAttributes()
@@ -61,7 +61,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', ['title' => 'foo'])
 <?php \$component->withAttributes(['class' => 'bar','wire:model' => 'foo']); ?>
-@endcomponent", trim($result));
+@endcomponentClass", trim($result));
     }
 
     public function testSelfClosingComponentsCanBeCompiledWithBoundData()
@@ -70,7 +70,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', ['title' => \$title])
 <?php \$component->withAttributes(['class' => 'bar']); ?>
-@endcomponent", trim($result));
+@endcomponentClass", trim($result));
     }
 
     public function testPairedComponentTags()
