@@ -194,7 +194,7 @@ trait HasEvents
      *
      * @param  string  $event
      * @param  string  $method
-     * @return mixed|null
+     * @return mixed
      */
     protected function fireCustomModelEvent($event, $method)
     {

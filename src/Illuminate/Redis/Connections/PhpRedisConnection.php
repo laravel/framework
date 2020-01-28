@@ -198,8 +198,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Removes and returns a random element from the set value at key.
      *
      * @param  string  $key
-     * @param  int|null  $count
-     * @return mixed|false
+     * @param  int  $count
+     * @return mixed
      */
     public function spop($key, $count = 1)
     {

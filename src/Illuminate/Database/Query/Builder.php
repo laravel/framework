@@ -2088,7 +2088,7 @@ class Builder
      *
      * @param  int|string  $id
      * @param  array  $columns
-     * @return mixed|static
+     * @return mixed
      */
     public function find($id, $columns = ['*'])
     {

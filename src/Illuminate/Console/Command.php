@@ -376,7 +376,7 @@ class Command extends SymfonyCommand
      * @param  string  $question
      * @param  array  $choices
      * @param  string|null  $default
-     * @param  mixed|null  $attempts
+     * @param  int|null  $attempts
      * @param  bool|null  $multiple
      * @return string
      */

@@ -110,7 +110,7 @@ if (! function_exists('app')) {
      *
      * @param  string|null  $abstract
      * @param  array  $parameters
-     * @return mixed|\Illuminate\Contracts\Foundation\Application
+     * @return mixed
      */
     function app($abstract = null, array $parameters = [])
     {
@@ -212,7 +212,7 @@ if (! function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      * @return \Illuminate\Broadcasting\PendingBroadcast
      */
     function broadcast($event = null)
@@ -228,7 +228,7 @@ if (! function_exists('cache')) {
      * If an array is passed, we'll assume you want to put to the cache.
      *
      * @param  dynamic  key|key,default|data,expiration|null
-     * @return mixed|\Illuminate\Cache\CacheManager
+     * @return mixed
      *
      * @throws \Exception
      */
@@ -268,7 +268,7 @@ if (! function_exists('config')) {
      *
      * @param  array|string|null  $key
      * @param  mixed  $default
-     * @return mixed|\Illuminate\Config\Repository
+     * @return mixed
      */
     function config($key = null, $default = null)
     {
@@ -818,7 +818,7 @@ if (! function_exists('session')) {
      *
      * @param  array|string|null  $key
      * @param  mixed  $default
-     * @return mixed|\Illuminate\Session\Store|\Illuminate\Session\SessionManager
+     * @return mixed
      */
     function session($key = null, $default = null)
     {
