@@ -233,12 +233,13 @@ abstract class Broadcaster implements BroadcasterContract
      * Format the channel array into an array of strings.
      *
      * @param  array  $channels
+     * @param  string $prefix
      * @return array
      */
-    protected function formatChannels(array $channels)
+    protected function formatChannels(array $channels, string $prefix = '')
     {
-        return array_map(function ($channel) {
-            return (string) $channel;
+        return array_map(function ($channel) use ($prefix) {
+            return $prefix . (string) $channel;
         }, $channels);
     }
 

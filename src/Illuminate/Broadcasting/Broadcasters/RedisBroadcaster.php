@@ -115,7 +115,7 @@ class RedisBroadcaster extends Broadcaster
 
         $connection->eval(
             $this->broadcastMultipleChannelsScript(),
-            0, $payload, ...$this->formatChannels($channels)
+            0, $payload, ...$this->formatChannels($channels, $this->prefix)
         );
     }
 
