@@ -80,7 +80,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes([]); ?>
-@endcomponent", trim($result));
+@endcomponentClass", trim($result));
     }
 }
 

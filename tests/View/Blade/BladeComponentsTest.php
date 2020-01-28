@@ -19,6 +19,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $this->assertSame('<?php if (isset($component)) { $__componentOriginal35bda42cbf6f9717b161c4f893644ac7a48b0d98 = $component; } ?>
 <?php $component = app()->make(Test::class, ["foo" => "bar"]); ?>
+<?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->view(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', ["foo" => "bar"])'));
     }
 
@@ -31,6 +32,18 @@ class BladeComponentsTest extends AbstractBladeTestCase
 <?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
 <?php endif; ?>
 <?php echo $__env->renderComponent(); ?>', $this->compiler->compileString('@endcomponent'));
+    }
+
+    public function testEndComponentClassesAreCompiled()
+    {
+        $this->compiler->newComponentHash('foo');
+
+        $this->assertSame('<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
+<?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
+<?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
+<?php endif; ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>', $this->compiler->compileString('@endcomponentClass'));
     }
 
     public function testSlotsAreCompiled()
