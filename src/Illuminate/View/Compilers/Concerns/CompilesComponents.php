@@ -92,9 +92,9 @@ trait CompilesComponents
      */
     public function compileEndComponentClass()
     {
-        return static::compileEndComponent() . PHP_EOL . implode(PHP_EOL, [
-                '<?php endif; ?>',
-            ]);
+        return static::compileEndComponent().PHP_EOL.implode(PHP_EOL, [
+            '<?php endif; ?>',
+        ]);
     }
 
     /**
