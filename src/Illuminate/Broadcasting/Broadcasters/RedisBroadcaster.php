@@ -120,17 +120,6 @@ class RedisBroadcaster extends Broadcaster
     }
 
     /**
-     * @param  array  $channels
-     * @return array
-     */
-    protected function formatChannels(array $channels)
-    {
-        return array_map(function ($channel) {
-            return $this->prefix.$channel;
-        }, parent::formatChannels($channels));
-    }
-
-    /**
      * Get the Lua script for broadcasting to multiple channels.
      *
      * ARGV[1] - The payload
@@ -145,5 +134,18 @@ for i = 2, #ARGV do
   redis.call('publish', ARGV[i], ARGV[1])
 end
 LUA;
+    }
+
+    /**
+     * Format the channel array into an array of strings.
+     *
+     * @param  array  $channels
+     * @return array
+     */
+    protected function formatChannels(array $channels)
+    {
+        return array_map(function ($channel) {
+            return $this->prefix.$channel;
+        }, parent::formatChannels($channels));
     }
 }
