@@ -2488,7 +2488,7 @@ class SupportCollectionTest extends TestCase
         $result = $data->keyBy('methods');
 
         $this->assertEquals([
-            'GET' => ['foo' => ['methods' => ['GET', 'HEAD']], 'bar' => ['method' => ['GET']]],
+            'GET' => ['foo' => ['methods' => ['GET', 'HEAD']], 'bar' => ['methods' => ['GET']]],
             'HEAD' => ['foo' => ['methods' => ['GET', 'HEAD']]],
             'POST' => ['baz' => ['methods' => ['POST']]],
         ], $result->all());
