@@ -12,7 +12,7 @@ class EventCacheCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'event:cache';
+    protected $name = 'event:cache';
 
     /**
      * The console command description.
