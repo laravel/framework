@@ -304,8 +304,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Returns the score of member in the sorted set at key.
      *
-     * @param $key
-     * @param $member
+     * @param  string  $key
+     * @param  string  $member
      * @return int
      */
     public function zscore($key, $member)
@@ -448,6 +448,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             while (! empty($parameters)) {
                 if ((in_array($parameters[0], ['NX', 'XX', 'CH', 'INCR']))) {
                     $args[] = array_shift($parameters);
+
                     continue;
                 }
 
