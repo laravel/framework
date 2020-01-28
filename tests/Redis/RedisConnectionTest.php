@@ -676,7 +676,7 @@ class RedisConnectionTest extends TestCase
             ],
         ]);
 
-        if(defined('Redis::COMPRESSION_LZF')){
+        if (defined('Redis::COMPRESSION_LZF')) {
             $withCompressionPhpRedis = new RedisManager(new Application, 'phpredis', [
                 'cluster' => false,
                 'default' => [

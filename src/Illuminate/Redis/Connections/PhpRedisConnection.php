@@ -302,7 +302,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Returns the score of member in the sorted set at key
+     * Returns the score of member in the sorted set at key.
      *
      * @param $key
      * @param $member
@@ -445,13 +445,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
             $options = [];
             $args = [];
-            while (!empty($parameters)) {
-                if((in_array($parameters[0], ['NX', 'XX', 'CH', 'INCR']))){
+            while (! empty($parameters)) {
+                if ((in_array($parameters[0], ['NX', 'XX', 'CH', 'INCR']))) {
                     $args[] = array_shift($parameters);
                     continue;
                 }
 
-                if (!empty($args)) {
+                if (! empty($args)) {
                     $options[] = $args;
                     $args = [];
                 }
