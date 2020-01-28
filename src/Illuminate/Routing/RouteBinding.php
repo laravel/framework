@@ -30,6 +30,8 @@ class RouteBinding
      * @param  \Illuminate\Container\Container  $container
      * @param  string  $binding
      * @return \Closure
+     *
+     * @throws \ModelNotFoundException
      */
     protected static function createClassBinding($container, $binding)
     {
