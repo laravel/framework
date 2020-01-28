@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use ArrayIterator;
 use Countable;
+use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
@@ -52,6 +53,20 @@ class RouteCollection implements Countable, IteratorAggregate
      * @var array
      */
     protected $actionList = [];
+
+    /**
+     * The router instance used by the route.
+     *
+     * @var \Illuminate\Routing\Router
+     */
+    protected $router;
+
+    /**
+     * The container instance used by the route.
+     *
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
 
     /**
      * Add a Route instance to the collection.
@@ -131,6 +146,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function refreshNameLookups()
     {
+        $this->resolveCompiledRoutes();
+
         $this->nameList = [];
 
         foreach ($this->allRoutes as $route) {
@@ -149,6 +166,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function refreshActionLookups()
     {
+        $this->resolveCompiledRoutes();
+
         $this->actionList = [];
 
         foreach ($this->allRoutes as $route) {
@@ -226,9 +245,9 @@ class RouteCollection implements Countable, IteratorAggregate
         $matcher = new CompiledUrlMatcher($this->compiledRoutes['compiled'], $context);
 
         if ($result = $matcher->matchRequest($request)) {
-            $attributes = $this->compiledRoutes['attributes'][$result['_route']];
-
-            return new Route($attributes['methods'], $attributes['uri'], $attributes['action']);
+            return $this->attributesToRoute(
+                $this->compiledRoutes['attributes'][$result['_route']]
+            );
         }
     }
 
@@ -305,6 +324,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function get($method = null)
     {
+        $this->resolveCompiledRoutes();
+
         return is_null($method) ? $this->getRoutes() : Arr::get($this->routes, $method, []);
     }
 
@@ -327,6 +348,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getByName($name)
     {
+        $this->resolveCompiledRoutes();
+
         return $this->nameList[$name] ?? null;
     }
 
@@ -338,6 +361,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getByAction($action)
     {
+        $this->resolveCompiledRoutes();
+
         return $this->actionList[$action] ?? null;
     }
 
@@ -348,6 +373,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getRoutes()
     {
+        $this->resolveCompiledRoutes();
+
         return array_values($this->allRoutes);
     }
 
@@ -358,6 +385,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getRoutesByMethod()
     {
+        $this->resolveCompiledRoutes();
+
         return $this->routes;
     }
 
@@ -368,6 +397,8 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     public function getRoutesByName()
     {
+        $this->resolveCompiledRoutes();
+
         return $this->nameList;
     }
 
@@ -435,6 +466,35 @@ class RouteCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Resolve the compiled routes to Route instances.
+     *
+     * @return void
+     */
+    protected function resolveCompiledRoutes()
+    {
+        if (empty($this->routes) && $this->compiledRoutes) {
+            foreach ($this->compiledRoutes['attributes'] as $name => $attributes) {
+                $this->add($this->attributesToRoute($attributes));
+            }
+
+            $this->compiledRoutes = [];
+        }
+    }
+
+    /**
+     * Resolve an array of attributes to a Route instance.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Routing\Route
+     */
+    protected function attributesToRoute(array $attributes)
+    {
+        return (new Route($attributes['methods'], $attributes['uri'], $attributes['action']))
+            ->setRouter($this->router)
+            ->setContainer($this->container);
+    }
+
+    /**
      * Convert the collection to a Symfony RouteCollection instance.
      *
      * @return \Symfony\Component\Routing\RouteCollection
@@ -459,5 +519,31 @@ class RouteCollection implements Countable, IteratorAggregate
         $this->refreshNameLookups();
 
         return $symfonyRoutes;
+    }
+
+    /**
+     * Set the router instance on the route.
+     *
+     * @param  \Illuminate\Routing\Router  $router
+     * @return $this
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+
+        return $this;
+    }
+
+    /**
+     * Set the container instance on the route.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @return $this
+     */
+    public function setContainer(Container $container)
+    {
+        $this->container = $container;
+
+        return $this;
     }
 }
