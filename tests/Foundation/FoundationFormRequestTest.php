@@ -123,7 +123,6 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
 
         $this->assertEquals(['name' => 'Rory'], $request->validatedExcept('unwanted'));
-
     }
 
     /**
