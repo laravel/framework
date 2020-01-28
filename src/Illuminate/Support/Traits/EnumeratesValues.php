@@ -84,6 +84,19 @@ trait EnumeratesValues
     }
 
     /**
+     * Create a new collection instance from an exploded string.
+     *
+     * @param  string  $delimiter
+     * @param  string  $string
+     * @param  int     $limit
+     * @return static
+     */
+    public static function explode($delimiter, $string, $limit = PHP_INT_MAX)
+    {
+        return new static(explode($delimiter, $string, $limit));
+    }
+
+    /**
      * Alias for the "avg" method.
      *
      * @param  callable|string|null  $callback

@@ -1887,6 +1887,12 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo', $collection::unwrap('foo'));
     }
 
+    public function testExplodeMethod()
+    {
+        $this->assertSame(['foo', 'bar', 'baz'], Collection::explode(' ', 'foo bar baz')->all());
+        $this->assertSame(['foo', 'bar baz'], Collection::explode(' ', 'foo bar baz', 2)->all());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
