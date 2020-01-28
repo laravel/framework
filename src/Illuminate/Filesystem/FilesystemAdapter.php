@@ -500,11 +500,9 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         $config = $this->driver->getConfig();
 
-        if ($config->has('url')) {
-            return $this->concatPathToUrl($config->get('url'), $path);
-        }
-
-        return $path;
+        return $config->has('url')
+                ? $this->concatPathToUrl($config->get('url'), $path)
+                : $path;
     }
 
     /**
