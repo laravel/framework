@@ -483,7 +483,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * If config option 'serializer' is set, we cannot rely on rawCommand.
      *
-     * @return boolean
+     * @return bool
      */
     private function shouldExecuteAsRaw()
     {
