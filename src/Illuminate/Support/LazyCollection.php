@@ -483,7 +483,13 @@ class LazyCollection implements Enumerable
                     $resolvedKey = (string) $resolvedKey;
                 }
 
-                yield $resolvedKey => $item;
+                if (is_array($resolvedKey)) {
+                    foreach ($resolvedKey as $resolvedKeyItem) {
+                        yield $resolvedKeyItem => [$key => $item];
+                    }
+                } else {
+                    yield $resolvedKey => $item;
+                }
             }
         });
     }

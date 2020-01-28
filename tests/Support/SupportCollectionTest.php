@@ -2477,6 +2477,26 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testKeyByArray($collection)
+    {
+        $data = new $collection([
+            'foo' => ['method' => ['GET', 'HEAD']],
+            'bar' => ['method' => ['GET']],
+            'baz' => ['method' => ['POST']],
+        ]);
+
+        $result = $data->keyBy('method');
+
+        $this->assertEquals([
+            'GET' => ['foo' => ['method' => ['GET', 'HEAD']], 'bar' => ['method' => ['GET']]],
+            'HEAD' => ['foo' => ['method' => ['GET', 'HEAD']]],
+            'POST' => ['baz' => ['method' => ['POST']]],
+        ], $result->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testContains($collection)
     {
         $c = new $collection([1, 3, 5]);

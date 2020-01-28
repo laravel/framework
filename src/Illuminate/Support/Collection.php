@@ -484,7 +484,13 @@ class Collection implements ArrayAccess, Enumerable
                 $resolvedKey = (string) $resolvedKey;
             }
 
-            $results[$resolvedKey] = $item;
+            if (is_array($resolvedKey)) {
+                foreach ($resolvedKey as $resolvedKeyItem) {
+                    $results[$resolvedKeyItem][$key] = $item;
+                }
+            } else {
+                $results[$resolvedKey] = $item;
+            }
         }
 
         return new static($results);
