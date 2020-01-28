@@ -193,7 +193,7 @@ trait ConditionallyLoadsAttributes
      * @param  string  $table
      * @param  mixed  $value
      * @param  mixed  $default
-     * @return mixed
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenPivotLoadedAs($accessor, $table, $value, $default = null)
     {
