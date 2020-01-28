@@ -115,8 +115,19 @@ class RedisBroadcaster extends Broadcaster
 
         $connection->eval(
             $this->broadcastMultipleChannelsScript(),
-            0, $payload, ...$this->formatChannels($channels, $this->prefix)
+            0, $payload, ...$this->formatChannels($channels)
         );
+    }
+
+    /**
+     * @param  array  $channels
+     * @return array
+     */
+    protected function formatChannels(array $channels)
+    {
+        return array_map(function ($channel) {
+            return $this->prefix.$channel;
+        }, parent::formatChannels($channels));
     }
 
     /**
