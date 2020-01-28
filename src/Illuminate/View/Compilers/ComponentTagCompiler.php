@@ -136,7 +136,7 @@ class ComponentTagCompiler
         return preg_replace_callback($pattern, function (array $matches) {
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
-            return $this->componentString($matches[1], $attributes)."\n@endcomponent";
+            return $this->componentString($matches[1], $attributes)."\n@endcomponentClass";
         }, $value);
     }
 
