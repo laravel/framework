@@ -12,5 +12,5 @@
 */
 
 app('router')->setCompiledRoutes(
-    {{compiledRoutes}}
+    {{routes}}
 );

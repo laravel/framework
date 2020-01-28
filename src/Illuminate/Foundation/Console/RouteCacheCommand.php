@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Routing\RouteCollection;
 
 class RouteCacheCommand extends Command
 {
@@ -62,11 +61,9 @@ class RouteCacheCommand extends Command
             $route->prepareForSerialization();
         }
 
-        $compiled = $routes->compile();
-
         $this->files->put(
             $this->laravel->getCachedRoutesPath(),
-            $this->buildRouteCacheFile($compiled)
+            $this->buildRouteCacheFile($routes->compile())
         );
 
         $this->info('Routes cached successfully!');
@@ -100,13 +97,13 @@ class RouteCacheCommand extends Command
     /**
      * Build the route cache file.
      *
-     * @param  array  $compiledRoutes
+     * @param  array  $routes
      * @return string
      */
-    protected function buildRouteCacheFile(array $compiledRoutes)
+    protected function buildRouteCacheFile(array $routes)
     {
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-        return str_replace('{{compiledRoutes}}', var_export($compiledRoutes, true), $stub);
+        return str_replace('{{routes}}', var_export($routes, true), $stub);
     }
 }
