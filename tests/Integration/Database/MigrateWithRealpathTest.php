@@ -2,11 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Events\MigrationEnded;
-use Illuminate\Database\Events\MigrationsEnded;
-use Illuminate\Database\Events\MigrationsStarted;
-use Illuminate\Database\Events\MigrationStarted;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 
 class MigrateWithRealpathTest extends DatabaseTestCase
