@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
@@ -27,7 +28,7 @@ abstract class Component implements Renderable
     public $attributes;
 
     /**
-     * Get the view that represents the component.
+     * Get the view/view contents that represents the component.
      *
      * @return string
      */
@@ -118,8 +119,45 @@ abstract class Component implements Renderable
             'data',
             'withAttributes',
             'render',
+            'viewFile',
             'shouldRender',
         ], $this->except);
+    }
+
+    /**
+     * Get the blade view file that should be used when rendering the component.
+     * When a string-based view is used, a temporary view will be generated.
+     *
+     * @return string
+     */
+    public function viewFile()
+    {
+        if (View::exists($this->view())) {
+            return $this->view();
+        }
+
+        return $this->createBladeViewFromString($this->view());
+    }
+
+    /**
+     * Create a blade view with the component string content.
+     *
+     * @param $contents
+     * @return string
+     */
+    protected function createBladeViewFromString($contents)
+    {
+        $viewPath = Container::getInstance()['config']->get('view.compiled');
+
+        View::addNamespace('__components', $viewPath);
+
+        $viewFile = $viewPath.'/'.sha1($contents).'.blade.php';
+
+        if (! file_exists($viewFile)) {
+            file_put_contents($viewFile, $contents);
+        }
+
+        return '__components::'.basename($viewFile,'.blade.php');
     }
 
     /**
@@ -139,6 +177,6 @@ abstract class Component implements Renderable
      */
     public function render()
     {
-        return (string) View::make($this->view(), $this->data());
+        return (string) View::make($this->viewFile(), $this->data());
     }
 }
