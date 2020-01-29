@@ -21,12 +21,10 @@ class Mix
     {
         static $manifests = [];
 
-        if (! Str::startsWith($path, '/')) {
-            $path = "/{$path}";
-        }
+        $path = Str::start($path, '/');
 
-        if ($manifestDirectory && ! Str::startsWith($manifestDirectory, '/')) {
-            $manifestDirectory = "/{$manifestDirectory}";
+        if ($manifestDirectory) {
+            $manifestDirectory = Str::start($manifestDirectory, '/');
         }
 
         if (file_exists(public_path($manifestDirectory.'/hot'))) {
