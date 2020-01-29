@@ -7,6 +7,7 @@ use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
+use Illuminate\View\Compilers\BladeCompiler;
 
 abstract class ServiceProvider
 {
@@ -101,6 +102,22 @@ abstract class ServiceProvider
             }
 
             $view->addNamespace($namespace, $path);
+        });
+    }
+
+    /**
+     * Load the given view components with the custom prefix.
+     *
+     * @param $prefix
+     * @param array $components
+     * @return void
+     */
+    protected function loadViewComponentsAs($prefix, array $components)
+    {
+        $this->callAfterResolving(BladeCompiler::class, function ($blade) use ($prefix, $components) {
+            foreach ($components as $component) {
+                $blade->component($component, $prefix.'-'.Str::snake(class_basename($component), '-'));
+            }
         });
     }
 
