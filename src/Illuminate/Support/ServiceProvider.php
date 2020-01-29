@@ -106,10 +106,10 @@ abstract class ServiceProvider
     }
 
     /**
-     * Load the given view components with the custom prefix.
+     * Register the given view components with a custom prefix.
      *
-     * @param $prefix
-     * @param array $components
+     * @param  string  $prefix
+     * @param  array  $components
      * @return void
      */
     protected function loadViewComponentsAs($prefix, array $components)
