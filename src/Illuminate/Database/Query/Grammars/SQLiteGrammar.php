@@ -20,6 +20,18 @@ class SQLiteGrammar extends Grammar
     ];
 
     /**
+     * Compile the lock into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  bool|string  $value
+     * @return string
+     */
+    protected function compileLock(Builder $query, $value)
+    {
+        return '';
+    }
+
+    /**
      * Wrap a union subquery in parentheses.
      *
      * @param  string  $sql
