@@ -5,14 +5,13 @@ namespace Illuminate\Foundation\Http;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
-class FormRequest extends Request implements ValidatesWhenResolved
+class FormRequest extends Request
 {
     use ValidatesWhenResolvedTrait;
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Session\SessionServiceProvider;
 use Illuminate\Support\Facades\Route;
@@ -30,7 +31,7 @@ class PreviousUrlTest extends TestCase
     }
 }
 
-class DummyFormRequest extends FormRequest
+class DummyFormRequest extends FormRequest implements ValidatesWhenResolved
 {
     public function rules()
     {

@@ -2,9 +2,10 @@
 
 namespace DummyNamespace;
 
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Foundation\Http\FormRequest;
 
-class DummyClass extends FormRequest
+class DummyClass extends FormRequest implements ValidatesWhenResolved
 {
     /**
      * Determine if the user is authorized to make this request.
