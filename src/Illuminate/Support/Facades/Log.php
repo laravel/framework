@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Support\Testing\Fakes\LogFake;
+
 /**
  * @method static void emergency(string $message, array $context = [])
  * @method static void alert(string $message, array $context = [])
@@ -19,6 +21,18 @@ namespace Illuminate\Support\Facades;
  */
 class Log extends Facade
 {
+    /**
+     * Replace the bound instance with a fake.
+     *
+     * @return \Illuminate\Support\Testing\Fakes\LogFake
+     */
+    public static function fake()
+    {
+        static::swap($fake = new LogFake);
+
+        return $fake;
+    }
+
     /**
      * Get the registered name of the component.
      *
