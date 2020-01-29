@@ -134,7 +134,9 @@ class Worker
                 $this->sleep($options->sleep);
             }
 
-            $this->resetTimeoutHandler();
+            if ($this->supportsAsyncSignals()) {
+                $this->resetTimeoutHandler();
+            }
 
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop

@@ -1,6 +1,25 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.12.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.13.0...6.x)
+
+
+## [v6.13.0 (2020-01-28)](https://github.com/laravel/framework/compare/v6.12.0...v6.13.0)
+
+### Added
+- Added `--api` option to the `make:model` command ([#31197](https://github.com/laravel/framework/pull/31197), [#31222](https://github.com/laravel/framework/pull/31222))
+- Added `PendingResourceRegistration::shallow()` method ([#31208](https://github.com/laravel/framework/pull/31208), [104c539](https://github.com/laravel/framework/commit/104c539c342d395e2f3c4ba7339df095f83f6352))
+- Allowed formatting an implicit attribute using a closure ([#31246](https://github.com/laravel/framework/pull/31246))
+- Added `Filesystem::ensureDirectoryExists()` method ([8a8eed4](https://github.com/laravel/framework/commit/8a8eed4d157102ef77527891ac1d8f8e85e7afee))
+- Added support to `Storage::url()` for the Ftp driver ([#31258](https://github.com/laravel/framework/pull/31258), [b8790e5](https://github.com/laravel/framework/commit/b8790e56bb7333943db799e6ff6e21a7b01218e0))
+
+### Fixed
+- Fixed laravel migrations when migrating to sql server (dropColumn with default value) ([#31229](https://github.com/laravel/framework/pull/31229))
+- Fixed `handleBeginTransactionException()` method calling pdo property instead of getPdo() method ([#31233](https://github.com/laravel/framework/pull/31233))
+- Fixed channel names when broadcasting via redis ([#31261](https://github.com/laravel/framework/pull/31261))
+- Replace asterisks before validation ([#31257](https://github.com/laravel/framework/pull/31257))
+
+### Changed
+- Reset timeout handler after worker loop ([#31198](https://github.com/laravel/framework/pull/31198))
 
 
 ## [v6.12.0 (2020-01-21)](https://github.com/laravel/framework/compare/v6.11.0...v6.12.0)
