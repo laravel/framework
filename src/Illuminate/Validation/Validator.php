@@ -378,6 +378,25 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Run the validator's rules against its data.
+     *
+     * @param  string  $errorBag
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validateWithBag(string $errorBag)
+    {
+        try {
+            return $this->validate();
+        } catch (ValidationException $e) {
+            $e->errorBag = $errorBag;
+
+            throw $e;
+        }
+    }
+
+    /**
      * Get the attributes and values that were validated.
      *
      * @return array
