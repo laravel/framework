@@ -118,7 +118,9 @@ class FoundationFormRequestTest extends TestCase
 
     public function testValidatedExceptMethodReturnsTheValidatedDataWithoutTheSpecifiedKeys()
     {
-        $request = $this->createRequest(['name' => 'Rory', 'unwanted' => 'extras']);
+        $payload = ['name' => 'Rory', 'unwanted' => 'extras'];
+
+        $request = $this->createRequest($payload,FoundationTestFormRequestMultipleRulesStub::class);
 
         $request->validateResolved();
 
@@ -231,6 +233,19 @@ class FoundationTestFormRequestStub extends FormRequest
     public function rules()
     {
         return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestMultipleRulesStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required', 'unwanted' => 'required'];
     }
 
     public function authorize()
