@@ -120,7 +120,7 @@ class FoundationFormRequestTest extends TestCase
     {
         $payload = ['name' => 'Rory', 'unwanted' => 'extras'];
 
-        $request = $this->createRequest($payload,FoundationTestFormRequestMultipleRulesStub::class);
+        $request = $this->createRequest($payload, FoundationTestFormRequestMultipleRulesStub::class);
 
         $request->validateResolved();
 
