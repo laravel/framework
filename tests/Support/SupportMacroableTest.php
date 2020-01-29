@@ -73,6 +73,21 @@ class SupportMacroableTest extends TestCase
         TestMacroable::mixin(new TestMixin);
         $this->assertSame('foo', $instance->methodThree());
     }
+
+    public function testMacroableExtendsWithCall()
+    {
+        TestMacroableExtendsWithCall::macro('something', function () {
+            return 'something';
+        });
+
+        $instance = new TestMacroableExtendsWithCall;
+        $this->assertSame('something', $instance->something());
+        $this->assertSame('parent __call', $instance->another());
+
+        $this->assertSame('something', TestMacroableExtendsWithCall::something());
+        $this->assertSame('parent __call', TestMacroableExtendsWithCall::another());
+    }
+
 }
 
 class EmptyMacroable
@@ -90,6 +105,24 @@ class TestMacroable
     {
         return 'static';
     }
+}
+
+class BaseWithCall
+{
+    public function __call($name, $arguments)
+    {
+        return 'parent __call';
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        return 'parent __call';
+    }
+}
+
+class TestMacroableExtendsWithCall extends BaseWithCall
+{
+    use Macroable;
 }
 
 class TestMixin
