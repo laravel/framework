@@ -17,7 +17,7 @@ class DummyClass extends Component
     }
 
     /**
-     * Get the view that represents the component.
+     * Get the view / contents that represent the component.
      *
      * @return string
      */
