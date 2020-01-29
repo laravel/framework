@@ -502,6 +502,12 @@ class Route
         return $this->bindingFields[$parameter] ?? null;
     }
 
+    /**
+     * Get the parent parameter of the given parameter.
+     *
+     * @param  string  $parameter
+     * @return string
+     */
     public function parentOfParameter($parameter)
     {
         $key = array_search($parameter, array_keys($this->parameters));
