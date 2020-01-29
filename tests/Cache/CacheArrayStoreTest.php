@@ -206,4 +206,16 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertObjectNotHasAttribute('bar', $store->get('object'));
     }
+
+    public function testValuesAreStoredByReferenceIfSerializationIsDisabled()
+    {
+        $store = new ArrayStore(false);
+        $object = new \stdClass;
+        $object->foo = true;
+
+        $store->put('object', $object, 10);
+        $object->bar = true;
+
+        $this->assertObjectHasAttribute('bar', $store->get('object'));
+    }
 }

@@ -24,6 +24,24 @@ class ArrayStore extends TaggableStore implements LockProvider
     public $locks = [];
 
     /**
+     * Indicates if values are serialized within the store.
+     *
+     * @var bool
+     */
+    protected $serializesValues;
+
+    /**
+     * Create a new Array store.
+     *
+     * @param  bool  $serializesValues
+     * @return void
+     */
+    public function __construct($serializesValues = true)
+    {
+        $this->serializesValues = $serializesValues;
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string|array  $key
@@ -45,7 +63,7 @@ class ArrayStore extends TaggableStore implements LockProvider
             return;
         }
 
-        return unserialize($item['value']);
+        return $this->serializesValues ? unserialize($item['value']) : $item['value'];
     }
 
     /**
@@ -59,7 +77,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function put($key, $value, $seconds)
     {
         $this->storage[$key] = [
-            'value' => serialize($value),
+            'value' => $this->serializesValues ? serialize($value) : $value,
             'expiresAt' => $this->calculateExpiration($seconds),
         ];
 
@@ -77,7 +95,9 @@ class ArrayStore extends TaggableStore implements LockProvider
     {
         if ($existing = $this->get($key)) {
             return tap(((int) $existing) + $value, function ($incremented) use ($key) {
-                $this->storage[$key]['value'] = serialize($incremented);
+                $value = $this->serializesValues ? serialize($incremented) : $incremented;
+
+                $this->storage[$key]['value'] = $value;
             });
         }
 
