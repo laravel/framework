@@ -77,7 +77,6 @@ class TestInlineViewComponent extends Component
     }
 }
 
-
 class TestRegularViewComponent extends Component
 {
     public $title;

@@ -157,7 +157,7 @@ abstract class Component implements Renderable
             file_put_contents($viewFile, $contents);
         }
 
-        return '__components::'.basename($viewFile,'.blade.php');
+        return '__components::'.basename($viewFile, '.blade.php');
     }
 
     /**
