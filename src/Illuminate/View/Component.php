@@ -35,6 +35,40 @@ abstract class Component implements Renderable
     abstract public function view();
 
     /**
+     * Get the Blade view file that should be used when rendering the component.
+     *
+     * @return string
+     */
+    public function viewFile()
+    {
+        $factory = Container::getInstance()->make('view');
+
+        return $factory->exists($this->view())
+                    ? $this->view()
+                    : $this->createBladeViewFromString($factory, $this->view());
+    }
+
+    /**
+     * Create a Blade view with the raw component string content.
+     *
+     * @param  string  $contents
+     * @return string
+     */
+    protected function createBladeViewFromString($factory, $contents)
+    {
+        $factory->addNamespace(
+            '__components',
+            $directory = Container::getInstance()['config']->get('view.compiled')
+        );
+
+        if (! file_exists($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
+            file_put_contents($viewFile, $contents);
+        }
+
+        return '__components::'.basename($viewFile, '.blade.php');
+    }
+
+    /**
      * Get the data that should be supplied to the view.
      *
      * @author Freek Van der Herten
@@ -81,21 +115,6 @@ abstract class Component implements Renderable
     }
 
     /**
-     * Set the extra attributes that the component should make available.
-     *
-     * @param  array  $attributes
-     * @return $this
-     */
-    public function withAttributes(array $attributes)
-    {
-        $this->attributes = $this->attributes ?: new ComponentAttributeBag;
-
-        $this->attributes->setAttributes($attributes);
-
-        return $this;
-    }
-
-    /**
      * Determine if the given property / method should be ignored.
      *
      * @param  string  $name
@@ -125,39 +144,18 @@ abstract class Component implements Renderable
     }
 
     /**
-     * Get the blade view file that should be used when rendering the component.
-     * When a string-based view is used, a temporary view will be generated.
+     * Set the extra attributes that the component should make available.
      *
-     * @return string
+     * @param  array  $attributes
+     * @return $this
      */
-    public function viewFile()
+    public function withAttributes(array $attributes)
     {
-        if (View::exists($this->view())) {
-            return $this->view();
-        }
+        $this->attributes = $this->attributes ?: new ComponentAttributeBag;
 
-        return $this->createBladeViewFromString($this->view());
-    }
+        $this->attributes->setAttributes($attributes);
 
-    /**
-     * Create a blade view with the component string content.
-     *
-     * @param $contents
-     * @return string
-     */
-    protected function createBladeViewFromString($contents)
-    {
-        $viewPath = Container::getInstance()['config']->get('view.compiled');
-
-        View::addNamespace('__components', $viewPath);
-
-        $viewFile = $viewPath.'/'.sha1($contents).'.blade.php';
-
-        if (! file_exists($viewFile)) {
-            file_put_contents($viewFile, $contents);
-        }
-
-        return '__components::'.basename($viewFile, '.blade.php');
+        return $this;
     }
 
     /**
