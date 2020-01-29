@@ -28,7 +28,7 @@ abstract class Component implements Renderable
     public $attributes;
 
     /**
-     * Get the view/view contents that represents the component.
+     * Get the view / view contents that represent the component.
      *
      * @return string
      */
