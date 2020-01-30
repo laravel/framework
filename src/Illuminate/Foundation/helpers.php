@@ -414,20 +414,6 @@ if (! function_exists('dispatch_now')) {
     }
 }
 
-if (! function_exists('dispatch_eventually')) {
-    /**
-     * Dispatch a command to its appropriate handler after the current process.
-     *
-     * @param  mixed  $job
-     * @param  mixed  $handler
-     * @return void
-     */
-    function dispatch_eventually($job, $handler = null)
-    {
-        return app(Dispatcher::class)->dispatchEventually($job, $handler);
-    }
-}
-
 if (! function_exists('elixir')) {
     /**
      * Get the path to a versioned Elixir file.

@@ -191,7 +191,7 @@ class Dispatcher implements QueueingDispatcher
      * @param  mixed  $handler
      * @return void
      */
-    public function dispatchEventually($command, $handler = null)
+    public function dispatchAfterResponse($command, $handler = null)
     {
         $this->container->terminating(function () use ($command, $handler) {
             $this->dispatchNow($command, $handler);
