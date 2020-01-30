@@ -70,6 +70,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->timestamps();
         });
 
+        $this->schema('default')->create('users_with_space_in_colum_name', function ($table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+            $table->string('email address');
+            $table->timestamps();
+        });
+
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->create('users', function ($table) {
                 $table->increments('id');
@@ -442,7 +449,19 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals([1 => 'First post', 2 => 'Second post'], $query->pluck('posts.name', 'posts.id')->all());
         $this->assertEquals([2 => 'First post', 1 => 'Second post'], $query->pluck('posts.name', 'users.id')->all());
-        $this->assertEquals(['abigailotwell@gmail.com' => 'First post', 'taylorotwell@gmail.com' => 'Second post'], $query->pluck('posts.name', 'users.email as user_email')->all());
+        $this->assertEquals(['abigailotwell@gmail.com' => 'First post', 'taylorotwell@gmail.com' => 'Second post'], $query->pluck('posts.name', 'users.email AS user_email')->all());
+    }
+
+    public function testPluckWithColumnNameContainingASpace()
+    {
+        EloquentTestUserWithSpaceInColumnName::create(['id' => 1, 'email address' => 'taylorotwell@gmail.com']);
+        EloquentTestUserWithSpaceInColumnName::create(['id' => 2, 'email address' => 'abigailotwell@gmail.com']);
+
+        $simple = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('users_with_space_in_colum_name.email address')->all();
+        $keyed = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('email address', 'id')->all();
+
+        $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
+        $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
     }
 
     public function testFindOrFail()
@@ -1733,6 +1752,11 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
         return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')
                         ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
     }
+}
+
+class EloquentTestUserWithSpaceInColumnName extends EloquentTestUser
+{
+    protected $table = 'users_with_space_in_colum_name';
 }
 
 class EloquentTestNonIncrementing extends Eloquent

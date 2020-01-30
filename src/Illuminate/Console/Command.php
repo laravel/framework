@@ -8,9 +8,7 @@ use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -18,6 +16,7 @@ use Symfony\Component\Console\Question\Question;
 class Command extends SymfonyCommand
 {
     use Concerns\CallsCommands,
+        Concerns\HasParameters,
         Macroable;
 
     /**
@@ -142,33 +141,6 @@ class Command extends SymfonyCommand
         // instances of these "InputArgument" and "InputOption" Symfony classes.
         $this->getDefinition()->addArguments($arguments);
         $this->getDefinition()->addOptions($options);
-    }
-
-    /**
-     * Specify the arguments and options on the command.
-     *
-     * @return void
-     */
-    protected function specifyParameters()
-    {
-        // We will loop through all of the arguments and options for the command and
-        // set them all on the base command instance. This specifies what can get
-        // passed into these commands as "parameters" to control the execution.
-        foreach ($this->getArguments() as $arguments) {
-            if ($arguments instanceof InputArgument) {
-                $this->getDefinition()->addArgument($arguments);
-            } else {
-                call_user_func_array([$this, 'addArgument'], $arguments);
-            }
-        }
-
-        foreach ($this->getOptions() as $options) {
-            if ($options instanceof InputOption) {
-                $this->getDefinition()->addOption($options);
-            } else {
-                call_user_func_array([$this, 'addOption'], $options);
-            }
-        }
     }
 
     /**
@@ -579,26 +551,6 @@ class Command extends SymfonyCommand
         parent::setHidden($this->hidden = $hidden);
 
         return $this;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [];
     }
 
     /**

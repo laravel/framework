@@ -7,6 +7,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
+use PDO;
 
 class DatabaseQueue extends Queue implements QueueContract
 {
@@ -211,7 +212,7 @@ class DatabaseQueue extends Queue implements QueueContract
     protected function getNextAvailableJob($queue)
     {
         $job = $this->database->table($this->table)
-                    ->lockForUpdate()
+                    ->lock($this->getLockForPopping())
                     ->where('queue', $this->getQueue($queue))
                     ->where(function ($query) {
                         $this->isAvailable($query);
@@ -221,6 +222,24 @@ class DatabaseQueue extends Queue implements QueueContract
                     ->first();
 
         return $job ? new DatabaseJobRecord((object) $job) : null;
+    }
+
+    /**
+     * Get the lock required for popping the next job.
+     *
+     * @return string
+     */
+    protected function getLockForPopping()
+    {
+        $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $databaseVersion = $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+
+        if ($databaseEngine == 'mysql' && version_compare($databaseVersion, '8.0.1', '>=') ||
+            $databaseEngine == 'pgsql' && version_compare($databaseVersion, '9.5', '>=')) {
+            return 'FOR UPDATE SKIP LOCKED';
+        }
+
+        return 'FOR UPDATE';
     }
 
     /**
