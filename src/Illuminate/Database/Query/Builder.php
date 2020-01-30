@@ -2310,7 +2310,13 @@ class Builder
      */
     protected function stripTableForPluck($column)
     {
-        return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
+        if (is_null($column)) {
+            return $column;
+        }
+
+        $seperator = strpos($column, ' as ') !== false ? ' as ' : '\.';
+
+        return last(preg_split('~'.$seperator.'~', $column));
     }
 
     /**
