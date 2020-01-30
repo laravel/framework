@@ -197,7 +197,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testValuesAreNotStoredByReference()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore($serialize = true);
         $object = new \stdClass;
         $object->foo = true;
 
@@ -209,7 +209,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testValuesAreStoredByReferenceIfSerializationIsDisabled()
     {
-        $store = new ArrayStore(false);
+        $store = new ArrayStore;
         $object = new \stdClass;
         $object->foo = true;
 
