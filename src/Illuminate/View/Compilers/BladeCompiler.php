@@ -546,6 +546,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Get the registered class component aliases.
+     *
+     * @return array
+     */
+    public function getClassComponentAliases()
+    {
+        return $this->classComponentAliases;
+    }
+
+    /**
      * Register a component alias directive.
      *
      * @param  string  $path
