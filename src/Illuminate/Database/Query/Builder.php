@@ -2314,9 +2314,9 @@ class Builder
             return $column;
         }
 
-        $seperator = strpos($column, ' as ') !== false ? ' as ' : '\.';
+        $seperator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
 
-        return last(preg_split('~'.$seperator.'~', $column));
+        return last(preg_split('~'.$seperator.'~i', $column));
     }
 
     /**
