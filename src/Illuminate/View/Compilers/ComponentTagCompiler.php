@@ -188,7 +188,11 @@ class ComponentTagCompiler
                     ->make(Application::class)
                     ->getNamespace();
 
-        return $namespace.'ViewComponents\\'.ucfirst(Str::camel($component));
+        $componentPieces = array_map(function ($componentPiece) {
+            return ucfirst(Str::camel($componentPiece));
+        }, explode(':', $component));
+
+        return $namespace.'ViewComponents\\'.implode('\\', $componentPieces);
     }
 
     /**

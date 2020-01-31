@@ -46,6 +46,20 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         Container::setInstance(null);
     }
 
+    public function testClassNamesCanBeGuessedWithNamespaces()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        Container::setInstance($container);
+
+        $result = (new ComponentTagCompiler([]))->guessClassName('base:alert');
+
+        $this->assertEquals("App\ViewComponents\Base\Alert", trim($result));
+
+        Container::setInstance(null);
+    }
+
     public function testComponentsCanBeCompiledWithHyphenAttributes()
     {
         $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<x-alert class="bar" wire:model="foo" x-on:click="bar" @click="baz" />');
