@@ -390,10 +390,13 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is contained within the response.
      *
      * @param  string  $value
+     * @param  bool  $escaped
      * @return $this
      */
-    public function assertSee($value)
+    public function assertSee($value, $escaped = true)
     {
+        $value = $escaped ? e($value) : $value;
+
         PHPUnit::assertStringContainsString((string) $value, $this->getContent());
 
         return $this;
@@ -403,10 +406,13 @@ class TestResponse implements ArrayAccess
      * Assert that the given strings are contained in order within the response.
      *
      * @param  array  $values
+     * @param  bool  $escaped
      * @return $this
      */
-    public function assertSeeInOrder(array $values)
+    public function assertSeeInOrder(array $values, $escaped = true)
     {
+        $values = $escaped ? array_map('e', ($values)) : $values;
+
         PHPUnit::assertThat($values, new SeeInOrder($this->getContent()));
 
         return $this;
@@ -432,10 +438,13 @@ class TestResponse implements ArrayAccess
      * Assert that the given strings are contained in order within the response text.
      *
      * @param  array  $values
+     * @param  bool  $escaped
      * @return $this
      */
-    public function assertSeeTextInOrder(array $values)
+    public function assertSeeTextInOrder(array $values, $escaped = true)
     {
+        $values = $escaped ? array_map('e', ($values)) : $values;
+
         PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
 
         return $this;
@@ -445,10 +454,13 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is not contained within the response.
      *
      * @param  string  $value
+     * @param  bool  $escaped
      * @return $this
      */
-    public function assertDontSee($value)
+    public function assertDontSee($value, $escaped = true)
     {
+        $value = $escaped ? e($value) : $value;
+
         PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
 
         return $this;
@@ -458,10 +470,13 @@ class TestResponse implements ArrayAccess
      * Assert that the given string is not contained within the response text.
      *
      * @param  string  $value
+     * @param  bool  $escaped
      * @return $this
      */
-    public function assertDontSeeText($value)
+    public function assertDontSeeText($value, $escaped = true)
     {
+        $value = $escaped ? e($value) : $value;
+
         PHPUnit::assertStringNotContainsString((string) $value, strip_tags($this->getContent()));
 
         return $this;

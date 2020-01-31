@@ -154,6 +154,15 @@ class TestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['foobar', 'baz', 'foo']);
     }
 
+    public function testAssertSeeTextInOrderEscaped()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<strong>laravel &amp; php</strong> <i>phpstorm &gt; sublime</i>',
+        ]);
+
+        $response->assertSeeTextInOrder(['laravel & php', 'phpstorm > sublime']);
+    }
+
     public function testAssertSeeTextInOrderCanFail()
     {
         $this->expectException(AssertionFailedError::class);
