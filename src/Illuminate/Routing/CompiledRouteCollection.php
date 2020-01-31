@@ -114,7 +114,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * Get routes from the collection by method.
      *
      * @param  string|null  $method
-     * @return array
+     * @return \Illuminate\Routing\Route[]
      */
     public function get($method = null)
     {

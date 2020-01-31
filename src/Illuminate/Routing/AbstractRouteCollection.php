@@ -69,7 +69,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     /**
      * Determine if a route in the array matches the request.
      *
-     * @param  array  $routes
+     * @param  \Illuminate\Routing\Route[]  $routes
      * @param  \Illuminate\Http\Request  $request
      * @param  bool  $includingMethod
      * @return \Illuminate\Routing\Route|null
@@ -89,7 +89,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      * Get a route (if necessary) that responds when other available methods are present.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array  $methods
+     * @param  string[]  $methods
      * @return \Illuminate\Routing\Route
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
