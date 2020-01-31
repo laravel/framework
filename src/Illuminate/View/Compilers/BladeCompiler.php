@@ -519,11 +519,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @param  string  $class
      * @param  string|null  $alias
+     * @param  string  $prefix
      * @return void
      */
-    public function component($class, $alias = null)
+    public function component($class, $alias = null, $prefix = '')
     {
         $alias = $alias ?: Str::kebab(class_basename($class));
+
+        if (! empty($prefix)) {
+            $alias = $prefix.'-'.$alias;
+        }
 
         $this->classComponentAliases[$alias] = $class;
     }
