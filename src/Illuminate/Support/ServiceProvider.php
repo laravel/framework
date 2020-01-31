@@ -116,7 +116,7 @@ abstract class ServiceProvider
     {
         $this->callAfterResolving(BladeCompiler::class, function ($blade) use ($prefix, $components) {
             foreach ($components as $component) {
-                $blade->component($component, $prefix.'-'.Str::snake(class_basename($component), '-'));
+                $blade->component($component, $prefix.'-'.Str::kebab(class_basename($component)));
             }
         });
     }
