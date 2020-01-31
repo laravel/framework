@@ -399,11 +399,12 @@ class Validator implements ValidatorContract
     /**
      * Get the attributes and values that were validated.
      *
+     * @param string|null $key
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function validated()
+    public function validated($key = null)
     {
         if ($this->invalid()) {
             throw new ValidationException($this);
@@ -413,15 +414,15 @@ class Validator implements ValidatorContract
 
         $missingValue = Str::random(10);
 
-        foreach (array_keys($this->getRules()) as $key) {
-            $value = data_get($this->getData(), $key, $missingValue);
+        foreach (array_keys($this->getRules()) as $ruleName) {
+            $value = data_get($this->getData(), $ruleName, $missingValue);
 
             if ($value !== $missingValue) {
-                Arr::set($results, $key, $value);
+                Arr::set($results, $ruleName, $value);
             }
         }
 
-        return $results;
+        return data_get($results, $key);
     }
 
     /**
