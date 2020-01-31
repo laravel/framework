@@ -537,15 +537,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an array of class-based components.
      *
      * @param  array  $components
+     * @param  string  $prefix
      * @return void
      */
-    public function components(array $components)
+    public function components(array $components, $prefix = '')
     {
         foreach ($components as $key => $value) {
             if (is_numeric($key)) {
-                static::component($value);
+                static::component($value, null, $prefix);
             } else {
-                static::component($key, $value);
+                static::component($key, $value, $prefix);
             }
         }
     }
