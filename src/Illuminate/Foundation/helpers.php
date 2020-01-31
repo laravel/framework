@@ -226,36 +226,35 @@ if (! function_exists('cache')) {
      *
      * If an array is passed, we'll assume you want to put to the cache.
      *
-     * @param  dynamic  key|key,default|data,expiration|null
+     * @param array|string $cache key|key,default|data
+     * @param mixed $expiration expiration|null
      * @return mixed|\Illuminate\Cache\CacheManager
      *
      * @throws \Exception
      */
-    function cache()
+    function cache($cache = null , $expiration = null)
     {
-        $arguments = func_get_args();
-
-        if (empty($arguments)) {
+        if (empty($cache)) {
             return app('cache');
         }
 
-        if (is_string($arguments[0])) {
-            return app('cache')->get(...$arguments);
+        if (is_string($cache)) {
+            return app('cache')->get($cache);
         }
 
-        if (! is_array($arguments[0])) {
+        if (! is_array($cache)) {
             throw new Exception(
                 'When setting a value in the cache, you must pass an array of key / value pairs.'
             );
         }
 
-        if (! isset($arguments[1])) {
+        if (! isset($expiration)) {
             throw new Exception(
                 'You must specify an expiration time when setting a value in the cache.'
             );
         }
 
-        return app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1]);
+        return app('cache')->put(key($cache), reset($cache), $expiration);
     }
 }
 
