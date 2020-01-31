@@ -232,7 +232,7 @@ if (! function_exists('cache')) {
      *
      * @throws \Exception
      */
-    function cache($cache = null , $expiration = null)
+    function cache($cache = null, $expiration = null)
     {
         if (empty($cache)) {
             return app('cache');
