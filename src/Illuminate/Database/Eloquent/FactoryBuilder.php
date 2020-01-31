@@ -193,7 +193,7 @@ class FactoryBuilder
     /**
      * Create a collection of models and persist them to the database.
      *
-     * @param iterable  $records
+     * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
     public function createMany(iterable $records)
