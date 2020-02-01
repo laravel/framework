@@ -119,6 +119,11 @@ class FrequencyTest extends TestCase
     {
         $this->assertSame('0 0 1 1-12/3 *', $this->event->quarterly()->getExpression());
     }
+    
+    public function testAfterDate()
+    {
+        $this->assertSame('* * * * *', $this->event->everyMinute()->afterDate(\Carbon\Carbon::now()->addDay())->getExpression());
+    }
 
     public function testFrequencyMacro()
     {
