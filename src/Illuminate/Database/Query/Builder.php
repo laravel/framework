@@ -677,7 +677,7 @@ class Builder
         if (is_array($value)) {
             if ($operator === '=') {
                 return $this->whereIn($column, $value, $boolean);
-            } elseif ($operator === '<>' || $operator ===  '!=') {
+            } elseif ($operator === '<>' || $operator === '!=') {
                 return $this->whereNotIn($column, $value, $boolean);
             }
         }
