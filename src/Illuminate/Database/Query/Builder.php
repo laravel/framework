@@ -672,6 +672,16 @@ class Builder
             [$value, $operator] = [$operator, '='];
         }
 
+        // If the given value is array and operator is '=', '<>' or '!=' we will use valid methods instead
+        // to avoid running query with only first value from array
+        if (is_array($value)) {
+            if ($operator === '=') {
+                return $this->whereIn($column, $value, $boolean);
+            } elseif ($operator === '<>' || $operator ===  '!=') {
+                return $this->whereNotIn($column, $value, $boolean);
+            }
+        }
+
         // If the value is a Closure, it means the developer is performing an entire
         // sub-select within the query and we will need to compile the sub-select
         // within the where clause to get the appropriate query record results.
