@@ -702,6 +702,18 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response JSON has zero number of items at the given key.
+     *
+     * @param  int  $count
+     * @param  string|null  $key
+     * @return $this
+     */
+    public function assertJsonEmpty($key = null)
+    {
+        return $this->assertJsonCount(0, $key);
+    }
+
+    /**
      * Assert that the response has the given JSON validation errors.
      *
      * @param  string|array  $errors

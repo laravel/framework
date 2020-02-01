@@ -486,6 +486,7 @@ class FoundationTestResponseTest extends TestCase
 
         // With simple key
         $response->assertJsonCount(3, 'bars');
+        $response->assertJsonCount(0, 'empty_bars');
 
         // With nested key
         $response->assertJsonCount(1, 'barfoo.0.bar');
@@ -494,6 +495,17 @@ class FoundationTestResponseTest extends TestCase
         // Without structure
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
         $response->assertJsonCount(4);
+    }
+
+    public function testAssertJsonEmpty()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonEmpty('empty_bars');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableEmptyResourcesStub));
+        
+        $response->assertJsonEmpty();
     }
 
     public function testAssertJsonMissing()
@@ -937,6 +949,7 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
                 3 => ['bar' => 'foo 1', 'foo' => 'bar 1'],
                 4 => ['bar' => 'foo 2', 'foo' => 'bar 2'],
             ],
+            'empty_bars' => []
         ];
     }
 }
@@ -963,5 +976,13 @@ class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
             ['id' => 20, 'foo' => 'bar'],
             ['id' => 30, 'foo' => 'bar'],
         ];
+    }
+}
+
+class JsonSerializableEmptyResourcesStub implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return [];
     }
 }
