@@ -522,6 +522,12 @@ class Dispatcher implements DispatcherContract
         } else {
             unset($this->listeners[$event]);
         }
+
+        foreach ($this->wildcardsCache as $key => $listeners) {
+            if (Str::is($event, $key)) {
+                unset($this->wildcardsCache[$key]);
+            }
+        }
     }
 
     /**
