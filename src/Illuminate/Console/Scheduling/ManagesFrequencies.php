@@ -420,4 +420,18 @@ trait ManagesFrequencies
 
         return $this->cron(implode(' ', $segments));
     }
+    
+    /**
+     * Schedule the event to run after time.
+     *
+     * @param  string|Carbon  $startTime
+     * @return \Closure
+     */
+    public function afterDate($date)
+    {
+        if(is_string($date)) {
+            $date = \Carbon\Carbon::make($date);
+        }
+        return $date <= Carbon::now();
+    }
 }
