@@ -499,7 +499,7 @@ class LogManager implements LoggerInterface
      */
     public function emergency($message, array $context = [])
     {
-        $this->driver()->emergency($message, $context);
+        $this->driver()->emergency($message, $this->context($context, __FUNCTION__));
     }
 
     /**
@@ -515,7 +515,7 @@ class LogManager implements LoggerInterface
      */
     public function alert($message, array $context = [])
     {
-        $this->driver()->alert($message, $context);
+        $this->driver()->alert($message, $this->context($context, __FUNCTION__));
     }
 
     /**
@@ -530,7 +530,7 @@ class LogManager implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        $this->driver()->critical($message, $context);
+        $this->driver()->critical($message, $this->context($context, __FUNCTION__));
     }
 
     /**
@@ -544,7 +544,7 @@ class LogManager implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
-        $this->driver()->error($message, $context);
+        $this->driver()->error($message, $this->context($context, __FUNCTION__));
     }
 
     /**
@@ -560,7 +560,7 @@ class LogManager implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        $this->driver()->warning($message, $context);
+        $this->driver()->warning($message, $this->context($context, __FUNCTION__));
     }
 
     /**
@@ -573,7 +573,7 @@ class LogManager implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        $this->driver()->notice($message, $context);
+        $this->driver()->notice($message, $this->context($context, __FUNCTION__));
     }
 
     /**
@@ -588,7 +588,7 @@ class LogManager implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
-        $this->driver()->info($message, $context);
+        $this->driver()->info($message, $this->context($context, __FUNCTION__));
     }
 
     /**
@@ -601,7 +601,7 @@ class LogManager implements LoggerInterface
      */
     public function debug($message, array $context = [])
     {
-        $this->driver()->debug($message, $context);
+        $this->driver()->debug($message, $this->context($context, __FUNCTION__));
     }
 
     /**
@@ -615,7 +615,7 @@ class LogManager implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        $this->driver()->log($level, $message, $context);
+        $this->driver()->log($level, $message, $this->context($context, $level));
     }
 
     /**
@@ -628,5 +628,18 @@ class LogManager implements LoggerInterface
     public function __call($method, $parameters)
     {
         return $this->driver()->$method(...$parameters);
+    }
+
+    /**
+     * Get context.
+     *
+     * @param  array  $context
+     * @param  mixed  $level
+     *
+     * @return array
+     */
+    protected function context(array $context, $level)
+    {
+        return $context;
     }
 }
