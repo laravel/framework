@@ -504,7 +504,7 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonEmpty('empty_bars');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableEmptyResourcesStub));
-        
+
         $response->assertJsonEmpty();
     }
 
@@ -949,7 +949,7 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
                 3 => ['bar' => 'foo 1', 'foo' => 'bar 1'],
                 4 => ['bar' => 'foo 2', 'foo' => 'bar 2'],
             ],
-            'empty_bars' => []
+            'empty_bars' => [],
         ];
     }
 }
