@@ -630,11 +630,12 @@ class SupportArrTest extends TestCase
 
     public function testSelectiveMap()
     {
-        $array = ['user' => ['login' => 'Admin', 'email' => 'Admin@Example.com', 'password' => 'SeCrEt']];
-        Arr::selectiveMap($array, ['user.login', 'user.email'], function ($value) {
+        $immutableArray = ['user' => ['login' => 'Admin', 'email' => 'Admin@Example.com', 'password' => 'SeCrEt']];
+        $newArray = Arr::selectiveMap($immutableArray, ['user.login', 'user.email'], function ($value) {
             return mb_strtolower($value, 'UTF-8');
         });
-        $this->assertEquals(['user' => ['login'=> 'admin', 'email' => 'admin@example.com', 'password' => 'SeCrEt']], $array);
+        $this->assertEquals(['user' => ['login' => 'Admin', 'email' => 'Admin@Example.com', 'password' => 'SeCrEt']], $immutableArray);
+        $this->assertEquals(['user' => ['login'=> 'admin', 'email' => 'admin@example.com', 'password' => 'SeCrEt']], $newArray);
     }
 
     public function testShuffleWithSeed()
