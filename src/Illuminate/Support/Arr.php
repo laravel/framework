@@ -542,7 +542,7 @@ class Arr
      * @return mixed
      */
     public static function selectiveMap(&$array, $key, callable $callback) {
-        $keys = (array)$key;
+        $keys = (array) $key;
 
         foreach ($keys as $key) {
             $value = static::get($array, $key);
