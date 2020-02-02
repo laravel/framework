@@ -4760,6 +4760,13 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['first' => 'foo'], $v->validated('object'));
     }
 
+    public function testValidatedWithArrayAsKey()
+    {
+        $post = ['first' => 'foo', 'second' => 'bar'];
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'second' => 'required']);
+        $this->assertEquals(['first' => 'foo', 'second' => 'bar'], $v->validated(['first', 'second']));
+    }
+
     public function testMultiplePassesCalls()
     {
         $trans = $this->getIlluminateArrayTranslator();

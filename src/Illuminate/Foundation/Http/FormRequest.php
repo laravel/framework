@@ -181,12 +181,12 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get the validated data from the request.
      *
-     * @param string|null $key
+     * @param string|array|null $query
      * @return array
      */
-    public function validated($key = null)
+    public function validated($query = null)
     {
-        return $this->validator->validated($key);
+        return $this->validator->validated($query);
     }
 
     /**

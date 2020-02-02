@@ -16,10 +16,10 @@ interface Validator extends MessageProvider
     /**
      * Get the attributes and values that were validated.
      *
-     * @param string|null $key
+     * @param string|array|null $query
      * @return array
      */
-    public function validated($key = null);
+    public function validated($query = null);
 
     /**
      * Determine if the data fails the validation rules.

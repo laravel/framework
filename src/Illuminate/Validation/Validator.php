@@ -399,12 +399,12 @@ class Validator implements ValidatorContract
     /**
      * Get the attributes and values that were validated.
      *
-     * @param string|null $key
+     * @param string|array|null $query
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function validated($key = null)
+    public function validated($query = null)
     {
         if ($this->invalid()) {
             throw new ValidationException($this);
@@ -422,7 +422,15 @@ class Validator implements ValidatorContract
             }
         }
 
-        return data_get($results, $key);
+        if (is_array($query)) {
+            return array_reduce($query, function ($carry, $selector) use ($results) {
+                $carry[$selector] = data_get($results, $selector);
+
+                return $carry;
+            }, []);
+        }
+
+        return data_get($results, $query);
     }
 
     /**
