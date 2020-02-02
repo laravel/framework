@@ -1,6 +1,25 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.13.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.13.1...6.x)
+
+### Added
+- Added `Illuminate\Bus\Dispatcher::dispatchAfterResponse()` method ([#31300](https://github.com/laravel/framework/pull/31300), [8a3cdb0](https://github.com/laravel/framework/commit/8a3cdb0622047b1d94b4a754bfe98fb7dc1c174a))
+
+### Fixed
+- Used current DB to create Doctrine Connections ([#31278](https://github.com/laravel/framework/pull/31278))
+
+### TODO
+- Use SKIP LOCKED for mysql 8.1 and pgsql 9.5 queue workers ([#31287](https://github.com/laravel/framework/pull/31287))
+- Dont merge middleware from method and property ([#31301](https://github.com/laravel/framework/pull/31301))
+- Fix plucking column name containing a space ([#31299](https://github.com/laravel/framework/pull/31299))
+- Split specifyParameter() to external trait ([#31254](https://github.com/laravel/framework/pull/31254))
+- Fix bug with wildcard caching in event dispatcher ([#31313](https://github.com/laravel/framework/pull/31313))
+
+
+## [v6.13.1 (2020-01-28)](https://github.com/laravel/framework/compare/v6.13.0...v6.13.1)
+
+### Fixed
+- Fixed error on `queue:work` database on Windows ([#31277](https://github.com/laravel/framework/pull/31277))
 
 
 ## [v6.13.0 (2020-01-28)](https://github.com/laravel/framework/compare/v6.12.0...v6.13.0)
