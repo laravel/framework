@@ -534,6 +534,26 @@ class Arr
     }
 
     /**
+     * Applies the callback to the items of the given array using "dot" notation.
+     *
+     * @param  array  $array
+     * @param  string|string[]  $key
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function selectiveMap(&$array, $key, callable $callback) {
+        $keys = (array)$key;
+
+        foreach ($keys as $key) {
+            $value = static::get($array, $key);
+
+            static::set($array, $key, $callback($value, $key));
+        }
+
+        return $array;
+    }
+
+    /**
      * Shuffle the given array and return the result.
      *
      * @param  array  $array
