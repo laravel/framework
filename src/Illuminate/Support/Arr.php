@@ -541,7 +541,8 @@ class Arr
      * @param  callable  $callback
      * @return mixed
      */
-    public static function selectiveMap(&$array, $key, callable $callback) {
+    public static function selectiveMap(&$array, $key, callable $callback)
+    {
         $keys = (array) $key;
 
         foreach ($keys as $key) {
