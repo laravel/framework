@@ -193,13 +193,13 @@ class ViewBladeCompilerTest extends TestCase
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
-        $compiler->component('App\ViewComponents\Forms\Input');
-        $this->assertEquals(['forms:input' => 'App\ViewComponents\Forms\Input'], $compiler->getClassComponentAliases());
+        $compiler->component('App\View\Components\Forms\Input');
+        $this->assertEquals(['forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
-        $compiler->component('App\ViewComponents\Forms\Input', null, 'prefix');
-        $this->assertEquals(['prefix-forms:input' => 'App\ViewComponents\Forms\Input'], $compiler->getClassComponentAliases());
+        $compiler->component('App\View\Components\Forms\Input', null, 'prefix');
+        $this->assertEquals(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
     }
 
     protected function getFiles()
