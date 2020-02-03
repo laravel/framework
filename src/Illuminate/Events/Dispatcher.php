@@ -11,10 +11,13 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use ReflectionClass;
 
 class Dispatcher implements DispatcherContract
 {
+    use Macroable;
+
     /**
      * The IoC container instance.
      *

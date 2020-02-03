@@ -2,11 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Events\MigrationEnded;
-use Illuminate\Database\Events\MigrationsEnded;
-use Illuminate\Database\Events\MigrationsStarted;
-use Illuminate\Database\Events\MigrationStarted;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 
 class MigrateWithRealpathTest extends DatabaseTestCase
@@ -39,28 +34,5 @@ class MigrateWithRealpathTest extends DatabaseTestCase
             'migration' => '2014_10_12_000000_create_members_table',
             'batch' => 1,
         ]);
-    }
-
-    public function testMigrationEventsAreFired()
-    {
-        Event::fake();
-
-        Event::listen(MigrationsStarted::class, function ($event) {
-            return $this->assertInstanceOf(MigrationsStarted::class, $event);
-        });
-
-        Event::listen(MigrationsEnded::class, function ($event) {
-            return $this->assertInstanceOf(MigrationsEnded::class, $event);
-        });
-
-        Event::listen(MigrationStarted::class, function ($event) {
-            return $this->assertInstanceOf(MigrationStarted::class, $event);
-        });
-
-        Event::listen(MigrationEnded::class, function ($event) {
-            return $this->assertInstanceOf(MigrationEnded::class, $event);
-        });
-
-        $this->artisan('migrate');
     }
 }
