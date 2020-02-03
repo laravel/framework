@@ -18,6 +18,11 @@ then
     VERSION="v$VERSION"
 fi
 
+# Tag Framework
+git tag $VERSION
+git push origin --tags
+
+# Tag Components
 for REMOTE in auth broadcasting bus cache config console container contracts cookie database encryption events filesystem hashing http log mail notifications pagination pipeline queue redis routing session support testing translation validation view
 do
     echo ""
