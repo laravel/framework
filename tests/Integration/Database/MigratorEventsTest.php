@@ -6,7 +6,7 @@ use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Events\MigrationStarted;
-use Illuminate\Database\Events\NoMigrations;
+use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Event;
 
@@ -61,10 +61,10 @@ class MigratorEventsTest extends DatabaseTestCase
         $this->artisan('migrate');
         $this->artisan('migrate:rollback');
 
-        Event::assertDispatched(NoMigrations::class, function ($event) {
+        Event::assertDispatched(NoPendingMigrations::class, function ($event) {
             return $event->method == 'up';
         });
-        Event::assertDispatched(NoMigrations::class, function ($event) {
+        Event::assertDispatched(NoPendingMigrations::class, function ($event) {
             return $event->method == 'down';
         });
     }
