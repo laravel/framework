@@ -737,6 +737,28 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Combine the collection with the given items by passing each pair of values to the callback.
+     *
+     * @param  mixed  $items
+     * @param  callable  $callback
+     * @return static
+     */
+    public function unionMap($items, callable $callback)
+    {
+        $arrayableItems = $this->getArrayableItems($items);
+
+        // Produce a list of all keys across the collection and the given items.
+        $keys = $this->union($arrayableItems)->keys();
+
+        // Pass each pair of values to the callback to compute the merged value.
+        $values = $keys->map(function ($key) use ($arrayableItems, $callback) {
+            return $callback($this->items[$key] ?? null, $arrayableItems[$key] ?? null, $key);
+        });
+
+        return new static(array_combine($keys->all(), $values->all()));
+    }
+
+    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step

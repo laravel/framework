@@ -738,6 +738,18 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Combine the collection with the given items by passing each pair of values to the callback.
+     *
+     * @param  mixed  $items
+     * @param  callable  $callback
+     * @return static
+     */
+    public function unionMap($items, callable $callback)
+    {
+        return $this->passthru('unionMap', func_get_args());
+    }
+
+    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step

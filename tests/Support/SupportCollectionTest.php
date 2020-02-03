@@ -942,6 +942,128 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testUnionMapNull($collection)
+    {
+        $this->assertEquals(
+            ['name' => 'Hello'],
+            (new $collection(['name' => 'Hello']))->unionMap(null, function ($l) {
+                return $l;
+            })->all()
+        );
+
+        $this->assertEquals(
+            ['name' => 'Hello'],
+            (new $collection(null))->unionMap(['name' => 'Hello'], function ($l, $r) {
+                return $r;
+            })->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUnionMapArray($collection)
+    {
+        $this->assertEquals(
+            ['name' => 'Hello there'],
+            (new $collection(['name' => 'Hello']))->unionMap(['name' => 'there'], function ($l, $r) {
+                return $l.' '.$r;
+            })->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUnionMapCollection($collection)
+    {
+        $this->assertEquals(
+            ['name' => 'Hello there'],
+            (new $collection(['name' => 'Hello']))->unionMap(new $collection(['name' => 'there']), function ($l, $r) {
+                return $l.' '.$r;
+            })->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUnionMapWithStringKeys($collection)
+    {
+        $left = ['one' => 1, 'two' => 2, 'three' => 3];
+        $right = ['one' => 1, 'three' => 3];
+
+        $this->assertSame(
+            ['one' => 2, 'two' => 2, 'three' => 6],
+            (new $collection($left))->unionMap($right, function ($l, $r) {
+                return ($l ?? 0) + ($r ?? 0);
+            })->all()
+        );
+
+        $this->assertSame(
+            ['one' => 2, 'three' => 6, 'two' => 2],
+            (new $collection($right))->unionMap($left, function ($l, $r) {
+                return ($l ?? 0) + ($r ?? 0);
+            })->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUnionMapWithNumericKeys($collection)
+    {
+        $left = [0, 1, 2];
+        $right = [0, 2 => 2];
+
+        $this->assertSame(
+            [0 => 0, 1 => 2, 2 => 4],
+            (new $collection($left))->unionMap($left, function ($l, $r) {
+                return ($l ?? 0) + ($r ?? 0);
+            })->all()
+        );
+
+        $this->assertSame(
+            [0 => 0, 1 => 1, 2 => 4],
+            (new $collection($left))->unionMap($right, function ($l, $r) {
+                return ($l ?? 0) + ($r ?? 0);
+            })->all()
+        );
+
+        $this->assertSame(
+            [0 => 0, 2 => 4, 1 => 1],
+            (new $collection($right))->unionMap($left, function ($l, $r) {
+                return ($l ?? 0) + ($r ?? 0);
+            })->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUnionMapWithMixedKeys($collection)
+    {
+        $left = [0 => 0, 'one' => 1, 2 => 2];
+        $right = [0 => 0, 'one' => 1, 'three' => 3, 2 => 2];
+
+        $this->assertSame(
+            [0 => 0, 'one' => 2, 2 => 4, 'three' => 3],
+            (new $collection($left))->unionMap($right, function ($l, $r) {
+                return ($l ?? 0) + ($r ?? 0);
+            })->all()
+        );
+
+        $this->assertSame(
+            [0 => 0, 'one' => 2, 'three' => 3, 2 => 4],
+            (new $collection($right))->unionMap($left, function ($l, $r) {
+                return ($l ?? 0) + ($r ?? 0);
+            })->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testDiffCollection($collection)
     {
         $c = new $collection(['id' => 1, 'first_word' => 'Hello']);

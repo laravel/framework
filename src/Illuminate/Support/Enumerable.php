@@ -601,6 +601,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function union($items);
 
     /**
+     * Combine the collection with the given items by passing each pair of values to the callback.
+     *
+     * @param  mixed  $items
+     * @param  callable  $callback
+     * @return static
+     */
+    public function unionMap($items, callable $callback);
+
+    /**
      * Get the min value of a given key.
      *
      * @param  callable|string|null  $callback
