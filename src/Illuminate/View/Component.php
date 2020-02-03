@@ -4,14 +4,13 @@ namespace Illuminate\View;
 
 use Closure;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 
-abstract class Component implements Renderable
+abstract class Component
 {
     /**
      * That properties / methods that should not be exposed to the component.
