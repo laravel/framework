@@ -192,7 +192,7 @@ class ComponentTagCompiler
             return ucfirst(Str::camel($componentPiece));
         }, explode(':', $component));
 
-        return $namespace.'ViewComponents\\'.implode('\\', $componentPieces);
+        return $namespace.'View\\Components\\'.implode('\\', $componentPieces);
     }
 
     /**

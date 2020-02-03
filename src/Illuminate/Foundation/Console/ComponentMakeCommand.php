@@ -104,7 +104,7 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\ViewComponents';
+        return $rootNamespace.'\View\Components';
     }
 
     /**

@@ -41,7 +41,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = (new ComponentTagCompiler([]))->guessClassName('alert');
 
-        $this->assertEquals("App\ViewComponents\Alert", trim($result));
+        $this->assertEquals("App\View\Components\Alert", trim($result));
 
         Container::setInstance(null);
     }
@@ -55,7 +55,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = (new ComponentTagCompiler([]))->guessClassName('base:alert');
 
-        $this->assertEquals("App\ViewComponents\Base\Alert", trim($result));
+        $this->assertEquals("App\View\Components\Base\Alert", trim($result));
 
         Container::setInstance(null);
     }
