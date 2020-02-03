@@ -43,7 +43,7 @@ class MorphTo extends BelongsTo
      * @var array
      */
     protected $morphableEagerLoads = [];
-    
+
     /**
      * A map of model type properties to show on individual morph type.
      *
@@ -131,8 +131,8 @@ class MorphTo extends BelongsTo
                             ));
 
         $whereIn = $this->whereInMethod($instance, $ownerKey);
-        
-        if(!empty($this->morphableProperties[get_class($instance)])) {
+
+        if (! empty($this->morphableProperties[get_class($instance)])) {
             $query->select($this->morphableProperties[get_class($instance)]);
         }
 
@@ -288,7 +288,7 @@ class MorphTo extends BelongsTo
 
         return $this;
     }
-    
+
     /**
      * Specify which properties to load for a given morph type.
      *
