@@ -303,11 +303,11 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function unserialize($value)
     {
-        if ($value === "INF") {
+        if ($value === 'INF') {
             return INF;
         }
 
-        if ($value === "-INF") {
+        if ($value === '-INF') {
             return -INF;
         }
 
