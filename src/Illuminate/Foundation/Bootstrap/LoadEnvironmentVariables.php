@@ -40,7 +40,7 @@ class LoadEnvironmentVariables
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if ($app->runningInConsole() && ($input = new ArgvInput)->hasParameterOption('--env')) {
+        if (($input = new ArgvInput)->hasParameterOption('--env')) {
             if ($this->setEnvironmentFilePath(
                 $app, $app->environmentFile().'.'.$input->getParameterOption('--env')
             )) {
