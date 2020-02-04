@@ -28,7 +28,6 @@ class StorageLinkCommand extends Command
     public function handle()
     {
         foreach ($this->laravel['config']['filesystems.links'] ?? [] as $link => $target) {
-
             if (file_exists($link)) {
                 $this->error("The [$link] link already exists.");
             } else {
