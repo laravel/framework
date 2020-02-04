@@ -75,7 +75,7 @@ class ComponentTagCompiler
                 (?<attributes>
                     (?:
                         \s+
-                        [^\s\=]+
+                        [\w\-:.@]+
                         (
                             =
                             (?:
@@ -116,7 +116,7 @@ class ComponentTagCompiler
                 (?<attributes>
                     (?:
                         \s+
-                        [^\s\=]+
+                        [\w\-:.@]+
                         (
                             =
                             (?:
@@ -252,7 +252,7 @@ class ComponentTagCompiler
         $attributeString = $this->parseBindAttributes($attributeString);
 
         $pattern = '/
-            (?<attribute>[^\s\=]+)
+            (?<attribute>[\w\-:.@]+)
             (
                 =
                 (?<value>
@@ -302,10 +302,10 @@ class ComponentTagCompiler
     protected function parseBindAttributes(string $attributeString)
     {
         $pattern = "/
-            (?:^|\s+)   # start of the string or whitespace between attributes
-            :           # attribute needs to start with a semicolon
-            ([^\s\=]+)    # match the actual attribute name
-            =           # only match attributes that have a value
+            (?:^|\s+)     # start of the string or whitespace between attributes
+            :             # attribute needs to start with a semicolon
+            ([\w\-:.@]+)  # match the actual attribute name
+            =             # only match attributes that have a value
         /xm";
 
         return preg_replace($pattern, ' bind:$1=', $attributeString);

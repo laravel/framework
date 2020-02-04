@@ -23,6 +23,17 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertEquals("@slot('foo') \n @endslot", trim($result));
     }
 
+    public function testBasicComponentParsing()
+    {
+        $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<div><x-alert type="foo" limit="5" @click="foo" required /><x-alert /></div>');
+
+        $this->assertEquals("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+<?php \$component->withAttributes(['type' => 'foo','limit' => '5','@click' => 'foo','required' => true]); ?>
+@endcomponentClass @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+<?php \$component->withAttributes([]); ?>
+@endcomponentClass</div>", trim($result));
+    }
+
     public function testSelfClosingComponentsCanBeCompiled()
     {
         $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<div><x-alert/></div>');
