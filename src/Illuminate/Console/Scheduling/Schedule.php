@@ -7,9 +7,12 @@ use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\ProcessUtils;
+use Illuminate\Support\Traits\Macroable;
 
 class Schedule
 {
+    use Macroable;
+
     /**
      * All of the events on the schedule.
      *
