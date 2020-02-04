@@ -185,6 +185,20 @@ class Dispatcher implements QueueingDispatcher
     }
 
     /**
+     * Dispatch a command to its appropriate handler after the current process.
+     *
+     * @param  mixed  $command
+     * @param  mixed  $handler
+     * @return void
+     */
+    public function dispatchAfterResponse($command, $handler = null)
+    {
+        $this->container->terminating(function () use ($command, $handler) {
+            $this->dispatchNow($command, $handler);
+        });
+    }
+
+    /**
      * Set the pipes through which commands should be piped before dispatching.
      *
      * @param  array  $pipes

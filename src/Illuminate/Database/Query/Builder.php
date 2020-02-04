@@ -1947,7 +1947,7 @@ class Builder
      */
     public function forPage($page, $perPage = 15)
     {
-        return $this->skip(($page - 1) * $perPage)->take($perPage);
+        return $this->offset(($page - 1) * $perPage)->limit($perPage);
     }
 
     /**
@@ -1967,7 +1967,7 @@ class Builder
         }
 
         return $this->orderBy($column, 'desc')
-                    ->take($perPage);
+                    ->limit($perPage);
     }
 
     /**
@@ -1987,7 +1987,7 @@ class Builder
         }
 
         return $this->orderBy($column, 'asc')
-                    ->take($perPage);
+                    ->limit($perPage);
     }
 
     /**
@@ -2171,7 +2171,7 @@ class Builder
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $this->skip(($page - 1) * $perPage)->take($perPage + 1);
+        $this->offset(($page - 1) * $perPage)->limit($perPage + 1);
 
         return $this->simplePaginator($this->get($columns), $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -2310,7 +2310,13 @@ class Builder
      */
     protected function stripTableForPluck($column)
     {
-        return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
+        if (is_null($column)) {
+            return $column;
+        }
+
+        $seperator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+
+        return last(preg_split('~'.$seperator.'~i', $column));
     }
 
     /**
@@ -2721,7 +2727,7 @@ class Builder
             return true;
         }
 
-        return (bool) $this->take(1)->update($values);
+        return (bool) $this->limit(1)->update($values);
     }
 
     /**

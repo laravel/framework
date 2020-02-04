@@ -127,7 +127,7 @@ trait Queueable
      */
     public function middleware()
     {
-        return $this->middleware ?: [];
+        return [];
     }
 
     /**
