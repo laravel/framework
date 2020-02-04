@@ -30,11 +30,11 @@ class StorageLinkCommand extends Command
         foreach($this->laravel['config']['filesystems.links'] ?? [] as $link => $target) {
 
             if (file_exists($link)) {
-                $this->error('The [$link] directory already exists.');
+                $this->error("The [$link] link already exists.");
             } else {
                 $this->laravel->make('files')->link($target, $link);
 
-                $this->info("The [$link] directory has been linked to [$target].");
+                $this->info("The [$link] link has been connected to [$target].");
             }
         }
 
