@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
@@ -126,6 +127,7 @@ class AuthenticationTest extends TestCase
 
             return true;
         });
+        Event::assertNotDispatched(Validated::class);
         Event::assertDispatched(Failed::class, function ($event) {
             $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
@@ -148,6 +150,12 @@ class AuthenticationTest extends TestCase
         Event::assertDispatched(Attempting::class, function ($event) {
             $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'email', 'password' => 'password'], $event->credentials);
+
+            return true;
+        });
+        Event::assertDispatched(Validated::class, function ($event) {
+            $this->assertSame('web', $event->guard);
+            $this->assertEquals(1, $event->user->id);
 
             return true;
         });
