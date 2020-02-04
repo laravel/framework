@@ -292,7 +292,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function serialize($value)
     {
-        return is_numeric($value) ? $value : serialize($value);
+        return is_numeric($value) && ! in_array($value, [INF, -INF]) ? $value : serialize($value);
     }
 
     /**
