@@ -211,7 +211,7 @@ class SqlServerGrammar extends Grammar
         $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
         $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$blueprint->getTable()}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
         $sql .= 'FROM SYS.COLUMNS ';
-        $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$blueprint->getTable()}]') AND [name] in ({$columns});";
+        $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$blueprint->getTable()}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
         $sql .= 'EXEC(@sql)';
 
         return $sql;
