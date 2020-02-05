@@ -5,7 +5,7 @@ namespace Illuminate\View\Compilers;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
+use Illuminate\View\ClassLessComponent;
 use ReflectionClass;
 
 /**
@@ -153,7 +153,19 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        return " @component('{$class}', [".$this->attributesToString($data->all()).'])
+        // If the component doesn't exists as a class we'll assume it's a class-less component
+        // and pass the component as a view parameter to the data collection bag.
+        if (! class_exists($class)) {
+            $data->put('view', "'$class'");
+
+            $class = ClassLessComponent::class;
+
+            $parameters = "'data' => [".$this->attributesToString($data->all()).']';
+        } else {
+            $parameters = $this->attributesToString($data->all());
+        }
+
+        return " @component('{$class}', [".$parameters.'])
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
     }
 
@@ -169,11 +181,11 @@ class ComponentTagCompiler
             return $this->aliases[$component];
         }
 
-        if (! class_exists($class = $this->guessClassName($component))) {
-            throw new InvalidArgumentException("Unable to locate class for component [{$component}].");
+        if (class_exists($class = $this->guessClassName($component))) {
+            return $class;
         }
 
-        return $class;
+        return $component;
     }
 
     /**
@@ -204,6 +216,12 @@ class ComponentTagCompiler
      */
     protected function partitionDataAndAttributes($class, array $attributes)
     {
+        // If the class doesn't exists, we'll assume it's a class-less component
+        // and return all attributes as data to the class-less component view.
+        if (! class_exists($class)) {
+            return [collect($attributes), collect()];
+        }
+
         $constructor = (new ReflectionClass($class))->getConstructor();
 
         $parameterNames = $constructor
