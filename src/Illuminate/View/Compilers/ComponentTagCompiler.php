@@ -156,16 +156,14 @@ class ComponentTagCompiler
         // If the component doesn't exists as a class we'll assume it's a class-less component
         // and pass the component as a view parameter to the data collection bag.
         if (! class_exists($class)) {
-            $data->put('view', "'$class'");
+            $parameters = ['view' => "'$class'", 'data' => $data->all()];
 
             $class = ClassLessComponent::class;
-
-            $parameters = "'data' => [".$this->attributesToString($data->all()).']';
         } else {
-            $parameters = $this->attributesToString($data->all());
+            $parameters = $data->all();
         }
 
-        return " @component('{$class}', [".$parameters.'])
+        return " @component('{$class}', [".$this->attributesToString($parameters).'])
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
     }
 
@@ -338,7 +336,11 @@ class ComponentTagCompiler
     protected function attributesToString(array $attributes)
     {
         return collect($attributes)
-                ->map(function (string $value, string $attribute) {
+                ->map(function ($value, string $attribute) {
+                    if (is_array($value)) {
+                        $value = '['.$this->attributesToString($value).']';
+                    }
+
                     return "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
