@@ -620,6 +620,10 @@ class Connection implements ConnectionInterface
     {
         $this->reconnectIfMissingConnection();
 
+        // allow raw SQL query to be modified before it's prepared and executed
+        // for instance you can prepend a comment to it with some helpful context information
+        $this->event(new Events\BeforeQueryExecuted($query, $this));
+
         $start = microtime(true);
 
         // Here we will run this query. If an exception occurs we'll determine if it was
