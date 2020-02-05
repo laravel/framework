@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\CurrentDeviceLogout;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -96,6 +97,7 @@ class AuthGuardTest extends TestCase
         $guard->setDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Failed::class));
+        $events->shouldNotReceive('dispatch')->with(m::type(Validated::class));
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo']);
         $guard->attempt(['foo']);
     }
@@ -106,6 +108,7 @@ class AuthGuardTest extends TestCase
         $guard = $this->getMockBuilder(SessionGuard::class)->setMethods(['login'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $guard->setDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
         $user = $this->createMock(Authenticatable::class);
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
@@ -119,6 +122,7 @@ class AuthGuardTest extends TestCase
         $mock->setDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Failed::class));
+        $events->shouldNotReceive('dispatch')->with(m::type(Validated::class));
         $mock->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn(null);
         $this->assertFalse($mock->attempt(['foo']));
     }
@@ -169,6 +173,7 @@ class AuthGuardTest extends TestCase
         $guard->setDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Failed::class));
+        $events->shouldNotReceive('dispatch')->with(m::type(Validated::class));
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn(null);
         $guard->attempt(['foo']);
     }
