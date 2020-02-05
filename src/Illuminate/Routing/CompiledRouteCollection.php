@@ -66,9 +66,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
             'action' => $route->getAction() + ['as' => $name],
         ];
 
-        // Because we don't want to recompile the routes every time a new one
-        // is added, we simply clear the array and let the recompiling be
-        // done as soon as we need to perform the matching manually.
         $this->compiled = [];
     }
 
@@ -82,16 +79,15 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function match(Request $request)
     {
-        // If the compiled routes array is empty but we have routes set on the attributes array
-        // we'll attempt to recompile the routes first. Because compiled routes will always
-        // be set on the first request, this won't affect initial request performance.
         if (empty($this->compiled) && $this->attributes) {
             $this->recompileRoutes();
         }
 
         $route = null;
-        $context = (new RequestContext())->fromRequest($request);
-        $matcher = new CompiledUrlMatcher($this->compiled, $context);
+
+        $matcher = new CompiledUrlMatcher(
+            $this->compiled, (new RequestContext())->fromRequest($request)
+        );
 
         if ($result = $matcher->matchRequest($request)) {
             $route = $this->getByName($result['_route']);

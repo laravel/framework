@@ -184,7 +184,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     }
 
     /**
-     * Generate a random new route name.
+     * Get a randomly generated route name.
      *
      * @return string
      */
