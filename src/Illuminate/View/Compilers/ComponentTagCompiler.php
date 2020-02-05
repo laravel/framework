@@ -6,7 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Str;
-use Illuminate\View\ClassLessComponent;
+use Illuminate\View\AnonymousComponent;
 use InvalidArgumentException;
 use ReflectionClass;
 
@@ -160,7 +160,7 @@ class ComponentTagCompiler
         if (! class_exists($class)) {
             $parameters = ['view' => "'$class'", 'data' => $data->all()];
 
-            $class = ClassLessComponent::class;
+            $class = AnonymousComponent::class;
         } else {
             $parameters = $data->all();
         }

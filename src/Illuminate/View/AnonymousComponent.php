@@ -2,7 +2,7 @@
 
 namespace Illuminate\View;
 
-class ClassLessComponent extends Component
+class AnonymousComponent extends Component
 {
     /**
      * The component view.
