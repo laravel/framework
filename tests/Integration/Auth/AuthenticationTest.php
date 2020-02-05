@@ -119,8 +119,10 @@ class AuthenticationTest extends TestCase
         $this->assertFalse(
             $this->app['auth']->attempt(['email' => 'wrong', 'password' => 'password'])
         );
+
         $this->assertFalse($this->app['auth']->check());
         $this->assertNull($this->app['auth']->user());
+
         Event::assertDispatched(Attempting::class, function ($event) {
             $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
@@ -128,6 +130,7 @@ class AuthenticationTest extends TestCase
             return true;
         });
         Event::assertNotDispatched(Validated::class);
+
         Event::assertDispatched(Failed::class, function ($event) {
             $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
