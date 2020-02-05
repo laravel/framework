@@ -354,11 +354,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         $this->fireAttemptEvent($credentials, $remember);
 
-        // We will pass the credentials to the validation method, which will retrieve
-        // and validate the user. If the user is found and valid, we will get the
-        // user "last attempted", log him into the application and return true.
-        if ($this->validate($credentials)) {
-            $this->login($this->lastAttempted, $remember);
+        $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
+
+        // If an implementation of UserInterface was returned, we'll ask the provider
+        // to validate the user against the given credentials, and if they are in
+        // fact valid we'll log the users into the application and return true.
+        if ($this->hasValidCredentials($user, $credentials)) {
+            $this->login($user, $remember);
 
             return true;
         }
