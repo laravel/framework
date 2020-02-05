@@ -17,6 +17,7 @@ use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
+use Illuminate\Foundation\Console\ConfigMakeCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
@@ -119,6 +120,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected $devCommands = [
         'CacheTable' => 'command.cache.table',
         'ChannelMake' => 'command.channel.make',
+        'ConfigMake' => 'command.config.make',
         'ConsoleMake' => 'command.console.make',
         'ControllerMake' => 'command.controller.make',
         'EventGenerate' => 'command.event.generate',
@@ -267,6 +269,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.config.clear', function ($app) {
             return new ConfigClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerConfigMakeCommand()
+    {
+        $this->app->singleton('command.config.make', function ($app) {
+            return new ConfigMakeCommand($app['files']);
         });
     }
 
