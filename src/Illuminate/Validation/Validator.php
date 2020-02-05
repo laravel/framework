@@ -98,6 +98,13 @@ class Validator implements ValidatorContract
     protected $implicitAttributes = [];
 
     /**
+     * The callback that should be used to format the attribute.
+     *
+     * @var callable|null
+     */
+    protected $implicitAttributesFormatter;
+
+    /**
      * The cached data for the "distinct" rule.
      *
      * @var array
@@ -243,14 +250,9 @@ class Validator implements ValidatorContract
                 $value = $this->parseData($value);
             }
 
-            // If the data key contains a dot, we will replace it with another character
-            // sequence so it doesn't interfere with dot processing when working with
-            // array based validation rules plus Arr::dot later in the validations.
-            if (Str::contains($key, '.')) {
-                $newData[str_replace('.', '->', $key)] = $value;
-            } else {
-                $newData[$key] = $value;
-            }
+            $key = str_replace(['.', '*'], ['->', '__asterisk__'], $key);
+
+            $newData[$key] = $value;
         }
 
         return $newData;
@@ -682,6 +684,8 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
+        $attribute = str_replace('__asterisk__', '*', $attribute);
+
         if (in_array($rule, $this->excludeRules)) {
             return $this->excludeAttribute($attribute);
         }
@@ -1108,6 +1112,19 @@ class Validator implements ValidatorContract
     public function addCustomAttributes(array $customAttributes)
     {
         $this->customAttributes = array_merge($this->customAttributes, $customAttributes);
+
+        return $this;
+    }
+
+    /**
+     * Set the callback that used to format an implicit attribute..
+     *
+     * @param  callable|null  $formatter
+     * @return $this
+     */
+    public function setImplicitAttributesFormatter(callable $formatter = null)
+    {
+        $this->implicitAttributesFormatter = $formatter;
 
         return $this;
     }

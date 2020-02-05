@@ -117,8 +117,8 @@ trait BuildsQueries
      *
      * @param  callable  $callback
      * @param  int  $count
-     * @param  string  $column
-     * @param  string  $alias
+     * @param  string|null  $column
+     * @param  string|null  $alias
      * @return bool
      */
     public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
