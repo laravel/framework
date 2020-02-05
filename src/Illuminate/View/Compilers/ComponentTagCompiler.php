@@ -4,8 +4,10 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Str;
 use Illuminate\View\ClassLessComponent;
+use InvalidArgumentException;
 use ReflectionClass;
 
 /**
@@ -183,7 +185,13 @@ class ComponentTagCompiler
             return $class;
         }
 
-        return $component;
+        $viewFactory = Container::getInstance()->make(Factory::class);
+
+        if ($viewFactory->exists($component)) {
+            return $component;
+        }
+
+        throw new InvalidArgumentException("Unable to locate a class or view for component [{$component}].");
     }
 
     /**
