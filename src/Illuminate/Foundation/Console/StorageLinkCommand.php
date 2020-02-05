@@ -18,7 +18,7 @@ class StorageLinkCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Create symbolic links';
+    protected $description = 'Create the symbolic links configured for the application';
 
     /**
      * Execute the console command.
@@ -27,7 +27,7 @@ class StorageLinkCommand extends Command
      */
     public function handle()
     {
-        foreach ($this->laravel['config']['filesystems.links'] ?? [public_path('storage') => storage_path('app/public')] as $link => $target) {
+        foreach ($this->links() as $link => $target) {
             if (file_exists($link)) {
                 $this->error("The [$link] link already exists.");
             } else {
@@ -38,5 +38,16 @@ class StorageLinkCommand extends Command
         }
 
         $this->info('The links have been created.');
+    }
+
+    /**
+     * Get the symbolic links that are configured for the application.
+     *
+     * @return array
+     */
+    protected function links()
+    {
+        return $this->laravel['config']['filesystems.links'] ??
+               [public_path('storage') => storage_path('app/public')];
     }
 }
