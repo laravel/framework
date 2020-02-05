@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
-use Illuminate\Auth\Events\Validated;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
@@ -10,6 +9,7 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Auth\Events\Validated;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\CurrentDeviceLogout;
@@ -10,6 +9,7 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
@@ -354,13 +354,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         $this->fireAttemptEvent($credentials, $remember);
 
-        $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
-
-        // If an implementation of UserInterface was returned, we'll ask the provider
-        // to validate the user against the given credentials, and if they are in
-        // fact valid we'll log the users into the application and return true.
-        if ($this->hasValidCredentials($user, $credentials)) {
-            $this->login($user, $remember);
+        // We will pass the credentials to the validation method, which will retrieve
+        // and validate the user. If the user is found and valid, we will get the
+        // user "last attempted", log him into the application and return true.
+        if ($this->validate($credentials)) {
+            $this->login($this->lastAttempted, $remember);
 
             return true;
         }
@@ -368,7 +366,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If the authentication attempt fails we will fire an event so that the user
         // may be notified of any suspicious attempts to access their account from
         // an unrecognized user. A developer may listen to this event as needed.
-        $this->fireFailedEvent($user, $credentials);
+        $this->fireFailedEvent($this->lastAttempted, $credentials);
 
         return false;
     }
