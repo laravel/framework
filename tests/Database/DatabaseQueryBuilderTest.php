@@ -1305,7 +1305,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where([['foo', [1,2]], ['bar', '<', 3]]);
+        $builder->select('*')->from('users')->where([['foo', [1, 2]], ['bar', '<', 3]]);
         $this->assertSame('select * from "users" where ("foo" in (?, ?) and "bar" < ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
     }
