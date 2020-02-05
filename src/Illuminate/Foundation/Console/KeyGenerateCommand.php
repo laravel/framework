@@ -77,7 +77,10 @@ class KeyGenerateCommand extends Command
             return false;
         }
 
-        $this->writeNewEnvironmentFileWith($key);
+        if (!$this->writeNewEnvironmentFileWith($key)) {
+            $this->error('Could not set Application key: missing entry APP_KEY in .env');
+            return false;
+        }
 
         return true;
     }
@@ -86,15 +89,19 @@ class KeyGenerateCommand extends Command
      * Write a new environment file with the given key.
      *
      * @param  string  $key
-     * @return void
+     * @return int
      */
     protected function writeNewEnvironmentFileWith($key)
     {
+        $count = 0;
         file_put_contents($this->laravel->environmentFilePath(), preg_replace(
             $this->keyReplacementPattern(),
             'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
+            file_get_contents($this->laravel->environmentFilePath(),
+            -1,
+            &$count)
         ));
+        return $count;
     }
 
     /**
