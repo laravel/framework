@@ -20,13 +20,13 @@ class ConfigMakeCommand extends GeneratorCommand
      */
     protected $description = 'Create a new config file';
 
-    public function handle ()
+    public function handle()
     {
-        $path = config_path() . '/' .  $this->getNameInput() . '.php';
+        $path = config_path().'/'.$this->getNameInput().'.php';
         $stub = $this->files->get($this->getStub());
 
         $this->files->put($path, $stub);
-        $this->info($this->getNameInput() .' config created successfully.');
+        $this->info($this->getNameInput().' config created successfully.');
     }
 
     /**
