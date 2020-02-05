@@ -21,15 +21,13 @@ class ClassLessComponent extends Component
     /**
      * Create a new class-less component instance.
      *
+     * @param  string  $view
      * @param  array  $data
      * @return void
      */
-    public function __construct($data)
+    public function __construct($view, $data)
     {
-        $this->view = $data['view'];
-
-        unset($data['view']);
-
+        $this->view = $view;
         $this->data = $data;
     }
 
