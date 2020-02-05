@@ -48,7 +48,7 @@ class ComponentTest extends TestCase
         $this->viewFactory->shouldReceive('addNamespace')->once()->with('__components', '/tmp');
 
         $component = new TestInlineViewComponent();
-        $this->assertSame('__components::c6327913fef3fca4518bcd7df1d0ff630758e241', $component->viewFile());
+        $this->assertSame('__components::c6327913fef3fca4518bcd7df1d0ff630758e241', $component->resolveView());
     }
 
     public function testRegularViewsGetReturned()
@@ -58,7 +58,7 @@ class ComponentTest extends TestCase
 
         $component = new TestRegularViewComponent();
 
-        $this->assertSame('alert', $component->viewFile());
+        $this->assertSame('alert', $component->resolveView());
     }
 }
 
@@ -71,7 +71,7 @@ class TestInlineViewComponent extends Component
         $this->title = $title;
     }
 
-    public function view()
+    public function render()
     {
         return 'Hello {{ $title }}';
     }
@@ -86,7 +86,7 @@ class TestRegularViewComponent extends Component
         $this->title = $title;
     }
 
-    public function view()
+    public function render()
     {
         return 'alert';
     }

@@ -29,22 +29,28 @@ abstract class Component
     /**
      * Get the view / view contents that represent the component.
      *
-     * @return string
+     * @return Illuminate\View\View|string
      */
-    abstract public function view();
+    abstract public function render();
 
     /**
-     * Get the Blade view file that should be used when rendering the component.
+     * Resolve the Blade view or view file that should be used when rendering the component.
      *
-     * @return string
+     * @return Illuminate\View\View|string
      */
-    public function viewFile()
+    public function resolveView()
     {
+        $view = $this->render();
+
+        if ($view instanceof \Illuminate\View\View) {
+            return $view;
+        }
+
         $factory = Container::getInstance()->make('view');
 
-        return $factory->exists($this->view())
-                    ? $this->view()
-                    : $this->createBladeViewFromString($factory, $this->view());
+        return $factory->exists($this->render())
+                    ? $this->render()
+                    : $this->createBladeViewFromString($factory, $this->render());
     }
 
     /**
@@ -133,12 +139,12 @@ abstract class Component
     protected function ignoredMethods()
     {
         return array_merge([
-            'view',
             'data',
-            'withAttributes',
             'render',
-            'viewFile',
+            'resolveView',
             'shouldRender',
+            'view',
+            'withAttributes',
         ], $this->except);
     }
 
@@ -165,15 +171,5 @@ abstract class Component
     public function shouldRender()
     {
         return true;
-    }
-
-    /**
-     * Get the evaluated contents of the object.
-     *
-     * @return string
-     */
-    public function render()
-    {
-        return (string) View::make($this->viewFile(), $this->data());
     }
 }

@@ -20,7 +20,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
         $this->assertSame('<?php if (isset($component)) { $__componentOriginal35bda42cbf6f9717b161c4f893644ac7a48b0d98 = $component; } ?>
 <?php $component = app()->make(Test::class, ["foo" => "bar"]); ?>
 <?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->viewFile(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', ["foo" => "bar"])'));
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', ["foo" => "bar"])'));
     }
 
     public function testEndComponentsAreCompiled()

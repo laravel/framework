@@ -63,7 +63,7 @@ trait CompilesComponents
             '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
             '<?php $component = app()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
             '<?php if ($component->shouldRender()): ?>',
-            '<?php $__env->startComponent($component->viewFile(), $component->data()); ?>',
+            '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
         ]);
     }
 

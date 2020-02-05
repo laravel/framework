@@ -118,7 +118,7 @@ class TestAlertComponent extends Component
         $this->title = $title;
     }
 
-    public function view()
+    public function render()
     {
         return 'alert';
     }

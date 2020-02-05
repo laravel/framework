@@ -23,7 +23,7 @@ class TestViewComponent extends Component
 {
     public $votes = 10;
 
-    public function view()
+    public function render()
     {
         return 'test';
     }
