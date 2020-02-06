@@ -42,7 +42,7 @@
         "symfony/var-dumper": "^5.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
         "vlucas/phpdotenv": "^4.0",
-        "voku/portable-ascii": "^1.2.3"
+        "voku/portable-ascii": "^1.4.8"
     },
     "replace": {
         "illuminate/auth": "self.version",

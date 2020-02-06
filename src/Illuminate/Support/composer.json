@@ -20,7 +20,7 @@
         "doctrine/inflector": "^1.1",
         "illuminate/contracts": "^7.0",
         "nesbot/carbon": "^2.17",
-        "voku/portable-ascii": "^1.2.3"
+        "voku/portable-ascii": "^1.4.8"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
