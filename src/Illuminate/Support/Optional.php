@@ -16,7 +16,7 @@ class Optional implements ArrayAccess
      *
      * @var mixed
      */
-    protected $value;
+    protected $_value;
 
     /**
      * Create a new optional instance.
@@ -26,7 +26,7 @@ class Optional implements ArrayAccess
      */
     public function __construct($value)
     {
-        $this->value = $value;
+        $this->_value = $value;
     }
 
     /**
@@ -37,8 +37,8 @@ class Optional implements ArrayAccess
      */
     public function __get($key)
     {
-        if (is_object($this->value)) {
-            return $this->value->{$key} ?? null;
+        if (is_object($this->_value)) {
+            return $this->_value->{$key} ?? null;
         }
     }
 
@@ -50,12 +50,12 @@ class Optional implements ArrayAccess
      */
     public function __isset($name)
     {
-        if (is_object($this->value)) {
-            return isset($this->value->{$name});
+        if (is_object($this->_value)) {
+            return isset($this->_value->{$name});
         }
 
-        if (is_array($this->value) || $this->value instanceof ArrayObject) {
-            return isset($this->value[$name]);
+        if (is_array($this->_value) || $this->_value instanceof ArrayObject) {
+            return isset($this->_value[$name]);
         }
 
         return false;
@@ -69,7 +69,7 @@ class Optional implements ArrayAccess
      */
     public function offsetExists($key)
     {
-        return Arr::accessible($this->value) && Arr::exists($this->value, $key);
+        return Arr::accessible($this->_value) && Arr::exists($this->_value, $key);
     }
 
     /**
@@ -80,7 +80,7 @@ class Optional implements ArrayAccess
      */
     public function offsetGet($key)
     {
-        return Arr::get($this->value, $key);
+        return Arr::get($this->_value, $key);
     }
 
     /**
@@ -92,8 +92,8 @@ class Optional implements ArrayAccess
      */
     public function offsetSet($key, $value)
     {
-        if (Arr::accessible($this->value)) {
-            $this->value[$key] = $value;
+        if (Arr::accessible($this->_value)) {
+            $this->_value[$key] = $value;
         }
     }
 
@@ -105,8 +105,8 @@ class Optional implements ArrayAccess
      */
     public function offsetUnset($key)
     {
-        if (Arr::accessible($this->value)) {
-            unset($this->value[$key]);
+        if (Arr::accessible($this->_value)) {
+            unset($this->_value[$key]);
         }
     }
 
@@ -123,8 +123,8 @@ class Optional implements ArrayAccess
             return $this->macroCall($method, $parameters);
         }
 
-        if (is_object($this->value)) {
-            return $this->value->{$method}(...$parameters);
+        if (is_object($this->_value)) {
+            return $this->_value->{$method}(...$parameters);
         }
     }
 }
