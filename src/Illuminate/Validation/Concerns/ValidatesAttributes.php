@@ -1631,7 +1631,11 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'size');
 
-        return $this->getSize($attribute, $value) == $parameters[0];
+        $comparedToValue = is_numeric($parameters[0])
+            ? $parameters[0]
+            : $this->getSize($parameters[0], $this->getValue($parameters[0]));
+
+        return $this->getSize($attribute, $value) == $comparedToValue;
     }
 
     /**

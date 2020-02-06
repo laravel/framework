@@ -1659,6 +1659,39 @@ class ValidationValidatorTest extends TestCase
         $file->expects($this->any())->method('getSize')->willReturn(4072);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Size:3']);
         $this->assertFalse($v->passes());
+
+        // Validate references to other field
+        $v = new Validator($trans, ['departure' => 'CO', 'arrival' => 'US'], ['arrival' => 'Size:departure']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['departure' => 'CO', 'arrival' => 'USA'], ['arrival' => 'Size:departure']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['dispatched' => '3', 'received' => '3'], ['dispatched' => 'Numeric', 'received' => 'Numeric|Size:dispatched']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['dispatched' => '123', 'received' => '121'], ['dispatched' => 'Numeric', 'received' => 'Numeric|Size:dispatched']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['alpha_2' => ['CO', 'US'], 'alpha_3' => ['COL', 'USA']], ['alpha_3' => 'Array|Size:alpha_2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['alpha_2' => ['CO', 'US'], 'alpha_3' => ['COL']], ['alpha_3' => 'Array|Size:alpha_2']);
+        $this->assertFalse($v->passes());
+
+        $file = $this->getMockBuilder(File::class)->setMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $backup = $this->getMockBuilder(File::class)->setMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $backup->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file, 'backup' => $backup], ['backup' => 'Size:photo']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(File::class)->setMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $backup = $this->getMockBuilder(File::class)->setMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $backup->expects($this->any())->method('getSize')->willReturn(4072);
+        $v = new Validator($trans, ['photo' => $file, 'backup' => $backup], ['backup' => 'Size:photo']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateBetween()
