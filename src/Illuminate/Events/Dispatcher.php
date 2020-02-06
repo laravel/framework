@@ -68,7 +68,7 @@ class Dispatcher implements DispatcherContract
      * Register an event listener with the dispatcher.
      *
      * @param  string|array  $events
-     * @param  mixed  $listener
+     * @param  \Closure|string  $listener
      * @return void
      */
     public function listen($events, $listener)
@@ -86,7 +86,7 @@ class Dispatcher implements DispatcherContract
      * Setup a wildcard listener callback.
      *
      * @param  string  $event
-     * @param  mixed  $listener
+     * @param  \Closure|string  $listener
      * @return void
      */
     protected function setupWildcardListen($event, $listener)
