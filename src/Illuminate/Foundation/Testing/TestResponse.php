@@ -564,7 +564,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given path in the response contains the given JSON fragment.
      *
-     * @param  string $path
+     * @param  string  $path
      * @param  array  $data
      * @return $this
      */
