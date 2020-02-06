@@ -239,7 +239,7 @@ class DatabaseQueue extends Queue implements QueueContract
             return 'FOR UPDATE SKIP LOCKED';
         }
 
-        return 'FOR UPDATE';
+        return true;
     }
 
     /**

@@ -1,19 +1,29 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.13.1...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.14.0...6.x)
+
+
+## [v6.14.0 (2020-02-04)](https://github.com/laravel/framework/compare/v6.13.1...v6.14.0)
 
 ### Added
 - Added `Illuminate\Bus\Dispatcher::dispatchAfterResponse()` method ([#31300](https://github.com/laravel/framework/pull/31300), [8a3cdb0](https://github.com/laravel/framework/commit/8a3cdb0622047b1d94b4a754bfe98fb7dc1c174a))
+- Added `Illuminate\Support\Testing\Fakes\QueueFake::assertPushedWithoutChain()` method ([#31332](https://github.com/laravel/framework/pull/31332), [7fcc6b5](https://github.com/laravel/framework/commit/7fcc6b5feb004f57aa61a0fa93c340694ae6a980))
+- Added `Macroable` trait to the `Illuminate\Events\Dispatcher` ([#31317](https://github.com/laravel/framework/pull/31317))
+- Added `NoPendingMigrations` event ([#31289](https://github.com/laravel/framework/pull/31289), [739fcea](https://github.com/laravel/framework/commit/739fcea5cfcc9079d3ca8e5aa9673f706741418e))
 
 ### Fixed
 - Used current DB to create Doctrine Connections ([#31278](https://github.com/laravel/framework/pull/31278))
+- Removed duplicate output when publishing tags in `vendor:publish` command ([#31333](https://github.com/laravel/framework/pull/31333))
+- Fixed plucking column name containing a space ([#31299](https://github.com/laravel/framework/pull/31299))
+- Fixed bug with wildcard caching in event dispatcher ([#31313](https://github.com/laravel/framework/pull/31313))
+- Fixed infinite value for RedisStore ([#31348](https://github.com/laravel/framework/pull/31348))
+- Fixed dropping columns in SQLServer with default value ([#31341](https://github.com/laravel/framework/pull/31341))
 
-### TODO
+### Changed
 - Use SKIP LOCKED for mysql 8.1 and pgsql 9.5 queue workers ([#31287](https://github.com/laravel/framework/pull/31287))
-- Dont merge middleware from method and property ([#31301](https://github.com/laravel/framework/pull/31301))
-- Fix plucking column name containing a space ([#31299](https://github.com/laravel/framework/pull/31299))
-- Split specifyParameter() to external trait ([#31254](https://github.com/laravel/framework/pull/31254))
-- Fix bug with wildcard caching in event dispatcher ([#31313](https://github.com/laravel/framework/pull/31313))
+- Dont merge middleware from method and property in `Illuminate\Bus\Queueable::middleware()` ([#31301](https://github.com/laravel/framework/pull/31301))
+- Split `specifyParameter()` from `Illuminate\Console\Command` to `HasParameters` trait ([#31254](https://github.com/laravel/framework/pull/31254))
+- Make sure changing a database field to json does not include charset ([#31343](https://github.com/laravel/framework/pull/31343))
 
 
 ## [v6.13.1 (2020-01-28)](https://github.com/laravel/framework/compare/v6.13.0...v6.13.1)
