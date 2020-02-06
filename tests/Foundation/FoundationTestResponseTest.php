@@ -452,6 +452,54 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonFragment(['id' => 1]);
     }
 
+    public function testAssertJsonPathFragment()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            [
+                'author' => [
+                    'name' => 'Taylor Otwell',
+                ],
+                'title' => 'Laravel: From Apprentice To Artisan',
+            ],
+            [
+                'author' => [
+                    'name' => 'Jeffrey Way',
+                ],
+                'title' => 'Laravel Testing Decoded',
+            ],
+        ]));
+
+        $response->assertJsonPathFragment('0', [
+            'name' => 'Taylor Otwell',
+            'title' => 'Laravel: From Apprentice To Artisan',
+        ]);
+    }
+
+    public function testAssertJsonPathFragmentCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response([
+            [
+                'author' => [
+                    'name' => 'Taylor Otwell',
+                ],
+                'title' => 'Laravel: From Apprentice To Artisan',
+            ],
+            [
+                'author' => [
+                    'name' => 'Jeffrey Way',
+                ],
+                'title' => 'Laravel Testing Decoded',
+            ],
+        ]));
+
+        $response->assertJsonPathFragment('0', [
+            'name' => 'Taylor Otwell',
+            'title' => 'Laravel Testing Decoded',
+        ]);
+    }
+
     public function testAssertJsonStructure()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));

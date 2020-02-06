@@ -562,6 +562,34 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given path in the response contains the given JSON fragment.
+     *
+     * @param  string $path
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonPathFragment($path, array $data)
+    {
+        $actual = json_encode(Arr::sortRecursive(
+            $this->json($path)
+        ));
+
+        foreach (Arr::sortRecursive($data) as $key => $value) {
+            $expected = $this->jsonSearchStrings($key, $value);
+
+            PHPUnit::assertTrue(
+                Str::contains($actual, $expected),
+                'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
+                '['.json_encode([$key => $value]).']'.PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
+                "[{$actual}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response does not contain the given JSON fragment.
      *
      * @param  array  $data
