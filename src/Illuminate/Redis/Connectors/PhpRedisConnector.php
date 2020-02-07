@@ -98,8 +98,8 @@ class PhpRedisConnector implements Connector
                 $client->setOption(Redis::OPT_READ_TIMEOUT, $config['read_timeout']);
             }
 
-            if (! empty($options['serializer'])) {
-                $client->setOption(Redis::OPT_SERIALIZER, $options['serializer']);
+            if (! empty($config['serializer'])) {
+                $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
             }
 
             if (! empty($config['scan'])) {
