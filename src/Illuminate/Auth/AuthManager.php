@@ -88,7 +88,7 @@ class AuthManager implements FactoryContract
         $guards = $this->app['config']['auth']['guards'];
 
         foreach (array_keys($guards) as $name) {
-            if ($this->getGuard($name)) {
+            if ($this->getGuard($name)->check()) {
 
                 return $name;
             }
