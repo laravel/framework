@@ -89,6 +89,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('bar'));
         $this->assertTrue($model->isDirty('foo', 'bar'));
         $this->assertTrue($model->isDirty(['foo', 'bar']));
+
+        $this->assertTrue($model->isOnlyDirtyFor(['bar', 'baz']));
+        $this->assertTrue($model->isOnlyDirtyFor('bar', 'baz'));
+        $this->assertFalse($model->isOnlyDirtyFor(['foo', 'bar', 'baz']));
+        $this->assertFalse($model->isOnlyDirtyFor('foo', 'bar', 'baz'));
+        $this->assertFalse($model->isOnlyDirtyFor(['foo']));
+        $this->assertFalse($model->isOnlyDirtyFor('foo'));
     }
 
     public function testDirtyOnCastOrDateAttributes()
@@ -114,6 +121,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty('boolAttribute'));
         $this->assertFalse($model->isDirty('dateAttribute'));
         $this->assertTrue($model->isDirty('datetimeAttribute'));
+
+        $this->assertTrue($model->isOnlyDirtyFor(['foo', 'bar', 'datetimeAttribute']));
+        $this->assertTrue($model->isOnlyDirtyFor('foo', 'bar', 'datetimeAttribute'));
+        $this->assertFalse($model->isOnlyDirtyFor('foo'));
+        $this->assertFalse($model->isOnlyDirtyFor('foo', 'bar'));
+        $this->assertFalse($model->isOnlyDirtyFor('foo', 'boolAttribute'));
+        $this->assertFalse($model->isOnlyDirtyFor(['boolAttribute', 'dateAttribute', 'datetimeAttribute']));
     }
 
     public function testDirtyOnCastedObjects()
@@ -131,6 +145,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
         $this->assertFalse($model->isDirty('objectAttribute'));
         $this->assertFalse($model->isDirty('collectionAttribute'));
+        $this->assertFalse($model->isDirty(['objectAttribute', 'collectionAttribute']));
+
+        $this->assertFalse($model->isOnlyDirtyFor('objectAttribute'));
+        $this->assertFalse($model->isOnlyDirtyFor('collectionAttribute'));
+        $this->assertFalse($model->isOnlyDirtyFor(['objectAttribute', 'collectionAttribute']));
     }
 
     public function testCleanAttributes()
