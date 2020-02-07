@@ -1239,6 +1239,19 @@ trait HasAttributes
     }
 
     /**
+     * Determine if only given attribute(s) have been modified.
+     *
+     * @param  array|string  $attributes
+     * @return bool
+     */
+    public function isOnlyDirtyFor($attributes)
+    {
+        return $this->hasChangesOnly(
+            $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
+        );
+    }
+
+    /**
      * Determine if the model and all the given attribute(s) have remained the same.
      *
      * @param  array|string|null  $attributes
@@ -1250,7 +1263,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or any of the given attribute(s) have been modified.
+     * Determine if the model or any of the given attribute(s) have been changed.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1258,6 +1271,19 @@ trait HasAttributes
     public function wasChanged($attributes = null)
     {
         return $this->hasChanges(
+            $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
+        );
+    }
+
+    /**
+     * Determine if only the given attribute(s) have been changed.
+     *
+     * @param  array|string  $attributes
+     * @return bool
+     */
+    public function wasOnlyChangedFor($attributes)
+    {
+        return $this->hasChangesOnly(
             $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
         );
     }
@@ -1288,6 +1314,18 @@ trait HasAttributes
         }
 
         return false;
+    }
+
+    /**
+     * Determine if only the given attributes were changed.
+     *
+     * @param  array  $changes
+     * @param  array|string  $attributes
+     * @return bool
+     */
+    protected function hasChangesOnly($changes, $attributes)
+    {
+        return Arr::wrap($attributes) == array_keys($changes);
     }
 
     /**
