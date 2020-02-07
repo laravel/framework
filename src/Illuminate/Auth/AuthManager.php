@@ -54,7 +54,7 @@ class AuthManager implements FactoryContract
             return $this->guard($guard)->user();
         };
     }
-     /**
+    /**
      * Attempt to get the guard from the local cache.
      *
      * @param  string|null  $name
@@ -65,37 +65,37 @@ class AuthManager implements FactoryContract
         $name = $name ?: $this->getAuthGaurd();
         return $this->getGuard($name);
     }
-     /**
+
+    /**
      * Attempt to get guard
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
      */
-
-
-    public function getGuard($name)
+    protected function getGuard($name)
     {
 
         return $this->guards[$name] ?? $this->guards[$name] = $this->resolve($name);
     }
+
     /**
      * Attempt to get the auth guard  name from the local cache.
      *
      * @return string $name
      */
-    
-    public function getAuthGuard()
+    protected function getAuthGuard()
     {
         $guards = $this->app['config']['auth']['guards'];
 
-        foreach(array_keys($guards) as $name){
-            if($this->getGuard($name)) return $name;
+        foreach (array_keys($guards) as $name) {
+            if ($this->getGuard($name)) {
 
+                return $name;
+            }
         }
 
         return $this->getDefaultDriver();
     }
-
     /**
      * Resolve the given guard.
      *
@@ -116,7 +116,7 @@ class AuthManager implements FactoryContract
             return $this->callCustomCreator($name, $config);
         }
 
-        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+        $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
 
         if (method_exists($this, $driverMethod)) {
             return $this->{$driverMethod}($name, $config);
