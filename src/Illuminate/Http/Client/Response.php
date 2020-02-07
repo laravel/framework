@@ -105,7 +105,7 @@ class Response
      *
      * @return bool
      */
-    public function isOk()
+    public function ok()
     {
         return $this->successful();
     }
@@ -115,7 +115,7 @@ class Response
      *
      * @return bool
      */
-    public function isRedirect()
+    public function redirect()
     {
         return $this->status() >= 300 && $this->status() < 400;
     }
@@ -125,7 +125,7 @@ class Response
      *
      * @return bool
      */
-    public function isClientError()
+    public function clientError()
     {
         return $this->status() >= 400 && $this->status() < 500;
     }
@@ -135,7 +135,7 @@ class Response
      *
      * @return bool
      */
-    public function isServerError()
+    public function serverError()
     {
         return $this->status() >= 500;
     }
