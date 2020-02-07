@@ -63,9 +63,39 @@ class AuthManager implements FactoryContract
      */
     public function guard($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = $name ?: $this->getAuthGaurd();
+        return $this->getGaurd($name);
+    }
+     /**
+     * Attempt to get gaurd
+     *
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     */
+
+
+    public function getGaurd($name)
+    {
 
         return $this->guards[$name] ?? $this->guards[$name] = $this->resolve($name);
+    }
+
+
+    /**
+     * Attempt to get the auth guard  name from the local cache.
+     *
+     * @return string $name
+     */
+    public function getAuthGaurd()
+    {
+        $guards = $this->app['config']['auth']['guards'];
+
+        foreach($guards as $name=>$guard){
+            if($this->getGaurd($name)) return $name;
+
+        }
+
+        return $this->getDefaultDriver();
     }
 
     /**
