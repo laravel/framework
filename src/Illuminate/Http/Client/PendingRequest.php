@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
-class Client
+class PendingRequest
 {
     /**
      * The request body format.
