@@ -192,7 +192,6 @@ trait MakesHttpRequests
         return $this;
     }
 
-
     /**
      * Add a cookie will be encrypted before sending with the request.
      *
