@@ -74,25 +74,25 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('new-value', $this->defaultCookies['new-cookie']);
     }
 
-    public function testWithEncryptableCookieSetCookie()
+    public function testWithUnencryptedCookieSetCookie()
     {
-        $this->withEncryptableCookie('foo', 'bar');
+        $this->withUnencryptedCookie('foo', 'bar');
 
-        $this->assertCount(1, $this->encryptableCookies);
-        $this->assertSame('bar', $this->encryptableCookies['foo']);
+        $this->assertCount(1, $this->unencryptedCookies);
+        $this->assertSame('bar', $this->unencryptedCookies['foo']);
     }
 
-    public function testWithEncryptableCookiesSetsCookiesAndOverwritesPreviousValues()
+    public function testWithUnencryptedCookiesSetsCookiesAndOverwritesPreviousValues()
     {
-        $this->withEncryptableCookie('foo', 'bar');
-        $this->withEncryptableCookies([
+        $this->withUnencryptedCookie('foo', 'bar');
+        $this->withUnencryptedCookies([
             'foo' => 'baz',
             'new-cookie' => 'new-value',
         ]);
 
-        $this->assertCount(2, $this->encryptableCookies);
-        $this->assertSame('baz', $this->encryptableCookies['foo']);
-        $this->assertSame('new-value', $this->encryptableCookies['new-cookie']);
+        $this->assertCount(2, $this->unencryptedCookies);
+        $this->assertSame('baz', $this->unencryptedCookies['foo']);
+        $this->assertSame('new-value', $this->unencryptedCookies['new-cookie']);
     }
 }
 
