@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
@@ -118,14 +119,18 @@ class AuthenticationTest extends TestCase
         $this->assertFalse(
             $this->app['auth']->attempt(['email' => 'wrong', 'password' => 'password'])
         );
+
         $this->assertFalse($this->app['auth']->check());
         $this->assertNull($this->app['auth']->user());
+
         Event::assertDispatched(Attempting::class, function ($event) {
             $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
 
             return true;
         });
+        Event::assertNotDispatched(Validated::class);
+
         Event::assertDispatched(Failed::class, function ($event) {
             $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
@@ -148,6 +153,12 @@ class AuthenticationTest extends TestCase
         Event::assertDispatched(Attempting::class, function ($event) {
             $this->assertSame('web', $event->guard);
             $this->assertEquals(['email' => 'email', 'password' => 'password'], $event->credentials);
+
+            return true;
+        });
+        Event::assertDispatched(Validated::class, function ($event) {
+            $this->assertSame('web', $event->guard);
+            $this->assertEquals(1, $event->user->id);
 
             return true;
         });
