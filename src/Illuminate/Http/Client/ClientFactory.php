@@ -11,7 +11,7 @@ class ClientFactory
      * @param  array  $parameters
      * @return mixed
      */
-    public static function __callStatic($method, $parameters)
+    public function __call($method, $parameters)
     {
         return (new Client)->{$method}(...$parameters);
     }
