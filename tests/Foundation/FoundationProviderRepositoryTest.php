@@ -92,12 +92,7 @@ class FoundationProviderRepositoryTest extends TestCase
     public function testWriteManifestThrowsExceptionIfManifestDirDoesntExist()
     {
         $this->expectException(Exception::class);
-
-        if (is_callable([$this, 'expectExceptionMessageMatches'])) {
-            $this->expectExceptionMessageMatches('/^The (.*) directory must be present and writable.$/');
-        } else {
-            $this->expectExceptionMessageRegExp('/^The (.*) directory must be present and writable.$/');
-        }
+        $this->expectExceptionMessageMatches('/^The (.*) directory must be present and writable.$/');
 
         $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files = m::mock(Filesystem::class), __DIR__.'/cache/services.php');
         $files->shouldReceive('replace')->never();
