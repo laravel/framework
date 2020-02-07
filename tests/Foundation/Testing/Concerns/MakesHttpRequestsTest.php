@@ -73,6 +73,27 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('baz', $this->defaultCookies['foo']);
         $this->assertSame('new-value', $this->defaultCookies['new-cookie']);
     }
+
+    public function testWithEncryptableCookieSetCookie()
+    {
+        $this->withEncryptable('foo', 'bar');
+
+        $this->assertCount(1, $this->encryptableCookies);
+        $this->assertSame('bar', $this->encryptableCookies['foo']);
+    }
+
+    public function testWithEncryptableCookiesSetsCookiesAndOverwritesPreviousValues()
+    {
+        $this->withCookie('foo', 'bar');
+        $this->withCookies([
+            'foo' => 'baz',
+            'new-cookie' => 'new-value',
+        ]);
+
+        $this->assertCount(2, $this->encryptableCookies);
+        $this->assertSame('baz', $this->encryptableCookies['foo']);
+        $this->assertSame('new-value', $this->encryptableCookies['new-cookie']);
+    }
 }
 
 class MyMiddleware

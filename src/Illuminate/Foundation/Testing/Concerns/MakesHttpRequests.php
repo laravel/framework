@@ -26,6 +26,13 @@ trait MakesHttpRequests
     protected $defaultCookies = [];
 
     /**
+     * Additional cookies will be encrypted for the request.
+     *
+     * @var array
+     */
+    protected $encryptableCookies = [];
+
+    /**
      * Additional server variables for the request.
      *
      * @var array
@@ -168,6 +175,34 @@ trait MakesHttpRequests
     public function withCookie(string $name, string $value)
     {
         $this->defaultCookies[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Define additional cookies will be encrypted before sending with the request.
+     *
+     * @param  array  $cookies
+     * @return $this
+     */
+    public function withEncryptableCookies(array $cookies)
+    {
+        $this->encryptableCookies = array_merge($this->encryptableCookies, $cookies);
+
+        return $this;
+    }
+
+
+    /**
+     * Add a cookie will be encrypted before sending with the request.
+     *
+     * @param  string  $name
+     * @param  string  $value
+     * @return $this
+     */
+    public function withEncryptableCookie(string $name, string $value)
+    {
+        $this->encryptableCookies[$name] = $value;
 
         return $this;
     }
@@ -527,12 +562,12 @@ trait MakesHttpRequests
     protected function prepareCookiesForRequest()
     {
         if (! $this->encryptCookies) {
-            return $this->defaultCookies;
+            return array_merge($this->defaultCookies, $this->encryptableCookies);
         }
 
-        return collect($this->defaultCookies)->map(function ($value) {
+        return collect($this->encryptableCookies)->map(function ($value) {
             return encrypt($value, false);
-        })->all();
+        })->merge($this->defaultCookies)->all();
     }
 
     /**
