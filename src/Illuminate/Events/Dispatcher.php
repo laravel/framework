@@ -104,7 +104,17 @@ class Dispatcher implements DispatcherContract
      */
     public function hasListeners($eventName)
     {
-        return isset($this->listeners[$eventName]) || isset($this->wildcards[$eventName]);
+        $hasWildcard = function ($eventName) {
+            foreach ($this->wildcards as $key => $listeners) {
+                if (Str::is($key, $eventName)) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        return isset($this->listeners[$eventName]) || isset($this->wildcards[$eventName]) || $hasWildcard($eventName);
     }
 
     /**
