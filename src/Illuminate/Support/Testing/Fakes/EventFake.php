@@ -189,7 +189,7 @@ class EventFake implements Dispatcher
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
-     * @return array|null
+     * @return mixed
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
@@ -250,7 +250,7 @@ class EventFake implements Dispatcher
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @return void
+     * @return mixed
      */
     public function until($event, $payload = [])
     {

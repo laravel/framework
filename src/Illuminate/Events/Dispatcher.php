@@ -165,7 +165,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @return array|null
+     * @return mixed
      */
     public function until($event, $payload = [])
     {
@@ -178,7 +178,7 @@ class Dispatcher implements DispatcherContract
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
-     * @return array|null
+     * @return mixed
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
