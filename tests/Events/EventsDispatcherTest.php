@@ -26,7 +26,9 @@ class EventsDispatcherTest extends TestCase
         $d->listen('foo', function ($foo) {
             $_SERVER['__event.test'] = $foo;
         });
-        $d->dispatch('foo', ['bar']);
+        $response = $d->dispatch('foo', ['bar']);
+
+        $this->assertEquals([null], $response);
         $this->assertSame('bar', $_SERVER['__event.test']);
     }
 
@@ -42,16 +44,23 @@ class EventsDispatcherTest extends TestCase
         $d->listen('foo', function ($foo) {
             throw new Exception('should not be called');
         });
-        $d->until('foo', ['bar']);
+
+        $response = $d->dispatch('foo', ['bar'], true);
+        $this->assertEquals('here', $response);
+
+        $response = $d->until('foo', ['bar']);
+        $this->assertEquals('here', $response);
     }
 
     public function testContainerResolutionOfEventHandlers()
     {
         $d = new Dispatcher($container = m::mock(Container::class));
         $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock(stdClass::class));
-        $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
+        $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar')->andReturn('baz');
         $d->listen('foo', 'FooHandler@onFooEvent');
-        $d->dispatch('foo', ['foo', 'bar']);
+        $response = $d->dispatch('foo', ['foo', 'bar']);
+
+        $this->assertEquals(['baz'], $response);
     }
 
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
@@ -104,9 +113,30 @@ class EventsDispatcherTest extends TestCase
         $d->listen('bar.*', function () {
             $_SERVER['__event.test'] = 'nope';
         });
-        $d->dispatch('foo.bar');
 
+        $response = $d->dispatch('foo.bar');
+
+        $this->assertEquals([null, null], $response);
         $this->assertSame('wildcard', $_SERVER['__event.test']);
+    }
+
+    public function testWildcardListenersWithResponses()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('foo.bar', function () {
+            return 'regular';
+        });
+        $d->listen('foo.*', function () {
+            return 'wildcard';
+        });
+        $d->listen('bar.*', function () {
+            return 'nope';
+        });
+
+        $response = $d->dispatch('foo.bar');
+
+        $this->assertEquals(['regular', 'wildcard'], $response);
     }
 
     public function testWildcardListenersCacheFlushing()
