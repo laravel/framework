@@ -1217,9 +1217,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->reboundCallbacks = [];
         $this->serviceProviders = [];
         $this->resolvingCallbacks = [];
+        $this->terminatingCallbacks = [];
         $this->afterResolvingCallbacks = [];
         $this->globalResolvingCallbacks = [];
-        $this->terminatingCallbacks = [];
     }
 
     /**
