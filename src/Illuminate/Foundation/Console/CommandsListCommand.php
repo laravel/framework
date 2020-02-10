@@ -29,7 +29,7 @@ class CommandsListCommand extends Command
      *
      * @var array
      */
-    protected $headers = ['Signature', 'Class'];
+    protected $headers = ['Name', 'Class'];
 
     /**
      * Create a new command instance.
@@ -65,7 +65,7 @@ class CommandsListCommand extends Command
     protected function getCommandInformation(SymfonyCommand $command)
     {
         return [
-            'signature' => $command->getName(),
+            'name' => $command->getName(),
             'namespace' => get_class($command)
         ];
     }
