@@ -65,7 +65,8 @@ class BusFake implements Dispatcher
         }
 
         PHPUnit::assertTrue(
-            $this->dispatched($command, $callback)->count() > 0,
+            $this->dispatched($command, $callback)->count() > 0 ||
+            $this->dispatchedAfterResponse($command, $callback)->count() > 0,
             "The expected [{$command}] job was not dispatched."
         );
     }
@@ -79,9 +80,47 @@ class BusFake implements Dispatcher
      */
     public function assertDispatchedTimes($command, $times = 1)
     {
+        $count = $this->dispatched($command)->count() +
+                 $this->dispatchedAfterResponse($command)->count();
+
         PHPUnit::assertTrue(
-            ($count = $this->dispatched($command)->count()) === $times,
+            $count === $times,
             "The expected [{$command}] job was pushed {$count} times instead of {$times} times."
+        );
+    }
+
+    /**
+     * Determine if a job was dispatched based on a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertNotDispatched($command, $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->dispatched($command, $callback)->count() === 0 &&
+            $this->dispatchedAfterResponse($command, $callback)->count() === 0,
+            "The unexpected [{$command}] job was dispatched."
+        );
+    }
+
+    /**
+     * Assert if a job was dispatched after the response was sent based on a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public function assertDispatchedAfterResponse($command, $callback = null)
+    {
+        if (is_numeric($callback)) {
+            return $this->assertDispatchedAfterResponseTimes($command, $callback);
+        }
+
+        PHPUnit::assertTrue(
+            $this->dispatchedAfterResponse($command, $callback)->count() > 0,
+            "The expected [{$command}] job was not dispatched for after sending the response."
         );
     }
 
@@ -107,45 +146,11 @@ class BusFake implements Dispatcher
      * @param  callable|null  $callback
      * @return void
      */
-    public function assertNotDispatched($command, $callback = null)
-    {
-        PHPUnit::assertTrue(
-            $this->dispatched($command, $callback)->count() === 0,
-            "The unexpected [{$command}] job was dispatched."
-        );
-    }
-
-    /**
-     * Determine if a job was dispatched based on a truth-test callback.
-     *
-     * @param  string  $command
-     * @param  callable|null  $callback
-     * @return void
-     */
     public function assertNotDispatchedAfterResponse($command, $callback = null)
     {
         PHPUnit::assertTrue(
             $this->dispatchedAfterResponse($command, $callback)->count() === 0,
             "The unexpected [{$command}] job was dispatched for after sending the response."
-        );
-    }
-
-    /**
-     * Assert if a job was dispatched after the response was sent based on a truth-test callback.
-     *
-     * @param  string  $command
-     * @param  callable|int|null  $callback
-     * @return void
-     */
-    public function assertDispatchedAfterResponse($command, $callback = null)
-    {
-        if (is_numeric($callback)) {
-            return $this->assertDispatchedAfterResponseTimes($command, $callback);
-        }
-
-        PHPUnit::assertTrue(
-            $this->dispatchedAfterResponse($command, $callback)->count() > 0,
-            "The expected [{$command}] job was not dispatched for after sending the response."
         );
     }
 
