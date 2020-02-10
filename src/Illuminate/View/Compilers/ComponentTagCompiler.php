@@ -71,7 +71,7 @@ class ComponentTagCompiler
         $pattern = "/
             <
                 \s*
-                x-([\w\-\:\.]*)
+                x[-\:]([\w\-\:\.]*)
                 (?<attributes>
                     (?:
                         \s+
@@ -111,7 +111,7 @@ class ComponentTagCompiler
         $pattern = "/
             <
                 \s*
-                x-([\w\-\:\.]*)
+                x[-\:]([\w\-\:\.]*)
                 \s*
                 (?<attributes>
                     (?:
@@ -223,7 +223,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x-[\w\-\:\.]*\s*>/", '@endcomponentClass', $value);
+        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", '@endcomponentClass', $value);
     }
 
     /**
