@@ -190,7 +190,7 @@ class ComponentTagCompiler
 
         $componentPieces = array_map(function ($componentPiece) {
             return ucfirst(Str::camel($componentPiece));
-        }, explode(':', $component));
+        }, explode('.', $component));
 
         return $namespace.'View\\Components\\'.implode('\\', $componentPieces);
     }

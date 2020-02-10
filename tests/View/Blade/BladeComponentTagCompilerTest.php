@@ -72,7 +72,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $app->shouldReceive('getNamespace')->andReturn('App\\');
         Container::setInstance($container);
 
-        $result = (new ComponentTagCompiler([]))->guessClassName('base:alert');
+        $result = (new ComponentTagCompiler([]))->guessClassName('base.alert');
 
         $this->assertEquals("App\View\Components\Base\Alert", trim($result));
 
