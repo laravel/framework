@@ -40,10 +40,9 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
     }
 
     /**
-     * Get a given attribute from the attribute array.
+     * Only include the given attribute from the attribute array.
      *
-     * @param  array|string  $key
-     * @param  mixed  $default
+     * @param  mixed|array  $keys
      * @return static
      */
     public function only($keys)
@@ -54,6 +53,25 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
             $keys = Arr::wrap($keys);
 
             $values = Arr::only($this->attributes, $keys);
+        }
+
+        return new static($values);
+    }
+
+    /**
+     * Exclude the given attribute from the attribute array.
+     *
+     * @param  mixed|array  $keys
+     * @return static
+     */
+    public function except($keys)
+    {
+        if (is_null($keys)) {
+            $values = $this->attributes;
+        } else {
+            $keys = Arr::wrap($keys);
+
+            $values = Arr::except($this->attributes, $keys);
         }
 
         return new static($values);
@@ -71,6 +89,10 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
             array_merge($attributeDefaults, collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
                 if ($value === true) {
                     return $key;
+                }
+
+                if ($key !== 'class') {
+                    return $attributeDefaults[$key] ?? $value;
                 }
 
                 return collect([$attributeDefaults[$key] ?? '', $value])

@@ -12,6 +12,7 @@ class ViewComponentAttributeBagTest extends TestCase
         $bag = new ComponentAttributeBag(['class' => 'font-bold', 'name' => 'test']);
 
         $this->assertEquals('class="mt-4 font-bold" name="test"', (string) $bag->merge(['class' => 'mt-4']));
+        $this->assertEquals('class="mt-4 font-bold" name="foo"', (string) $bag->merge(['class' => 'mt-4', 'name' => 'foo']));
         $this->assertEquals('class="mt-4 font-bold" name="test"', (string) $bag(['class' => 'mt-4']));
         $this->assertEquals('class="mt-4 font-bold"', (string) $bag->only('class')->merge(['class' => 'mt-4']));
         $this->assertEquals('class="mt-4 font-bold"', (string) $bag->merge(['class' => 'mt-4'])->only('class'));
