@@ -13,7 +13,7 @@ class Response
     /**
      * The underlying PSR response.
      *
-     * @var \Psr\Http\Message\MessageInterface
+     * @var \Psr\Http\Message\ResponseInterface
      */
     protected $response;
 
@@ -148,6 +148,16 @@ class Response
     public function cookies()
     {
         return $this->cookies;
+    }
+
+    /**
+     * Get the underlying PSR response for the response.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function toPsrResponse()
+    {
+        return $this->response;
     }
 
     /**
