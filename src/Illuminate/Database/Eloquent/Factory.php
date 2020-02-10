@@ -60,6 +60,8 @@ class Factory implements ArrayAccess
      * @param  \Faker\Generator  $faker
      * @param  string|null  $pathToFactories
      * @return static
+     *
+     * @deprecated Construct using new keyword as this approach is incompatible with the Factory facade
      */
     public static function construct(Faker $faker, $pathToFactories = null)
     {

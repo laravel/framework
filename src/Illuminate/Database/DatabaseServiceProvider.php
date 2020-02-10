@@ -79,8 +79,15 @@ class DatabaseServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(EloquentFactory::class, function ($app) {
-            return EloquentFactory::construct(
-                $app->make(FakerGenerator::class), $this->app->databasePath('factories')
+            return new EloquentFactory(
+                $app->make(FakerGenerator::class)
+            );
+        });
+
+        /* Unable to use `$this->loadFactoriesFrom()` as database path may be changed at runtime (e.g. tests) */
+        $this->app->afterResolving(EloquentFactory::class, function ($factory) {
+            $factory->load(
+                $this->app->databasePath('factories')
             );
         });
     }
