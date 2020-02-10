@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Client;
 
+use Exception;
+
 class RequestException extends Exception
 {
     /**
@@ -17,7 +19,7 @@ class RequestException extends Exception
      * @param  \Illuminate\Http\Client\Response  $response
      * @return void
      */
-    public function __construct(Respnose $response)
+    public function __construct(Response $response)
     {
         $this->response = $response;
     }
