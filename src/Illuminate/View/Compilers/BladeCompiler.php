@@ -128,6 +128,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $compilesComponentTags = true;
 
     /**
+     * The default component prefix.
+     *
+     * @var string
+     */
+    public static $componentPrefix = 'x';
+
+    /**
      * Compile the view at the given path.
      *
      * @param  string|null  $path
@@ -569,6 +576,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 static::component($key, $value, $prefix);
             }
         }
+    }
+
+    /**
+     * Set the default component prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function prefix($prefix)
+    {
+        self::$componentPrefix = $prefix;
     }
 
     /**

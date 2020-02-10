@@ -13,6 +13,7 @@ namespace Illuminate\Support\Facades;
  * @method static void if(string $name, callable $callback)
  * @method static bool check(string $name, array ...$parameters)
  * @method static void component(string $path, string|null $alias = null)
+ * @method static void prefix(string $prefix)
  * @method static void include(string $path, string|null $alias = null)
  * @method static void directive(string $name, callable $handler)
  * @method static array getCustomDirectives()

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
 use Mockery;
@@ -122,6 +123,19 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes([]); ?>
 @endcomponentClass", trim($result));
+    }
+
+    public function testCustomPrefixComponents()
+    {
+        BladeCompiler::$componentPrefix = 'z';
+
+        $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<z-alert></z-alert>');
+
+        $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+<?php \$component->withAttributes([]); ?>@endcomponentClass", trim($result));
+
+        // Reset prefix back to default...
+        BladeCompiler::$componentPrefix = 'x';
     }
 }
 
