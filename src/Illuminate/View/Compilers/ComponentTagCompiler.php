@@ -71,7 +71,7 @@ class ComponentTagCompiler
         $pattern = "/
             <
                 \s*
-                x-([\w\-\:]*)
+                x[-\:]([\w\-\:\.]*)
                 (?<attributes>
                     (?:
                         \s+
@@ -111,7 +111,7 @@ class ComponentTagCompiler
         $pattern = "/
             <
                 \s*
-                x-([\w\-\:]*)
+                x[-\:]([\w\-\:\.]*)
                 \s*
                 (?<attributes>
                     (?:
@@ -190,7 +190,7 @@ class ComponentTagCompiler
 
         $componentPieces = array_map(function ($componentPiece) {
             return ucfirst(Str::camel($componentPiece));
-        }, explode(':', $component));
+        }, explode('.', $component));
 
         return $namespace.'View\\Components\\'.implode('\\', $componentPieces);
     }
@@ -223,7 +223,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x-[\w\-\:]*\s*>/", '@endcomponentClass', $value);
+        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", '@endcomponentClass', $value);
     }
 
     /**
