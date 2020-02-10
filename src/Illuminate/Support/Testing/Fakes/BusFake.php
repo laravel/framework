@@ -31,6 +31,13 @@ class BusFake implements Dispatcher
     protected $commands = [];
 
     /**
+     * The commands that have been dispatched after the response has been sent.
+     *
+     * @var array
+     */
+    protected $commandsAfterResponse = [];
+
+    /**
      * Create a new bus fake instance.
      *
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
@@ -79,6 +86,21 @@ class BusFake implements Dispatcher
     }
 
     /**
+     * Assert if a job was pushed after the response was sent a number of times.
+     *
+     * @param  string  $command
+     * @param  int  $times
+     * @return void
+     */
+    public function assertDispatchedAfterResponseTimes($command, $times = 1)
+    {
+        PHPUnit::assertTrue(
+            ($count = $this->dispatchedAfterResponse($command)->count()) === $times,
+            "The expected [{$command}] job was pushed {$count} times instead of {$times} times."
+        );
+    }
+
+    /**
      * Determine if a job was dispatched based on a truth-test callback.
      *
      * @param  string  $command
@@ -90,6 +112,40 @@ class BusFake implements Dispatcher
         PHPUnit::assertTrue(
             $this->dispatched($command, $callback)->count() === 0,
             "The unexpected [{$command}] job was dispatched."
+        );
+    }
+
+    /**
+     * Determine if a job was dispatched based on a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertNotDispatchedAfterResponse($command, $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->dispatchedAfterResponse($command, $callback)->count() === 0,
+            "The unexpected [{$command}] job was dispatched for after sending the response."
+        );
+    }
+
+    /**
+     * Assert if a job was dispatched after the response was sent based on a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public function assertDispatchedAfterResponse($command, $callback = null)
+    {
+        if (is_numeric($callback)) {
+            return $this->assertDispatchedAfterResponseTimes($command, $callback);
+        }
+
+        PHPUnit::assertTrue(
+            $this->dispatchedAfterResponse($command, $callback)->count() > 0,
+            "The expected [{$command}] job was not dispatched for after sending the response."
         );
     }
 
@@ -116,6 +172,28 @@ class BusFake implements Dispatcher
     }
 
     /**
+     * Get all of the jobs dispatched after the response was sent matching a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  callable|null  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function dispatchedAfterResponse(string $command, $callback = null)
+    {
+        if (! $this->hasDispatchedAfterResponse($command)) {
+            return collect();
+        }
+
+        $callback = $callback ?: function () {
+            return true;
+        };
+
+        return collect($this->commandsAfterResponse[$command])->filter(function ($command) use ($callback) {
+            return $callback($command);
+        });
+    }
+
+    /**
      * Determine if there are any stored commands for a given class.
      *
      * @param  string  $command
@@ -124,6 +202,17 @@ class BusFake implements Dispatcher
     public function hasDispatched($command)
     {
         return isset($this->commands[$command]) && ! empty($this->commands[$command]);
+    }
+
+    /**
+     * Determine if there are any stored commands for a given class.
+     *
+     * @param  string  $command
+     * @return bool
+     */
+    public function hasDispatchedAfterResponse($command)
+    {
+        return isset($this->commandsAfterResponse[$command]) && ! empty($this->commandsAfterResponse[$command]);
     }
 
     /**
@@ -154,6 +243,21 @@ class BusFake implements Dispatcher
             $this->commands[get_class($command)][] = $command;
         } else {
             return $this->dispatcher->dispatchNow($command, $handler);
+        }
+    }
+
+    /**
+     * Dispatch a command to its appropriate handler.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     */
+    public function dispatchAfterResponse($command)
+    {
+        if ($this->shouldFakeJob($command)) {
+            $this->commandsAfterResponse[get_class($command)][] = $command;
+        } else {
+            return $this->dispatcher->dispatch($command);
         }
     }
 
