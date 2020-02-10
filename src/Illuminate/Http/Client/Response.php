@@ -151,6 +151,18 @@ class Response
     }
 
     /**
+     * Throw an exception if a server or client error occurred.
+     *
+     * @return void
+     */
+    public function throw()
+    {
+        if ($this->serverError() || $this->clientError()) {
+            throw new RequestException($this);
+        }
+    }
+
+    /**
      * Get the body of the response.
      *
      * @return string
