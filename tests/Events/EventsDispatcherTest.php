@@ -192,6 +192,7 @@ class EventsDispatcherTest extends TestCase
             //
         });
         $this->assertTrue($d->hasListeners('foo.*'));
+        $this->assertTrue($d->hasListeners('foo.bar'));
     }
 
     public function testEventPassedFirstToWildcards()
