@@ -411,17 +411,6 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Get the view used to render HTTP exceptions.
-     *
-     * @param  \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface  $e
-     * @return string
-     */
-    protected function getHttpExceptionView(HttpExceptionInterface $e)
-    {
-        return "errors::{$e->getStatusCode()}";
-    }
-
-    /**
      * Register the error template hint paths.
      *
      * @return void
@@ -433,6 +422,17 @@ class Handler implements ExceptionHandlerContract
         View::replaceNamespace('errors', $paths->map(function ($path) {
             return "{$path}/errors";
         })->push(__DIR__.'/views')->all());
+    }
+
+    /**
+     * Get the view used to render HTTP exceptions.
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface  $e
+     * @return string
+     */
+    protected function getHttpExceptionView(HttpExceptionInterface $e)
+    {
+        return "errors::{$e->getStatusCode()}";
     }
 
     /**
