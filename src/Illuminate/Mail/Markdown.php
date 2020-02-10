@@ -7,7 +7,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment;
-use League\CommonMark\Ext\Table\TableExtension;
+use League\CommonMark\Extension\Table\TableExtension;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class Markdown
