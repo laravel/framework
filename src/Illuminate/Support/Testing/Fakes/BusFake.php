@@ -178,7 +178,8 @@ class BusFake implements Dispatcher
      * @param  callable|null  $callback
      * @return \Illuminate\Support\Collection
      */
-    public function dispatchedAfterResponse(string $command, $callback = null) {
+    public function dispatchedAfterResponse(string $command, $callback = null)
+    {
         if (! $this->hasDispatchedAfterResponse($command)) {
             return collect();
         }
