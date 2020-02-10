@@ -3,10 +3,11 @@
 namespace Illuminate\View;
 
 use ArrayAccess;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 
-class ComponentAttributeBag implements ArrayAccess
+class ComponentAttributeBag implements ArrayAccess, Htmlable
 {
     /**
      * The raw array of attributes.
@@ -89,6 +90,16 @@ class ComponentAttributeBag implements ArrayAccess
     public function setAttributes(array $attributes)
     {
         $this->attributes = $attributes;
+    }
+
+    /**
+     * Get content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return (string) $this;
     }
 
     /**
