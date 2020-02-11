@@ -353,7 +353,7 @@ class PendingRequest
                 'query' => $this->parseQueryParams($url),
                 'on_stats' => function ($transferStats) {
                     $this->transferStats = $transferStats;
-                }
+                },
             ], $options))), function ($response) {
                 $response->cookies = $this->cookies;
                 $response->transferStats = $this->transferStats;
@@ -390,7 +390,7 @@ class PendingRequest
     }
 
     /**
-     * Build the before sending handler
+     * Build the before sending handler.
      *
      * @return \Closure
      */
@@ -404,7 +404,7 @@ class PendingRequest
     }
 
     /**
-     * Build the stub handler
+     * Build the stub handler.
      *
      * @return \Closure
      */

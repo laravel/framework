@@ -10,7 +10,7 @@ class Request
      * @param  \GuzzleHttp\Psr7\RequestInterface  $request
      * @return void
      */
-    function __construct($request)
+    public function __construct($request)
     {
         $this->request = $request;
     }
@@ -20,7 +20,7 @@ class Request
      *
      * @return strign
      */
-    function method()
+    public function method()
     {
         return $this->request->getMethod();
     }
@@ -30,7 +30,7 @@ class Request
      *
      * @return string
      */
-    function url()
+    public function url()
     {
         return (string) $this->request->getUri();
     }
@@ -40,7 +40,7 @@ class Request
      *
      * @return string
      */
-    function body()
+    public function body()
     {
         return (string) $this->request->getBody();
     }
@@ -50,7 +50,7 @@ class Request
      *
      * @return array
      */
-    function headers()
+    public function headers()
     {
         return collect($this->request->getHeaders())->mapWithKeys(function ($values, $header) {
             return [$header => $values];
