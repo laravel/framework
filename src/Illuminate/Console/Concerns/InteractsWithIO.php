@@ -218,11 +218,11 @@ trait InteractsWithIO
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  string  $tableStyle
      * @param  array  $columnStyles
-     * @return void
+     * @return \Symfony\Component\Console\Helper\Table
      */
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
     {
-        $table = new Table($this->output);
+        $table = new Table($this->output->getOutput()->section());
 
         if ($rows instanceof Arrayable) {
             $rows = $rows->toArray();
@@ -235,6 +235,8 @@ trait InteractsWithIO
         }
 
         $table->render();
+
+        return $table;
     }
 
     /**
