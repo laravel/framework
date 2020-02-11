@@ -51,9 +51,27 @@ class InstallCommand extends Command
     {
         $this->repository->setSource($this->input->getOption('database'));
 
-        $this->repository->createRepository();
+        if (true === (bool) $this->input->getOption('force')) {
 
-        $this->info('Migration table created successfully.');
+            $this->repository->createRepository();
+
+            $this->info('Migration table created successfully.');
+
+        } else {
+
+            if (false === $this->repository->repositoryExists()) {
+
+                $this->repository->createRepository();
+
+                $this->info('Migration table created successfully.');
+
+            } else {
+
+                $this->info('Migration table already exists.');
+
+            }
+
+        }
     }
 
     /**
@@ -65,6 +83,7 @@ class InstallCommand extends Command
     {
         return [
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
+            ['force', null, InputOption::VALUE_OPTIONAL, 'Force the operation to attempt to create the repository', true],
         ];
     }
 }
