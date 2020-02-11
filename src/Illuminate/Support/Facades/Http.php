@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Http\Client\RequestFactory;
+use Illuminate\Http\Client\Factory;
 
 /**
  * @see \Illuminate\Http\Client\Client
@@ -16,6 +16,6 @@ class Http extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return RequestFactory::class;
+        return Factory::class;
     }
 }

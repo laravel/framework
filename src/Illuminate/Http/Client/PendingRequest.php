@@ -40,6 +40,13 @@ class PendingRequest
     protected $beforeSendingCallbacks;
 
     /**
+     * The stub callables that will handle requests.
+     *
+     * @var \Illuminate\Support\Collection|null
+     */
+    protected $expectations;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @return void
@@ -378,6 +385,7 @@ class PendingRequest
     {
         return tap(\GuzzleHttp\HandlerStack::create(), function ($stack) {
             $stack->push($this->buildBeforeSendingHandler());
+            $stack->push($this->buildStubHandler());
         });
     }
 
@@ -391,6 +399,24 @@ class PendingRequest
         return function ($handler) {
             return function ($request, $options) use ($handler) {
                 return $handler($this->runBeforeSendingCallbacks($request, $options), $options);
+            };
+        };
+    }
+
+    /**
+     * Build the stub handler
+     *
+     * @return \Closure
+     */
+    public function buildStubHandler()
+    {
+        return function ($handler) {
+            return function ($request, $options) use ($handler) {
+                return ($this->expectations ?? collect())
+                     ->map
+                     ->__invoke(new Request($request), $options)
+                     ->filter()
+                     ->first(null, $handler($request, $options));
             };
         };
     }
@@ -431,5 +457,18 @@ class PendingRequest
         return tap([], function (&$query) use ($url) {
             parse_str(parse_url($url, PHP_URL_QUERY), $query);
         });
+    }
+
+    /**
+     * Register a stub callable that will intercept requests and be able to return stub responses.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function stub($callback)
+    {
+        $this->expectations = collect($callback);
+
+        return $this;
     }
 }
