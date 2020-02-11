@@ -3924,6 +3924,19 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([
             1 => ['name' => null],
         ], $data->whereNull('name')->all());
+
+        $this->assertSame([], $data->whereNull()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereNullWithoutKey($collection)
+    {
+        $collection = new $collection([1, null, 3, 'null', false, true]);
+        $this->assertSame([
+            1 => null,
+        ], $collection->whereNull()->all());
     }
 
     /**
@@ -3931,7 +3944,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testWhereNotNull($collection)
     {
-        $data = new $collection([
+        $data = new $collection($originalData = [
             ['name' => 'Taylor'],
             ['name' => null],
             ['name' => 'Bert'],
@@ -3945,6 +3958,24 @@ class SupportCollectionTest extends TestCase
             3 => ['name' => false],
             4 => ['name' => ''],
         ], $data->whereNotNull('name')->all());
+
+        $this->assertSame($originalData, $data->whereNotNull()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereNotNullWithoutKey($collection)
+    {
+        $data = new $collection([1, null, 3, 'null', false, true]);
+
+        $this->assertSame([
+            0 => 1,
+            2 => 3,
+            3 => 'null',
+            4 => false,
+            5 => true,
+        ], $data->whereNotNull()->all());
     }
 
     /**

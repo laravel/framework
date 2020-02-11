@@ -498,7 +498,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @return static
      */
-    public function whereNull($key)
+    public function whereNull($key = null)
     {
         return $this->whereStrict($key, null);
     }
@@ -509,7 +509,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @return static
      */
-    public function whereNotNull($key)
+    public function whereNotNull($key = null)
     {
         return $this->where($key, '!==', null);
     }
