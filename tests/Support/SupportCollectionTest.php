@@ -3911,6 +3911,39 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testWhereNull($collection)
+    {
+        $data = new $collection([
+            ['name' => 'Taylor'],
+            ['name' => null],
+            ['name' => 'Bert'],
+        ]);
+
+        $this->assertSame([
+            1 => ['name' => null],
+        ], $data->whereNull('name')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testWhereNotNull($collection)
+    {
+        $data = new $collection([
+            ['name' => 'Taylor'],
+            ['name' => null],
+            ['name' => 'Bert'],
+        ]);
+
+        $this->assertSame([
+            0 => ['name' => 'Taylor'],
+            2 => ['name' => 'Bert'],
+        ], $data->whereNotNull('name')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testCollect($collection)
     {
         $data = $collection::make([
