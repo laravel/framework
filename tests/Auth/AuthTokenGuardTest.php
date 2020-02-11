@@ -2,9 +2,12 @@
 
 namespace Illuminate\Tests\Auth;
 
+use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\TokenGuard;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
+use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -13,6 +16,14 @@ class AuthTokenGuardTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+    }
+
+    public function testManagerWontCreateTokenGuardWithInvalidStorageKey()
+    {
+        $this->expectException(LogicException::class);
+
+        $manager = new AuthManager(new Container);
+        $manager->createTokenDriver('name', ['storage_key' => 'foo_password']);
     }
 
     public function testUserCanBeRetrievedByQueryStringVariable()
