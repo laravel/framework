@@ -68,8 +68,16 @@ class Factory
      * @param  callable|array  $callback
      * @return $this
      */
-    public function stub($callback)
+    public function stub($callback = null)
     {
+        $this->record();
+
+        if (is_null($callback)) {
+            $callback = function () {
+                return static::response();
+            };
+        }
+
         if (is_array($callback)) {
             foreach ($callback as $url => $callable) {
                 $this->stubUrl($url, $callable);
@@ -114,7 +122,7 @@ class Factory
      *
      * @return $this
      */
-    public function record()
+    protected function record()
     {
         $this->recording = true;
 
@@ -141,7 +149,7 @@ class Factory
      * @param  callable  $callback
      * @return void
      */
-    public function assertRecorded($callback)
+    public function assert($callback)
     {
         PHPUnit::assertTrue(
             $this->recorded($callback)->count() > 0,
