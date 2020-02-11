@@ -90,7 +90,7 @@ class Response implements ArrayAccess
      */
     public function status()
     {
-        return $this->response->getStatusCode();
+        return (int) $this->response->getStatusCode();
     }
 
     /**
@@ -120,7 +120,7 @@ class Response implements ArrayAccess
      */
     public function ok()
     {
-        return $this->successful();
+        return $this->status() === 200;
     }
 
     /**
