@@ -126,6 +126,22 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Determine if the request has a given header.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function hasHeader($key, $value = null)
+    {
+        if (is_null($value)) {
+            return ! empty($this->request->getHeaders()[$key]);
+        }
+
+        return in_array($value, $this->headers()[$key]);
+    }
+
+    /**
      * Get the request headers.
      *
      * @return array

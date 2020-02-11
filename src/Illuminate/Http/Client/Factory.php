@@ -68,7 +68,7 @@ class Factory
      * @param  callable|array  $callback
      * @return $this
      */
-    public function stub($callback = null)
+    public function fake($callback = null)
     {
         $this->record();
 
@@ -106,7 +106,7 @@ class Factory
      */
     public function stubUrl($url, $callback)
     {
-        return $this->stub(function ($request, $options) use ($url, $callback) {
+        return $this->fake(function ($request, $options) use ($url, $callback) {
             if (! Str::is(Str::start($url, '*'), $request->url())) {
                 return;
             }
@@ -149,7 +149,7 @@ class Factory
      * @param  callable  $callback
      * @return void
      */
-    public function assert($callback)
+    public function assertSent($callback)
     {
         PHPUnit::assertTrue(
             $this->recorded($callback)->count() > 0,
