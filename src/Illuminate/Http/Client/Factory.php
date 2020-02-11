@@ -2,6 +2,9 @@
 
 namespace Illuminate\Http\Client;
 
+use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Support\Str;
+
 class Factory
 {
     /**
@@ -12,12 +15,22 @@ class Factory
     protected $expectations;
 
     /**
+     * Create a new factory instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->expectations = collect();
+    }
+
+    /**
      * Create a new response instance.
      *
      * @param  string  $body
      * @param  int  $status
      * @param  array  $headers
-     * @return \GuzzleHttp\Psr7\Response
+     * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public function response($body = null, $status = 200, $headers = [])
     {
@@ -32,9 +45,27 @@ class Factory
      */
     public function stub($callback)
     {
-        $this->expectations = collect($callback);
+        $this->expectations = $this->expectations->merge(collect($callback));
 
         return $this;
+    }
+
+    /**
+     * Stub the given URL using the given callback.
+     *
+     * @param  string  $url
+     * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable  $callback
+     * @return $this
+     */
+    public function stubUrl($url, $callback)
+    {
+        return $this->stub(function ($request, $options) use ($url, $callback) {
+            if (Str::is($url, $request->url())) {
+                return $callback instanceof PromiseInterface || $callback instanceof Response
+                                ? $callback
+                                : $callback($request, $options);
+            }
+        });
     }
 
     /**
