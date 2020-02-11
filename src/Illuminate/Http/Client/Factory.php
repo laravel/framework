@@ -153,7 +153,7 @@ class Factory
     {
         PHPUnit::assertTrue(
             $this->recorded($callback)->count() > 0,
-            "An expected request was not recorded."
+            'An expected request was not recorded.'
         );
     }
 
