@@ -500,7 +500,7 @@ trait EnumeratesValues
      */
     public function whereNull($key)
     {
-        return $this->where($key, null);
+        return $this->whereStrict($key, null);
     }
 
     /**
@@ -511,7 +511,7 @@ trait EnumeratesValues
      */
     public function whereNotNull($key)
     {
-        return $this->where($key, '!=', null);
+        return $this->where($key, '!==', null);
     }
 
     /**

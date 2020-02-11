@@ -3917,6 +3917,8 @@ class SupportCollectionTest extends TestCase
             ['name' => 'Taylor'],
             ['name' => null],
             ['name' => 'Bert'],
+            ['name' => false],
+            ['name' => ''],
         ]);
 
         $this->assertSame([
@@ -3933,11 +3935,15 @@ class SupportCollectionTest extends TestCase
             ['name' => 'Taylor'],
             ['name' => null],
             ['name' => 'Bert'],
+            ['name' => false],
+            ['name' => ''],
         ]);
 
         $this->assertSame([
             0 => ['name' => 'Taylor'],
             2 => ['name' => 'Bert'],
+            3 => ['name' => false],
+            4 => ['name' => ''],
         ], $data->whereNotNull('name')->all());
     }
 
