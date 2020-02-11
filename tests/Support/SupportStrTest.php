@@ -175,6 +175,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
         $this->assertEquals(['Class', 'foo'], Str::parseCallback('Class', 'foo'));
+        $this->assertEquals(['Class', null], Str::parseCallback('Class'));
     }
 
     public function testSlug()
