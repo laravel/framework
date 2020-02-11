@@ -52,25 +52,17 @@ class InstallCommand extends Command
         $this->repository->setSource($this->input->getOption('database'));
 
         if (true === (bool) $this->input->getOption('force')) {
-
             $this->repository->createRepository();
 
             $this->info('Migration table created successfully.');
-
         } else {
-
             if (false === $this->repository->repositoryExists()) {
-
                 $this->repository->createRepository();
 
                 $this->info('Migration table created successfully.');
-
             } else {
-
                 $this->info('Migration table already exists.');
-
             }
-
         }
     }
 
