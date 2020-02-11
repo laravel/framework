@@ -2,15 +2,33 @@
 
 set -e
 
+# Make sure the release tag is provided.
 if (( "$#" != 1 ))
 then
-    echo "Tag has to be provided"
+    echo "Tag has to be provided."
 
     exit 1
 fi
 
-CURRENT_BRANCH="master"
+# Make sure the working directory is clear.
+if [ -z "$(git status --porcelain)" ]; then
+else
+    echo "Your working directory is dirty. Did you forget to commit your changes?"
+
+    exit 1
+fi
+
+RELEASE_BRANCH="master"
+CURRENT_BRANCH=$(git branch --show-current)
 VERSION=$1
+
+# Make sure current branch and release branch match
+if (( $RELEASE_BRANCH != $CURRENT_BRANCH ))
+then
+    echo "Release branch ($RELEASE_BRANCH) does not matches the current active branch ($CURRENT_BRANCH)."
+
+    exit 1
+fi
 
 # Always prepend with "v"
 if [[ $VERSION != v*  ]]
@@ -19,6 +37,7 @@ then
 fi
 
 # Tag Framework
+git pull
 git tag $VERSION
 git push origin --tags
 
@@ -39,7 +58,7 @@ do
         cd $TMP_DIR;
 
         git clone $REMOTE_URL .
-        git checkout "$CURRENT_BRANCH";
+        git checkout "$RELEASE_BRANCH";
 
         git tag $VERSION
         git push origin --tags
