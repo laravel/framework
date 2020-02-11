@@ -581,12 +581,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Set the default component prefix.
      *
-     * @param  string  $prefix
+     * @param  string  $componentPrefix
      * @return void
      */
-    public function prefix($prefix)
+    public function componentPrefix($componentPrefix)
     {
-        self::$componentPrefix = $prefix;
+        self::$componentPrefix = $componentPrefix;
     }
 
     /**
