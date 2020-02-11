@@ -412,11 +412,13 @@ class PendingRequest
     {
         return function ($handler) {
             return function ($request, $options) use ($handler) {
-                return ($this->expectations ?? collect())
+                $response = ($this->expectations ?? collect())
                      ->map
                      ->__invoke(new Request($request), $options)
                      ->filter()
                      ->first(null, $handler($request, $options));
+
+                return is_array($response) ? Factory::response($response) : $response;
             };
         };
     }
