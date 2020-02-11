@@ -495,7 +495,7 @@ trait EnumeratesValues
     /**
      * Filter items where the given key is not null.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @return static
      */
     public function whereNull($key = null)
@@ -506,7 +506,7 @@ trait EnumeratesValues
     /**
      * Filter items where the given key is null.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @return static
      */
     public function whereNotNull($key = null)
