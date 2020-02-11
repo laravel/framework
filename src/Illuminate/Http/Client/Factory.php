@@ -66,9 +66,17 @@ class Factory
             foreach ($callback as $url => $callable) {
                 $this->stubUrl($url, $callable);
             }
-        } else {
-            $this->expectations = $this->expectations->merge(collect([$callback]));
+
+            return;
         }
+
+        $this->expectations = $this->expectations->merge(collect([
+            $callback instanceof Closure
+                    ? $callback
+                    : function () use ($callback) {
+                        return $callback;
+                    }
+        ]));
 
         return $this;
     }
@@ -83,11 +91,13 @@ class Factory
     public function stubUrl($url, $callback)
     {
         return $this->stub(function ($request, $options) use ($url, $callback) {
-            if (Str::is(Str::start($url, '*'), $request->url())) {
-                return $callback instanceof Closure || $callback instanceof ResponseSequence
-                            ? $callback($request, $options)
-                            : $callback;
+            if (! Str::is(Str::start($url, '*'), $request->url())) {
+                return;
             }
+
+            return $callback instanceof Closure || $callback instanceof ResponseSequence
+                        ? $callback($request, $options)
+                        : $callback;
         });
     }
 
