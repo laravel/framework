@@ -4,6 +4,7 @@ namespace Illuminate\Http\Client;
 
 use Closure;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class Factory
 {
@@ -13,6 +14,13 @@ class Factory
      * @var \Illuminate\Support\Collection|null
      */
     protected $expectations;
+
+    /**
+     * Indicates if the factory is recording requests and responses.
+     *
+     * @var bool
+     */
+    protected $recording = false;
 
     /**
      * Create a new factory instance.
@@ -102,6 +110,67 @@ class Factory
     }
 
     /**
+     * Begin recording request / response pairs.
+     *
+     * @return $this
+     */
+    public function record()
+    {
+        $this->recording = true;
+
+        return $this;
+    }
+
+    /**
+     * Record a request response pair.
+     *
+     * @param  \Illuminate\Http\Client\Request  $request
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return void
+     */
+    public function recordRequestResponsePair($request, $response)
+    {
+        if ($this->recording) {
+            $this->recorded[] = [$request, $response];
+        }
+    }
+
+    /**
+     * Assert that a request / response pair was recorded matching a given truth test.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function assertRecorded($callback)
+    {
+        PHPUnit::assertTrue(
+            $this->recorded($callback)->count() > 0,
+            "An expected request was not recorded."
+        );
+    }
+
+    /**
+     * Get a collection of the request / response pairs matching the given truth test.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function recorded($callback)
+    {
+        if (empty($this->recorded)) {
+            return collect();
+        }
+
+        $callback = $callback ?: function () {
+            return true;
+        };
+
+        return collect($this->recorded)->filter(function ($pair) use ($callback) {
+            return $callback($pair[0], $pair[1]);
+        });
+    }
+
+    /**
      * Execute a method against a new pending request instance.
      *
      * @param  string  $method
@@ -110,7 +179,7 @@ class Factory
      */
     public function __call($method, $parameters)
     {
-        return tap(new PendingRequest, function ($request) {
+        return tap(new PendingRequest($this), function ($request) {
             $request->stub($this->expectations);
         })->{$method}(...$parameters);
     }

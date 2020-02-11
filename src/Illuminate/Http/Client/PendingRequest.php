@@ -5,6 +5,13 @@ namespace Illuminate\Http\Client;
 class PendingRequest
 {
     /**
+     * The factory instance.
+     *
+     * @var \Illuminate\Http\Client\Factory|null
+     */
+    protected $factory;
+
+    /**
      * The request body format.
      *
      * @var string
@@ -49,17 +56,20 @@ class PendingRequest
     /**
      * Create a new HTTP Client instance.
      *
+     * @param  \Illuminate\Http\Client\Factory|null  $factory
      * @return void
      */
-    public function __construct()
+    public function __construct(Factory $factory = null)
     {
+        $this->factory = $factory;
+
         $this->asJson();
 
         $this->options = [
             'http_errors' => false,
         ];
 
-        $this->beforeSendingCallbacks = collect([function ($request, $options) {
+        $this->beforeSendingCallbacks = collect([function (Request $request, array $options) {
             $this->cookies = $options['cookies'];
         }]);
     }
@@ -385,6 +395,7 @@ class PendingRequest
     {
         return tap(\GuzzleHttp\HandlerStack::create(), function ($stack) {
             $stack->push($this->buildBeforeSendingHandler());
+            $stack->push($this->buildRecorderHandler());
             $stack->push($this->buildStubHandler());
         });
     }
@@ -399,6 +410,29 @@ class PendingRequest
         return function ($handler) {
             return function ($request, $options) use ($handler) {
                 return $handler($this->runBeforeSendingCallbacks($request, $options), $options);
+            };
+        };
+    }
+
+    /**
+     * Build the recorder handler.
+     *
+     * @return \Closure
+     */
+    public function buildRecorderHandler()
+    {
+        return function ($handler) {
+            return function ($request, $options) use ($handler) {
+                $promise = $handler($this->runBeforeSendingCallbacks($request, $options), $options);
+
+                return $promise->then(function ($response) use ($request) {
+                    optional($this->factory)->recordRequestResponsePair(
+                        new Request($request),
+                        new Response($response)
+                    );
+
+                    return $response;
+                });
             };
         };
     }
