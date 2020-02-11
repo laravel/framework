@@ -153,10 +153,6 @@ class AuthManager implements FactoryContract
      */
     public function createTokenDriver($name, $config)
     {
-        if (Str::contains($config['storage_key'], 'password')) {
-            throw new LogicException("The token guard storage key may not contain 'password'.");
-        }
-
         // The token guard implements a basic API token based guard implementation
         // that takes an API token field from the request and matches it to the
         // user in the database or another persistence layer where users are.

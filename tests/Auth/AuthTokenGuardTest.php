@@ -18,14 +18,6 @@ class AuthTokenGuardTest extends TestCase
         m::close();
     }
 
-    public function testManagerWontCreateTokenGuardWithInvalidStorageKey()
-    {
-        $this->expectException(LogicException::class);
-
-        $manager = new AuthManager(new Container);
-        $manager->createTokenDriver('name', ['storage_key' => 'foo_password']);
-    }
-
     public function testUserCanBeRetrievedByQueryStringVariable()
     {
         $provider = m::mock(UserProvider::class);
