@@ -75,7 +75,7 @@ class Factory
                     ? $callback
                     : function () use ($callback) {
                         return $callback;
-                    }
+                    },
         ]));
 
         return $this;
