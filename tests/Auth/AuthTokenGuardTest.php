@@ -2,12 +2,9 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\TokenGuard;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
-use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 

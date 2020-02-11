@@ -4,9 +4,7 @@ namespace Illuminate\Auth;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
-use LogicException;
 
 class AuthManager implements FactoryContract
 {
