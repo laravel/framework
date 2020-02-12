@@ -377,7 +377,7 @@ class PendingRequest
      */
     public function delete($url, $data = [])
     {
-        return $this->send('DELETE', $url, [
+        return $this->send('DELETE', $url, empty($data) ? [] : [
             $this->bodyFormat => $data,
         ]);
     }
@@ -390,17 +390,19 @@ class PendingRequest
      * @param  array  $options
      * @return \Illuminate\Http\Client\Response
      */
-    public function send(string $method, string $url, array $options)
+    public function send(string $method, string $url, array $options = [])
     {
-        $options[$this->bodyFormat] = array_merge(
-            $options[$this->bodyFormat], $this->pendingFiles
-        );
+        if (isset($options[$this->bodyFormat])) {
+            $options[$this->bodyFormat] = array_merge(
+                $options[$this->bodyFormat], $this->pendingFiles
+            );
+        }
 
         $this->pendingFiles = [];
 
         try {
             return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
-                'laravel_data' => $options[$this->bodyFormat],
+                'laravel_data' => $options[$this->bodyFormat] ?? [],
                 'query' => $this->parseQueryParams($url),
                 'on_stats' => function ($transferStats) {
                     $this->transferStats = $transferStats;
