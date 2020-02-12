@@ -380,6 +380,10 @@ class PostgresGrammar extends Grammar
     protected function wrapJsonPathAttributes($path)
     {
         return array_map(function ($attribute) {
+            if (\strval(\intval($attribute)) === $attribute) {
+                return $attribute;
+            }
+
             return "'$attribute'";
         }, $path);
     }

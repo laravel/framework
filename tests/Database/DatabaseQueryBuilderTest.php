@@ -2626,6 +2626,10 @@ SQL;
         $this->assertSame('select * from "users" where "items"->\'price\'->>\'in_usd\' = ? and "items"->>\'age\' = ?', $builder->toSql());
 
         $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('items->prices->0', '=', 1)->where('items->age', '=', 2);
+        $this->assertSame('select * from "users" where "items"->\'prices\'->>0 = ? and "items"->>\'age\' = ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->where('items->available', '=', true);
         $this->assertSame('select * from "users" where ("items"->\'available\')::jsonb = \'true\'::jsonb', $builder->toSql());
     }
