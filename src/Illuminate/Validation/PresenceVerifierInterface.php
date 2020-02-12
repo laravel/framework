@@ -27,4 +27,12 @@ interface PresenceVerifierInterface
      * @return int
      */
     public function getMultiCount($collection, $column, array $values, array $extra = []);
+
+    /**
+     * Set the connection to be used.
+     *
+     * @param  string  $connection
+     * @return void
+     */
+    public function setConnection($connection);
 }
