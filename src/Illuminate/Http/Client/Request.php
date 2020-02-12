@@ -127,9 +127,9 @@ class Request implements ArrayAccess
      */
     public function data()
     {
-        if ($this->hasHeader('Content-Type', 'application/x-www-form-urlencoded')) {
+        if ($this->isForm()) {
             return $this->parameters();
-        } elseif (Str::contains($this->header('Content-Type')[0], 'json')) {
+        } elseif ($this->isJson()) {
             return $this->json();
         }
 
@@ -164,6 +164,16 @@ class Request implements ArrayAccess
         }
 
         return $this->data;
+    }
+
+    /**
+     * Determine if the request is simple form data.
+     *
+     * @return bool
+     */
+    public function isForm()
+    {
+        return $this->hasHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
 
     /**
