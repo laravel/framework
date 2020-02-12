@@ -2,7 +2,6 @@
 
 namespace Illuminate\Validation;
 
-use RuntimeException;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -11,9 +10,10 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\ImplicitRule;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Validator implements ValidatorContract
 {
@@ -1079,16 +1079,16 @@ class Validator implements ValidatorContract
      *
      * @throws \RuntimeException
      */
-    public function getPresenceVerifier($connection = NULL)
+    public function getPresenceVerifier($connection = null)
     {
         if (! isset($this->presenceVerifier)) {
             throw new RuntimeException('Presence verifier has not been set.');
         }
-        
-        if (! is_null($connection) && !$this->presenceVerifier instanceOf DatabasePresenceVerifierInterface) {
-            throw new RuntimeException('PresenceVerifier does not support connections');
+
+        if ($this->presenceVerifier instanceOf DatabasePresenceVerifierInterface) {
+            $this->presenceVerifier->setConnection($connection);
         }
-        
+
         return $this->presenceVerifier;
     }
 
