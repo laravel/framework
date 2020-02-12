@@ -100,6 +100,27 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Determine if the request contains the given file.
+     *
+     * @param  string  $name
+     * @param  string|null  $value
+     * @param  string|null  $filename
+     * @return bool
+     */
+    public function hasFile($name, $value = null, $filename = null)
+    {
+        if (! $this->isMultipart()) {
+            return false;
+        }
+
+        return collect($this->data)->reject(function ($file) use ($name, $value, $filename) {
+            return $file['name'] != $name ||
+                ($value && $file['contents'] != $value) ||
+                ($filename && $file['filename'] != $filename);
+        })->count() > 0;
+    }
+
+    /**
      * Get the request's data (form parameters or JSON).
      *
      * @return array
@@ -110,9 +131,9 @@ class Request implements ArrayAccess
             return $this->parameters();
         } elseif (Str::contains($this->header('Content-Type')[0], 'json')) {
             return $this->json();
-        } else {
-            return $this->data ?? [];
         }
+
+        return $this->data ?? [];
     }
 
     /**
@@ -143,6 +164,26 @@ class Request implements ArrayAccess
         }
 
         return $this->data;
+    }
+
+    /**
+     * Determine if the request is JSON.
+     *
+     * @return bool
+     */
+    public function isJson()
+    {
+        return Str::contains($this->header('Content-Type')[0], 'json');
+    }
+
+    /**
+     * Determine if the request is multipart.
+     *
+     * @return bool
+     */
+    public function isMultipart()
+    {
+        return Str::startsWith($this->header('Content-Type')[0], 'multipart');
     }
 
     /**

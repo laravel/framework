@@ -100,4 +100,22 @@ class HttpClientTest extends TestCase
                    $request[0]['name'] == 'foo';
         });
     }
+
+    public function testFilesCanBeAttached()
+    {
+        $factory = new Factory;
+
+        $factory->fake();
+
+        $fooResponse = $factory
+                        ->attach('foo', 'data', ['X-Test-Header' => 'foo'], 'file.txt')
+                        ->post('http://foo.com/file');
+
+        $factory->assertSent(function ($request) {
+            return $request->url() === 'http://foo.com/file' &&
+                   Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                   $request[0]['name'] == 'foo' &&
+                   $request->hasFile('foo', 'data', 'file.txt');
+        });
+    }
 }

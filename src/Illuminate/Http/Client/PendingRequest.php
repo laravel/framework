@@ -19,6 +19,13 @@ class PendingRequest
     protected $bodyFormat;
 
     /**
+     * The pending files for the request.
+     *
+     * @var array
+     */
+    protected $pendingFiles = [];
+
+    /**
      * The request cookies.
      *
      * @var array
@@ -92,6 +99,29 @@ class PendingRequest
     public function asForm()
     {
         return $this->bodyFormat('form_params')->contentType('application/x-www-form-urlencoded');
+    }
+
+    /**
+     * Attach a file to the request.
+     *
+     * @param  string  $name
+     * @param  string  $contents
+     * @param  array  $headers
+     * @param  string|null  $filename
+     * @return $this
+     */
+    public function attach($name, $contents, array $headers = [], $filename = null)
+    {
+        $this->asMultipart();
+
+        $this->pendingFiles[] = array_filter([
+            'name' => $name,
+            'contents' => $contents,
+            'headers' => $headers,
+            'filename' => $filename,
+        ]);
+
+        return $this;
     }
 
     /**
@@ -358,16 +388,20 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options)
     {
+        $options[$this->bodyFormat] = array_merge(
+            $options[$this->bodyFormat], $this->pendingFiles
+        );
+
+        $this->pendingFiles = [];
+
         try {
-            $options = $this->mergeOptions([
+            return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
                 'laravel_data' => $options[$this->bodyFormat],
                 'query' => $this->parseQueryParams($url),
                 'on_stats' => function ($transferStats) {
                     $this->transferStats = $transferStats;
                 },
-            ], $options);
-
-            return tap(new Response($this->buildClient()->request($method, $url, $options)), function ($response) {
+            ], $options))), function ($response) {
                 $response->cookies = $this->cookies;
                 $response->transferStats = $this->transferStats;
             });
