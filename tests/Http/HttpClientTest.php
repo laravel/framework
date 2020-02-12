@@ -108,7 +108,7 @@ class HttpClientTest extends TestCase
         $factory->fake();
 
         $fooResponse = $factory
-                        ->attach('foo', 'data', ['X-Test-Header' => 'foo'], 'file.txt')
+                        ->attach('foo', 'data', 'file.txt', ['X-Test-Header' => 'foo'])
                         ->post('http://foo.com/file');
 
         $factory->assertSent(function ($request) {

@@ -106,11 +106,11 @@ class PendingRequest
      *
      * @param  string  $name
      * @param  string  $contents
-     * @param  array  $headers
      * @param  string|null  $filename
+     * @param  array  $headers
      * @return $this
      */
-    public function attach($name, $contents, array $headers = [], $filename = null)
+    public function attach($name, $contents, $filename = null, array $headers = [])
     {
         $this->asMultipart();
 
