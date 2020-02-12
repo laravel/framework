@@ -22,7 +22,7 @@ RELEASE_BRANCH="6.x"
 CURRENT_BRANCH=$(git branch --show-current)
 VERSION=$1
 
-# Make sure current branch and release branch match
+# Make sure current branch and release branch match.
 if (( $RELEASE_BRANCH != $CURRENT_BRANCH ))
 then
     echo "Release branch ($RELEASE_BRANCH) does not matches the current active branch ($CURRENT_BRANCH)."
