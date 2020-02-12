@@ -359,12 +359,15 @@ class PendingRequest
     public function send(string $method, string $url, array $options)
     {
         try {
-            return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
+            $options = $this->mergeOptions([
+                'laravel_data' => $options[$this->bodyFormat],
                 'query' => $this->parseQueryParams($url),
                 'on_stats' => function ($transferStats) {
                     $this->transferStats = $transferStats;
                 },
-            ], $options))), function ($response) {
+            ], $options);
+
+            return tap(new Response($this->buildClient()->request($method, $url, $options)), function ($response) {
                 $response->cookies = $this->cookies;
                 $response->transferStats = $this->transferStats;
             });
@@ -425,9 +428,9 @@ class PendingRequest
             return function ($request, $options) use ($handler) {
                 $promise = $handler($this->runBeforeSendingCallbacks($request, $options), $options);
 
-                return $promise->then(function ($response) use ($request) {
+                return $promise->then(function ($response) use ($request, $options) {
                     optional($this->factory)->recordRequestResponsePair(
-                        new Request($request),
+                        (new Request($request))->withData($options['laravel_data']),
                         new Response($response)
                     );
 
@@ -448,7 +451,7 @@ class PendingRequest
             return function ($request, $options) use ($handler) {
                 $response = ($this->expectations ?? collect())
                      ->map
-                     ->__invoke(new Request($request), $options)
+                     ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
                      ->filter()
                      ->first(null, $handler($request, $options));
 
@@ -467,7 +470,10 @@ class PendingRequest
     public function runBeforeSendingCallbacks($request, array $options)
     {
         return tap($request, function ($request) use ($options) {
-            $this->beforeSendingCallbacks->each->__invoke(new Request($request), $options);
+            $this->beforeSendingCallbacks->each->__invoke(
+                (new Request($request))->withData($options['laravel_data']),
+                $options
+            );
         });
     }
 

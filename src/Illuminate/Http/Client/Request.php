@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Illuminate\Support\Str;
 use LogicException;
 
 class Request implements ArrayAccess
@@ -15,18 +16,11 @@ class Request implements ArrayAccess
     protected $request;
 
     /**
-     * The decoded form parameters request.
+     * The decoded payload for the request.
      *
      * @var array
      */
-    protected $decodedParameters;
-
-    /**
-     * The decoded JSON payload for the request.
-     *
-     * @var array
-     */
-    protected $decodedJson;
+    protected $data;
 
     /**
      * Create a new request instance.
@@ -60,6 +54,42 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Determine if the request has a given header.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function hasHeader($key, $value = null)
+    {
+        return is_null($value)
+                    ? ! empty($this->request->getHeaders()[$key])
+                    : in_array($value, $this->headers()[$key]);
+    }
+
+    /**
+     * Get the values for the header with the given name.
+     *
+     * @return array
+     */
+    public function header($key)
+    {
+        return $this->headers()[$key];
+    }
+
+    /**
+     * Get the request headers.
+     *
+     * @return array
+     */
+    public function headers()
+    {
+        return collect($this->request->getHeaders())->mapWithKeys(function ($values, $header) {
+            return [$header => $values];
+        })->all();
+    }
+
+    /**
      * Get the body of the request.
      *
      * @return string
@@ -78,8 +108,10 @@ class Request implements ArrayAccess
     {
         if ($this->hasHeader('Content-Type', 'application/x-www-form-urlencoded')) {
             return $this->parameters();
-        } else {
+        } elseif (Str::contains($this->header('Content-Type')[0], 'json')) {
             return $this->json();
+        } else {
+            return $this->data ?? [];
         }
     }
 
@@ -88,15 +120,15 @@ class Request implements ArrayAccess
      *
      * @return array
      */
-    public function parameters()
+    protected function parameters()
     {
-        if (! $this->decodedParameters) {
+        if (! $this->data) {
             parse_str($this->body(), $parameters);
 
-            $this->decodedParameters = $parameters;
+            $this->data = $parameters;
         }
 
-        return $this->decodedParameters;
+        return $this->data;
     }
 
     /**
@@ -104,13 +136,26 @@ class Request implements ArrayAccess
      *
      * @return array
      */
-    public function json()
+    protected function json()
     {
-        if (! $this->decodedJson) {
-            $this->decodedJson = json_decode($this->body(), true);
+        if (! $this->data) {
+            $this->data = json_decode($this->body(), true);
         }
 
-        return $this->decodedJson;
+        return $this->data;
+    }
+
+    /**
+     * Set the decoded data on the request.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function withData(array $data)
+    {
+        $this->data = $data;
+
+        return $this;
     }
 
     /**
@@ -160,41 +205,5 @@ class Request implements ArrayAccess
     public function offsetUnset($offset)
     {
         throw new LogicException('Request data may not be mutated using array access.');
-    }
-
-    /**
-     * Determine if the request has a given header.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function hasHeader($key, $value = null)
-    {
-        return is_null($value)
-                    ? ! empty($this->request->getHeaders()[$key])
-                    : in_array($value, $this->headers()[$key]);
-    }
-
-    /**
-     * Get the values for the header with the given name.
-     *
-     * @return array
-     */
-    public function header($key)
-    {
-        return $this->headers()[$key];
-    }
-
-    /**
-     * Get the request headers.
-     *
-     * @return array
-     */
-    public function headers()
-    {
-        return collect($this->request->getHeaders())->mapWithKeys(function ($values, $header) {
-            return [$header => $values];
-        })->all();
     }
 }

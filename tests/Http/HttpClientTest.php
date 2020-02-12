@@ -96,7 +96,8 @@ class HttpClientTest extends TestCase
 
         $factory->assertSent(function ($request) {
             return $request->url() === 'http://foo.com/multipart' &&
-                   Str::startsWith($request->header('Content-Type')[0], 'multipart');
+                   Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                   $request[0]['name'] == 'foo';
         });
     }
 }
