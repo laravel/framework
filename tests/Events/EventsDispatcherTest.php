@@ -156,6 +156,20 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('unset', $_SERVER['__event.test']);
     }
 
+    public function testMultiplePushedEventsWillGetFlushed()
+    {
+        $_SERVER['__event.test'] = '';
+        $d = new Dispatcher;
+        $d->push('update', ['name' => 'taylor ']);
+        $d->push('update', ['name' => 'otwell']);
+        $d->listen('update', function ($name) {
+            $_SERVER['__event.test'] .= $name;
+        });
+
+        $d->flush('update');
+        $this->assertSame('taylor otwell', $_SERVER['__event.test']);
+    }
+
     public function testWildcardListeners()
     {
         unset($_SERVER['__event.test']);
