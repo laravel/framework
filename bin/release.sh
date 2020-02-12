@@ -12,6 +12,7 @@ fi
 
 # Make sure the working directory is clear.
 if [ -z "$(git status --porcelain)" ]; then
+    echo "Working directory clean"
 else
     echo "Your working directory is dirty. Did you forget to commit your changes?"
 
