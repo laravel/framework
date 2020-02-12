@@ -13,7 +13,7 @@ class MockStreamTest extends TestCase
 {
     public function testMockStreamWritesToOutputInterface()
     {
-        $mock = Mockery::mock(BufferedOutput::class . '[doWrite]')
+        $mock = Mockery::mock(BufferedOutput::class.'[doWrite]')
             ->shouldAllowMockingProtectedMethods();
 
         $mock->shouldReceive('doWrite')

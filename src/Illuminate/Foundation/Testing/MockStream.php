@@ -44,7 +44,7 @@ class MockStream
     }
 
     /**
-     * Unregister the mock:// stream wrapper
+     * Unregister the mock:// stream wrapper.
      *
      * @return void
      */
