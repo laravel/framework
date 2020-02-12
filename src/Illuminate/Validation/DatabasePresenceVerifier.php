@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Str;
 
-class DatabasePresenceVerifier implements PresenceVerifierInterface
+class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
 {
     /**
      * The database connection instance.
