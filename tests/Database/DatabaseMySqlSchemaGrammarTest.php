@@ -433,7 +433,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5), add `discounted_stored` int as (price - 5) stored', $statements[0]);
 
-
         $blueprint = new Blueprint('products');
         $blueprint->integer('price');
         $blueprint->integer('discounted_virtual')->virtualAs('price - 5')->nullable(false);
