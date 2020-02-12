@@ -231,6 +231,20 @@ class PendingRequest
     }
 
     /**
+     * Specify an authorization token for the request.
+     *
+     * @param  string  $token
+     * @param  string  $type
+     * @return $this
+     */
+    public function withToken($token, $type = 'Bearer')
+    {
+        return $this->withHeaders([
+            'Authorization' => trim($type.' '.$token),
+        ]);
+    }
+
+    /**
      * Specify the cookies that should be included with the request.
      *
      * @param  array  $cookies
