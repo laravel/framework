@@ -18,7 +18,7 @@ class MockStream
     protected static $existed = false;
 
     /**
-     * Register a new Stream wrapper using the protocol mock://
+     * Register a new Stream wrapper using the protocol mock://.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @return void
@@ -36,7 +36,7 @@ class MockStream
     }
 
     /**
-     * Attempt to restore the stream wrapper to the previous state, if it existed
+     * Attempt to restore the stream wrapper to the previous state, if it existed.
      *
      * @return void
      */
