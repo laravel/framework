@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Cookie\CookieJar;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cookie\CookieJar;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Routing\Controller;
-use Illuminate\Container\Container;
-use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class EncryptCookiesTest extends TestCase
 {
@@ -49,10 +49,10 @@ class EncryptCookiesTest extends TestCase
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(2, $cookies);
-        $this->assertEquals('encrypted_cookie', $cookies[0]->getName());
-        $this->assertNotEquals('value', $cookies[0]->getValue());
-        $this->assertEquals('unencrypted_cookie', $cookies[1]->getName());
-        $this->assertEquals('value', $cookies[1]->getValue());
+        $this->assertSame('encrypted_cookie', $cookies[0]->getName());
+        $this->assertNotSame('value', $cookies[0]->getValue());
+        $this->assertSame('unencrypted_cookie', $cookies[1]->getName());
+        $this->assertSame('value', $cookies[1]->getValue());
     }
 
     public function testQueuedCookieEncryption()
@@ -66,10 +66,10 @@ class EncryptCookiesTest extends TestCase
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(2, $cookies);
-        $this->assertEquals('encrypted_cookie', $cookies[0]->getName());
-        $this->assertNotEquals('value', $cookies[0]->getValue());
-        $this->assertEquals('unencrypted_cookie', $cookies[1]->getName());
-        $this->assertEquals('value', $cookies[1]->getValue());
+        $this->assertSame('encrypted_cookie', $cookies[0]->getName());
+        $this->assertNotSame('value', $cookies[0]->getValue());
+        $this->assertSame('unencrypted_cookie', $cookies[1]->getName());
+        $this->assertSame('value', $cookies[1]->getValue());
     }
 }
 

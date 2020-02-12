@@ -2,10 +2,11 @@
 
 namespace Illuminate\Routing;
 
-use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
+use Throwable;
 
 /**
  * This extended pipeline catches any exceptions that occur during each slice.
@@ -15,15 +16,28 @@ use Illuminate\Pipeline\Pipeline as BasePipeline;
 class Pipeline extends BasePipeline
 {
     /**
+     * Handles the value returned from each pipe before passing it to the next.
+     *
+     * @param  mixed  $carry
+     * @return mixed
+     */
+    protected function handleCarry($carry)
+    {
+        return $carry instanceof Responsable
+            ? $carry->toResponse($this->getContainer()->make(Request::class))
+            : $carry;
+    }
+
+    /**
      * Handle the given exception.
      *
      * @param  mixed  $passable
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return mixed
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
-    protected function handleException($passable, Exception $e)
+    protected function handleException($passable, Throwable $e)
     {
         if (! $this->container->bound(ExceptionHandler::class) ||
             ! $passable instanceof Request) {

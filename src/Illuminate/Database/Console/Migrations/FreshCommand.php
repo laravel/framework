@@ -27,31 +27,22 @@ class FreshCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
         if (! $this->confirmToProceed()) {
-            return;
+            return 1;
         }
 
         $database = $this->input->getOption('database');
 
-        if ($this->option('drop-views')) {
-            $this->dropAllViews($database);
-
-            $this->info('Dropped all views successfully.');
-        }
-
-        $this->dropAllTables($database);
-
-        $this->info('Dropped all tables successfully.');
-
-        if ($this->option('drop-types')) {
-            $this->dropAllTypes($database);
-
-            $this->info('Dropped all types successfully.');
-        }
+        $this->call('db:wipe', array_filter([
+            '--database' => $database,
+            '--drop-views' => $this->option('drop-views'),
+            '--drop-types' => $this->option('drop-types'),
+            '--force' => true,
+        ]));
 
         $this->call('migrate', array_filter([
             '--database' => $database,
@@ -64,45 +55,8 @@ class FreshCommand extends Command
         if ($this->needsSeeding()) {
             $this->runSeeder($database);
         }
-    }
 
-    /**
-     * Drop all of the database tables.
-     *
-     * @param  string  $database
-     * @return void
-     */
-    protected function dropAllTables($database)
-    {
-        $this->laravel['db']->connection($database)
-                    ->getSchemaBuilder()
-                    ->dropAllTables();
-    }
-
-    /**
-     * Drop all of the database views.
-     *
-     * @param  string  $database
-     * @return void
-     */
-    protected function dropAllViews($database)
-    {
-        $this->laravel['db']->connection($database)
-                    ->getSchemaBuilder()
-                    ->dropAllViews();
-    }
-
-    /**
-     * Drop all of the database types.
-     *
-     * @param string $database
-     * @return void
-     */
-    protected function dropAllTypes($database)
-    {
-        $this->laravel['db']->connection($database)
-                    ->getSchemaBuilder()
-                    ->dropAllTypes();
+        return 0;
     }
 
     /**
@@ -142,7 +96,7 @@ class FreshCommand extends Command
             ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
             ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
-            ['path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations files to be executed'],
+            ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to be executed'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run'],
             ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder'],

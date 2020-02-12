@@ -2,9 +2,9 @@
 
 namespace Illuminate\Console;
 
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class OutputStyle extends SymfonyStyle
 {
@@ -67,5 +67,15 @@ class OutputStyle extends SymfonyStyle
     public function isDebug()
     {
         return $this->output->isDebug();
+    }
+
+    /**
+     * Get the underlying Symfony output implementation.
+     *
+     * @return \Symfony\Component\Console\Output\OutputInterface
+     */
+    public function getOutput()
+    {
+        return $this->output;
     }
 }

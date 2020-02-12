@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
  */
 class FluentRoutingTest extends TestCase
 {
-    public function test_middleware_run_when_registered_as_array_or_params()
+    public function testMiddlewareRunWhenRegisteredAsArrayOrParams()
     {
         Route::middleware(Middleware::class, Middleware2::class)
             ->get('one', function () {
@@ -30,10 +30,10 @@ class FluentRoutingTest extends TestCase
             return 'Hello World';
         })->middleware([Middleware::class, Middleware2::class]);
 
-        $this->assertEquals('middleware output', $this->get('one')->content());
-        $this->assertEquals('middleware output', $this->get('two')->content());
-        $this->assertEquals('middleware output', $this->get('three')->content());
-        $this->assertEquals('middleware output', $this->get('four')->content());
+        $this->assertSame('middleware output', $this->get('one')->content());
+        $this->assertSame('middleware output', $this->get('two')->content());
+        $this->assertSame('middleware output', $this->get('three')->content());
+        $this->assertSame('middleware output', $this->get('four')->content());
     }
 }
 

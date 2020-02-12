@@ -2,16 +2,21 @@
 
 namespace Illuminate\Http;
 
-use Closure;
 use ArrayAccess;
-use RuntimeException;
+use Closure;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Arrayable;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
+/**
+ * @method array validate(array $rules, ...$params)
+ * @method array validateWithBag(string $errorBag, array $rules, ...$params)
+ * @method string hasValidSignature(bool $absolute = true)
+ */
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
     use Concerns\InteractsWithContentTypes,
@@ -340,7 +345,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the JSON payload for the request.
      *
      * @param  string|null  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
      */
     public function json($key = null, $default = null)
@@ -422,8 +427,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $request;
         }
 
-        $content = $request->content;
-
         $newRequest = (new static)->duplicate(
             $request->query->all(), $request->request->all(), $request->attributes->all(),
             $request->cookies->all(), $request->files->all(), $request->server->all()
@@ -431,7 +434,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $newRequest->headers->replace($request->headers->all());
 
-        $newRequest->content = $content;
+        $newRequest->content = $request->content;
 
         $newRequest->request = $newRequest->getInputSource();
 
@@ -523,8 +526,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the route handling the request.
      *
      * @param  string|null  $param
-     * @param  mixed   $default
-     * @return \Illuminate\Routing\Route|object|string
+     * @param  mixed  $default
+     * @return \Illuminate\Routing\Route|object|string|null
      */
     public function route($param = null, $default = null)
     {

@@ -12,7 +12,7 @@ interface PresenceVerifierInterface
      * @param  string  $value
      * @param  int|null  $excludeId
      * @param  string|null  $idColumn
-     * @param  array   $extra
+     * @param  array  $extra
      * @return int
      */
     public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = []);
@@ -22,17 +22,9 @@ interface PresenceVerifierInterface
      *
      * @param  string  $collection
      * @param  string  $column
-     * @param  array   $values
-     * @param  array   $extra
+     * @param  array  $values
+     * @param  array  $extra
      * @return int
      */
     public function getMultiCount($collection, $column, array $values, array $extra = []);
-
-    /**
-     * Set the connection to be used.
-     *
-     * @param  string  $connection
-     * @return void
-     */
-    public function setConnection($connection);
 }

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Composer;
+use Illuminate\Support\Str;
 
 class FailedTableCommand extends Command
 {
@@ -39,7 +39,7 @@ class FailedTableCommand extends Command
      * Create a new failed queue jobs table command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Support\Composer    $composer
+     * @param  \Illuminate\Support\Composer  $composer
      * @return void
      */
     public function __construct(Filesystem $files, Composer $composer)

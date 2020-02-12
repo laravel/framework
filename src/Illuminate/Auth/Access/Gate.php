@@ -3,13 +3,13 @@
 namespace Illuminate\Auth\Access;
 
 use Exception;
-use ReflectionClass;
-use ReflectionFunction;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use ReflectionClass;
+use ReflectionFunction;
 
 class Gate implements GateContract
 {
@@ -144,7 +144,7 @@ class Gate implements GateContract
      *
      * @param  string  $name
      * @param  string  $class
-     * @param  array|null   $abilities
+     * @param  array|null  $abilities
      * @return $this
      */
     public function resource($name, $class, array $abilities = null)
@@ -379,7 +379,7 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  \Closure|string|array  $class
-     * @param  string|null $method
+     * @param  string|null  $method
      * @return bool
      */
     protected function canBeCalledWithUser($user, $class, $method = null)
@@ -544,6 +544,7 @@ class Gate implements GateContract
         }
 
         return function () {
+            //
         };
     }
 

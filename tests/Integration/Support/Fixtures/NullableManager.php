@@ -13,5 +13,6 @@ class NullableManager extends Manager
      */
     public function getDefaultDriver()
     {
+        //
     }
 }

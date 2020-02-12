@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Failed;
 
-use Illuminate\Support\Facades\Date;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Support\Facades\Date;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface
 {
@@ -49,7 +49,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      * @param  string  $connection
      * @param  string  $queue
      * @param  string  $payload
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return int|null
      */
     public function log($connection, $queue, $payload, $exception)

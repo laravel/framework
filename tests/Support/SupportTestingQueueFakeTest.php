@@ -4,11 +4,11 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
@@ -136,6 +136,13 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
             new JobStub,
         ]);
+    }
+
+    public function testAssertPushedWithoutChain()
+    {
+        $this->fake->push(new JobWithChainStub([]));
+
+        $this->fake->assertPushedWithoutChain(JobWithChainStub::class);
     }
 
     public function testAssertPushedWithChainSameJobDifferentChains()

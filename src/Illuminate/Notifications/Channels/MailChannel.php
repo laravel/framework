@@ -2,20 +2,21 @@
 
 namespace Illuminate\Notifications\Channels;
 
+use Illuminate\Contracts\Mail\Factory as MailFactory;
+use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Markdown;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Mail\Markdown;
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Contracts\Mail\Mailable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MailChannel
 {
     /**
      * The mailer implementation.
      *
-     * @var \Illuminate\Contracts\Mail\Mailer
+     * @var \Illuminate\Contracts\Mail\Factory
      */
     protected $mailer;
 
@@ -29,11 +30,11 @@ class MailChannel
     /**
      * Create a new mail channel instance.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  \Illuminate\Contracts\Mail\Factory  $mailer
      * @param  \Illuminate\Mail\Markdown  $markdown
      * @return void
      */
-    public function __construct(Mailer $mailer, Markdown $markdown)
+    public function __construct(MailFactory $mailer, Markdown $markdown)
     {
         $this->mailer = $mailer;
         $this->markdown = $markdown;
@@ -59,7 +60,7 @@ class MailChannel
             return $message->send($this->mailer);
         }
 
-        $this->mailer->send(
+        $this->mailer->mailer($message->mailer ?? null)->send(
             $this->buildView($message),
             array_merge($message->data(), $this->additionalMessageData($notification)),
             $this->messageBuilder($notifiable, $notification, $message)

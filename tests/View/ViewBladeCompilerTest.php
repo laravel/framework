@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\View;
 
-use Mockery as m;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
+use InvalidArgumentException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class ViewBladeCompilerTest extends TestCase
 {
@@ -59,14 +59,14 @@ class ViewBladeCompilerTest extends TestCase
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
         $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
-        $this->assertEquals('foo', $compiler->getPath());
+        $this->assertSame('foo', $compiler->getPath());
     }
 
     public function testCompileSetAndGetThePath()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $compiler->setPath('foo');
-        $this->assertEquals('foo', $compiler->getPath());
+        $this->assertSame('foo', $compiler->getPath());
     }
 
     public function testCompileWithPathSetBefore()
@@ -78,7 +78,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler->setPath('foo');
         // trigger compilation with $path
         $compiler->compile();
-        $this->assertEquals('foo', $compiler->getPath());
+        $this->assertSame('foo', $compiler->getPath());
     }
 
     public function testRawTagsCanBeSetToLegacyValues()
@@ -86,9 +86,9 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $compiler->setEchoFormat('%s');
 
-        $this->assertEquals('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
-        $this->assertEquals('<?php echo $name; ?>', $compiler->compileString('{{
+        $this->assertSame('<?php echo e($name); ?>', $compiler->compileString('{{{ $name }}}'));
+        $this->assertSame('<?php echo $name; ?>', $compiler->compileString('{{ $name }}'));
+        $this->assertSame('<?php echo $name; ?>', $compiler->compileString('{{
             $name
         }}'));
     }
@@ -177,6 +177,29 @@ class ViewBladeCompilerTest extends TestCase
         $strictTypeDecl = "<?php\ndeclare(strict_types = 1);";
         $this->assertTrue(substr($compiler->compileString("<?php\ndeclare(strict_types = 1);\nHello World"),
             0, strlen($strictTypeDecl)) === $strictTypeDecl);
+    }
+
+    public function testComponentAliasesCanBeConventionallyDetermined()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->component('App\Foo\Bar');
+        $this->assertEquals(['bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->component('App\Foo\Bar', null, 'prefix');
+        $this->assertEquals(['prefix-bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->component('App\View\Components\Forms\Input');
+        $this->assertEquals(['forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->component('App\View\Components\Forms\Input', null, 'prefix');
+        $this->assertEquals(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
     }
 
     protected function getFiles()

@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Console\Migrations\RollbackCommand;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
-use Illuminate\Database\Console\Migrations\RollbackCommand;
 
 class DatabaseMigrationRollbackCommandTest extends TestCase
 {
@@ -24,7 +24,9 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('setConnection')->once()->with(null);
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+            return $callback();
+        });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 0]);
 
@@ -38,7 +40,9 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('setConnection')->once()->with(null);
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+            return $callback();
+        });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 2]);
 
@@ -52,7 +56,9 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('setConnection')->once()->with('foo');
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+            return $callback();
+        });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
 
@@ -66,7 +72,9 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('setConnection')->once()->with('foo');
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+            return $callback();
+        });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => 2]);
 

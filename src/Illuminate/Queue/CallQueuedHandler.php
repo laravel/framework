@@ -3,10 +3,12 @@
 namespace Illuminate\Queue;
 
 use Exception;
-use ReflectionClass;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pipeline\Pipeline;
+use ReflectionClass;
 
 class CallQueuedHandler
 {
@@ -18,13 +20,22 @@ class CallQueuedHandler
     protected $dispatcher;
 
     /**
+     * The container instance.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
      * Create a new handler instance.
      *
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    public function __construct(Dispatcher $dispatcher)
+    public function __construct(Dispatcher $dispatcher, Container $container)
     {
+        $this->container = $container;
         $this->dispatcher = $dispatcher;
     }
 
@@ -45,9 +56,7 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
-        $this->dispatcher->dispatchNow(
-            $command, $this->resolveHandler($job, $command)
-        );
+        $this->dispatchThroughMiddleware($job, $command);
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
@@ -56,6 +65,24 @@ class CallQueuedHandler
         if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
+    }
+
+    /**
+     * Dispatch the given job / command through its specified middleware.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  mixed  $command
+     * @return mixed
+     */
+    protected function dispatchThroughMiddleware(Job $job, $command)
+    {
+        return (new Pipeline($this->container))->send($command)
+                ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
+                ->then(function ($command) use ($job) {
+                    return $this->dispatcher->dispatchNow(
+                        $command, $this->resolveHandler($job, $command)
+                    );
+                });
     }
 
     /**
@@ -109,7 +136,7 @@ class CallQueuedHandler
      * Handle a model not found exception.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
     protected function handleModelNotFound(Job $job, $e)
@@ -136,7 +163,7 @@ class CallQueuedHandler
      * The exception that caused the failure will be passed.
      *
      * @param  array  $data
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
     public function failed(array $data, $e)

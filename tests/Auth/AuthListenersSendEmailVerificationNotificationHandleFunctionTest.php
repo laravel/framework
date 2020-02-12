@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Auth;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Foundation\Auth\User;
+use PHPUnit\Framework\TestCase;
 
 class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends TestCase
 {

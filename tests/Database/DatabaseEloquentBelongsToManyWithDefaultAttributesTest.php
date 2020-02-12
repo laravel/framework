@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 {
@@ -15,13 +15,13 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         m::close();
     }
 
-    public function testwithPivotValueMethodSetsWhereConditionsForFetching()
+    public function testWithPivotValueMethodSetsWhereConditionsForFetching()
     {
         $relation = $this->getMockBuilder(BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);
     }
 
-    public function testwithPivotValueMethodSetsDefaultArgumentsForInsertion()
+    public function testWithPivotValueMethodSetsDefaultArgumentsForInsertion()
     {
         $relation = $this->getMockBuilder(BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);

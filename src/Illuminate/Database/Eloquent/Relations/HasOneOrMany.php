@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 abstract class HasOneOrMany extends Relation
 {
@@ -91,7 +91,7 @@ abstract class HasOneOrMany extends Relation
     /**
      * Match the eagerly loaded results to their single parents.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
      * @return array
@@ -104,7 +104,7 @@ abstract class HasOneOrMany extends Relation
     /**
      * Match the eagerly loaded results to their many parents.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
      * @return array
@@ -117,7 +117,7 @@ abstract class HasOneOrMany extends Relation
     /**
      * Match the eagerly loaded results to their many parents.
      *
-     * @param  array   $models
+     * @param  array  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
      * @param  string  $type
@@ -144,7 +144,7 @@ abstract class HasOneOrMany extends Relation
     /**
      * Get the value of a relationship by one or many type.
      *
-     * @param  array   $dictionary
+     * @param  array  $dictionary
      * @param  string  $key
      * @param  string  $type
      * @return mixed

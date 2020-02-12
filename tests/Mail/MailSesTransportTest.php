@@ -2,39 +2,41 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Swift_Message;
 use Aws\Ses\SesClient;
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Mail\MailManager;
+use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
-use Illuminate\Mail\TransportManager;
-use Illuminate\Foundation\Application;
-use Illuminate\Mail\Transport\SesTransport;
+use Swift_Message;
 
 class MailSesTransportTest extends TestCase
 {
+    /** @group Foo */
     public function testGetTransport()
     {
-        /** @var Application $app */
-        $app = [
-            'config' => new Collection([
+        $container = new Container();
+
+        $container->singleton('config', function () {
+            return new Repository([
                 'services.ses' => [
-                    'key'    => 'foo',
+                    'key' => 'foo',
                     'secret' => 'bar',
                     'region' => 'us-east-1',
                 ],
-            ]),
-        ];
+            ]);
+        });
 
-        $manager = new TransportManager($app);
+        $manager = new MailManager($container);
 
         /** @var SesTransport $transport */
-        $transport = $manager->driver('ses');
+        $transport = $manager->createTransport(['transport' => 'ses']);
 
         /** @var SesClient $ses */
         $ses = $transport->ses();
 
-        $this->assertEquals('us-east-1', $ses->getRegion());
+        $this->assertSame('us-east-1', $ses->getRegion());
     }
 
     public function testSend()

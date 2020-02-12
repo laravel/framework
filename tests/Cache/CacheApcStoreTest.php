@@ -3,15 +3,15 @@
 namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ApcStore;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ApcWrapper;
+use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->setMethods(['get'])->getMock();
-        $apc->expects($this->once())->method('get')->with($this->equalTo('foobar'))->will($this->returnValue(null));
+        $apc->expects($this->once())->method('get')->with($this->equalTo('foobar'))->willReturn(null);
         $store = new ApcStore($apc, 'foo');
         $this->assertNull($store->get('bar'));
     }
@@ -19,9 +19,9 @@ class CacheApcStoreTest extends TestCase
     public function testAPCValueIsReturned()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->setMethods(['get'])->getMock();
-        $apc->expects($this->once())->method('get')->will($this->returnValue('bar'));
+        $apc->expects($this->once())->method('get')->willReturn('bar');
         $store = new ApcStore($apc);
-        $this->assertEquals('bar', $store->get('foo'));
+        $this->assertSame('bar', $store->get('foo'));
     }
 
     public function testGetMultipleReturnsNullWhenNotFoundAndValueWhenFound()

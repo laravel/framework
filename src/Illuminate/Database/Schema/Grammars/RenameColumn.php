@@ -2,12 +2,12 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Support\Fluent;
+use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
-use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
+use Illuminate\Support\Fluent;
 
 class RenameColumn
 {

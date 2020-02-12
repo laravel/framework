@@ -2,21 +2,10 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladeElseGuestStatementsTest extends TestCase
+class BladeElseGuestStatementsTest extends AbstractBladeTestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testIfStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@guest("api")
 breeze
 @elseguest("standard")
@@ -27,11 +16,6 @@ breeze
 <?php elseif(auth()->guard("standard")->guest()): ?>
 wheeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
-    }
-
-    protected function getFiles()
-    {
-        return m::mock(Filesystem::class);
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

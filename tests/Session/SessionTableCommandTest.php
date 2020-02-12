@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Session;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Composer;
+use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
+use Illuminate\Session\Console\SessionTableCommand;
+use Illuminate\Support\Composer;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
-use Illuminate\Session\Console\SessionTableCommand;
-use Illuminate\Database\Migrations\MigrationCreator;
 
 class SessionTableCommandTest extends TestCase
 {
@@ -50,6 +50,6 @@ class SessionTableCommandTestStub extends SessionTableCommand
 {
     public function call($command, array $arguments = [])
     {
-        //
+        return 0;
     }
 }

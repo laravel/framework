@@ -3,11 +3,11 @@
 namespace Illuminate\Validation;
 
 use Closure;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Contracts\Validation\Rule as RuleContract;
 
 class ValidationRuleParser
 {
@@ -131,7 +131,7 @@ class ValidationRuleParser
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $rule) {
-                    $this->implicitAttributes[$attribute][] = $key;
+                    $this->implicitAttributes[$attribute][] = strval($key);
 
                     $results = $this->mergeRules($results, $key, $rule);
                 }

@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -29,7 +29,7 @@ class RedisCacheLockTest extends TestCase
         $this->tearDownRedis();
     }
 
-    public function test_redis_locks_can_be_acquired_and_released()
+    public function testRedisLocksCanBeAcquiredAndReleased()
     {
         Cache::store('redis')->lock('foo')->forceRelease();
 
@@ -44,12 +44,12 @@ class RedisCacheLockTest extends TestCase
         Cache::store('redis')->lock('foo')->release();
     }
 
-    public function test_redis_locks_can_block_for_seconds()
+    public function testRedisLocksCanBlockForSeconds()
     {
         Carbon::setTestNow();
 
         Cache::store('redis')->lock('foo')->forceRelease();
-        $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
+        $this->assertSame('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
 
@@ -57,7 +57,7 @@ class RedisCacheLockTest extends TestCase
         $this->assertTrue(Cache::store('redis')->lock('foo', 10)->block(1));
     }
 
-    public function test_concurrent_redis_locks_are_released_safely()
+    public function testConcurrentRedisLocksAreReleasedSafely()
     {
         Cache::store('redis')->lock('foo')->forceRelease();
 
@@ -73,7 +73,7 @@ class RedisCacheLockTest extends TestCase
         $this->assertFalse(Cache::store('redis')->lock('foo')->get());
     }
 
-    public function test_redis_locks_with_failed_block_callback_are_released()
+    public function testRedisLocksWithFailedBlockCallbackAreReleased()
     {
         Cache::store('redis')->lock('foo')->forceRelease();
 
@@ -94,7 +94,7 @@ class RedisCacheLockTest extends TestCase
         $this->assertTrue($secondLock->get());
     }
 
-    public function test_redis_locks_can_be_released_using_owner_token()
+    public function testRedisLocksCanBeReleasedUsingOwnerToken()
     {
         Cache::store('redis')->lock('foo')->forceRelease();
 

@@ -10,7 +10,7 @@ class SortedMiddleware extends Collection
      * Create a new Sorted Middleware container.
      *
      * @param  array  $priorityMap
-     * @param  array|\Illuminate\Support\Collection  $middlewares
+     * @param  \Illuminate\Support\Collection|array  $middlewares
      * @return void
      */
     public function __construct(array $priorityMap, $middlewares)
@@ -40,11 +40,9 @@ class SortedMiddleware extends Collection
                 continue;
             }
 
-            $stripped = head(explode(':', $middleware));
+            $priorityIndex = $this->priorityMapIndex($priorityMap, $middleware);
 
-            if (in_array($stripped, $priorityMap)) {
-                $priorityIndex = array_search($stripped, $priorityMap);
-
+            if (! is_null($priorityIndex)) {
                 // This middleware is in the priority map. If we have encountered another middleware
                 // that was also in the priority map and was at a lower priority than the current
                 // middleware, we will move this middleware to be above the previous encounter.
@@ -58,11 +56,51 @@ class SortedMiddleware extends Collection
                 // encountered from the map thus far. We'll save its current index plus its index
                 // from the priority map so we can compare against them on the next iterations.
                 $lastIndex = $index;
+
                 $lastPriorityIndex = $priorityIndex;
             }
         }
 
         return array_values(array_unique($middlewares, SORT_REGULAR));
+    }
+
+    /**
+     * Calculate the priority map index of the middleware.
+     *
+     * @param  array  $priorityMap
+     * @param  string  $middleware
+     * @return int|null
+     */
+    protected function priorityMapIndex($priorityMap, $middleware)
+    {
+        foreach ($this->middlewareNames($middleware) as $name) {
+            $priorityIndex = array_search($name, $priorityMap);
+
+            if ($priorityIndex !== false) {
+                return $priorityIndex;
+            }
+        }
+    }
+
+    /**
+     * Resolve the middleware names to look for in the priority array.
+     *
+     * @param  string  $middleware
+     * @return \Generator
+     */
+    protected function middlewareNames($middleware)
+    {
+        $stripped = head(explode(':', $middleware));
+
+        yield $stripped;
+
+        $interfaces = @class_implements($stripped);
+
+        if ($interfaces !== false) {
+            foreach ($interfaces as $interface) {
+                yield $interface;
+            }
+        }
     }
 
     /**

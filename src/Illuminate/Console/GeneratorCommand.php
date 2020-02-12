@@ -2,8 +2,8 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
@@ -46,6 +46,7 @@ abstract class GeneratorCommand extends Command
      * Execute the console command.
      *
      * @return bool|null
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
@@ -70,7 +71,7 @@ abstract class GeneratorCommand extends Command
         // stub files so that it gets the correctly formatted namespace and class name.
         $this->makeDirectory($path);
 
-        $this->files->put($path, $this->buildClass($name));
+        $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
         $this->info($this->type.' created successfully.');
     }
@@ -153,6 +154,7 @@ abstract class GeneratorCommand extends Command
      *
      * @param  string  $name
      * @return string
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function buildClass($name)
@@ -171,11 +173,19 @@ abstract class GeneratorCommand extends Command
      */
     protected function replaceNamespace(&$stub, $name)
     {
-        $stub = str_replace(
+        $searches = [
             ['DummyNamespace', 'DummyRootNamespace', 'NamespacedDummyUserModel'],
-            [$this->getNamespace($name), $this->rootNamespace(), $this->userProviderModel()],
-            $stub
-        );
+            ['{{ namespace }}', '{{ rootNamespace }}', '{{ namespacedUserModel }}'],
+            ['{{namespace}}', '{{rootNamespace}}', '{{namespacedUserModel}}'],
+        ];
+
+        foreach ($searches as $search) {
+            $stub = str_replace(
+                $search,
+                [$this->getNamespace($name), $this->rootNamespace(), $this->userProviderModel()],
+                $stub
+            );
+        }
 
         return $this;
     }
@@ -202,7 +212,26 @@ abstract class GeneratorCommand extends Command
     {
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
 
-        return str_replace('DummyClass', $class, $stub);
+        return str_replace(['DummyClass', '{{ class }}', '{{class}}'], $class, $stub);
+    }
+
+    /**
+     * Alphabetically sorts the imports for the given stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function sortImports($stub)
+    {
+        if (preg_match('/(?P<imports>(?:use [^;]+;$\n?)+)/m', $stub, $match)) {
+            $imports = explode("\n", trim($match['imports']));
+
+            sort($imports);
+
+            return str_replace(trim($match['imports']), implode("\n", $imports), $stub);
+        }
+
+        return $stub;
     }
 
     /**

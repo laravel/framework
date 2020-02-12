@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToTest extends TestCase
 {
@@ -131,7 +131,10 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
+
+        // Always set relation when we received Model
         $parent->shouldReceive('setRelation')->once()->with('relation', null);
+
         $relation->dissociate();
     }
 
@@ -141,8 +144,11 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
         $relation = $this->getRelation($parent);
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
-        $parent->shouldReceive('isDirty')->once()->andReturn(true);
+
+        // Always unset relation when we received id, regardless of dirtiness
+        $parent->shouldReceive('isDirty')->never();
         $parent->shouldReceive('unsetRelation')->once()->with($relation->getRelationName());
+
         $relation->associate(1);
     }
 

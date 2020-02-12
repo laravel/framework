@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphEagerLoadingTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -46,7 +46,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($video)->save();
     }
 
-    public function test_with_morph_loading()
+    public function testWithMorphLoading()
     {
         $comments = Comment::query()
             ->with(['commentable' => function (MorphTo $morphTo) {
@@ -59,7 +59,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
     }
 
-    public function test_with_morph_loading_with_single_relation()
+    public function testWithMorphLoadingWithSingleRelation()
     {
         $comments = Comment::query()
             ->with(['commentable' => function (MorphTo $morphTo) {

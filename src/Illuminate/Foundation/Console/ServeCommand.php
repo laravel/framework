@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Env;
 use Illuminate\Console\Command;
+use Illuminate\Support\Env;
 use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -42,7 +42,7 @@ class ServeCommand extends Command
     {
         chdir(public_path());
 
-        $this->line("<info>Laravel development server started:</info> <http://{$this->host()}:{$this->port()}>");
+        $this->line("<info>Laravel development server started:</info> http://{$this->host()}:{$this->port()}");
 
         passthru($this->serverCommand(), $status);
 

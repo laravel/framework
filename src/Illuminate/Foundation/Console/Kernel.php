@@ -4,20 +4,19 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Exception;
-use Throwable;
-use ReflectionClass;
+use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Command;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Console\Kernel as KernelContract;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
-use Illuminate\Console\Command;
+use ReflectionClass;
 use Symfony\Component\Finder\Finder;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Console\Application as Artisan;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Console\Kernel as KernelContract;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class Kernel implements KernelContract
 {
@@ -129,15 +128,7 @@ class Kernel implements KernelContract
             $this->bootstrap();
 
             return $this->getArtisan()->run($input, $output);
-        } catch (Exception $e) {
-            $this->reportException($e);
-
-            $this->renderException($output, $e);
-
-            return 1;
         } catch (Throwable $e) {
-            $e = new FatalThrowableError($e);
-
             $this->reportException($e);
 
             $this->renderException($output, $e);
@@ -277,7 +268,7 @@ class Kernel implements KernelContract
      * Queue the given console command.
      *
      * @param  string  $command
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public function queue($command, array $parameters = [])
@@ -368,10 +359,10 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    protected function reportException(Exception $e)
+    protected function reportException(Throwable $e)
     {
         $this->app[ExceptionHandler::class]->report($e);
     }
@@ -380,10 +371,10 @@ class Kernel implements KernelContract
      * Render the given exception.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    protected function renderException($output, Exception $e)
+    protected function renderException($output, Throwable $e)
     {
         $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
     }

@@ -2,15 +2,15 @@
 
 namespace Illuminate\Foundation\Http;
 
-use Exception;
-use Throwable;
-use Illuminate\Routing\Router;
-use Illuminate\Routing\Pipeline;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Routing\Pipeline;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Facade;
+use InvalidArgumentException;
+use Throwable;
 
 class Kernel implements KernelContract
 {
@@ -73,7 +73,8 @@ class Kernel implements KernelContract
     protected $middlewarePriority = [
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \Illuminate\Auth\Middleware\Authenticate::class,
+        \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+        \Illuminate\Routing\Middleware\ThrottleRequests::class,
         \Illuminate\Session\Middleware\AuthenticateSession::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
         \Illuminate\Auth\Middleware\Authorize::class,
@@ -91,15 +92,7 @@ class Kernel implements KernelContract
         $this->app = $app;
         $this->router = $router;
 
-        $router->middlewarePriority = $this->middlewarePriority;
-
-        foreach ($this->middlewareGroups as $key => $middleware) {
-            $router->middlewareGroup($key, $middleware);
-        }
-
-        foreach ($this->routeMiddleware as $key => $middleware) {
-            $router->aliasMiddleware($key, $middleware);
-        }
+        $this->syncMiddlewareToRouter();
     }
 
     /**
@@ -114,18 +107,14 @@ class Kernel implements KernelContract
             $request->enableHttpMethodParameterOverride();
 
             $response = $this->sendRequestThroughRouter($request);
-        } catch (Exception $e) {
-            $this->reportException($e);
-
-            $response = $this->renderException($request, $e);
         } catch (Throwable $e) {
-            $this->reportException($e = new FatalThrowableError($e));
+            $this->reportException($e);
 
             $response = $this->renderException($request, $e);
         }
 
         $this->app['events']->dispatch(
-            new Events\RequestHandled($request, $response)
+            new RequestHandled($request, $response)
         );
 
         return $response;
@@ -294,6 +283,106 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Prepend the given middleware to the given middleware group.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function prependMiddlewareToGroup($group, $middleware)
+    {
+        if (! isset($this->middlewareGroups[$group])) {
+            throw new InvalidArgumentException("The [{$group}] middleware group has not been defined.");
+        }
+
+        if (array_search($middleware, $this->middlewareGroups[$group]) === false) {
+            array_unshift($this->middlewareGroups[$group], $middleware);
+        }
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
+    }
+
+    /**
+     * Append the given middleware to the given middleware group.
+     *
+     * @param  string  $group
+     * @param  string  $middleware
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function appendMiddlewareToGroup($group, $middleware)
+    {
+        if (! isset($this->middlewareGroups[$group])) {
+            throw new InvalidArgumentException("The [{$group}] middleware group has not been defined.");
+        }
+
+        if (array_search($middleware, $this->middlewareGroups[$group]) === false) {
+            $this->middlewareGroups[$group][] = $middleware;
+        }
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
+    }
+
+    /**
+     * Prepend the given middleware to the middleware priority list.
+     *
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function prependToMiddlewarePriority($middleware)
+    {
+        if (! in_array($middleware, $this->middlewarePriority)) {
+            array_unshift($this->middlewarePriority, $middleware);
+        }
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
+    }
+
+    /**
+     * Append the given middleware to the middleware priority list.
+     *
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function appendToMiddlewarePriority($middleware)
+    {
+        if (! in_array($middleware, $this->middlewarePriority)) {
+            $this->middlewarePriority[] = $middleware;
+        }
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
+    }
+
+    /**
+     * Sync the current state of the middleware to the router.
+     *
+     * @return void
+     */
+    protected function syncMiddlewareToRouter()
+    {
+        $this->router->middlewarePriority = $this->middlewarePriority;
+
+        foreach ($this->middlewareGroups as $key => $middleware) {
+            $this->router->middlewareGroup($key, $middleware);
+        }
+
+        foreach ($this->routeMiddleware as $key => $middleware) {
+            $this->router->aliasMiddleware($key, $middleware);
+        }
+    }
+
+    /**
      * Get the bootstrap classes for the application.
      *
      * @return array
@@ -306,10 +395,10 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    protected function reportException(Exception $e)
+    protected function reportException(Throwable $e)
     {
         $this->app[ExceptionHandler::class]->report($e);
     }
@@ -318,10 +407,10 @@ class Kernel implements KernelContract
      * Render the exception to a response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderException($request, Exception $e)
+    protected function renderException($request, Throwable $e)
     {
         return $this->app[ExceptionHandler::class]->render($request, $e);
     }

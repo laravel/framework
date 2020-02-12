@@ -2,15 +2,17 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\ServiceProvider;
-use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Response as PsrResponse;
-use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
-use Illuminate\Contracts\View\Factory as ViewFactoryContract;
-use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
+use Exception;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
+use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
+use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Support\ServiceProvider;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Response as PsrResponse;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
 class RoutingServiceProvider extends ServiceProvider
 {
@@ -128,7 +130,14 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrRequest()
     {
         $this->app->bind(ServerRequestInterface::class, function ($app) {
-            return (new DiactorosFactory)->createRequest($app->make('request'));
+            if (class_exists(Psr17Factory::class) && class_exists(PsrHttpFactory::class)) {
+                $psr17Factory = new Psr17Factory;
+
+                return (new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
+                    ->createRequest($app->make('request'));
+            }
+
+            throw new Exception('Unable to resolve PSR request. Please install symfony/psr-http-message-bridge and nyholm/psr7.');
         });
     }
 
@@ -140,7 +149,11 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrResponse()
     {
         $this->app->bind(ResponseInterface::class, function () {
-            return new PsrResponse;
+            if (class_exists(PsrResponse::class)) {
+                return new PsrResponse;
+            }
+
+            throw new Exception('Unable to resolve PSR response. Please install nyholm/psr7.');
         });
     }
 

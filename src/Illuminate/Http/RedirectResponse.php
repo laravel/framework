@@ -2,13 +2,13 @@
 
 namespace Illuminate\Http;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\ViewErrorBag;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\ForwardsCalls;
-use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
+use Illuminate\Session\Store as SessionStore;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 

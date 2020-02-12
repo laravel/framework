@@ -2,11 +2,11 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Support\Str;
-use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
 
 class EloquentUserProvider implements UserProvider
 {
@@ -107,7 +107,7 @@ class EloquentUserProvider implements UserProvider
     {
         if (empty($credentials) ||
            (count($credentials) === 1 &&
-            array_key_exists('password', $credentials))) {
+            Str::contains($this->firstCredentialKey($credentials), 'password'))) {
             return;
         }
 
@@ -129,6 +129,19 @@ class EloquentUserProvider implements UserProvider
         }
 
         return $query->first();
+    }
+
+    /**
+     * Get the first key from the credential array.
+     *
+     * @param  array  $credentials
+     * @return string|null
+     */
+    protected function firstCredentialKey(array $credentials)
+    {
+        foreach ($credentials as $key => $value) {
+            return $key;
+        }
     }
 
     /**

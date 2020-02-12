@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Expression;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneTest extends TestCase
 {
@@ -111,7 +111,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation();
         $mockModel = $this->getMockBuilder(Model::class)->setMethods(['save'])->getMock();
-        $mockModel->expects($this->once())->method('save')->will($this->returnValue(true));
+        $mockModel->expects($this->once())->method('save')->willReturn(true);
         $result = $relation->save($mockModel);
 
         $attributes = $result->getAttributes();
@@ -122,7 +122,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation();
         $created = $this->getMockBuilder(Model::class)->setMethods(['save', 'getKey', 'setAttribute'])->getMock();
-        $created->expects($this->once())->method('save')->will($this->returnValue(true));
+        $created->expects($this->once())->method('save')->willReturn(true);
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
 

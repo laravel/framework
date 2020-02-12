@@ -2,13 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
+use Illuminate\Database\Console\Migrations\ResetCommand;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
-use Illuminate\Database\Console\Migrations\ResetCommand;
 
 class DatabaseMigrationResetCommandTest extends TestCase
 {
@@ -24,7 +25,9 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('setConnection')->once()->with(null);
+        $migrator->shouldReceive('usingConnection')->once()->with(null, m::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
+            $callback();
+        });
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('reset')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], false);
@@ -39,7 +42,9 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('setConnection')->once()->with('foo');
+        $migrator->shouldReceive('usingConnection')->once()->with('foo', m::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
+            $callback();
+        });
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('reset')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);

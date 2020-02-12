@@ -2,69 +2,71 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Queue\Console\TableCommand;
-use Illuminate\Foundation\Console\UpCommand;
-use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
-use Illuminate\Foundation\Console\ServeCommand;
-use Illuminate\Foundation\Console\PresetCommand;
-use Illuminate\Queue\Console\FailedTableCommand;
-use Illuminate\Foundation\Console\JobMakeCommand;
-use Illuminate\Database\Console\Seeds\SeedCommand;
-use Illuminate\Foundation\Console\MailMakeCommand;
-use Illuminate\Foundation\Console\OptimizeCommand;
-use Illuminate\Foundation\Console\RuleMakeCommand;
-use Illuminate\Foundation\Console\TestMakeCommand;
-use Illuminate\Foundation\Console\EventListCommand;
-use Illuminate\Foundation\Console\EventMakeCommand;
-use Illuminate\Foundation\Console\ModelMakeCommand;
-use Illuminate\Foundation\Console\RouteListCommand;
-use Illuminate\Foundation\Console\ViewCacheCommand;
-use Illuminate\Foundation\Console\ViewClearCommand;
-use Illuminate\Session\Console\SessionTableCommand;
-use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Foundation\Console\EventCacheCommand;
-use Illuminate\Foundation\Console\EventClearCommand;
-use Illuminate\Foundation\Console\PolicyMakeCommand;
-use Illuminate\Foundation\Console\RouteCacheCommand;
-use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
+use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
+use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Database\Console\Factories\FactoryMakeCommand;
+use Illuminate\Database\Console\Seeds\SeedCommand;
+use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
+use Illuminate\Foundation\Console\ClearCompiledCommand;
+use Illuminate\Foundation\Console\ComponentMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
+use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
-use Illuminate\Foundation\Console\KeyGenerateCommand;
-use Illuminate\Foundation\Console\RequestMakeCommand;
-use Illuminate\Foundation\Console\StorageLinkCommand;
-use Illuminate\Routing\Console\ControllerMakeCommand;
-use Illuminate\Routing\Console\MiddlewareMakeCommand;
-use Illuminate\Foundation\Console\ListenerMakeCommand;
-use Illuminate\Foundation\Console\ObserverMakeCommand;
-use Illuminate\Foundation\Console\ProviderMakeCommand;
-use Illuminate\Foundation\Console\ResourceMakeCommand;
-use Illuminate\Foundation\Console\ClearCompiledCommand;
+use Illuminate\Foundation\Console\EventCacheCommand;
+use Illuminate\Foundation\Console\EventClearCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
+use Illuminate\Foundation\Console\EventListCommand;
+use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ExceptionMakeCommand;
-use Illuminate\Foundation\Console\OptimizeClearCommand;
-use Illuminate\Foundation\Console\VendorPublishCommand;
-use Illuminate\Console\Scheduling\ScheduleFinishCommand;
-use Illuminate\Database\Console\Seeds\SeederMakeCommand;
-use Illuminate\Foundation\Console\PackageDiscoverCommand;
+use Illuminate\Foundation\Console\JobMakeCommand;
+use Illuminate\Foundation\Console\KeyGenerateCommand;
+use Illuminate\Foundation\Console\ListenerMakeCommand;
+use Illuminate\Foundation\Console\MailMakeCommand;
+use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
-use Illuminate\Database\Console\Factories\FactoryMakeCommand;
-use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
+use Illuminate\Foundation\Console\ObserverMakeCommand;
+use Illuminate\Foundation\Console\OptimizeClearCommand;
+use Illuminate\Foundation\Console\OptimizeCommand;
+use Illuminate\Foundation\Console\PackageDiscoverCommand;
+use Illuminate\Foundation\Console\PolicyMakeCommand;
+use Illuminate\Foundation\Console\ProviderMakeCommand;
+use Illuminate\Foundation\Console\RequestMakeCommand;
+use Illuminate\Foundation\Console\ResourceMakeCommand;
+use Illuminate\Foundation\Console\RouteCacheCommand;
+use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Foundation\Console\RouteListCommand;
+use Illuminate\Foundation\Console\RuleMakeCommand;
+use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Foundation\Console\StorageLinkCommand;
+use Illuminate\Foundation\Console\StubPublishCommand;
+use Illuminate\Foundation\Console\TestMakeCommand;
+use Illuminate\Foundation\Console\UpCommand;
+use Illuminate\Foundation\Console\VendorPublishCommand;
+use Illuminate\Foundation\Console\ViewCacheCommand;
+use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
-use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
-use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
-use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
-use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
-use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
-use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
+use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
+use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
+use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
+use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
+use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
+use Illuminate\Queue\Console\TableCommand;
+use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
+use Illuminate\Routing\Console\ControllerMakeCommand;
+use Illuminate\Routing\Console\MiddlewareMakeCommand;
+use Illuminate\Session\Console\SessionTableCommand;
+use Illuminate\Support\ServiceProvider;
 
 class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -80,6 +82,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ClearResets' => 'command.auth.resets.clear',
         'ConfigCache' => 'command.config.cache',
         'ConfigClear' => 'command.config.clear',
+        'DbWipe' => 'command.db.wipe',
         'Down' => 'command.down',
         'Environment' => 'command.environment',
         'EventCache' => 'command.event.cache',
@@ -89,7 +92,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Optimize' => 'command.optimize',
         'OptimizeClear' => 'command.optimize.clear',
         'PackageDiscover' => 'command.package.discover',
-        'Preset' => 'command.preset',
         'QueueFailed' => 'command.queue.failed',
         'QueueFlush' => 'command.queue.flush',
         'QueueForget' => 'command.queue.forget',
@@ -117,6 +119,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected $devCommands = [
         'CacheTable' => 'command.cache.table',
         'ChannelMake' => 'command.channel.make',
+        'ComponentMake' => 'command.component.make',
         'ConsoleMake' => 'command.console.make',
         'ControllerMake' => 'command.controller.make',
         'EventGenerate' => 'command.event.generate',
@@ -141,6 +144,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
         'Serve' => 'command.serve',
+        'StubPublish' => 'command.stub.publish',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
     ];
@@ -249,6 +253,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
+    protected function registerComponentMakeCommand()
+    {
+        $this->app->singleton('command.component.make', function ($app) {
+            return new ComponentMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerConfigCacheCommand()
     {
         $this->app->singleton('command.config.cache', function ($app) {
@@ -289,6 +305,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.controller.make', function ($app) {
             return new ControllerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDbWipeCommand()
+    {
+        $this->app->singleton('command.db.wipe', function () {
+            return new WipeCommand;
         });
     }
 
@@ -561,18 +589,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
-    protected function registerPresetCommand()
-    {
-        $this->app->singleton('command.preset', function () {
-            return new PresetCommand;
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
     protected function registerProviderMakeCommand()
     {
         $this->app->singleton('command.provider.make', function ($app) {
@@ -635,8 +651,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueRestartCommand()
     {
-        $this->app->singleton('command.queue.restart', function () {
-            return new QueueRestartCommand;
+        $this->app->singleton('command.queue.restart', function ($app) {
+            return new QueueRestartCommand($app['cache.store']);
         });
     }
 
@@ -660,7 +676,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueWorkCommand()
     {
         $this->app->singleton('command.queue.work', function ($app) {
-            return new QueueWorkCommand($app['queue.worker']);
+            return new QueueWorkCommand($app['queue.worker'], $app['cache.store']);
         });
     }
 
@@ -837,6 +853,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.serve', function () {
             return new ServeCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerStubPublishCommand()
+    {
+        $this->app->singleton('command.stub.publish', function () {
+            return new StubPublishCommand;
         });
     }
 

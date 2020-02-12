@@ -3,10 +3,10 @@
 namespace Illuminate\Pagination;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
@@ -259,7 +259,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Load a set of relationships onto the mixed relationship collection.
      *
-     * @param  string $relation
+     * @param  string  $relation
      * @param  array  $relations
      * @return $this
      */

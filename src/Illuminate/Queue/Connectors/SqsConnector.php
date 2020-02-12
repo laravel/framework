@@ -3,8 +3,8 @@
 namespace Illuminate\Queue\Connectors;
 
 use Aws\Sqs\SqsClient;
-use Illuminate\Support\Arr;
 use Illuminate\Queue\SqsQueue;
+use Illuminate\Support\Arr;
 
 class SqsConnector implements ConnectorInterface
 {
@@ -18,7 +18,7 @@ class SqsConnector implements ConnectorInterface
     {
         $config = $this->getDefaultConfiguration($config);
 
-        if ($config['key'] && $config['secret']) {
+        if (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 

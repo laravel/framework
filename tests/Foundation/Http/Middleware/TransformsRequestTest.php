@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TransformsRequestTest extends TestCase
@@ -21,8 +21,8 @@ class TransformsRequestTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertEquals('12', $request->get('bar'));
-            $this->assertEquals('ab', $request->get('baz'));
+            $this->assertSame('12', $request->get('bar'));
+            $this->assertSame('ab', $request->get('baz'));
         });
     }
 
@@ -40,7 +40,7 @@ class TransformsRequestTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertEquals('Damian', $request->get('name'));
+            $this->assertSame('Damian', $request->get('name'));
             $this->assertEquals(27, $request->get('age'));
             $this->assertEquals(5, $request->get('beers'));
         });
@@ -62,7 +62,7 @@ class TransformsRequestTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertEquals('Damian', $request->get('name'));
+            $this->assertSame('Damian', $request->get('name'));
             $this->assertEquals([27, 55, 83], $request->get('age'));
             $this->assertEquals([5, 9, 13], $request->get('beers'));
         });
@@ -87,7 +87,7 @@ class TransformsRequestTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertEquals('Damian', $request->input('name'));
+            $this->assertSame('Damian', $request->input('name'));
             $this->assertEquals(27, $request->input('age'));
             $this->assertEquals(5, $request->input('beers'));
         });

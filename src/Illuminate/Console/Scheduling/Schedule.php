@@ -5,11 +5,14 @@ namespace Illuminate\Console\Scheduling;
 use DateTimeInterface;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
-use Illuminate\Support\ProcessUtils;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\ProcessUtils;
+use Illuminate\Support\Traits\Macroable;
 
 class Schedule
 {
+    use Macroable;
+
     /**
      * All of the events on the schedule.
      *

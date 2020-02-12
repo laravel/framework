@@ -2,13 +2,13 @@
 
 namespace Illuminate\Broadcasting;
 
-use ReflectionClass;
-use ReflectionProperty;
-use Illuminate\Support\Arr;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Illuminate\Support\Arr;
+use ReflectionClass;
+use ReflectionProperty;
 
 class BroadcastEvent implements ShouldQueue
 {
@@ -22,6 +22,20 @@ class BroadcastEvent implements ShouldQueue
     public $event;
 
     /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries;
+
+    /**
+     * The number of seconds the job can run before timing out.
+     *
+     * @var int
+     */
+    public $timeout;
+
+    /**
      * Create a new job handler instance.
      *
      * @param  mixed  $event
@@ -30,6 +44,8 @@ class BroadcastEvent implements ShouldQueue
     public function __construct($event)
     {
         $this->event = $event;
+        $this->tries = property_exists($event, 'tries') ? $event->tries : null;
+        $this->timeout = property_exists($event, 'timeout') ? $event->timeout : null;
     }
 
     /**

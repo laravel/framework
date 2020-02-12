@@ -2,8 +2,8 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Mime_SimpleMessage;
 use GuzzleHttp\ClientInterface;
+use Swift_Mime_SimpleMessage;
 
 class MailgunTransport extends Transport
 {
@@ -29,7 +29,7 @@ class MailgunTransport extends Transport
     protected $domain;
 
     /**
-     * The Mailgun API end-point.
+     * The Mailgun API endpoint.
      *
      * @var string
      */
@@ -62,6 +62,8 @@ class MailgunTransport extends Transport
 
         $to = $this->getTo($message);
 
+        $bcc = $message->getBcc();
+
         $message->setBcc([]);
 
         $response = $this->client->request(
@@ -73,6 +75,8 @@ class MailgunTransport extends Transport
         $message->getHeaders()->addTextHeader(
             'X-Mailgun-Message-ID', $this->getMessageId($response)
         );
+
+        $message->setBcc($bcc);
 
         $this->sendPerformed($message);
 
@@ -186,5 +190,26 @@ class MailgunTransport extends Transport
     public function setDomain($domain)
     {
         return $this->domain = $domain;
+    }
+
+    /**
+     * Get the API endpoint being used by the transport.
+     *
+     * @return string
+     */
+    public function getEndpoint()
+    {
+        return $this->endpoint;
+    }
+
+    /**
+     * Set the API endpoint being used by the transport.
+     *
+     * @param  string  $endpoint
+     * @return string
+     */
+    public function setEndpoint($endpoint)
+    {
+        return $this->endpoint = $endpoint;
     }
 }

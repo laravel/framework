@@ -3,17 +3,17 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Event;
-use Queue;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Events\CallQueuedListener;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\CallQueuedListener;
+use Orchestra\Testbench\TestCase;
+use Queue;
 
 /**
  * @group integration
  */
 class QueuedListenersTest extends TestCase
 {
-    public function test_listeners_can_be_queued_optionally()
+    public function testListenersCanBeQueuedOptionally()
     {
         Queue::fake();
 

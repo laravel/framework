@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Arr;
 
 class SqlServerGrammar extends Grammar
 {
@@ -280,6 +280,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Wrap a union subquery in parentheses.
+     *
+     * @param  string  $sql
+     * @return string
+     */
+    protected function wrapUnion($sql)
+    {
+        return 'select * from ('.$sql.') as '.$this->wrapTable('temp_table');
+    }
+
+    /**
      * Compile an exists statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -295,105 +306,21 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a delete statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    public function compileDelete(Builder $query)
-    {
-        $table = $this->wrapTable($query->from);
-
-        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
-
-        return isset($query->joins)
-                    ? $this->compileDeleteWithJoins($query, $table, $where)
-                    : trim("delete from {$table} {$where}");
-    }
-
-    /**
-     * Compile a delete statement with joins into SQL.
+     * Compile an update statement with joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
+     * @param  string  $columns
      * @param  string  $where
      * @return string
      */
-    protected function compileDeleteWithJoins(Builder $query, $table, $where)
+    protected function compileUpdateWithJoins(Builder $query, $table, $columns, $where)
     {
-        $joins = ' '.$this->compileJoins($query, $query->joins);
+        $alias = last(explode(' as ', $table));
 
-        $alias = stripos($table, ' as ') !== false
-                ? explode(' as ', $table)[1] : $table;
+        $joins = $this->compileJoins($query, $query->joins);
 
-        return trim("delete {$alias} from {$table}{$joins} {$where}");
-    }
-
-    /**
-     * Compile a truncate table statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return array
-     */
-    public function compileTruncate(Builder $query)
-    {
-        return ['truncate table '.$this->wrapTable($query->from) => []];
-    }
-
-    /**
-     * Compile an update statement into SQL.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
-     * @return string
-     */
-    public function compileUpdate(Builder $query, $values)
-    {
-        [$table, $alias] = $this->parseUpdateTable($query->from);
-
-        // Each one of the columns in the update statements needs to be wrapped in the
-        // keyword identifiers, also a place-holder needs to be created for each of
-        // the values in the list of bindings so we can make the sets statements.
-        $columns = collect($values)->map(function ($value, $key) {
-            return $this->wrap($key).' = '.$this->parameter($value);
-        })->implode(', ');
-
-        // If the query has any "join" clauses, we will setup the joins on the builder
-        // and compile them so we can attach them to this update, as update queries
-        // can get join statements to attach to other tables when they're needed.
-        $joins = '';
-
-        if (isset($query->joins)) {
-            $joins = ' '.$this->compileJoins($query, $query->joins);
-        }
-
-        // Of course, update queries may also be constrained by where clauses so we'll
-        // need to compile the where clauses and attach it to the query so only the
-        // intended records are updated by the SQL statements we generate to run.
-        $where = $this->compileWheres($query);
-
-        if (! empty($joins)) {
-            return trim("update {$alias} set {$columns} from {$table}{$joins} {$where}");
-        }
-
-        return trim("update {$table}{$joins} set $columns $where");
-    }
-
-    /**
-     * Get the table and alias for the given table.
-     *
-     * @param  string  $table
-     * @return array
-     */
-    protected function parseUpdateTable($table)
-    {
-        $table = $alias = $this->wrapTable($table);
-
-        if (stripos($table, '] as [') !== false) {
-            $alias = '['.explode('] as [', $table)[1];
-        }
-
-        return [$table, $alias];
+        return "update {$alias} set {$columns} from {$table} {$joins} {$where}";
     }
 
     /**

@@ -2,13 +2,13 @@
 
 namespace Illuminate\Database\Capsule;
 
-use PDO;
 use Illuminate\Container\Container;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Traits\CapsuleManagerTrait;
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Traits\CapsuleManagerTrait;
+use PDO;
 
 class Manager
 {
@@ -77,13 +77,14 @@ class Manager
     /**
      * Get a fluent query builder instance.
      *
-     * @param  string  $table
+     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
+     * @param  string|null  $as
      * @param  string|null  $connection
      * @return \Illuminate\Database\Query\Builder
      */
-    public static function table($table, $connection = null)
+    public static function table($table, $as = null, $connection = null)
     {
-        return static::$instance->connection($connection)->table($table);
+        return static::$instance->connection($connection)->table($table, $as);
     }
 
     /**
@@ -111,7 +112,7 @@ class Manager
     /**
      * Register a connection with the manager.
      *
-     * @param  array   $config
+     * @param  array  $config
      * @param  string  $name
      * @return void
      */
@@ -191,7 +192,7 @@ class Manager
      * Dynamically pass methods to the default connection.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      * @return mixed
      */
     public static function __callStatic($method, $parameters)
