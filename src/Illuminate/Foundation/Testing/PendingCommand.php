@@ -197,7 +197,9 @@ class PendingCommand
                 ->shouldIgnoreMissing();
 
         MockStream::register($mock);
+
         $stream = fopen('mock://stream', 'r+');
+
         $consoleOutputSections = [];
 
         $mock->shouldReceive('section')

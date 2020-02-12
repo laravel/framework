@@ -8,6 +8,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MockStream
 {
     /**
+     * The console output implementation.
+     *
      * @var \Symfony\Component\Console\Output\OutputInterface
      */
     protected static $output;
@@ -25,6 +27,33 @@ class MockStream
         self::$output = $output;
 
         stream_wrapper_register('mock', self::class);
+    }
+
+    /**
+     * Open the stream.
+     *
+     * @param  string  $path
+     * @param  string  $mode
+     * @param  int  $options
+     * @param  string  $opened_path
+     * @return bool
+     */
+    public function stream_open($path, $mode, $options, &$opened_path)
+    {
+        return true;
+    }
+
+    /**
+     * Write to the stream.
+     *
+     * @param  string  $data
+     * @return int
+     */
+    public function stream_write($data)
+    {
+        self::$output->doWrite($data, true);
+
+        return strlen($data);
     }
 
     /**
@@ -53,17 +82,5 @@ class MockStream
         if (in_array('mock', stream_get_wrappers())) {
             stream_wrapper_unregister('mock');
         }
-    }
-
-    public function stream_open($path, $mode, $options, &$opened_path)
-    {
-        return true;
-    }
-
-    public function stream_write($data)
-    {
-        self::$output->doWrite($data, true);
-
-        return strlen($data);
     }
 }
