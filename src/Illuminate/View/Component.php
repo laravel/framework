@@ -5,7 +5,6 @@ namespace Illuminate\View;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
