@@ -34,5 +34,9 @@ class HttpClientTest extends TestCase
         $this->assertEquals('foo', $fooResponse['page']);
         $this->assertEquals('bar', $barResponse['page']);
         $this->assertEquals('fallback', $fallbackResponse['page']);
+
+        $factory->assertSent(function ($request) {
+            return $request->url() === 'http://foo.com/test';
+        });
     }
 }
