@@ -2,8 +2,12 @@
 
 namespace Illuminate\Http\Client;
 
+use Illuminate\Support\Traits\Macroable;
+
 class PendingRequest
 {
+    use Macroable;
+
     /**
      * The factory instance.
      *

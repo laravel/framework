@@ -4,10 +4,15 @@ namespace Illuminate\Http\Client;
 
 use Closure;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class Factory
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The stub callables that will handle requests.
      *
@@ -187,6 +192,10 @@ class Factory
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return tap(new PendingRequest($this), function ($request) {
             $request->stub($this->expectations);
         })->{$method}(...$parameters);
