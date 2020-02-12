@@ -4,7 +4,6 @@ namespace Illuminate\View;
 
 use Closure;
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -29,20 +28,20 @@ abstract class Component
     /**
      * Get the view / view contents that represent the component.
      *
-     * @return Illuminate\View\View|string
+     * @return \Illuminate\View\View|string
      */
     abstract public function render();
 
     /**
      * Resolve the Blade view or view file that should be used when rendering the component.
      *
-     * @return Illuminate\View\View|string
+     * @return \Illuminate\View\View|string
      */
     public function resolveView()
     {
         $view = $this->render();
 
-        if ($view instanceof \Illuminate\View\View) {
+        if ($view instanceof View) {
             return $view;
         }
 
@@ -56,6 +55,7 @@ abstract class Component
     /**
      * Create a Blade view with the raw component string content.
      *
+     * @param  \Illuminate\Contracts\View\Factory  $factory
      * @param  string  $contents
      * @return string
      */
