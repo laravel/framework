@@ -55,7 +55,7 @@ abstract class Component
     /**
      * Create a Blade view with the raw component string content.
      *
-     * @param  \Illuminate\View\Factory  $factory
+     * @param  \Illuminate\Contracts\View\Factory  $factory
      * @param  string  $contents
      * @return string
      */
