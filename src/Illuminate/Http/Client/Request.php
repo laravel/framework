@@ -15,11 +15,18 @@ class Request implements ArrayAccess
     protected $request;
 
     /**
-     * The decoded JSON request.
+     * The decoded form parameters request.
      *
      * @var array
      */
-    protected $decoded;
+    protected $decodedParameters;
+
+    /**
+     * The decoded JSON payload for the request.
+     *
+     * @var array
+     */
+    protected $decodedJson;
 
     /**
      * Create a new request instance.
@@ -63,17 +70,47 @@ class Request implements ArrayAccess
     }
 
     /**
+     * Get the request's data (form parameters or JSON).
+     *
+     * @return array
+     */
+    public function data()
+    {
+        if ($this->hasHeader('Content-Type', 'application/x-www-form-urlencoded')) {
+            return $this->parameters();
+        } else {
+            return $this->json();
+        }
+    }
+
+    /**
+     * Get the request's form parameters.
+     *
+     * @return array
+     */
+    public function parameters()
+    {
+        if (! $this->decodedParameters) {
+            parse_str($this->body(), $parameters);
+
+            $this->decodedParameters = $parameters;
+        }
+
+        return $this->decodedParameters;
+    }
+
+    /**
      * Get the JSON decoded body of the request.
      *
      * @return array
      */
     public function json()
     {
-        if (! $this->decoded) {
-            $this->decoded = json_decode((string) $this->request->getBody(), true);
+        if (! $this->decodedJson) {
+            $this->decodedJson = json_decode($this->body(), true);
         }
 
-        return $this->decoded;
+        return $this->decodedJson;
     }
 
     /**
@@ -84,7 +121,7 @@ class Request implements ArrayAccess
      */
     public function offsetExists($offset)
     {
-        return isset($this->json()[$offset]);
+        return isset($this->data()[$offset]);
     }
 
     /**
@@ -95,7 +132,7 @@ class Request implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return $this->json()[$offset];
+        return $this->data()[$offset];
     }
 
     /**
@@ -137,6 +174,16 @@ class Request implements ArrayAccess
         return is_null($value)
                     ? ! empty($this->request->getHeaders()[$key])
                     : in_array($value, $this->headers()[$key]);
+    }
+
+    /**
+     * Get the values for the header with the given name.
+     *
+     * @return array
+     */
+    public function header($key)
+    {
+        return $this->headers()[$key];
     }
 
     /**
