@@ -13,22 +13,14 @@ class MockStream
     protected static $output;
 
     /**
-     * @var bool
-     */
-    protected static $existed = false;
-
-    /**
-     * Register a new Stream wrapper using the protocol mock://.
+     * Register a new stream wrapper using the protocol mock://.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @return void
      */
     public static function register(OutputInterface $output)
     {
-        if (in_array('mock', stream_get_wrappers())) {
-            stream_wrapper_unregister('mock');
-            self::$existed = true;
-        }
+        self::unregister();
 
         self::$output = $output;
 
@@ -40,12 +32,26 @@ class MockStream
      *
      * @return void
      */
-    public static function deregister()
+    public static function restore()
     {
+        self::unregister();
+
         try {
             stream_wrapper_restore('mock');
         } catch (ErrorException $e) {
             //
+        }
+    }
+
+    /**
+     * Unregister the mock:// stream wrapper
+     *
+     * @return void
+     */
+    protected static function unregister()
+    {
+        if (in_array('mock', stream_get_wrappers())) {
+            stream_wrapper_unregister('mock');
         }
     }
 

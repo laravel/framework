@@ -235,6 +235,6 @@ class PendingCommand
 
         $this->run();
 
-        MockStream::deregister();
+        MockStream::restore();
     }
 }
