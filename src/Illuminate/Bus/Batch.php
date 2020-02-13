@@ -2,8 +2,8 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Support\Str;
 use Illuminate\Queue\SerializableClosure;
+use Illuminate\Support\Str;
 
 class Batch
 {
@@ -140,7 +140,7 @@ class Batch
             'failure' => $this->failureCallback ? serialize($this->failureCallback) : null,
         ]), 3600);
 
-        foreach($this->jobs as $job){
+        foreach ($this->jobs as $job) {
             $job->batchId($id);
 
             $job->onConnection($job->connection ?: $this->connection);
