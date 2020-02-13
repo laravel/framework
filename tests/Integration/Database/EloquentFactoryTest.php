@@ -39,25 +39,20 @@ class EloquentFactoryTest extends TestCase
 
 class FactoryViaVariable extends Model
 {
-
 }
 
 class FactoryViaFacade extends Model
 {
-
 }
 
 class FactoryViaExtension extends Model
 {
-
 }
 
 class FactoryViaThis extends Model
 {
-
 }
 
 class FactoryNotDefined extends Model
 {
-
 }
