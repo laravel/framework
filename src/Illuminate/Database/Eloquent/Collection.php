@@ -227,6 +227,18 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get the array of model's route key.
+     *
+     * @return array
+     */
+    public function modelRouteKeys()
+    {
+        return array_map(function ($model) {
+            return $model->getRouteKey();
+        }, $this->items);
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param  \ArrayAccess|array  $items
