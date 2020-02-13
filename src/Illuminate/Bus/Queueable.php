@@ -228,13 +228,7 @@ trait Queueable
         // Here we decrement the counter of remaining jobs and invoke the success
         // callback if there aren't any remaining jobs. We also mark the batch
         // as finished so it's removed from the cache store.
-        if (app('cache')->decrement('batch_'.$this->batchId.'_counter') == 0) {
-            $this->finishBatch();
-
-            if ($batch->success) {
-                app()->call(unserialize($batch->success)->getClosure());
-            }
-        }
+        $this->handleFinishedJob($batch);
     }
 
     /**
@@ -248,10 +242,8 @@ trait Queueable
             return;
         }
 
-        if ($this->batch()->allowFailure) {
-            app('cache')->decrement('batch_'.$this->batchId.'_counter');
-
-            return;
+        if ($batch->allowFailure) {
+            return $this->handleFinishedJob($batch);
         }
 
         // If the batch doesn't allow failure, we'll mark it as finished to remove
@@ -260,6 +252,23 @@ trait Queueable
 
         if ($batch->failure) {
             app()->call(unserialize($batch->failure)->getClosure());
+        }
+    }
+
+    /**
+     * Handle a finished batch job.
+     *
+     * @param  object  $batch
+     * @return void
+     */
+    public function handleFinishedJob($batch)
+    {
+        if (app('cache')->decrement('batch_'.$this->batchId.'_counter') == 0) {
+            $this->finishBatch();
+
+            if ($batch->success) {
+                app()->call(unserialize($batch->success)->getClosure());
+            }
         }
     }
 }
