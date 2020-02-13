@@ -2,8 +2,8 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Str;
+use Illuminate\Queue\SerializableClosure;
 
 class Batch
 {
