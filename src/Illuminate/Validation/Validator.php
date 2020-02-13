@@ -1188,32 +1188,22 @@ class Validator implements ValidatorContract
     /**
      * Get the Presence Verifier implementation.
      *
+     * @param  string|null  $connection
      * @return \Illuminate\Validation\PresenceVerifierInterface
      *
      * @throws \RuntimeException
      */
-    public function getPresenceVerifier()
+    public function getPresenceVerifier($connection = null)
     {
         if (! isset($this->presenceVerifier)) {
             throw new RuntimeException('Presence verifier has not been set.');
         }
 
-        return $this->presenceVerifier;
-    }
+        if ($this->presenceVerifier instanceof DatabasePresenceVerifierInterface) {
+            $this->presenceVerifier->setConnection($connection);
+        }
 
-    /**
-     * Get the Presence Verifier implementation.
-     *
-     * @param  string  $connection
-     * @return \Illuminate\Validation\PresenceVerifierInterface
-     *
-     * @throws \RuntimeException
-     */
-    public function getPresenceVerifierFor($connection)
-    {
-        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
-            $verifier->setConnection($connection);
-        });
+        return $this->presenceVerifier;
     }
 
     /**
