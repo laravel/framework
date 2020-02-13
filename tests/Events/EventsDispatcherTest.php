@@ -132,14 +132,20 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->push('update', ['name' => 'taylor']);
         $d->listen('update', function ($name) {
             $_SERVER['__event.test'] = $name;
+        });
+        $d->push('update', ['name' => 'taylor']);
+        $d->listen('update', function ($name) {
+            $_SERVER['__event.test'] .= '_'.$name;
         });
 
         $this->assertFalse(isset($_SERVER['__event.test']));
         $d->flush('update');
-        $this->assertSame('taylor', $_SERVER['__event.test']);
+        $d->listen('update', function ($name) {
+            $_SERVER['__event.test'] .= $name;
+        });
+        $this->assertSame('taylor_taylor', $_SERVER['__event.test']);
     }
 
     public function testQueuedEventsCanBeForgotten()
@@ -154,6 +160,20 @@ class EventsDispatcherTest extends TestCase
         $d->forgetPushed();
         $d->flush('update');
         $this->assertSame('unset', $_SERVER['__event.test']);
+    }
+
+    public function testMultiplePushedEventsWillGetFlushed()
+    {
+        $_SERVER['__event.test'] = '';
+        $d = new Dispatcher;
+        $d->push('update', ['name' => 'taylor ']);
+        $d->push('update', ['name' => 'otwell']);
+        $d->listen('update', function ($name) {
+            $_SERVER['__event.test'] .= $name;
+        });
+
+        $d->flush('update');
+        $this->assertSame('taylor otwell', $_SERVER['__event.test']);
     }
 
     public function testWildcardListeners()
