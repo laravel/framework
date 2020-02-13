@@ -1155,6 +1155,18 @@ trait HasAttributes
     }
 
     /**
+     * Get the model's raw original attribute values.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed|array
+     */
+    public function getRawOriginal($key = null, $default = null)
+    {
+        return Arr::get($this->original, $key, $default);
+    }
+
+    /**
      * Get a subset of the model's attributes.
      *
      * @param  array|mixed  $attributes
