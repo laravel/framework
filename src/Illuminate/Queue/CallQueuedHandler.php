@@ -60,7 +60,7 @@ class CallQueuedHandler
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
-            $this->ensureBatchCallbackIsInvoked($command);
+            $this->handleSuccessfulBatchJob($command);
         }
 
         if (! $job->isDeletedOrReleased()) {
@@ -134,28 +134,28 @@ class CallQueuedHandler
     }
 
     /**
-     * Ensure the batch callback is invoked if applicable.
+     * Mark the job as finished inside the batch.
      *
      * @param  mixed  $command
      * @return void
      */
-    protected function ensureBatchCallbackIsInvoked($command)
+    protected function handleSuccessfulBatchJob($command)
     {
-        if (method_exists($command, 'invokeBatchCallback')) {
-            $command->invokeBatchCallback();
+        if (method_exists($command, 'handleSuccessfulBatchJob')) {
+            $command->handleSuccessfulBatchJob();
         }
     }
 
     /**
-     * Ensure the batch failure callback is invoked if applicable.
+     * Mark the job as failed inside the batch.
      *
      * @param  mixed  $command
      * @return void
      */
-    protected function ensureBatchFailureCallbackIsInvoked($command)
+    protected function handleFailedBatchJob($command)
     {
-        if (method_exists($command, 'invokeBatchFailureCallback')) {
-            $command->invokeBatchFailureCallback();
+        if (method_exists($command, 'handleFailedBatchJob')) {
+            $command->handleFailedBatchJob();
         }
     }
 
@@ -197,7 +197,7 @@ class CallQueuedHandler
     {
         $command = unserialize($data['command']);
 
-        $this->ensureBatchFailureCallbackIsInvoked($command);
+        $this->handleFailedBatchJob($command);
 
         if (method_exists($command, 'failed')) {
             $command->failed($e);

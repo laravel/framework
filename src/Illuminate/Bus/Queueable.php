@@ -189,52 +189,77 @@ trait Queueable
     }
 
     /**
-     * Dispatch the next job on the chain.
+     * Return the batch object.
      *
-     * @return void
+     * @return object|null
      */
-    public function invokeBatchCallback()
+    public function batch()
     {
         if (! $this->batchId ||
             ! $batch = app('cache')->get('batch_'.$this->batchId)) {
             return;
         }
 
-        if (app('cache')->decrement('batch_'.$this->batchId.'_counter') == 0 &&
-            $callback = json_decode($batch, true)['success']) {
-
-            app()->call(unserialize($callback)->getClosure());
-        }
+        return json_decode($batch);
     }
 
     /**
-     * Dispatch the next job on the chain.
+     * Remove the batch from the cache store.
      *
      * @return void
      */
-    public function invokeBatchFailureCallback()
+    public function finishBatch()
     {
-        if (! $this->batchId ||
-            ! $batch = app('cache')->get('batch_'.$this->batchId)) {
-            return;
-        }
-
         app('cache')->forget('batch_'.$this->batchId.'_counter');
+        app('cache')->forget('batch_'.$this->batchId);
+    }
 
-        if ($callback = json_decode($batch, true)['failure']) {
-            app('cache')->forget('batch_'.$this->batchId);
+    /**
+     * Handle a successful batch job.
+     *
+     * @return void
+     */
+    public function handleSuccessfulBatchJob()
+    {
+        if (! $batch = $this->batch()) {
+            return;
+        }
 
-            app()->call(unserialize($callback)->getClosure());
+        // Here we decrement the counter of remaining jobs and invoke the success
+        // callback if there aren't any remaining jobs. We also mark the batch
+        // as finished so it's removed from the cache store.
+        if (app('cache')->decrement('batch_'.$this->batchId.'_counter') == 0) {
+            $this->finishBatch();
+
+            if ($batch->success) {
+                app()->call(unserialize($batch->success)->getClosure());
+            }
         }
     }
 
     /**
-     * Dispatch the next job on the chain.
+     * Handle a failed batch job.
      *
-     * @return boolean
+     * @return void
      */
-    public function batchIsRunning()
+    public function handleFailedBatchJob()
     {
-        return app('cache')->has('batch_'.$this->batchId);
+        if (! $batch = $this->batch()) {
+            return;
+        }
+
+        if ($this->batch()->allowFailure) {
+            app('cache')->decrement('batch_'.$this->batchId.'_counter');
+
+            return;
+        }
+
+        // If the batch doesn't allow failure, we'll mark it as finished to remove
+        // it from store. We'll also call the failure callback if defined.
+        $this->finishBatch();
+
+        if ($batch->failure) {
+            app()->call(unserialize($batch->failure)->getClosure());
+        }
     }
 }

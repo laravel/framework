@@ -43,6 +43,13 @@ class Batch
     public $failureCallback;
 
     /**
+     * Determine if the batch should fail if any job fails.
+     *
+     * @var bool
+     */
+    public $allowFailure = false;
+
+    /**
      * Create a new batch instance.
      *
      * @param  array  $jobs
@@ -75,6 +82,18 @@ class Batch
     public function otherwise($failureCallback)
     {
         $this->failureCallback = new SerializableClosure($failureCallback);
+
+        return $this;
+    }
+
+    /**
+     * Allow the batch to continue of a job fails.
+     *
+     * @return $this
+     */
+    public function allowFailure()
+    {
+        $this->allowFailure = true;
 
         return $this;
     }
@@ -116,8 +135,9 @@ class Batch
 
         app('cache')->put('batch_'.$id.'_counter', count($this->jobs), 3600);
         app('cache')->put('batch_'.$id, json_encode([
-            'success' => serialize($this->callback),
-            'failure' => serialize($this->failureCallback),
+            'allowFailure' => $this->allowFailure,
+            'success' => $this->callback ? serialize($this->callback) : null,
+            'failure' => $this->failureCallback ? serialize($this->failureCallback) : null,
         ]), 3600);
 
         foreach($this->jobs as $job){
