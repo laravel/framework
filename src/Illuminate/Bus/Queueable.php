@@ -54,6 +54,13 @@ trait Queueable
     public $chained = [];
 
     /**
+     * The batch id.
+     *
+     * @var string
+     */
+    public $batchId;
+
+    /**
      * Set the desired connection for the job.
      *
      * @param  string|null  $connection
@@ -134,6 +141,19 @@ trait Queueable
     }
 
     /**
+     * Set the batch ID.
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function batchId($id)
+    {
+        $this->batchId = $id;
+
+        return $this;
+    }
+
+    /**
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain
@@ -166,5 +186,55 @@ trait Queueable
                 $next->chainQueue = $this->chainQueue;
             }));
         }
+    }
+
+    /**
+     * Dispatch the next job on the chain.
+     *
+     * @return void
+     */
+    public function invokeBatchCallback()
+    {
+        if (! $this->batchId ||
+            ! $batch = app('cache')->get('batch_'.$this->batchId)) {
+            return;
+        }
+
+        if (app('cache')->decrement('batch_'.$this->batchId.'_counter') == 0 &&
+            $callback = json_decode($batch, true)['success']) {
+
+            app()->call(unserialize($callback)->getClosure());
+        }
+    }
+
+    /**
+     * Dispatch the next job on the chain.
+     *
+     * @return void
+     */
+    public function invokeBatchFailureCallback()
+    {
+        if (! $this->batchId ||
+            ! $batch = app('cache')->get('batch_'.$this->batchId)) {
+            return;
+        }
+
+        app('cache')->forget('batch_'.$this->batchId.'_counter');
+
+        if ($callback = json_decode($batch, true)['failure']) {
+            app('cache')->forget('batch_'.$this->batchId);
+
+            app()->call(unserialize($callback)->getClosure());
+        }
+    }
+
+    /**
+     * Dispatch the next job on the chain.
+     *
+     * @return boolean
+     */
+    public function batchIsRunning()
+    {
+        return app('cache')->has('batch_'.$this->batchId);
     }
 }

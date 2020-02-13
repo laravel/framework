@@ -60,6 +60,7 @@ class CallQueuedHandler
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
+            $this->ensureBatchCallbackIsInvoked($command);
         }
 
         if (! $job->isDeletedOrReleased()) {
@@ -133,6 +134,32 @@ class CallQueuedHandler
     }
 
     /**
+     * Ensure the batch callback is invoked if applicable.
+     *
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function ensureBatchCallbackIsInvoked($command)
+    {
+        if (method_exists($command, 'invokeBatchCallback')) {
+            $command->invokeBatchCallback();
+        }
+    }
+
+    /**
+     * Ensure the batch failure callback is invoked if applicable.
+     *
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function ensureBatchFailureCallbackIsInvoked($command)
+    {
+        if (method_exists($command, 'invokeBatchFailureCallback')) {
+            $command->invokeBatchFailureCallback();
+        }
+    }
+
+    /**
      * Handle a model not found exception.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -169,6 +196,8 @@ class CallQueuedHandler
     public function failed(array $data, $e)
     {
         $command = unserialize($data['command']);
+
+        $this->ensureBatchFailureCallbackIsInvoked($command);
 
         if (method_exists($command, 'failed')) {
             $command->failed($e);
