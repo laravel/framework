@@ -113,6 +113,7 @@ trait InteractsWithExceptionHandling
              * @return \Symfony\Component\HttpFoundation\Response
              *
              * @throws \Exception
+             * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
              */
             public function render($request, Exception $e)
             {

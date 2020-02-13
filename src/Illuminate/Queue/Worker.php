@@ -428,6 +428,8 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
      * @return void
+     *
+     * @throws \Illuminate\Queue\MaxAttemptsExceededException
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {

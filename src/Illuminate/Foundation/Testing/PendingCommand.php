@@ -128,6 +128,8 @@ class PendingCommand
      * Execute the command.
      *
      * @return int
+     *
+     * @throws \Mockery\Exception\NoMatchingExpectationException
      */
     public function run()
     {

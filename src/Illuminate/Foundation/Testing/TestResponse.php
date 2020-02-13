@@ -797,6 +797,8 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|null  $key
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function decodeResponseJson($key = null)
     {

@@ -433,6 +433,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \RedisException
      */
     public function command($method, array $parameters = [])
     {

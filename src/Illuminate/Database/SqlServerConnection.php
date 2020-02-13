@@ -20,7 +20,8 @@ class SqlServerConnection extends Connection
      * @param  int  $attempts
      * @return mixed
      *
-     * @throws \Exception|\Throwable
+     * @throws \Exception
+     * @throws \Throwable
      */
     public function transaction(Closure $callback, $attempts = 1)
     {

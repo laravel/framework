@@ -15,7 +15,8 @@ trait ManagesTransactions
      * @param  int  $attempts
      * @return mixed
      *
-     * @throws \Exception|\Throwable
+     * @throws \Exception
+     * @throws \Throwable
      */
     public function transaction(Closure $callback, $attempts = 1)
     {
@@ -144,7 +145,7 @@ trait ManagesTransactions
     /**
      * Handle an exception from a transaction beginning.
      *
-     * @param  \Throwable  $e
+     * @param  \Exception  $e
      * @return void
      *
      * @throws \Exception
@@ -183,6 +184,8 @@ trait ManagesTransactions
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
      * @return void
+     *
+     * @throws \Exception
      */
     protected function handleCommitTransactionException($e, $currentAttempt, $maxAttempts)
     {

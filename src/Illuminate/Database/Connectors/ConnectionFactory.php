@@ -171,6 +171,8 @@ class ConnectionFactory
      *
      * @param  array  $config
      * @return \Closure
+     *
+     * @throws \PDOException
      */
     protected function createPdoResolverWithHosts(array $config)
     {

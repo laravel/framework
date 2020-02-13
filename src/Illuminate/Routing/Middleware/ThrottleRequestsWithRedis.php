@@ -50,7 +50,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  string  $prefix
      * @return mixed
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
     {
