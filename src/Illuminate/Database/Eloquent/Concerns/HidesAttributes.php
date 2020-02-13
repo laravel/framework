@@ -42,19 +42,6 @@ trait HidesAttributes
     }
 
     /**
-     * Add hidden attributes for the model.
-     *
-     * @param  array|string|null  $attributes
-     * @return void
-     */
-    public function addHidden($attributes = null)
-    {
-        $this->hidden = array_merge(
-            $this->hidden, is_array($attributes) ? $attributes : func_get_args()
-        );
-    }
-
-    /**
      * Get the visible attributes for the model.
      *
      * @return array
