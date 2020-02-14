@@ -32,7 +32,7 @@
         "ramsey/uuid": "^3.7",
         "swiftmailer/swiftmailer": "^6.0",
         "symfony/console": "^4.3.4",
-        "symfony/debug": "^4.3.4",
+        "symfony/debug": "~4.3.4",
         "symfony/finder": "^4.3.4",
         "symfony/http-foundation": "^4.3.4",
         "symfony/http-kernel": "^4.3.4",
