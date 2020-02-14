@@ -42,6 +42,7 @@ class BufferedConsoleOutput extends Output
     {
         MockStream::register($this);
         $sections = [];
+
         return new ConsoleSectionOutput(MockStream::getStream(), $sections, $this->getVerbosity(), $this->isDecorated(), $this->getFormatter());
     }
 }
