@@ -110,14 +110,14 @@ class Filesystem
     }
 
     /**
-     * Get the MD5 hash of the file at the given path.
+     * Get the hash of the file at the given path.
      *
      * @param  string  $path
      * @return string
      */
-    public function hash($path)
+    public function hash(string $path, string $algo = 'md5'): string
     {
-        return md5_file($path);
+        return hash_file($algo, $path);
     }
 
     /**
