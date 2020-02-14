@@ -133,6 +133,22 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile an update statement for a JSON field into SQL.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @return string
+     */
+    public function compileJsonSetForUpdate($column, $value)
+    {
+        $value = $this->parameter($value);
+
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+
+        return $field." = (select json_set(ifnull({$field}, json('{}')){$path}, {$value}))";
+    }
+
+    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -171,6 +187,10 @@ class SQLiteGrammar extends Grammar
     {
         return collect($values)->map(function ($value, $key) {
             $column = last(explode('.', $key));
+
+            if ($this->isJsonSelector($key)) {
+                return $this->compileJsonSetForUpdate($column, $value);
+            }
 
             return $this->wrap($column).' = '.$this->parameter($value);
         })->implode(', ');
