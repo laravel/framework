@@ -23,7 +23,9 @@ use ReflectionMethod;
  */
 class Builder
 {
-    use BuildsQueries, Concerns\QueriesRelationships, ForwardsCalls;
+    use BuildsQueries,
+        ForwardsCalls,
+        Concerns\QueriesRelationships;
 
     /**
      * The base query builder instance.

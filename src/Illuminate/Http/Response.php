@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
 class Response extends BaseResponse
 {
     use ResponseTrait, Macroable {
-        Macroable::__call as macroCall;
+        __call as macroCall;
     }
 
     /**
