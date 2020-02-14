@@ -542,6 +542,12 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $filesystem = new Filesystem;
         $this->assertSame('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash($this->tempDir.'/foo.txt'));
+        $this->assertSame('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', $filesystem->hash($this->tempDir.'/foo.txt', 'sha1'));
+        $this->assertSame('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',  $filesystem->hash($this->tempDir.'/foo.txt', 'sha256'));
+        $this->assertSame('f7fbba6e0636f890e56fbbf3283e524c6fa3204ae298382d624741d0dc6638326e282c41be5e4254d8820772c5518a2c5a8c0c7f7eda19594a7eb539453e1ed7',  $filesystem->hash($this->tempDir.'/foo.txt', 'sha512'));
+        $this->assertSame('a5c4fe49',  $filesystem->hash($this->tempDir.'/foo.txt', 'crc32'));
+
+        $this->assertSame($filesystem->hash($this->tempDir.'/foo.txt', 'md5'), $filesystem->hash($this->tempDir.'/foo.txt'));
     }
 
     /**
