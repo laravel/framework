@@ -350,7 +350,7 @@ class ComponentTagCompiler
     protected function attributesToString(array $attributes)
     {
         return collect($attributes)
-                ->map(function ($value, string $attribute) {
+                ->map(function (string $value, string $attribute) {
                     return "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
