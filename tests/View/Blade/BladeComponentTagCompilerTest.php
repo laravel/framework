@@ -134,10 +134,11 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $factory->shouldReceive('exists')->andReturn(true);
         Container::setInstance($container);
 
-        $result = (new ComponentTagCompiler([]))->compileTags('<x-anonymous-component name="Taylor" :age="31" wire:model="foo">');
+        $result = (new ComponentTagCompiler([]))->compileTags('<x-anonymous-component name="Taylor" :age="31" wire:model="foo" />');
 
         $this->assertEquals("@component('Illuminate\View\AnonymousComponent', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
-<?php \$component->withAttributes(['name' => 'Taylor','age' => 31,'wire:model' => 'foo']); ?>", trim($result));
+<?php \$component->withAttributes(['name' => 'Taylor','age' => 31,'wire:model' => 'foo']); ?>
+@endcomponentClass", trim($result));
     }
 }
 
