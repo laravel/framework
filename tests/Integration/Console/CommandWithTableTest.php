@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
-use Illuminate\Console\Command;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Exception\RuntimeException;
 
@@ -22,7 +21,6 @@ class CommandWithTableTest extends TestCase
 
         $this->artisan('command:table');
     }
-
 
     public function testItCantExecuteCommandWithTableAndAppendRowDueToBufferedOutput()
     {
@@ -63,4 +61,3 @@ class CommandWithTableTest extends TestCase
         });
     }
 }
-
