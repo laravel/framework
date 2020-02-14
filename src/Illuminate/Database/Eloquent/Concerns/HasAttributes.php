@@ -626,7 +626,7 @@ trait HasAttributes
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
-        elseif ($value && $this->isDateAttribute($key)) {
+        if ($value && $this->isDateAttribute($key)) {
             $value = $this->fromDateTime($value);
         }
 
