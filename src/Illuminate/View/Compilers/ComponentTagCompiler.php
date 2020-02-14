@@ -155,10 +155,14 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        // If the component doesn't exists as a class we'll assume it's a class-less component
-        // and pass the component as a view parameter to the data collection bag.
+        // If the component doesn't exists as a class we'll assume it's a class-less
+        // component and pass the component as a view parameter to the data so it
+        // can be accessed within the component and we can render out the view.
         if (! class_exists($class)) {
-            $parameters = ['view' => "'$class'", 'data' => $data->all()];
+            $parameters = [
+                'view' => "'$class'",
+                'data' => '['.$this->attributesToString($data->all()).']',
+            ];
 
             $class = AnonymousComponent::class;
         } else {
@@ -185,13 +189,14 @@ class ComponentTagCompiler
             return $class;
         }
 
-        $viewFactory = Container::getInstance()->make(Factory::class);
-
-        if ($viewFactory->exists($view = "components.{$component}")) {
+        if (Container::getInstance()->make(Factory::class)
+                    ->exists($view = "components.{$component}")) {
             return $view;
         }
 
-        throw new InvalidArgumentException("Unable to locate a class or view for component [{$component}].");
+        throw new InvalidArgumentException(
+            "Unable to locate a class or view for component [{$component}]."
+        );
     }
 
     /**
@@ -222,8 +227,9 @@ class ComponentTagCompiler
      */
     protected function partitionDataAndAttributes($class, array $attributes)
     {
-        // If the class doesn't exists, we'll assume it's a class-less component
-        // and return all attributes as data to the class-less component view.
+        // If the class doesn't exists, we'll assume it's a class-less component and
+        // return all of the attributes as both data and attributes since we have
+        // now way to partition them. The user can exclude attributes manually.
         if (! class_exists($class)) {
             return [collect($attributes), collect($attributes)];
         }
@@ -345,10 +351,6 @@ class ComponentTagCompiler
     {
         return collect($attributes)
                 ->map(function ($value, string $attribute) {
-                    if (is_array($value)) {
-                        $value = '['.$this->attributesToString($value).']';
-                    }
-
                     return "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
