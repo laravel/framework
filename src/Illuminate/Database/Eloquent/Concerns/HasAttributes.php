@@ -334,15 +334,14 @@ trait HasAttributes
     }
 
     /**
-     * Get a plain attribute (not a relationship).
+     * Get a plain attribute value (not a relationship).
      *
      * @param  string  $key
+     * @param  mixed  $value
      * @return mixed
      */
-    public function getAttributeValue($key)
+    public function getValue($key, $value)
     {
-        $value = $this->getAttributeFromArray($key);
-
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
         // retrieval from the model to a form that is more useful for usage.
@@ -366,6 +365,32 @@ trait HasAttributes
         }
 
         return $value;
+    }
+
+    /**
+     * Get a plain attribute original value (not a relationship).
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function getAttributeOriginalValue($key)
+    {
+        $value = $this->getOriginal($key);
+
+        return $this->getValue($key, $value);
+    }
+
+    /**
+     * Get a plain attribute current value (not a relationship).
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function getAttributeValue($key)
+    {
+        $value = $this->getAttributeFromArray($key);
+
+        return $this->getValue($key, $value);
     }
 
     /**
