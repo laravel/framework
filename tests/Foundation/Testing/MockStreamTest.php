@@ -50,7 +50,7 @@ class MockStreamTest extends TestCase
 
         $this->assertIsResource($stream);
 
-        fputs($stream, 'Taylor');
+        fwrite($stream, 'Taylor');
         $contents = stream_get_contents($stream);
         fclose($stream);
 

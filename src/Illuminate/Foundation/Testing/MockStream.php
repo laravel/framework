@@ -31,7 +31,7 @@ class MockStream
     }
 
     /**
-     * Return an opened resource of the captured stream
+     * Return an opened resource of the captured stream.
      *
      * @return false|resource
      */
@@ -55,7 +55,7 @@ class MockStream
     }
 
     /**
-     * Retrieve information about the resource
+     * Retrieve information about the resource.
      *
      * @return array
      */
@@ -65,7 +65,7 @@ class MockStream
     }
 
     /**
-     * Tests for end-of-file on the stream
+     * Tests for end-of-file on the stream.
      *
      * @return bool
      */
@@ -75,7 +75,7 @@ class MockStream
     }
 
     /**
-     * Read from the stream
+     * Read from the stream.
      *
      * @param $count
      * @return false|string
@@ -90,7 +90,7 @@ class MockStream
     }
 
     /**
-     * Seeks to specific location in the stream
+     * Seeks to specific location in the stream.
      *
      * @param     $offset
      * @param int $whence

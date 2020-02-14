@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\Output;
 
