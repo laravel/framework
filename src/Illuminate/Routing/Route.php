@@ -924,22 +924,19 @@ class Route
      */
     public function toSymfonyRoute()
     {
-        $optionals = $this->getOptionalParameters();
-
-        $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri());
-
         return new SymfonyRoute(
-            $uri, $optionals, $this->wheres, ['utf8' => true, 'action' => $this->action],
+            preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri()), $this->getOptionalParameterNames(),
+            $this->wheres, ['utf8' => true, 'action' => $this->action],
             $this->getDomain() ?: '', [], $this->methods
         );
     }
 
     /**
-     * Get the optional parameters for the route.
+     * Get the optional parameter names for the route.
      *
      * @return array
      */
-    protected function getOptionalParameters()
+    protected function getOptionalParameterNames()
     {
         preg_match_all('/\{(\w+?)\?\}/', $this->uri(), $matches);
 

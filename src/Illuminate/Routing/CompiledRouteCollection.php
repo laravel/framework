@@ -89,7 +89,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
         $route = null;
 
         $matcher = new CompiledUrlMatcher(
-            $this->compiled, (new RequestContext())->fromRequest($request)
+            $this->compiled, (new RequestContext)->fromRequest($request)
         );
 
         if ($result = $matcher->matchRequest($request)) {
