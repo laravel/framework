@@ -11,6 +11,8 @@ use ReflectionProperty;
 
 abstract class Component
 {
+    protected static $propertyCache = [];
+    protected static $methodCache = [];
     /**
      * That properties / methods that should not be exposed to the component.
      *
@@ -85,25 +87,67 @@ abstract class Component
     {
         $this->attributes = $this->attributes ?: new ComponentAttributeBag;
 
-        $class = new ReflectionClass($this);
+        return array_merge($this->extractPublicProperties(), $this->extractPublicMethods());
+    }
 
-        $publicProperties = collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(function (ReflectionProperty $property) {
-                return $this->shouldIgnore($property->getName());
-            })
-            ->mapWithKeys(function (ReflectionProperty $property) {
-                return [$property->getName() => $this->{$property->getName()}];
-            });
+    /**
+     * Extract the public properties for the component.
+     *
+     * @return array
+     */
+    protected function extractPublicProperties()
+    {
+        $class = get_class($this);
 
-        $publicMethods = collect($class->getMethods(ReflectionMethod::IS_PUBLIC))
-            ->reject(function (ReflectionMethod $method) {
-                return $this->shouldIgnore($method->getName());
-            })
-            ->mapWithKeys(function (ReflectionMethod $method) {
-                return [$method->getName() => $this->createVariableFromMethod($method)];
-            });
+        if (! isset(static::$propertyCache[$class])) {
+            $reflection = new ReflectionClass($this);
 
-        return $publicProperties->merge($publicMethods)->all();
+            static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
+                ->reject(function (ReflectionProperty $property) {
+                    return $this->shouldIgnore($property->getName());
+                })
+                ->map(function (ReflectionProperty $property) {
+                    return $property->getName();
+                })->all();
+        }
+
+        $values = [];
+
+        foreach (static::$propertyCache[$class] as $property) {
+            $values[$property] = $this->{$property};
+        }
+
+        return $values;
+    }
+
+    /**
+     * Extract the public methods for the component.
+     *
+     * @return array
+     */
+    protected function extractPublicMethods()
+    {
+        $class = get_class($this);
+
+        if (! isset(static::$methodCache[$class])) {
+            $reflection = new ReflectionClass($this);
+
+            static::$methodCache[$class] = collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
+                ->reject(function (ReflectionMethod $method) {
+                    return $this->shouldIgnore($method->getName());
+                })
+                ->map(function (ReflectionMethod $method) {
+                    return $method->getName();
+                });
+        }
+
+        $values = [];
+
+        foreach (static::$methodCache[$class] as $method) {
+            $values[$method] = $this->createVariableFromMethod(new ReflectionMethod($this, $method));
+        }
+
+        return $values;
     }
 
     /**
