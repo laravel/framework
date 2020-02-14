@@ -50,7 +50,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * The route collection instance.
      *
-     * @var \Illuminate\Routing\RouteCollection
+     * @var \Illuminate\Routing\RouteCollectionInterface
      */
     protected $routes;
 
@@ -1177,7 +1177,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Get the underlying route collection.
      *
-     * @return \Illuminate\Routing\RouteCollection
+     * @return \Illuminate\Routing\RouteCollectionInterface
      */
     public function getRoutes()
     {
@@ -1197,6 +1197,21 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         $this->routes = $routes;
+
+        $this->container->instance('routes', $this->routes);
+    }
+
+    /**
+     * Set the compiled route collection instance.
+     *
+     * @param  array  $routes
+     * @return void
+     */
+    public function setCompiledRoutes(array $routes)
+    {
+        $this->routes = (new CompiledRouteCollection($routes['compiled'], $routes['attributes']))
+            ->setRouter($this)
+            ->setContainer($this->container);
 
         $this->container->instance('routes', $this->routes);
     }

@@ -21,7 +21,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * The route collection.
      *
-     * @var \Illuminate\Routing\RouteCollection
+     * @var \Illuminate\Routing\RouteCollectionInterface
      */
     protected $routes;
 
@@ -705,10 +705,10 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the route collection.
      *
-     * @param  \Illuminate\Routing\RouteCollection  $routes
+     * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @return $this
      */
-    public function setRoutes(RouteCollection $routes)
+    public function setRoutes(RouteCollectionInterface $routes)
     {
         $this->routes = $routes;
 
