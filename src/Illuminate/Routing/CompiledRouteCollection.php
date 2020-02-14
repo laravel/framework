@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 
@@ -67,6 +68,8 @@ class CompiledRouteCollection extends AbstractRouteCollection
         ];
 
         $this->compiled = [];
+
+        return $route;
     }
 
     /**
@@ -148,7 +151,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
     public function getByAction($action)
     {
         $attributes = collect($this->attributes)->first(function (array $attributes) use ($action) {
-            return $attributes['controller'] === $action;
+            return $attributes['action']['controller'] === $action;
         });
 
         return $attributes ? $this->newRoute($attributes) : null;
@@ -171,9 +174,16 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutesByMethod()
     {
-        return $this->mapAttributesToRoutes()->groupBy(function (Route $route) {
-            return $route->methods();
-        })->all();
+        return $this->mapAttributesToRoutes()
+            ->groupBy(function (Route $route) {
+                return $route->methods();
+            })
+            ->map(function (Collection $routes) {
+                return $routes->mapWithKeys(function (Route $route) {
+                    return [$route->uri => $route];
+                })->all();
+            })
+            ->all();
     }
 
     /**
