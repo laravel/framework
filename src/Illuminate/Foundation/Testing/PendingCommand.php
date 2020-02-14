@@ -7,10 +7,8 @@ use Illuminate\Contracts\Console\Kernel;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\Output;
 
 class PendingCommand
@@ -196,21 +194,6 @@ class PendingCommand
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldIgnoreMissing();
 
-        MockStream::register($mock);
-
-        $stream = fopen('mock://stream', 'r+');
-
-        $consoleOutputSections = [];
-
-        $mock->shouldReceive('section')
-            ->andReturn(new ConsoleSectionOutput(
-                $stream,
-                $consoleOutputSections,
-                Output::VERBOSITY_NORMAL,
-                false,
-                new OutputFormatter)
-            );
-
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')
                 ->once()
@@ -236,7 +219,5 @@ class PendingCommand
         }
 
         $this->run();
-
-        MockStream::restore();
     }
 }
