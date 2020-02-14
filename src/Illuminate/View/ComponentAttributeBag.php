@@ -3,11 +3,13 @@
 namespace Illuminate\View;
 
 use ArrayAccess;
+use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use IteratorAggregate;
 
-class ComponentAttributeBag implements ArrayAccess, Htmlable
+class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 {
     /**
      * The raw array of attributes.
@@ -178,6 +180,16 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+
+    /**
+     * Get an iterator for the items.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->attributes);
     }
 
     /**

@@ -138,4 +138,20 @@ trait CompilesComponents
     {
         return $this->compileEndComponent();
     }
+
+    /**
+     * Compile the prop statement into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileProps($expression)
+    {
+        return "<?php \$attributes = \$attributes->except{$expression}; ?>
+<?php \$__defined_vars = get_defined_vars(); ?>
+<?php foreach (\$attributes as \$key => \$value) {
+    if (array_key_exists(\$key, \$__defined_vars)) unset(\$\$key);
+} ?>
+<?php unset(\$__defined_vars); ?>";
+    }
 }
