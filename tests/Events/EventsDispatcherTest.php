@@ -347,6 +347,18 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('baz', $_SERVER['__event.test']);
     }
 
+    public function testEventClassesArePayload()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(ExampleEvent::class, function ($payload) {
+            $_SERVER['__event.test'] = $payload;
+        });
+        $d->dispatch($e = new ExampleEvent, ['foo']);
+
+        $this->assertSame($e, $_SERVER['__event.test']);
+    }
+
     public function testInterfacesWork()
     {
         unset($_SERVER['__event.test']);
@@ -362,17 +374,25 @@ class EventsDispatcherTest extends TestCase
     public function testBothClassesAndInterfacesWork()
     {
         unset($_SERVER['__event.test']);
+        $_SERVER['__event.test'] = [];
         $d = new Dispatcher;
-        $d->listen(AnotherEvent::class, function () {
+        $d->listen(AnotherEvent::class, function ($p) {
+            $_SERVER['__event.test'][] = $p;
             $_SERVER['__event.test1'] = 'fooo';
         });
-        $d->listen(SomeEventInterface::class, function () {
+        $d->listen(SomeEventInterface::class, function ($p) {
+            $_SERVER['__event.test'][] = $p;
             $_SERVER['__event.test2'] = 'baar';
         });
-        $d->dispatch(new AnotherEvent);
+        $d->dispatch($e = new AnotherEvent, ['foo']);
 
+        $this->assertSame($e, $_SERVER['__event.test'][0]);
+        $this->assertSame($e, $_SERVER['__event.test'][1]);
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);
+
+        unset($_SERVER['__event.test1']);
+        unset($_SERVER['__event.test2']);
     }
 
     public function testShouldBroadcastSuccess()
