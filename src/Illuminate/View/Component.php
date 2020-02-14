@@ -11,8 +11,20 @@ use ReflectionProperty;
 
 abstract class Component
 {
+    /**
+     * The cache of public property names, keyed by class.
+     *
+     * @var array
+     */
     protected static $propertyCache = [];
+
+    /**
+     * The cache of public method names, keyed by class.
+     *
+     * @var array
+     */
     protected static $methodCache = [];
+
     /**
      * That properties / methods that should not be exposed to the component.
      *
