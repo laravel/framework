@@ -655,10 +655,10 @@ class Builder
             return $this->whereNested($column, $boolean);
         }
 
-        // If the column is a Closure instance and there is an operator value, we will
-        // assume the developer wants to run a subquery and then compare the result
-        // of that subquery with the given value that was provided to the method.
-        if ($column instanceof Closure && ! is_null($operator)) {
+        // If the column is a Closure or Builder instance, and there is an operator value,
+        // we will assume the developer wants to run the subquery and then compare the
+        // result of the subquery with the value that was provided to the method.
+        if ($this->isQueryable($column) && ! is_null($operator)) {
             [$sub, $bindings] = $this->createSub($column);
 
             return $this->addBinding($bindings, 'where')
