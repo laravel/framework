@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Testing;
+namespace Illuminate\Testing;
 
 use ErrorException;
 use Symfony\Component\Console\Output\OutputInterface;

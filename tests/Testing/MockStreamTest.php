@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Testing;
+namespace Illuminate\Tests\Testing;
 
 use ErrorException;
-use Illuminate\Foundation\Testing\MockStream;
+use Illuminate\Testing\MockStream;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
