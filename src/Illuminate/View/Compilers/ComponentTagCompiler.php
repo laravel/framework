@@ -187,8 +187,8 @@ class ComponentTagCompiler
 
         $viewFactory = Container::getInstance()->make(Factory::class);
 
-        if ($viewFactory->exists($component)) {
-            return $component;
+        if ($viewFactory->exists($view = "components.{$component}")) {
+            return $view;
         }
 
         throw new InvalidArgumentException("Unable to locate a class or view for component [{$component}].");
