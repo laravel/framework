@@ -334,13 +334,13 @@ trait HasAttributes
     }
 
     /**
-     * Get a plain attribute value (not a relationship).
+     * Get a plain attribute value from raw (not a relationship).
      *
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
      */
-    public function getValue($key, $value)
+    public function getValueFromRaw($key, $value)
     {
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
@@ -377,7 +377,7 @@ trait HasAttributes
     {
         $value = $this->getOriginal($key);
 
-        return $this->getValue($key, $value);
+        return $this->getValueFromRaw($key, $value);
     }
 
     /**
@@ -390,7 +390,7 @@ trait HasAttributes
     {
         $value = $this->getAttributeFromArray($key);
 
-        return $this->getValue($key, $value);
+        return $this->getValueFromRaw($key, $value);
     }
 
     /**
