@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -222,7 +223,9 @@ trait InteractsWithIO
      */
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
     {
-        $table = new Table($this->output->getOutput()->section());
+        $output = $this->output->getOutput();
+
+        $table = new Table($output instanceof ConsoleOutput ? $output->section() : $output);
 
         if ($rows instanceof Arrayable) {
             $rows = $rows->toArray();
