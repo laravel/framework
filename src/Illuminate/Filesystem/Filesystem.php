@@ -121,6 +121,23 @@ class Filesystem
     }
 
     /**
+     * Verify if the file at the given path matches the hash given
+     *
+     * @param  string  $path
+     * @param  string  $hash
+     * @param  string  $algo
+     * @return bool
+     */
+    public function check(string $path, string $hash, string $algo = 'md5'): bool
+    {
+        if($this->exists($path)) {
+            return hash_file($algo, $path) === $hash;
+        }
+
+        throw new FileNotFoundException("File does not exist at path {$path}");
+    }
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path

@@ -550,6 +550,25 @@ class FilesystemTest extends TestCase
         $this->assertSame($filesystem->hash($this->tempDir.'/foo.txt', 'md5'), $filesystem->hash($this->tempDir.'/foo.txt'));
     }
 
+    public function testCheck()
+    {
+        file_put_contents($this->tempDir.'/foo.txt', 'foo');
+        $filesystem = new Filesystem;
+        $this->assertTrue($filesystem->check($this->tempDir.'/foo.txt', 'acbd18db4cc2f85cedef654fccc4a4d8'));
+        $this->assertTrue($filesystem->check($this->tempDir.'/foo.txt', 'acbd18db4cc2f85cedef654fccc4a4d8', 'md5'));
+        $this->assertTrue($filesystem->check($this->tempDir.'/foo.txt', '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', 'sha1'));
+        $this->assertTrue($filesystem->check($this->tempDir.'/foo.txt', '2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae', 'sha256'));
+        $this->assertTrue($filesystem->check($this->tempDir.'/foo.txt', 'f7fbba6e0636f890e56fbbf3283e524c6fa3204ae298382d624741d0dc6638326e282c41be5e4254d8820772c5518a2c5a8c0c7f7eda19594a7eb539453e1ed7', 'sha512'));
+        $this->assertTrue($filesystem->check($this->tempDir.'/foo.txt', 'a5c4fe49','crc32'));
+
+        $this->assertFalse($filesystem->check($this->tempDir.'/foo.txt', 'invalid'));
+        $this->assertFalse($filesystem->check($this->tempDir.'/foo.txt', 'invalid', 'md5'));
+        $this->assertFalse($filesystem->check($this->tempDir.'/foo.txt', 'invalid', 'sha1'));
+        $this->assertFalse($filesystem->check($this->tempDir.'/foo.txt', 'invalid', 'sha256'));
+        $this->assertFalse($filesystem->check($this->tempDir.'/foo.txt', 'invalid', 'sha512'));
+        $this->assertFalse($filesystem->check($this->tempDir.'/foo.txt', 'invalid','crc32'));
+    }
+
     /**
      * @param string $file
      * @return int
