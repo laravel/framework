@@ -199,10 +199,14 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function __toString()
     {
-        return collect($this->attributes)->map(function ($value, $key) {
-            return $value === true
-                    ? $key
-                    : $key.'="'.str_replace('"', '\\"', trim($value)).'"';
-        })->implode(' ');
+        $string = '';
+
+        foreach ($this->attributes as $key => $value) {
+            $string .= $value === true
+                    ? ' '.$key
+                    : ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+        }
+
+        return trim($string);
     }
 }
