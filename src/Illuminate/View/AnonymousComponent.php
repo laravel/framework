@@ -36,7 +36,7 @@ class AnonymousComponent extends Component
      *
      * @return string
      */
-    public function view()
+    public function render()
     {
         return $this->view;
     }
