@@ -3,11 +3,13 @@
 namespace Illuminate\View;
 
 use ArrayAccess;
+use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use IteratorAggregate;
 
-class ComponentAttributeBag implements ArrayAccess, Htmlable
+class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 {
     /**
      * The raw array of attributes.
@@ -85,22 +87,27 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
      */
     public function merge(array $attributeDefaults = [])
     {
-        return new static(
-            array_merge($attributeDefaults, collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
-                if ($value === true) {
-                    return $key;
-                }
+        $attributes = [];
 
-                if ($key !== 'class') {
-                    return $attributeDefaults[$key] ?? $value;
-                }
+        foreach ($this->attributes as $key => $value) {
+            if ($value === true) {
+                $attributes[$key] = $key;
 
-                return collect([$attributeDefaults[$key] ?? '', $value])
-                                ->filter()
-                                ->unique()
-                                ->join(' ');
-            })->filter()->all())
-        );
+                continue;
+            }
+
+            if ($key !== 'class') {
+                $attributes[$key] = $attributeDefaults[$key] ?? $value;
+
+                continue;
+            }
+
+            $attributes[$key] = implode(' ', array_unique(
+                array_filter([$attributeDefaults[$key] ?? '', $value])
+            ));
+        }
+
+        return new static(array_merge($attributeDefaults, array_filter($attributes)));
     }
 
     /**
@@ -181,16 +188,30 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable
     }
 
     /**
+     * Get an iterator for the items.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->attributes);
+    }
+
+    /**
      * Implode the attributes into a single HTML ready string.
      *
      * @return string
      */
     public function __toString()
     {
-        return collect($this->attributes)->map(function ($value, $key) {
-            return $value === true
-                    ? $key
-                    : $key.'="'.str_replace('"', '\\"', trim($value)).'"';
-        })->implode(' ');
+        $string = '';
+
+        foreach ($this->attributes as $key => $value) {
+            $string .= $value === true
+                    ? ' '.$key
+                    : ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+        }
+
+        return trim($string);
     }
 }

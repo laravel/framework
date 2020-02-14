@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
 use Mockery;
@@ -121,6 +122,22 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes([]); ?>
+@endcomponentClass", trim($result));
+    }
+
+    public function testClasslessComponents()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $container->instance(Factory::class, $factory = Mockery::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $factory->shouldReceive('exists')->andReturn(true);
+        Container::setInstance($container);
+
+        $result = (new ComponentTagCompiler([]))->compileTags('<x-anonymous-component name="Taylor" :age="31" wire:model="foo" />');
+
+        $this->assertEquals("@component('Illuminate\View\AnonymousComponent', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php \$component->withAttributes(['name' => 'Taylor','age' => 31,'wire:model' => 'foo']); ?>
 @endcomponentClass", trim($result));
     }
 }
