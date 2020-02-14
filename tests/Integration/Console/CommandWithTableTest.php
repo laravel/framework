@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Console;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Console\Command;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 class CommandWithTableTest extends TestCase
 {
@@ -27,7 +28,7 @@ class CommandWithTableTest extends TestCase
     {
         $this->mockConsoleOutput = false;
 
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput" when calling "Symfony\Component\Console\Helper\Table::appendRow');
 
         $this->app[ConsoleKernel::class]->command('command:table-with-append', function () {
@@ -51,12 +52,6 @@ class CommandWithTableTest extends TestCase
             ->assertExitCode(0);
     }
 
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
     protected function getEnvironmentSetUp($app)
     {
         $app[ConsoleKernel::class]->command('command:table', function () {
