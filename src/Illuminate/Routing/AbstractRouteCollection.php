@@ -166,19 +166,45 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     public function toSymfonyRouteCollection()
     {
         $symfonyRoutes = new SymfonyRouteCollection();
+        $routes = $this->getRoutes();
 
-        foreach ($this->getRoutes() as $route) {
-            // If the route doesn't have a name, we'll generate one for it
-            // and re-add the route to the collection. This way we can
-            // add the route to the Symfony route collection.
-            if (! $name = $route->getName()) {
-                $route->name($name = $this->generateRouteName());
-
-                $this->add($route);
+        // Because we need to make sure that fallback routes are always placed as last
+        // we'll first iterate over the regular routes and add them to the symfony
+        // routes collection. Then we'll do the same thing for the fallback routes.
+        foreach ($routes as $route) {
+            if (! $route->isFallback) {
+                $symfonyRoutes = $this->addToSymfonyRoutesCollection($symfonyRoutes, $route);
             }
-
-            $symfonyRoutes->add($name, $route->toSymfonyRoute());
         }
+
+        foreach ($routes as $route) {
+            if ($route->isFallback) {
+                $symfonyRoutes = $this->addToSymfonyRoutesCollection($symfonyRoutes, $route);
+            }
+        }
+
+        return $symfonyRoutes;
+    }
+
+    /**
+     * Add a route to the SymfonyRouteCollection instance.
+     *
+     * @param  \Symfony\Component\Routing\RouteCollection  $symfonyRoutes
+     * @param  \Illuminate\Routing\Route  $route
+     * @return \Symfony\Component\Routing\RouteCollection
+     */
+    protected function addToSymfonyRoutesCollection(SymfonyRouteCollection $symfonyRoutes, Route $route)
+    {
+        // If the route doesn't have a name, we'll generate one for it
+        // and re-add the route to the collection. This way we can
+        // add the route to the Symfony route collection.
+        if (! $name = $route->getName()) {
+            $route->name($name = $this->generateRouteName());
+
+            $this->add($route);
+        }
+
+        $symfonyRoutes->add($name, $route->toSymfonyRoute());
 
         return $symfonyRoutes;
     }
