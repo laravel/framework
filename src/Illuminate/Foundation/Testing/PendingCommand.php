@@ -198,13 +198,11 @@ class PendingCommand
 
         MockStream::register($mock);
 
-        $stream = fopen('mock://stream', 'r+');
-
         $consoleOutputSections = [];
 
         $mock->shouldReceive('section')
             ->andReturn(new ConsoleSectionOutput(
-                $stream,
+                MockStream::getStream(),
                 $consoleOutputSections,
                 Output::VERBOSITY_NORMAL,
                 false,

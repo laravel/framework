@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Testing;
 
 use ErrorException;
+use Illuminate\Foundation\Testing\BufferedConsoleOutput;
 use Illuminate\Foundation\Testing\MockStream;
 use Mockery;
 use Orchestra\Testbench\TestCase;
@@ -17,7 +18,7 @@ class MockStreamTest extends TestCase
             ->shouldAllowMockingProtectedMethods();
 
         $mock->shouldReceive('doWrite')
-            ->with('Taylor', true)
+            ->with('Taylor', false)
             ->once();
 
         MockStream::register($mock);
@@ -40,5 +41,19 @@ class MockStreamTest extends TestCase
         }
 
         $this->assertTrue($failed);
+    }
+
+    public function testGetStreamReturnsAnOpenedResource()
+    {
+        MockStream::register(new BufferedConsoleOutput);
+        $stream = MockStream::getStream();
+
+        $this->assertIsResource($stream);
+
+        fputs($stream, 'Taylor');
+        $contents = stream_get_contents($stream);
+        fclose($stream);
+
+        $this->assertEquals('Taylor', $contents);
     }
 }

@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Testing\BufferedConsoleOutput;
 use Illuminate\Foundation\Testing\PendingCommand;
 use Illuminate\Support\Arr;
 
@@ -40,7 +41,7 @@ trait InteractsWithConsole
     public function artisan($command, $parameters = [])
     {
         if (! $this->mockConsoleOutput) {
-            return $this->app[Kernel::class]->call($command, $parameters);
+            return $this->app[Kernel::class]->call($command, $parameters, new BufferedConsoleOutput);
         }
 
         $this->beforeApplicationDestroyed(function () {

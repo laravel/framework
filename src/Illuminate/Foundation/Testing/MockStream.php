@@ -13,6 +13,7 @@ class MockStream
      * @var \Symfony\Component\Console\Output\OutputInterface
      */
     protected static $output;
+    protected static $position = 0;
 
     /**
      * Register a new stream wrapper using the protocol mock://.
@@ -30,6 +31,16 @@ class MockStream
     }
 
     /**
+     * Return an opened resource of the captured stream
+     *
+     * @return false|resource
+     */
+    public static function getStream()
+    {
+        return fopen('mock://stream', 'r+');
+    }
+
+    /**
      * Open the stream.
      *
      * @param  string  $path
@@ -44,6 +55,63 @@ class MockStream
     }
 
     /**
+     * Retrieve information about the resource
+     *
+     * @return array
+     */
+    public function stream_stat()
+    {
+        return [];
+    }
+
+    /**
+     * Tests for end-of-file on the stream
+     *
+     * @return bool
+     */
+    public function stream_eof()
+    {
+        return self::$position === strlen(self::$output->fetch());
+    }
+
+    /**
+     * Read from the stream
+     *
+     * @param $count
+     * @return false|string
+     */
+    public function stream_read($count)
+    {
+        $read = substr(self::$output->fetch(), self::$position, $count);
+
+        self::$position = self::$position + $count;
+
+        return $read;
+    }
+
+    /**
+     * Seeks to specific location in the stream
+     *
+     * @param     $offset
+     * @param int $whence
+     * @return void
+     */
+    public function stream_seek($offset, $whence = SEEK_SET)
+    {
+        switch ($whence) {
+            case SEEK_SET:
+                self::$position = $offset;
+                break;
+            case SEEK_CUR:
+                self::$position += $offset;
+                break;
+            case SEEK_END:
+                self::$position = strlen(self::$output) + $offset;
+                break;
+        }
+    }
+
+    /**
      * Write to the stream.
      *
      * @param  string  $data
@@ -51,7 +119,7 @@ class MockStream
      */
     public function stream_write($data)
     {
-        self::$output->doWrite($data, true);
+        self::$output->doWrite($data, false);
 
         return strlen($data);
     }
