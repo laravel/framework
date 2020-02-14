@@ -351,7 +351,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame('/base/path/bootstrap/cache/services.php', $app->getCachedServicesPath());
         $this->assertSame('/base/path/bootstrap/cache/packages.php', $app->getCachedPackagesPath());
         $this->assertSame('/base/path/bootstrap/cache/config.php', $app->getCachedConfigPath());
-        $this->assertSame('/base/path/bootstrap/cache/routes.php', $app->getCachedRoutesPath());
+        $this->assertSame('/base/path/bootstrap/cache/routes-v7.php', $app->getCachedRoutesPath());
         $this->assertSame('/base/path/bootstrap/cache/events.php', $app->getCachedEventsPath());
     }
 
