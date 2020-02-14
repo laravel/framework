@@ -113,11 +113,12 @@ class Filesystem
      * Get the hash of the file at the given path.
      *
      * @param  string  $path
+     * @param  string|null  $algo
      * @return string
      */
-    public function hash(string $path, string $algo = 'md5'): string
+    public function hash($path, $algo = null)
     {
-        return hash_file($algo, $path);
+        return hash_file($algo ?? 'md5', $path);
     }
 
     /**
@@ -125,13 +126,15 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $hash
-     * @param  string  $algo
+     * @param  string|null  $algo
      * @return bool
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function check(string $path, string $hash, string $algo = 'md5'): bool
+    public function check($path, $hash, $algo = null)
     {
         if ($this->exists($path)) {
-            return hash_file($algo, $path) === $hash;
+            return $this->hash($algo, $path) === $hash;
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}");
