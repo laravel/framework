@@ -225,7 +225,7 @@ class ComponentTagCompiler
         // If the class doesn't exists, we'll assume it's a class-less component
         // and return all attributes as data to the class-less component view.
         if (! class_exists($class)) {
-            return [collect($attributes), collect()];
+            return [collect($attributes), collect($attributes)];
         }
 
         $constructor = (new ReflectionClass($class))->getConstructor();
