@@ -215,7 +215,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertResponseTimeFasterThan($milliseconds = 0)
     {
-        $requestTime = round((REQUEST_END - REQUEST_START) * 1000, 2);
+        $requestTime = round((TEST_REQUEST_END - TEST_REQUEST_START) * 1000, 2);
 
         PHPUnit::assertLessThan($milliseconds, $requestTime, "Response time took longer than {$milliseconds}ms.");
 

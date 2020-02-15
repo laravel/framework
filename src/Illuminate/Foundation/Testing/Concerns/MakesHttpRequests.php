@@ -464,7 +464,7 @@ trait MakesHttpRequests
             $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
 
-        define('REQUEST_START', microtime(true));
+        define('TEST_REQUEST_START', microtime(true));
 
         $response = $kernel->handle(
             $request = Request::createFromBase($symfonyRequest)
@@ -474,7 +474,7 @@ trait MakesHttpRequests
             $response = $this->followRedirects($response);
         }
 
-        define('REQUEST_END', microtime(true));
+        define('TEST_REQUEST_END', microtime(true));
 
         $kernel->terminate($request, $response);
 
