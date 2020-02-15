@@ -31,6 +31,15 @@ class PaginatorTest extends TestCase
         $this->assertEquals($pageInfo, $p->toArray());
     }
 
+    public function testPerPageShouldAlwaysReturnAnInt()
+    {
+        $perPageOptions = [2, '2'];
+        foreach ($perPageOptions as $perPage) {
+            $p = new Paginator($array = ['item3', 'item4', 'item5'], $perPage, 2);
+            $this->assertTrue(is_int($p->toArray()["per_page"]));
+        }
+    }
+
     public function testPaginatorRemovesTrailingSlashes()
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
