@@ -40,6 +40,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     /**
      * Specify which column this foreign ID references on another table.
      *
+     * @param  string|array  $column
      * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function references($column)

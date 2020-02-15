@@ -22,7 +22,7 @@ class FilterEmailValidation implements EmailValidation
     /**
      * Returns the validation error.
      *
-     * @return \Egulias\EmailValidator\Exception\InvalidEmail|null
+     * @return void
      */
     public function getError()
     {

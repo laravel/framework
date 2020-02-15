@@ -218,7 +218,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * Format the given message provider into a MessageBag.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
-     * @return \Illuminate\Support\MessageBag
+     * @return \Illuminate\Contracts\Support\MessageBag
      */
     protected function formatErrors($provider)
     {

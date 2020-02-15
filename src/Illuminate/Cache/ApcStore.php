@@ -37,7 +37,7 @@ class ApcStore extends TaggableStore
      * Retrieve an item from the cache by key.
      *
      * @param  string|array  $key
-     * @return mixed
+     * @return mixed|null will return null on error
      */
     public function get($key)
     {

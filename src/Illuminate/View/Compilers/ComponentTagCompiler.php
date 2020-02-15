@@ -328,6 +328,10 @@ class ComponentTagCompiler
 
     /**
      * Strip any quotes from the given string.
+     *
+     * @param string $value
+     *
+     * @return string
      */
     public function stripQuotes(string $value)
     {

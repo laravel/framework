@@ -266,7 +266,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $field
      * @param  array  $extraConditions
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return void
      */
     public function basic($field = 'email', $extraConditions = [])
     {
@@ -281,7 +281,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        return $this->failedBasicResponse();
+        $this->failedBasicResponse();
     }
 
     /**
@@ -289,14 +289,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $field
      * @param  array  $extraConditions
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return void
      */
     public function onceBasic($field = 'email', $extraConditions = [])
     {
         $credentials = $this->basicCredentials($this->getRequest(), $field);
 
         if (! $this->once(array_merge($credentials, $extraConditions))) {
-            return $this->failedBasicResponse();
+            $this->failedBasicResponse();
         }
     }
 

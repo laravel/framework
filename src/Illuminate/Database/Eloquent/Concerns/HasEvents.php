@@ -353,7 +353,7 @@ trait HasEvents
             static::$dispatcher->forget("eloquent.{$event}: ".static::class);
         }
 
-        foreach (array_values($instance->dispatchesEvents) as $event) {
+        foreach ($instance->dispatchesEvents as $event) {
             static::$dispatcher->forget($event);
         }
     }

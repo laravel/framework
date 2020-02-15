@@ -506,7 +506,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Check the result of a condition.
      *
      * @param  string  $name
-     * @param  array  $parameters
+     * @param  array|mixed  ...$parameters
      * @return bool
      */
     public function check($name, ...$parameters)

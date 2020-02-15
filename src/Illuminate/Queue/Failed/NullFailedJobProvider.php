@@ -11,7 +11,7 @@ class NullFailedJobProvider implements FailedJobProviderInterface
      * @param  string  $queue
      * @param  string  $payload
      * @param  \Throwable  $exception
-     * @return int|null
+     * @return void
      */
     public function log($connection, $queue, $payload, $exception)
     {
@@ -32,7 +32,7 @@ class NullFailedJobProvider implements FailedJobProviderInterface
      * Get a single failed job.
      *
      * @param  mixed  $id
-     * @return object|null
+     * @return void
      */
     public function find($id)
     {

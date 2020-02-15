@@ -119,11 +119,17 @@ class LogManager implements LoggerInterface
                 return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']));
             });
         } catch (Throwable $e) {
-            return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
-                $logger->emergency('Unable to create configured logger. Using emergency logger.', [
-                    'exception' => $e,
-                ]);
-            });
+            return tap(
+                $this->createEmergencyLogger(),
+                /**
+                 * @param \Psr\Log\LoggerInterface $logger
+                 */
+                function ($logger) use ($e) {
+                    $logger->emergency('Unable to create configured logger. Using emergency logger.', [
+                        'exception' => $e,
+                    ]);
+                }
+            );
         }
     }
 
@@ -413,9 +419,20 @@ class LogManager implements LoggerInterface
      */
     protected function formatter()
     {
-        return tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
-            $formatter->includeStacktraces();
-        });
+        return tap(
+            new LineFormatter(
+                null,
+                $this->dateFormat,
+                true,
+                true
+            ),
+            /**
+             * @param LineFormatter $formatter
+             */
+            function ($formatter) {
+                $formatter->includeStacktraces();
+            }
+        );
     }
 
     /**
@@ -477,8 +494,8 @@ class LogManager implements LoggerInterface
     /**
      * Unset the given channel instance.
      *
-     * @param  string|null  $name
-     * @return $this
+     * @param  string|null  $driver
+     * @return void
      */
     public function forgetChannel($driver = null)
     {

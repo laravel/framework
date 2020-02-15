@@ -4,6 +4,9 @@ namespace Illuminate\Contracts\Foundation;
 
 use Illuminate\Contracts\Container\Container;
 
+/**
+ * @property-read array $config
+ */
 interface Application extends Container
 {
     /**

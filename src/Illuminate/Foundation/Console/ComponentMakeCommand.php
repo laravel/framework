@@ -33,7 +33,7 @@ class ComponentMakeCommand extends GeneratorCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return void|false
      */
     public function handle()
     {

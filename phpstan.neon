@@ -1,0 +1,11 @@
+parameters:
+    level: 5
+    checkMissingIterableValueType: false
+    treatPhpDocTypesAsCertain: false
+    paths:
+        - %currentWorkingDirectory%/src/
+    autoload_files:
+        - %currentWorkingDirectory%/vendor/autoload.php
+    ignoreErrors:
+        - '#should return .*\|null but return statement is missing#'
+        - '#Unsafe usage of new static\(\)#'

@@ -145,6 +145,7 @@ class Stringable
     /**
      * Determine if a given string contains a given substring.
      *
+     * @param  mixed         $haystack
      * @param  string|array  $needles
      * @return bool
      */

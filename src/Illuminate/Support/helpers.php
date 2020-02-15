@@ -130,7 +130,7 @@ if (! function_exists('data_get')) {
      * Get an item from an array or object using "dot" notation.
      *
      * @param  mixed  $target
-     * @param  string|array|int  $key
+     * @param  string|array|int|null  $key
      * @param  mixed  $default
      * @return mixed
      */

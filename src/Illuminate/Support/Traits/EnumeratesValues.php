@@ -87,7 +87,7 @@ trait EnumeratesValues
      * Alias for the "avg" method.
      *
      * @param  callable|string|null  $callback
-     * @return mixed
+     * @return int|float|null
      */
     public function average($callback = null)
     {

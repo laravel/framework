@@ -125,7 +125,7 @@ class FoundationHelpersTest extends TestCase
         $app['config'] = m::mock(Repository::class);
         $app['config']->shouldReceive('get')->with('app.mix_url');
 
-        mkdir($directory = __DIR__.'/mix');
+        @mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -138,7 +138,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixManifestDirectoryMissingStartingSlashHasItAdded()
     {
-        mkdir($directory = __DIR__.'/mix');
+        @mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('/mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -173,7 +173,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixHotModuleReloadingGetsUrlFromFileWithManifestDirectoryAndHttps()
     {
-        mkdir($directory = __DIR__.'/mix');
+        @mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('https://laravel.com/docs', 'mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -186,7 +186,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixHotModuleReloadingGetsUrlFromFileWithManifestDirectoryAndHttp()
     {
-        mkdir($directory = __DIR__.'/mix');
+        @mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('http://laravel.com/docs', 'mix');
 
         $result = mix('unversioned.css', 'mix');
@@ -210,7 +210,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixHotModuleReloadingWithManifestDirectoryUsesLocalhostIfNoHttpScheme()
     {
-        mkdir($directory = __DIR__.'/mix');
+        @mkdir($directory = __DIR__.'/mix');
         $path = $this->makeHotModuleReloadFile('', 'mix');
 
         $result = mix('unversioned.css', 'mix');

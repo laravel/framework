@@ -9,6 +9,11 @@ use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use stdClass;
 
+/**
+ * @template TKey of array-key
+ * @template T
+ * @template-implements Enumerable<TKey,T>
+ */
 class LazyCollection implements Enumerable
 {
     use EnumeratesValues, Macroable;
@@ -53,6 +58,8 @@ class LazyCollection implements Enumerable
      * @param  int  $number
      * @param  callable  $callback
      * @return static
+     *
+     * @psalm-return static<TKey,int>
      */
     public static function times($number, callable $callback = null)
     {
@@ -75,6 +82,8 @@ class LazyCollection implements Enumerable
      * @param  int  $from
      * @param  int  $to
      * @return static
+     *
+     * @psalm-return static<TKey,int>
      */
     public static function range($from, $to)
     {
@@ -89,6 +98,8 @@ class LazyCollection implements Enumerable
      * Get all items in the enumerable.
      *
      * @return array
+     *
+     * @psalm-return array<TKey,T>
      */
     public function all()
     {
@@ -96,13 +107,15 @@ class LazyCollection implements Enumerable
             return $this->source;
         }
 
-        return iterator_to_array($this->getIterator());
+        return iterator_to_array($this->getIterator(), true);
     }
 
     /**
      * Eager load all items into a new lazy collection backed by an array.
      *
      * @return static
+     *
+     * @psalm-return static<TKey,T>
      */
     public function eager()
     {
@@ -113,6 +126,8 @@ class LazyCollection implements Enumerable
      * Cache values as they're enumerated.
      *
      * @return static
+     *
+     * @psalm-return static<TKey,T>
      */
     public function remember()
     {
@@ -151,7 +166,7 @@ class LazyCollection implements Enumerable
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback
-     * @return mixed
+     * @return int|float|null
      */
     public function avg($callback = null)
     {

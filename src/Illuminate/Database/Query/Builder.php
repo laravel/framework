@@ -1356,7 +1356,7 @@ class Builder
     /**
      * Add another query builder as a nested where to the query builder.
      *
-     * @param  $this  $query
+     * @param  self  $query
      * @param  string  $boolean
      * @return $this
      */

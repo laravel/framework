@@ -8,6 +8,12 @@ use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
 
+/**
+ * @template TKey of array-key
+ * @template T
+ * @template-implements Enumerable<TKey,T>
+ * @template-implements ArrayAccess<TKey|null,T>
+ */
 class Collection implements ArrayAccess, Enumerable
 {
     use EnumeratesValues, Macroable;
@@ -16,6 +22,7 @@ class Collection implements ArrayAccess, Enumerable
      * The items contained in the collection.
      *
      * @var array
+     * @psalm-var array<TKey,T>
      */
     protected $items = [];
 
@@ -24,6 +31,8 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  mixed  $items
      * @return void
+     *
+     * @psalm-param array<TKey,T>|mixed $items
      */
     public function __construct($items = [])
     {
@@ -36,6 +45,8 @@ class Collection implements ArrayAccess, Enumerable
      * @param  int  $number
      * @param  callable  $callback
      * @return static
+     *
+     * @psalm-return static<TKey,int>
      */
     public static function times($number, callable $callback = null)
     {
@@ -54,6 +65,8 @@ class Collection implements ArrayAccess, Enumerable
      * Get all of the items in the collection.
      *
      * @return array
+     *
+     * @psalm-return array<TKey,T>
      */
     public function all()
     {
@@ -64,6 +77,8 @@ class Collection implements ArrayAccess, Enumerable
      * Get a lazy collection for the items in this collection.
      *
      * @return \Illuminate\Support\LazyCollection
+     *
+     * @psalm-return \Illuminate\Support\LazyCollection<TKey,T>
      */
     public function lazy()
     {
@@ -74,7 +89,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback
-     * @return mixed
+     * @return int|float|null
      */
     public function avg($callback = null)
     {
@@ -86,7 +101,8 @@ class Collection implements ArrayAccess, Enumerable
             return ! is_null($value);
         });
 
-        if ($count = $items->count()) {
+        $count = $items->count();
+        if ($count > 0) {
             return $items->sum() / $count;
         }
     }
@@ -95,7 +111,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get the median of a given key.
      *
      * @param  string|array|null  $key
-     * @return mixed
+     * @return int|float|null
      */
     public function median($key = null)
     {
@@ -126,6 +142,8 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  string|array|null  $key
      * @return array|null
+     *
+     * @psalm-return array<int,TKey>|null
      */
     public function mode($key = null)
     {
@@ -201,6 +219,9 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  mixed  $items
      * @return static
+     *
+     * @psalm-param T $items
+     * @psalm-return static<TKey,T>
      */
     public function diff($items)
     {
@@ -213,6 +234,9 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $items
      * @param  callable  $callback
      * @return static
+     *
+     * @psalm-param T $items
+     * @psalm-return static<TKey,T>
      */
     public function diffUsing($items, callable $callback)
     {
@@ -224,6 +248,9 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  mixed  $items
      * @return static
+     *
+     * @psalm-param T $items
+     * @psalm-return static<TKey,T>
      */
     public function diffAssoc($items)
     {
@@ -236,6 +263,9 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $items
      * @param  callable  $callback
      * @return static
+     *
+     * @psalm-param T $items
+     * @psalm-return static<TKey,T>
      */
     public function diffAssocUsing($items, callable $callback)
     {
@@ -247,6 +277,9 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  mixed  $items
      * @return static
+     *
+     * @psalm-param T $items
+     * @psalm-return static<TKey,T>
      */
     public function diffKeys($items)
     {
@@ -259,6 +292,9 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $items
      * @param  callable  $callback
      * @return static
+     *
+     * @psalm-param T $items
+     * @psalm-return static<TKey,T>
      */
     public function diffKeysUsing($items, callable $callback)
     {
@@ -616,8 +652,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the values of a given key.
      *
-     * @param  string|array  $value
-     * @param  string|null  $key
+     * @param  int|string|array  $value
+     * @param  int|string|null  $key
      * @return static
      */
     public function pluck($value, $key = null)
@@ -1202,6 +1238,8 @@ class Collection implements ArrayAccess, Enumerable
      * Reset the keys on the underlying array.
      *
      * @return static
+     *
+     * @psalm-return static<int,T>
      */
     public function values()
     {
@@ -1216,6 +1254,9 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  mixed ...$items
      * @return static
+     *
+     * @psalm-param T ...$items
+     * @psalm-return static<TKey,T>
      */
     public function zip($items)
     {
@@ -1227,7 +1268,7 @@ class Collection implements ArrayAccess, Enumerable
             return new static(func_get_args());
         }, $this->items], $arrayableItems);
 
-        return new static(call_user_func_array('array_map', $params));
+        return new static(array_map(...$params));
     }
 
     /**
@@ -1236,6 +1277,9 @@ class Collection implements ArrayAccess, Enumerable
      * @param  int  $size
      * @param  mixed  $value
      * @return static
+     *
+     * @psalm-param T $value
+     * @psalm-return static<TKey,T>
      */
     public function pad($size, $value)
     {
@@ -1246,6 +1290,8 @@ class Collection implements ArrayAccess, Enumerable
      * Get an iterator for the items.
      *
      * @return \ArrayIterator
+     *
+     * @psalm-return \ArrayIterator<TKey,T>
      */
     public function getIterator()
     {
@@ -1267,6 +1313,9 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  mixed  $item
      * @return $this
+     *
+     * @psalm-param T $item
+     * @psalm-return $this<TKey,T>
      */
     public function add($item)
     {

@@ -259,7 +259,7 @@ class MailFake implements Mailer, MailQueue
      * Get a mailer instance by name.
      *
      * @param  string|null  $name
-     * @return \Illuminate\Mail\Mailer
+     * @return $this
      */
     public function mailer($name = null)
     {

@@ -24,8 +24,8 @@ class Arr
     /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
-     * @param  array  $array
-     * @param  string  $key
+     * @param  array<int|string, mixed> $array
+     * @param  int|string  $key
      * @param  mixed  $value
      * @return array
      */
@@ -373,8 +373,8 @@ class Arr
      * Pluck an array of values from an array.
      *
      * @param  iterable  $array
-     * @param  string|array  $value
-     * @param  string|array|null  $key
+     * @param  int|string|array  $value
+     * @param  int|string|array|null  $key
      * @return array
      */
     public static function pluck($array, $value, $key = null)
@@ -591,7 +591,7 @@ class Arr
     /**
      * Convert the array into a query string.
      *
-     * @param  array  $array
+     * @param  array<int|string, int|string,null,bool,array>>  $array
      * @return string
      */
     public static function query($array)

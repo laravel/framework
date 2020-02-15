@@ -1157,7 +1157,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return;
         }
 
-        return static::newQueryWithoutScopes()
+        return (new static())->newQueryWithoutScopes()
                         ->with(is_string($with) ? func_get_args() : $with)
                         ->where($this->getKeyName(), $this->getKey())
                         ->first();
@@ -1175,7 +1175,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         }
 
         $this->setRawAttributes(
-            static::newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
+            (new static())->newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
         );
 
         $this->load(collect($this->relations)->reject(function ($relation) {

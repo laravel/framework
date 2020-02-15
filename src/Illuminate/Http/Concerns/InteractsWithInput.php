@@ -8,6 +8,9 @@ use Illuminate\Support\Str;
 use SplFileInfo;
 use stdClass;
 
+/**
+ * @property \Symfony\Component\HttpFoundation\FileBag $files;
+ */
 trait InteractsWithInput
 {
     /**
@@ -231,6 +234,10 @@ trait InteractsWithInput
      * @param  string|null  $key
      * @param  bool  $default
      * @return bool
+     *
+     * @template TInputBoolDefault
+     * @psalm-param TInputBoolDefault $default
+     * @psalm-return bool|TInputBoolDefault
      */
     public function boolean($key = null, $default = false)
     {
@@ -405,7 +412,7 @@ trait InteractsWithInput
      * Retrieve a parameter item from a given source.
      *
      * @param  string  $source
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */

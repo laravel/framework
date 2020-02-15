@@ -37,7 +37,7 @@ abstract class Facade
             $callback(static::getFacadeRoot());
         }
 
-        static::$app->afterResolving($accessor, function ($service) use ($callback) {
+        static::$app->afterResolving($accessor, static function ($service) use ($callback) {
             $callback($service);
         });
     }
@@ -52,7 +52,7 @@ abstract class Facade
         if (! static::isMock()) {
             $class = static::getMockableClass();
 
-            return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+            return tap($class ? Mockery::spy($class) : Mockery::spy(), static function ($spy) {
                 static::swap($spy);
             });
         }
@@ -97,11 +97,17 @@ abstract class Facade
      */
     protected static function createFreshMockInstance()
     {
-        return tap(static::createMock(), function ($mock) {
-            static::swap($mock);
+        return tap(
+            static::createMock(),
+            /**
+             * @param \Mockery\MockInterface $mock
+             */
+            static function ($mock) {
+                static::swap($mock);
 
-            $mock->shouldAllowMockingProtectedMethods();
-        });
+                $mock->shouldAllowMockingProtectedMethods();
+            }
+        );
     }
 
     /**

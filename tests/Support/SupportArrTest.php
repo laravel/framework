@@ -27,11 +27,14 @@ class SupportArrTest extends TestCase
 
     public function testAdd()
     {
-        $array = Arr::add(['name' => 'Desk'], 'price', 100);
-        $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
+        $array = Arr::add(['foo' => 'bar'], 1, 99);
+        $this->assertSame(['foo' => 'bar', 1 => 99], $array);
 
-        $this->assertEquals(['surname' => 'Mövsümov'], Arr::add([], 'surname', 'Mövsümov'));
-        $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
+        $array = Arr::add(['name' => 'Desk'], 'price', 100);
+        $this->assertSame(['name' => 'Desk', 'price' => 100], $array);
+
+        $this->assertSame(['surname' => 'Mövsümov'], Arr::add([], 'surname', 'Mövsümov'));
+        $this->assertSame(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
     }
 
     public function testCollapse()

@@ -429,7 +429,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  string  $rule
-     * @return void
+     * @return void|null
      */
     protected function validateAttribute($attribute, $rule)
     {
@@ -457,7 +457,9 @@ class Validator implements ValidatorContract
         if ($value instanceof UploadedFile && ! $value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
         ) {
-            return $this->addFailure($attribute, 'uploaded', []);
+            $this->addFailure($attribute, 'uploaded', []);
+
+            return;
         }
 
         // If we have made it this far we will make sure the attribute is validatable and if it is
@@ -466,9 +468,11 @@ class Validator implements ValidatorContract
         $validatable = $this->isValidatable($rule, $attribute, $value);
 
         if ($rule instanceof RuleContract) {
-            return $validatable
+             $validatable
                     ? $this->validateUsingCustomRule($attribute, $value, $rule)
                     : null;
+
+            return;
         }
 
         $method = "validate{$rule}";
@@ -706,7 +710,9 @@ class Validator implements ValidatorContract
         $attribute = str_replace('__asterisk__', '*', $attribute);
 
         if (in_array($rule, $this->excludeRules)) {
-            return $this->excludeAttribute($attribute);
+            $this->excludeAttribute($attribute);
+
+            return;
         }
 
         $this->messages->add($attribute, $this->makeReplacements(
@@ -991,7 +997,7 @@ class Validator implements ValidatorContract
         if ($extensions) {
             $keys = array_map([Str::class, 'snake'], array_keys($extensions));
 
-            $extensions = array_combine($keys, array_values($extensions));
+            $extensions = array_combine($keys, $extensions);
         }
 
         $this->extensions = array_merge($this->extensions, $extensions);
@@ -1078,7 +1084,7 @@ class Validator implements ValidatorContract
         if ($replacers) {
             $keys = array_map([Str::class, 'snake'], array_keys($replacers));
 
-            $replacers = array_combine($keys, array_values($replacers));
+            $replacers = array_combine($keys, $replacers);
         }
 
         $this->replacers = array_merge($this->replacers, $replacers);
@@ -1211,9 +1217,15 @@ class Validator implements ValidatorContract
      */
     public function getPresenceVerifierFor($connection)
     {
-        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
-            $verifier->setConnection($connection);
-        });
+        return tap(
+            $this->getPresenceVerifier(),
+            /**
+             * @param \Illuminate\Validation\PresenceVerifierInterface $verifier
+             */
+            function ($verifier) use ($connection) {
+                $verifier->setConnection($connection);
+            }
+        );
     }
 
     /**

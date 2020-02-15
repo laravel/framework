@@ -108,7 +108,7 @@ trait ResponseTrait
     public function withCookie($cookie)
     {
         if (is_string($cookie) && function_exists('cookie')) {
-            $cookie = call_user_func_array('cookie', func_get_args());
+            $cookie = cookie(...func_get_args());
         }
 
         $this->headers->setCookie($cookie);

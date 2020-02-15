@@ -8,6 +8,11 @@ use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
 use JsonSerializable;
 
+/**
+ * @template TKey of array-key
+ * @template T
+ * @template-extends IteratorAggregate<TKey,T>
+ */
 interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
     /**

@@ -575,7 +575,7 @@ trait ValidatesAttributes
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
-        return ! in_array($value, array_values($data));
+        return ! in_array($value, $data);
     }
 
     /**
@@ -694,7 +694,7 @@ trait ValidatesAttributes
         $verifier = $this->getPresenceVerifierFor($connection);
 
         $extra = $this->getExtraConditions(
-            array_values(array_slice($parameters, 2))
+            array_slice($parameters, 2)
         );
 
         if ($this->currentRule instanceof Exists) {

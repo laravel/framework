@@ -15,6 +15,8 @@ abstract class ServiceProvider
      * The application instance.
      *
      * @var \Illuminate\Contracts\Foundation\Application
+     *
+     * @psalm-var \Illuminate\Contracts\Foundation\Application|iterable<\Illuminate\Contracts\Foundation\Application>
      */
     protected $app;
 
@@ -91,18 +93,23 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        $this->callAfterResolving('view', function ($view) use ($path, $namespace) {
-            if (isset($this->app->config['view']['paths']) &&
-                is_array($this->app->config['view']['paths'])) {
-                foreach ($this->app->config['view']['paths'] as $viewPath) {
-                    if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
-                        $view->addNamespace($namespace, $appPath);
+        $this->callAfterResolving(
+            'view',
+            function ($view) use ($path, $namespace) {
+                assert($view instanceof \Illuminate\Contracts\View\Factory);
+
+                if (isset($this->app->config['view']['paths']) &&
+                    is_array($this->app->config['view']['paths'])) {
+                    foreach ($this->app->config['view']['paths'] as $viewPath) {
+                        if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
+                            $view->addNamespace($namespace, $appPath);
+                        }
                     }
                 }
-            }
 
-            $view->addNamespace($namespace, $path);
-        });
+                $view->addNamespace($namespace, $path);
+            }
+        );
     }
 
     /**
@@ -114,11 +121,17 @@ abstract class ServiceProvider
      */
     protected function loadViewComponentsAs($prefix, array $components)
     {
-        $this->callAfterResolving(BladeCompiler::class, function ($blade) use ($prefix, $components) {
-            foreach ($components as $component) {
-                $blade->component($component, null, $prefix);
+        $this->callAfterResolving(
+            BladeCompiler::class,
+            /**
+             * @param \Illuminate\View\Compilers\BladeCompiler $blade
+             */
+            static function ($blade) use ($prefix, $components) {
+                foreach ($components as $component) {
+                    $blade->component($component, null, $prefix);
+                }
             }
-        });
+        );
     }
 
     /**
@@ -130,9 +143,13 @@ abstract class ServiceProvider
      */
     protected function loadTranslationsFrom($path, $namespace)
     {
-        $this->callAfterResolving('translator', function ($translator) use ($path, $namespace) {
-            $translator->addNamespace($namespace, $path);
-        });
+        $this->callAfterResolving(
+            'translator',
+            static function ($translator) use ($path, $namespace) {
+                assert($translator instanceof \Illuminate\Contracts\Translation\Translator);
+                $translator->addNamespace($namespace, $path);
+            }
+        );
     }
 
     /**
@@ -143,9 +160,15 @@ abstract class ServiceProvider
      */
     protected function loadJsonTranslationsFrom($path)
     {
-        $this->callAfterResolving('translator', function ($translator) use ($path) {
-            $translator->addJsonPath($path);
-        });
+        $this->callAfterResolving(
+            'translator',
+            /**
+             * @param \Illuminate\Contracts\Translation\Translator $translator
+             */
+            static function ($translator) use ($path) {
+                $translator->addJsonPath($path);
+            }
+        );
     }
 
     /**
@@ -156,11 +179,17 @@ abstract class ServiceProvider
      */
     protected function loadMigrationsFrom($paths)
     {
-        $this->callAfterResolving('migrator', function ($migrator) use ($paths) {
-            foreach ((array) $paths as $path) {
-                $migrator->path($path);
+        $this->callAfterResolving(
+            'migrator',
+            /**
+             * @param \Illuminate\Database\Migrations\Migrator $migrator
+             */
+            static function ($migrator) use ($paths) {
+                foreach ((array) $paths as $path) {
+                    $migrator->path($path);
+                }
             }
-        });
+        );
     }
 
     /**
@@ -171,11 +200,17 @@ abstract class ServiceProvider
      */
     protected function loadFactoriesFrom($paths)
     {
-        $this->callAfterResolving(ModelFactory::class, function ($factory) use ($paths) {
-            foreach ((array) $paths as $path) {
-                $factory->load($path);
+        $this->callAfterResolving(
+            ModelFactory::class,
+            /**
+             * @param \Illuminate\Database\Eloquent\Factory $factory
+             */
+            static function ($factory) use ($paths) {
+                foreach ((array) $paths as $path) {
+                    $factory->load($path);
+                }
             }
-        });
+            );
     }
 
     /**
@@ -256,7 +291,8 @@ abstract class ServiceProvider
             return $paths;
         }
 
-        return collect(static::$publishes)->reduce(function ($paths, $p) {
+        return collect(static::$publishes)->reduce(
+            static function ($paths, $p) {
             return array_merge($paths, $p);
         }, []);
     }
@@ -327,9 +363,12 @@ abstract class ServiceProvider
     {
         $commands = is_array($commands) ? $commands : func_get_args();
 
-        Artisan::starting(function ($artisan) use ($commands) {
-            $artisan->resolveCommands($commands);
-        });
+        Artisan::starting(
+            static function ($artisan) use ($commands) {
+                assert($artisan instanceof \Illuminate\Contracts\Console\Application);
+                $artisan->resolveCommands($commands);
+            }
+        );
     }
 
     /**

@@ -41,8 +41,7 @@ class ComponentAttributeBag implements ArrayAccess
     /**
      * Get a given attribute from the attribute array.
      *
-     * @param  array|string  $key
-     * @param  mixed  $default
+     * @param  array|string|null  $keys
      * @return static
      */
     public function only($keys)
@@ -61,7 +60,7 @@ class ComponentAttributeBag implements ArrayAccess
     /**
      * Merge additional attributes / values into the attribute bag.
      *
-     * @param  array  $attributes
+     * @param  array  $attributeDefaults
      * @return static
      */
     public function merge(array $attributeDefaults = [])
@@ -94,7 +93,7 @@ class ComponentAttributeBag implements ArrayAccess
     /**
      * Merge additional attributes / values into the attribute bag.
      *
-     * @param  array  $attributes
+     * @param  array  $attributeDefaults
      * @return \Illuminate\Support\HtmlString
      */
     public function __invoke(array $attributeDefaults = [])

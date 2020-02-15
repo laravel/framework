@@ -442,7 +442,7 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Remove all items from the cache.
      *
-     * @return bool
+     * @return void
      *
      * @throws \RuntimeException
      */

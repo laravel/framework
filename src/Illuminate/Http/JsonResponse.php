@@ -99,7 +99,24 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
-     * {@inheritdoc}
+     * Sets options used while encoding data to JSON.
+     *
+     * @param int $options [optional] <p>
+     * Bitmask consisting of <b>JSON_HEX_QUOT</b>,
+     * <b>JSON_HEX_TAG</b>,
+     * <b>JSON_HEX_AMP</b>,
+     * <b>JSON_HEX_APOS</b>,
+     * <b>JSON_NUMERIC_CHECK</b>,
+     * <b>JSON_PRETTY_PRINT</b>,
+     * <b>JSON_UNESCAPED_SLASHES</b>,
+     * <b>JSON_FORCE_OBJECT</b>,
+     * <b>JSON_UNESCAPED_UNICODE</b>.
+     * <b>JSON_THROW_ON_ERROR</b> The behaviour of these
+     * constants is described on
+     * the JSON constants page.
+     * </p>
+     *
+     * @return $this
      */
     public function setEncodingOptions($options)
     {
