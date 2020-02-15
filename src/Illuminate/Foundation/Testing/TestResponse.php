@@ -208,6 +208,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response time is less than expected time.
+     *
+     * @param  int|float  $milliseconds
+     * @return $this
+     */
+    public function assertResponseTimeFasterThan($milliseconds = 0)
+    {
+        $requestTime = round((REQUEST_END - REQUEST_START) * 1000, 2);
+
+        PHPUnit::assertLessThan($milliseconds, $requestTime, "Response time took longer than {$milliseconds}ms.");
+
+        return $this;
+    }
+
+    /**
      * Asserts that the response contains the given header and equals the optional value.
      *
      * @param  string  $headerName
