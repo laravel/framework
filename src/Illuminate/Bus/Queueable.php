@@ -2,6 +2,9 @@
 
 namespace Illuminate\Bus;
 
+use Closure;
+use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 
 trait Queueable
@@ -142,7 +145,9 @@ trait Queueable
     public function chain($chain)
     {
         $this->chained = collect($chain)->map(function ($job) {
-            return serialize($job);
+            return $job instanceof Closure
+                        ? new CallQueuedClosure(new SerializableClosure($job))
+                        : $job;
         })->all();
 
         return $this;
@@ -156,7 +161,7 @@ trait Queueable
     public function dispatchNextJobInChain()
     {
         if (! empty($this->chained)) {
-            dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
+            dispatch(tap(array_shift($this->chained), function ($next) {
                 $next->chained = $this->chained;
 
                 $next->onConnection($next->connection ?: $this->chainConnection);
