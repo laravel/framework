@@ -39,6 +39,9 @@ class TestResponse implements ArrayAccess
      */
     protected $streamedContent;
 
+    protected $responseTimeStart;
+    protected $responseTimeEnd;
+
     /**
      * Create a new test response instance.
      *
@@ -203,6 +206,21 @@ class TestResponse implements ArrayAccess
         if (! is_null($uri)) {
             $this->assertLocation($uri);
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response time is less than expected time.
+     *
+     * @param  int|float  $milliseconds
+     * @return $this
+     */
+    public function assertResponseTimeFasterThan($milliseconds = 0)
+    {
+        $requestTime = round(($this->responseTimeEnd - $this->responseTimeStart) * 1000, 2);
+
+        PHPUnit::assertLessThan($milliseconds, $requestTime, "Response time took longer than {$milliseconds}ms.");
 
         return $this;
     }
@@ -1181,6 +1199,21 @@ class TestResponse implements ArrayAccess
         } else {
             dump($this->session()->all());
         }
+
+        return $this;
+    }
+
+    /**
+     * Set response times.
+     *
+     * @param  float  $start
+     * @param  float  $end
+     * @return $this
+     */
+    public function setResponseTimes($start, $end)
+    {
+        $this->responseTimeStart = $start;
+        $this->responseTimeEnd = $end;
 
         return $this;
     }

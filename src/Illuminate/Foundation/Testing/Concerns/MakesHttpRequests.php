@@ -464,6 +464,8 @@ trait MakesHttpRequests
             $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
 
+        $responseTimeStart = microtime(true);
+
         $response = $kernel->handle(
             $request = Request::createFromBase($symfonyRequest)
         );
@@ -472,9 +474,12 @@ trait MakesHttpRequests
             $response = $this->followRedirects($response);
         }
 
+        $responseTimeEnd = microtime(true);
+
         $kernel->terminate($request, $response);
 
-        return $this->createTestResponse($response);
+        return $this->createTestResponse($response)
+            ->setResponseTimes($responseTimeStart, $responseTimeEnd);
     }
 
     /**
