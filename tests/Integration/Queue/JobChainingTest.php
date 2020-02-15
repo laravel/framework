@@ -59,7 +59,7 @@ class JobChainingTest extends TestCase
 
     public function testJobsCanBeChainedOnSuccessUsingBusFacade()
     {
-        Bus::chain([
+        Bus::dispatchChain([
             new JobChainingTestFirstJob(),
             new JobChainingTestSecondJob(),
         ]);
@@ -70,7 +70,7 @@ class JobChainingTest extends TestCase
 
     public function testJobsCanBeChainedOnSuccessUsingBusFacadeAsArguments()
     {
-        Bus::chain(
+        Bus::dispatchChain(
             new JobChainingTestFirstJob(),
             new JobChainingTestSecondJob()
         );

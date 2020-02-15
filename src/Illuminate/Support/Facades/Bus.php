@@ -35,12 +35,12 @@ class Bus extends Facade
     }
 
     /**
-     * Chain the given jobs.
+     * Dispatch the given chain of jobs.
      *
      * @param  array|mixed  $jobs
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
-    public static function chain($jobs)
+    public static function dispatchChain($jobs)
     {
         $jobs = is_array($jobs) ? $jobs : func_get_args();
 
