@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
 use Mockery;
@@ -42,6 +43,14 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$component->withAttributes([]); ?>@endcomponentClass", trim($result));
     }
 
+    public function testColonStartingNestedComponentParsing()
+    {
+        $result = (new ComponentTagCompiler(['foo:alert' => TestAlertComponent::class]))->compileTags('<x:foo:alert></x-foo:alert>');
+
+        $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+<?php \$component->withAttributes([]); ?>@endcomponentClass", trim($result));
+    }
+
     public function testSelfClosingComponentsCanBeCompiled()
     {
         $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<div><x-alert/></div>');
@@ -72,7 +81,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $app->shouldReceive('getNamespace')->andReturn('App\\');
         Container::setInstance($container);
 
-        $result = (new ComponentTagCompiler([]))->guessClassName('base:alert');
+        $result = (new ComponentTagCompiler([]))->guessClassName('base.alert');
 
         $this->assertEquals("App\View\Components\Base\Alert", trim($result));
 
@@ -113,6 +122,22 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes([]); ?>
+@endcomponentClass", trim($result));
+    }
+
+    public function testClasslessComponents()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $container->instance(Factory::class, $factory = Mockery::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $factory->shouldReceive('exists')->andReturn(true);
+        Container::setInstance($container);
+
+        $result = (new ComponentTagCompiler([]))->compileTags('<x-anonymous-component name="Taylor" :age="31" wire:model="foo" />');
+
+        $this->assertEquals("@component('Illuminate\View\AnonymousComponent', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php \$component->withAttributes(['name' => 'Taylor','age' => 31,'wire:model' => 'foo']); ?>
 @endcomponentClass", trim($result));
     }
 }

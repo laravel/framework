@@ -4,7 +4,9 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Str;
+use Illuminate\View\AnonymousComponent;
 use InvalidArgumentException;
 use ReflectionClass;
 
@@ -71,7 +73,7 @@ class ComponentTagCompiler
         $pattern = "/
             <
                 \s*
-                x-([\w\-\:]*)
+                x[-\:]([\w\-\:\.]*)
                 (?<attributes>
                     (?:
                         \s+
@@ -111,7 +113,7 @@ class ComponentTagCompiler
         $pattern = "/
             <
                 \s*
-                x-([\w\-\:]*)
+                x[-\:]([\w\-\:\.]*)
                 \s*
                 (?<attributes>
                     (?:
@@ -153,7 +155,21 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        return " @component('{$class}', [".$this->attributesToString($data->all()).'])
+        // If the component doesn't exists as a class we'll assume it's a class-less
+        // component and pass the component as a view parameter to the data so it
+        // can be accessed within the component and we can render out the view.
+        if (! class_exists($class)) {
+            $parameters = [
+                'view' => "'$class'",
+                'data' => '['.$this->attributesToString($data->all()).']',
+            ];
+
+            $class = AnonymousComponent::class;
+        } else {
+            $parameters = $data->all();
+        }
+
+        return " @component('{$class}', [".$this->attributesToString($parameters).'])
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
     }
 
@@ -169,11 +185,18 @@ class ComponentTagCompiler
             return $this->aliases[$component];
         }
 
-        if (! class_exists($class = $this->guessClassName($component))) {
-            throw new InvalidArgumentException("Unable to locate class for component [{$component}].");
+        if (class_exists($class = $this->guessClassName($component))) {
+            return $class;
         }
 
-        return $class;
+        if (Container::getInstance()->make(Factory::class)
+                    ->exists($view = "components.{$component}")) {
+            return $view;
+        }
+
+        throw new InvalidArgumentException(
+            "Unable to locate a class or view for component [{$component}]."
+        );
     }
 
     /**
@@ -190,7 +213,7 @@ class ComponentTagCompiler
 
         $componentPieces = array_map(function ($componentPiece) {
             return ucfirst(Str::camel($componentPiece));
-        }, explode(':', $component));
+        }, explode('.', $component));
 
         return $namespace.'View\\Components\\'.implode('\\', $componentPieces);
     }
@@ -204,6 +227,13 @@ class ComponentTagCompiler
      */
     protected function partitionDataAndAttributes($class, array $attributes)
     {
+        // If the class doesn't exists, we'll assume it's a class-less component and
+        // return all of the attributes as both data and attributes since we have
+        // now way to partition them. The user can exclude attributes manually.
+        if (! class_exists($class)) {
+            return [collect($attributes), collect($attributes)];
+        }
+
         $constructor = (new ReflectionClass($class))->getConstructor();
 
         $parameterNames = $constructor
@@ -223,7 +253,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x-[\w\-\:]*\s*>/", '@endcomponentClass', $value);
+        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", '@endcomponentClass', $value);
     }
 
     /**

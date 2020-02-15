@@ -151,7 +151,7 @@ class Str
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public static function contains($haystack, $needles)
@@ -169,7 +169,7 @@ class Str
      * Determine if a given string contains all array values.
      *
      * @param  string  $haystack
-     * @param  array  $needles
+     * @param  string[]  $needles
      * @return bool
      */
     public static function containsAll($haystack, array $needles)
@@ -187,7 +187,7 @@ class Str
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public static function endsWith($haystack, $needles)
@@ -354,11 +354,11 @@ class Str
     }
 
     /**
-     * Parse a Class@method style callback into class and method.
+     * Parse a Class[@]method style callback into class and method.
      *
      * @param  string  $callback
      * @param  string|null  $default
-     * @return array
+     * @return array<int, string|null>
      */
     public static function parseCallback($callback, $default = null)
     {
@@ -418,7 +418,7 @@ class Str
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
-     * @param  array  $replace
+     * @param  array<int|string, string>  $replace
      * @param  string  $subject
      * @return string
      */
@@ -534,23 +534,9 @@ class Str
      */
     public static function slug($title, $separator = '-', $language = 'en')
     {
-        $title = $language ? static::ascii($title, $language) : $title;
+        $language = $language ?? '';
 
-        // Convert all dashes/underscores into separator
-        $flip = $separator === '-' ? '_' : '-';
-
-        $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
-
-        // Replace @ with the word 'at'
-        $title = str_replace('@', $separator.'at'.$separator, $title);
-
-        // Remove all characters that are not the separator, letters, numbers, or whitespace.
-        $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', static::lower($title));
-
-        // Replace all separator characters and whitespace by a single separator
-        $title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
-
-        return trim($title, $separator);
+        return ASCII::to_slugify($title, $separator, $language, [], true);
     }
 
     /**
@@ -581,7 +567,7 @@ class Str
      * Determine if a given string starts with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public static function startsWith($haystack, $needles)

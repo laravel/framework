@@ -46,6 +46,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $conditions = [];
 
     /**
+     * All of the registered precompilers.
+     *
+     * @var array
+     */
+    protected $precompilers = [];
+
+    /**
      * The file currently being compiled.
      *
      * @var string
@@ -208,9 +215,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         [$this->footer, $result] = [[], ''];
 
+        // First we will compile the Blade component tags. This is a precompile style
+        // step which compiles the component Blade tags into @component directives
+        // that may be used by Blade. Then we should call any other precompilers.
         $value = $this->compileComponentTags(
             $this->storeUncompiledBlocks($value)
         );
+
+        foreach ($this->precompilers as $precompiler) {
+            $value = call_user_func($precompiler, $value);
+        }
 
         // Here we will loop through all of the tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
@@ -645,6 +659,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getCustomDirectives()
     {
         return $this->customDirectives;
+    }
+
+    /**
+     * Register a new precompiler.
+     *
+     * @param  callable  $precompiler
+     * @return void
+     */
+    public function precompiler(callable $precompiler)
+    {
+        $this->precompilers[] = $precompiler;
     }
 
     /**

@@ -3,10 +3,13 @@
 namespace Illuminate\View;
 
 use ArrayAccess;
+use ArrayIterator;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use IteratorAggregate;
 
-class ComponentAttributeBag implements ArrayAccess
+class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 {
     /**
      * The raw array of attributes.
@@ -39,9 +42,9 @@ class ComponentAttributeBag implements ArrayAccess
     }
 
     /**
-     * Get a given attribute from the attribute array.
+     * Only include the given attribute from the attribute array.
      *
-     * @param  array|string|null  $keys
+     * @param  mixed|array  $keys
      * @return static
      */
     public function only($keys)
@@ -58,6 +61,25 @@ class ComponentAttributeBag implements ArrayAccess
     }
 
     /**
+     * Exclude the given attribute from the attribute array.
+     *
+     * @param  mixed|array  $keys
+     * @return static
+     */
+    public function except($keys)
+    {
+        if (is_null($keys)) {
+            $values = $this->attributes;
+        } else {
+            $keys = Arr::wrap($keys);
+
+            $values = Arr::except($this->attributes, $keys);
+        }
+
+        return new static($values);
+    }
+
+    /**
      * Merge additional attributes / values into the attribute bag.
      *
      * @param  array  $attributeDefaults
@@ -65,18 +87,27 @@ class ComponentAttributeBag implements ArrayAccess
      */
     public function merge(array $attributeDefaults = [])
     {
-        return new static(
-            array_merge($attributeDefaults, collect($this->attributes)->map(function ($value, $key) use ($attributeDefaults) {
-                if ($value === true) {
-                    return $key;
-                }
+        $attributes = [];
 
-                return collect([$attributeDefaults[$key] ?? '', $value])
-                                ->filter()
-                                ->unique()
-                                ->join(' ');
-            })->filter()->all())
-        );
+        foreach ($this->attributes as $key => $value) {
+            if ($value === true) {
+                $attributes[$key] = $key;
+
+                continue;
+            }
+
+            if ($key !== 'class') {
+                $attributes[$key] = $attributeDefaults[$key] ?? $value;
+
+                continue;
+            }
+
+            $attributes[$key] = implode(' ', array_unique(
+                array_filter([$attributeDefaults[$key] ?? '', $value])
+            ));
+        }
+
+        return new static(array_merge($attributeDefaults, array_filter($attributes)));
     }
 
     /**
@@ -88,6 +119,16 @@ class ComponentAttributeBag implements ArrayAccess
     public function setAttributes(array $attributes)
     {
         $this->attributes = $attributes;
+    }
+
+    /**
+     * Get content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return (string) $this;
     }
 
     /**
@@ -147,16 +188,30 @@ class ComponentAttributeBag implements ArrayAccess
     }
 
     /**
+     * Get an iterator for the items.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->attributes);
+    }
+
+    /**
      * Implode the attributes into a single HTML ready string.
      *
      * @return string
      */
     public function __toString()
     {
-        return collect($this->attributes)->map(function ($value, $key) {
-            return $value === true
-                    ? $key
-                    : $key.'="'.str_replace('"', '\\"', trim($value)).'"';
-        })->implode(' ');
+        $string = '';
+
+        foreach ($this->attributes as $key => $value) {
+            $string .= $value === true
+                    ? ' '.$key
+                    : ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+        }
+
+        return trim($string);
     }
 }

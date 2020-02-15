@@ -36,7 +36,7 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/job.queued.stub' => $stubsPath.'/job.queued.stub',
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
-            __DIR__.'/stubs/model.pivot.stub' => $stubsPath.'stubs/model.pivot.stub',
+            __DIR__.'/stubs/model.pivot.stub' => $stubsPath.'/model.pivot.stub',
             __DIR__.'/stubs/model.stub' => $stubsPath.'/model.stub',
             __DIR__.'/stubs/test.stub' => $stubsPath.'/test.stub',
             __DIR__.'/stubs/test.unit.stub' => $stubsPath.'/test.unit.stub',

@@ -143,7 +143,7 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
             return (array) $other;
         }
     }
-} elseif (class_exists(Version::class) && (int) Version::series()[0] >= 8) {
+} else {
     /**
      * @internal This class is not meant to be used or overwritten outside the framework itself.
      */
