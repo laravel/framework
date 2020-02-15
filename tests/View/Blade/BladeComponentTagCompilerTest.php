@@ -18,8 +18,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testSlotsCanBeCompiled()
     {
-        $result = (new ComponentTagCompiler)->compileSlots('<slot name="foo">
-</slot>');
+        $result = (new ComponentTagCompiler)->compileSlots('<x-slot name="foo">
+</x-slot>');
 
         $this->assertEquals("@slot('foo') \n @endslot", trim($result));
     }
