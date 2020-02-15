@@ -2551,6 +2551,23 @@ class DatabaseQueryBuilderTest extends TestCase
         ]);
     }
 
+    public function testSQLiteUpdateWrappingNestedJsonArray()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "group_id" = 45, "created_at" = ?, "options" = json_patch(ifnull("options", json(\'{}\')), json(?))', [
+                new DateTime('2019-08-06'),
+                json_encode(['name' => 'Taylor', 'security' => ['2fa' => false, 'presets' => ['laravel', 'vue']]]),
+            ]);
+
+        $builder->from('users')->update([
+            'options->name' => 'Taylor',
+            'options->security' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
+            'group_id' => new Raw('45'),
+            'created_at' => new DateTime('2019-08-06'),
+        ]);
+    }
+
     public function testMySqlWrappingJsonWithString()
     {
         $builder = $this->getMySqlBuilder();
