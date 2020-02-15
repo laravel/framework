@@ -35,6 +35,14 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 @endcomponentClass</div>", trim($result));
     }
 
+    public function testDataCamelCasing()
+    {
+        $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile user-id="1"></x-profile>');
+
+        $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestProfileComponent', ['userId' => '1'])
+<?php \$component->withAttributes([]); ?>@endcomponentClass", trim($result));
+    }
+
     public function testColonNestedComponentParsing()
     {
         $result = (new ComponentTagCompiler(['foo:alert' => TestAlertComponent::class]))->compileTags('<x-foo:alert></x-foo:alert>');
@@ -146,7 +154,7 @@ class TestAlertComponent extends Component
 {
     public $title;
 
-    public function __construct($title = 'foo')
+    public function __construct($title = 'foo', $userId = 1)
     {
         $this->title = $title;
     }
@@ -154,5 +162,20 @@ class TestAlertComponent extends Component
     public function render()
     {
         return 'alert';
+    }
+}
+
+class TestProfileComponent extends Component
+{
+    public $userId;
+
+    public function __construct($userId = 'foo')
+    {
+        $this->userId = $userId;
+    }
+
+    public function render()
+    {
+        return 'profile';
     }
 }

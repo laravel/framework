@@ -7,6 +7,7 @@ use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use IteratorAggregate;
 
 class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
@@ -77,6 +78,24 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         }
 
         return new static($values);
+    }
+
+    /**
+     * Exclude the given attribute from the attribute array.
+     *
+     * @param  mixed|array  $keys
+     * @return static
+     */
+    public function exceptProps($keys)
+    {
+        $props = [];
+
+        foreach ($keys as $key) {
+            $props[] = $key;
+            $props[] = Str::kebab($key);
+        }
+
+        return $this->except($props);
     }
 
     /**

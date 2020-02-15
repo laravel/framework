@@ -155,6 +155,10 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
+        $data = $data->mapWithKeys(function ($value, $key) {
+            return [Str::camel($key) => $value];
+        });
+
         // If the component doesn't exists as a class we'll assume it's a class-less
         // component and pass the component as a view parameter to the data so it
         // can be accessed within the component and we can render out the view.
@@ -241,7 +245,7 @@ class ComponentTagCompiler
                     : [];
 
         return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
-            return in_array($key, $parameterNames);
+            return in_array(Str::camel($key), $parameterNames);
         });
     }
 
