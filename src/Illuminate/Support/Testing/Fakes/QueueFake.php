@@ -145,7 +145,7 @@ class QueueFake extends QueueManager implements Queue
     {
         $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
             return collect($chain)->map(function ($job) {
-                return get_class(unserialize($job));
+                return get_class($job);
             });
         })->filter(function ($chain) use ($expectedChain) {
             return $chain->all() === $expectedChain;
