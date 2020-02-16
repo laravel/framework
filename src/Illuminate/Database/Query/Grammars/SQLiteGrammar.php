@@ -200,19 +200,17 @@ class SQLiteGrammar extends Grammar
      */
     protected function compileUpdateColumns(Builder $query, array $values)
     {
-        $groups = collect($this->groupJsonColumnsForUpdate($values))->map(function ($value, $key) {
-            $column = last(explode('.', $key));
-
-            return $this->wrap($column).' = '.$this->compileJsonPatch($column, $value);
-        });
+        $groups = $this->groupJsonColumnsForUpdate($values);
 
         return collect($values)->reject(function ($value, $key) {
             return $this->isJsonSelector($key);
-        })->map(function ($value, $key) {
+        })->merge($groups)->map(function ($value, $key) use ($groups) {
             $column = last(explode('.', $key));
 
-            return $this->wrap($column).' = '.$this->parameter($value);
-        })->merge($groups)->implode(', ');
+            $updateSql = isset($groups[$key]) ? $this->compileJsonPatch($column, $value) : $this->parameter($value);
+
+            return $this->wrap($column).' = '.$updateSql;
+        })->implode(', ');
     }
 
     /**

@@ -2557,13 +2557,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('update')
             ->with('update "users" set "group_id" = 45, "created_at" = ?, "options" = json_patch(ifnull("options", json(\'{}\')), json(?))', [
                 new DateTime('2019-08-06'),
-                json_encode(['name' => 'Taylor', 'security' => ['2fa' => false, 'presets' => ['laravel', 'vue']]]),
+                json_encode(['name' => 'Taylor', 'security' => ['2fa' => false, 'presets' => ['laravel', 'vue']], 'sharing' => ['twitter' => 'username']]),
             ]);
 
         $builder->from('users')->update([
             'options->name' => 'Taylor',
-            'options->security' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
             'group_id' => new Raw('45'),
+            'options->security' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
+            'options->sharing->twitter' => 'username',
             'created_at' => new DateTime('2019-08-06'),
         ]);
     }
