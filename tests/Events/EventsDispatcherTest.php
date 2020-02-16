@@ -416,6 +416,27 @@ class EventsDispatcherTest extends TestCase
 
         $this->assertFalse($d->shouldBroadcast([$event]));
     }
+
+    public function testEventSubscribers()
+    {
+        $d = new Dispatcher($container = m::mock(Container::class));
+        $subs = m::mock(ExampleSubscriber::class);
+        $subs->shouldReceive('subscribe')->once()->with($d);
+        $container->shouldReceive('make')->once()->with(ExampleSubscriber::class)->andReturn($subs);
+
+        $d->subscribe(ExampleSubscriber::class);
+        $this->assertTrue(true);
+    }
+
+    public function testEventSubscribeCanAcceptObject()
+    {
+        $d = new Dispatcher();
+        $subs = m::mock(ExampleSubscriber::class);
+        $subs->shouldReceive('subscribe')->once()->with($d);
+
+        $d->subscribe($subs);
+        $this->assertTrue(true);
+    }
 }
 
 class TestDispatcherQueuedHandler implements ShouldQueue
@@ -442,6 +463,14 @@ class TestDispatcherQueuedHandlerCustomQueue implements ShouldQueue
 class ExampleEvent
 {
     //
+}
+
+class ExampleSubscriber
+{
+    public function subscribe($e)
+    {
+        //
+    }
 }
 
 interface SomeEventInterface
