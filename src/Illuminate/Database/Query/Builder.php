@@ -53,14 +53,14 @@ class Builder
      * @var array
      */
     public $bindings = [
-        'select'     => [],
-        'from'       => [],
-        'join'       => [],
-        'where'      => [],
-        'groupBy'    => [],
-        'having'     => [],
-        'order'      => [],
-        'union'      => [],
+        'select' => [],
+        'from' => [],
+        'join' => [],
+        'where' => [],
+        'groupBy' => [],
+        'having' => [],
+        'order' => [],
+        'union' => [],
         'unionOrder' => [],
     ];
 
