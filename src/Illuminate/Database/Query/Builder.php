@@ -53,14 +53,14 @@ class Builder
      * @var array
      */
     public $bindings = [
-        'select'     => [],
-        'from'       => [],
-        'join'       => [],
-        'where'      => [],
-        'groupBy'    => [],
-        'having'     => [],
-        'order'      => [],
-        'union'      => [],
+        'select'  => [],
+        'from'    => [],
+        'join'    => [],
+        'where'   => [],
+        'groupBy' => [],
+        'having'  => [],
+        'order'   => [],
+        'union'   => [],
         'unionOrder' => [],
     ];
 
@@ -1700,9 +1700,10 @@ class Builder
      * Add a raw groupBy clause to the query.
      *
      * @param  string  $sql
-     * @param  array   $bindings
+     * @param  array  $bindings
+     * @return $this
      */
-    public function groupByRaw($sql, array $bindings = []): self
+    public function groupByRaw($sql, array $bindings = [])
     {
         $this->groups[] = new Expression($sql);
 
