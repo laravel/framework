@@ -625,7 +625,7 @@ class Str
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
     }
     
-     /**
+    /**
      * Make a string's first character lowercase.
      *
      * @param  string  $string
