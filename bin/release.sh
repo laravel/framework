@@ -11,16 +11,15 @@ then
 fi
 
 # Make sure the working directory is clear.
-if [ -z "$(git status --porcelain)" ]; then
-    echo "Working directory clean"
-else
+if [[ ! -z "$(git status --porcelain)" ]]
+then
     echo "Your working directory is dirty. Did you forget to commit your changes?"
 
     exit 1
 fi
 
 RELEASE_BRANCH="6.x"
-CURRENT_BRANCH=$(git branch --show-current)
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 VERSION=$1
 
 # Make sure current branch and release branch match.
