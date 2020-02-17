@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Mail\Events\MessageProcessing;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\HtmlString;
@@ -244,6 +245,8 @@ class Mailer implements MailerContract, MailQueueContract
         $callback($message);
 
         $this->addContent($message, $view, $plain, $raw, $data);
+
+        $this->dispatchProcessingEvent($message, $data);
 
         // If a global "to" address has been set, we will set that address on the mail
         // message. This is primarily useful during local development in which each
@@ -587,5 +590,21 @@ class Mailer implements MailerContract, MailQueueContract
         $this->queue = $queue;
 
         return $this;
+    }
+
+    /**
+     * Dispatch the message processing event.
+     *
+     * @param  \Illuminate\Mail\Message  $message
+     * @param  array  $data
+     * @return void
+     */
+    protected function dispatchProcessingEvent($message, $data = [])
+    {
+        if ($this->events) {
+            $this->events->dispatch(
+                new MessageProcessing($message->getSwiftMessage(), $data)
+            );
+        }
     }
 }

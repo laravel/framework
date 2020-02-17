@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Mail;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Mail\Events\MessageProcessing;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Mailer;
@@ -170,6 +171,7 @@ class MailMailerTest extends TestCase
         $events = m::mock(Dispatcher::class);
         $events->shouldReceive('until')->once()->with(m::type(MessageSending::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(MessageSent::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(MessageProcessing::class));
         $mailer = $this->getMailer($events);
         $view = m::mock(stdClass::class);
         $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
