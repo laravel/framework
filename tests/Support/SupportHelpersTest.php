@@ -643,6 +643,28 @@ class SupportHelpersTest extends TestCase
         $_SERVER['foo'] = 'From $_SERVER';
         $this->assertSame('From $_ENV', env('foo'));
     }
+
+    public function providesPregReplaceArrayData()
+    {
+        return [
+            ['/:[a-z_]+/', ['8:30', '9:00'], 'The event will take place between :start and :end', 'The event will take place between 8:30 and 9:00'],
+            ['/%s/', ['Taylor'], 'Hi, %s', 'Hi, Taylor'],
+            ['/%s/', ['Taylor', 'Otwell'], 'Hi, %s %s', 'Hi, Taylor Otwell'],
+            ['/%s/', [], 'Hi, %s %s', 'Hi,  '],
+            ['/%s/', ['a', 'b', 'c'], 'Hi', 'Hi'],
+            ['//', [], '', ''],
+            ['/%s/', ['a'], '', ''],
+        ];
+    }
+
+    /** @dataProvider providesPregReplaceArrayData */
+    public function testPregReplaceArray($pattern, $replacements, $subject, $expectedOutput)
+    {
+        $this->assertSame(
+            $expectedOutput,
+            preg_replace_array($pattern, $replacements, $subject)
+        );
+    }
 }
 
 trait SupportTestTraitOne
