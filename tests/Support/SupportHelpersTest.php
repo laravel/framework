@@ -665,6 +665,18 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+    public function testPregReplaceArrayIgnoresInternalArrayPointer()
+    {
+        $pointerArray = ['Taylor', 'Otwell'];
+
+        next($pointerArray);
+
+        $this->assertSame(
+            'Hi, Taylor Otwell',
+            preg_replace_array('/%s/', $pointerArray, 'Hi, %s %s')
+        );
+    }
 }
 
 trait SupportTestTraitOne
