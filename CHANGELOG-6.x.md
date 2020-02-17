@@ -1,6 +1,31 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.15.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.15.1...6.x)
+
+### Added
+- Added Guzzle 7 support ([#31484](https://github.com/laravel/framework/pull/31484))
+
+### Fixed
+- Fixed `appendRow` on console table ([#31469](https://github.com/laravel/framework/pull/31469))
+
+### Revert
+- Revert table feature in the console output ([4094d78](https://github.com/laravel/framework/commit/4094d785269ce7849557b792f650fb278d48978e))
+
+### TODO
+- Change MySql nullable modifier to allow generated columns to be not null ([#31452](https://github.com/laravel/framework/pull/31452))
+- Throw exception on empty collection in tests ([#31471](https://github.com/laravel/framework/pull/31471))
+- fix password check ([4436662](https://github.com/laravel/framework/commit/4436662a1ee19fc5e9eb76a0651d0de1aedb3ee2))
+
+
+## [v6.15.1 (2020-02-12)](https://github.com/laravel/framework/compare/v6.15.0...v6.15.1)
+
+### Added
+- Added `whereNull` and `whereNotNull` to `Collection` ([#31425](https://github.com/laravel/framework/pull/31425))
+- Added `Illuminate\Foundation\Testing\MockStream` class ([#31447](https://github.com/laravel/framework/pull/31447))
+
+### Fixed
+- Fixed `event:list` command for shows non-registered events ([#31444](https://github.com/laravel/framework/pull/31444))
+- Fixed postgres grammar for nested json arrays with  ([#31448](https://github.com/laravel/framework/pull/31448), [b3d0da1](https://github.com/laravel/framework/commit/b3d0da164bdf3d5d829384025476ca1b2065c97e))
 
 
 ## [v6.15.0 (2020-02-11)](https://github.com/laravel/framework/compare/v6.14.0...v6.15.0)
