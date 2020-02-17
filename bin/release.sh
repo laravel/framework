@@ -10,14 +10,6 @@ then
     exit 1
 fi
 
-# Make sure the working directory is clear.
-if [[ ! -z "$(git status --porcelain)" ]]
-then
-    echo "Your working directory is dirty. Did you forget to commit your changes?"
-
-    exit 1
-fi
-
 RELEASE_BRANCH="6.x"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 VERSION=$1
@@ -30,6 +22,25 @@ then
     exit 1
 fi
 
+# Make sure the working directory is clear.
+if [[ ! -z "$(git status --porcelain)" ]]
+then
+    echo "Your working directory is dirty. Did you forget to commit your changes?"
+
+    exit 1
+fi
+
+# Make sure latest changes are fetched first.
+git fetch origin
+
+# Make sure that release branch is in sync with origin.
+if [[ $(git rev-parse HEAD) != $(git rev-parse origin/$RELEASE_BRANCH) ]]
+then
+    echo "Your branch is out of date with its upstream. Did you forget to pull or push any changes before releasing?"
+
+    exit 1
+fi
+
 # Always prepend with "v"
 if [[ $VERSION != v*  ]]
 then
@@ -37,7 +48,6 @@ then
 fi
 
 # Tag Framework
-git pull
 git tag $VERSION
 git push origin --tags
 
