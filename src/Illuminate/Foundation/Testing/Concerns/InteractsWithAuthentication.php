@@ -33,8 +33,6 @@ trait InteractsWithAuthentication
 
         $this->app['auth']->guard($driver)->setUser($user);
 
-        $this->app['auth']->shouldUse($driver);
-
         return $this;
     }
 

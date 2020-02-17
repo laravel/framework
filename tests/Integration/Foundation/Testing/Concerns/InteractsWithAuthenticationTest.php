@@ -22,6 +22,8 @@ class InteractsWithAuthenticationTest extends TestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        $app['config']->set('auth.guards.custom', $app['config']->get('auth.guards.web'));
     }
 
     protected function setUp(): void
@@ -57,6 +59,25 @@ class InteractsWithAuthenticationTest extends TestCase
             ->get('/me')
             ->assertSuccessful()
             ->assertSeeText('Hello taylorotwell');
+    }
+
+    public function testActingAsDoesNotImplyAuthenticatedRouteWhenUsingACustomGuard()
+    {
+        Route::get('non-authenticated', function (Request $request) {
+            return ['user' => $request->user()];
+        });
+
+        Route::get('authenticated', function (Request $request) {
+            return ['user' => $request->user()];
+        })->middleware('auth:custom');
+
+        $user = AuthenticationTestUser::where('username', '=', 'taylorotwell')->first();
+
+        $nonImpliedResponse = $this->actingAs($user, 'custom')->get('/non-authenticated');
+        $this->assertNull($nonImpliedResponse->json('user'));
+
+        $impliedResponse = $this->actingAs($user, 'custom')->get('/authenticated');
+        $this->assertEquals('taylorotwell', $impliedResponse->json('user.username'));
     }
 
     public function testActingAsIsProperlyHandledForAuthViaRequest()
