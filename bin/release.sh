@@ -25,7 +25,7 @@ VERSION=$1
 # Make sure current branch and release branch match.
 if (( $RELEASE_BRANCH != $CURRENT_BRANCH ))
 then
-    echo "Release branch ($RELEASE_BRANCH) does not matches the current active branch ($CURRENT_BRANCH)."
+    echo "Release branch ($RELEASE_BRANCH) does not match the current active branch ($CURRENT_BRANCH)."
 
     exit 1
 fi
