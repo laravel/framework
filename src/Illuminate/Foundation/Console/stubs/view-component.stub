@@ -23,6 +23,6 @@ class DummyClass extends Component
      */
     public function render()
     {
-        return view('DummyView');
+        return DummyView;
     }
 }

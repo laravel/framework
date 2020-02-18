@@ -41,7 +41,7 @@ class ComponentMakeCommand extends GeneratorCommand
             return false;
         }
 
-        if ($this->input->getParameterOption('--view') !== false) {
+        if (! $this->option('inline')) {
             $this->writeView();
         }
     }
@@ -53,9 +53,7 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function writeView()
     {
-        $view = $this->option('view')
-                    ? $this->option('view')
-                    : 'components.'.Str::kebab(class_basename($this->argument('name')));
+        $view = 'components.'.Str::kebab(class_basename($this->argument('name')));
 
         $path = resource_path('views').'/'.str_replace('.', '/', $view);
 
@@ -79,9 +77,17 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
+        if ($this->option('inline')) {
+            return str_replace(
+                'DummyView',
+                "<<<'blade'\n<div>\n    ".Inspiring::quote()."\n</div>\nblade",
+                parent::buildClass($name)
+            );
+        }
+
         return str_replace(
             'DummyView',
-            $this->option('view') ?? 'components.'.Str::kebab(class_basename($name)),
+            'view(\'components.'.Str::kebab(class_basename($name)).'\')',
             parent::buildClass($name)
         );
     }
@@ -116,7 +122,7 @@ class ComponentMakeCommand extends GeneratorCommand
     {
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the component already exists'],
-            ['view', null, InputOption::VALUE_OPTIONAL, 'Create a new Blade template for the component'],
+            ['inline', null, InputOption::VALUE_NONE, 'Create a component that renders an inline view'],
         ];
     }
 }
