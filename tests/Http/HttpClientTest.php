@@ -146,7 +146,7 @@ class HttpClientTest extends TestCase
         $this->assertSame(200, $response->status());
 
         $response = $factory->get('https://example.com');
-        $this->assertSame("", $response->body());
+        $this->assertSame('', $response->body());
         $this->assertSame(403, $response->status());
     }
 }
