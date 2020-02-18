@@ -161,6 +161,28 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the columns for an update statement.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    protected function compileUpdateColumns(Builder $query, array $values)
+    {
+        $jsonGroups = $this->groupJsonColumnsForUpdate($values);
+
+        return collect($values)->reject(function ($value, $key) {
+            return $this->isJsonSelector($key);
+        })->merge($jsonGroups)->map(function ($value, $key) use ($jsonGroups) {
+            $column = last(explode('.', $key));
+
+            $value = isset($jsonGroups[$key]) ? $this->compileJsonPatch($column, $value) : $this->parameter($value);
+
+            return $this->wrap($column).' = '.$value;
+        })->implode(', ');
+    }
+
+    /**
      * Group the nested JSON columns.
      *
      * @param  array  $values
@@ -189,28 +211,6 @@ class SQLiteGrammar extends Grammar
     protected function compileJsonPatch($column, $value)
     {
         return "json_patch(ifnull({$this->wrap($column)}, json('{}')), json({$this->parameter($value)}))";
-    }
-
-    /**
-     * Compile the columns for an update statement.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
-     * @return string
-     */
-    protected function compileUpdateColumns(Builder $query, array $values)
-    {
-        $groups = $this->groupJsonColumnsForUpdate($values);
-
-        return collect($values)->reject(function ($value, $key) {
-            return $this->isJsonSelector($key);
-        })->merge($groups)->map(function ($value, $key) use ($groups) {
-            $column = last(explode('.', $key));
-
-            $updateSql = isset($groups[$key]) ? $this->compileJsonPatch($column, $value) : $this->parameter($value);
-
-            return $this->wrap($column).' = '.$updateSql;
-        })->implode(', ');
     }
 
     /**
