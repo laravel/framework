@@ -81,7 +81,6 @@ class TestViewComponent extends Component
     }
 }
 
-
 class TestValidationViewComponent extends Component
 {
     public $votes = 10;
