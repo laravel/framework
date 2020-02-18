@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Mailer;
@@ -185,7 +185,8 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
         $events = m::mock(Dispatcher::class);
-        $events->shouldReceive('until')->once()->with(m::type(MessageSending::class));
+        $events->shouldReceive('getListeners')->once()->with(MessageSending::class)->andReturn([]);
+        $events->shouldReceive('dispatch')->once()->with(m::type(MessageSending::class))->andReturn([]);
         $events->shouldReceive('dispatch')->once()->with(m::type(MessageSent::class));
         $mailer = $this->getMailer($events);
         $view = m::mock(stdClass::class);
@@ -196,6 +197,63 @@ class MailMailerTest extends TestCase
         $mailer->send('foo', ['data'], function ($m) {
             //
         });
+    }
+
+    public function testPreventingMessageFromBeingSent()
+    {
+        unset($_SERVER['__mailer.test']);
+
+        $events = new Dispatcher;
+
+        $events->listen(MessageSending::class, function () {
+            $_SERVER['__mailer.test'] = 'sending';
+
+            return false;
+        });
+
+        $events->listen(MessageSent::class, function () {
+            $_SERVER['__mailer.test'] = 'sent';
+        });
+
+        $mailer = $this->getMailer($events);
+        $this->prepareMailerForSendingMessage($mailer);
+
+        $mailer->send('foo', ['data'], function () {
+            //
+        });
+
+        $this->assertNotSame('sent', $_SERVER['__mailer.test']);
+
+        unset($_SERVER['__mailer.test']);
+    }
+
+    public function testFirstMessageSendingListenerTakesPriority()
+    {
+        unset($_SERVER['__mailer.test']);
+
+        $events = new Dispatcher;
+
+        $events->listen(MessageSending::class, function () {
+            return true;
+        });
+        $events->listen(MessageSending::class, function () {
+            return false;
+        });
+
+        $events->listen(MessageSent::class, function () {
+            $_SERVER['__mailer.test'] = 'sent';
+        });
+
+        $mailer = $this->getMailer($events);
+        $this->prepareMailerForSendingMessage($mailer);
+
+        $mailer->send('foo', ['data'], function ($m) {
+            //
+        });
+
+        $this->assertSame('sent', $_SERVER['__mailer.test']);
+
+        unset($_SERVER['__mailer.test']);
     }
 
     public function testMacroable()
@@ -209,6 +267,15 @@ class MailMailerTest extends TestCase
         $this->assertSame(
             'bar', $mailer->foo()
         );
+    }
+
+    protected function prepareMailerForSendingMessage($mailer)
+    {
+        $view = m::mock(stdClass::class);
+        $view->shouldReceive('render')->andReturn('rendered.view');
+        $mailer->getViewFactory()->shouldReceive('make')->andReturn($view);
+        $this->setSwiftMailer($mailer);
+        $mailer->getSwiftMailer()->shouldReceive('send');
     }
 
     protected function getMailer($events = null)

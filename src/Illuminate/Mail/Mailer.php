@@ -535,9 +535,22 @@ class Mailer implements MailerContract, MailQueueContract
             return true;
         }
 
-        return $this->events->until(
+        $responses = $this->events->dispatch(
             new MessageSending($message, $data)
-        ) !== false;
+        );
+
+        // Check the first non-null response.
+        foreach ($responses as $response) {
+            if ($response !== null) {
+                return $response !== false;
+            }
+        }
+
+        $listeners = $this->events->getListeners(MessageSending::class);
+
+        // There should be an equal amount of listeners and responses,
+        // Otherwise it means that a listener returned a boolean false.
+        return count($listeners) === count($responses);
     }
 
     /**
