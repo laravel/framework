@@ -344,7 +344,7 @@ abstract class Component
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return $this
      */
-    public function setContainer(\Illuminate\Contracts\Container\Container $container)
+    public function setContainer(Container $container)
     {
         $this->container = $container;
 
