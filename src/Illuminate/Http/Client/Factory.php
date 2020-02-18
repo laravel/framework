@@ -62,7 +62,7 @@ class Factory
      * @param  array  $responses
      * @return \Illuminate\Http\Client\ResponseSequence
      */
-    public static function sequence(array $responses)
+    public static function sequence(array $responses = [])
     {
         return new ResponseSequence($responses);
     }
