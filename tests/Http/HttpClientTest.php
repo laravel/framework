@@ -126,10 +126,10 @@ class HttpClientTest extends TestCase
 
         $factory->fake([
             '*' => Factory::sequence()
-                ->pushString('Ok', 201)
-                ->pushJson(['fact' => 'Cats are great!'])
+                ->push('Ok', 201)
+                ->push(['fact' => 'Cats are great!'])
                 ->pushFile(__DIR__.'/fixtures/test.txt')
-                ->pushEmptyResponse(403),
+                ->pushStatus(403),
         ]);
 
         /** @var PendingRequest $factory */

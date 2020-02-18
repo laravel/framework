@@ -25,57 +25,35 @@ class ResponseSequence
     /**
      * Push a response to the sequence.
      *
-     * @param  mixed $response
+     * @param  string|array  $body
+     * @param  int  $status
+     * @param  array  $headers
      * @return $this
      */
-    public function pushResponse($response)
+    public function push($body = '', int $status = 200, array $headers = [])
     {
-        $this->responses[] = $response;
+        if (is_array($body)) {
+            return $this->pushResponse(
+                Factory::response(json_encode($body), $status, $headers)
+            );
+        }
 
-        return $this;
+        return $this->pushResponse(
+            Factory::response($body, $status, $headers)
+        );
     }
 
     /**
-     * Push an empty response to the sequence.
+     * Push a response with the given status code to the sequence.
      *
      * @param  int  $status
      * @param  array  $headers
      * @return $this
      */
-    public function pushEmptyResponse($status = 200, $headers = [])
+    public function pushStatus(int $status, array $headers = [])
     {
         return $this->pushResponse(
             Factory::response('', $status, $headers)
-        );
-    }
-
-    /**
-     * Push response with a string body to the sequence.
-     *
-     * @param  string  $string
-     * @param  int  $status
-     * @param  array  $headers
-     * @return $this
-     */
-    public function pushString($string, $status = 200, $headers = [])
-    {
-        return $this->pushResponse(
-            Factory::response($string, $status, $headers)
-        );
-    }
-
-    /**
-     * Push response with a json body to the sequence.
-     *
-     * @param  array  $data
-     * @param  int  $status
-     * @param  array  $headers
-     * @return $this
-     */
-    public function pushJson(array $data, $status = 200, $headers = [])
-    {
-        return $this->pushResponse(
-            Factory::response(json_encode($data), $status, $headers)
         );
     }
 
@@ -87,13 +65,26 @@ class ResponseSequence
      * @param  array  $headers
      * @return $this
      */
-    public function pushFile($filePath, $status = 200, $headers = [])
+    public function pushFile(string $filePath, int $status = 200, array $headers = [])
     {
         $string = file_get_contents($filePath);
 
         return $this->pushResponse(
             Factory::response($string, $status, $headers)
         );
+    }
+
+    /**
+     * Push a response to the sequence.
+     *
+     * @param  mixed $response
+     * @return $this
+     */
+    public function pushResponse($response)
+    {
+        $this->responses[] = $response;
+
+        return $this;
     }
 
     /**
