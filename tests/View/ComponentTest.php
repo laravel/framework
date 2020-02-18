@@ -4,7 +4,10 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\View\Component;
 use Illuminate\View\Factory;
 use Mockery as m;
@@ -47,7 +50,7 @@ class ComponentTest extends TestCase
         $this->viewFactory->shouldReceive('exists')->once()->andReturn(false);
         $this->viewFactory->shouldReceive('addNamespace')->once()->with('__components', '/tmp');
 
-        $component = new TestInlineViewComponent();
+        $component = $this->createComponent(TestInlineViewComponent::class);
         $this->assertSame('__components::c6327913fef3fca4518bcd7df1d0ff630758e241', $component->resolveView());
     }
 
@@ -56,9 +59,38 @@ class ComponentTest extends TestCase
         $this->viewFactory->shouldReceive('exists')->once()->andReturn(true);
         $this->viewFactory->shouldReceive('addNamespace')->never();
 
-        $component = new TestRegularViewComponent();
+        $component = $this->createComponent(TestRegularViewComponent::class);
 
         $this->assertSame('alert', $component->resolveView());
+    }
+
+    protected function createComponent($class)
+    {
+        $container = tap(new Container, function ($container) {
+            $container->instance(
+                ValidationFactoryContract::class,
+                $this->createValidationFactory($container)
+            );
+        });
+
+        $component = new $class();
+        $component->setContainer($container);
+
+        return $component;
+    }
+
+    /**
+     * Create a new validation factory.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @return \Illuminate\Validation\Factory
+     */
+    protected function createValidationFactory($container)
+    {
+        $translator = m::mock(Translator::class)->shouldReceive('get')
+            ->zeroOrMoreTimes()->andReturn('error')->getMock();
+
+        return new ValidationFactory($translator, $container);
     }
 }
 

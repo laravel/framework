@@ -28,6 +28,18 @@ class ViewServiceProvider extends ServiceProvider
     }
 
     /**
+     * Bootstrap the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->app->resolving(Component::class, function ($component, $app) {
+            $component->setContainer($app);
+        });
+    }
+
+    /**
      * Register the view environment.
      *
      * @return void

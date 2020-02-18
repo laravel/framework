@@ -4,7 +4,12 @@ namespace Illuminate\View;
 
 use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -40,11 +45,35 @@ abstract class Component
     public $attributes;
 
     /**
+     * The container instance.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
+     * The validator instance.
+     *
+     * @var \Illuminate\Contracts\Validation\Validator
+     */
+    protected $validator;
+
+    /**
      * Get the view / view contents that represent the component.
      *
      * @return \Illuminate\View\View|string
      */
     abstract public function render();
+
+    /**
+     * Get the validation rules for the component properties.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [];
+    }
 
     /**
      * Resolve the Blade view or view file that should be used when rendering the component.
@@ -53,6 +82,8 @@ abstract class Component
      */
     public function resolveView()
     {
+        $this->validate();
+
         $view = $this->render();
 
         if ($view instanceof View) {
@@ -198,7 +229,9 @@ abstract class Component
             'data',
             'render',
             'resolveView',
+            'setValidator',
             'shouldRender',
+            'validate',
             'view',
             'withAttributes',
         ], $this->except);
@@ -227,5 +260,95 @@ abstract class Component
     public function shouldRender()
     {
         return true;
+    }
+
+    /**
+     * Validate the given class instance.
+     *
+     * @return void
+     */
+    public function validate()
+    {
+        $instance = $this->getValidatorInstance();
+
+        if ($instance->fails()) {
+            $this->failedValidation($instance);
+        }
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param  Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new ValidationException($validator);
+    }
+
+    /**
+     * Get the validator instance for the request.
+     *
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function getValidatorInstance()
+    {
+        if ($this->validator) {
+            return $this->validator;
+        }
+
+        $factory = $this->container->make(ValidationFactory::class);
+
+        if (method_exists($this, 'validator')) {
+            $validator = $this->container->call([$this, 'validator'], compact('factory'));
+        } else {
+            $validator = $this->createDefaultValidator($factory);
+        }
+
+        $this->setValidator($validator);
+
+        return $this->validator;
+    }
+
+    /**
+     * Create the default validator instance.
+     *
+     * @param  \Illuminate\Contracts\Validation\Factory  $factory
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function createDefaultValidator(ValidationFactory $factory)
+    {
+        return $factory->make(
+            $this->data(), $this->container->call([$this, 'rules'])
+        );
+    }
+
+    /**
+     * Set the Validator instance.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return $this
+     */
+    public function setValidator(Validator $validator)
+    {
+        $this->validator = $validator;
+
+        return $this;
+    }
+
+    /**
+     * Set the container implementation.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return $this
+     */
+    public function setContainer(\Illuminate\Contracts\Container\Container $container)
+    {
+        $this->container = $container;
+
+        return $this;
     }
 }
