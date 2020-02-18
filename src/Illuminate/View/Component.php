@@ -229,6 +229,7 @@ abstract class Component
             'data',
             'render',
             'resolveView',
+            'setContainer',
             'setValidator',
             'shouldRender',
             'validate',
