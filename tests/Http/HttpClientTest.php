@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Http;
 
 use Illuminate\Http\Client\Factory;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -117,5 +118,35 @@ class HttpClientTest extends TestCase
                    $request[0]['name'] == 'foo' &&
                    $request->hasFile('foo', 'data', 'file.txt');
         });
+    }
+
+    public function testSequenceBuilder()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            '*' => Factory::sequence()
+                ->pushString('Ok', 201)
+                ->pushJson(['fact' => 'Cats are great!'])
+                ->pushFile(__DIR__.'/fixtures/test.txt')
+                ->pushEmptyResponse(403),
+        ]);
+
+        /** @var PendingRequest $factory */
+        $response = $factory->get('https://example.com');
+        $this->assertSame('Ok', $response->body());
+        $this->assertSame(201, $response->status());
+
+        $response = $factory->get('https://example.com');
+        $this->assertSame(['fact' => 'Cats are great!'], $response->json());
+        $this->assertSame(200, $response->status());
+
+        $response = $factory->get('https://example.com');
+        $this->assertSame("This is a story about something that happened long ago when your grandfather was a child.\n", $response->body());
+        $this->assertSame(200, $response->status());
+
+        $response = $factory->get('https://example.com');
+        $this->assertSame('', $response->body());
+        $this->assertSame(403, $response->status());
     }
 }
