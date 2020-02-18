@@ -176,13 +176,15 @@ class Response implements ArrayAccess
     /**
      * Throw an exception if a server or client error occurred.
      *
-     * @return void
+     * @return $this
      */
     public function throw()
     {
         if ($this->serverError() || $this->clientError()) {
             throw new RequestException($this);
         }
+
+        return $this;
     }
 
     /**
