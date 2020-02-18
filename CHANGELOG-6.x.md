@@ -1,20 +1,25 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.15.1...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.16.0...6.x)
+
+
+## [v6.16.0 (2020-02-18)](https://github.com/laravel/framework/compare/v6.15.1...v6.16.0)
 
 ### Added
 - Added Guzzle 7 support ([#31484](https://github.com/laravel/framework/pull/31484))
+- Added `Illuminate\Database\Query\Builder::groupByRaw()` ([#31498](https://github.com/laravel/framework/pull/31498))
+- Added SQLite JSON update support with json_patch ([#31492](https://github.com/laravel/framework/pull/31492))
 
 ### Fixed
 - Fixed `appendRow` on console table ([#31469](https://github.com/laravel/framework/pull/31469))
+- Fixed password check in `EloquentUserProvider::retrieveByCredentials()` ([4436662](https://github.com/laravel/framework/commit/4436662a1ee19fc5e9eb76a0651d0de1aedb3ee2))
 
 ### Revert
 - Revert table feature in the console output ([4094d78](https://github.com/laravel/framework/commit/4094d785269ce7849557b792f650fb278d48978e))
 
-### TODO
+### Changed
 - Change MySql nullable modifier to allow generated columns to be not null ([#31452](https://github.com/laravel/framework/pull/31452))
-- Throw exception on empty collection in tests ([#31471](https://github.com/laravel/framework/pull/31471))
-- fix password check ([4436662](https://github.com/laravel/framework/commit/4436662a1ee19fc5e9eb76a0651d0de1aedb3ee2))
+- Throw exception on empty collection in `assertSentTo()` \ `assertNotSentTo()` methods in `NotificationFake` class ([#31471](https://github.com/laravel/framework/pull/31471))
 
 
 ## [v6.15.1 (2020-02-12)](https://github.com/laravel/framework/compare/v6.15.0...v6.15.1)
