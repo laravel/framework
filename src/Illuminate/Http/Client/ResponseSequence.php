@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Client;
 
+use OutOfBoundsException;
+
 class ResponseSequence
 {
     /**
@@ -10,6 +12,13 @@ class ResponseSequence
      * @var array
      */
     protected $responses;
+
+    /**
+     * Indicates that invoking this sequence when it is empty should throw an exception.
+     *
+     * @var bool
+     */
+    protected $failWhenEmpty = true;
 
     /**
      * Create a new response sequence.
@@ -88,12 +97,38 @@ class ResponseSequence
     }
 
     /**
+     * Make the sequence return a default response when it is empty.
+     *
+     * @return $this
+     */
+    public function dontFailWhenEmpty()
+    {
+        $this->failWhenEmpty = false;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that this sequence has depleted all of its responses.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return count($this->responses) === 0;
+    }
+
+    /**
      * Get the next response in the sequence.
      *
      * @return mixed
      */
     public function __invoke()
     {
+        if ($this->failWhenEmpty && count($this->responses) === 0) {
+            throw new OutOfBoundsException('A request was made, but the response sequence is empty');
+        }
+
         return array_shift($this->responses);
     }
 }

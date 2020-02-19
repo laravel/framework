@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Http;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Str;
+use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 
 class HttpClientTest extends TestCase
@@ -148,5 +149,45 @@ class HttpClientTest extends TestCase
         $response = $factory->get('https://example.com');
         $this->assertSame('', $response->body());
         $this->assertSame(403, $response->status());
+
+        $this->expectException(OutOfBoundsException::class);
+
+        // The sequence is empty, it should throw an exception.
+        $factory->get('https://example.com');
+    }
+
+    public function testSequenceBuilderCanKeepGoingWhenEmpty()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            '*' => Factory::sequence()
+                ->dontFailWhenEmpty()
+                ->push('Ok'),
+        ]);
+
+        /** @var PendingRequest $factory */
+        $response = $factory->get('https://example.com');
+        $this->assertSame('Ok', $response->body());
+
+        // The sequence is empty, but it should not fail.
+        $factory->get('https://example.com');
+    }
+
+    public function testAssertSequencesAreEmpty()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            '*' => Factory::sequence()
+                ->push('1')
+                ->push('2'),
+        ]);
+
+        /** @var PendingRequest $factory */
+        $factory->get('https://example.com');
+        $factory->get('https://example.com');
+
+        Factory::assertSequencesAreEmpty();
     }
 }
