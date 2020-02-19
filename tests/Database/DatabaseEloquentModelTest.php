@@ -520,10 +520,6 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testFromDateTimeMilliseconds()
     {
-        if (version_compare(PHP_VERSION, '7.3.0-dev', '<')) {
-            $this->markTestSkipped('Due to https://bugs.php.net/bug.php?id=75577, proper "v" format support can only works since PHP 7.3.');
-        }
-
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->setMethods(['getDateFormat'])->getMock();
         $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d H:s.vi');
         $model->setRawAttributes([
