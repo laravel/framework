@@ -30,6 +30,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
  * @method static \Illuminate\Http\Client\PendingRequest stub(callable $callback)
+ * @method static \Illuminate\Http\Client\ResponseSequence fakeSequence(string $urlPattern = '*')
  *
  * @see \Illuminate\Http\Client\Factory
  */
