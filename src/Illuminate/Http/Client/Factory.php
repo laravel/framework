@@ -110,6 +110,21 @@ class Factory
     }
 
     /**
+     * Register a response sequence for the given url pattern.
+     *
+     * @param  string  $urlPattern
+     * @return ResponseSequence
+     */
+    public function fakeSequence($urlPattern = '*')
+    {
+        $responseSequence = $this->sequence();
+
+        $this->fake([$urlPattern => $responseSequence]);
+
+        return $responseSequence;
+    }
+
+    /**
      * Stub the given URL using the given callback.
      *
      * @param  string  $url
