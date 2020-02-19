@@ -28,6 +28,13 @@ class Factory
     protected $recording = false;
 
     /**
+     * All created response sequences.
+     *
+     * @var array
+     */
+    protected $responseSequences = [];
+
+    /**
      * Create a new factory instance.
      *
      * @return void
@@ -62,9 +69,9 @@ class Factory
      * @param  array  $responses
      * @return \Illuminate\Http\Client\ResponseSequence
      */
-    public static function sequence(array $responses = [])
+    public function sequence(array $responses = [])
     {
-        return new ResponseSequence($responses);
+        return $this->responseSequences[] = new ResponseSequence($responses);
     }
 
     /**
@@ -160,6 +167,21 @@ class Factory
             $this->recorded($callback)->count() > 0,
             'An expected request was not recorded.'
         );
+    }
+
+    /**
+     * Assert that every created response sequence is empty.
+     *
+     * @return void
+     */
+    public function assertSequencesAreEmpty()
+    {
+        foreach ($this->responseSequences as $responseSequence) {
+            PHPUnit::assertTrue(
+                $responseSequence->isEmpty(),
+                'Not all response sequences are empty.'
+            );
+        }
     }
 
     /**
