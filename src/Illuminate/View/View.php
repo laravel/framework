@@ -206,17 +206,14 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * Add validation errors to the view.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
+     * @param  string  $bag
      * @return $this
      */
-    public function withErrors($provider, $key = 'default')
+    public function withErrors($provider, $bag = 'default')
     {
-        $value = $this->parseErrors($provider);
-
-        $errors = new ViewErrorBag;
-
-        $this->with('errors', $errors->put($key, $value));
-
-        return $this;
+        return $this->with('errors', (new ViewErrorBag)->put(
+            $bag, $this->formatErrors($provider)
+        ));
     }
 
     /**
@@ -225,13 +222,11 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
      * @return \Illuminate\Support\MessageBag
      */
-    protected function parseErrors($provider)
+    protected function formatErrors($provider)
     {
-        if ($provider instanceof MessageProvider) {
-            return $provider->getMessageBag();
-        }
-
-        return new MessageBag((array) $provider);
+        return $provider instanceof MessageProvider
+                        ? $provider->getMessageBag()
+                        : new MessageBag((array) $provider);
     }
 
     /**
