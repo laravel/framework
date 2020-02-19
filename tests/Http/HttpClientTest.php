@@ -126,7 +126,7 @@ class HttpClientTest extends TestCase
         $factory = new Factory;
 
         $factory->fake([
-            '*' => Factory::sequence()
+            '*' => $factory->sequence()
                 ->push('Ok', 201)
                 ->push(['fact' => 'Cats are great!'])
                 ->pushFile(__DIR__.'/fixtures/test.txt')
@@ -161,7 +161,7 @@ class HttpClientTest extends TestCase
         $factory = new Factory;
 
         $factory->fake([
-            '*' => Factory::sequence()
+            '*' => $factory->sequence()
                 ->dontFailWhenEmpty()
                 ->push('Ok'),
         ]);
@@ -179,7 +179,7 @@ class HttpClientTest extends TestCase
         $factory = new Factory;
 
         $factory->fake([
-            '*' => Factory::sequence()
+            '*' => $factory->sequence()
                 ->push('1')
                 ->push('2'),
         ]);
@@ -188,6 +188,6 @@ class HttpClientTest extends TestCase
         $factory->get('https://example.com');
         $factory->get('https://example.com');
 
-        Factory::assertSequencesAreEmpty();
+        $factory->assertSequencesAreEmpty();
     }
 }

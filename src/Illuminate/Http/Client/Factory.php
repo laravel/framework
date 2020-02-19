@@ -32,7 +32,7 @@ class Factory
      *
      * @var array
      */
-    protected static $responseSequences = [];
+    protected $responseSequences = [];
 
     /**
      * Create a new factory instance.
@@ -69,9 +69,9 @@ class Factory
      * @param  array  $responses
      * @return \Illuminate\Http\Client\ResponseSequence
      */
-    public static function sequence(array $responses = [])
+    public function sequence(array $responses = [])
     {
-        return static::$responseSequences[] = new ResponseSequence($responses);
+        return $this->responseSequences[] = new ResponseSequence($responses);
     }
 
     /**
@@ -174,9 +174,9 @@ class Factory
      *
      * @return void
      */
-    public static function assertSequencesAreEmpty()
+    public function assertSequencesAreEmpty()
     {
-        foreach (static::$responseSequences as $responseSequence) {
+        foreach ($this->responseSequences as $responseSequence) {
             PHPUnit::assertTrue(
                 $responseSequence->isEmpty(),
                 'Not all response sequences are empty.'
