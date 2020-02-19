@@ -219,7 +219,7 @@ class SimpleMessage
             'outroLines' => $this->outroLines,
             'actionText' => $this->actionText,
             'actionUrl' => $this->actionUrl,
-            'actionUrlReadable' => str_replace(['mailto:', 'tel:'], '', $this->actionUrl),
+            'displayableActionUrl' => str_replace(['mailto:', 'tel:'], '', $this->actionUrl),
         ];
     }
 }
