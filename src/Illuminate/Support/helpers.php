@@ -51,7 +51,7 @@ if (! function_exists('blank')) {
             return false;
         }
 
-        if ($value instanceof Countable) {
+        if (is_countable($value)) {
             return count($value) === 0;
         }
 
