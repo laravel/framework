@@ -181,7 +181,7 @@ class HttpClientTest extends TestCase
         $factory->fake([
             '*' => Factory::sequence()
                 ->push('1')
-                ->push('2')
+                ->push('2'),
         ]);
 
         /** @var PendingRequest $factory */

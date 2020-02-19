@@ -111,7 +111,7 @@ class ResponseSequence
     /**
      * Indicate that this sequence has depleted all of its responses.
      *
-     * @return boolean
+     * @return bool
      */
     public function isEmpty()
     {
