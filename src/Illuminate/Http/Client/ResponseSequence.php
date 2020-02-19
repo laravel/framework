@@ -109,6 +109,16 @@ class ResponseSequence
     }
 
     /**
+     * Indicate that this sequence has depleted all of its responses.
+     *
+     * @return boolean
+     */
+    public function isEmpty()
+    {
+        return count($this->responses) === 0;
+    }
+
+    /**
      * Get the next response in the sequence.
      *
      * @return mixed
@@ -116,7 +126,7 @@ class ResponseSequence
     public function __invoke()
     {
         if ($this->failWhenEmpty && count($this->responses) === 0) {
-            throw new OutOfBoundsException('A request was made, but the response sequence is empty.');
+            throw new OutOfBoundsException('A request was made, but the response sequence is empty');
         }
 
         return array_shift($this->responses);

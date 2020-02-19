@@ -173,4 +173,21 @@ class HttpClientTest extends TestCase
         // The sequence is empty, but it should not fail.
         $factory->get('https://example.com');
     }
+
+    public function testAssertSequencesAreEmpty()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            '*' => Factory::sequence()
+                ->push('1')
+                ->push('2')
+        ]);
+
+        /** @var PendingRequest $factory */
+        $factory->get('https://example.com');
+        $factory->get('https://example.com');
+
+        Factory::assertSequencesAreEmpty();
+    }
 }
