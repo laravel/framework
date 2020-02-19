@@ -13,6 +13,7 @@ use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\ViewErrorBag;
 use Throwable;
 
 class View implements ArrayAccess, Htmlable, ViewContract
@@ -207,23 +208,30 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
      * @return $this
      */
-    public function withErrors($provider)
+    public function withErrors($provider, $key = 'default')
     {
-        $this->with('errors', $this->formatErrors($provider));
+        $value = $this->parseErrors($provider);
+
+        $errors = new ViewErrorBag;
+
+        $this->with('errors', $errors->put($key, $value));
 
         return $this;
     }
 
     /**
-     * Format the given message provider into a MessageBag.
+     * Parse the given errors into an appropriate value.
      *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
+     * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
      * @return \Illuminate\Support\MessageBag
      */
-    protected function formatErrors($provider)
+    protected function parseErrors($provider)
     {
-        return $provider instanceof MessageProvider
-                        ? $provider->getMessageBag() : new MessageBag((array) $provider);
+        if ($provider instanceof MessageProvider) {
+            return $provider->getMessageBag();
+        }
+
+        return new MessageBag((array) $provider);
     }
 
     /**
