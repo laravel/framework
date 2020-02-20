@@ -227,7 +227,7 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Get the lock required for popping the next job.
      *
-     * @return string
+     * @return string|bool
      */
     protected function getLockForPopping()
     {
