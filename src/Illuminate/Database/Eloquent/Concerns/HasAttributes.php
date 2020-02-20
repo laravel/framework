@@ -207,8 +207,7 @@ trait HasAttributes
     {
         foreach ($this->getCasts() as $key => $value) {
             if (! array_key_exists($key, $attributes) ||
-                in_array($key, $mutatedAttributes) ||
-                $this->isClassCastable($key)) {
+                in_array($key, $mutatedAttributes)) {
                 continue;
             }
 
@@ -733,7 +732,7 @@ trait HasAttributes
             );
         }
 
-        if ($caster instanceof CastsInboundAttributes || is_null($value)) {
+        if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
             unset($this->classCastCache[$key]);
         } else {
             $this->classCastCache[$key] = $value;
