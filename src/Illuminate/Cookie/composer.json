@@ -17,8 +17,8 @@
         "php": "^7.3",
         "illuminate/contracts": "^8.0",
         "illuminate/support": "^8.0",
-        "symfony/http-foundation": "^5.0",
-        "symfony/http-kernel": "^5.0"
+        "symfony/http-foundation": "^5.1",
+        "symfony/http-kernel": "^5.1"
     },
     "autoload": {
         "psr-4": {

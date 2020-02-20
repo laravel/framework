@@ -20,7 +20,7 @@
         "illuminate/container": "^8.0",
         "illuminate/contracts": "^8.0",
         "illuminate/support": "^8.0",
-        "symfony/console": "^5.0"
+        "symfony/console": "^5.1"
     },
     "autoload": {
         "psr-4": {
