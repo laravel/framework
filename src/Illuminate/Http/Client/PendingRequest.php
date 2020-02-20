@@ -507,9 +507,15 @@ class PendingRequest
                      ->map
                      ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
                      ->filter()
-                     ->first(null, $handler($request, $options));
+                     ->first();
 
-                return is_array($response) ? Factory::response($response) : $response;
+                if (is_null($response)) {
+                    return Factory::response();
+                } elseif (is_array($response)) {
+                    return Factory::response($response);
+                }
+
+                return $response;
             };
         };
     }
