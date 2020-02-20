@@ -373,6 +373,18 @@ class Stringable
     }
 
     /**
+     * Replace the given value in the given string.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @return static
+     */
+    public function replace($search, $replace)
+    {
+        return new static(str_replace($search, $replace, $this->value));
+    }
+
+    /**
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
