@@ -110,12 +110,12 @@ class Factory
     }
 
     /**
-     * Register a response sequence for the given url pattern.
+     * Register a response sequence for the given URL pattern.
      *
-     * @param  string  $urlPattern
-     * @return ResponseSequence
+     * @param  string  $url
+     * @return \Illuminate\Http\Client\ResponseSequence
      */
-    public function fakeSequence($urlPattern = '*')
+    public function fakeSequence($url = '*')
     {
         $responseSequence = $this->sequence();
 
