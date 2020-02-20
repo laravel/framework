@@ -510,7 +510,7 @@ class PendingRequest
                      ->first();
 
                 if (is_null($response)) {
-                    return Factory::response();
+                    return $handler($request, $options);
                 } elseif (is_array($response)) {
                     return Factory::response($response);
                 }
