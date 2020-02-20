@@ -117,11 +117,9 @@ class Factory
      */
     public function fakeSequence($url = '*')
     {
-        $responseSequence = $this->sequence();
-
-        $this->fake([$url => $responseSequence]);
-
-        return $responseSequence;
+        return tap($this->sequence(), function ($sequence) use ($url) {
+            $this->fake([$url => $sequence]);
+        });
     }
 
     /**
