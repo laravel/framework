@@ -68,6 +68,11 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $model->options);
 
         $this->assertEquals(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
+
+        $model = new TestEloquentModelWithCustomCast(['options' => []]);
+        $model->syncOriginal();
+        $model->options = ['foo' => 'bar'];
+        $this->assertTrue($model->isDirty('options'));
     }
 
     public function testOneWayCasting()
@@ -112,6 +117,13 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
 class TestEloquentModelWithCustomCast extends Model
 {
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [];
+
     /**
      * The attributes that should be cast to native types.
      *

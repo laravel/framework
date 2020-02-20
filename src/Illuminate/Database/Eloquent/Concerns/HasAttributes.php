@@ -1342,8 +1342,8 @@ trait HasAttributes
             return false;
         }
 
-        $attribute = $this->getAttribute($key);
-        $original = $this->getOriginal($key);
+        $attribute = Arr::get($this->attributes, $key);
+        $original = Arr::get($this->original, $key);
 
         if ($attribute === $original) {
             return true;
@@ -1352,13 +1352,13 @@ trait HasAttributes
         } elseif ($this->isDateAttribute($key)) {
             return $this->fromDateTime($attribute) ===
                    $this->fromDateTime($original);
-        } elseif ($this->hasCast($key, ['object', 'collection'])) {
+        } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ==
                 $this->castAttribute($key, $original);
         }
 
         return is_numeric($attribute) && is_numeric($original)
-                && strcmp((string) $attribute, (string) $original) === 0;
+               && strcmp((string) $attribute, (string) $original) === 0;
     }
 
     /**
