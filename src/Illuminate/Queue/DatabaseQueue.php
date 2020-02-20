@@ -236,7 +236,7 @@ class DatabaseQueue extends Queue implements QueueContract
     }
 
     /**
-     * Check if the used database driver supports SKIP LOCKED
+     * Check if the used database driver supports SKIP LOCKED.
      *
      * @return bool
      */
