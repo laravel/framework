@@ -119,7 +119,7 @@ class Factory
     {
         $responseSequence = $this->sequence();
 
-        $this->fake([$urlPattern => $responseSequence]);
+        $this->fake([$url => $responseSequence]);
 
         return $responseSequence;
     }
