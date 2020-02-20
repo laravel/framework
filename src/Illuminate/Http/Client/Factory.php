@@ -18,7 +18,7 @@ class Factory
      *
      * @var \Illuminate\Support\Collection|null
      */
-    protected $expectations;
+    protected $stubCallbacks;
 
     /**
      * Indicates if the factory is recording requests and responses.
@@ -41,7 +41,7 @@ class Factory
      */
     public function __construct()
     {
-        $this->expectations = collect();
+        $this->stubCallbacks = collect();
     }
 
     /**
@@ -98,7 +98,7 @@ class Factory
             return;
         }
 
-        $this->expectations = $this->expectations->merge(collect([
+        $this->stubCallbacks = $this->stubCallbacks->merge(collect([
             $callback instanceof Closure
                     ? $callback
                     : function () use ($callback) {
@@ -219,7 +219,7 @@ class Factory
         }
 
         return tap(new PendingRequest($this), function ($request) {
-            $request->stub($this->expectations);
+            $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
     }
 }
