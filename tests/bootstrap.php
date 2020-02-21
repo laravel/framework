@@ -30,3 +30,5 @@ use Illuminate\Support\Carbon;
 date_default_timezone_set('UTC');
 
 Carbon::setTestNow(Carbon::now());
+
+setlocale(LC_ALL, 'C.UTF-8');
