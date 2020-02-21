@@ -122,11 +122,11 @@ abstract class Queue
     protected function createObjectPayload($job, $queue)
     {
         $payload = $this->withCreatePayloadHooks($queue, [
+            'maxExceptions' => $job->allowedExceptions ?? null,
             'displayName' => $this->getDisplayName($job),
             'uuid' => (string) Str::uuid(),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
-            'maxExceptions' => $job->allowedExceptions ?? null,
             'delay' => $this->getJobRetryDelay($job),
             'timeout' => $job->timeout ?? null,
             'timeoutAt' => $this->getJobExpiration($job),
@@ -203,8 +203,8 @@ abstract class Queue
     protected function createStringPayload($job, $queue, $data)
     {
         return $this->withCreatePayloadHooks($queue, [
-            'displayName' => is_string($job) ? explode('@', $job)[0] : null,
             'uuid' => (string) Str::uuid(),
+            'displayName' => is_string($job) ? explode('@', $job)[0] : null,
             'job' => $job,
             'maxTries' => null,
             'maxExceptions' => null,
