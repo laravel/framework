@@ -39,7 +39,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
         $this->expectException(QueryException::class);
 
-        $this->expectExceptionMessage("Access denied for user 'root'@'localhost'");
+        $this->expectExceptionMessage("Access denied for user 'root'@");
 
         try {
             $this->withoutExceptionHandling()->get('/auth', ['Authorization' => 'Bearer whatever']);
