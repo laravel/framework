@@ -9,6 +9,10 @@ use RuntimeException;
 
 class MySqlGrammar extends Grammar
 {
+    public const LENGTH_LIMIT_TINYBLOB   = 255;
+    public const LENGTH_LIMIT_BLOB       = 65535;
+    public const LENGTH_LIMIT_MEDIUMBLOB = 16777215;
+
     /**
      * The possible column modifiers.
      *
@@ -723,7 +727,16 @@ class MySqlGrammar extends Grammar
      */
     protected function typeBinary(Fluent $column)
     {
-        return 'blob';
+        $length = $column->length ?? static::LENGTH_LIMIT_BLOB;
+        if ($length <= self::LENGTH_LIMIT_TINYBLOB) {
+            return 'tinyblob';
+        } else if ($length <= static::LENGTH_LIMIT_BLOB) {
+            return 'blob';
+        } else if ($length <= static::LENGTH_LIMIT_MEDIUMBLOB) {
+            return 'mediumblob';
+        } else {
+            return 'longblob';
+        }
     }
 
     /**
