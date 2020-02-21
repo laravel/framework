@@ -246,6 +246,26 @@ abstract class Job
     }
 
     /**
+     * Get the number of times to attempt a job after an exception.
+     *
+     * @return int|null
+     */
+    public function maxExceptions()
+    {
+        return $this->payload()['maxExceptions'] ?? null;
+    }
+
+    /**
+     * Get the UUID of the job.
+     *
+     * @return string|null
+     */
+    public function uuid()
+    {
+        return $this->payload()['uuid'] ?? null;
+    }
+
+    /**
      * Get the number of seconds to delay a failed job before retrying it.
      *
      * @return int|null

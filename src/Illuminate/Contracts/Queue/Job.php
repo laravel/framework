@@ -100,6 +100,20 @@ interface Job
     public function maxTries();
 
     /**
+     * Get the number of times to attempt a job after an exception.
+     *
+     * @return int|null
+     */
+    public function maxExceptions();
+
+    /**
+     * Get the UUID of the job.
+     *
+     * @return string|null
+     */
+    public function uuid();
+
+    /**
      * Get the number of seconds the job can run.
      *
      * @return int|null

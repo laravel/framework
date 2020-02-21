@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
 
 abstract class Queue
 {
@@ -122,8 +123,10 @@ abstract class Queue
     {
         $payload = $this->withCreatePayloadHooks($queue, [
             'displayName' => $this->getDisplayName($job),
+            'uuid' => (string) Str::uuid(),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
+            'maxExceptions' => $job->allowedExceptions ?? null,
             'delay' => $this->getJobRetryDelay($job),
             'timeout' => $job->timeout ?? null,
             'timeoutAt' => $this->getJobExpiration($job),
@@ -201,8 +204,10 @@ abstract class Queue
     {
         return $this->withCreatePayloadHooks($queue, [
             'displayName' => is_string($job) ? explode('@', $job)[0] : null,
+            'uuid' => (string) Str::uuid(),
             'job' => $job,
             'maxTries' => null,
+            'maxExceptions' => null,
             'delay' => null,
             'timeout' => null,
             'data' => $data,
