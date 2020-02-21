@@ -723,7 +723,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeBinary(Fluent $column)
     {
-        return 'blob';
+        return 'longblob';
     }
 
     /**
