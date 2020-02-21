@@ -1049,7 +1049,7 @@ trait HasAttributes
     protected function isClassCastable($key)
     {
         return array_key_exists($key, $this->getCasts()) &&
-                class_exists($class = $this->getCasts()[$key]) &&
+                class_exists($class = $this->parseCasterClass($this->getCasts()[$key])) &&
                 ! in_array($class, static::$primitiveCastTypes);
     }
 
@@ -1068,6 +1068,19 @@ trait HasAttributes
         $segments = explode(':', $castType, 2);
 
         return new $segments[0](...explode(',', $segments[1]));
+    }
+
+    /**
+     * Parse the given caster class, removing any arguments.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function parseCasterClass($class)
+    {
+        return strpos($class, ':') === false
+                        ? $class
+                        : explode(':', $class, 2)[0];
     }
 
     /**
