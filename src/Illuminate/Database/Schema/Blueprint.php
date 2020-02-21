@@ -1059,11 +1059,14 @@ class Blueprint
      * Create a new binary column on the table.
      *
      * @param  string  $column
+     * @param  int|null  $length
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function binary($column)
+    public function binary($column, $length = null)
     {
-        return $this->addColumn('binary', $column);
+        $length = $length ?: Builder::$defaultBinaryLength;
+
+        return $this->addColumn('binary', $column, compact('length'));
     }
 
     /**
