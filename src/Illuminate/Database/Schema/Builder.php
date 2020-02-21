@@ -39,13 +39,6 @@ class Builder
     public static $defaultStringLength = 255;
 
     /**
-     * The default binary length for migrations.
-     *
-     * @var int
-     */
-    public static $defaultBinaryLength = 65535;
-
-    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection

@@ -1064,8 +1064,6 @@ class Blueprint
      */
     public function binary($column, $length = null)
     {
-        $length = $length ?: Builder::$defaultBinaryLength;
-
         return $this->addColumn('binary', $column, compact('length'));
     }
 
