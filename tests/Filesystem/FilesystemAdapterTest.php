@@ -44,7 +44,7 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertSame('Hello World', $content);
-        // $this->assertSame('inline; filename="file.txt"', $response->headers->get('content-disposition'));
+        $this->assertSame('inline; filename=file.txt', $response->headers->get('content-disposition'));
     }
 
     public function testDownload()
@@ -53,7 +53,7 @@ class FilesystemAdapterTest extends TestCase
         $files = new FilesystemAdapter($this->filesystem);
         $response = $files->download('file.txt', 'hello.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
-        // $this->assertSame('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
+        $this->assertSame('attachment; filename=hello.txt', $response->headers->get('content-disposition'));
     }
 
     public function testDownloadNonAsciiFilename()
