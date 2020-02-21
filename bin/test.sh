@@ -3,7 +3,7 @@
 docker-compose down -t 0 &> /dev/null
 docker-compose up -d
 
-echo "Waiting for services to boot..."
+echo "Waiting for services to boot   ..."
 
 if docker run -it --rm registry.gitlab.com/grahamcampbell/php:7.4-base -r "\$tries = 0; while (true) { try { \$tries++; if (\$tries > 30) { throw new RuntimeException('MySQL never became available'); } sleep(1); new PDO('mysql:host=docker.for.mac.localhost;dbname=forge', 'root', '', [PDO::ATTR_TIMEOUT => 3]); break; } catch (PDOException \$e) {} }"; then
     if docker run -it -w /data -v ${PWD}:/data:delegated --entrypoint vendor/bin/phpunit \
