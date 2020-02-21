@@ -469,7 +469,8 @@ class Worker
      */
     protected function markJobAsFailedIfWillExceedMaxExceptions($connectionName, $job, Throwable $e)
     {
-        if (is_null($maxExceptions = $job->maxExceptions()) || ! $uuid = $job->uuid()) {
+        if (! $this->cache || ! $uuid = $job->uuid() ||
+           is_null($maxExceptions = $job->maxExceptions())) {
             return;
         }
 
