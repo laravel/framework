@@ -14,17 +14,17 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
     public function testBasicCustomCasting()
     {
         $model = new TestEloquentModelWithCustomCast;
-        $model->reversed = 'taylor';
+        $model->uppercase = 'taylor';
 
-        $this->assertEquals('taylor', $model->reversed);
-        $this->assertEquals('rolyat', $model->getAttributes()['reversed']);
-        $this->assertEquals('rolyat', $model->toArray()['reversed']);
+        $this->assertEquals('TAYLOR', $model->uppercase);
+        $this->assertEquals('TAYLOR', $model->getAttributes()['uppercase']);
+        $this->assertEquals('TAYLOR', $model->toArray()['uppercase']);
 
         $unserializedModel = unserialize(serialize($model));
 
-        $this->assertEquals('taylor', $unserializedModel->reversed);
-        $this->assertEquals('rolyat', $unserializedModel->getAttributes()['reversed']);
-        $this->assertEquals('rolyat', $unserializedModel->toArray()['reversed']);
+        $this->assertEquals('TAYLOR', $unserializedModel->uppercase);
+        $this->assertEquals('TAYLOR', $unserializedModel->getAttributes()['uppercase']);
+        $this->assertEquals('TAYLOR', $unserializedModel->toArray()['uppercase']);
 
         $model = new TestEloquentModelWithCustomCast;
 
@@ -68,6 +68,11 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $model->options);
 
         $this->assertEquals(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
+
+        $model = new TestEloquentModelWithCustomCast(['options' => []]);
+        $model->syncOriginal();
+        $model->options = ['foo' => 'bar'];
+        $this->assertTrue($model->isDirty('options'));
     }
 
     public function testOneWayCasting()
@@ -113,6 +118,13 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 class TestEloquentModelWithCustomCast extends Model
 {
     /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
@@ -121,7 +133,7 @@ class TestEloquentModelWithCustomCast extends Model
         'address' => AddressCaster::class,
         'password' => HashCaster::class,
         'other_password' => HashCaster::class.':md5',
-        'reversed' => ReverseCaster::class,
+        'uppercase' => UppercaseCaster::class,
         'options' => JsonCaster::class,
     ];
 }
@@ -139,16 +151,16 @@ class HashCaster implements CastsInboundAttributes
     }
 }
 
-class ReverseCaster implements CastsAttributes
+class UppercaseCaster implements CastsAttributes
 {
     public function get($model, $key, $value, $attributes)
     {
-        return strrev($value);
+        return strtoupper($value);
     }
 
     public function set($model, $key, $value, $attributes)
     {
-        return [$key => strrev($value)];
+        return [$key => strtoupper($value)];
     }
 }
 

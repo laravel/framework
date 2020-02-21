@@ -39,7 +39,7 @@ trait HasAttributes
     protected $changes = [];
 
     /**
-     * The attributes that should be cast to native types.
+     * The attributes that should be cast.
      *
      * @var array
      */
@@ -207,8 +207,7 @@ trait HasAttributes
     {
         foreach ($this->getCasts() as $key => $value) {
             if (! array_key_exists($key, $attributes) ||
-                in_array($key, $mutatedAttributes) ||
-                $this->isClassCastable($key)) {
+                in_array($key, $mutatedAttributes)) {
                 continue;
             }
 
@@ -733,7 +732,7 @@ trait HasAttributes
             );
         }
 
-        if ($caster instanceof CastsInboundAttributes || is_null($value)) {
+        if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
             unset($this->classCastCache[$key]);
         } else {
             $this->classCastCache[$key] = $value;
@@ -1050,7 +1049,7 @@ trait HasAttributes
     protected function isClassCastable($key)
     {
         return array_key_exists($key, $this->getCasts()) &&
-                class_exists($class = $this->getCasts()[$key]) &&
+                class_exists($class = $this->parseCasterClass($this->getCasts()[$key])) &&
                 ! in_array($class, static::$primitiveCastTypes);
     }
 
@@ -1069,6 +1068,19 @@ trait HasAttributes
         $segments = explode(':', $castType, 2);
 
         return new $segments[0](...explode(',', $segments[1]));
+    }
+
+    /**
+     * Parse the given caster class, removing any arguments.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function parseCasterClass($class)
+    {
+        return strpos($class, ':') === false
+                        ? $class
+                        : explode(':', $class, 2)[0];
     }
 
     /**
@@ -1342,8 +1354,8 @@ trait HasAttributes
             return false;
         }
 
-        $attribute = $this->getAttribute($key);
-        $original = $this->getOriginal($key);
+        $attribute = Arr::get($this->attributes, $key);
+        $original = Arr::get($this->original, $key);
 
         if ($attribute === $original) {
             return true;
@@ -1352,13 +1364,13 @@ trait HasAttributes
         } elseif ($this->isDateAttribute($key)) {
             return $this->fromDateTime($attribute) ===
                    $this->fromDateTime($original);
-        } elseif ($this->hasCast($key, ['object', 'collection'])) {
+        } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ==
                 $this->castAttribute($key, $original);
         }
 
         return is_numeric($attribute) && is_numeric($original)
-                && strcmp((string) $attribute, (string) $original) === 0;
+               && strcmp((string) $attribute, (string) $original) === 0;
     }
 
     /**

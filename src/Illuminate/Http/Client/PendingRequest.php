@@ -62,7 +62,7 @@ class PendingRequest
      *
      * @var \Illuminate\Support\Collection|null
      */
-    protected $expectations;
+    protected $stubCallbacks;
 
     /**
      * Create a new HTTP Client instance.
@@ -503,13 +503,19 @@ class PendingRequest
     {
         return function ($handler) {
             return function ($request, $options) use ($handler) {
-                $response = ($this->expectations ?? collect())
+                $response = ($this->stubCallbacks ?? collect())
                      ->map
                      ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
                      ->filter()
-                     ->first(null, $handler($request, $options));
+                     ->first();
 
-                return is_array($response) ? Factory::response($response) : $response;
+                if (is_null($response)) {
+                    return $handler($request, $options);
+                } elseif (is_array($response)) {
+                    return Factory::response($response);
+                }
+
+                return $response;
             };
         };
     }
@@ -563,7 +569,7 @@ class PendingRequest
      */
     public function stub($callback)
     {
-        $this->expectations = collect($callback);
+        $this->stubCallbacks = collect($callback);
 
         return $this;
     }

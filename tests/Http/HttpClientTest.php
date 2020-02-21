@@ -190,4 +190,17 @@ class HttpClientTest extends TestCase
 
         $factory->assertSequencesAreEmpty();
     }
+
+    public function testFakeSequence()
+    {
+        $factory = new Factory;
+
+        $factory->fakeSequence()
+            ->pushStatus(201)
+            ->pushStatus(301);
+
+        /** @var PendingRequest $factory */
+        $this->assertSame(201, $factory->get('https://example.com')->status());
+        $this->assertSame(301, $factory->get('https://example.com')->status());
+    }
 }

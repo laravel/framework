@@ -94,6 +94,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testDirtyOnCastOrDateAttributes()
     {
         $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
         $model->boolAttribute = 1;
         $model->foo = 1;
         $model->bar = '2017-03-18';
