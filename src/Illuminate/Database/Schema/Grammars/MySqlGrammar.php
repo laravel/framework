@@ -730,9 +730,9 @@ class MySqlGrammar extends Grammar
         $length = $column->length ?? static::LENGTH_LIMIT_BLOB;
         if ($length <= self::LENGTH_LIMIT_TINYBLOB) {
             return 'tinyblob';
-        } else if ($length <= static::LENGTH_LIMIT_BLOB) {
+        } elseif ($length <= static::LENGTH_LIMIT_BLOB) {
             return 'blob';
-        } else if ($length <= static::LENGTH_LIMIT_MEDIUMBLOB) {
+        } elseif ($length <= static::LENGTH_LIMIT_MEDIUMBLOB) {
             return 'mediumblob';
         } else {
             return 'longblob';
