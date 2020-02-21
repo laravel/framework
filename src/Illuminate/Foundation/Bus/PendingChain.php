@@ -7,9 +7,9 @@ class PendingChain
     /**
      * The class name of the job being dispatched.
      *
-     * @var string
+     * @var mixed
      */
-    public $class;
+    public $job;
 
     /**
      * The jobs to be chained.
@@ -21,13 +21,13 @@ class PendingChain
     /**
      * Create a new PendingChain instance.
      *
-     * @param  string  $class
+     * @param  mixed  $job
      * @param  array  $chain
      * @return void
      */
-    public function __construct($class, $chain)
+    public function __construct($job, $chain)
     {
-        $this->class = $class;
+        $this->job = $job;
         $this->chain = $chain;
     }
 
@@ -38,8 +38,10 @@ class PendingChain
      */
     public function dispatch()
     {
-        return (new PendingDispatch(
-            new $this->class(...func_get_args())
-        ))->chain($this->chain);
+        $firstJob = is_string($this->job)
+                    ? new $this->job(...func_get_args())
+                    : $this->job;
+
+        return (new PendingDispatch($firstJob))->chain($this->chain);
     }
 }
