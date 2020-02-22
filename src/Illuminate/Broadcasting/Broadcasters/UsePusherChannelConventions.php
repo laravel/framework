@@ -26,9 +26,8 @@ trait UsePusherChannelConventions
     public function normalizeChannelName($channel)
     {
         foreach (['private-encrypted-', 'private-', 'presence-'] as $prefix) {
-            $replacement = Str::replaceFirst($prefix, '', $channel);
-            if ($replacement !== $channel) {
-                return $replacement;
+            if (Str::startsWith($channel, $prefix)) {
+                return Str::replaceFirst($prefix, '', $channel);
             }
         }
 
