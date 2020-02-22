@@ -21,6 +21,16 @@ class UsePusherChannelConventionsTest extends TestCase
         );
     }
 
+    public function testChannelNameNormalizationSpecialCase()
+    {
+        $broadcaster = new FakeBroadcasterUsingPusherChannelsNames();
+
+        $this->assertSame(
+            'private-123',
+            $broadcaster->normalizeChannelName('private-encrypted-private-123')
+        );
+    }
+
     /**
      * @dataProvider channelsProvider
      */
@@ -48,7 +58,6 @@ class UsePusherChannelConventionsTest extends TestCase
             'test-channel',
             'test-private-channel',
             'test-presence-channel',
-            'private-123',
             'abcd.efgh',
             'abcd.efgh.ijkl',
             'test.{param}',
