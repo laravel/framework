@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 
@@ -51,6 +52,28 @@ class JobChainingTest extends TestCase
         JobChainingTestFirstJob::withChain([
             new JobChainingTestSecondJob,
         ])->dispatch();
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testJobsCanBeChainedOnSuccessUsingBusFacade()
+    {
+        Bus::dispatchChain([
+            new JobChainingTestFirstJob(),
+            new JobChainingTestSecondJob(),
+        ]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testJobsCanBeChainedOnSuccessUsingBusFacadeAsArguments()
+    {
+        Bus::dispatchChain(
+            new JobChainingTestFirstJob(),
+            new JobChainingTestSecondJob()
+        );
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
