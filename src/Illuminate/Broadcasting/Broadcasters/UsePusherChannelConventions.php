@@ -14,7 +14,7 @@ trait UsePusherChannelConventions
      */
     public function isGuardedChannel($channel)
     {
-        return Str::startsWith($channel, ['private-', 'presence-']);
+        return Str::startsWith($channel, ['private-', 'presence-', 'private-encrypted-']);
     }
 
     /**
@@ -27,7 +27,7 @@ trait UsePusherChannelConventions
     {
         if ($this->isGuardedChannel($channel)) {
             return Str::startsWith($channel, 'private-')
-                ? Str::replaceFirst('private-', '', $channel)
+                ? Str::replaceFirst('private-', '', Str::replaceFirst('private-encrypted-', '', $channel))
                 : Str::replaceFirst('presence-', '', $channel);
         }
 
