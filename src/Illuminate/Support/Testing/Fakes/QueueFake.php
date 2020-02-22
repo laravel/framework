@@ -122,7 +122,7 @@ class QueueFake extends QueueManager implements Queue
     protected function assertPushedWithChainOfObjects($job, $expectedChain, $callback)
     {
         $chain = collect($expectedChain)->map(function ($job) {
-            return $job;
+            return serialize($job);
         })->all();
 
         PHPUnit::assertTrue(
@@ -145,7 +145,7 @@ class QueueFake extends QueueManager implements Queue
     {
         $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
             return collect($chain)->map(function ($job) {
-                return get_class($job);
+                return get_class(unserialize($job));
             });
         })->filter(function ($chain) use ($expectedChain) {
             return $chain->all() === $expectedChain;
