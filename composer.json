@@ -14,6 +14,11 @@
             "email": "taylor@laravel.com"
         }
     ],
+    "conflict": {
+        "mockery/mockery": "<1.3.1|>=2.0",
+        "phpunit/phpunit": "<8.4|>=10",
+        "tightenco/collect": "<5.5.33"
+    },
     "require": {
         "php": "^7.2.5",
         "ext-json": "*",
@@ -75,9 +80,6 @@
         "illuminate/validation": "self.version",
         "illuminate/view": "self.version"
     },
-    "conflict": {
-        "tightenco/collect": "<5.5.33"
-    },
     "require-dev": {
         "aws/aws-sdk-php": "^3.0",
         "doctrine/dbal": "^2.6",
@@ -129,9 +131,11 @@
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^1.0).",
         "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
+        "mockery/mockery": "Required to use mocking (^1.3.1).",
         "moontoast/math": "Required to use ordered UUIDs (^1.1).",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
+        "phpunit/phpunit": "Required to use assertions and run tests (^8.4|^9.0).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^5.0).",
