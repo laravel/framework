@@ -45,13 +45,6 @@ class PendingRequest
     protected $options = [];
 
     /**
-     * The callbacks that should execute before the request is sent.
-     *
-     * @var array
-     */
-    protected $beforeSendingCallbacks;
-
-    /**
      * @var Client
      */
     private $guzzle;
@@ -298,19 +291,6 @@ class PendingRequest
     {
         return tap($this, function ($request) use ($options) {
             return $this->options = array_merge_recursive($this->options, $options);
-        });
-    }
-
-    /**
-     * Add a new "before sending" callback to the request.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function beforeSending($callback)
-    {
-        return tap($this, function () use ($callback) {
-            $this->beforeSendingCallbacks[] = $callback;
         });
     }
 

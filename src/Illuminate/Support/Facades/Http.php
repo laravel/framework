@@ -23,7 +23,6 @@ use Illuminate\Support\Testing\Fakes\HttpFake;
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest withOptions(array $options)
- * @method static \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
  * @method static \Illuminate\Http\Client\Response get(string $url, array $query = [])
  * @method static \Illuminate\Http\Client\Response post(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response patch(string $url, array $data = [])
