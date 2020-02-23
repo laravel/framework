@@ -67,6 +67,12 @@ class HttpFake
         );
     }
 
+    /**
+     * Assert the amount of responses in the mock queue.
+     *
+     * @param  int  $expected
+     * @return void
+     */
     public function assertMockQueueCount($expected)
     {
         PHPUnit::assertSame(
@@ -74,13 +80,16 @@ class HttpFake
             $actual = $this->mockHandler->count(),
             "The Guzzle mock queue did not contain the expected amount of responses (expected: $expected, actual $actual)"
         );
-
-        return $this;
     }
 
+    /**
+     * Assert that the mock queue is empty.
+     *
+     * @return void
+     */
     public function assertMockQueueEmpty()
     {
-        return $this->assertMockQueueCount(0);
+        $this->assertMockQueueCount(0);
     }
 
     /**

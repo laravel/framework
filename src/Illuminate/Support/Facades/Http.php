@@ -30,8 +30,13 @@ use Illuminate\Support\Testing\Fakes\HttpFake;
  * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
+ * @method static void assertSent(callable $callback)
+ * @method static void assertMockQueueCount(int $expected)
+ * @method static void assertMockQueueEmpty()
+ * @method static \Illuminate\Support\Collection history(callable $callback = null)
  *
  * @see \Illuminate\Http\Client\PendingRequest
+ * @see \Illuminate\Support\Testing\Fakes\HttpFake
  */
 class Http extends Facade
 {
