@@ -18,7 +18,7 @@ use Illuminate\Support\Testing\Fakes\HttpFake;
  * @method static \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withToken(string $token, string $type = 'Bearer')
- * @method static \Illuminate\Http\Client\PendingRequest withCookies(array $cookies)
+ * @method static \Illuminate\Http\Client\PendingRequest withCookies(\GuzzleHttp\Cookie\CookieJarInterface $cookies)
  * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)

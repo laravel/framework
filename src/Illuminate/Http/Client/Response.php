@@ -27,6 +27,20 @@ class Response implements ArrayAccess
     protected $decoded;
 
     /**
+     * The Guzzle transfer stats.
+     *
+     * @var \GuzzleHttp\TransferStats
+     */
+    public $transferStats;
+
+    /**
+     * The cookies present in the response.
+     *
+     * @var \GuzzleHttp\Cookie\CookieJarInterface|null
+     */
+    public $cookies;
+
+    /**
      * Create a new response instance.
      *
      * @param  \Psr\Http\Message\MessageInterface
@@ -156,7 +170,7 @@ class Response implements ArrayAccess
     /**
      * Get the response cookies.
      *
-     * @return array
+     * @return \GuzzleHttp\Cookie\CookieJarInterface|null
      */
     public function cookies()
     {

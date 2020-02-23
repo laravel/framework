@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Psr7\Uri;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Testing\Fakes\HttpFake;
 use Illuminate\Support\Testing\HttpHistory;
@@ -152,5 +154,35 @@ class SupportTestingHttpFakeTest extends TestCase
 
         $response = $factory->get('https://laravel.com');
         $this->assertSame(422, $response->status());
+    }
+
+    public function testWithCookies()
+    {
+        $factory = (new HttpFake)
+            ->pushStatus(200);
+
+        /** @var PendingRequest $factory */
+        $response = $factory->withCookies(
+            CookieJar::fromArray(['bar' => 'baz'], 'http://laravel.com')
+        )->get('http://laravel.com');
+
+        $cookieArray = $response->cookies()->toArray();
+
+        $this->assertSame('bar', $cookieArray[0]['Name']);
+        $this->assertSame('baz', $cookieArray[0]['Value']);
+        $this->assertSame('http://laravel.com', $cookieArray[0]['Domain']);
+    }
+
+    public function testEffectiveUriFromTransferStats()
+    {
+        $factory = (new HttpFake)
+            ->push('Ok');
+
+        /** @var PendingRequest $factory */
+        $response = $factory->get('https://laravel.com');
+
+        $this->assertInstanceOf(Uri::class, $response->effectiveUri());
+
+        $this->assertSame('https://laravel.com', (string) $response->effectiveUri());
     }
 }

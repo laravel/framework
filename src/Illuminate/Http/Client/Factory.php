@@ -15,7 +15,7 @@ class Factory
      */
     public function __call($method, $parameters)
     {
-        $pendingRequest = new PendingRequest(new Guzzle);
+        $pendingRequest = new PendingRequest(new Guzzle(['cookies' => true]));
 
         return $pendingRequest->{$method}(...$parameters);
     }

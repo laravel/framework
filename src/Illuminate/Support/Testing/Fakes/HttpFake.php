@@ -198,7 +198,10 @@ class HttpFake
             $this->pushResponse(($this->defaultResponseClosure)());
         }
 
-        $pendingRequest = new PendingRequest(new Guzzle(['handler' => $this->handlerStack]));
+        $pendingRequest = new PendingRequest(new Guzzle([
+            'handler' => $this->handlerStack,
+            'cookies' => true,
+        ]));
 
         return $pendingRequest->{$method}(...$parameters);
     }

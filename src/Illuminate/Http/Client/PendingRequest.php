@@ -59,7 +59,7 @@ class PendingRequest
     /**
      * Create a new HTTP Client instance.
      *
-     * @param  \Illuminate\Http\Client\Factory|null  $factory
+     * @param  \GuzzleHttp\Client  $guzzle
      * @return void
      */
     public function __construct(Client $guzzle)
@@ -71,10 +71,6 @@ class PendingRequest
         $this->options = [
             'http_errors' => false,
         ];
-
-        $this->beforeSendingCallbacks = collect([function ($request, array $options) {
-            $this->cookies = $options['cookies'];
-        }]);
     }
 
     /**
@@ -239,10 +235,10 @@ class PendingRequest
     /**
      * Specify the cookies that should be included with the request.
      *
-     * @param  array  $cookies
+     * @param  \GuzzleHttp\Cookie\CookieJarInterface  $cookies
      * @return $this
      */
-    public function withCookies(array $cookies)
+    public function withCookies($cookies)
     {
         return tap($this, function ($request) use ($cookies) {
             return $this->options = array_merge_recursive($this->options, [
@@ -407,21 +403,19 @@ class PendingRequest
         $this->pendingFiles = [];
 
         try {
-            $response = $this->guzzle->request($method, $url, $this->mergeOptions([
+            $options = $this->mergeOptions([
                 'laravel_data' => $options[$this->bodyFormat] ?? [],
                 'query' => $this->parseQueryParams($url),
                 'on_stats' => function ($transferStats) {
                     $this->transferStats = $transferStats;
                 },
-            ], $options));
+            ], $options);
 
-            $wrappedResponse = new Response($response);
+            return tap(new Response($this->guzzle->request($method, $url, $options)), function (Response $response) use ($options) {
+                $response->cookies = $options['cookies'] ?? null;
 
-            $wrappedResponse->cookies = $this->cookies;
-
-            $wrappedResponse->transferStats = $this->transferStats;
-
-            return $wrappedResponse;
+                $response->transferStats = $this->transferStats;
+            });
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
             throw new ConnectionException($e->getMessage(), 0, $e);
         }
