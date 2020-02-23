@@ -1,12 +1,12 @@
 <?php
 
-namespace Illuminate\Http\Client;
+namespace Illuminate\Support\Testing;
 
 use ArrayAccess;
 use Illuminate\Support\Str;
 use LogicException;
 
-class Request implements ArrayAccess
+class HttpRequest implements ArrayAccess
 {
     /**
      * The underlying PSR request.
@@ -36,7 +36,7 @@ class Request implements ArrayAccess
     /**
      * Get the request method.
      *
-     * @return strign
+     * @return string
      */
     public function method()
     {

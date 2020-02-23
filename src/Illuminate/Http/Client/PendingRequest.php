@@ -2,18 +2,12 @@
 
 namespace Illuminate\Http\Client;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\Traits\Macroable;
 
 class PendingRequest
 {
     use Macroable;
-
-    /**
-     * The factory instance.
-     *
-     * @var \Illuminate\Http\Client\Factory|null
-     */
-    protected $factory;
 
     /**
      * The request body format.
@@ -58,11 +52,9 @@ class PendingRequest
     protected $beforeSendingCallbacks;
 
     /**
-     * The stub callables that will handle requests.
-     *
-     * @var \Illuminate\Support\Collection|null
+     * @var Client
      */
-    protected $stubCallbacks;
+    private $guzzle;
 
     /**
      * Create a new HTTP Client instance.
@@ -70,9 +62,9 @@ class PendingRequest
      * @param  \Illuminate\Http\Client\Factory|null  $factory
      * @return void
      */
-    public function __construct(Factory $factory = null)
+    public function __construct(Client $guzzle)
     {
-        $this->factory = $factory;
+        $this->guzzle = $guzzle;
 
         $this->asJson();
 
@@ -80,7 +72,7 @@ class PendingRequest
             'http_errors' => false,
         ];
 
-        $this->beforeSendingCallbacks = collect([function (Request $request, array $options) {
+        $this->beforeSendingCallbacks = collect([function ($request, array $options) {
             $this->cookies = $options['cookies'];
         }]);
     }
@@ -415,126 +407,24 @@ class PendingRequest
         $this->pendingFiles = [];
 
         try {
-            return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
+            $response = $this->guzzle->request($method, $url, $this->mergeOptions([
                 'laravel_data' => $options[$this->bodyFormat] ?? [],
                 'query' => $this->parseQueryParams($url),
                 'on_stats' => function ($transferStats) {
                     $this->transferStats = $transferStats;
                 },
-            ], $options))), function ($response) {
-                $response->cookies = $this->cookies;
-                $response->transferStats = $this->transferStats;
-            });
+            ], $options));
+
+            $wrappedResponse = new Response($response);
+
+            $wrappedResponse->cookies = $this->cookies;
+
+            $wrappedResponse->transferStats = $this->transferStats;
+
+            return $wrappedResponse;
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
             throw new ConnectionException($e->getMessage(), 0, $e);
         }
-    }
-
-    /**
-     * Build the Guzzle client.
-     *
-     * @return \GuzzleHttp\Client
-     */
-    public function buildClient()
-    {
-        return new \GuzzleHttp\Client([
-            'handler' => $this->buildHandlerStack(),
-            'cookies' => true,
-        ]);
-    }
-
-    /**
-     * Build the before sending handler stack.
-     *
-     * @return \GuzzleHttp\HandlerStack
-     */
-    public function buildHandlerStack()
-    {
-        return tap(\GuzzleHttp\HandlerStack::create(), function ($stack) {
-            $stack->push($this->buildBeforeSendingHandler());
-            $stack->push($this->buildRecorderHandler());
-            $stack->push($this->buildStubHandler());
-        });
-    }
-
-    /**
-     * Build the before sending handler.
-     *
-     * @return \Closure
-     */
-    public function buildBeforeSendingHandler()
-    {
-        return function ($handler) {
-            return function ($request, $options) use ($handler) {
-                return $handler($this->runBeforeSendingCallbacks($request, $options), $options);
-            };
-        };
-    }
-
-    /**
-     * Build the recorder handler.
-     *
-     * @return \Closure
-     */
-    public function buildRecorderHandler()
-    {
-        return function ($handler) {
-            return function ($request, $options) use ($handler) {
-                $promise = $handler($this->runBeforeSendingCallbacks($request, $options), $options);
-
-                return $promise->then(function ($response) use ($request, $options) {
-                    optional($this->factory)->recordRequestResponsePair(
-                        (new Request($request))->withData($options['laravel_data']),
-                        new Response($response)
-                    );
-
-                    return $response;
-                });
-            };
-        };
-    }
-
-    /**
-     * Build the stub handler.
-     *
-     * @return \Closure
-     */
-    public function buildStubHandler()
-    {
-        return function ($handler) {
-            return function ($request, $options) use ($handler) {
-                $response = ($this->stubCallbacks ?? collect())
-                     ->map
-                     ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
-                     ->filter()
-                     ->first();
-
-                if (is_null($response)) {
-                    return $handler($request, $options);
-                } elseif (is_array($response)) {
-                    return Factory::response($response);
-                }
-
-                return $response;
-            };
-        };
-    }
-
-    /**
-     * Execute the "before sending" callbacks.
-     *
-     * @param  \GuzzleHttp\Psr7\RequestInterface
-     * @param  array  $options
-     * @return \Closure
-     */
-    public function runBeforeSendingCallbacks($request, array $options)
-    {
-        return tap($request, function ($request) use ($options) {
-            $this->beforeSendingCallbacks->each->__invoke(
-                (new Request($request))->withData($options['laravel_data']),
-                $options
-            );
-        });
     }
 
     /**
@@ -559,18 +449,5 @@ class PendingRequest
         return tap([], function (&$query) use ($url) {
             parse_str(parse_url($url, PHP_URL_QUERY), $query);
         });
-    }
-
-    /**
-     * Register a stub callable that will intercept requests and be able to return stub responses.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function stub($callback)
-    {
-        $this->stubCallbacks = collect($callback);
-
-        return $this;
     }
 }
