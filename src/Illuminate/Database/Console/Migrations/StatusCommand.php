@@ -77,14 +77,14 @@ class StatusCommand extends BaseCommand
      */
     protected function getStatusFor(array $ran, array $batches)
     {
-        return Collection::make($this->getAllMigrationFiles())
-                    ->map(function ($migration) use ($ran, $batches) {
-                        $migrationName = $this->migrator->getMigrationName($migration);
+        return collect($this->getAllMigrationFiles())
+                ->map(function ($migration) use ($ran, $batches) {
+                    $migrationName = $this->migrator->getMigrationName($migration);
 
-                        return in_array($migrationName, $ran)
-                                ? ['<info>Yes</info>', $migrationName, $batches[$migrationName]]
-                                : ['<fg=red>No</fg=red>', $migrationName];
-                    });
+                    return in_array($migrationName, $ran)
+                            ? ['<info>Yes</info>', $migrationName, $batches[$migrationName]]
+                            : ['<fg=red>No</fg=red>', $migrationName];
+                });
     }
 
     /**

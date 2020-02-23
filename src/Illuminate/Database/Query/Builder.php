@@ -2015,7 +2015,7 @@ class Builder
      */
     protected function removeExistingOrdersFor($column)
     {
-        return Collection::make($this->orders)
+        return collect($this->orders)
                     ->reject(function ($order) use ($column) {
                         return isset($order['column'])
                                ? $order['column'] === $column : false;

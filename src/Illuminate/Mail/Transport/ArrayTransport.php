@@ -21,7 +21,7 @@ class ArrayTransport extends Transport
      */
     public function __construct()
     {
-        $this->messages = new Collection;
+        $this->messages = collect();
     }
 
     /**
@@ -53,6 +53,6 @@ class ArrayTransport extends Transport
      */
     public function flush()
     {
-        return $this->messages = new Collection;
+        return $this->messages = collect();
     }
 }

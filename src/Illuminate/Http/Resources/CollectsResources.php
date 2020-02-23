@@ -21,7 +21,7 @@ trait CollectsResources
         }
 
         if (is_array($resource)) {
-            $resource = new Collection($resource);
+            $resource = collect($resource);
         }
 
         $collects = $this->collects();

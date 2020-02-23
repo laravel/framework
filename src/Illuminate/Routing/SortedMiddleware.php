@@ -19,7 +19,7 @@ class SortedMiddleware extends Collection
             $middlewares = $middlewares->all();
         }
 
-        $this->items = $this->sortMiddleware($priorityMap, $middlewares);
+        parent::__construct($this->sortMiddleware($priorityMap, $middlewares));
     }
 
     /**

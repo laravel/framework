@@ -7,7 +7,6 @@ use Countable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 
@@ -50,7 +49,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->lastPage = max((int) ceil($total / $perPage), 1);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->items = collect($items);
     }
 
     /**
