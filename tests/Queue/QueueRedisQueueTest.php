@@ -33,6 +33,8 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
+
+        Str::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoRedisWithCustomPayloadHook()
@@ -56,6 +58,8 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('foo', $id);
 
         Queue::createPayloadUsing(null);
+
+        Str::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoRedisWithTwoCustomPayloadHook()
@@ -83,6 +87,8 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('foo', $id);
 
         Queue::createPayloadUsing(null);
+
+        Str::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobOntoRedis()
@@ -106,6 +112,8 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->later(1, 'foo', ['data']);
         $this->assertSame('foo', $id);
+
+        Str::createUuidsNormally();
     }
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
@@ -129,5 +137,7 @@ class QueueRedisQueueTest extends TestCase
         );
 
         $queue->later($date, 'foo', ['data']);
+
+        Str::createUuidsNormally();
     }
 }

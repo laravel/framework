@@ -38,6 +38,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
 
         $queue->push('foo', ['data']);
+
+        Str::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobOntoDatabase()
@@ -64,6 +66,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
 
         $queue->later(10, 'foo', ['data']);
+
+        Str::createUuidsNormally();
     }
 
     public function testFailureToCreatePayloadFromObject()
@@ -131,6 +135,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
+
+        Str::createUuidsNormally();
     }
 
     public function testBuildDatabaseRecordWithPayloadAtTheEnd()

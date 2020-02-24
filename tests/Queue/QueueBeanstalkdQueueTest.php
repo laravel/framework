@@ -34,6 +34,8 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $queue->push('foo', ['data'], 'stack');
         $queue->push('foo', ['data']);
+
+        Str::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobOntoBeanstalkd()
@@ -52,6 +54,8 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $queue->later(5, 'foo', ['data'], 'stack');
         $queue->later(5, 'foo', ['data']);
+
+        Str::createUuidsNormally();
     }
 
     public function testPopProperlyPopsJobOffOfBeanstalkd()
