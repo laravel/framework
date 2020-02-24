@@ -187,6 +187,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         return $this->validator->validated();
     }
+    
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [];
+    }
 
     /**
      * Get custom messages for validator errors.
