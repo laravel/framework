@@ -65,6 +65,9 @@ class CompiledRouteCollection extends AbstractRouteCollection
             'methods' => $route->methods(),
             'uri' => $route->uri(),
             'action' => $route->getAction() + ['as' => $name],
+            'fallback' => $route->isFallback,
+            'defaults' => $route->defaults,
+            'wheres' => $route->wheres,
         ];
 
         $this->compiled = [];
@@ -219,6 +222,9 @@ class CompiledRouteCollection extends AbstractRouteCollection
     protected function newRoute(array $attributes)
     {
         return (new Route($attributes['methods'], $attributes['uri'], $attributes['action']))
+            ->setFallback($attributes['fallback'])
+            ->setDefaults($attributes['defaults'])
+            ->setWheres($attributes['wheres'])
             ->setRouter($this->router)
             ->setContainer($this->container);
     }
