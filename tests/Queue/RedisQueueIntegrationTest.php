@@ -8,6 +8,7 @@ use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -226,22 +227,28 @@ class RedisQueueIntegrationTest extends TestCase
      */
     public function testBlockingPopProperlyPopsExpiredJobs($driver)
     {
-//        $this->setQueue($driver, 'default', null, 60, 5);
-//
-//        $jobs = [
-//            new RedisQueueIntegrationTestJob(0),
-//            new RedisQueueIntegrationTestJob(1),
-//        ];
-//
-//        $this->queue->later(-200, $jobs[0]);
-//        $this->queue->later(-200, $jobs[1]);
-//
-//        $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-//        $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-//
-//        $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default:notify'));
-//        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
-//        $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+        Str::createUuidsUsing(function () {
+            return 'uuid';
+        });
+
+        $this->setQueue($driver, 'default', null, 60, 5);
+
+        $jobs = [
+            new RedisQueueIntegrationTestJob(0),
+            new RedisQueueIntegrationTestJob(1),
+        ];
+
+        $this->queue->later(-200, $jobs[0]);
+        $this->queue->later(-200, $jobs[1]);
+
+        $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+
+        $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default:notify'));
+        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
+        $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+
+        Str::createUuidsNormally();
     }
 
     /**
