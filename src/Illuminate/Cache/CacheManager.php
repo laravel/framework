@@ -153,7 +153,7 @@ class CacheManager implements FactoryContract
      */
     protected function createFileDriver(array $config)
     {
-        return $this->repository(new FileStore($this->app['files'], $config['path']));
+        return $this->repository(new FileStore($this->app['files'], $config['path'], $config['permission'] ?? null));
     }
 
     /**

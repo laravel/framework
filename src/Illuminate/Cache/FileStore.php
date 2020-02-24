@@ -2,10 +2,10 @@
 
 namespace Illuminate\Cache;
 
-use Exception;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\InteractsWithTime;
+use Throwable;
 
 class FileStore implements Store
 {
@@ -26,16 +26,25 @@ class FileStore implements Store
     protected $directory;
 
     /**
+     * Cache file access permissions in octal.
+     *
+     * @var int
+     */
+    protected $filePermission;
+
+    /**
      * Create a new file cache store instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $directory
+     * @param  int|null  $filePermission
      * @return void
      */
-    public function __construct(Filesystem $files, $directory)
+    public function __construct(Filesystem $files, $directory, ?int $filePermission = null)
     {
         $this->files = $files;
         $this->directory = $directory;
+        $this->filePermission = $filePermission ?? 0775;
     }
 
     /**
@@ -65,7 +74,13 @@ class FileStore implements Store
             $path, $this->expiration($seconds).serialize($value), true
         );
 
-        return $result !== false && $result > 0;
+        if ($result !== false && $result > 0) {
+            $this->files->chmod($path, $this->filePermission);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -173,7 +188,7 @@ class FileStore implements Store
             $expire = substr(
                 $contents = $this->files->get($path, true), 0, 10
             );
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return $this->emptyPayload();
         }
 
@@ -188,7 +203,7 @@ class FileStore implements Store
 
         try {
             $data = unserialize(substr($contents, 10));
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->forget($key);
 
             return $this->emptyPayload();
