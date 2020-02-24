@@ -18,9 +18,9 @@
         "ext-json": "*",
         "illuminate/session": "^8.0",
         "illuminate/support": "^8.0",
-        "symfony/http-foundation": "^5.0",
-        "symfony/http-kernel": "^5.0",
-        "symfony/mime": "^5.0"
+        "symfony/http-foundation": "^5.1",
+        "symfony/http-kernel": "^5.1",
+        "symfony/mime": "^5.1"
     },
     "autoload": {
         "psr-4": {
