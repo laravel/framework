@@ -167,11 +167,11 @@ class HttpClientTest extends TestCase
         ]);
 
         /** @var PendingRequest $factory */
-        $response = $factory->get('https://example.com');
+        $response = $factory->get('https://laravel.com');
         $this->assertSame('Ok', $response->body());
 
         // The sequence is empty, but it should not fail.
-        $factory->get('https://example.com');
+        $factory->get('https://laravel.com');
     }
 
     public function testAssertSequencesAreEmpty()
