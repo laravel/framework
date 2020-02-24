@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
+/**
+ * @method self withoutTrashed() Show only non-trashed records
+ * @method self withTrashed() Show all records
+ * @method self onlyTrashed() Show only trashed records
+ * @method int forceDetach(\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids, bool  $touch) Show only trashed records
+ * @method int syncWithForceDetaching(mixed  $ids) Show only trashed records
+ */
 class BelongsToMany extends Relation
 {
     use Concerns\InteractsWithPivotTable;
@@ -92,6 +99,13 @@ class BelongsToMany extends Relation
     public $withTimestamps = false;
 
     /**
+     * Indicates if soft deletes are available on the pivot table.
+     *
+     * @var bool
+     */
+    public $withSoftDeletes = false;
+
+    /**
      * The custom pivot table column for the created_at timestamp.
      *
      * @var string
@@ -104,6 +118,13 @@ class BelongsToMany extends Relation
      * @var string
      */
     protected $pivotUpdatedAt;
+
+    /**
+     * The custom pivot table column for the deleted_at timestamp.
+     *
+     * @var string
+     */
+    protected $pivotDeletedAt;
 
     /**
      * The class name of the custom pivot model to use for the relationship.
@@ -1071,6 +1092,63 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Specify that the pivot table has delete timestamp.
+     *
+     * @param  mixed  $deletedAt
+     * @return $this
+     */
+    public function withSoftDeletes($deletedAt = 'deleted_at')
+    {
+        $this->withSoftDeletes = true;
+
+        $this->pivotDeletedAt = $deletedAt;
+
+        $this->macro('withoutTrashed', function () {
+            $this->query->withGlobalScope('withoutTrashed', function (Builder $query) {
+                $query->whereNull(
+                    $this->getQualifiedDeletedAtColumnName()
+                );
+            })->withoutGlobalScopes(['onlyTrashed']);
+
+            return $this;
+        });
+
+        $this->macro('withTrashed', function () {
+            $this->query->withoutGlobalScopes(['withoutTrashed', 'onlyTrashed']);
+
+            return $this;
+        });
+
+        $this->macro('onlyTrashed', function () {
+            $this->query->withGlobalScope('onlyTrashed', function (Builder $query) {
+                $query->whereNotNull(
+                    $this->getQualifiedDeletedAtColumnName()
+                );
+            })->withoutGlobalScopes(['withoutTrashed']);
+
+            return $this;
+        });
+
+        $this->macro('forceDetach', function ($ids = null, $touch = true) {
+            $this->withSoftDeletes = false;
+
+            return tap($this->detach($ids, $touch), function () {
+                $this->withSoftDeletes = true;
+            });
+        });
+
+        $this->macro('syncWithForceDetaching', function ($ids) {
+            $this->withSoftDeletes = false;
+
+            return tap($this->sync($ids), function () {
+                $this->withSoftDeletes = true;
+            });
+        });
+
+        return $this->withPivot($this->deletedAt())->withoutTrashed();
+    }
+
+    /**
      * Get the name of the "created at" column.
      *
      * @return string
@@ -1091,6 +1169,26 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Get the name of the "deleted at" column.
+     *
+     * @return string
+     */
+    public function deletedAt()
+    {
+        return $this->pivotDeletedAt;
+    }
+
+    /**
+     * Get the fully qualified deleted at column name.
+     *
+     * @return string
+     */
+    public function getQualifiedDeletedAtColumnName()
+    {
+        return $this->getQualifiedColumnName($this->pivotDeletedAt);
+    }
+
+    /**
      * Get the foreign key for the relation.
      *
      * @return string
@@ -1107,7 +1205,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedForeignPivotKeyName()
     {
-        return $this->table.'.'.$this->foreignPivotKey;
+        return $this->getQualifiedColumnName($this->foreignPivotKey);
     }
 
     /**
@@ -1127,7 +1225,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedRelatedPivotKeyName()
     {
-        return $this->table.'.'.$this->relatedPivotKey;
+        return $this->getQualifiedColumnName($this->relatedPivotKey);
     }
 
     /**
@@ -1168,6 +1266,17 @@ class BelongsToMany extends Relation
     public function getTable()
     {
         return $this->table;
+    }
+
+    /**
+     * Get the fully qualified column name.
+     *
+     * @param string $column
+     * @return string
+     */
+    public function getQualifiedColumnName($column)
+    {
+        return $this->table.'.'.$column;
     }
 
     /**
