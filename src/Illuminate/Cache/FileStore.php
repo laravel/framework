@@ -2,10 +2,10 @@
 
 namespace Illuminate\Cache;
 
+use Exception;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\InteractsWithTime;
-use Throwable;
 
 class FileStore implements Store
 {
@@ -40,7 +40,7 @@ class FileStore implements Store
      * @param  int|null  $filePermission
      * @return void
      */
-    public function __construct(Filesystem $files, $directory, ?int $filePermission = null)
+    public function __construct(Filesystem $files, $directory, $filePermission = null)
     {
         $this->files = $files;
         $this->directory = $directory;
@@ -188,7 +188,7 @@ class FileStore implements Store
             $expire = substr(
                 $contents = $this->files->get($path, true), 0, 10
             );
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             return $this->emptyPayload();
         }
 
@@ -203,7 +203,7 @@ class FileStore implements Store
 
         try {
             $data = unserialize(substr($contents, 10));
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             $this->forget($key);
 
             return $this->emptyPayload();
