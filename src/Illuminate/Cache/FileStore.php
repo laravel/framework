@@ -26,7 +26,7 @@ class FileStore implements Store
     protected $directory;
 
     /**
-     * Cache file access permissions in octal.
+     * Octal representation of the cache file permissions.
      *
      * @var int
      */
