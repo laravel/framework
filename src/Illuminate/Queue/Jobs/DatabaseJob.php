@@ -57,6 +57,23 @@ class DatabaseJob extends Job implements JobContract
     }
 
     /**
+     * Requeue the job.
+     *
+     * @param  int  $delay
+     * @return void
+     */
+    public function requeue($delay = 0)
+    {
+        parent::requeue($delay);
+
+        $this->delete();
+
+        $this->job->decrement();
+
+        return $this->database->release($this->queue, $this->job, $delay);
+    }
+
+    /**
      * Delete the job from the queue.
      *
      * @return void

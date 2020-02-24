@@ -35,6 +35,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isRequeued')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
         $job->shouldReceive('delete')->once();
 

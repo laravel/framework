@@ -40,6 +40,13 @@ abstract class Job
     protected $released = false;
 
     /**
+     * Indicates if the job has been requeued.
+     *
+     * @var bool
+     */
+    protected $requeued = false;
+
+    /**
      * Indicates if the job has failed.
      *
      * @var bool
@@ -120,6 +127,17 @@ abstract class Job
     }
 
     /**
+     * Requeue the job back into the queue.
+     *
+     * @param  int  $delay
+     * @return void
+     */
+    public function requeue($delay = 0)
+    {
+        $this->requeued = true;
+    }
+
+    /**
      * Determine if the job was released back into the queue.
      *
      * @return bool
@@ -130,13 +148,23 @@ abstract class Job
     }
 
     /**
+     * Determine if the job was requeued back into the queue.
+     *
+     * @return bool
+     */
+    public function isRequeued()
+    {
+        return $this->requeued;
+    }
+
+    /**
      * Determine if the job has been deleted or released.
      *
      * @return bool
      */
     public function isDeletedOrReleased()
     {
-        return $this->isDeleted() || $this->isReleased();
+        return $this->isDeleted() || $this->isReleased() || $this->isRequeued();
     }
 
     /**

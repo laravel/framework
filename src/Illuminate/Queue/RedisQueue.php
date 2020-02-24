@@ -259,10 +259,39 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function deleteAndRelease($queue, $job, $delay)
     {
-        $queue = $this->getQueue($queue);
+        $this->evaluateReservedJobScript(
+            LuaScripts::release(), $this->getQueue($queue), $job, $delay
+        );
+    }
 
+    /**
+     * Delete a reserved job from the reserved queue and requeue it.
+     *
+     * @param  string  $queue
+     * @param  \Illuminate\Queue\Jobs\RedisJob  $job
+     * @param  int  $delay
+     * @return void
+     */
+    public function deleteAndRequeue($queue, $job, $delay)
+    {
+        $this->evaluateReservedJobScript(
+            LuaScripts::requeue(), $this->getQueue($queue), $job, $delay
+        );
+    }
+
+    /**
+     * Evaluate the given reserved job script.
+     *
+     * @param  string  $script
+     * @param  string  $queue
+     * @param  \Illuminate\Queue\Jobs\RedisJob  $job
+     * @param  int  $delay
+     * @return void
+     */
+    protected function evaluateReservedJobScript($script, $queue, $job, $delay)
+    {
         $this->getConnection()->eval(
-            LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
+            $script, 2, $queue.':delayed', $queue.':reserved',
             $job->getReservedJob(), $this->availableAt($delay)
         );
     }

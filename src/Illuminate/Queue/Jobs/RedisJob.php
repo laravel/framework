@@ -98,6 +98,19 @@ class RedisJob extends Job implements JobContract
     }
 
     /**
+     * Requeue the job.
+     *
+     * @param  int  $delay
+     * @return void
+     */
+    public function requeue($delay = 0)
+    {
+        parent::requeue($delay);
+
+        $this->redis->deleteAndRequeue($this->queue, $this, $delay);
+    }
+
+    /**
      * Get the number of times the job has been attempted.
      *
      * @return int

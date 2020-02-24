@@ -50,6 +50,17 @@ class SyncJob extends Job implements JobContract
     }
 
     /**
+     * Requeue the job back.
+     *
+     * @param  int  $delay
+     * @return void
+     */
+    public function requeue($delay = 0)
+    {
+        $this->release($delay);
+    }
+
+    /**
      * Get the number of times the job has been attempted.
      *
      * @return int

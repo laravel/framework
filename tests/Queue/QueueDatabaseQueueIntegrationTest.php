@@ -212,4 +212,28 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $this->assertNull($popped_job);
     }
+
+    public function testRequeuedJobDoesNotIncrementAttempts()
+    {
+        $job = [
+            'id' => 1,
+            'queue' => $mock_queue_name = 'mock_queue_name',
+            'payload' => $mock_payload_data = 'mock_payload',
+            'attempts' => 0,
+            'reserved_at' => null,
+            'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
+            'created_at' => Carbon::now()->getTimestamp(),
+        ];
+
+        $this->connection()->table('jobs')->insert($job);
+
+        $popped_job = $this->queue->pop($mock_queue_name);
+        $popped_job->requeue();
+        $database_record = $this->connection()->table('jobs')->first();
+
+        $this->assertEquals(0, $database_record->attempts, 'Attempts has not been decremented in database!');
+        $this->assertEquals(0, $popped_job->attempts(), 'Attempts has not been decremented on model!');
+        $this->assertEquals(2, $database_record->id, 'Job is not deleted and released to database!');
+        $this->assertEquals($mock_payload_data, $database_record->payload, 'Payload in the database is not persistent!');
+    }
 }

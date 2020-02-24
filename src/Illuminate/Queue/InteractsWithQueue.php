@@ -62,6 +62,19 @@ trait InteractsWithQueue
     }
 
     /**
+     * Requeue the job.
+     *
+     * @param  int  $delay
+     * @return void
+     */
+    public function requeue($delay = 0)
+    {
+        if ($this->job) {
+            return $this->job->requeue($delay);
+        }
+    }
+
+    /**
      * Set the base queue job instance.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job

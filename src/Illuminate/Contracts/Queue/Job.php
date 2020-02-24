@@ -43,6 +43,23 @@ interface Job
     public function isReleased();
 
     /**
+     * Requeue the job back into the queue.
+     *
+     * Accepts a delay specified in seconds.
+     *
+     * @param  int  $delay
+     * @return void
+     */
+    public function requeue($delay = 0);
+
+    /**
+     * Determine if the job was requeued back into the queue.
+     *
+     * @return bool
+     */
+    public function isRequeued();
+
+    /**
      * Delete the job from the queue.
      *
      * @return void

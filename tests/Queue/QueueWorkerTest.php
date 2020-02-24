@@ -421,6 +421,7 @@ class WorkerFakeJob implements QueueJobContract
     public $deleted = false;
     public $releaseAfter;
     public $released = false;
+    public $requeued = false;
     public $maxTries;
     public $delaySeconds;
     public $timeoutAt;
@@ -491,9 +492,21 @@ class WorkerFakeJob implements QueueJobContract
         return $this->released;
     }
 
+    public function requeue($delay = 0)
+    {
+        $this->requeued = true;
+
+        $this->releaseAfter = $delay;
+    }
+
+    public function isRequeued()
+    {
+        return $this->requeued;
+    }
+
     public function isDeletedOrReleased()
     {
-        return $this->deleted || $this->released;
+        return $this->isDeleted() || $this->isReleased() || $this->isRequeued();
     }
 
     public function attempts()
