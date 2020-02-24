@@ -535,6 +535,19 @@ class Route
     }
 
     /**
+     * Set the default values for the route.
+     *
+     * @param  array  $defaults
+     * @return $this
+     */
+    public function setDefaults(array $defaults)
+    {
+        $this->defaults = $defaults;
+
+        return $this;
+    }
+
+    /**
      * Set a regular expression requirement on the route.
      *
      * @param  array|string  $name
@@ -568,7 +581,7 @@ class Route
      * @param  array  $wheres
      * @return $this
      */
-    protected function whereArray(array $wheres)
+    public function setWheres(array $wheres)
     {
         foreach ($wheres as $name => $expression) {
             $this->where($name, $expression);
@@ -585,6 +598,19 @@ class Route
     public function fallback()
     {
         $this->isFallback = true;
+
+        return $this;
+    }
+
+    /**
+     * Set the fallback value
+     *
+     * @param  bool  $isFallback
+     * @return $this
+     */
+    public function setFallback($isFallback)
+    {
+        $this->isFallback = $isFallback;
 
         return $this;
     }
