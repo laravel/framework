@@ -603,7 +603,7 @@ class Route
     }
 
     /**
-     * Set the fallback value
+     * Set the fallback value.
      *
      * @param  bool  $isFallback
      * @return $this
