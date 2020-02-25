@@ -384,7 +384,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function makeHidden($attributes)
     {
-        return $this->each->addHidden($attributes);
+        return $this->each->makeHidden($attributes);
     }
 
     /**

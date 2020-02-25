@@ -52,6 +52,31 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomMorphToMany::class, $post->tags());
         $this->assertInstanceOf(CustomMorphTo::class, $post->postable());
     }
+
+    public function testAlwaysUnsetBelongsToRelationWhenReceivedModelId()
+    {
+        // create users
+        $user1 = (new FakeRelationship())->forceFill(['id' => 1]);
+        $user2 = (new FakeRelationship())->forceFill(['id' => 2]);
+
+        // sync user 1 using Model
+        $post = new Post();
+        $post->author()->associate($user1);
+        $post->syncOriginal();
+
+        // associate user 2 using Model
+        $post->author()->associate($user2);
+        $this->assertTrue($post->isDirty());
+        $this->assertTrue($post->relationLoaded('author'));
+        $this->assertSame($user2, $post->author);
+
+        // associate user 1 using model ID
+        $post->author()->associate($user1->id);
+        $this->assertTrue($post->isClean());
+
+        // we must unset relation even if attributes are clean
+        $this->assertFalse($post->relationLoaded('author'));
+    }
 }
 
 class FakeRelationship extends Model

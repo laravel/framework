@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Bus;
 
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Fluent;
 
 trait Dispatchable
 {
@@ -14,6 +15,32 @@ trait Dispatchable
     public static function dispatch()
     {
         return new PendingDispatch(new static(...func_get_args()));
+    }
+
+    /**
+     * Dispatch the job with the given arguments if the given truth test passes.
+     *
+     * @param  bool  $boolean
+     * @return \Illuminate\Foundation\Bus\PendingDispatch|\Illuminate\Support\Fluent
+     */
+    public static function dispatchIf($boolean, ...$arguments)
+    {
+        return $boolean
+            ? new PendingDispatch(new static(...$arguments))
+            : new Fluent;
+    }
+
+    /**
+     * Dispatch the job with the given arguments unless the given truth test passes.
+     *
+     * @param  bool  $boolean
+     * @return \Illuminate\Foundation\Bus\PendingDispatch|\Illuminate\Support\Fluent
+     */
+    public static function dispatchUnless($boolean, ...$arguments)
+    {
+        return ! $boolean
+            ? new PendingDispatch(new static(...$arguments))
+            : new Fluent;
     }
 
     /**

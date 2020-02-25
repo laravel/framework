@@ -806,14 +806,16 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Push an item onto the end of the collection.
+     * Push one or more items onto the end of the collection.
      *
-     * @param  mixed  $value
+     * @param  mixed  $values [optional]
      * @return $this
      */
-    public function push($value)
+    public function push(...$values)
     {
-        $this->items[] = $value;
+        foreach ($values as $value) {
+            $this->items[] = $value;
+        }
 
         return $this;
     }
@@ -1052,13 +1054,28 @@ class Collection implements ArrayAccess, Enumerable
      * @param  callable|null  $callback
      * @return static
      */
-    public function sort(callable $callback = null)
+    public function sort($callback = null)
     {
         $items = $this->items;
 
-        $callback
+        $callback && is_callable($callback)
             ? uasort($items, $callback)
-            : asort($items);
+            : asort($items, $callback);
+
+        return new static($items);
+    }
+
+    /**
+     * Sort items in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortDesc($options = SORT_REGULAR)
+    {
+        $items = $this->items;
+
+        arsort($items, $options);
 
         return new static($items);
     }

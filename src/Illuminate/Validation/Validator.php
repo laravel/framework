@@ -378,6 +378,25 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Run the validator's rules against its data.
+     *
+     * @param  string  $errorBag
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validateWithBag(string $errorBag)
+    {
+        try {
+            return $this->validate();
+        } catch (ValidationException $e) {
+            $e->errorBag = $errorBag;
+
+            throw $e;
+        }
+    }
+
+    /**
      * Get the attributes and values that were validated.
      *
      * @return array
@@ -1169,32 +1188,22 @@ class Validator implements ValidatorContract
     /**
      * Get the Presence Verifier implementation.
      *
+     * @param  string|null  $connection
      * @return \Illuminate\Validation\PresenceVerifierInterface
      *
      * @throws \RuntimeException
      */
-    public function getPresenceVerifier()
+    public function getPresenceVerifier($connection = null)
     {
         if (! isset($this->presenceVerifier)) {
             throw new RuntimeException('Presence verifier has not been set.');
         }
 
-        return $this->presenceVerifier;
-    }
+        if ($this->presenceVerifier instanceof DatabasePresenceVerifierInterface) {
+            $this->presenceVerifier->setConnection($connection);
+        }
 
-    /**
-     * Get the Presence Verifier implementation.
-     *
-     * @param  string  $connection
-     * @return \Illuminate\Validation\PresenceVerifierInterface
-     *
-     * @throws \RuntimeException
-     */
-    public function getPresenceVerifierFor($connection)
-    {
-        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
-            $verifier->setConnection($connection);
-        });
+        return $this->presenceVerifier;
     }
 
     /**

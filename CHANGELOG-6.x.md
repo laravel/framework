@@ -1,6 +1,66 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.14.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.16.0...6.x)
+
+### TODO
+- Consider mailto: and tel: links in the subcopy actionUrl label. #31522 ([#31523](https://github.com/laravel/framework/pull/31523), [641a7cd](https://github.com/laravel/framework/commit/641a7cda8280ecd3035616d4ce6434434b116624))
+- exclude mariaDB from database queue support for new SKIP LOCKED ([fff96e7](https://github.com/laravel/framework/commit/fff96e7df7de470e162a6b7f6dd528e6fe17aadc))
+- Fix for issue Content Type not specified ([#31533](https://github.com/laravel/framework/pull/31533))
+- MySQL Aurora failover - DetectsLostConnections ([#31539](https://github.com/laravel/framework/pull/31539))
+
+
+## [v6.16.0 (2020-02-18)](https://github.com/laravel/framework/compare/v6.15.1...v6.16.0)
+
+### Added
+- Added Guzzle 7 support ([#31484](https://github.com/laravel/framework/pull/31484))
+- Added `Illuminate\Database\Query\Builder::groupByRaw()` ([#31498](https://github.com/laravel/framework/pull/31498))
+- Added SQLite JSON update support with json_patch ([#31492](https://github.com/laravel/framework/pull/31492))
+
+### Fixed
+- Fixed `appendRow` on console table ([#31469](https://github.com/laravel/framework/pull/31469))
+- Fixed password check in `EloquentUserProvider::retrieveByCredentials()` ([4436662](https://github.com/laravel/framework/commit/4436662a1ee19fc5e9eb76a0651d0de1aedb3ee2))
+
+### Revert
+- Revert table feature in the console output ([4094d78](https://github.com/laravel/framework/commit/4094d785269ce7849557b792f650fb278d48978e))
+
+### Changed
+- Change MySql nullable modifier to allow generated columns to be not null ([#31452](https://github.com/laravel/framework/pull/31452))
+- Throw exception on empty collection in `assertSentTo()` \ `assertNotSentTo()` methods in `NotificationFake` class ([#31471](https://github.com/laravel/framework/pull/31471))
+
+
+## [v6.15.1 (2020-02-12)](https://github.com/laravel/framework/compare/v6.15.0...v6.15.1)
+
+### Added
+- Added `whereNull` and `whereNotNull` to `Collection` ([#31425](https://github.com/laravel/framework/pull/31425))
+- Added `Illuminate\Foundation\Testing\MockStream` class ([#31447](https://github.com/laravel/framework/pull/31447))
+
+### Fixed
+- Fixed `event:list` command for shows non-registered events ([#31444](https://github.com/laravel/framework/pull/31444))
+- Fixed postgres grammar for nested json arrays with  ([#31448](https://github.com/laravel/framework/pull/31448), [b3d0da1](https://github.com/laravel/framework/commit/b3d0da164bdf3d5d829384025476ca1b2065c97e))
+
+
+## [v6.15.0 (2020-02-11)](https://github.com/laravel/framework/compare/v6.14.0...v6.15.0)
+
+### Added
+- Added `Illuminate\Auth\Events\Validated` event ([#31357](https://github.com/laravel/framework/pull/31357), [7ddac28](https://github.com/laravel/framework/commit/7ddac28bc08b99ee248b1e4aa559efc3a8bfec8c))
+- Make `Blueprint` support Grammar's `macro` ([#31365](https://github.com/laravel/framework/pull/31365))
+- Added `Macroable` trait to `Illuminate\Console\Scheduling\Schedule` class ([#31354](https://github.com/laravel/framework/pull/31354))
+- Added support `dispatchAfterResponse` in `BusFake` ([#31418](https://github.com/laravel/framework/pull/31418), [e59597f](https://github.com/laravel/framework/commit/e59597f13af3ee6e6467bdb8593844f9db6bb789)) 
+- Added `Illuminate\Foundation\Exceptions\Handler::getHttpExceptionView()` ([#31420](https://github.com/laravel/framework/pull/31420))
+- Allowed appending of rows to Artisan tables ([#31426](https://github.com/laravel/framework/pull/31426))
+
+### Fixed
+- Fixed `locks` for `sqlsrv` queue ([5868066](https://github.com/laravel/framework/commit/58680668102282fcc4215a48e8947c2c1b051201))
+- Fixed `Illuminate\Events\Dispatcher::hasListeners()` ([#31403](https://github.com/laravel/framework/pull/31403), [c80302e](https://github.com/laravel/framework/commit/c80302e6e9403f9fad71f114d94e758ee0fcbff7))
+- Fixed testing with unencrypted cookies ([#31390](https://github.com/laravel/framework/pull/31390))
+
+### Changed
+- Allowed multiple paths to be passed to migrate fresh and migrate refresh commands ([#31381](https://github.com/laravel/framework/pull/31381))
+- Split Console InteractsWithIO to external trait ([#31376](https://github.com/laravel/framework/pull/31376))
+- Added sms link as valid URL in `UrlGenerator::isValid()` method ([#31382](https://github.com/laravel/framework/pull/31382))
+- Upgrade CommonMark and use the bundled table extension ([#31411](https://github.com/laravel/framework/pull/31411))
+- Ensure `Application::$terminatingCallbacks` are reset on `Application::flush()` ([#31413](https://github.com/laravel/framework/pull/31413))
+- Remove serializer option in `PhpRedisConnector::createClient()` ([#31417](https://github.com/laravel/framework/pull/31417))
 
 
 ## [v6.14.0 (2020-02-04)](https://github.com/laravel/framework/compare/v6.13.1...v6.14.0)

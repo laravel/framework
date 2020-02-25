@@ -53,7 +53,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * @param  string  $connection
      * @param  string  $queue
      * @param  string  $payload
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return string|int|null
      */
     public function log($connection, $queue, $payload, $exception)

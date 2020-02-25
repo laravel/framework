@@ -21,11 +21,6 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection = new RouteCollection;
     }
 
-    public function testRouteCollectionCanBeConstructed()
-    {
-        $this->assertInstanceOf(RouteCollection::class, $this->routeCollection);
-    }
-
     public function testRouteCollectionCanAddRoute()
     {
         $this->routeCollection->add(new Route('GET', 'foo', [

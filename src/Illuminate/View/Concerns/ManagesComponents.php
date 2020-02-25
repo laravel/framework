@@ -4,6 +4,7 @@ namespace Illuminate\View\Concerns;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use Illuminate\View\View;
 use InvalidArgumentException;
 
 trait ManagesComponents
@@ -39,14 +40,14 @@ trait ManagesComponents
     /**
      * Start a component rendering process.
      *
-     * @param  string  $name
+     * @param  \Illuminate\View\View|string  $view
      * @param  array  $data
      * @return void
      */
-    public function startComponent($name, array $data = [])
+    public function startComponent($view, array $data = [])
     {
         if (ob_start()) {
-            $this->componentStack[] = $name;
+            $this->componentStack[] = $view;
 
             $this->componentData[$this->currentComponent()] = $data;
 
@@ -77,18 +78,21 @@ trait ManagesComponents
      */
     public function renderComponent()
     {
-        $name = array_pop($this->componentStack);
+        $view = array_pop($this->componentStack);
 
-        return $this->make($name, $this->componentData($name))->render();
+        if ($view instanceof View) {
+            return $view->with($this->componentData())->render();
+        } else {
+            return $this->make($view, $this->componentData())->render();
+        }
     }
 
     /**
      * Get the data for the given component.
      *
-     * @param  string  $name
      * @return array
      */
-    protected function componentData($name)
+    protected function componentData()
     {
         return array_merge(
             $this->componentData[count($this->componentStack)],

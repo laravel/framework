@@ -1018,12 +1018,23 @@ class LazyCollection implements Enumerable
     /**
      * Sort through each item with a callback.
      *
-     * @param  callable|null  $callback
+     * @param  callable|null|int  $callback
      * @return static
      */
-    public function sort(callable $callback = null)
+    public function sort($callback = null)
     {
         return $this->passthru('sort', func_get_args());
+    }
+
+    /**
+     * Sort items in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortDesc($options = SORT_REGULAR)
+    {
+        return $this->passthru('sortDesc', func_get_args());
     }
 
     /**

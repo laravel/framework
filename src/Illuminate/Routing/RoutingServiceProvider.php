@@ -9,13 +9,10 @@ use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Support\ServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\Response as NyholmPsrResponse;
+use Nyholm\Psr7\Response as PsrResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
-use Zend\Diactoros\Response as ZendPsrResponse;
-use Zend\Diactoros\ServerRequestFactory;
 
 class RoutingServiceProvider extends ServiceProvider
 {
@@ -140,10 +137,6 @@ class RoutingServiceProvider extends ServiceProvider
                     ->createRequest($app->make('request'));
             }
 
-            if (class_exists(ServerRequestFactory::class) && class_exists(DiactorosFactory::class)) {
-                return (new DiactorosFactory)->createRequest($app->make('request'));
-            }
-
             throw new Exception('Unable to resolve PSR request. Please install symfony/psr-http-message-bridge and nyholm/psr7.');
         });
     }
@@ -156,12 +149,8 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerPsrResponse()
     {
         $this->app->bind(ResponseInterface::class, function () {
-            if (class_exists(NyholmPsrResponse::class)) {
-                return new NyholmPsrResponse;
-            }
-
-            if (class_exists(ZendPsrResponse::class)) {
-                return new ZendPsrResponse;
+            if (class_exists(PsrResponse::class)) {
+                return new PsrResponse;
             }
 
             throw new Exception('Unable to resolve PSR response. Please install nyholm/psr7.');

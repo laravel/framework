@@ -4,7 +4,6 @@ namespace Illuminate\View;
 
 use ArrayAccess;
 use BadMethodCallException;
-use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\MessageProvider;
@@ -14,6 +13,7 @@ use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\ViewErrorBag;
 use Throwable;
 
 class View implements ArrayAccess, Htmlable, ViewContract
@@ -98,10 +98,6 @@ class View implements ArrayAccess, Htmlable, ViewContract
             $this->factory->flushStateIfDoneRendering();
 
             return ! is_null($response) ? $response : $contents;
-        } catch (Exception $e) {
-            $this->factory->flushState();
-
-            throw $e;
         } catch (Throwable $e) {
             $this->factory->flushState();
 
@@ -210,25 +206,27 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * Add validation errors to the view.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
+     * @param  string  $bag
      * @return $this
      */
-    public function withErrors($provider)
+    public function withErrors($provider, $bag = 'default')
     {
-        $this->with('errors', $this->formatErrors($provider));
-
-        return $this;
+        return $this->with('errors', (new ViewErrorBag)->put(
+            $bag, $this->formatErrors($provider)
+        ));
     }
 
     /**
-     * Format the given message provider into a MessageBag.
+     * Parse the given errors into an appropriate value.
      *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
+     * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
      * @return \Illuminate\Support\MessageBag
      */
     protected function formatErrors($provider)
     {
         return $provider instanceof MessageProvider
-                        ? $provider->getMessageBag() : new MessageBag((array) $provider);
+                        ? $provider->getMessageBag()
+                        : new MessageBag((array) $provider);
     }
 
     /**

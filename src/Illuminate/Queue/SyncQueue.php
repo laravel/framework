@@ -2,14 +2,12 @@
 
 namespace Illuminate\Queue;
 
-use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Jobs\SyncJob;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Throwable;
 
 class SyncQueue extends Queue implements QueueContract
@@ -33,7 +31,7 @@ class SyncQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return mixed
      *
-     * @throws \Exception|\Throwable
+     * @throws \Throwable
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -45,10 +43,8 @@ class SyncQueue extends Queue implements QueueContract
             $queueJob->fire();
 
             $this->raiseAfterJobEvent($queueJob);
-        } catch (Exception $e) {
-            $this->handleException($queueJob, $e);
         } catch (Throwable $e) {
-            $this->handleException($queueJob, new FatalThrowableError($e));
+            $this->handleException($queueJob, $e);
         }
 
         return 0;
@@ -96,10 +92,10 @@ class SyncQueue extends Queue implements QueueContract
      * Raise the exception occurred queue job event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
-    protected function raiseExceptionOccurredJobEvent(Job $job, $e)
+    protected function raiseExceptionOccurredJobEvent(Job $job, Throwable $e)
     {
         if ($this->container->bound('events')) {
             $this->container['events']->dispatch(new JobExceptionOccurred($this->connectionName, $job, $e));
@@ -110,12 +106,12 @@ class SyncQueue extends Queue implements QueueContract
      * Handle an exception that occurred while processing a job.
      *
      * @param  \Illuminate\Queue\Jobs\Job  $queueJob
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      *
      * @throws \Exception
      */
-    protected function handleException($queueJob, $e)
+    protected function handleException(Job $queueJob, Throwable $e)
     {
         $this->raiseExceptionOccurredJobEvent($queueJob, $e);
 

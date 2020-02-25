@@ -390,6 +390,10 @@ trait QueriesRelationships
 
             $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
 
+            $query->orders = null;
+
+            $query->setBindings([], 'order');
+
             if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
 

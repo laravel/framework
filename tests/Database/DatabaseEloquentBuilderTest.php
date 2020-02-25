@@ -126,6 +126,17 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrFail([1, 2], ['column']);
     }
 
+    public function testFindOrFailMethodWithManyUsingCollectionThrowsModelNotFoundException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->findOrFail(new Collection([1, 2]), ['column']);
+    }
+
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -624,6 +635,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('insertUsing')->once()->with(['bar'], 'baz')->andReturn('foo');
 
         $this->assertSame('foo', $builder->insertUsing(['bar'], 'baz'));
+
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('raw')->once()->with('bar')->andReturn('foo');
+
+        $this->assertSame('foo', $builder->raw('bar'));
     }
 
     public function testQueryScopes()
@@ -1222,6 +1238,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
 
         Carbon::setTestNow(null);
+    }
+
+    public function testWithCastsMethod()
+    {
+        $builder = new Builder($this->getMockQueryBuilder());
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+
+        $model->shouldReceive('mergeCasts')->with(['foo' => 'bar'])->once();
+        $builder->withCasts(['foo' => 'bar']);
     }
 
     protected function mockConnectionForModel($model, $database)

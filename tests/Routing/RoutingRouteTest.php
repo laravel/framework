@@ -372,6 +372,23 @@ class RoutingRouteTest extends TestCase
         $this->assertNull($route->getAction('unknown_property'));
     }
 
+    public function testResolvingBindingParameters()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('foo/{bar:slug}', function () {
+            return 'foo';
+        })->name('foo');
+
+        $this->assertEquals('slug', $route->bindingFieldFor('bar'));
+
+        $route = $router->get('foo/{bar:slug}/{baz}', function () {
+            return 'foo';
+        })->name('foo');
+
+        $this->assertNull($route->bindingFieldFor('baz'));
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();
@@ -829,12 +846,13 @@ class RoutingRouteTest extends TestCase
             SubstituteBindings::class,
             Placeholder2::class,
             Authenticate::class,
+            ExampleMiddleware::class,
             Placeholder3::class,
         ];
 
         $router = $this->getRouter();
 
-        $router->middlewarePriority = [Authenticate::class, SubstituteBindings::class, Authorize::class];
+        $router->middlewarePriority = [ExampleMiddlewareContract::class, Authenticate::class, SubstituteBindings::class, Authorize::class];
 
         $route = $router->get('foo', ['middleware' => $middleware, 'uses' => function ($name) {
             return $name;
@@ -842,6 +860,7 @@ class RoutingRouteTest extends TestCase
 
         $this->assertEquals([
             Placeholder1::class,
+            ExampleMiddleware::class,
             Authenticate::class,
             SubstituteBindings::class,
             Placeholder2::class,
@@ -1504,6 +1523,7 @@ class RoutingRouteTest extends TestCase
     public function testImplicitBindings()
     {
         $router = $this->getRouter();
+
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
             'uses' => function (RoutingTestUserModel $bar) {
@@ -1512,7 +1532,25 @@ class RoutingRouteTest extends TestCase
                 return $bar->value;
             },
         ]);
+
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testParentChildImplicitBindings()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{user}/{post:slug}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $user, RoutingTestPostModel $post) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $user);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $post);
+
+                return $user->value.'|'.$post->value;
+            },
+        ]);
+
+        $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
@@ -1994,6 +2032,11 @@ class RoutingTestMiddlewareGroupTwo
 
 class RoutingTestUserModel extends Model
 {
+    public function posts()
+    {
+        return new RoutingTestPostModel;
+    }
+
     public function getRouteKeyName()
     {
         return 'id';
@@ -2012,6 +2055,26 @@ class RoutingTestUserModel extends Model
     }
 
     public function firstOrFail()
+    {
+        return $this;
+    }
+}
+
+class RoutingTestPostModel extends Model
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function where($key, $value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function first()
     {
         return $this;
     }
@@ -2065,5 +2128,18 @@ class ActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+}
+
+interface ExampleMiddlewareContract
+{
+    //
+}
+
+class ExampleMiddleware implements ExampleMiddlewareContract
+{
+    public function handle($request, Closure $next)
+    {
+        return $next($request);
     }
 }

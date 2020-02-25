@@ -5,7 +5,6 @@ namespace Illuminate\Validation\Concerns;
 use Countable;
 use DateTime;
 use DateTimeInterface;
-use DateTimeZone;
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
@@ -24,7 +23,6 @@ use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Throwable;
 
 trait ValidatesAttributes
 {
@@ -442,14 +440,12 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'different');
 
         foreach ($parameters as $parameter) {
-            if (! Arr::has($this->data, $parameter)) {
-                return false;
-            }
+            if (Arr::has($this->data, $parameter)) {
+                $other = Arr::get($this->data, $parameter);
 
-            $other = Arr::get($this->data, $parameter);
-
-            if ($value === $other) {
-                return false;
+                if ($value === $other) {
+                    return false;
+                }
             }
         }
 
@@ -695,7 +691,7 @@ trait ValidatesAttributes
      */
     protected function getExistCount($connection, $table, $column, $value, $parameters)
     {
-        $verifier = $this->getPresenceVerifierFor($connection);
+        $verifier = $this->getPresenceVerifier($connection);
 
         $extra = $this->getExtraConditions(
             array_values(array_slice($parameters, 2))
@@ -744,7 +740,7 @@ trait ValidatesAttributes
         // The presence verifier is responsible for counting rows within this store
         // mechanism which might be a relational database or any other permanent
         // data store like Redis, etc. We will use it to determine uniqueness.
-        $verifier = $this->getPresenceVerifierFor($connection);
+        $verifier = $this->getPresenceVerifier($connection);
 
         $extra = $this->getUniqueExtra($parameters);
 
@@ -1693,15 +1689,7 @@ trait ValidatesAttributes
      */
     public function validateTimezone($attribute, $value)
     {
-        try {
-            new DateTimeZone($value);
-        } catch (Exception $e) {
-            return false;
-        } catch (Throwable $e) {
-            return false;
-        }
-
-        return true;
+        return in_array($value, timezone_identifiers_list(), true);
     }
 
     /**

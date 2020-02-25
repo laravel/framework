@@ -42,8 +42,8 @@ class SupportStrTest extends TestCase
 
     public function testStringAsciiWithSpecificLocale()
     {
-        $this->assertSame('h H sht SHT a A y Y', Str::ascii('х Х щ Щ ъ Ъ ь Ь', 'bg'));
-        $this->assertSame('ae oe ue AE OE UE', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
+        $this->assertSame('h H sht Sht a A ia yo', Str::ascii('х Х щ Щ ъ Ъ иа йо', 'bg'));
+        $this->assertSame('ae oe ue Ae Oe Ue', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
     }
 
     public function testStartsWith()
@@ -54,6 +54,11 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith('jason', ['day', 'jas']));
         $this->assertFalse(Str::startsWith('jason', 'day'));
         $this->assertFalse(Str::startsWith('jason', ['day']));
+        $this->assertFalse(Str::startsWith('jason', null));
+        $this->assertFalse(Str::startsWith('jason', [null]));
+        $this->assertFalse(Str::startsWith('0123', [null]));
+        $this->assertTrue(Str::startsWith('0123', 0));
+        $this->assertFalse(Str::startsWith('jason', 'J'));
         $this->assertFalse(Str::startsWith('jason', ''));
         $this->assertFalse(Str::startsWith('7', ' 7'));
         $this->assertTrue(Str::startsWith('7a', '7'));
@@ -79,6 +84,9 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::endsWith('jason', 'no'));
         $this->assertFalse(Str::endsWith('jason', ['no']));
         $this->assertFalse(Str::endsWith('jason', ''));
+        $this->assertFalse(Str::endsWith('jason', [null]));
+        $this->assertFalse(Str::endsWith('jason', null));
+        $this->assertFalse(Str::endsWith('jason', 'N'));
         $this->assertFalse(Str::endsWith('7', ' 7'));
         $this->assertTrue(Str::endsWith('a7', '7'));
         $this->assertTrue(Str::endsWith('a7', 7));
@@ -167,6 +175,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
         $this->assertEquals(['Class', 'foo'], Str::parseCallback('Class', 'foo'));
+        $this->assertEquals(['Class', null], Str::parseCallback('Class'));
     }
 
     public function testSlug()
@@ -176,7 +185,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('hello-world', Str::slug('hello_world'));
         $this->assertSame('hello_world', Str::slug('hello_world', '_'));
         $this->assertSame('user-at-host', Str::slug('user@host'));
-        $this->assertSame('سلام-دنیا', Str::slug('سلام دنیا', '-', null));
+        $this->assertSame('slam-dnya', Str::slug('سلام دنیا', '-', null));
     }
 
     public function testStrStart()

@@ -2,19 +2,19 @@
 
 namespace Illuminate\Database;
 
-use Exception;
 use Illuminate\Support\Str;
 use PDOException;
+use Throwable;
 
 trait DetectsConcurrencyErrors
 {
     /**
      * Determine if the given exception was caused by a concurrency error such as a deadlock or serialization failure.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return bool
      */
-    protected function causedByConcurrencyError(Exception $e)
+    protected function causedByConcurrencyError(Throwable $e)
     {
         if ($e instanceof PDOException && $e->getCode() === '40001') {
             return true;

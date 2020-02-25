@@ -3,8 +3,11 @@
 namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
+use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
+use Illuminate\View\Compilers\BladeCompiler;
 
 abstract class ServiceProvider
 {
@@ -59,7 +62,7 @@ abstract class ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        if (! $this->app->configurationIsCached()) {
+        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
             $this->app['config']->set($key, array_merge(
                 require $path, $this->app['config']->get($key, [])
             ));
@@ -74,7 +77,7 @@ abstract class ServiceProvider
      */
     protected function loadRoutesFrom($path)
     {
-        if (! $this->app->routesAreCached()) {
+        if (! ($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
             require $path;
         }
     }
@@ -99,6 +102,22 @@ abstract class ServiceProvider
             }
 
             $view->addNamespace($namespace, $path);
+        });
+    }
+
+    /**
+     * Register the given view components with a custom prefix.
+     *
+     * @param  string  $prefix
+     * @param  array  $components
+     * @return void
+     */
+    protected function loadViewComponentsAs($prefix, array $components)
+    {
+        $this->callAfterResolving(BladeCompiler::class, function ($blade) use ($prefix, $components) {
+            foreach ($components as $component) {
+                $blade->component($component, null, $prefix);
+            }
         });
     }
 

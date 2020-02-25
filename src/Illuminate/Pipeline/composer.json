@@ -14,10 +14,9 @@
         }
     ],
     "require": {
-        "php": "^7.2",
-        "illuminate/contracts": "^6.0",
-        "illuminate/support": "^6.0",
-        "symfony/debug": "^4.3"
+        "php": "^7.2.5",
+        "illuminate/contracts": "^7.0",
+        "illuminate/support": "^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +25,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.x-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "config": {

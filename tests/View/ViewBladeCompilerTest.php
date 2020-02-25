@@ -179,6 +179,29 @@ class ViewBladeCompilerTest extends TestCase
             0, strlen($strictTypeDecl)) === $strictTypeDecl);
     }
 
+    public function testComponentAliasesCanBeConventionallyDetermined()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->component('App\Foo\Bar');
+        $this->assertEquals(['bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->component('App\Foo\Bar', null, 'prefix');
+        $this->assertEquals(['prefix-bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->component('App\View\Components\Forms\Input');
+        $this->assertEquals(['forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->component('App\View\Components\Forms\Input', null, 'prefix');
+        $this->assertEquals(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
+    }
+
     protected function getFiles()
     {
         return m::mock(Filesystem::class);

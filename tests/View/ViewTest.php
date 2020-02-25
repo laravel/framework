@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
 use Mockery as m;
@@ -216,7 +217,7 @@ class ViewTest extends TestCase
         $view = $this->getView();
         $errors = ['foo' => 'bar', 'qu' => 'ux'];
         $this->assertSame($view, $view->withErrors($errors));
-        $this->assertInstanceOf(MessageBag::class, $view->errors);
+        $this->assertInstanceOf(ViewErrorBag::class, $view->errors);
         $foo = $view->errors->get('foo');
         $this->assertEquals($foo[0], 'bar');
         $qu = $view->errors->get('qu');
@@ -224,6 +225,11 @@ class ViewTest extends TestCase
         $data = ['foo' => 'baz'];
         $this->assertSame($view, $view->withErrors(new MessageBag($data)));
         $foo = $view->errors->get('foo');
+        $this->assertEquals($foo[0], 'baz');
+        $foo = $view->errors->getBag('default')->get('foo');
+        $this->assertEquals($foo[0], 'baz');
+        $this->assertSame($view, $view->withErrors(new MessageBag($data), 'login'));
+        $foo = $view->errors->getBag('login')->get('foo');
         $this->assertEquals($foo[0], 'baz');
     }
 

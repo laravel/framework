@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,9 +18,9 @@ use Illuminate\Database\QueryException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -81,6 +82,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->increments('id');
                 $table->string('name')->nullable();
                 $table->string('email');
+                $table->timestamp('birthday', 6)->nullable();
                 $table->timestamps();
             });
 
@@ -492,6 +494,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::findOrFail([1, 2]);
+    }
+
+    public function testFindOrFailWithMultipleIdsUsingCollectionThrowsModelNotFoundException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2');
+
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::findOrFail(new Collection([1, 2]));
     }
 
     public function testOneToOneRelationship()
@@ -1075,14 +1086,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $array = $model->toArray();
 
-        $this->assertSame('2012-12-04 00:00:00', $array['created_at']);
-        $this->assertSame('2012-12-05 00:00:00', $array['updated_at']);
+        $this->assertSame('2012-12-04T00:00:00.000000Z', $array['created_at']);
+        $this->assertSame('2012-12-05T00:00:00.000000Z', $array['updated_at']);
     }
 
     public function testToArrayIncludesCustomFormattedTimestamps()
     {
-        $model = new EloquentTestUser;
-        $model->setDateFormat('d-m-y');
+        $model = new EloquentTestUserWithCustomDateSerialization;
 
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
@@ -1212,28 +1222,75 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testFreshMethodOnModel()
     {
         $now = Carbon::now();
+        $nowSerialized = $now->startOfSecond()->toJSON();
+        $nowWithFractionsSerialized = $now->toJSON();
         Carbon::setTestNow($now);
 
-        $storedUser1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        $storedUser1->newQuery()->update(['email' => 'dev@mathieutu.ovh', 'name' => 'Mathieu TUDISCO']);
+        $storedUser1 = EloquentTestUser::create([
+            'id' => 1,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
+        $storedUser1->newQuery()->update([
+            'email' => 'dev@mathieutu.ovh',
+            'name' => 'Mathieu TUDISCO',
+        ]);
         $freshStoredUser1 = $storedUser1->fresh();
 
-        $storedUser2 = EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwell@gmail.com']);
+        $storedUser2 = EloquentTestUser::create([
+            'id' => 2,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
         $storedUser2->newQuery()->update(['email' => 'dev@mathieutu.ovh']);
         $freshStoredUser2 = $storedUser2->fresh();
 
-        $notStoredUser = new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']);
+        $notStoredUser = new EloquentTestUser([
+            'id' => 3,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
         $freshNotStoredUser = $notStoredUser->fresh();
 
-        $this->assertEquals(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'created_at' => $now, 'updated_at' => $now], $storedUser1->toArray());
-        $this->assertEquals(['id' => 1, 'name' => 'Mathieu TUDISCO', 'email' => 'dev@mathieutu.ovh', 'created_at' => $now, 'updated_at' => $now], $freshStoredUser1->toArray());
+        $this->assertEquals([
+            'id' => 1,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $storedUser1->toArray());
+        $this->assertEquals([
+            'id' => 1,
+            'name' => 'Mathieu TUDISCO',
+            'email' => 'dev@mathieutu.ovh',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $freshStoredUser1->toArray());
         $this->assertInstanceOf(EloquentTestUser::class, $storedUser1);
 
-        $this->assertEquals(['id' => 2, 'email' => 'taylorotwell@gmail.com', 'created_at' => $now, 'updated_at' => $now], $storedUser2->toArray());
-        $this->assertEquals(['id' => 2, 'name' => null, 'email' => 'dev@mathieutu.ovh', 'created_at' => $now, 'updated_at' => $now], $freshStoredUser2->toArray());
+        $this->assertEquals([
+            'id' => 2,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $storedUser2->toArray());
+        $this->assertEquals([
+            'id' => 2,
+            'name' => null,
+            'email' => 'dev@mathieutu.ovh',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $freshStoredUser2->toArray());
         $this->assertInstanceOf(EloquentTestUser::class, $storedUser2);
 
-        $this->assertEquals(['id' => 3, 'email' => 'taylorotwell@gmail.com'], $notStoredUser->toArray());
+        $this->assertEquals([
+            'id' => 3,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+        ], $notStoredUser->toArray());
         $this->assertNull($freshNotStoredUser);
     }
 
@@ -1304,17 +1361,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
-    public function testTimestampsUsingOldSqlServerDateFormatFailInEdgeCases()
+    public function testTimestampsUsingOldSqlServerDateFormatFallbackToDefaultParsing()
     {
-        $this->expectException(InvalidArgumentException::class);
-
         $model = new EloquentTestUser;
         $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
         $model->setRawAttributes([
             'updated_at' => '2017-11-14 08:23:19.734',
         ]);
 
-        $model->fromDateTime($model->getAttribute('updated_at'));
+        $date = $model->getAttribute('updated_at');
+        $this->assertSame('2017-11-14 08:23:19.734', $date->format('Y-m-d H:i:s.v'), 'the date should contains the precision');
+        $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($date), 'the format should trims it');
+        // No longer throwing exception since Laravel 7,
+        // but Date::hasFormat() can be used instead to check date formatting:
+        $this->assertTrue(Date::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
+        $this->assertFalse(Date::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
     }
 
     public function testUpdatingChildModelTouchesParent()
@@ -1642,6 +1703,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';
+    protected $dates = ['birthday'];
     protected $guarded = [];
 
     public function friends()
@@ -1800,6 +1862,14 @@ class EloquentTestUserWithStringCastId extends EloquentTestUser
     protected $casts = [
         'id' => 'string',
     ];
+}
+
+class EloquentTestUserWithCustomDateSerialization extends EloquentTestUser
+{
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('d-m-y');
+    }
 }
 
 class EloquentTestOrder extends Eloquent

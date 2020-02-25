@@ -25,6 +25,7 @@ namespace Illuminate\Support\Facades;
  * @method static \SessionHandlerInterface getHandler()
  * @method static bool handlerNeedsRequest()
  * @method static void setRequestOnHandler(\Illuminate\Http\Request $request)
+ * @method static void push(string $key, mixed $value)
  *
  * @see \Illuminate\Session\SessionManager
  * @see \Illuminate\Session\Store

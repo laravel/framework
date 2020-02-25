@@ -14,13 +14,13 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2.5",
         "ext-json": "*",
         "psr/log": "^1.0",
-        "illuminate/bus": "^6.0",
-        "illuminate/contracts": "^6.0",
-        "illuminate/queue": "^6.0",
-        "illuminate/support": "^6.0"
+        "illuminate/bus": "^7.0",
+        "illuminate/contracts": "^7.0",
+        "illuminate/queue": "^7.0",
+        "illuminate/support": "^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -29,7 +29,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.x-dev"
+            "dev-master": "7.x-dev"
         }
     },
     "suggest": {

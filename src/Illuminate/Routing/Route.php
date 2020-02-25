@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 use ReflectionFunction;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
 {
@@ -120,6 +121,13 @@ class Route
     protected $container;
 
     /**
+     * The fields that implicit binding should use for a given parameter.
+     *
+     * @var array
+     */
+    protected $bindingFields = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -136,7 +144,7 @@ class Route
      */
     public function __construct($methods, $uri, $action)
     {
-        $this->uri = $uri;
+        $this->uri = $this->parseUri($uri);
         $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
 
@@ -147,6 +155,19 @@ class Route
         if (isset($this->action['prefix'])) {
             $this->prefix($this->action['prefix']);
         }
+    }
+
+    /**
+     * Parse the route URI and normalize / store any implicit binding fields.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function parseUri($uri)
+    {
+        return tap(RouteUri::parse($uri), function ($uri) {
+            $this->bindingFields = $uri->bindingFields;
+        })->uri;
     }
 
     /**
@@ -288,7 +309,7 @@ class Route
     protected function compileRoute()
     {
         if (! $this->compiled) {
-            $this->compiled = (new RouteCompiler($this))->compile();
+            $this->compiled = $this->toSymfonyRoute()->compile();
         }
 
         return $this->compiled;
@@ -469,6 +490,34 @@ class Route
     public function signatureParameters($subClass = null)
     {
         return RouteSignatureParameters::fromAction($this->action, $subClass);
+    }
+
+    /**
+     * Get the binding field for the given parameter.
+     *
+     * @param  string  $parameter
+     * @return string|null
+     */
+    public function bindingFieldFor($parameter)
+    {
+        return $this->bindingFields[$parameter] ?? null;
+    }
+
+    /**
+     * Get the parent parameter of the given parameter.
+     *
+     * @param  string  $parameter
+     * @return string
+     */
+    public function parentOfParameter($parameter)
+    {
+        $key = array_search($parameter, array_keys($this->parameters));
+
+        if ($key === 0) {
+            return;
+        }
+
+        return array_values($this->parameters)[$key - 1];
     }
 
     /**
@@ -866,6 +915,32 @@ class Route
             new UriValidator, new MethodValidator,
             new SchemeValidator, new HostValidator,
         ];
+    }
+
+    /**
+     * Convert the route to a Symfony route.
+     *
+     * @return \Symfony\Component\Routing\Route
+     */
+    public function toSymfonyRoute()
+    {
+        return new SymfonyRoute(
+            preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri()), $this->getOptionalParameterNames(),
+            $this->wheres, ['utf8' => true, 'action' => $this->action],
+            $this->getDomain() ?: '', [], $this->methods
+        );
+    }
+
+    /**
+     * Get the optional parameter names for the route.
+     *
+     * @return array
+     */
+    protected function getOptionalParameterNames()
+    {
+        preg_match_all('/\{(\w+?)\?\}/', $this->uri(), $matches);
+
+        return isset($matches[1]) ? array_fill_keys($matches[1], null) : [];
     }
 
     /**
