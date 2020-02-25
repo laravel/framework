@@ -1,12 +1,26 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.16.0...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.17.0...6.x)
 
-### TODO
-- Consider mailto: and tel: links in the subcopy actionUrl label. #31522 ([#31523](https://github.com/laravel/framework/pull/31523), [641a7cd](https://github.com/laravel/framework/commit/641a7cda8280ecd3035616d4ce6434434b116624))
-- exclude mariaDB from database queue support for new SKIP LOCKED ([fff96e7](https://github.com/laravel/framework/commit/fff96e7df7de470e162a6b7f6dd528e6fe17aadc))
-- Fix for issue Content Type not specified ([#31533](https://github.com/laravel/framework/pull/31533))
-- MySQL Aurora failover - DetectsLostConnections ([#31539](https://github.com/laravel/framework/pull/31539))
+
+## [v6.17.0 (2020-02-25)](https://github.com/laravel/framework/compare/v6.16.0...v6.17.0)
+
+### Added
+- Allowed private-encrypted pusher channels ([#31559](https://github.com/laravel/framework/pull/31559), [ceabaef](https://github.com/laravel/framework/commit/ceabaef88741c0c6a891166cf14eb967fdf4e8ee), [8215e0d](https://github.com/laravel/framework/commit/8215e0dc66bf71a7ff4e9bf260380cf4a26f28a6))
+- Added file `permission` config option for the File cache store ([#31579](https://github.com/laravel/framework/pull/31579))
+- Added `Connection refused` and `running with the --read-only option so it cannot execute this statement` to `DetectsLostConnections` ([#31539](https://github.com/laravel/framework/pull/31539))
+
+### Reverted
+- Reverted ["Fixed memory usage on downloading large files"](https://github.com/laravel/framework/pull/31163) ([#31587](https://github.com/laravel/framework/pull/31587))
+
+### Fixed
+- Fixed issue `Content Type not specified` ([#31533](https://github.com/laravel/framework/pull/31533))
+
+### Changed
+- Allowed `cache` helper to have an optional `expiration` parameter ([#31554](https://github.com/laravel/framework/pull/31554))
+- Allowed passing of strings to `TestResponse::dumpSession()` method ([#31583](https://github.com/laravel/framework/pull/31583))
+- Consider mailto: and tel: links in the subcopy actionUrl label in emails ([#31523](https://github.com/laravel/framework/pull/31523), [641a7cd](https://github.com/laravel/framework/commit/641a7cda8280ecd3035616d4ce6434434b116624))
+- Exclude mariaDB from database queue support for new SKIP LOCKED ([fff96e7](https://github.com/laravel/framework/commit/fff96e7df7de470e162a6b7f6dd528e6fe17aadc))
 
 
 ## [v6.16.0 (2020-02-18)](https://github.com/laravel/framework/compare/v6.15.1...v6.16.0)
