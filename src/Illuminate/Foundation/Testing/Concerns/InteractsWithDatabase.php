@@ -14,13 +14,19 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition exists in the database.
      *
-     * @param  string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
+        if ($table instanceof Model) {
+            return $this->assertThat(
+                $table->getTable(), new HasInDatabase($this->getConnection($table->getConnectionName()), $data)
+            );
+        }
+
         $this->assertThat(
             $table, new HasInDatabase($this->getConnection($connection), $data)
         );
