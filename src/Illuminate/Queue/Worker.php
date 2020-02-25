@@ -474,7 +474,7 @@ class Worker
             return;
         }
 
-        if ($maxExceptions < $this->cache->increment('job-exceptions:'.$uuid)) {
+        if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
             $this->failJob($job, $e);
         }
     }

@@ -126,7 +126,7 @@ abstract class Queue
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
-            'maxExceptions' => $job->allowedExceptions ?? null,
+            'maxExceptions' => $job->maxExceptions ?? null,
             'delay' => $this->getJobRetryDelay($job),
             'timeout' => $job->timeout ?? null,
             'timeoutAt' => $this->getJobExpiration($job),
