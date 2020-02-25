@@ -107,7 +107,7 @@ interface Job
     public function maxTries();
 
     /**
-     * Get the number of times to attempt a job after an exception.
+     * Get the maximum number of exceptions allowed, regardless of attempts.
      *
      * @return int|null
      */
