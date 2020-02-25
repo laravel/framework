@@ -37,13 +37,21 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition does not exist in the database.
      *
-     * @param  string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
      * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseMissing($table, array $data, $connection = null)
     {
+        if ($table instanceof Model) {
+            $constraint = new ReverseConstraint(
+                new HasInDatabase($this->getConnection($table->getConnectionName()), $data)
+            );
+
+            return $this->assertThat($table->getTable(), $constraint);
+        }
+
         $constraint = new ReverseConstraint(
             new HasInDatabase($this->getConnection($connection), $data)
         );
