@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Optional;
 use Illuminate\Support\Str;
 use SplFileInfo;
 use stdClass;
@@ -219,7 +220,9 @@ trait InteractsWithInput
     public function input($key = null, $default = null)
     {
         return data_get(
-            $this->getInputSource()->all() + $this->query->all(), $key, $default
+            $this->getInputSource()->all() + $this->query->all(),
+            $key,
+            $default
         );
     }
 
@@ -235,6 +238,19 @@ trait InteractsWithInput
     public function boolean($key = null, $default = false)
     {
         return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * Retrieve optional input.
+     *
+     * Returns value when value is non-empty. Otherwise, returns null.
+     *
+     * @param  string|null  $key
+     * @return mixed
+     */
+    public function optional($key = null)
+    {
+        return $this->filled($key) ? $this->input($key) : null;
     }
 
     /**

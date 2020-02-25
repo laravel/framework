@@ -415,6 +415,16 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->boolean('some_undefined_key'));
     }
 
+    public function testOptionalMethod()
+    {
+        $request = Request::create('/', 'GET', ['is_string' => 'string', 'is_integer' => 123, 'is_empty_string' => '', 'is_null' => null]);
+        $this->assertSame('string', $request->optional('is_string'));
+        $this->assertSame(123, $request->optional('is_integer'));
+        $this->assertSame(null, $request->optional('is_empty_string'));
+        $this->assertSame(null, $request->optional('is_null'));
+        $this->assertSame(null, $request->optional('some_undefined_key'));
+    }
+
     public function testArrayAccess()
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
