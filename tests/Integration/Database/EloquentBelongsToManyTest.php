@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $table->integer('tag_id');
             $table->string('flag')->default('');
             $table->timestamps();
+        });
+
+        Schema::create('posts_tags_soft', function (Blueprint $table) {
+            $table->integer('post_id');
+            $table->integer('tag_id');
+            $table->string('flag')->default('');
+            $table->timestamps();
+            $table->softDeletes();
         });
 
         Carbon::setTestNow(null);
@@ -855,6 +864,168 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $user->postsWithCustomPivot()->updateExistingPivot($post2->uuid, ['is_draft' => 0]);
         $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
     }
+
+    public function testWithTrashedMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tagsWithSoftDeletes')->tagsWithSoftDeletes->pluck('name')
+        );
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->tagsWithSoftDeletes()->withTrashed()->pluck('name')
+        );
+    }
+
+    public function testOnlyTrashedMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tagsWithSoftDeletes')->tagsWithSoftDeletes->pluck('name')
+        );
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag2->id])->pluck('name'),
+            $post->tagsWithSoftDeletes()->onlyTrashed()->pluck('name')
+        );
+    }
+
+    public function testRestoreMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tagsWithSoftDeletes')->tagsWithSoftDeletes->pluck('name')
+        );
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag2->id])->pluck('name'),
+            $post->tagsWithSoftDeletes()->onlyTrashed()->pluck('name')
+        );
+
+        $output = $post->tagsWithSoftDeletes()->restore([$tag2->id]);
+
+        $this->assertEquals(1, $output);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tagsWithSoftDeletes')->tagsWithSoftDeletes->pluck('name')
+        );
+    }
+
+    public function testRestoreMethodWithCustomPivotClass()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithCustomPivotSoftDeletes()->sync([$tag->id, $tag2->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tagsWithCustomPivotSoftDeletes')->tagsWithCustomPivotSoftDeletes->pluck('name')
+        );
+
+        $post->tagsWithCustomPivotSoftDeletes()->sync([$tag->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag2->id])->pluck('name'),
+            $post->tagsWithCustomPivotSoftDeletes()->onlyTrashed()->pluck('name')
+        );
+
+        $output = $post->tagsWithCustomPivotSoftDeletes()->restore([$tag2->id]);
+
+        $this->assertEquals(1, $output);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tagsWithCustomPivotSoftDeletes')->tagsWithCustomPivotSoftDeletes->pluck('name')
+        );
+    }
+
+    public function testForceDetachMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag2->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tagsWithSoftDeletes')->tagsWithSoftDeletes->pluck('name')
+        );
+
+        $post->tagsWithSoftDeletes()->forceDetach([$tag->id, $tag3->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag2->id, $tag4->id])->pluck('name'),
+            $post->tagsWithSoftDeletes()->withTrashed()->pluck('name')
+        );
+    }
+
+    public function testSyncWithForceDetachingMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag2->id, $tag3->id, $tag4->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tagsWithSoftDeletes')->tagsWithSoftDeletes->pluck('name')
+        );
+
+        $post->tagsWithSoftDeletes()->syncWithForceDetaching([$tag->id, $tag3->id]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag3->id])->pluck('name'),
+            $post->tagsWithSoftDeletes()->withTrashed()->pluck('name')
+        );
+    }
 }
 
 class User extends Model
@@ -952,6 +1123,21 @@ class Post extends Model
     {
         return $this->belongsToMany(TagWithGlobalScope::class, 'posts_tags', 'post_id', 'tag_id');
     }
+
+    public function tagsWithSoftDeletes()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags_soft', 'post_id', 'tag_id')
+            ->withTimestamps()
+            ->withSoftDeletes();
+    }
+
+    public function tagsWithCustomPivotSoftDeletes()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags_soft', 'post_id', 'tag_id')
+            ->using(PostTagPivotSoftDeletes::class)
+            ->withTimestamps()
+            ->withSoftDeletes();
+    }
 }
 
 class Tag extends Model
@@ -1000,6 +1186,14 @@ class PostTagPivot extends Pivot
 {
     protected $table = 'posts_tags';
     protected $dateFormat = 'U';
+}
+
+class PostTagPivotSoftDeletes extends Pivot
+{
+    protected $table = 'posts_tags_soft';
+    protected $dateFormat = 'U';
+
+    use SoftDeletes;
 }
 
 class TagWithGlobalScope extends Model
