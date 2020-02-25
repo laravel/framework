@@ -75,6 +75,16 @@ abstract class Job
     abstract public function getRawBody();
 
     /**
+     * Get the UUID of the job.
+     *
+     * @return string|null
+     */
+    public function uuid()
+    {
+        return $this->payload()['uuid'] ?? null;
+    }
+
+    /**
      * Fire the job.
      *
      * @return void
@@ -243,6 +253,16 @@ abstract class Job
     public function maxTries()
     {
         return $this->payload()['maxTries'] ?? null;
+    }
+
+    /**
+     * Get the number of times to attempt a job after an exception.
+     *
+     * @return int|null
+     */
+    public function maxExceptions()
+    {
+        return $this->payload()['maxExceptions'] ?? null;
     }
 
     /**
