@@ -2,6 +2,10 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Closure;
+use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\SerializableClosure;
+
 class PendingChain
 {
     /**
@@ -38,9 +42,13 @@ class PendingChain
      */
     public function dispatch()
     {
-        $firstJob = is_string($this->job)
-                    ? new $this->job(...func_get_args())
-                    : $this->job;
+        if (is_string($this->job)) {
+            $firstJob = new $this->job(...func_get_args());
+        } elseif ($this->job instanceof Closure) {
+            $firstJob = new CallQueuedClosure(new SerializableClosure($this->job));
+        } else {
+            $firstJob = $this->job;
+        }
 
         return (new PendingDispatch($firstJob))->chain($this->chain);
     }
