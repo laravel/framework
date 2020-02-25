@@ -8,6 +8,7 @@ use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -226,6 +227,10 @@ class RedisQueueIntegrationTest extends TestCase
      */
     public function testBlockingPopProperlyPopsExpiredJobs($driver)
     {
+        Str::createUuidsUsing(function () {
+            return 'uuid';
+        });
+
         $this->setQueue($driver, 'default', null, 60, 5);
 
         $jobs = [
@@ -242,6 +247,8 @@ class RedisQueueIntegrationTest extends TestCase
         $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default:notify'));
         $this->assertEquals(0, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
         $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
+
+        Str::createUuidsNormally();
     }
 
     /**
