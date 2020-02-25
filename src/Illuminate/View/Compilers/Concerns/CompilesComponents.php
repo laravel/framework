@@ -149,8 +149,8 @@ trait CompilesComponents
     {
         return "<?php \$attributes = \$attributes->exceptProps{$expression}; ?>
 <?php \$__defined_vars = get_defined_vars(); ?>
-<?php foreach (\$attributes as \$key => \$value) {
-    if (array_key_exists(\$key, \$__defined_vars)) unset(\$\$key);
+<?php foreach (\$attributes as \$__key => \$__value) {
+    if (array_key_exists(\$__key, \$__defined_vars)) unset(\$\$__key);
 } ?>
 <?php unset(\$__defined_vars); ?>";
     }
