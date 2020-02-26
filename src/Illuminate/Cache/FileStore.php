@@ -28,7 +28,7 @@ class FileStore implements Store
     /**
      * Octal representation of the cache file permissions.
      *
-     * @var int
+     * @var int|null
      */
     protected $filePermission;
 
