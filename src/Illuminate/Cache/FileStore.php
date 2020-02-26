@@ -28,7 +28,7 @@ class FileStore implements Store
     /**
      * Octal representation of the cache file permissions.
      *
-     * @var int
+     * @var int|null
      */
     protected $filePermission;
 
@@ -44,7 +44,7 @@ class FileStore implements Store
     {
         $this->files = $files;
         $this->directory = $directory;
-        $this->filePermission = $filePermission ?? 0775;
+        $this->filePermission = $filePermission;
     }
 
     /**
@@ -75,7 +75,9 @@ class FileStore implements Store
         );
 
         if ($result !== false && $result > 0) {
-            $this->files->chmod($path, $this->filePermission);
+            if (! is_null($this->filePermission)) {
+                $this->files->chmod($path, $this->filePermission);
+            }
 
             return true;
         }
