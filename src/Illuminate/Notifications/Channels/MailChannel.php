@@ -4,9 +4,9 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Markdown;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -43,7 +43,7 @@ class MailChannel
      * Send the given notification.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @return void
      */
     public function send($notifiable, Notification $notification)
@@ -70,7 +70,7 @@ class MailChannel
      * Get the mailer Closure for the message.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return \Closure
      */
@@ -106,7 +106,7 @@ class MailChannel
     /**
      * Get additional meta-data to pass along with the view data.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @return array
      */
     protected function additionalMessageData($notification)
@@ -124,7 +124,7 @@ class MailChannel
      *
      * @param  \Illuminate\Mail\Message  $mailMessage
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return void
      */
@@ -150,7 +150,7 @@ class MailChannel
      *
      * @param  \Illuminate\Mail\Message  $mailMessage
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return void
      */
@@ -197,7 +197,7 @@ class MailChannel
      * Get the recipients of the given message.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return mixed
      */

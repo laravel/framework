@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Contracts\Notifications\Notification as NotificationContract;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
@@ -61,7 +62,7 @@ class NotificationDatabaseChannelTestNotification extends Notification
 
 class ExtendedDatabaseChannel extends DatabaseChannel
 {
-    protected function buildPayload($notifiable, Notification $notification)
+    protected function buildPayload($notifiable, NotificationContract $notification)
     {
         return array_merge(parent::buildPayload($notifiable, $notification), [
             'something' => 'else',

@@ -3,9 +3,9 @@
 namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Notifications\Notification;
 use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 use Illuminate\Notifications\Messages\BroadcastMessage;
-use Illuminate\Notifications\Notification;
 use RuntimeException;
 
 class BroadcastChannel
@@ -32,7 +32,7 @@ class BroadcastChannel
      * Send the given notification.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @return array|null
      */
     public function send($notifiable, Notification $notification)
@@ -55,7 +55,7 @@ class BroadcastChannel
      * Get the data for the notification.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @return mixed
      *
      * @throws \RuntimeException

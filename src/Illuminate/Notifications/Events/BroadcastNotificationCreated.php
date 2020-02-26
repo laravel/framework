@@ -21,7 +21,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     /**
      * The notification instance.
      *
-     * @var \Illuminate\Notifications\Notification
+     * @var \Illuminate\Contracts\Notifications\Notification
      */
     public $notification;
 
@@ -36,7 +36,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
      * Create a new event instance.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification  $notification
      * @param  array  $data
      * @return void
      */

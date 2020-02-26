@@ -21,7 +21,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * The notification to be sent.
      *
-     * @var \Illuminate\Notifications\Notification
+     * @var \Illuminate\Contracts\Notifications\Notification
      */
     public $notification;
 
@@ -50,7 +50,7 @@ class SendQueuedNotifications implements ShouldQueue
      * Create a new job instance.
      *
      * @param  \Illuminate\Support\Collection  $notifiables
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Contracts\Notifications\Notification $notification
      * @param  array|null  $channels
      * @return void
      */
