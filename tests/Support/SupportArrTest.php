@@ -305,6 +305,63 @@ class SupportArrTest extends TestCase
         }));
     }
 
+    public function testGroupBy()
+    {
+        $array = [
+            'foo' => ['name' => 'Desk', 'type' => 'desk'],
+            'bar' => ['name' => 'Standing desk', 'type' => 'desk'],
+        ];
+
+        // Simple grouping by different values
+        $groupByName = Arr::group($array, 'name');
+        $this->assertSame([
+            'Desk' => ['foo' => ['name' => 'Desk', 'type' => 'desk']],
+            'Standing desk' => ['bar' => ['name' => 'Standing desk', 'type' => 'desk']],
+        ], $groupByName);
+
+        // Simple grouping by same value
+        $groupByType = Arr::group($array, 'type');
+        $this->assertSame([
+            'desk' => [
+                'foo' => ['name' => 'Desk', 'type' => 'desk'],
+                'bar' => ['name' => 'Standing desk', 'type' => 'desk'],
+            ],
+        ], $groupByType);
+
+        // Simple grouping by unknown values
+        $groupByUnknown = Arr::group($array, 'unknown');
+        $this->assertSame([
+            '' => [
+                'foo' => ['name' => 'Desk', 'type' => 'desk'],
+                'bar' => ['name' => 'Standing desk', 'type' => 'desk'],
+            ],
+        ], $groupByUnknown);
+
+        // Simple grouping by unknown values with fallback
+        $groupByFallback = Arr::group($array, 'unknown', 'fallback');
+        $this->assertSame([
+            'fallback' => [
+                'foo' => ['name' => 'Desk', 'type' => 'desk'],
+                'bar' => ['name' => 'Standing desk', 'type' => 'desk'],
+            ],
+        ], $groupByFallback);
+
+        // Custom grouping by callable
+        $groupByCallable = Arr::group($array, function ($value, $key) {
+            return $key . $value['type'];
+        });
+        $this->assertSame([
+            'foodesk' => ['foo' => ['name' => 'Desk', 'type' => 'desk']],
+            'bardesk' => ['bar' => ['name' => 'Standing desk', 'type' => 'desk']],
+        ], $groupByCallable);
+
+        // Non-associative array support, shouldn't be really useful but still, thanks Arr::get
+        $groupNonAssociative = Arr::group(['thats', 'all', 'folks'], '...');
+        $this->assertSame([
+            '' => ['thats', 'all', 'folks'],
+        ], $groupNonAssociative);
+    }
+
     public function testHas()
     {
         $array = ['products.desk' => ['price' => 100]];

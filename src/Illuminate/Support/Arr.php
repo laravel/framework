@@ -309,6 +309,29 @@ class Arr
     }
 
     /**
+     * Group an associative array by a field or by using a callback.
+     *
+     * @param  array  $array
+     * @param  callable|string  $groupBy
+     * @param  string  $default
+     * @return array
+     */
+    public static function group($array, $groupBy, $default = '')
+    {
+        $results = [];
+
+        foreach ($array as $key => $item) {
+            if (is_callable($groupBy)) {
+                $results[$groupBy($item, $key)][$key] = $item;
+            } else {
+                $results[Arr::get($item, $groupBy, $default)][$key] = $item;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
