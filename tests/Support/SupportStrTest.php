@@ -127,6 +127,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('yv2et', Str::beforeLast('yv2et2te', 2));
     }
 
+    public function testStrBetween()
+    {
+        $this->assertSame('nn', Str::between('hannah', 'ha', 'ah'));
+        $this->assertSame('foo', Str::between('foofoobar', 'foo', 'bar'));
+        $this->assertSame('bar', Str::between('foobarbar', 'foo', 'bar'));
+    }
+
     public function testStrAfter()
     {
         $this->assertSame('nah', Str::after('hannah', 'han'));
