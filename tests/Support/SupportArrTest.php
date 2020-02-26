@@ -305,7 +305,7 @@ class SupportArrTest extends TestCase
         }));
     }
 
-    public function testGroupBy()
+    public function testGroup()
     {
         $array = [
             'foo' => ['name' => 'Desk', 'type' => 'desk'],
