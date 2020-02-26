@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 
 class HasManyThrough extends Relation
 {
@@ -204,16 +205,10 @@ class HasManyThrough extends Relation
      */
     protected function buildDictionary(Collection $results)
     {
-        $dictionary = [];
-
         // First we will create a dictionary of models keyed by the foreign key of the
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
-        foreach ($results as $result) {
-            $dictionary[$result->laravel_through_key][] = $result;
-        }
-
-        return $dictionary;
+        return Arr::group($results, 'laravel_through_key');
     }
 
     /**
