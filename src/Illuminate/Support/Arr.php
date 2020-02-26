@@ -311,7 +311,7 @@ class Arr
     /**
      * Group an associative array by a field or by using a callback.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @param  callable|string  $groupBy
      * @param  string  $default
      * @return array
