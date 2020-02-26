@@ -348,7 +348,7 @@ class SupportArrTest extends TestCase
 
         // Custom grouping by callable
         $groupByCallable = Arr::group($array, function ($value, $key) {
-            return $key . $value['type'];
+            return $key.$value['type'];
         });
         $this->assertSame([
             'foodesk' => ['foo' => ['name' => 'Desk', 'type' => 'desk']],

@@ -324,7 +324,7 @@ class Arr
             if (is_callable($groupBy)) {
                 $results[$groupBy($item, $key)][$key] = $item;
             } else {
-                $results[Arr::get($item, $groupBy, $default)][$key] = $item;
+                $results[self::get($item, $groupBy, $default)][$key] = $item;
             }
         }
 
