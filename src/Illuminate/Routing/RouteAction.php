@@ -19,15 +19,15 @@ class RouteAction
     public static function parse($uri, $action)
     {
         // If no action is passed in right away, we assume the user will make use of
-        // fluent routing. In that case, we set a default closure, to be executed
+        // fluent routing. In that case, we set a default callable, to be executed
         // if the user never explicitly sets an action to handle the given uri.
         if (is_null($action)) {
             return static::missingAction($uri);
         }
 
-        // If the action is already a Closure instance, we will just set that instance
-        // as the "uses" property, because there is nothing else we need to do when
-        // it is available. Otherwise we will need to find it in the action list.
+        // If the action is already a callable, we will set that callable as the 
+        // "uses" property, because there is nothing else we need to do when it
+        // is available. Otherwise we will need to find it in the action list.
         if (is_callable($action, true)) {
             return ! is_array($action) ? ['uses' => $action] : [
                 'uses' => $action[0].'@'.$action[1],
@@ -36,8 +36,8 @@ class RouteAction
         }
 
         // If no "uses" property has been set, we will dig through the array to find a
-        // Closure instance within this list. We will set the first Closure we come
-        // across into the "uses" property that will get fired off by this route.
+        // callable within this list. We will set the first callable we come across
+        // into the "uses" property that will get fired off by this route.
         elseif (! isset($action['uses'])) {
             $action['uses'] = static::findCallable($action);
         }
