@@ -384,7 +384,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function updateGroupStack(array $attributes)
     {
-        if (! empty($this->groupStack)) {
+        if ($this->hasGroupStack()) {
             $attributes = $this->mergeWithLastGroup($attributes);
         }
 
@@ -509,7 +509,7 @@ class Router implements BindingRegistrar, RegistrarContract
         // Here we'll merge any group "uses" statement if necessary so that the action
         // has the proper clause for this property. Then we can simply set the name
         // of the controller on the action and return the action array for usage.
-        if (! empty($this->groupStack)) {
+        if ($this->hasGroupStack()) {
             $action['uses'] = $this->prependGroupNamespace($action['uses']);
         }
 
