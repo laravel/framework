@@ -287,7 +287,7 @@ class MailFake implements Mailer, MailQueue
      *
      * @param  string|array  $view
      * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string|null  $callback
      * @return void
      */
     public function send($view, array $data = [], $callback = null)
@@ -324,7 +324,7 @@ class MailFake implements Mailer, MailQueue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function later($delay, $view, $queue = null)

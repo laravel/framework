@@ -135,7 +135,7 @@ class BelongsToMany extends Relation
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
      * @param  string  $relatedKey
-     * @param  string  $relationName
+     * @param  string|null  $relationName
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $table, $foreignPivotKey,
