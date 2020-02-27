@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use OutOfBoundsException;
 
 class ResponseSequence
@@ -106,7 +107,7 @@ class ResponseSequence
     /**
      * Make the sequence return a default response when it is empty.
      *
-     * @param  \GuzzleHttp\Promise\PromiseInterface|callable  $response
+     * @param  \GuzzleHttp\Promise\PromiseInterface|\Closure  $response
      * @return $this
      */
     public function whenEmpty($response)
@@ -149,7 +150,7 @@ class ResponseSequence
         }
 
         if (! $this->failWhenEmpty && count($this->responses) === 0) {
-            return $this->emptyResponse ?? Factory::response();
+            return value($this->emptyResponse ?? Factory::response());
         }
 
         return array_shift($this->responses);
