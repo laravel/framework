@@ -6,7 +6,7 @@
 - Use correct locale when resolving Faker from the container ([#31615](https://github.com/laravel/framework/pull/31615))
 
 
-## [v6.17.0 (2020-02-25)](https://github.com/laravel/framework/compare/v6.17.0...v6.17.1)
+## [v6.17.1 (2020-02-26)](https://github.com/laravel/framework/compare/v6.17.0...v6.17.1)
 
 ### Changed
 - Don`t do chmod in File cache in case if permission not set ([#31593](https://github.com/laravel/framework/pull/31593))
