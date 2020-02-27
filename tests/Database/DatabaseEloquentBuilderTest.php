@@ -553,6 +553,62 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getRelation('invalid');
     }
 
+    public function testEagerLoadSelectColumns()
+    {
+        $builder = $this->getBuilder();
+
+        // IT WORKS
+        // $builder->with([
+        //     'books:id',
+        //     'books.chapters:id,book_id',
+        // ]);
+
+        // IT DOESN'T
+        $builder
+            ->with('books:id')
+            ->with('books.chapters:id,book_id');
+
+        // Base Tests
+
+        $eagers = $builder->getEagerLoads();
+
+        $this->assertEquals(['books', 'books.chapters'], array_keys($eagers));
+        $this->assertInstanceOf(Closure::class, $eagers['books']);
+        $this->assertInstanceOf(Closure::class, $eagers['books.chapters']);
+
+        // Chapters Eager
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getKeyName')->andReturn('id');
+        $model->shouldReceive('getTable')->andReturn('chapters');
+        $model->shouldReceive('getQualifiedKeyName')->andReturn('chapters.id');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('select')->once()->with(['id', 'book_id']);
+        $query->shouldReceive('from')->once()->with('chapters');
+
+        $builder = new Builder($query);
+        $builder->setModel($model);
+
+        $eagers['books.chapters']($builder);
+
+        // Books Eager
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getKeyName')->andReturn('id');
+        $model->shouldReceive('getTable')->andReturn('books');
+        $model->shouldReceive('getQualifiedKeyName')->andReturn('books.id');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('select')->once()->with(['id']);
+        $query->shouldReceive('from')->once()->with('books');
+
+        $builder = new Builder($query);
+        $builder->setModel($model);
+
+        $eagers['books']($builder);
+    }
+
     public function testEagerLoadParsingSetsProperRelationships()
     {
         $builder = $this->getBuilder();
