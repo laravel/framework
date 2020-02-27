@@ -121,13 +121,14 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * Handle a failed validation attempt.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param  \Symfony\Component\HttpFoundation\Response|null  $response
      * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator, $response = null)
     {
-        throw (new ValidationException($validator))
+        throw (new ValidationException($validator, $response))
                     ->errorBag($this->errorBag)
                     ->redirectTo($this->getRedirectUrl());
     }
