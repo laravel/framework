@@ -775,7 +775,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Load deferred provider if $abstract is deferred and instance was not loaded
+     * Load deferred provider if $abstract is deferred and instance was not loaded.
      *
      * @param  string  $abstract
      */
