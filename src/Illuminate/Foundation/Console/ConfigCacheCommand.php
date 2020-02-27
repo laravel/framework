@@ -57,8 +57,8 @@ class ConfigCacheCommand extends Command
         $this->call('config:clear');
 
         $freshConfig = $this->getFreshConfiguration();
-        $dotConfig   = Arr::dot($freshConfig);
-        $config      = $dotConfig + $freshConfig;
+        $dotConfig = Arr::dot($freshConfig);
+        $config = $dotConfig + $freshConfig;
 
         $configPath = $this->laravel->getCachedConfigPath();
 
