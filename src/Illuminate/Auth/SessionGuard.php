@@ -496,6 +496,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         $user = $this->user();
 
+        $this->session->flush();
+        
         $this->clearUserDataFromStorage();
 
         if (! is_null($this->user) && ! empty($user->getRememberToken())) {
