@@ -261,7 +261,7 @@ class Container implements ArrayAccess, ContainerContract
                 return $container->build($concrete);
             }
 
-            return $container->resolve(
+            return $container->make(
                 $concrete, $parameters, $raiseEvents = false
             );
         };
@@ -620,13 +620,14 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  array  $parameters
+     * @param  bool  $raiseEvents
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function make($abstract, array $parameters = [])
+    public function make($abstract, array $parameters = [], $raiseEvents = true)
     {
-        return $this->resolve($abstract, $parameters);
+        return $this->resolve($abstract, $parameters, $raiseEvents);
     }
 
     /**
