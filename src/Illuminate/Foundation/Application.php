@@ -763,10 +763,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @param  string  $abstract
      * @param  array  $parameters
-     * @param  bool  $raiseEvents
      * @return mixed
      */
-    public function make($abstract, array $parameters = [], $raiseEvents = true)
+    public function make($abstract, array $parameters = [])
     {
         $abstract = $this->getAlias($abstract);
 
@@ -774,7 +773,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $this->loadDeferredProvider($abstract);
         }
 
-        return parent::make($abstract, $parameters, $raiseEvents);
+        return parent::make($abstract, $parameters);
     }
 
     /**

@@ -139,12 +139,11 @@ interface Container extends ContainerInterface
      *
      * @param  string  $abstract
      * @param  array  $parameters
-     * @param  bool  $raiseEvents
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function make($abstract, array $parameters = [], $raiseEvents = true);
+    public function make($abstract, array $parameters = []);
 
     /**
      * Call the given Closure / class@method and inject its dependencies.
