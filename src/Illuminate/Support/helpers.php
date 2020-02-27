@@ -34,7 +34,7 @@ if (! function_exists('blank')) {
     /**
      * Determine if the given value is "blank".
      *
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return bool
      */
     function blank($value)
@@ -101,7 +101,7 @@ if (! function_exists('collect')) {
     /**
      * Create a collection from the given value.
      *
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return \Illuminate\Support\Collection
      */
     function collect($value = null)
@@ -130,8 +130,8 @@ if (! function_exists('data_get')) {
      * Get an item from an array or object using "dot" notation.
      *
      * @param  mixed  $target
-     * @param  string|array|int  $key
-     * @param  mixed  $default
+     * @param  string|array|int|null  $key
+     * @param  mixed|null  $default
      * @return mixed
      */
     function data_get($target, $key, $default = null)
@@ -257,7 +257,7 @@ if (! function_exists('env')) {
      * Gets the value of an environment variable.
      *
      * @param  string  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     function env($key, $default = null)
@@ -310,8 +310,8 @@ if (! function_exists('object_get')) {
      * Get an item from an object using "dot" notation.
      *
      * @param  object  $object
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param  string|null  $key
+     * @param  mixed|null  $default
      * @return mixed
      */
     function object_get($object, $key, $default = null)
@@ -336,7 +336,7 @@ if (! function_exists('optional')) {
     /**
      * Provide access to optional objects.
      *
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @param  callable|null  $callback
      * @return mixed
      */
@@ -376,7 +376,7 @@ if (! function_exists('retry')) {
      * @param  int  $times
      * @param  callable  $callback
      * @param  int  $sleep
-     * @param  callable  $when
+     * @param  callable|null  $when
      * @return mixed
      *
      * @throws \Exception
@@ -492,7 +492,7 @@ if (! function_exists('transform')) {
      *
      * @param  mixed  $value
      * @param  callable  $callback
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed|null
      */
     function transform($value, callable $callback, $default = null)

@@ -399,7 +399,7 @@ if (! function_exists('dispatch_now')) {
      * Dispatch a command to its appropriate handler in the current process.
      *
      * @param  mixed  $job
-     * @param  mixed  $handler
+     * @param  mixed|null  $handler
      * @return mixed
      */
     function dispatch_now($job, $handler = null)
@@ -592,7 +592,7 @@ if (! function_exists('old')) {
      * Retrieve an old input item.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     function old($key = null, $default = null)
@@ -672,7 +672,7 @@ if (! function_exists('request')) {
      * Get an instance of the current request or an input item from the request.
      *
      * @param  array|string|null  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return \Illuminate\Http\Request|string|array
      */
     function request($key = null, $default = null)
@@ -696,7 +696,7 @@ if (! function_exists('rescue')) {
      * Catch a potential exception and return a default value.
      *
      * @param  callable  $callback
-     * @param  mixed  $rescue
+     * @param  mixed|null  $rescue
      * @param  bool  $report
      * @return mixed
      */
@@ -811,7 +811,7 @@ if (! function_exists('session')) {
      * If an array is passed as the key, we will assume you want to set an array of values.
      *
      * @param  array|string|null  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed|\Illuminate\Session\Store|\Illuminate\Session\SessionManager
      */
     function session($key = null, $default = null)

@@ -341,7 +341,7 @@ class Route
      * Get a given parameter from the route.
      *
      * @param  string  $name
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return string|object
      */
     public function parameter($name, $default = null)
@@ -353,7 +353,7 @@ class Route
      * Get original value of a given parameter from the route.
      *
      * @param  string  $name
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return string
      */
     public function originalParameter($name, $default = null)

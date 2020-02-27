@@ -80,7 +80,7 @@ class Dispatcher implements QueueingDispatcher
      * Dispatch a command to its appropriate handler in the current process.
      *
      * @param  mixed  $command
-     * @param  mixed  $handler
+     * @param  mixed|null  $handler
      * @return mixed
      */
     public function dispatchNow($command, $handler = null)
@@ -188,7 +188,7 @@ class Dispatcher implements QueueingDispatcher
      * Dispatch a command to its appropriate handler after the current process.
      *
      * @param  mixed  $command
-     * @param  mixed  $handler
+     * @param  mixed|null  $handler
      * @return void
      */
     public function dispatchAfterResponse($command, $handler = null)

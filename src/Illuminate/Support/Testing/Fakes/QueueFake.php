@@ -230,7 +230,7 @@ class QueueFake extends QueueManager implements Queue
     /**
      * Resolve a queue connection instance.
      *
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($value = null)

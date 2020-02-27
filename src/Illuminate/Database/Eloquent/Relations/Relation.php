@@ -217,7 +217,7 @@ abstract class Relation
      * Get all of the primary keys for an array of models.
      *
      * @param  array  $models
-     * @param  string  $key
+     * @param  string|null  $key
      * @return array
      */
     protected function getKeys(array $models, $key = null)

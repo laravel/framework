@@ -1366,7 +1366,7 @@ trait ValidatesAttributes
      * Validate that a required attribute exists.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return bool
      */
     public function validateRequired($attribute, $value)

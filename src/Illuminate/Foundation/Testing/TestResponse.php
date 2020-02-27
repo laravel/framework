@@ -211,7 +211,7 @@ class TestResponse implements ArrayAccess
      * Asserts that the response contains the given header and equals the optional value.
      *
      * @param  string  $headerName
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      */
     public function assertHeader($headerName, $value = null)
@@ -266,7 +266,7 @@ class TestResponse implements ArrayAccess
      * Asserts that the response contains the given cookie and equals the optional value.
      *
      * @param  string  $cookieName
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      */
     public function assertPlainCookie($cookieName, $value = null)
@@ -280,7 +280,7 @@ class TestResponse implements ArrayAccess
      * Asserts that the response contains the given cookie and equals the optional value.
      *
      * @param  string  $cookieName
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @param  bool  $encrypted
      * @param  bool  $unserialize
      * @return $this
@@ -843,7 +843,7 @@ class TestResponse implements ArrayAccess
      * Assert that the response view has a given piece of bound data.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      */
     public function assertViewHas($key, $value = null)
@@ -932,7 +932,7 @@ class TestResponse implements ArrayAccess
      * Assert that the session has a given value.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      */
     public function assertSessionHas($key, $value = null)
@@ -978,7 +978,7 @@ class TestResponse implements ArrayAccess
      * Assert that the session has a given value in the flashed input array.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      */
     public function assertSessionHasInput($key, $value = null)
@@ -1013,7 +1013,7 @@ class TestResponse implements ArrayAccess
      * Assert that the session has the given errors.
      *
      * @param  string|array  $keys
-     * @param  mixed  $format
+     * @param  mixed|null  $format
      * @param  string  $errorBag
      * @return $this
      */
@@ -1096,7 +1096,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  string  $errorBag
      * @param  string|array  $keys
-     * @param  mixed  $format
+     * @param  mixed|null  $format
      * @return $this
      */
     public function assertSessionHasErrorsIn($errorBag, $keys = [], $format = null)

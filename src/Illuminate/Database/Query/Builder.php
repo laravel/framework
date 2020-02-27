@@ -628,8 +628,8 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -777,8 +777,8 @@ class Builder
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -1594,7 +1594,7 @@ class Builder
      *
      * @param  string  $column
      * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      */
     public function orWhereJsonLength($column, $operator, $value = null)
@@ -2796,7 +2796,7 @@ class Builder
     /**
      * Delete a record from the database.
      *
-     * @param  mixed  $id
+     * @param  mixed|null  $id
      * @return int
      */
     public function delete($id = null)

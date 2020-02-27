@@ -135,7 +135,7 @@ class BelongsToMany extends Relation
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
      * @param  string  $relatedKey
-     * @param  string  $relationName
+     * @param  string|null  $relationName
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $table, $foreignPivotKey,
@@ -345,7 +345,7 @@ class BelongsToMany extends Relation
      *
      * @param  string  $column
      * @param  string|null  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -377,7 +377,7 @@ class BelongsToMany extends Relation
      *
      * @param  string  $column
      * @param  string|null  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      */
     public function orWherePivot($column, $operator = null, $value = null)
@@ -391,7 +391,7 @@ class BelongsToMany extends Relation
      * In addition, new pivot records will receive this value.
      *
      * @param  string|array  $column
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -1043,8 +1043,8 @@ class BelongsToMany extends Relation
     /**
      * Specify that the pivot table has creation and update timestamps.
      *
-     * @param  mixed  $createdAt
-     * @param  mixed  $updatedAt
+     * @param  mixed|null  $createdAt
+     * @param  mixed|null  $updatedAt
      * @return $this
      */
     public function withTimestamps($createdAt = null, $updatedAt = null)

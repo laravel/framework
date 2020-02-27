@@ -983,7 +983,7 @@ trait HasAttributes
      * Get the model's original attribute values.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed|array
      */
     public function getOriginal($key = null, $default = null)

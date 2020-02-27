@@ -408,7 +408,7 @@ trait InteractsWithPivotTable
     /**
      * Detach models from the relationship.
      *
-     * @param  mixed  $ids
+     * @param  mixed|null  $ids
      * @param  bool  $touch
      * @return int
      */

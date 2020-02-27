@@ -724,7 +724,7 @@ class Mailable implements MailableContract, Renderable
      * Set the view data for the message.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return $this
      */
     public function with($key, $value = null)

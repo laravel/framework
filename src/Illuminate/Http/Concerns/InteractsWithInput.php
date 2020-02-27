@@ -213,7 +213,7 @@ trait InteractsWithInput
      * Retrieve an input item from the request.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function input($key = null, $default = null)
@@ -393,7 +393,7 @@ trait InteractsWithInput
      * Retrieve a file from the request.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|array|null
      */
     public function file($key = null, $default = null)

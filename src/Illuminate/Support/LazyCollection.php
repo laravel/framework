@@ -23,7 +23,7 @@ class LazyCollection implements Enumerable
     /**
      * Create a new lazy collection instance.
      *
-     * @param  mixed  $source
+     * @param  mixed|null  $source
      * @return void
      */
     public function __construct($source = null)
@@ -51,7 +51,7 @@ class LazyCollection implements Enumerable
      * Create a new instance by invoking the callback a given amount of times.
      *
      * @param  int  $number
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return static
      */
     public static function times($number, callable $callback = null)
@@ -202,8 +202,8 @@ class LazyCollection implements Enumerable
      * Determine if an item exists in the enumerable.
      *
      * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null)
@@ -370,7 +370,7 @@ class LazyCollection implements Enumerable
      * Get the first item from the enumerable passing the given truth test.
      *
      * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function first(callable $callback = null, $default = null)
@@ -434,8 +434,8 @@ class LazyCollection implements Enumerable
     /**
      * Get an item by key.
      *
-     * @param  mixed  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $key
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -512,7 +512,7 @@ class LazyCollection implements Enumerable
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
-     * @param  string  $glue
+     * @param  string|null  $glue
      * @return string
      */
     public function implode($value, $glue = null)
@@ -582,7 +582,7 @@ class LazyCollection implements Enumerable
      * Get the last item from the collection.
      *
      * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function last(callable $callback = null, $default = null)
@@ -762,7 +762,7 @@ class LazyCollection implements Enumerable
     /**
      * Get the items with the specified keys.
      *
-     * @param  mixed  $keys
+     * @param  mixed|null  $keys
      * @return static
      */
     public function only($keys)
@@ -827,7 +827,7 @@ class LazyCollection implements Enumerable
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback
-     * @param  mixed  $initial
+     * @param  mixed|null  $initial
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null)
@@ -916,7 +916,7 @@ class LazyCollection implements Enumerable
     /**
      * Shuffle the items in the collection.
      *
-     * @param  int  $seed
+     * @param  int|null  $seed
      * @return static
      */
     public function shuffle($seed = null)
@@ -951,7 +951,7 @@ class LazyCollection implements Enumerable
      * Get a slice of items from the enumerable.
      *
      * @param  int  $offset
-     * @param  int  $length
+     * @param  int|null  $length
      * @return static
      */
     public function slice($offset, $length = null)

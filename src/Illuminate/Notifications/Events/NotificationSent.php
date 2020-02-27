@@ -43,7 +43,7 @@ class NotificationSent
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  string  $channel
-     * @param  mixed  $response
+     * @param  mixed|null  $response
      * @return void
      */
     public function __construct($notifiable, $notification, $channel, $response = null)

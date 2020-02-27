@@ -34,7 +34,7 @@ class Collection implements ArrayAccess, Enumerable
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $number
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return static
      */
     public static function times($number, callable $callback = null)
@@ -164,8 +164,8 @@ class Collection implements ArrayAccess, Enumerable
      * Determine if an item exists in the collection.
      *
      * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null)
@@ -407,7 +407,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get an item from the collection by key.
      *
      * @param  mixed  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -513,7 +513,7 @@ class Collection implements ArrayAccess, Enumerable
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
-     * @param  string  $glue
+     * @param  string|null  $glue
      * @return string
      */
     public function implode($value, $glue = null)
@@ -605,7 +605,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get the last item from the collection.
      *
      * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function last(callable $callback = null, $default = null)
@@ -763,7 +763,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the items with the specified keys.
      *
-     * @param  mixed  $keys
+     * @param  mixed|null  $keys
      * @return static
      */
     public function only($keys)
@@ -795,7 +795,7 @@ class Collection implements ArrayAccess, Enumerable
      * Push an item onto the beginning of the collection.
      *
      * @param  mixed  $value
-     * @param  mixed  $key
+     * @param  mixed|null  $key
      * @return $this
      */
     public function prepend($value, $key = null)
@@ -839,7 +839,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get and remove an item from the collection.
      *
      * @param  mixed  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function pull($key, $default = null)
@@ -882,7 +882,7 @@ class Collection implements ArrayAccess, Enumerable
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback
-     * @param  mixed  $initial
+     * @param  mixed|null  $initial
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null)
@@ -957,7 +957,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Shuffle the items in the collection.
      *
-     * @param  int  $seed
+     * @param  int|null  $seed
      * @return static
      */
     public function shuffle($seed = null)
@@ -980,7 +980,7 @@ class Collection implements ArrayAccess, Enumerable
      * Slice the underlying collection array.
      *
      * @param  int  $offset
-     * @param  int  $length
+     * @param  int|null  $length
      * @return static
      */
     public function slice($offset, $length = null)
@@ -1293,7 +1293,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Set the item at a given offset.
      *
-     * @param  mixed  $key
+     * @param  mixed|null  $key
      * @param  mixed  $value
      * @return void
      */

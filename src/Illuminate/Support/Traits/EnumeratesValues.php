@@ -98,8 +98,8 @@ trait EnumeratesValues
      * Alias for the "contains" method.
      *
      * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return bool
      */
     public function some($key, $operator = null, $value = null)
@@ -111,7 +111,7 @@ trait EnumeratesValues
      * Determine if an item exists, using strict comparison.
      *
      * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return bool
      */
     public function containsStrict($key, $value = null)
@@ -200,8 +200,8 @@ trait EnumeratesValues
      * Determine if all items pass the given truth test.
      *
      * @param  string|callable  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return bool
      */
     public function every($key, $operator = null, $value = null)
@@ -225,8 +225,8 @@ trait EnumeratesValues
      * Get the first item by the given key value pair.
      *
      * @param  string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return mixed
      */
     public function firstWhere($key, $operator = null, $value = null)
@@ -354,8 +354,8 @@ trait EnumeratesValues
      * Partition the collection into two arrays using the given callback or key.
      *
      * @param  callable|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return static
      */
     public function partition($key, $operator = null, $value = null)
@@ -404,7 +404,7 @@ trait EnumeratesValues
      *
      * @param  bool|mixed  $value
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return static|mixed
      */
     public function when($value, callable $callback, callable $default = null)
@@ -422,7 +422,7 @@ trait EnumeratesValues
      * Apply the callback if the collection is empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return static|mixed
      */
     public function whenEmpty(callable $callback, callable $default = null)
@@ -434,7 +434,7 @@ trait EnumeratesValues
      * Apply the callback if the collection is not empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return static|mixed
      */
     public function whenNotEmpty(callable $callback, callable $default = null)
@@ -447,7 +447,7 @@ trait EnumeratesValues
      *
      * @param  bool  $value
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return static|mixed
      */
     public function unless($value, callable $callback, callable $default = null)
@@ -459,7 +459,7 @@ trait EnumeratesValues
      * Apply the callback unless the collection is empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return static|mixed
      */
     public function unlessEmpty(callable $callback, callable $default = null)
@@ -471,7 +471,7 @@ trait EnumeratesValues
      * Apply the callback unless the collection is not empty.
      *
      * @param  callable  $callback
-     * @param  callable  $default
+     * @param  callable|null  $default
      * @return static|mixed
      */
     public function unlessNotEmpty(callable $callback, callable $default = null)
@@ -483,8 +483,8 @@ trait EnumeratesValues
      * Filter items by the given key value pair.
      *
      * @param  string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return static
      */
     public function where($key, $operator = null, $value = null)
@@ -848,7 +848,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  string|null  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return \Closure
      */
     protected function operatorForWhere($key, $operator = null, $value = null)

@@ -548,7 +548,7 @@ class Factory implements FactoryContract
      * Get an item from the shared data.
      *
      * @param  string  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function shared($key, $default = null)

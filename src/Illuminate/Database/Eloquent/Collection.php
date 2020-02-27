@@ -16,7 +16,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Find a model in the collection by key.
      *
      * @param  mixed  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return \Illuminate\Database\Eloquent\Model|static|null
      */
     public function find($key, $default = null)
@@ -193,8 +193,8 @@ class Collection extends BaseCollection implements QueueableCollection
      * Determine if a key exists in the collection.
      *
      * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null)

@@ -210,7 +210,7 @@ class Store implements Session
      * Get an item from the session.
      *
      * @param  string  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -247,7 +247,7 @@ class Store implements Session
      * Get the requested item from the flashed input array.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function getOldInput($key = null, $default = null)
@@ -270,7 +270,7 @@ class Store implements Session
      * Put a key / value pair or array of key / value pairs in the session.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return void
      */
     public function put($key, $value = null)

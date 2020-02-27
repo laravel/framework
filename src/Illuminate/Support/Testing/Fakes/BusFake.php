@@ -239,7 +239,7 @@ class BusFake implements Dispatcher
      * Dispatch a command to its appropriate handler in the current process.
      *
      * @param  mixed  $command
-     * @param  mixed  $handler
+     * @param  mixed|null  $handler
      * @return mixed
      */
     public function dispatchNow($command, $handler = null)

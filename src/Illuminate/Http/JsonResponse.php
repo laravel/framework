@@ -18,7 +18,7 @@ class JsonResponse extends BaseJsonResponse
     /**
      * Constructor.
      *
-     * @param  mixed  $data
+     * @param  mixed|null  $data
      * @param  int  $status
      * @param  array  $headers
      * @param  int  $options

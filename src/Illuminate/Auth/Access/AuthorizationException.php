@@ -17,7 +17,7 @@ class AuthorizationException extends Exception
      * Create a new authorization exception instance.
      *
      * @param  string|null  $message
-     * @param  mixed  $code
+     * @param  mixed|null  $code
      * @param  \Exception|null  $previous
      * @return void
      */

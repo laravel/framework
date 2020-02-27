@@ -117,7 +117,7 @@ class CookieJar implements JarContract
      * Get a queued cookie instance.
      *
      * @param  string  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @param  string|null  $path
      * @return \Symfony\Component\HttpFoundation\Cookie
      */

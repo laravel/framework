@@ -217,8 +217,8 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -239,8 +239,8 @@ class Builder
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Eloquent\Model|static
      */
@@ -253,8 +253,8 @@ class Builder
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|array|string  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  mixed|null  $operator
+     * @param  mixed|null  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -269,7 +269,7 @@ class Builder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  string  $column
+     * @param  string|null  $column
      * @return $this
      */
     public function latest($column = null)
@@ -286,7 +286,7 @@ class Builder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  string  $column
+     * @param  string|null  $column
      * @return $this
      */
     public function oldest($column = null)

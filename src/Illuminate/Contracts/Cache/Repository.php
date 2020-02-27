@@ -11,7 +11,7 @@ interface Repository extends CacheInterface
      * Retrieve an item from the cache and delete it.
      *
      * @param  string  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public function pull($key, $default = null);

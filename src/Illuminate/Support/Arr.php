@@ -156,7 +156,7 @@ class Arr
      *
      * @param  iterable  $array
      * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public static function first($array, callable $callback = null, $default = null)
@@ -185,7 +185,7 @@ class Arr
      *
      * @param  array  $array
      * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public static function last($array, callable $callback = null, $default = null)
@@ -276,7 +276,7 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public static function get($array, $key, $default = null)
@@ -426,7 +426,7 @@ class Arr
      *
      * @param  array  $array
      * @param  mixed  $value
-     * @param  mixed  $key
+     * @param  mixed|null  $key
      * @return array
      */
     public static function prepend($array, $value, $key = null)
@@ -445,7 +445,7 @@ class Arr
      *
      * @param  array  $array
      * @param  string  $key
-     * @param  mixed  $default
+     * @param  mixed|null  $default
      * @return mixed
      */
     public static function pull(&$array, $key, $default = null)
@@ -503,7 +503,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array  $array
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $value
      * @return array
      */
@@ -614,7 +614,7 @@ class Arr
     /**
      * If the given value is not an array and not null, wrap it in one.
      *
-     * @param  mixed  $value
+     * @param  mixed|null  $value
      * @return array
      */
     public static function wrap($value)
