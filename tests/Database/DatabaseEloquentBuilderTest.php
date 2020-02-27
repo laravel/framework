@@ -571,6 +571,15 @@ class DatabaseEloquentBuilderTest extends TestCase
             ->with('books.chapters:id,book_id')
             ->with('books:id');
 
+        // Fluent Interface Duplicated
+
+        $builderFluentDuplicate = $this->getBuilder();
+
+        $builderFluentDuplicate
+            ->with('books')
+            ->with('books.chapters:id,book_id')
+            ->with('books:id');
+
         // Array Configuration
 
         $builderArray = $this->getBuilder();
@@ -592,6 +601,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         return [
             [$builderFluent],
             [$builderFluentInverse],
+            [$builderFluentDuplicate],
             [$builderArray],
             [$builderArrayInverse],
         ];
