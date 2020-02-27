@@ -555,14 +555,26 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function eagerLoadSelectColumnsProvider()
     {
+        // Fluent Interface
+
         $builderFluent = $this->getBuilder();
 
         $builderFluent
             ->with('books:id')
             ->with('books.chapters:id,book_id');
 
+        // Array Configuration
+
+        $builderArray = $this->getBuilder();
+
+        $builderArray->with([
+            'books:id',
+            'books.chapters:id,book_id',
+        ]);
+
         return [
             [$builderFluent],
+            [$builderArray],
         ];
     }
 
