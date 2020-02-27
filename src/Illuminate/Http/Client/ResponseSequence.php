@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http\Client;
 
-use Closure;
 use OutOfBoundsException;
 
 class ResponseSequence
