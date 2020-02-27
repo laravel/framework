@@ -1058,6 +1058,25 @@ class Builder
     {
         $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
 
+        $segmentsToIgnore = [];
+        foreach ($eagerLoad as $name => $constraints) {
+            $segments = explode('.', $name);
+            if (count($segments) > 1) {
+                // Last Segment is the Current Definition
+                $currentDefinition = array_pop($segments);
+                foreach ($segments as $segment) {
+                    // Already Defined?
+                    if (isset($this->eagerLoad[$segment])) {
+                        // Mark to Ignore!
+                        $segmentsToIgnore[$segment] = true;
+                    }
+                }
+            }
+        }
+
+        // Remove Duplicated Eager @see PR #31616
+        $eagerLoad = array_diff_key($eagerLoad, $segmentsToIgnore);
+
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
 
         return $this;
