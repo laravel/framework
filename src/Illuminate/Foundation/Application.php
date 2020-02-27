@@ -769,11 +769,40 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $abstract = $this->getAlias($abstract);
 
+        $this->loadDeferredProviderIfNeeded($abstract);
+
+        return parent::make($abstract, $parameters);
+    }
+
+    /**
+     * Load deferred provider if $abstract is deferred and instance was not loaded
+     *
+     * @param  string  $abstract
+     */
+    private function loadDeferredProviderIfNeeded($abstract)
+    {
         if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
             $this->loadDeferredProvider($abstract);
         }
+    }
 
-        return parent::make($abstract, $parameters);
+    /**
+     * Resolve the given type from the container.
+     *
+     * (Overriding Container::resolve)
+     *
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @param  bool  $raiseEvents
+     * @return mixed
+     */
+    protected function resolve($abstract, $parameters = [], $raiseEvents = true)
+    {
+        $abstract = $this->getAlias($abstract);
+
+        $this->loadDeferredProviderIfNeeded($abstract);
+
+        return parent::resolve($abstract, $parameters, $raiseEvents);
     }
 
     /**
