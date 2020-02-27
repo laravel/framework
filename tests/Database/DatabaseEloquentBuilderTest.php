@@ -563,6 +563,14 @@ class DatabaseEloquentBuilderTest extends TestCase
             ->with('books:id')
             ->with('books.chapters:id,book_id');
 
+        // Inverse Fluent Interface
+
+        $builderFluentInverse = $this->getBuilder();
+
+        $builderFluentInverse
+            ->with('books.chapters:id,book_id')
+            ->with('books:id');
+
         // Array Configuration
 
         $builderArray = $this->getBuilder();
@@ -572,9 +580,20 @@ class DatabaseEloquentBuilderTest extends TestCase
             'books.chapters:id,book_id',
         ]);
 
+        // Inverse Array Configuration
+
+        $builderArrayInverse = $this->getBuilder();
+
+        $builderArrayInverse->with([
+            'books.chapters:id,book_id',
+            'books:id',
+        ]);
+
         return [
             [$builderFluent],
+            [$builderFluentInverse],
             [$builderArray],
+            [$builderArrayInverse],
         ];
     }
 
