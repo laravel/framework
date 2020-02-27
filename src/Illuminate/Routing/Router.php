@@ -424,7 +424,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function getLastGroupPrefix()
     {
-        if (! empty($this->groupStack)) {
+        if ($this->hasGroupStack()) {
             $last = end($this->groupStack);
 
             return $last['prefix'] ?? '';
