@@ -553,21 +553,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getRelation('invalid');
     }
 
-    public function testEagerLoadSelectColumns()
+    public function eagerLoadSelectColumnsProvider()
     {
-        $builder = $this->getBuilder();
+        $builderFluent = $this->getBuilder();
 
-        // IT WORKS
-        // $builder->with([
-        //     'books:id',
-        //     'books.chapters:id,book_id',
-        // ]);
-
-        // IT DOESN'T
-        $builder
+        $builderFluent
             ->with('books:id')
             ->with('books.chapters:id,book_id');
 
+        return [
+            [$builderFluent],
+        ];
+    }
+
+    /**
+     * @dataProvider eagerLoadSelectColumnsProvider
+     */
+    public function testEagerLoadSelectColumns($builder)
+    {
         // Base Tests
 
         $eagers = $builder->getEagerLoads();
