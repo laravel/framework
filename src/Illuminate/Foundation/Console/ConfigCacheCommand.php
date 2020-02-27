@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use LogicException;
 use Throwable;
 
@@ -55,7 +56,9 @@ class ConfigCacheCommand extends Command
     {
         $this->call('config:clear');
 
-        $config = $this->getFreshConfiguration();
+        $freshConfig = $this->getFreshConfiguration();
+        $dotConfig   = Arr::dot($freshConfig);
+        $config      = $dotConfig + $freshConfig;
 
         $configPath = $this->laravel->getCachedConfigPath();
 
