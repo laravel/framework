@@ -16,6 +16,13 @@ class PendingRequest
     protected $factory;
 
     /**
+     * The base URL for the request.
+     *
+     * @var string
+     */
+    protected $baseUrl = '';
+
+    /**
      * The request body format.
      *
      * @var string
@@ -97,6 +104,19 @@ class PendingRequest
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options) {
             $this->cookies = $options['cookies'];
         }]);
+    }
+
+    /**
+     * Set the base URL for the pending request.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function baseUrl(string $url)
+    {
+        $this->baseUrl = $url;
+
+        return $this;
     }
 
     /**
@@ -435,6 +455,8 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
+        $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
+
         if (isset($options[$this->bodyFormat])) {
             $options[$this->bodyFormat] = array_merge(
                 $options[$this->bodyFormat], $this->pendingFiles
