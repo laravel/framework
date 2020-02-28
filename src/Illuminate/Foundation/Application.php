@@ -767,23 +767,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function make($abstract, array $parameters = [])
     {
-        $abstract = $this->getAlias($abstract);
-
-        $this->loadDeferredProviderIfNeeded($abstract);
+        $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
 
         return parent::make($abstract, $parameters);
-    }
-
-    /**
-     * Load deferred provider if $abstract is deferred service and instance was not loaded.
-     *
-     * @param  string  $abstract
-     */
-    private function loadDeferredProviderIfNeeded($abstract)
-    {
-        if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
-            $this->loadDeferredProvider($abstract);
-        }
     }
 
     /**
@@ -798,11 +784,22 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
-        $abstract = $this->getAlias($abstract);
-
-        $this->loadDeferredProviderIfNeeded($abstract);
+        $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
 
         return parent::resolve($abstract, $parameters, $raiseEvents);
+    }
+
+    /**
+     * Load the deferred provider if the given type is a deferred service and the instance has not been loaded.
+     *
+     * @param  string  $abstract
+     * @return void
+     */
+    protected function loadDeferredProviderIfNeeded($abstract)
+    {
+        if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
+            $this->loadDeferredProvider($abstract);
+        }
     }
 
     /**
