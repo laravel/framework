@@ -77,7 +77,17 @@ class ServeCommand extends Command
      */
     protected function host()
     {
-        return $this->input->getOption('host');
+        return $this->input->getOption('host') === 'network' ? $this->getLocalIp() : $this->input->getOption('host');
+    }
+
+    /**
+     * Get the user's local IP address to serve on the network.
+     *
+     * @return string
+     */
+    protected function getLocalIp()
+    {
+        return exec('ipconfig getifaddr en1') ?: '127.0.0.1';
     }
 
     /**
@@ -100,7 +110,7 @@ class ServeCommand extends Command
     protected function canTryAnotherPort()
     {
         return is_null($this->input->getOption('port')) &&
-               ($this->input->getOption('tries') > $this->portOffset);
+            ($this->input->getOption('tries') > $this->portOffset);
     }
 
     /**
