@@ -3,10 +3,10 @@
 namespace Illuminate\Pagination;
 
 use Closure;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
@@ -99,6 +99,13 @@ abstract class AbstractPaginator implements Htmlable
      * @var \Closure
      */
     protected static $viewFactoryResolver;
+
+    /**
+     * The with query string resolver callback.
+     *
+     * @var \Closure
+     */
+    protected static $queryStringResolver;
 
     /**
      * The default pagination view.
@@ -213,6 +220,20 @@ abstract class AbstractPaginator implements Htmlable
         }
 
         return $this->addQuery($key, $value);
+    }
+
+    /**
+     * Add a set of query string values to the paginator.
+     *
+     * @return $this
+     */
+    public function withQueryString()
+    {
+        if (isset(static::$queryStringResolver)) {
+            return $this->appends(call_user_func(static::$queryStringResolver));
+        }
+
+        return $this;
     }
 
     /**
@@ -482,6 +503,17 @@ abstract class AbstractPaginator implements Htmlable
     public static function viewFactoryResolver(Closure $resolver)
     {
         static::$viewFactoryResolver = $resolver;
+    }
+
+    /**
+     * Set with query string resolver callback.
+     *
+     * @param  \Closure  $resolver
+     * @return void
+     */
+    public static function withQueryStringResolver(Closure $resolver)
+    {
+        static::$queryStringResolver = $resolver;
     }
 
     /**
