@@ -78,7 +78,7 @@ abstract class Queue
     /**
      * Create a payload string from the given job and data.
      *
-     * @param  string|\Closure|object  $job
+     * @param  \Closure|string|object  $job
      * @param  string  $queue
      * @param  mixed  $data
      * @return string
