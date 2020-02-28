@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
@@ -7,6 +9,7 @@ use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\UuidInterface;
 use voku\helper\ASCII;
 
 class Str
@@ -47,7 +50,7 @@ class Str
      * @param  string  $string
      * @return \Illuminate\Support\Stringable
      */
-    public static function of($string)
+    public static function of(string $string): Stringable
     {
         return new Stringable($string);
     }
@@ -59,7 +62,7 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function after($subject, $search)
+    public static function after(string $subject, string $search): string
     {
         return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
     }
@@ -71,7 +74,7 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function afterLast($subject, $search)
+    public static function afterLast(string $subject, string $search): string
     {
         if ($search === '') {
             return $subject;
@@ -93,7 +96,7 @@ class Str
      * @param  string  $language
      * @return string
      */
-    public static function ascii($value, $language = 'en')
+    public static function ascii(string $value, string $language = 'en'): string
     {
         return ASCII::to_ascii($value, $language);
     }
@@ -105,7 +108,7 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function before($subject, $search)
+    public static function before(string $subject, string $search): string
     {
         return $search === '' ? $subject : explode($search, $subject)[0];
     }
@@ -117,7 +120,7 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function beforeLast($subject, $search)
+    public static function beforeLast(string $subject, string $search): string
     {
         if ($search === '') {
             return $subject;
@@ -138,7 +141,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function camel($value)
+    public static function camel(string $value): string
     {
         if (isset(static::$camelCache[$value])) {
             return static::$camelCache[$value];
@@ -154,7 +157,7 @@ class Str
      * @param  string|string[]  $needles
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains(string $haystack, $needles): bool
     {
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
@@ -172,7 +175,7 @@ class Str
      * @param  string[]  $needles
      * @return bool
      */
-    public static function containsAll($haystack, array $needles)
+    public static function containsAll(string $haystack, array $needles): bool
     {
         foreach ($needles as $needle) {
             if (! static::contains($haystack, $needle)) {
@@ -190,7 +193,7 @@ class Str
      * @param  string|string[]  $needles
      * @return bool
      */
-    public static function endsWith($haystack, $needles)
+    public static function endsWith(string $haystack, $needles): bool
     {
         foreach ((array) $needles as $needle) {
             if (substr($haystack, -strlen($needle)) === (string) $needle) {
@@ -208,7 +211,7 @@ class Str
      * @param  string  $cap
      * @return string
      */
-    public static function finish($value, $cap)
+    public static function finish(string $value, string $cap): string
     {
         $quoted = preg_quote($cap, '/');
 
@@ -222,7 +225,7 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function is($pattern, $value)
+    public static function is($pattern, string $value): bool
     {
         $patterns = Arr::wrap($pattern);
 
@@ -259,7 +262,7 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function isAscii($value)
+    public static function isAscii(string $value): bool
     {
         return ASCII::is_ascii($value);
     }
@@ -270,7 +273,7 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function isUuid($value)
+    public static function isUuid(string $value): bool
     {
         if (! is_string($value)) {
             return false;
@@ -285,7 +288,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function kebab($value)
+    public static function kebab(string $value): string
     {
         return static::snake($value, '-');
     }
@@ -297,7 +300,7 @@ class Str
      * @param  string|null  $encoding
      * @return int
      */
-    public static function length($value, $encoding = null)
+    public static function length(string $value, ?string $encoding = null): int
     {
         if ($encoding) {
             return mb_strlen($value, $encoding);
@@ -314,7 +317,7 @@ class Str
      * @param  string  $end
      * @return string
      */
-    public static function limit($value, $limit = 100, $end = '...')
+    public static function limit(string $value, int $limit = 100, string $end = '...'): string
     {
         if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
@@ -329,7 +332,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function lower($value)
+    public static function lower(string $value): string
     {
         return mb_strtolower($value, 'UTF-8');
     }
@@ -342,7 +345,7 @@ class Str
      * @param  string  $end
      * @return string
      */
-    public static function words($value, $words = 100, $end = '...')
+    public static function words(string $value, int $words = 100, string $end = '...'): string
     {
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
@@ -360,7 +363,7 @@ class Str
      * @param  string|null  $default
      * @return array<int, string|null>
      */
-    public static function parseCallback($callback, $default = null)
+    public static function parseCallback(string $callback, string $default = null): array
     {
         return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
     }
@@ -372,7 +375,7 @@ class Str
      * @param  int  $count
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural(string $value, int $count = 2): string
     {
         return Pluralizer::plural($value, $count);
     }
@@ -384,7 +387,7 @@ class Str
      * @param  int  $count
      * @return string
      */
-    public static function pluralStudly($value, $count = 2)
+    public static function pluralStudly(string $value, int $count = 2): string
     {
         $parts = preg_split('/(.)(?=[A-Z])/u', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -399,7 +402,7 @@ class Str
      * @param  int  $length
      * @return string
      */
-    public static function random($length = 16)
+    public static function random(int $length = 16): string
     {
         $string = '';
 
@@ -422,7 +425,7 @@ class Str
      * @param  string  $subject
      * @return string
      */
-    public static function replaceArray($search, array $replace, $subject)
+    public static function replaceArray(string $search, array $replace, string $subject): string
     {
         $segments = explode($search, $subject);
 
@@ -443,7 +446,7 @@ class Str
      * @param  string  $subject
      * @return string
      */
-    public static function replaceFirst($search, $replace, $subject)
+    public static function replaceFirst(string $search, string $replace, string $subject): string
     {
         if ($search == '') {
             return $subject;
@@ -466,7 +469,7 @@ class Str
      * @param  string  $subject
      * @return string
      */
-    public static function replaceLast($search, $replace, $subject)
+    public static function replaceLast(string $search, string $replace, string $subject): string
     {
         $position = strrpos($subject, $search);
 
@@ -484,7 +487,7 @@ class Str
      * @param  string  $prefix
      * @return string
      */
-    public static function start($value, $prefix)
+    public static function start(string $value, string $prefix): string
     {
         $quoted = preg_quote($prefix, '/');
 
@@ -497,7 +500,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function upper($value)
+    public static function upper(string $value): string
     {
         return mb_strtoupper($value, 'UTF-8');
     }
@@ -508,7 +511,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function title($value)
+    public static function title(string $value): string
     {
         return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
     }
@@ -519,7 +522,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function singular($value)
+    public static function singular(string $value): string
     {
         return Pluralizer::singular($value);
     }
@@ -532,7 +535,7 @@ class Str
      * @param  string|null  $language
      * @return string
      */
-    public static function slug($title, $separator = '-', $language = 'en')
+    public static function slug(string $title, string $separator = '-', string $language = 'en'): string
     {
         $language = $language ?? '';
 
@@ -546,7 +549,7 @@ class Str
      * @param  string  $delimiter
      * @return string
      */
-    public static function snake($value, $delimiter = '_')
+    public static function snake(string $value, string $delimiter = '_'): string
     {
         $key = $value;
 
@@ -570,7 +573,7 @@ class Str
      * @param  string|string[]  $needles
      * @return bool
      */
-    public static function startsWith($haystack, $needles)
+    public static function startsWith(string $haystack, $needles): bool
     {
         foreach ((array) $needles as $needle) {
             if ((string) $needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
@@ -587,7 +590,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function studly($value)
+    public static function studly(string $value): string
     {
         $key = $value;
 
@@ -608,7 +611,7 @@ class Str
      * @param  int|null  $length
      * @return string
      */
-    public static function substr($string, $start, $length = null)
+    public static function substr(string $string, int $start, int $length = null): string
     {
         return mb_substr($string, $start, $length, 'UTF-8');
     }
@@ -619,7 +622,7 @@ class Str
      * @param  string  $string
      * @return string
      */
-    public static function ucfirst($string)
+    public static function ucfirst(string $string): string
     {
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
     }
@@ -629,7 +632,7 @@ class Str
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
-    public static function uuid()
+    public static function uuid(): UuidInterface
     {
         return static::$uuidFactory
                     ? call_user_func(static::$uuidFactory)
@@ -641,7 +644,7 @@ class Str
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
-    public static function orderedUuid()
+    public static function orderedUuid(): UuidInterface
     {
         if (static::$uuidFactory) {
             return call_user_func(static::$uuidFactory);
@@ -667,7 +670,7 @@ class Str
      * @param  callable|null  $factory
      * @return void
      */
-    public static function createUuidsUsing(callable $factory = null)
+    public static function createUuidsUsing(callable $factory = null): void
     {
         static::$uuidFactory = $factory;
     }
@@ -677,7 +680,7 @@ class Str
      *
      * @return void
      */
-    public static function createUuidsNormally()
+    public static function createUuidsNormally(): void
     {
         static::$uuidFactory = null;
     }
