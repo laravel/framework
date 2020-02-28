@@ -133,6 +133,18 @@ class Stringable
     }
 
     /**
+     * Get the portion of a string between a given values.
+     *
+     * @param  string  $before
+     * @param  string  $after
+     * @return static
+     */
+    public function between($before, $after)
+    {
+        return new static(Str::between($this->value, $before, $after));
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @return static
