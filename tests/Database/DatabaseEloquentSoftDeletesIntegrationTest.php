@@ -285,7 +285,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         /** @var SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->delete();
-        $userModel->syncOriginal();
         $userModel->restore();
 
         $this->assertEquals($userModel->id, SoftDeletesTestUser::find(2)->id);
