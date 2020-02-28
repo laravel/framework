@@ -439,7 +439,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function callCustomDirective($name, $value)
     {
-        if (Str::startsWith($value, '(') && Str::endsWith($value, ')')) {
+        if (Str::startsWith((string) $value, '(') && Str::endsWith((string) $value, ')')) {
             $value = Str::substr($value, 1, -1);
         }
 

@@ -630,9 +630,9 @@ class Str
     /**
      * Generate a UUID (version 4).
      *
-     * @return \Ramsey\Uuid\UuidInterface
+     * @return \Ramsey\Uuid\UuidInterface|string
      */
-    public static function uuid(): UuidInterface
+    public static function uuid()
     {
         return static::$uuidFactory
                     ? call_user_func(static::$uuidFactory)
