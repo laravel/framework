@@ -70,7 +70,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSent()
     {
         $notification = new TestMailNotification;
-        $notification->id = Str::uuid();
+        $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -115,7 +115,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentToNamedAddress()
     {
         $notification = new TestMailNotification;
-        $notification->id = Str::uuid();
+        $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUserWithNamedAddress::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -161,7 +161,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentWithSubject()
     {
         $notification = new TestMailNotificationWithSubject;
-        $notification->id = Str::uuid();
+        $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -196,7 +196,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentToMultipleAdresses()
     {
         $notification = new TestMailNotificationWithSubject;
-        $notification->id = Str::uuid();
+        $notification->id = Str::uuid()->toString();
 
         $user = NotifiableUserWithMultipleAddreses::forceCreate([
             'email' => 'taylor@laravel.com',
