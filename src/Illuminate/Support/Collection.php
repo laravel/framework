@@ -34,7 +34,7 @@ class Collection implements ArrayAccess, Enumerable
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $number
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return static
      */
     public static function times($number, callable $callback = null)
@@ -513,7 +513,7 @@ class Collection implements ArrayAccess, Enumerable
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
-     * @param  string  $glue
+     * @param  string|null  $glue
      * @return string
      */
     public function implode($value, $glue = null)
@@ -959,7 +959,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Shuffle the items in the collection.
      *
-     * @param  int  $seed
+     * @param  int|null  $seed
      * @return static
      */
     public function shuffle($seed = null)
@@ -982,7 +982,7 @@ class Collection implements ArrayAccess, Enumerable
      * Slice the underlying collection array.
      *
      * @param  int  $offset
-     * @param  int  $length
+     * @param  int|null  $length
      * @return static
      */
     public function slice($offset, $length = null)
