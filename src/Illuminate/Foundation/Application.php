@@ -769,13 +769,39 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function make($abstract, array $parameters = [])
     {
-        $abstract = $this->getAlias($abstract);
+        $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
 
+        return parent::make($abstract, $parameters);
+    }
+
+    /**
+     * Resolve the given type from the container.
+     *
+     * (Overriding Container::resolve)
+     *
+     * @param  string  $abstract
+     * @param  array  $parameters
+     * @param  bool  $raiseEvents
+     * @return mixed
+     */
+    protected function resolve($abstract, $parameters = [], $raiseEvents = true)
+    {
+        $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
+
+        return parent::resolve($abstract, $parameters, $raiseEvents);
+    }
+
+    /**
+     * Load the deferred provider if the given type is a deferred service and the instance has not been loaded.
+     *
+     * @param  string  $abstract
+     * @return void
+     */
+    protected function loadDeferredProviderIfNeeded($abstract)
+    {
         if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
             $this->loadDeferredProvider($abstract);
         }
-
-        return parent::make($abstract, $parameters);
     }
 
     /**
