@@ -51,6 +51,20 @@ class PendingRequest
     protected $options = [];
 
     /**
+     * The number of times to try the request.
+     *
+     * @var int
+     */
+    protected $tries = 1;
+
+    /**
+     * The number of milliseconds to wait between retries.
+     *
+     * @var int
+     */
+    protected $retryDelay = 100;
+
+    /**
      * The callbacks that should execute before the request is sent.
      *
      * @var array
@@ -301,6 +315,21 @@ class PendingRequest
     }
 
     /**
+     * Specify the number of times the request should be attempted.
+     *
+     * @param  int  $times
+     * @param  int  $sleep
+     * @return $this
+     */
+    public function retry(int $times, int $sleep = 0)
+    {
+        $this->tries = $times;
+        $this->retryDelay = $sleep;
+
+        return $this;
+    }
+
+    /**
      * Merge new options into the client.
      *
      * @param  array  $options
@@ -414,20 +443,26 @@ class PendingRequest
 
         $this->pendingFiles = [];
 
-        try {
-            return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
-                'laravel_data' => $options[$this->bodyFormat] ?? [],
-                'query' => $this->parseQueryParams($url),
-                'on_stats' => function ($transferStats) {
-                    $this->transferStats = $transferStats;
-                },
-            ], $options))), function ($response) {
-                $response->cookies = $this->cookies;
-                $response->transferStats = $this->transferStats;
-            });
-        } catch (\GuzzleHttp\Exception\ConnectException $e) {
-            throw new ConnectionException($e->getMessage(), 0, $e);
-        }
+        return retry($this->tries ?? 1, function () use ($method, $url, $options) {
+            try {
+                return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
+                    'laravel_data' => $options[$this->bodyFormat] ?? [],
+                    'query' => $this->parseQueryParams($url),
+                    'on_stats' => function ($transferStats) {
+                        $this->transferStats = $transferStats;
+                    },
+                ], $options))), function ($response) {
+                    $response->cookies = $this->cookies;
+                    $response->transferStats = $this->transferStats;
+
+                    if ($this->tries > 1 && ! $response->successful()) {
+                        $response->throw();
+                    }
+                });
+            } catch (\GuzzleHttp\Exception\ConnectException $e) {
+                throw new ConnectionException($e->getMessage(), 0, $e);
+            }
+        }, $this->retryDelay ?? 100);
     }
 
     /**

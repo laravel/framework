@@ -25,7 +25,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Create a new PhpRedis connection.
      *
      * @param  \Redis  $client
-     * @param  callable  $connector
+     * @param  callable|null  $connector
      * @return void
      */
     public function __construct($client, callable $connector = null)

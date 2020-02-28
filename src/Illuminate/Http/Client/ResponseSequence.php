@@ -21,6 +21,13 @@ class ResponseSequence
     protected $failWhenEmpty = true;
 
     /**
+     * The repsonse that should be returned when the sequence is empty.
+     *
+     * @var \GuzzleHttp\Promise\PromiseInterface
+     */
+    protected $emptyResponse;
+
+    /**
      * Create a new response sequence.
      *
      * @param  array  $responses
@@ -99,13 +106,25 @@ class ResponseSequence
     /**
      * Make the sequence return a default response when it is empty.
      *
+     * @param  \GuzzleHttp\Promise\PromiseInterface|\Closure  $response
+     * @return $this
+     */
+    public function whenEmpty($response)
+    {
+        $this->failWhenEmpty = false;
+        $this->emptyResponse = $response;
+
+        return $this;
+    }
+
+    /**
+     * Make the sequence return a default response when it is empty.
+     *
      * @return $this
      */
     public function dontFailWhenEmpty()
     {
-        $this->failWhenEmpty = false;
-
-        return $this;
+        return $this->whenEmpty(Factory::response());
     }
 
     /**
@@ -126,7 +145,11 @@ class ResponseSequence
     public function __invoke()
     {
         if ($this->failWhenEmpty && count($this->responses) === 0) {
-            throw new OutOfBoundsException('A request was made, but the response sequence is empty');
+            throw new OutOfBoundsException('A request was made, but the response sequence is empty.');
+        }
+
+        if (! $this->failWhenEmpty && count($this->responses) === 0) {
+            return value($this->emptyResponse ?? Factory::response());
         }
 
         return array_shift($this->responses);

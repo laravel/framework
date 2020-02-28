@@ -35,6 +35,15 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 @endcomponentClass</div>", trim($result));
     }
 
+    public function testBasicComponentWithEmptyAttributesParsing()
+    {
+        $result = (new ComponentTagCompiler(['alert' => TestAlertComponent::class]))->compileTags('<div><x-alert type="" limit=\'\' @click="" required /></div>');
+
+        $this->assertEquals("<div> @component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
+<?php \$component->withAttributes(['type' => '','limit' => '','@click' => '','required' => true]); ?>
+@endcomponentClass</div>", trim($result));
+    }
+
     public function testDataCamelCasing()
     {
         $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile user-id="1"></x-profile>');
