@@ -3,10 +3,10 @@
 namespace Illuminate\Pagination;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
@@ -216,7 +216,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Add a set of query string values to the paginator.
+     * Add all query string values to the paginator.
      *
      * @return $this
      */
