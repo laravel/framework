@@ -759,8 +759,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Resolve the given type from the container.
      *
-     * (Overriding Container::make)
-     *
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
@@ -774,8 +772,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
     /**
      * Resolve the given type from the container.
-     *
-     * (Overriding Container::resolve)
      *
      * @param  string  $abstract
      * @param  array  $parameters
@@ -804,8 +800,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
     /**
      * Determine if the given abstract type has been bound.
-     *
-     * (Overriding Container::bound)
      *
      * @param  string  $abstract
      * @return bool
