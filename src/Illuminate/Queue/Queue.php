@@ -2,13 +2,11 @@
 
 namespace Illuminate\Queue;
 
+use Closure;
 use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
-use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\SerializableClosure;
-use Closure;
 
 abstract class Queue
 {
