@@ -6,6 +6,9 @@ use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\SerializableClosure;
+use Closure;
 
 abstract class Queue
 {
@@ -86,6 +89,10 @@ abstract class Queue
      */
     protected function createPayload($job, $queue, $data = '')
     {
+        if ($job instanceof Closure) {
+            $job = new CallQueuedClosure(new SerializableClosure($job));
+        }
+
         $payload = json_encode($this->createPayloadArray($job, $queue, $data));
 
         if (JSON_ERROR_NONE !== json_last_error()) {
