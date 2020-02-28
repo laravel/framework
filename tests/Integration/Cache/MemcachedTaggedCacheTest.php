@@ -13,8 +13,8 @@ class MemcachedTaggedCacheTest extends MemcachedIntegrationTest
     {
         $store = Cache::store('memcached');
 
-        $store->tags(['people', 'artists'])->put('John', 'foo', 1);
-        $store->tags(['people', 'authors'])->put('Anne', 'bar', 1);
+        $store->tags(['people', 'artists'])->put('John', 'foo', 2);
+        $store->tags(['people', 'authors'])->put('Anne', 'bar', 2);
 
         $this->assertSame('foo', $store->tags(['people', 'artists'])->get('John'));
         $this->assertSame('bar', $store->tags(['people', 'authors'])->get('Anne'));
@@ -36,7 +36,7 @@ class MemcachedTaggedCacheTest extends MemcachedIntegrationTest
     {
         $store = Cache::store('memcached');
 
-        $store->tags(['people', 'artists'])->putMany(['John' => 'foo', 'Jane' => 'bar'], 1);
+        $store->tags(['people', 'artists'])->putMany(['John' => 'foo', 'Jane' => 'bar'], 2);
 
         $this->assertSame('foo', $store->tags(['people', 'artists'])->get('John'));
         $this->assertSame('bar', $store->tags(['people', 'artists'])->get('Jane'));
