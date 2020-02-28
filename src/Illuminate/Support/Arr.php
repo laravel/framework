@@ -343,7 +343,7 @@ class Arr
     }
 
     /**
-     * Check if any of the keys exist in an array using "dot" notation.
+     * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|array  $keys
