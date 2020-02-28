@@ -111,4 +111,15 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $this->assertSame($this->options, $this->p->getOptions());
     }
+
+    public function testLengthAwarePaginatorIsMacroable()
+    {
+        $this->p->macro('foo', function () {
+            return 'bar';
+        });
+
+        $this->assertSame(
+            'bar', $this->p->foo()
+        );
+    }
 }

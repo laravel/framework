@@ -8,11 +8,14 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginator
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use JsonSerializable;
 
 class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, LengthAwarePaginatorContract
 {
+    use Macroable;
+
     /**
      * The total number of items before slicing.
      *

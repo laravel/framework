@@ -62,4 +62,17 @@ class PaginatorTest extends TestCase
 
         $this->assertSame($p->path(), 'http://website.com/test');
     }
+
+    public function testPaginatorIsMacroable()
+    {
+        $p = new Paginator([], 1);
+
+        $p->macro('foo', function () {
+            return 'bar';
+        });
+
+        $this->assertSame(
+            'bar', $p->foo()
+        );
+    }
 }
