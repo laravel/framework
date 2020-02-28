@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Closure;
 use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Support\InteractsWithTime;
@@ -77,7 +78,7 @@ abstract class Queue
     /**
      * Create a payload string from the given job and data.
      *
-     * @param  string|object  $job
+     * @param  \Closure|string|object  $job
      * @param  string  $queue
      * @param  mixed  $data
      * @return string
@@ -86,6 +87,10 @@ abstract class Queue
      */
     protected function createPayload($job, $queue, $data = '')
     {
+        if ($job instanceof Closure) {
+            $job = new CallQueuedClosure(new SerializableClosure($job));
+        }
+
         $payload = json_encode($this->createPayloadArray($job, $queue, $data));
 
         if (JSON_ERROR_NONE !== json_last_error()) {
