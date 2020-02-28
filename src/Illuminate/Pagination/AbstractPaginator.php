@@ -223,7 +223,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Add a set of query string values to the paginator.
+     * Add all query string values to the paginator.
      *
      * @return $this
      */
