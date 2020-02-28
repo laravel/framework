@@ -80,6 +80,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
@@ -124,6 +125,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
@@ -167,6 +169,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
@@ -200,6 +203,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification_id' => $notification->id,
                 '__laravel_notification' => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
