@@ -172,6 +172,11 @@ class PipelineTest extends TestCase
     {
         $this->assertInstanceOf(Pipeline::class, Pipeline::make());
     }
+
+    public function testPipelineInstanceHelperAcceptsPassable()
+    {
+        $this->assertEquals('thing', Pipeline::make('thing')->thenReturn());
+    }
 }
 
 class PipelineTestPipeOne

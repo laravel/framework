@@ -128,11 +128,9 @@ class Pipeline implements PipelineContract
         return function ($passable) use ($destination) {
             try {
                 return $destination($passable);
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 return $this->handleException($passable, $e);
-            }
-            catch (Throwable $e) {
+            } catch (Throwable $e) {
                 return $this->handleException($passable, new FatalThrowableError($e));
             }
         };
@@ -153,8 +151,7 @@ class Pipeline implements PipelineContract
                         // will resolve the pipes out of the dependency container and call it with
                         // the appropriate method and arguments, returning the results back out.
                         return $pipe($passable, $stack);
-                    }
-                    elseif (! is_object($pipe)) {
+                    } elseif (! is_object($pipe)) {
                         [$name, $parameters] = $this->parsePipeString($pipe);
 
                         // If the pipe is a string we will parse the string and resolve the class out
@@ -163,8 +160,7 @@ class Pipeline implements PipelineContract
                         $pipe = $this->getContainer()->make($name);
 
                         $parameters = array_merge([$passable, $stack], $parameters);
-                    }
-                    else {
+                    } else {
                         // If the pipe is already an object we'll just make a callable and pass it to
                         // the pipe as-is. There is no need to do any extra parsing and formatting
                         // since the object we're given was already a fully instantiated object.
@@ -172,15 +168,13 @@ class Pipeline implements PipelineContract
                     }
 
                     $carry = method_exists($pipe, $this->method)
-                        ? $pipe->{$this->method}(...$parameters)
-                        : $pipe(...$parameters);
+                                    ? $pipe->{$this->method}(...$parameters)
+                                    : $pipe(...$parameters);
 
                     return $this->handleCarry($carry);
-                }
-                catch (Exception $e) {
+                } catch (Exception $e) {
                     return $this->handleException($passable, $e);
-                }
-                catch (Throwable $e) {
+                } catch (Throwable $e) {
                     return $this->handleException($passable, new FatalThrowableError($e));
                 }
             };
@@ -258,10 +252,17 @@ class Pipeline implements PipelineContract
     /**
      * Creates a new Pipeline instance.
      *
+     * @param  mixed $passable
      * @return static
      */
-    public static function make()
+    public static function make($passable = null)
     {
-        return app(static::class);
+        $instance = app(static::class);
+
+        if ($passable === null) {
+            return $instance;
+        }
+
+        return $instance->send($passable);
     }
 }
