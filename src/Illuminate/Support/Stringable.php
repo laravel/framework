@@ -542,7 +542,7 @@ class Stringable
      */
     public function trim($characters = null)
     {
-        return new static(trim($this->value, $characters));
+        return new static(trim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
