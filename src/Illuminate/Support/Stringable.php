@@ -148,7 +148,7 @@ class Stringable
      * @param  string|array  $needles
      * @return bool
      */
-    public function contains($haystack, $needles)
+    public function contains($needles)
     {
         return Str::contains($this->value, $needles);
     }
