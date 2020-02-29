@@ -542,7 +542,7 @@ class Stringable
      */
     public function trim($characters = null)
     {
-        return new static(trim($this->value, $characters));
+        return new static(trim($this->value, $characters ?? " \t\n\r\0\x0B"));
     }
 
     /**
