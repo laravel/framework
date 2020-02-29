@@ -686,7 +686,7 @@ class Route
     /**
      * Get the prefix of the route instance.
      *
-     * @return string
+     * @return string|null
      */
     public function getPrefix()
     {
@@ -734,7 +734,7 @@ class Route
     /**
      * Get the name of the route instance.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
