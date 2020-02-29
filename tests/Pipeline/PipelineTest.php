@@ -167,6 +167,11 @@ class PipelineTest extends TestCase
 
         unset($_SERVER['__test.pipe.one']);
     }
+
+    public function testPipelinesInstancesWithHelper()
+    {
+        $this->assertInstanceOf(Pipeline::class, Pipeline::make());
+    }
 }
 
 class PipelineTestPipeOne

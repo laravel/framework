@@ -248,4 +248,14 @@ class Pipeline implements PipelineContract
     {
         throw $e;
     }
+
+    /**
+     * Creates a new Pipeline instance.
+     *
+     * @return static
+     */
+    public static function make()
+    {
+        return app(static::class);
+    }
 }
