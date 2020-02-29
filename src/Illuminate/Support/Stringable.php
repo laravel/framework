@@ -133,15 +133,15 @@ class Stringable
     }
 
     /**
-     * Get the portion of a string between a given values.
+     * Get the portion of a string between two given values.
      *
-     * @param  string  $before
-     * @param  string  $after
+     * @param  string  $from
+     * @param  string  $to
      * @return static
      */
-    public function between($before, $after)
+    public function between($from, $to)
     {
-        return new static(Str::between($this->value, $before, $after));
+        return new static(Str::between($this->value, $from, $to));
     }
 
     /**

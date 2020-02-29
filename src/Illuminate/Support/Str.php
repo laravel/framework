@@ -133,22 +133,20 @@ class Str
     }
 
     /**
-     * Get the portion of a string between a given values.
+     * Get the portion of a string between two given values.
      *
      * @param  string  $subject
-     * @param  string  $before
-     * @param  string  $after
+     * @param  string  $from
+     * @param  string  $to
      * @return string
      */
-    public static function between($subject, $before, $after)
+    public static function between($subject, $from, $to)
     {
-        if ($before === '' || $after === '') {
+        if ($from === '' || $to === '') {
             return $subject;
         }
 
-        $rightCropped = static::after($subject, $before);
-
-        return static::beforeLast($rightCropped, $after);
+        return static::beforeLast(static::after($subject, $from), $to);
     }
 
     /**
