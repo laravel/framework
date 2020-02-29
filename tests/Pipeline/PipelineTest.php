@@ -6,6 +6,8 @@ use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 class PipelineTest extends TestCase
 {
@@ -166,6 +168,13 @@ class PipelineTest extends TestCase
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelinesInstancesWithHelper()
+    {
+        $pipeline = Pipeline::make();
+
+        $this->assertInstanceOf(PipelineContract::class, $pipeline);
     }
 }
 
