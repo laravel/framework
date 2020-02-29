@@ -227,19 +227,19 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Get the lock required for popping the next job.
      *
-     * @return string
+     * @return string|bool
      */
     protected function getLockForPopping()
     {
         $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
         $databaseVersion = $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
-        if ($databaseEngine == 'mysql' && version_compare($databaseVersion, '8.0.1', '>=') ||
+        if ($databaseEngine == 'mysql' && ! strpos($databaseVersion, 'MariaDB') && version_compare($databaseVersion, '8.0.1', '>=') ||
             $databaseEngine == 'pgsql' && version_compare($databaseVersion, '9.5', '>=')) {
             return 'FOR UPDATE SKIP LOCKED';
         }
 
-        return 'FOR UPDATE';
+        return true;
     }
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
  * @method static array all()
  * @method static string output()
  * @method static void terminate(\Symfony\Component\Console\Input\InputInterface $input, int $status)
+ * @method static \Illuminate\Foundation\Console\ClosureCommand command(string $command, callable $callback)
  *
  * @see \Illuminate\Contracts\Console\Kernel
  */

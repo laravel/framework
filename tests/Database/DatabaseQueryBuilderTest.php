@@ -298,6 +298,29 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testWheresWithArrayValue()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', [12, 30]);
+        $this->assertSame('select * from "users" where "id" = ?', $builder->toSql());
+        $this->assertEquals([0 => 12, 1 => 30], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', [12, 30]);
+        $this->assertSame('select * from "users" where "id" = ?', $builder->toSql());
+        $this->assertEquals([0 => 12, 1 => 30], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '!=', [12, 30]);
+        $this->assertSame('select * from "users" where "id" != ?', $builder->toSql());
+        $this->assertEquals([0 => 12, 1 => 30], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '<>', [12, 30]);
+        $this->assertSame('select * from "users" where "id" <> ?', $builder->toSql());
+        $this->assertEquals([0 => 12, 1 => 30], $builder->getBindings());
+    }
+
     public function testMySqlWrappingProtectsQuotationMarks()
     {
         $builder = $this->getMySqlBuilder();
@@ -1045,6 +1068,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->groupBy(new Raw('DATE(created_at)'));
         $this->assertSame('select * from "users" group by DATE(created_at)', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupByRaw('DATE(created_at), ? DESC', ['foo']);
+        $this->assertSame('select * from "users" group by DATE(created_at), ? DESC', $builder->toSql());
+        $this->assertEquals(['foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->havingRaw('?', ['havingRawBinding'])->groupByRaw('?', ['groupByRawBinding'])->whereRaw('?', ['whereRawBinding']);
+        $this->assertEquals(['whereRawBinding', 'groupByRawBinding', 'havingRawBinding'], $builder->getBindings());
     }
 
     public function testOrderBys()
@@ -2515,6 +2547,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSQLiteUpdateWrappingJsonArray()
     {
         $builder = $this->getSQLiteBuilder();
+
         $builder->getConnection()->shouldReceive('update')
             ->with('update "users" set "options" = ?, "group_id" = 45, "created_at" = ?', [
                 json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
@@ -2524,6 +2557,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->update([
             'options' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
             'group_id' => new Raw('45'),
+            'created_at' => new DateTime('2019-08-06'),
+        ]);
+    }
+
+    public function testSQLiteUpdateWrappingNestedJsonArray()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "group_id" = 45, "created_at" = ?, "options" = json_patch(ifnull("options", json(\'{}\')), json(?))', [
+                new DateTime('2019-08-06'),
+                json_encode(['name' => 'Taylor', 'security' => ['2fa' => false, 'presets' => ['laravel', 'vue']], 'sharing' => ['twitter' => 'username']]),
+            ]);
+
+        $builder->from('users')->update([
+            'options->name' => 'Taylor',
+            'group_id' => new Raw('45'),
+            'options->security' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
+            'options->sharing->twitter' => 'username',
             'created_at' => new DateTime('2019-08-06'),
         ]);
     }
@@ -2624,6 +2675,10 @@ SQL;
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
         $this->assertSame('select * from "users" where "items"->\'price\'->>\'in_usd\' = ? and "items"->>\'age\' = ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('items->prices->0', '=', 1)->where('items->age', '=', 2);
+        $this->assertSame('select * from "users" where "items"->\'prices\'->>0 = ? and "items"->>\'age\' = ?', $builder->toSql());
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->where('items->available', '=', true);

@@ -250,13 +250,7 @@ if (! function_exists('cache')) {
             );
         }
 
-        if (! isset($arguments[1])) {
-            throw new Exception(
-                'You must specify an expiration time when setting a value in the cache.'
-            );
-        }
-
-        return app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1]);
+        return app('cache')->put(key($arguments[0]), reset($arguments[0]), $arguments[1] ?? null);
     }
 }
 

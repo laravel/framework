@@ -40,6 +40,8 @@ trait DetectsLostConnections
             'Communication link failure',
             'connection is no longer usable',
             'Login timeout expired',
+            'Connection refused',
+            'running with the --read-only option so it cannot execute this statement',
         ]);
     }
 }
