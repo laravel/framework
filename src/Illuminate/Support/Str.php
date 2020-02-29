@@ -159,6 +159,8 @@ class Str
      */
     public static function contains($haystack, $needles): bool
     {
+        $haystack = (string) $haystack;
+
         foreach ((array) $needles as $needle) {
             $needle = (string) $needle;
 
