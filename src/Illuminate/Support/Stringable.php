@@ -540,7 +540,7 @@ class Stringable
      * @param  string  $characters
      * @return static
      */
-    public function trim($characters = null)
+    public function trim($characters = ' ')
     {
         return new static(trim($this->value, $characters));
     }

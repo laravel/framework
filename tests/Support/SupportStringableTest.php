@@ -23,5 +23,9 @@ class SupportStringableTest extends TestCase
 
         $this->assertEquals(['un', 'ly'], $string->matchAll('/f(\w*)/')->all());
         $this->assertTrue($string->matchAll('/nothing/')->isEmpty());
+
+        $string = new Stringable('  bar  ');
+
+        $this->assertEquals('bar', $string->trim());
     }
 }
