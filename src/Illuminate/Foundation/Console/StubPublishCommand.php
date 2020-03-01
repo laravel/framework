@@ -52,7 +52,9 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.stub') => $stubsPath.'/controller.nested.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.plain.stub') => $stubsPath.'/controller.plain.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => $stubsPath.'/controller.stub',
-        ]);
+        ])->filter(function ($destination) {
+            return ! file_exists($destination);
+        });
 
         if ($stubs = $this->option('stubs')) {
             $files->filter(function ($destination) use ($stubs, $stubsPath) {
