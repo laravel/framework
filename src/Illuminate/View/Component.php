@@ -112,15 +112,8 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$propertyCache[$class])) {
-            $reflection = new ReflectionClass($this);
-
-            static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
-                ->reject(function (ReflectionProperty $property) {
-                    return $this->shouldIgnore($property->getName());
-                })
-                ->map(function (ReflectionProperty $property) {
-                    return $property->getName();
-                })->all();
+            $publicProperties = (new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC);
+            static::$propertyCache[$class] = $this->getNames($publicProperties)->all();
         }
 
         $values = [];
@@ -142,15 +135,8 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$methodCache[$class])) {
-            $reflection = new ReflectionClass($this);
-
-            static::$methodCache[$class] = collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
-                ->reject(function (ReflectionMethod $method) {
-                    return $this->shouldIgnore($method->getName());
-                })
-                ->map(function (ReflectionMethod $method) {
-                    return $method->getName();
-                });
+            $publicMethods = (new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC);
+            static::$methodCache[$class] = $this->getNames($publicMethods);
         }
 
         $values = [];
@@ -227,5 +213,20 @@ abstract class Component
     public function shouldRender()
     {
         return true;
+    }
+
+    /**
+     * @param  array  $reflections
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getNames(array $reflections)
+    {
+        return collect($reflections)->reject(function ($reflection) {
+            return $this->shouldIgnore($reflection->getName());
+        })
+        ->map(function ($reflection) {
+            return $reflection->getName();
+        });
     }
 }
