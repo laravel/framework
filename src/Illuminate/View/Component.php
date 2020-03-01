@@ -112,8 +112,8 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$propertyCache[$class])) {
-            $publicProperties = (new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC);
-            static::$propertyCache[$class] = $this->getNames($publicProperties)->all();
+            $properties = (new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC);
+            static::$propertyCache[$class] = $this->getNames($properties);
         }
 
         $values = [];
@@ -135,8 +135,8 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$methodCache[$class])) {
-            $publicMethods = (new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC);
-            static::$methodCache[$class] = $this->getNames($publicMethods);
+            $methods = (new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC);
+            static::$methodCache[$class] = $this->getNames($methods);
         }
 
         $values = [];
@@ -216,17 +216,15 @@ abstract class Component
     }
 
     /**
-     * @param  array  $reflections
+     * Get the non-ignored names of the given methods.
      *
-     * @return \Illuminate\Support\Collection
+     * @param  array  $reflections
+     * @return string[]
      */
     protected function getNames(array $reflections)
     {
-        return collect($reflections)->reject(function ($reflection) {
-            return $this->shouldIgnore($reflection->getName());
-        })
-        ->map(function ($reflection) {
+        return collect($reflections)->map(function ($reflection) {
             return $reflection->getName();
-        });
+        })->reject([$this, 'shouldIgnore'])->all();
     }
 }
