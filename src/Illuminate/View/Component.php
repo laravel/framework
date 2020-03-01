@@ -227,6 +227,8 @@ abstract class Component
     {
         return collect($reflections)->map(function ($reflection) {
             return $reflection->getName();
-        })->reject([$this, 'shouldIgnore'])->all();
+        })->reject(function ($item) {
+            return $this->shouldIgnore($item);
+        })->all();
     }
 }
