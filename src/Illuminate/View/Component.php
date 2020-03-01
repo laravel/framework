@@ -112,8 +112,9 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$propertyCache[$class])) {
-            $properties = (new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC);
-            static::$propertyCache[$class] = $this->getNames($properties);
+            static::$propertyCache[$class] = $this->getNames(
+                (new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC)
+            );
         }
 
         $values = [];
@@ -135,8 +136,9 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$methodCache[$class])) {
-            $methods = (new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC);
-            static::$methodCache[$class] = $this->getNames($methods);
+            static::$methodCache[$class] = $this->getNames(
+                (new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC)
+            );
         }
 
         $values = [];
