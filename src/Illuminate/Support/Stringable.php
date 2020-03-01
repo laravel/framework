@@ -133,6 +133,18 @@ class Stringable
     }
 
     /**
+     * Get the portion of a string between two given values.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return static
+     */
+    public function between($from, $to)
+    {
+        return new static(Str::between($this->value, $from, $to));
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @return static
@@ -542,7 +554,7 @@ class Stringable
      */
     public function trim($characters = null)
     {
-        return new static(trim($this->value, $characters));
+        return new static(trim(...array_merge([$this->value], func_get_args())));
     }
 
     /**

@@ -133,6 +133,23 @@ class Str
     }
 
     /**
+     * Get the portion of a string between two given values.
+     *
+     * @param  string  $subject
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    public static function between($subject, $from, $to)
+    {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::beforeLast(static::after($subject, $from), $to);
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @param  string  $value
