@@ -117,13 +117,9 @@ abstract class Component
             );
         }
 
-        $values = [];
-
-        foreach (static::$propertyCache[$class] as $property) {
-            $values[$property] = $this->{$property};
-        }
-
-        return $values;
+        return $this->collectAttributes(static::$propertyCache[$class], function ($property) {
+            return $this->{$property};
+        });
     }
 
     /**
@@ -141,13 +137,9 @@ abstract class Component
             );
         }
 
-        $values = [];
-
-        foreach (static::$methodCache[$class] as $method) {
-            $values[$method] = $this->createVariableFromMethod(new ReflectionMethod($this, $method));
-        }
-
-        return $values;
+        return $this->collectAttributes(static::$methodCache[$class], function ($method) {
+            return $this->createVariableFromMethod(new ReflectionMethod($this, $method));
+        });
     }
 
     /**
@@ -230,5 +222,22 @@ abstract class Component
         })->reject(function ($item) {
             return $this->shouldIgnore($item);
         })->all();
+    }
+
+    /**
+     * @param  array  $items
+     * @param  \Closure  $callable
+     *
+     * @return array
+     */
+    protected function collectAttributes($items, Closure $callable)
+    {
+        $values = [];
+
+        foreach ($items as $name) {
+            $values[$name] = $callable($name);
+        }
+
+        return $values;
     }
 }
