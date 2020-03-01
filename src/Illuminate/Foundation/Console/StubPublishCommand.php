@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
@@ -12,14 +13,14 @@ class StubPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'stub:publish';
+    protected $signature = 'stub:publish {--stubs= : The stubs to publish}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Publish all stubs that are available for customization';
+    protected $description = 'Publish the stubs that are available for customization';
 
     /**
      * Execute the console command.
@@ -32,7 +33,7 @@ class StubPublishCommand extends Command
             (new Filesystem)->makeDirectory($stubsPath);
         }
 
-        $files = [
+        $files = collect([
             __DIR__.'/stubs/job.queued.stub' => $stubsPath.'/job.queued.stub',
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
@@ -51,7 +52,13 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.stub') => $stubsPath.'/controller.nested.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.plain.stub') => $stubsPath.'/controller.plain.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => $stubsPath.'/controller.stub',
-        ];
+        ]);
+
+        if ($stubs = $this->option('stubs')) {
+            $files->filter(function ($destination) use ($stubs, $stubsPath) {
+                return ! in_array(Str::between($destination, $stubsPath, '.stub'), $stubs);
+            });
+        }
 
         foreach ($files as $from => $to) {
             file_put_contents($to, file_get_contents($from));
