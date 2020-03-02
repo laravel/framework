@@ -177,7 +177,7 @@ class Mailable implements MailableContract, Renderable
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
         return $queue->connection($connection)->pushOn(
-            $queueName ?: null, $this->makeQueuedJob()
+            $queueName ?: null, $this->newQueuedJob()
         );
     }
 
@@ -195,7 +195,7 @@ class Mailable implements MailableContract, Renderable
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
         return $queue->connection($connection)->laterOn(
-            $queueName ?: null, $delay, $this->makeQueuedJob()
+            $queueName ?: null, $delay, $this->newQueuedJob()
         );
     }
 
@@ -204,7 +204,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @return mixed
      */
-    protected function makeQueuedJob()
+    protected function newQueuedJob()
     {
         return new SendQueuedMailable($this);
     }
