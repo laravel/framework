@@ -49,7 +49,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile user-id="1"></x-profile>');
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestProfileComponent', ['userId' => '1'])
-<?php \$component->withAttributes([]); ?>@endcomponentClass", trim($result));
+<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
     }
 
     public function testColonNestedComponentParsing()
@@ -57,7 +57,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = (new ComponentTagCompiler(['foo:alert' => TestAlertComponent::class]))->compileTags('<x-foo:alert></x-foo:alert>');
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
-<?php \$component->withAttributes([]); ?>@endcomponentClass", trim($result));
+<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
     }
 
     public function testColonStartingNestedComponentParsing()
@@ -65,7 +65,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = (new ComponentTagCompiler(['foo:alert' => TestAlertComponent::class]))->compileTags('<x:foo:alert></x-foo:alert>');
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
-<?php \$component->withAttributes([]); ?>@endcomponentClass", trim($result));
+<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
     }
 
     public function testSelfClosingComponentsCanBeCompiled()
@@ -139,7 +139,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertEquals("@component('Illuminate\Tests\View\Blade\TestAlertComponent', [])
 <?php \$component->withAttributes([]); ?>
-@endcomponentClass", trim($result));
+ @endcomponentClass", trim($result));
     }
 
     public function testClasslessComponents()
