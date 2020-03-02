@@ -20,10 +20,9 @@ class SupportStringableTest extends TestCase
     {
         $stringable = $this->stringable('foo bar');
 
-        $this->assertSame('bar',(string) $stringable->match('/bar/'));
-        $this->assertSame('bar',(string) $stringable->match('/foo (.*)/'));
+        $this->assertSame('bar', (string) $stringable->match('/bar/'));
+        $this->assertSame('bar', (string) $stringable->match('/foo (.*)/'));
         $this->assertTrue($stringable->match('/nothing/')->isEmpty());
-
 
         $this->assertEquals(['bar', 'bar'], $this->stringable('bar foo bar')->matchAll('/bar/')->all());
 
@@ -81,7 +80,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('jason')->startsWith('jas'));
         $this->assertTrue($this->stringable('jason')->startsWith('jason'));
         $this->assertTrue($this->stringable('jason')->startsWith(['jas']));
-        $this->assertTrue($this->stringable('jason' )->startsWith(['day', 'jas']));
+        $this->assertTrue($this->stringable('jason')->startsWith(['day', 'jas']));
         $this->assertFalse($this->stringable('jason')->startsWith('day'));
         $this->assertFalse($this->stringable('jason')->startsWith(['day']));
         $this->assertFalse($this->stringable('jason')->startsWith(null));
@@ -110,7 +109,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('jason')->endsWith('on'));
         $this->assertTrue($this->stringable('jason')->endsWith('jason'));
         $this->assertTrue($this->stringable('jason')->endsWith(['on']));
-        $this->assertTrue($this->stringable('jason')->endsWith( ['no', 'on']));
+        $this->assertTrue($this->stringable('jason')->endsWith(['no', 'on']));
         $this->assertFalse($this->stringable('jason')->endsWith('no'));
         $this->assertFalse($this->stringable('jason')->endsWith(['no']));
         $this->assertFalse($this->stringable('jason')->endsWith(''));
@@ -218,9 +217,9 @@ class SupportStringableTest extends TestCase
 
     public function testParseCallback()
     {
-        $this->assertEquals(['Class', 'method'],  $this->stringable('Class@method')->parseCallback('foo'));
-        $this->assertEquals(['Class', 'foo'],  $this->stringable('Class')->parseCallback('foo'));
-        $this->assertEquals(['Class', null],  $this->stringable('Class')->parseCallback());
+        $this->assertEquals(['Class', 'method'], $this->stringable('Class@method')->parseCallback('foo'));
+        $this->assertEquals(['Class', 'foo'], $this->stringable('Class')->parseCallback('foo'));
+        $this->assertEquals(['Class', null], $this->stringable('Class')->parseCallback());
     }
 
     public function testSlug()
@@ -264,9 +263,9 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('a')->is('A'));
 
         // Accepts array of patterns
-        $this->assertTrue($this->stringable('a/')->is( ['a*', 'b*']));
-        $this->assertTrue($this->stringable('b/')->is( ['a*', 'b*']));
-        $this->assertFalse($this->stringable('f/')->is( ['a*', 'b*']));
+        $this->assertTrue($this->stringable('a/')->is(['a*', 'b*']));
+        $this->assertTrue($this->stringable('b/')->is(['a*', 'b*']));
+        $this->assertFalse($this->stringable('f/')->is(['a*', 'b*']));
 
         // numeric values and patterns
         $this->assertFalse($this->stringable(123)->is(['a*', 'b*']));
@@ -281,7 +280,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable($valueObject)->is($patternObject));
 
         //empty patterns
-        $this->assertFalse($this->stringable('test')->is( []));
+        $this->assertFalse($this->stringable('test')->is([]));
     }
 
     public function testKebab()
@@ -297,8 +296,8 @@ class SupportStringableTest extends TestCase
 
     public function testUpper()
     {
-        $this->assertSame('FOO BAR BAZ',(string) $this->stringable('foo bar baz')->upper());
-        $this->assertSame('FOO BAR BAZ',(string) $this->stringable('foO bAr BaZ')->upper());
+        $this->assertSame('FOO BAR BAZ', (string) $this->stringable('foo bar baz')->upper());
+        $this->assertSame('FOO BAR BAZ', (string) $this->stringable('foO bAr BaZ')->upper());
     }
 
     public function testLimit()
@@ -326,13 +325,13 @@ class SupportStringableTest extends TestCase
 
     public function testReplaceArray()
     {
-        $this->assertSame('foo/bar/baz', (string) $this->stringable( '?/?/?')->replaceArray('?', ['foo', 'bar', 'baz']));
+        $this->assertSame('foo/bar/baz', (string) $this->stringable('?/?/?')->replaceArray('?', ['foo', 'bar', 'baz']));
         $this->assertSame('foo/bar/baz/?', (string) $this->stringable('?/?/?/?')->replaceArray('?', ['foo', 'bar', 'baz']));
-        $this->assertSame('foo/bar', (string) $this->stringable( '?/?')->replaceArray('?', ['foo', 'bar', 'baz']));
-        $this->assertSame('?/?/?', (string) $this->stringable( '?/?/?')->replaceArray('x', ['foo', 'bar', 'baz']));
+        $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', ['foo', 'bar', 'baz']));
+        $this->assertSame('?/?/?', (string) $this->stringable('?/?/?')->replaceArray('x', ['foo', 'bar', 'baz']));
         $this->assertSame('foo?/bar/baz', (string) $this->stringable('?/?/?')->replaceArray('?', ['foo?', 'bar', 'baz']));
-        $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', [1 => 'foo', 2 => 'bar'] ));
-        $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', ['x' => 'foo', 'y' => 'bar'] ));
+        $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', [1 => 'foo', 2 => 'bar']));
+        $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', ['x' => 'foo', 'y' => 'bar']));
     }
 
     public function testReplaceFirst()
@@ -408,8 +407,6 @@ class SupportStringableTest extends TestCase
 
     public function testSubstr()
     {
-
-
         $this->assertSame('Ё', (string) $this->stringable('БГДЖИЛЁ')->substr(-1));
         $this->assertSame('ЛЁ', (string) $this->stringable('БГДЖИЛЁ')->substr(-2));
         $this->assertSame('И', (string) $this->stringable('БГДЖИЛЁ')->substr(-3, 1));
@@ -423,4 +420,3 @@ class SupportStringableTest extends TestCase
         $this->assertSame('', (string) $this->stringable('Б')->substr(2));
     }
 }
-
