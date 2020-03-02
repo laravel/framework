@@ -3,6 +3,7 @@
 namespace Illuminate\Pagination;
 
 use Closure;
+use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -283,9 +284,14 @@ abstract class AbstractPaginator implements Htmlable
      * @param  string  $relation
      * @param  array  $relations
      * @return $this
+     * @throws \Exception
      */
     public function loadMorph($relation, $relations)
     {
+        if (! method_exists($this->getCollection(), 'loadMorph')) {
+            throw new Exception('loadMorph method does not exist for this Collection.');
+        }
+
         $this->getCollection()->loadMorph($relation, $relations);
 
         return $this;
