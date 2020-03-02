@@ -13,7 +13,7 @@ class StubPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'stub:publish {--stubs= : The stubs to publish}
+    protected $signature = 'stub:publish {--stubs= : Comma-separated list of the stubs to publish}
                     {--force : Overwrite any existing files}';
 
     /**
