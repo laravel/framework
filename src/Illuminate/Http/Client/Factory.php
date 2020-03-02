@@ -3,9 +3,11 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
+use function GuzzleHttp\Promise\promise_for;
 
 class Factory
 {
@@ -16,7 +18,7 @@ class Factory
     /**
      * The stub callables that will handle requests.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
     protected $stubCallbacks;
 
@@ -33,6 +35,13 @@ class Factory
      * @var array
      */
     protected $responseSequences = [];
+
+    /**
+     * The record array.
+     *
+     * @var array
+     */
+    protected $recorded;
 
     /**
      * Create a new factory instance.
@@ -60,7 +69,7 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        return \GuzzleHttp\Promise\promise_for(new \GuzzleHttp\Psr7\Response($status, $headers, $body));
+        return promise_for(new Psr7Response($status, $headers, $body));
     }
 
     /**
@@ -95,7 +104,7 @@ class Factory
                 $this->stubUrl($url, $callable);
             }
 
-            return;
+            return $this;
         }
 
         $this->stubCallbacks = $this->stubCallbacks->merge(collect([

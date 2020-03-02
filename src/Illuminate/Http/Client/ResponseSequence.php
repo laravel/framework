@@ -21,7 +21,7 @@ class ResponseSequence
     protected $failWhenEmpty = true;
 
     /**
-     * The repsonse that should be returned when the sequence is empty.
+     * The response that should be returned when the sequence is empty.
      *
      * @var \GuzzleHttp\Promise\PromiseInterface
      */
@@ -48,11 +48,7 @@ class ResponseSequence
      */
     public function push($body = '', int $status = 200, array $headers = [])
     {
-        if (is_array($body)) {
-            return $this->pushResponse(
-                Factory::response(json_encode($body), $status, $headers)
-            );
-        }
+        $body = is_array($body) ? json_encode($body) : $body;
 
         return $this->pushResponse(
             Factory::response($body, $status, $headers)
