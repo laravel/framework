@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 
 class SendQueuedNotifications implements ShouldQueue
 {
@@ -57,7 +58,7 @@ class SendQueuedNotifications implements ShouldQueue
     public function __construct($notifiables, $notification, array $channels = null)
     {
         $this->channels = $channels;
-        $this->notifiables = $notifiables;
+        $this->notifiables = Collection::wrap($notifiables);
         $this->notification = $notification;
         $this->tries = property_exists($notification, 'tries') ? $notification->tries : null;
         $this->timeout = property_exists($notification, 'timeout') ? $notification->timeout : null;
