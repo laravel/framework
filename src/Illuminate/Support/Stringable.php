@@ -299,7 +299,7 @@ class Stringable
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
-     * @return static|null
+     * @return \Illuminate\Support\Collection
      */
     public function matchAll($pattern)
     {
