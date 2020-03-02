@@ -172,6 +172,17 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame('foobar', $app->make('bar'));
     }
 
+    public function testDeferredServiceIsLoadedWhenAccessingImplementationThroughInterface()
+    {
+        $app = new Application;
+        $app->setDeferredServices([
+            SampleInterface::class => InterfaceToImplementationDeferredServiceProvider::class,
+            SampleImplementation::class => SampleImplementationDeferredServiceProvider::class,
+        ]);
+        $instance = $app->make(SampleInterface::class);
+        $this->assertEquals($instance->getPrimitive(), 'foo');
+    }
+
     public function testEnvironment()
     {
         $app = new Application;
@@ -470,6 +481,44 @@ class ApplicationDeferredServiceProviderStub extends ServiceProvider implements 
     {
         static::$initialized = true;
         $this->app['foo'] = 'foo';
+    }
+}
+
+interface SampleInterface
+{
+    public function getPrimitive();
+}
+
+class SampleImplementation implements SampleInterface
+{
+    private $primitive;
+
+    public function __construct($primitive)
+    {
+        $this->primitive = $primitive;
+    }
+
+    public function getPrimitive()
+    {
+        return $this->primitive;
+    }
+}
+
+class InterfaceToImplementationDeferredServiceProvider extends ServiceProvider implements DeferrableProvider
+{
+    public function register()
+    {
+        $this->app->bind(SampleInterface::class, SampleImplementation::class);
+    }
+}
+
+class SampleImplementationDeferredServiceProvider extends ServiceProvider implements DeferrableProvider
+{
+    public function register()
+    {
+        $this->app->when(SampleImplementation::class)->needs('$primitive')->give(function () {
+            return 'foo';
+        });
     }
 }
 
