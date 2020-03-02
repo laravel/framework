@@ -2,8 +2,13 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v6.17.1...6.x)
 
+### Added
+- Added `Arr::hasAny()` method ([#31636](https://github.com/laravel/framework/pull/31636))
+
 ### TODO
 - Use correct locale when resolving Faker from the container ([#31615](https://github.com/laravel/framework/pull/31615))
+- Expose Notification Id within Message Data ([#31632](https://github.com/laravel/framework/pull/31632))
+- Fixed loading deferred providers for binding interfaces and implementations ([#31629](https://github.com/laravel/framework/pull/31629), [1764ff7](https://github.com/laravel/framework/commit/1764ff762966083a12dd2c9b522cec5f1bbda967))
 
 
 ## [v6.17.1 (2020-02-26)](https://github.com/laravel/framework/compare/v6.17.0...v6.17.1)
