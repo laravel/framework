@@ -63,7 +63,7 @@ class StubPublishCommand extends Command
 
         if ($stubs = $this->option('stubs')) {
             $files = $files->filter(function ($destination) use ($stubs, $stubsPath) {
-                return ! in_array(Str::between($destination, $stubsPath . '/', '.stub'), $stubs);
+                return ! in_array(Str::between($destination, $stubsPath.'/', '.stub'), $stubs);
             });
         }
 
