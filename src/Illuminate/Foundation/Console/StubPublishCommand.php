@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class StubPublishCommand extends Command
 {
@@ -30,29 +30,29 @@ class StubPublishCommand extends Command
      */
     public function handle()
     {
-        if (!is_dir($stubsPath = $this->laravel->basePath('stubs'))) {
+        if (! is_dir($stubsPath = $this->laravel->basePath('stubs'))) {
             (new Filesystem)->makeDirectory($stubsPath);
         }
 
         $files = collect([
-            __DIR__ . '/stubs/job.queued.stub' => $stubsPath . '/job.queued.stub',
-            __DIR__ . '/stubs/job.stub' => $stubsPath . '/job.stub',
-            __DIR__ . '/stubs/job.stub' => $stubsPath . '/job.stub',
-            __DIR__ . '/stubs/model.pivot.stub' => $stubsPath . '/model.pivot.stub',
-            __DIR__ . '/stubs/model.stub' => $stubsPath . '/model.stub',
-            __DIR__ . '/stubs/test.stub' => $stubsPath . '/test.stub',
-            __DIR__ . '/stubs/test.unit.stub' => $stubsPath . '/test.unit.stub',
-            realpath(__DIR__ . '/../../Database/Migrations/stubs/migration.create.stub') => $stubsPath . '/migration.create.stub',
-            realpath(__DIR__ . '/../../Database/Migrations/stubs/migration.stub') => $stubsPath . '/migration.stub',
-            realpath(__DIR__ . '/../../Database/Migrations/stubs/migration.update.stub') => $stubsPath . '/migration.update.stub',
-            realpath(__DIR__ . '/../../Routing/Console/stubs/controller.api.stub') => $stubsPath . '/controller.api.stub',
-            realpath(__DIR__ . '/../../Routing/Console/stubs/controller.invokable.stub') => $stubsPath . '/controller.invokable.stub',
-            realpath(__DIR__ . '/../../Routing/Console/stubs/controller.model.api.stub') => $stubsPath . '/controller.model.api.stub',
-            realpath(__DIR__ . '/../../Routing/Console/stubs/controller.model.stub') => $stubsPath . '/controller.model.stub',
-            realpath(__DIR__ . '/../../Routing/Console/stubs/controller.nested.api.stub') => $stubsPath . '/controller.nested.api.stub',
-            realpath(__DIR__ . '/../../Routing/Console/stubs/controller.nested.stub') => $stubsPath . '/controller.nested.stub',
-            realpath(__DIR__ . '/../../Routing/Console/stubs/controller.plain.stub') => $stubsPath . '/controller.plain.stub',
-            realpath(__DIR__ . '/../../Routing/Console/stubs/controller.stub') => $stubsPath . '/controller.stub',
+            __DIR__ .'/stubs/job.queued.stub' => $stubsPath . '/job.queued.stub',
+            __DIR__ .'/stubs/job.stub' => $stubsPath . '/job.stub',
+            __DIR__ .'/stubs/job.stub' => $stubsPath . '/job.stub',
+            __DIR__ .'/stubs/model.pivot.stub' => $stubsPath . '/model.pivot.stub',
+            __DIR__ .'/stubs/model.stub' => $stubsPath . '/model.stub',
+            __DIR__ .'/stubs/test.stub' => $stubsPath . '/test.stub',
+            __DIR__ .'/stubs/test.unit.stub' => $stubsPath . '/test.unit.stub',
+            realpath(__DIR__ .'/../../Database/Migrations/stubs/migration.create.stub') => $stubsPath . '/migration.create.stub',
+            realpath(__DIR__ .'/../../Database/Migrations/stubs/migration.stub') => $stubsPath . '/migration.stub',
+            realpath(__DIR__ .'/../../Database/Migrations/stubs/migration.update.stub') => $stubsPath . '/migration.update.stub',
+            realpath(__DIR__ .'/../../Routing/Console/stubs/controller.api.stub') => $stubsPath . '/controller.api.stub',
+            realpath(__DIR__ .'/../../Routing/Console/stubs/controller.invokable.stub') => $stubsPath . '/controller.invokable.stub',
+            realpath(__DIR__ .'/../../Routing/Console/stubs/controller.model.api.stub') => $stubsPath . '/controller.model.api.stub',
+            realpath(__DIR__ .'/../../Routing/Console/stubs/controller.model.stub') => $stubsPath . '/controller.model.stub',
+            realpath(__DIR__ .'/../../Routing/Console/stubs/controller.nested.api.stub') => $stubsPath . '/controller.nested.api.stub',
+            realpath(__DIR__ .'/../../Routing/Console/stubs/controller.nested.stub') => $stubsPath . '/controller.nested.stub',
+            realpath(__DIR__ .'/../../Routing/Console/stubs/controller.plain.stub') => $stubsPath . '/controller.plain.stub',
+            realpath(__DIR__ .'/../../Routing/Console/stubs/controller.stub') => $stubsPath . '/controller.stub',
         ]);
 
         if ($this->option('select')) {
@@ -81,7 +81,7 @@ class StubPublishCommand extends Command
     }
 
     /**
-     * Formats a stub name to a more readable name to display on the console
+     * Formats a stub name to a more readable name to display on the console.
      *
      * @param string $stubpath
      * @return string
@@ -98,7 +98,7 @@ class StubPublishCommand extends Command
     }
 
     /**
-     * Converts the stud name into the 
+     * Converts the stud name into the format like it was picked from the files array.
      *
      * @param string $stubName
      * @return string
