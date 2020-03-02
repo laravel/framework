@@ -46,6 +46,31 @@ class ViewComponentTest extends TestCase
         $this->assertEquals(3, $component->counter);
     }
 
+    public function testItIgnoresExceptedMethodsAndProperties()
+    {
+        $component = new TestExceptedViewComponent();
+        $variables = $component->data();
+
+        // Ignored methods (with no args) are not invoked behind the scenes.
+        $this->assertEquals('Otwell', $component->taylor);
+
+        $this->assertArrayNotHasKey('hello', $variables);
+        $this->assertArrayNotHasKey('hello2', $variables);
+        $this->assertArrayNotHasKey('taylor', $variables);
+    }
+
+    public function testMethodsOverridePropertyValues()
+    {
+        $component = new TestHelloPropertyHelloMethodComponent();
+        $variables = $component->data();
+        $this->assertArrayHasKey('hello', $variables);
+        $this->assertEquals('world', $variables['hello']());
+
+        // protected methods do not override public properties.
+        $this->assertArrayHasKey('world', $variables);
+        $this->assertEquals('world property', $variables['world']);
+    }
+
     public function testAttributesAreMergedNotOverwritten()
     {
         $component = new TestDefaultAttributesComponent;
@@ -108,6 +133,50 @@ class TestSampleViewComponent extends Component
     private function privateHello()
     {
         $this->counter++;
+    }
+}
+
+class TestExceptedViewComponent extends Component
+{
+    protected $except = ['hello', 'hello2', 'taylor'];
+
+    public $taylor = 'Otwell';
+
+    public function hello($string = 'world')
+    {
+        return $string;
+    }
+
+    public function hello2()
+    {
+        return $this->taylor = '';
+    }
+
+    public function render()
+    {
+        return 'test';
+    }
+}
+
+class TestHelloPropertyHelloMethodComponent extends Component
+{
+    public function render()
+    {
+        return 'test';
+    }
+
+    public $hello = 'hello property';
+
+    public $world = 'world property';
+
+    public function hello($string = 'world')
+    {
+        return $string;
+    }
+
+    protected function world($string = 'world')
+    {
+        return $string;
     }
 }
 
