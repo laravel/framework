@@ -348,7 +348,7 @@ class Stringable
      */
     public function parseCallback($default = null)
     {
-        return Str::parseCallback($this->value);
+        return Str::parseCallback($this->value, $default);
     }
 
     /**
