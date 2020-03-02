@@ -46,7 +46,6 @@ class ViewComponentTest extends TestCase
         $this->assertEquals(3, $component->counter);
     }
 
-
     public function testItIgnoresExceptedMethodsAndProperties()
     {
         $component = new TestExceptedViewComponent();
@@ -70,6 +69,7 @@ class ViewComponentTest extends TestCase
         // protected methods do not override public properties.
         $this->assertArrayHasKey('world', $variables);
         $this->assertEquals('world property', $variables['world']);
+    }
 
     public function testAttributesAreMergedNotOverwritten()
     {
@@ -80,7 +80,6 @@ class ViewComponentTest extends TestCase
         $component->withAttributes(['class' => 'bg-blue-100']);
 
         $this->assertEquals('bg-blue-100 text-red-500', $component->attributes->get('class'));
-
     }
 }
 
@@ -161,6 +160,11 @@ class TestExceptedViewComponent extends Component
 
 class TestHelloPropertyHelloMethodComponent extends Component
 {
+    public function render()
+    {
+        return 'test';
+    }
+
     public $hello = 'hello property';
 
     public $world = 'world property';
