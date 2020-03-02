@@ -58,8 +58,8 @@ class SendQueuedNotifications implements ShouldQueue
     public function __construct($notifiables, $notification, array $channels = null)
     {
         $this->channels = $channels;
-        $this->notifiables = Collection::wrap($notifiables);
         $this->notification = $notification;
+        $this->notifiables = Collection::wrap($notifiables);
         $this->tries = property_exists($notification, 'tries') ? $notification->tries : null;
         $this->timeout = property_exists($notification, 'timeout') ? $notification->timeout : null;
     }
