@@ -77,7 +77,6 @@ class MigrateCommand extends BaseCommand
         if ($this->option('seed') && ! $this->option('pretend')) {
             $this->call('db:seed', array_filter([
                 '--database' => $this->option('database'),
-                '--class' => $this->option('seeder'),
                 '--force' => true,
             ]));
         }
