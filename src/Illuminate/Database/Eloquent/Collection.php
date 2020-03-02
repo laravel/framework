@@ -37,7 +37,8 @@ class Collection extends BaseCollection implements QueueableCollection
             return $this->whereIn($this->first()->getKeyName(), $key);
         }
 
-        return Arr::first($this->items, function ($model) use ($key) {
+        return Arr::first($this->items, static function ($model) use ($key) {
+            /** @var Model $model */
             return $model->getKey() == $key;
         }, $default);
     }
@@ -55,6 +56,7 @@ class Collection extends BaseCollection implements QueueableCollection
                 $relations = func_get_args();
             }
 
+            /** @var Builder $query */
             $query = $this->first()->newQueryWithoutRelationships()->with($relations);
 
             $this->items = $query->eagerLoadRelations($this->items);
@@ -75,6 +77,9 @@ class Collection extends BaseCollection implements QueueableCollection
             return $this;
         }
 
+        /**
+         * @var static $models
+         */
         $models = $this->first()->newModelQuery()
             ->whereKey($this->modelKeys())
             ->select($this->first()->getKeyName())
@@ -87,6 +92,7 @@ class Collection extends BaseCollection implements QueueableCollection
         );
 
         $models->each(function ($model) use ($attributes) {
+            /** @var Model $model */
             $this->find($model->getKey())->forceFill(
                 Arr::only($model->getAttributes(), $attributes)
             )->syncOriginalAttributes($attributes);
@@ -151,7 +157,8 @@ class Collection extends BaseCollection implements QueueableCollection
             $relation = reset($relation);
         }
 
-        $models->filter(function ($model) use ($name) {
+        $models->filter(static function ($model) use ($name) {
+            /** @var Model|null $model */
             return ! is_null($model) && ! $model->relationLoaded($name);
         })->load($relation);
 
@@ -179,10 +186,10 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $this->pluck($relation)
             ->filter()
-            ->groupBy(function ($model) {
+            ->groupBy(static function ($model) {
                 return get_class($model);
             })
-            ->each(function ($models, $className) use ($relations) {
+            ->each(static function ($models, $className) use ($relations) {
                 static::make($models)->load($relations[$className] ?? []);
             });
 
@@ -204,12 +211,14 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         if ($key instanceof Model) {
-            return parent::contains(function ($model) use ($key) {
+            return parent::contains(static function ($model) use ($key) {
+                /** @var Model $model */
                 return $model->is($key);
             });
         }
 
-        return parent::contains(function ($model) use ($key) {
+        return parent::contains(static function ($model) use ($key) {
+            /** @var Model $model */
             return $model->getKey() == $key;
         });
     }
@@ -221,7 +230,8 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function modelKeys()
     {
-        return array_map(function ($model) {
+        return array_map(static function ($model) {
+            /** @var Model $model */
             return $model->getKey();
         }, $this->items);
     }
@@ -253,7 +263,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = parent::map($callback);
 
-        return $result->contains(function ($item) {
+        return $result->contains(static function ($item) {
             return ! $item instanceof Model;
         }) ? $result->toBase() : $result;
     }
@@ -278,7 +288,8 @@ class Collection extends BaseCollection implements QueueableCollection
             ->get()
             ->getDictionary();
 
-        return $this->map(function ($model) use ($freshModels) {
+        return $this->map(static function ($model) use ($freshModels) {
+            /** @var Model $model */
             return $model->exists && isset($freshModels[$model->getKey()])
                     ? $freshModels[$model->getKey()] : null;
         });
@@ -505,7 +516,13 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     protected function duplicateComparator($strict)
     {
-        return function ($a, $b) {
+        /**
+         * @param Model $a
+         * @param Model $b
+         *
+         * @return bool
+         */
+        return static function ($a, $b) {
             return $a->is($b);
         };
     }
@@ -525,7 +542,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $class = get_class($this->first());
 
-        $this->each(function ($model) use ($class) {
+        $this->each(static function ($model) use ($class) {
             if (get_class($model) !== $class) {
                 throw new LogicException('Queueing collections with multiple model types is not supported.');
             }
@@ -575,7 +592,8 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $connection = $this->first()->getConnectionName();
 
-        $this->each(function ($model) use ($connection) {
+        $this->each(static function ($model) use ($connection) {
+            /** @var Model $model */
             if ($model->getConnectionName() !== $connection) {
                 throw new LogicException('Queueing collections with multiple model connections is not supported.');
             }

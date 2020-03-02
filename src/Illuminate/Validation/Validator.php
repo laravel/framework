@@ -267,7 +267,7 @@ class Validator implements ValidatorContract
     public function after($callback)
     {
         $this->after[] = function () use ($callback) {
-            return call_user_func_array($callback, [$this]);
+            return call_user_func($callback, $this);
         };
 
         return $this;
@@ -410,7 +410,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  string  $rule
-     * @return void
+     * @return void|mixed
      */
     protected function validateAttribute($attribute, $rule)
     {
@@ -425,8 +425,11 @@ class Validator implements ValidatorContract
         // First we will get the correct keys for the given attribute in case the field is nested in
         // an array. Then we determine if the given rule accepts other field names as parameters.
         // If so, we will replace any asterisks found in the parameters with the correct keys.
-        if (($keys = $this->getExplicitKeys($attribute)) &&
-            $this->dependsOnOtherFields($rule)) {
+        if (
+            ($keys = $this->getExplicitKeys($attribute))
+            &&
+            $this->dependsOnOtherFields($rule)
+        ) {
             $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
         }
 
@@ -435,8 +438,15 @@ class Validator implements ValidatorContract
         // If the attribute is a file, we will verify that the file upload was actually successful
         // and if it wasn't we will add a failure for the attribute. Files may not successfully
         // upload if they are too large based on PHP's settings so we will bail in this case.
-        if ($value instanceof UploadedFile && ! $value->isValid() &&
-            $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
+        if (
+            $value instanceof UploadedFile
+            &&
+            ! $value->isValid()
+            &&
+            $this->hasRule(
+                $attribute,
+                array_merge($this->fileRules, $this->implicitRules)
+            )
         ) {
             return $this->addFailure($attribute, 'uploaded', []);
         }
@@ -519,7 +529,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceAsterisksInParameters(array $parameters, array $keys)
     {
-        return array_map(function ($field) use ($keys) {
+        return array_map(static function ($field) use ($keys) {
             return vsprintf(str_replace('*', '%s', $field), $keys);
         }, $parameters);
     }
@@ -538,9 +548,12 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
-               $this->passesOptionalCheck($attribute) &&
-               $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
+        return $this->presentOrRuleIsImplicit($rule, $attribute, $value)
+               &&
+               $this->passesOptionalCheck($attribute)
+               &&
+               $this->isNotNullIfMarkedAsNullable($rule, $attribute)
+               &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
@@ -558,7 +571,8 @@ class Validator implements ValidatorContract
             return $this->isImplicit($rule);
         }
 
-        return $this->validatePresent($attribute, $value) ||
+        return $this->validatePresent($attribute, $value)
+               ||
                $this->isImplicit($rule);
     }
 
@@ -657,16 +671,21 @@ class Validator implements ValidatorContract
             return $this->messages->has($attribute);
         }
 
-        if (isset($this->failedRules[$attribute]) &&
-            array_key_exists('uploaded', $this->failedRules[$attribute])) {
+        if (
+            isset($this->failedRules[$attribute])
+            &&
+            array_key_exists('uploaded', $this->failedRules[$attribute])
+        ) {
             return true;
         }
 
         // In case the attribute has any rule that indicates that the field is required
         // and that rule already failed then we should stop validation at this point
         // as now there is no point in calling other rules with this field empty.
-        return $this->hasRule($attribute, $this->implicitRules) &&
-               isset($this->failedRules[$attribute]) &&
+        return $this->hasRule($attribute, $this->implicitRules)
+               &&
+               isset($this->failedRules[$attribute])
+               &&
                array_intersect(array_keys($this->failedRules[$attribute]), $this->implicitRules);
     }
 
@@ -759,7 +778,7 @@ class Validator implements ValidatorContract
      */
     protected function attributesThatHaveMessages()
     {
-        return collect($this->messages()->toArray())->map(function ($message, $key) {
+        return collect($this->messages()->toArray())->map(static function ($message, $key) {
             return explode('.', $key)[0];
         })->unique()->flip()->all();
     }
@@ -972,7 +991,7 @@ class Validator implements ValidatorContract
         if ($extensions) {
             $keys = array_map([Str::class, 'snake'], array_keys($extensions));
 
-            $extensions = array_combine($keys, array_values($extensions));
+            $extensions = array_combine($keys, $extensions);
         }
 
         $this->extensions = array_merge($this->extensions, $extensions);
@@ -1059,7 +1078,7 @@ class Validator implements ValidatorContract
         if ($replacers) {
             $keys = array_map([Str::class, 'snake'], array_keys($replacers));
 
-            $replacers = array_combine($keys, array_values($replacers));
+            $replacers = array_combine($keys, $replacers);
         }
 
         $this->replacers = array_merge($this->replacers, $replacers);
@@ -1192,7 +1211,8 @@ class Validator implements ValidatorContract
      */
     public function getPresenceVerifierFor($connection)
     {
-        return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
+        return tap($this->getPresenceVerifier(), static function ($verifier) use ($connection) {
+            /** @var \Illuminate\Validation\PresenceVerifierInterface $verifier */
             $verifier->setConnection($connection);
         });
     }

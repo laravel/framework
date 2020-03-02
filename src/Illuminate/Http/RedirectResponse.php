@@ -149,7 +149,7 @@ class RedirectResponse extends BaseRedirectResponse
      * Parse the given errors into an appropriate value.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
-     * @return \Illuminate\Support\MessageBag
+     * @return \Illuminate\Contracts\Support\MessageBag
      */
     protected function parseErrors($provider)
     {

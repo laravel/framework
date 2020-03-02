@@ -150,7 +150,7 @@ class DynamoDbStore implements LockProvider, Store
 
         $now = Carbon::now();
 
-        return array_merge(collect(array_flip($keys))->map(function () {
+        return array_merge(collect(array_flip($keys))->map(static function () {
             //
         })->all(), collect($response['Responses'][$this->table])->mapWithKeys(function ($response) use ($now) {
             if ($this->isExpired($response, $now)) {
@@ -178,7 +178,8 @@ class DynamoDbStore implements LockProvider, Store
     {
         $expiration = $expiration ?: Carbon::now();
 
-        return isset($item[$this->expirationAttribute]) &&
+        return isset($item[$this->expirationAttribute])
+               &&
                $expiration->getTimestamp() >= $item[$this->expirationAttribute]['N'];
     }
 
@@ -442,7 +443,7 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Remove all items from the cache.
      *
-     * @return bool
+     * @return void
      *
      * @throws \RuntimeException
      */

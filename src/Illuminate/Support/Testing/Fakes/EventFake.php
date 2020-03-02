@@ -106,11 +106,11 @@ class EventFake implements Dispatcher
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
-        return collect($this->events[$event])->filter(function ($arguments) use ($callback) {
+        return collect($this->events[$event])->filter(static function ($arguments) use ($callback) {
             return $callback(...$arguments);
         });
     }
@@ -216,7 +216,7 @@ class EventFake implements Dispatcher
         }
 
         return collect($this->eventsToFake)
-            ->filter(function ($event) use ($eventName, $payload) {
+            ->filter(static function ($event) use ($eventName, $payload) {
                 return $event instanceof Closure
                             ? $event($eventName, $payload)
                             : $event === $eventName;
@@ -250,7 +250,7 @@ class EventFake implements Dispatcher
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @return void
+     * @return null
      */
     public function until($event, $payload = [])
     {

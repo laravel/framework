@@ -57,7 +57,7 @@ class EventListCommand extends Command
             $events = $this->filterEvents($events);
         }
 
-        return collect($events)->map(function ($listeners, $event) {
+        return collect($events)->map(static function ($listeners, $event) {
             return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
         })->sortBy('Event')->values()->toArray();
     }
@@ -74,7 +74,7 @@ class EventListCommand extends Command
             return $events;
         }
 
-        return collect($events)->filter(function ($listeners, $event) use ($eventName) {
+        return collect($events)->filter(static function ($listeners, $event) use ($eventName) {
             return Str::contains($event, $eventName);
         })->toArray();
     }

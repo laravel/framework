@@ -31,6 +31,8 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
     protected function registerIlluminateMailer()
     {
         $this->app->singleton('mailer', function ($app) {
+            /** @var \Illuminate\Contracts\Foundation\Application $app */
+
             $config = $app->make('config')->get('mail');
 
             // Once we have create the mailer instance, we will set a container instance
@@ -84,7 +86,9 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
         // Once we have the transporter registered, we will register the actual Swift
         // mailer instance, passing in the transport instances, which allows us to
         // override this transporter instances during app start-up if necessary.
-        $this->app->singleton('swift.mailer', function ($app) {
+        $this->app->singleton('swift.mailer', static function ($app) {
+            /** @var \Illuminate\Contracts\Foundation\Application $app */
+
             if ($domain = $app->make('config')->get('mail.domain')) {
                 Swift_DependencyContainer::getInstance()
                                 ->register('mime.idgenerator.idright')
@@ -102,7 +106,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerSwiftTransport()
     {
-        $this->app->singleton('swift.transport', function ($app) {
+        $this->app->singleton('swift.transport', static function ($app) {
             return new TransportManager($app);
         });
     }
@@ -120,7 +124,9 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
             ], 'laravel-mail');
         }
 
-        $this->app->singleton(Markdown::class, function ($app) {
+        $this->app->singleton(Markdown::class, static function ($app) {
+            /** @var \Illuminate\Contracts\Foundation\Application $app */
+
             $config = $app->make('config');
 
             return new Markdown($app->make('view'), [

@@ -329,7 +329,7 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         if ($expiration) {
-            $parameters = $parameters + ['expires' => $this->availableAt($expiration)];
+            $parameters += ['expires' => $this->availableAt($expiration)];
         }
 
         ksort($parameters);
@@ -666,7 +666,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function pathFormatter()
     {
-        return $this->formatPathUsing ?: function ($path) {
+        return $this->formatPathUsing ?: static function ($path) {
             return $path;
         };
     }

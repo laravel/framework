@@ -229,7 +229,7 @@ class BelongsToMany extends Relation
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param  Model[]  $models
      * @return void
      */
     public function addEagerConstraints(array $models)
@@ -245,9 +245,9 @@ class BelongsToMany extends Relation
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array  $models
+     * @param  Model[]  $models
      * @param  string  $relation
-     * @return array
+     * @return Model[]
      */
     public function initRelation(array $models, $relation)
     {
@@ -261,10 +261,10 @@ class BelongsToMany extends Relation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array  $models
+     * @param  Model[]  $models
      * @param  \Illuminate\Database\Eloquent\Collection  $results
      * @param  string  $relation
-     * @return array
+     * @return Model[]
      */
     public function match(array $models, Collection $results, $relation)
     {
@@ -692,6 +692,7 @@ class BelongsToMany extends Relation
         $this->query->addSelect($this->shouldSelect($columns));
 
         return tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
+            /** @var \Illuminate\Contracts\Pagination\LengthAwarePaginator $paginator */
             $this->hydratePivotRelation($paginator->items());
         });
     }
@@ -710,6 +711,7 @@ class BelongsToMany extends Relation
         $this->query->addSelect($this->shouldSelect($columns));
 
         return tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), function ($paginator) {
+            /** @var \Illuminate\Contracts\Pagination\LengthAwarePaginator $paginator */
             $this->hydratePivotRelation($paginator->items());
         });
     }
@@ -726,6 +728,7 @@ class BelongsToMany extends Relation
         $this->query->addSelect($this->shouldSelect());
 
         return $this->query->chunk($count, function ($results) use ($callback) {
+            /** @var Collection|Model[] $results */
             $this->hydratePivotRelation($results->all());
 
             return $callback($results);
@@ -795,7 +798,7 @@ class BelongsToMany extends Relation
     /**
      * Hydrate the pivot table relationship on the models.
      *
-     * @param  array  $models
+     * @param  Model[]  $models
      * @return void
      */
     protected function hydratePivotRelation(array $models)

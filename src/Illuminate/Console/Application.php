@@ -288,6 +288,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected function getDefaultInputDefinition()
     {
         return tap(parent::getDefaultInputDefinition(), function ($definition) {
+            /** @var \Symfony\Component\Console\Input\InputDefinition $definition */
             $definition->addOption($this->getEnvironmentOption());
         });
     }

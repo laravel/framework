@@ -318,8 +318,11 @@ trait HasAttributes
         // If the attribute exists in the attribute array or has a "get" mutator we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
-            $this->hasGetMutator($key)) {
+        if (
+            array_key_exists($key, $this->attributes)
+            ||
+            $this->hasGetMutator($key)
+        ) {
             return $this->getAttributeValue($key);
         }
 
@@ -360,8 +363,11 @@ trait HasAttributes
         // If the attribute is listed as a date, we will convert it to a DateTime
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
-        if (in_array($key, $this->getDates()) &&
-            ! is_null($value)) {
+        if (
+            ! is_null($value)
+            &&
+            in_array($key, $this->getDates())
+        ) {
             return $this->asDateTime($value);
         }
 
@@ -531,7 +537,7 @@ trait HasAttributes
             return 'decimal';
         }
 
-        return trim(strtolower($this->getCasts()[$key]));
+        return strtolower(trim($this->getCasts()[$key]));
     }
 
     /**
@@ -627,8 +633,9 @@ trait HasAttributes
      */
     protected function isDateAttribute($key)
     {
-        return in_array($key, $this->getDates(), true) ||
-                                    $this->isDateCastable($key);
+        return in_array($key, $this->getDates(), true)
+               ||
+               $this->isDateCastable($key);
     }
 
     /**
@@ -659,7 +666,7 @@ trait HasAttributes
      */
     protected function getArrayAttributeWithValue($path, $key, $value)
     {
-        return tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
+        return tap($this->getArrayAttributeByKey($key), static function (&$array) use ($path, $value) {
             Arr::set($array, str_replace('->', '.', $path), $value);
         });
     }
@@ -1239,7 +1246,7 @@ trait HasAttributes
      */
     public static function cacheMutatedAttributes($class)
     {
-        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(function ($match) {
+        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(static function ($match) {
             return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
         })->all();
     }

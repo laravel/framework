@@ -16,6 +16,7 @@ class WhoopsHandler
     public function forDebug()
     {
         return tap(new PrettyPageHandler, function ($handler) {
+            /** @var PrettyPageHandler $handler */
             $handler->handleUnconditionally(true);
 
             $this->registerApplicationPaths($handler)

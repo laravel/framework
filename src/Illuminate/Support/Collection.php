@@ -82,7 +82,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $items = $this->map(function ($value) use ($callback) {
             return $callback($value);
-        })->filter(function ($value) {
+        })->filter(static function ($value) {
             return ! is_null($value);
         });
 
@@ -100,7 +100,7 @@ class Collection implements ArrayAccess, Enumerable
     public function median($key = null)
     {
         $values = (isset($key) ? $this->pluck($key) : $this)
-            ->filter(function ($item) {
+            ->filter(static function ($item) {
                 return ! is_null($item);
             })->sort()->values();
 
@@ -137,7 +137,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $counts = new self;
 
-        $collection->each(function ($value) use ($counts) {
+        $collection->each(static function ($value) use ($counts) {
             $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
         });
 
@@ -145,7 +145,7 @@ class Collection implements ArrayAccess, Enumerable
 
         $highestValue = $sorted->last();
 
-        return $sorted->filter(function ($value) use ($highestValue) {
+        return $sorted->filter(static function ($value) use ($highestValue) {
             return $value == $highestValue;
         })->sort()->keys()->all();
     }
@@ -313,12 +313,12 @@ class Collection implements ArrayAccess, Enumerable
     protected function duplicateComparator($strict)
     {
         if ($strict) {
-            return function ($a, $b) {
+            return static function ($a, $b) {
                 return $a === $b;
             };
         }
 
-        return function ($a, $b) {
+        return static function ($a, $b) {
             return $a == $b;
         };
     }
@@ -1206,11 +1206,11 @@ class Collection implements ArrayAccess, Enumerable
             return $this->getArrayableItems($items);
         }, func_get_args());
 
-        $params = array_merge([function () {
+        $params = array_merge([static function () {
             return new static(func_get_args());
         }, $this->items], $arrayableItems);
 
-        return new static(call_user_func_array('array_map', $params));
+        return new static(array_map(...$params));
     }
 
     /**

@@ -206,8 +206,15 @@ class Worker
      */
     protected function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
     {
-        return ! ((($this->isDownForMaintenance)() && ! $options->force) ||
-            $this->paused ||
+        return ! (
+            (
+                ($this->isDownForMaintenance)()
+                &&
+                ! $options->force
+            )
+            ||
+            $this->paused
+            ||
             $this->events->until(new Looping($connectionName, $queue)) === false);
     }
 
@@ -663,7 +670,7 @@ class Worker
     /**
      * Get the queue manager instance.
      *
-     * @return \Illuminate\Queue\QueueManager
+     * @return QueueManager
      */
     public function getManager()
     {

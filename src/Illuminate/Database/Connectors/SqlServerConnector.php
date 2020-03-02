@@ -62,7 +62,8 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      */
     protected function prefersOdbc(array $config)
     {
-        return in_array('odbc', $this->getAvailableDrivers()) &&
+        return in_array('odbc', $this->getAvailableDrivers())
+               &&
                ($config['odbc'] ?? null) === true;
     }
 
@@ -168,7 +169,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      */
     protected function buildConnectString($driver, array $arguments)
     {
-        return $driver.':'.implode(';', array_map(function ($key) use ($arguments) {
+        return $driver.':'.implode(';', array_map(static function ($key) use ($arguments) {
             return sprintf('%s=%s', $key, $arguments[$key]);
         }, array_keys($arguments)));
     }

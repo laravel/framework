@@ -61,7 +61,7 @@ class ControllerDispatcher implements ControllerDispatcherContract
             return [];
         }
 
-        return collect($controller->getMiddleware())->reject(function ($data) use ($method) {
+        return collect($controller->getMiddleware())->reject(static function ($data) use ($method) {
             return static::methodExcludedByOptions($method, $data['options']);
         })->pluck('middleware')->all();
     }
@@ -75,7 +75,16 @@ class ControllerDispatcher implements ControllerDispatcherContract
      */
     protected static function methodExcludedByOptions($method, array $options)
     {
-        return (isset($options['only']) && ! in_array($method, (array) $options['only'])) ||
-            (! empty($options['except']) && in_array($method, (array) $options['except']));
+        return (
+                   isset($options['only'])
+                   &&
+                   !in_array($method, (array)$options['only'])
+               )
+               ||
+               (
+                   !empty($options['except'])
+                   &&
+                   in_array($method, (array)$options['except'])
+               );
     }
 }

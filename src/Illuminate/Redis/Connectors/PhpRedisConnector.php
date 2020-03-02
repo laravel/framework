@@ -72,6 +72,8 @@ class PhpRedisConnector implements Connector
     protected function createClient(array $config)
     {
         return tap(new Redis, function ($client) use ($config) {
+            /** @var Redis $client */
+
             if ($client instanceof RedisFacade) {
                 throw new LogicException(
                         extension_loaded('redis')
@@ -151,7 +153,9 @@ class PhpRedisConnector implements Connector
             $parameters[] = $options['password'] ?? null;
         }
 
-        return tap(new RedisCluster(...$parameters), function ($client) use ($options) {
+        return tap(new RedisCluster(...$parameters), static function ($client) use ($options) {
+            /** @var RedisCluster $client */
+
             if (! empty($options['prefix'])) {
                 $client->setOption(RedisCluster::OPT_PREFIX, $options['prefix']);
             }

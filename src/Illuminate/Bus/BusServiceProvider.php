@@ -17,8 +17,8 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register()
     {
-        $this->app->singleton(Dispatcher::class, function ($app) {
-            return new Dispatcher($app, function ($connection = null) use ($app) {
+        $this->app->singleton(Dispatcher::class, static function ($app) {
+            return new Dispatcher($app, static function ($connection = null) use ($app) {
                 return $app[QueueFactoryContract::class]->connection($connection);
             });
         });

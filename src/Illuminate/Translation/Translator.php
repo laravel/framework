@@ -235,7 +235,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function sortReplacements(array $replace)
     {
-        return (new Collection($replace))->sortBy(function ($value, $key) {
+        return (new Collection($replace))->sortBy(static function ($value, $key) {
             return mb_strlen($key) * -1;
         })->all();
     }

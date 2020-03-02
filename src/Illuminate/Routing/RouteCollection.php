@@ -189,11 +189,14 @@ class RouteCollection implements Countable, IteratorAggregate
      */
     protected function matchAgainstRoutes(array $routes, $request, $includingMethod = true)
     {
-        [$fallbacks, $routes] = collect($routes)->partition(function ($route) {
+        [$fallbacks, $routes] = collect($routes)->partition(static function ($route) {
             return $route->isFallback;
         });
+        /** @var $routes \Illuminate\Support\Collection */
 
-        return $routes->merge($fallbacks)->first(function ($value) use ($request, $includingMethod) {
+        return $routes->merge($fallbacks)->first(static function ($value) use ($request, $includingMethod) {
+            /** @var \Illuminate\Routing\Route $value */
+
             return $value->matches($request, $includingMethod);
         });
     }
@@ -234,7 +237,7 @@ class RouteCollection implements Countable, IteratorAggregate
     protected function getRouteForMethods($request, array $methods)
     {
         if ($request->method() === 'OPTIONS') {
-            return (new Route('OPTIONS', $request->path(), function () use ($methods) {
+            return (new Route('OPTIONS', $request->path(), static function () use ($methods) {
                 return new Response('', 200, ['Allow' => implode(',', $methods)]);
             }))->bind($request);
         }

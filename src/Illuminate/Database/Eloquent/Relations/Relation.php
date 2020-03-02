@@ -103,7 +103,7 @@ abstract class Relation
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param  Model[]  $models
      * @return void
      */
     abstract public function addEagerConstraints(array $models);
@@ -216,13 +216,14 @@ abstract class Relation
     /**
      * Get all of the primary keys for an array of models.
      *
-     * @param  array  $models
+     * @param  Model[]  $models
      * @param  string  $key
      * @return array
      */
     protected function getKeys(array $models, $key = null)
     {
-        return collect($models)->map(function ($value) use ($key) {
+        return collect($models)->map(static function ($value) use ($key) {
+            /** @var Model $value */
             return $key ? $value->getAttribute($key) : $value->getKey();
         })->values()->unique(null, true)->sort()->all();
     }
@@ -345,7 +346,7 @@ abstract class Relation
      * Builds a table-keyed array from model class names.
      *
      * @param  string[]|null  $models
-     * @return array|null
+     * @return string[]|null
      */
     protected static function buildMorphMapFromModels(array $models = null)
     {
@@ -353,8 +354,10 @@ abstract class Relation
             return $models;
         }
 
-        return array_combine(array_map(function ($model) {
-            return (new $model)->getTable();
+        return array_combine(array_map(static function ($model) {
+            /** @var Model $model */
+            $model = new $model();
+            return $model->getTable();
         }, $models), $models);
     }
 

@@ -2174,7 +2174,7 @@ class EloquentModelDestroyStub extends Model
 
 class EloquentModelHydrateRawStub extends Model
 {
-    public static function hydrate(array $items, $connection = null)
+    public function hydrate(array $items, $connection = null)
     {
         return 'hydrated';
     }

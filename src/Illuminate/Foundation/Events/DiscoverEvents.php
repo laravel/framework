@@ -22,7 +22,7 @@ class DiscoverEvents
     {
         return collect(static::getListenerEvents(
             (new Finder)->files()->in($listenerPath), $basePath
-        ))->mapToDictionary(function ($event, $listener) {
+        ))->mapToDictionary(static function ($event, $listener) {
             return [$event => $listener];
         })->all();
     }
@@ -52,8 +52,11 @@ class DiscoverEvents
             }
 
             foreach ($listener->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-                if (! Str::is('handle*', $method->name) ||
-                    ! isset($method->getParameters()[0])) {
+                if (
+                    ! Str::is('handle*', $method->name)
+                    ||
+                    ! isset($method->getParameters()[0])
+                ) {
                     continue;
                 }
 

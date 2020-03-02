@@ -51,18 +51,18 @@ class DatabaseServiceProvider extends ServiceProvider
         // The connection factory is used to create the actual connection instances on
         // the database. We will inject the factory into the manager so that it may
         // make the connections while they are actually needed and not of before.
-        $this->app->singleton('db.factory', function ($app) {
+        $this->app->singleton('db.factory', static function ($app) {
             return new ConnectionFactory($app);
         });
 
         // The database manager is used to resolve various connections, since multiple
         // connections might be managed. It also implements the connection resolver
         // interface which may be used by other components requiring connections.
-        $this->app->singleton('db', function ($app) {
+        $this->app->singleton('db', static function ($app) {
             return new DatabaseManager($app, $app['db.factory']);
         });
 
-        $this->app->bind('db.connection', function ($app) {
+        $this->app->bind('db.connection', static function ($app) {
             return $app['db']->connection();
         });
     }
@@ -74,11 +74,12 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     protected function registerEloquentFactory()
     {
-        $this->app->singleton(FakerGenerator::class, function ($app) {
+        $this->app->singleton(FakerGenerator::class, static function ($app) {
             return FakerFactory::create($app['config']->get('app.faker_locale', 'en_US'));
         });
 
         $this->app->singleton(EloquentFactory::class, function ($app) {
+            /** @var \Illuminate\Contracts\Foundation\Application $app */
             return EloquentFactory::construct(
                 $app->make(FakerGenerator::class), $this->app->databasePath('factories')
             );
@@ -92,7 +93,7 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     protected function registerQueueableEntityResolver()
     {
-        $this->app->singleton(EntityResolver::class, function () {
+        $this->app->singleton(EntityResolver::class, static function () {
             return new QueueEntityResolver;
         });
     }

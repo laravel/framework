@@ -75,7 +75,9 @@ class StartSession
      */
     protected function startSession(Request $request)
     {
-        return tap($this->getSession($request), function ($session) use ($request) {
+        return tap($this->getSession($request), static function ($session) use ($request) {
+            /** @var \Illuminate\Contracts\Session\Session $session */
+
             $session->setRequestOnHandler($request);
 
             $session->start();
@@ -90,7 +92,9 @@ class StartSession
      */
     public function getSession(Request $request)
     {
-        return tap($this->manager->driver(), function ($session) use ($request) {
+        return tap($this->manager->driver(), static function ($session) use ($request) {
+            /** @var \Illuminate\Contracts\Session\Session $session */
+
             $session->setId($request->cookies->get($session->getName()));
         });
     }
@@ -133,10 +137,14 @@ class StartSession
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->method() === 'GET' &&
-            $request->route() &&
-            ! $request->ajax() &&
-            ! $request->prefetch()) {
+        if ($request->method() === 'GET'
+            &&
+            $request->route()
+            &&
+            ! $request->ajax()
+            &&
+            ! $request->prefetch()
+        ) {
             $session->setPreviousUrl($request->fullUrl());
         }
     }

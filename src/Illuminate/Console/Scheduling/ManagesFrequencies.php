@@ -66,7 +66,7 @@ trait ManagesFrequencies
             }
         }
 
-        return function () use ($now, $startTime, $endTime) {
+        return static function () use ($now, $startTime, $endTime) {
             return $now->between($startTime, $endTime);
         };
     }

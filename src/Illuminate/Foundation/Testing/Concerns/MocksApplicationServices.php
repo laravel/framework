@@ -223,8 +223,19 @@ trait MocksApplicationServices
     protected function wasDispatched($needle, array $haystack)
     {
         foreach ($haystack as $dispatched) {
-            if ((is_string($dispatched) && ($dispatched === $needle || is_subclass_of($dispatched, $needle))) ||
-                $dispatched instanceof $needle) {
+            if (
+                (
+                    is_string($dispatched)
+                    &&
+                    (
+                        $dispatched === $needle
+                        ||
+                        is_subclass_of($dispatched, $needle)
+                    )
+                )
+                ||
+                $dispatched instanceof $needle
+            ) {
                 return true;
             }
         }
@@ -267,8 +278,13 @@ trait MocksApplicationServices
             foreach ($this->dispatchedNotifications as $dispatched) {
                 $notified = $dispatched['notifiable'];
 
-                if (($notified === $notifiable ||
-                     $notified->getKey() == $notifiable->getKey()) &&
+                if (
+                    (
+                        $notified === $notifiable
+                        ||
+                        $notified->getKey() == $notifiable->getKey()
+                    )
+                    &&
                     get_class($dispatched['instance']) === $notification
                 ) {
                     return $this;

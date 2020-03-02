@@ -116,7 +116,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Get the currently authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Authenticatable|\Illuminate\Database\Eloquent\Model|null
      */
     public function user()
     {
@@ -160,7 +160,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Pull a user from the repository by its "remember me" cookie token.
      *
      * @param  \Illuminate\Auth\Recaller  $recaller
-     * @return mixed
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     protected function userFromRecaller($recaller)
     {
@@ -207,8 +207,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        return $this->user()
-                    ? $this->user()->getAuthIdentifier()
+        $user = $this->user();
+
+        return $user
+                    ? $user->getAuthIdentifier()
                     : $this->session->get($this->getName());
     }
 
@@ -578,24 +580,29 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $password
      * @param  string  $attribute
-     * @return bool|null
+     * @return bool|void
      */
     public function logoutOtherDevices($password, $attribute = 'password')
     {
-        if (! $this->user()) {
+        $user = $this->user();
+
+        if (! $user) {
             return;
         }
 
-        $result = tap($this->user()->forceFill([
+        $result = tap($user->forceFill([
             $attribute => Hash::make($password),
         ]))->save();
 
-        if ($this->recaller() ||
-            $this->getCookieJar()->hasQueued($this->getRecallerName())) {
-            $this->queueRecallerCookie($this->user());
+        if (
+            $this->recaller()
+            ||
+            $this->getCookieJar()->hasQueued($this->getRecallerName())
+        ) {
+            $this->queueRecallerCookie($user);
         }
 
-        $this->fireOtherDeviceLogoutEvent($this->user());
+        $this->fireOtherDeviceLogoutEvent($user);
 
         return $result;
     }

@@ -75,7 +75,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Get the URL for the next page.
      *
-     * @return string|null
+     * @return string|void
      */
     public function nextPageUrl()
     {
@@ -89,7 +89,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return string
+     * @return \Illuminate\Contracts\View\View
      */
     public function links($view = null, $data = [])
     {
@@ -101,7 +101,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return \Illuminate\Contracts\Support\Htmlable
+     * @return \Illuminate\Contracts\View\View
      */
     public function render($view = null, $data = [])
     {

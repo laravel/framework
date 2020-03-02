@@ -96,7 +96,7 @@ class ControllerMakeCommand extends GeneratorCommand
         $replace["use {$controllerNamespace}\Controller;\n"] = '';
 
         return str_replace(
-            array_keys($replace), array_values($replace), parent::buildClass($name)
+            array_keys($replace), $replace, parent::buildClass($name)
         );
     }
 
@@ -109,10 +109,12 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         $parentModelClass = $this->parseModel($this->option('parent'));
 
-        if (! class_exists($parentModelClass)) {
-            if ($this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $parentModelClass]);
-            }
+        if (
+            !class_exists($parentModelClass)
+            &&
+            $this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)
+        ) {
+            $this->call('make:model', ['name' => $parentModelClass]);
         }
 
         return [
@@ -132,10 +134,12 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         $modelClass = $this->parseModel($this->option('model'));
 
-        if (! class_exists($modelClass)) {
-            if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $modelClass]);
-            }
+        if (
+            !class_exists($modelClass)
+            &&
+            $this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)
+        ) {
+            $this->call('make:model', ['name' => $modelClass]);
         }
 
         return array_merge($replace, [

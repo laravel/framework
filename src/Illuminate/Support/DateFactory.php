@@ -114,19 +114,29 @@ class DateFactory
     /**
      * Use the given handler when generating dates (class name, callable, or factory).
      *
-     * @param  mixed  $handler
-     * @return mixed
+     * @param  Factory|callable|string  $handler
+     * @return void
      *
      * @throws \InvalidArgumentException
      */
     public static function use($handler)
     {
         if (is_callable($handler) && is_object($handler)) {
-            return static::useCallable($handler);
-        } elseif (is_string($handler)) {
-            return static::useClass($handler);
-        } elseif ($handler instanceof Factory) {
-            return static::useFactory($handler);
+            static::useCallable($handler);
+
+            return;
+        }
+
+        if (is_string($handler)) {
+            static::useClass($handler);
+
+            return;
+        }
+
+        if ($handler instanceof Factory) {
+            static::useFactory($handler);
+
+            return;
         }
 
         throw new InvalidArgumentException('Invalid date creation handler. Please provide a class name, callable, or Carbon factory.');
@@ -212,12 +222,22 @@ class DateFactory
         $dateClass = static::$dateClass ?: $defaultClassName;
 
         // Check if date can be created using public class method...
-        if (method_exists($dateClass, $method) ||
-            method_exists($dateClass, 'hasMacro') && $dateClass::hasMacro($method)) {
+        if (
+            method_exists($dateClass, $method)
+            ||
+            (
+                method_exists($dateClass, 'hasMacro')
+                &&
+                $dateClass::hasMacro($method)
+            )
+        ) {
             return $dateClass::$method(...$parameters);
         }
 
         // If that fails, create the date with the default class..
+        /**
+         * @var \DateTimeInterface $date
+         */
         $date = $defaultClassName::$method(...$parameters);
 
         // If the configured class has an "instance" method, we'll try to pass our date into there...

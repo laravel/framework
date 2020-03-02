@@ -88,7 +88,7 @@ trait InteractsWithContainer
             $this->originalMix = app(Mix::class);
         }
 
-        $this->swap(Mix::class, function () {
+        $this->swap(Mix::class, static function () {
             return '';
         });
 

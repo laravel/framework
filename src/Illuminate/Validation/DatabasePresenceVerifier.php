@@ -39,7 +39,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
      * @param  string  $collection
      * @param  string  $column
      * @param  string  $value
-     * @param  int|null  $excludeId
+     * @param  int|string|null  $excludeId
      * @param  string|null  $idColumn
      * @param  array  $extra
      * @return int
@@ -82,7 +82,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
     {
         foreach ($conditions as $key => $value) {
             if ($value instanceof Closure) {
-                $query->where(function ($query) use ($value) {
+                $query->where(static function ($query) use ($value) {
                     $value($query);
                 });
             } else {

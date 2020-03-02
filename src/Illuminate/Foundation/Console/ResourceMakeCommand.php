@@ -62,7 +62,8 @@ class ResourceMakeCommand extends GeneratorCommand
      */
     protected function collection()
     {
-        return $this->option('collection') ||
+        return $this->option('collection')
+               ||
                Str::endsWith($this->argument('name'), 'Collection');
     }
 

@@ -36,7 +36,7 @@ class In
      */
     public function __toString()
     {
-        $values = array_map(function ($value) {
+        $values = array_map(static function ($value) {
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);
 

@@ -90,12 +90,13 @@ class JsonResponse extends BaseJsonResponse
             return true;
         }
 
-        return $this->hasEncodingOption(JSON_PARTIAL_OUTPUT_ON_ERROR) &&
-                    in_array($jsonError, [
-                        JSON_ERROR_RECURSION,
-                        JSON_ERROR_INF_OR_NAN,
-                        JSON_ERROR_UNSUPPORTED_TYPE,
-                    ]);
+        return $this->hasEncodingOption(JSON_PARTIAL_OUTPUT_ON_ERROR)
+               &&
+               in_array($jsonError, [
+                   JSON_ERROR_RECURSION,
+                   JSON_ERROR_INF_OR_NAN,
+                   JSON_ERROR_UNSUPPORTED_TYPE,
+               ]);
     }
 
     /**

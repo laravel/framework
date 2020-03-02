@@ -87,7 +87,13 @@ class RouteUrlGenerator
             $route
         ), $parameters);
 
-        if (preg_match('/\{.*?\}/', $uri)) {
+        if (
+            strpos($uri, '{') !== false
+            &&
+            strpos($uri, '}') !== false
+            &&
+            preg_match('/\{.*?\}/', $uri)
+        ) {
             throw UrlGenerationException::forMissingParameters($route);
         }
 
@@ -196,7 +202,7 @@ class RouteUrlGenerator
     {
         $path = $this->replaceNamedParameters($path, $parameters);
 
-        $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
+        $path = preg_replace_callback('/\{.*?\}/', static function ($match) use (&$parameters) {
             // Reset only the numeric keys...
             $parameters = array_merge($parameters);
 

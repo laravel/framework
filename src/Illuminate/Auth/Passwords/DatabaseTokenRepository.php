@@ -133,9 +133,11 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
             'email', $user->getEmailForPasswordReset()
         )->first();
 
-        return $record &&
-               ! $this->tokenExpired($record['created_at']) &&
-                 $this->hasher->check($token, $record['token']);
+        return $record
+               &&
+               ! $this->tokenExpired($record['created_at'])
+               &&
+               $this->hasher->check($token, $record['token']);
     }
 
     /**

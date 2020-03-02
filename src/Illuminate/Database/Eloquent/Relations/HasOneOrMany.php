@@ -166,7 +166,7 @@ abstract class HasOneOrMany extends Relation
     {
         $foreign = $this->getForeignKeyName();
 
-        return $results->mapToDictionary(function ($result) use ($foreign) {
+        return $results->mapToDictionary(static function ($result) use ($foreign) {
             return [$result->{$foreign} => $result];
         })->all();
     }
@@ -232,7 +232,9 @@ abstract class HasOneOrMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return tap($this->firstOrNew($attributes), static function ($instance) use ($values) {
+            /** @var Model $instance */
+
             $instance->fill($values);
 
             $instance->save();
@@ -276,6 +278,8 @@ abstract class HasOneOrMany extends Relation
     public function create(array $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
+            /** @var Model $instance */
+
             $this->setForeignAttributesForCreate($instance);
 
             $instance->save();

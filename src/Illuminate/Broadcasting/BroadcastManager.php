@@ -65,7 +65,8 @@ class BroadcastManager implements FactoryContract
 
         $attributes = $attributes ?: ['middleware' => ['web']];
 
-        $this->app['router']->group($attributes, function ($router) {
+        $this->app['router']->group($attributes, static function ($router) {
+            /** @var \Illuminate\Routing\Router $router */
             $router->match(
                 ['get', 'post'], '/broadcasting/auth',
                 '\\'.BroadcastController::class.'@authenticate'

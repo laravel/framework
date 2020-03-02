@@ -151,7 +151,7 @@ class TransportManager extends Manager
     {
         return tap(new PostmarkTransport(
             $this->config->get('services.postmark.token')
-        ), function ($transport) {
+        ), static function ($transport) {
             $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
         });
     }

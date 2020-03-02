@@ -86,7 +86,7 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNothingSent()
     {
-        $mailableNames = collect($this->mailables)->map(function ($mailable) {
+        $mailableNames = collect($this->mailables)->map(static function ($mailable) {
             return get_class($mailable);
         })->join(', ');
 
@@ -149,7 +149,7 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNothingQueued()
     {
-        $mailableNames = collect($this->queuedMailables)->map(function ($mailable) {
+        $mailableNames = collect($this->queuedMailables)->map(static function ($mailable) {
             return get_class($mailable);
         })->join(', ');
 
@@ -169,7 +169,7 @@ class MailFake implements Mailer, MailQueue
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
@@ -202,7 +202,7 @@ class MailFake implements Mailer, MailQueue
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
@@ -230,7 +230,7 @@ class MailFake implements Mailer, MailQueue
      */
     protected function mailablesOf($type)
     {
-        return collect($this->mailables)->filter(function ($mailable) use ($type) {
+        return collect($this->mailables)->filter(static function ($mailable) use ($type) {
             return $mailable instanceof $type;
         });
     }
@@ -243,7 +243,7 @@ class MailFake implements Mailer, MailQueue
      */
     protected function queuedMailablesOf($type)
     {
-        return collect($this->queuedMailables)->filter(function ($mailable) use ($type) {
+        return collect($this->queuedMailables)->filter(static function ($mailable) use ($type) {
             return $mailable instanceof $type;
         });
     }

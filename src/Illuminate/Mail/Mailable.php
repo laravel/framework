@@ -151,6 +151,7 @@ class Mailable implements MailableContract, Renderable
             Container::getInstance()->call([$this, 'build']);
 
             return $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
+                /** @var Message $message */
                 $this->buildFrom($message)
                      ->buildRecipients($message)
                      ->buildSubject($message)
@@ -387,6 +388,7 @@ class Mailable implements MailableContract, Renderable
     protected function buildDiskAttachments($message)
     {
         foreach ($this->diskAttachments as $attachment) {
+            /** @var \Illuminate\Contracts\Filesystem\Filesystem $storage */
             $storage = Container::getInstance()->make(
                 FilesystemFactory::class
             )->disk($attachment['disk']);
@@ -437,7 +439,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function priority($level = 3)
     {
-        $this->callbacks[] = function ($message) use ($level) {
+        $this->callbacks[] = static function ($message) use ($level) {
+            /** @var Message $message */
             $message->setPriority($level);
         };
 
@@ -640,7 +643,7 @@ class Mailable implements MailableContract, Renderable
             'address' => $expected->email,
         ];
 
-        return collect($this->{$property})->contains(function ($actual) use ($expected) {
+        return collect($this->{$property})->contains(static function ($actual) use ($expected) {
             if (! isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
             }
@@ -784,7 +787,7 @@ class Mailable implements MailableContract, Renderable
             'path' => $path,
             'name' => $name ?? basename($path),
             'options' => $options,
-        ])->unique(function ($file) {
+        ])->unique(static function ($file) {
             return $file['disk'].$file['path'];
         })->all();
 

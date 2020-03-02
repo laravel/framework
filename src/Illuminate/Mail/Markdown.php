@@ -118,7 +118,7 @@ class Markdown
      */
     public function htmlComponentPaths()
     {
-        return array_map(function ($path) {
+        return array_map(static function ($path) {
             return $path.'/html';
         }, $this->componentPaths());
     }
@@ -130,7 +130,7 @@ class Markdown
      */
     public function textComponentPaths()
     {
-        return array_map(function ($path) {
+        return array_map(static function ($path) {
             return $path.'/text';
         }, $this->componentPaths());
     }

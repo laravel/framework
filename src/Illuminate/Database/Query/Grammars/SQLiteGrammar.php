@@ -246,7 +246,7 @@ class SQLiteGrammar extends Grammar
 
         $values = collect($values)->reject(function ($value, $key) {
             return $this->isJsonSelector($key);
-        })->merge($groups)->map(function ($value) {
+        })->merge($groups)->map(static function ($value) {
             return is_array($value) ? json_encode($value) : $value;
         })->all();
 

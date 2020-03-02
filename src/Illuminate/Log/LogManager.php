@@ -119,7 +119,8 @@ class LogManager implements LoggerInterface
                 return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']));
             });
         } catch (Throwable $e) {
-            return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
+            return tap($this->createEmergencyLogger(), static function ($logger) use ($e) {
+                /** @var LoggerInterface $logger */
                 $logger->emergency('Unable to create configured logger. Using emergency logger.', [
                     'exception' => $e,
                 ]);
@@ -166,7 +167,7 @@ class LogManager implements LoggerInterface
         $config = $this->configurationFor('emergency');
 
         $handler = new StreamHandler(
-            $config['path'] ?? $this->app->storagePath().'/logs/laravel.log',
+            $config['path'] ?? ($this->app->storagePath().'/logs/laravel.log'),
             $this->level(['level' => 'debug'])
         );
 
@@ -413,7 +414,8 @@ class LogManager implements LoggerInterface
      */
     protected function formatter()
     {
-        return tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
+        return tap(new LineFormatter(null, $this->dateFormat, true, true), static function ($formatter) {
+            /** @var LineFormatter $formatter */
             $formatter->includeStacktraces();
         });
     }
@@ -477,8 +479,8 @@ class LogManager implements LoggerInterface
     /**
      * Unset the given channel instance.
      *
-     * @param  string|null  $name
-     * @return $this
+     * @param  string|null  $driver
+     * @return void
      */
     public function forgetChannel($driver = null)
     {

@@ -104,10 +104,15 @@ class ValidationRuleParser
             $rule = new ClosureValidationRule($rule);
         }
 
-        if (! is_object($rule) ||
-            $rule instanceof RuleContract ||
-            ($rule instanceof Exists && $rule->queryCallbacks()) ||
-            ($rule instanceof Unique && $rule->queryCallbacks())) {
+        if (
+            ! is_object($rule)
+            ||
+            $rule instanceof RuleContract
+            ||
+            ($rule instanceof Exists && $rule->queryCallbacks())
+            ||
+            ($rule instanceof Unique && $rule->queryCallbacks())
+        ) {
             return $rule;
         }
 
@@ -124,14 +129,18 @@ class ValidationRuleParser
      */
     protected function explodeWildcardRules($results, $attribute, $rules)
     {
-        $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute));
+        $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute, '/'));
 
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
         foreach ($data as $key => $value) {
-            if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
+            if (
+                Str::startsWith($key, $attribute)
+                ||
+                (bool) preg_match('/^'.$pattern.'\z/', $key)
+            ) {
                 foreach ((array) $rules as $rule) {
-                    $this->implicitAttributes[$attribute][] = strval($key);
+                    $this->implicitAttributes[$attribute][] = (string)$key;
 
                     $results = $this->mergeRules($results, $key, $rule);
                 }

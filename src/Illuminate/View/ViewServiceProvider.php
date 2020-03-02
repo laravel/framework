@@ -75,7 +75,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerViewFinder()
     {
-        $this->app->bind('view.finder', function ($app) {
+        $this->app->bind('view.finder', static function ($app) {
             return new FileViewFinder($app['files'], $app['config']['view.paths']);
         });
     }
@@ -123,7 +123,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerFileEngine($resolver)
     {
-        $resolver->register('file', function () {
+        $resolver->register('file', static function () {
             return new FileEngine;
         });
     }
@@ -136,7 +136,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerPhpEngine($resolver)
     {
-        $resolver->register('php', function () {
+        $resolver->register('php', static function () {
             return new PhpEngine;
         });
     }

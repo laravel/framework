@@ -98,7 +98,7 @@ class Env
     public static function get($key, $default = null)
     {
         return Option::fromValue(static::getVariables()->get($key))
-            ->map(function ($value) {
+            ->map(static function ($value) {
                 switch (strtolower($value)) {
                     case 'true':
                     case '(true)':
@@ -120,7 +120,7 @@ class Env
 
                 return $value;
             })
-            ->getOrCall(function () use ($default) {
+            ->getOrCall(static function () use ($default) {
                 return value($default);
             });
     }

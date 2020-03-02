@@ -28,8 +28,11 @@ trait ForwardsCalls
                 throw $e;
             }
 
-            if ($matches['class'] != get_class($object) ||
-                $matches['method'] != $method) {
+            if (
+                $matches['class'] != get_class($object)
+                ||
+                $matches['method'] != $method
+            ) {
                 throw $e;
             }
 

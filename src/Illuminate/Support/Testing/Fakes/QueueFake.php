@@ -121,12 +121,12 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function assertPushedWithChainOfObjects($job, $expectedChain, $callback)
     {
-        $chain = collect($expectedChain)->map(function ($job) {
+        $chain = collect($expectedChain)->map(static function ($job) {
             return serialize($job);
         })->all();
 
         PHPUnit::assertTrue(
-            $this->pushed($job, $callback)->filter(function ($job) use ($chain) {
+            $this->pushed($job, $callback)->filter(static function ($job) use ($chain) {
                 return $job->chained == $chain;
             })->isNotEmpty(),
             'The expected chain was not pushed.'
@@ -143,11 +143,11 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function assertPushedWithChainOfClasses($job, $expectedChain, $callback)
     {
-        $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
-            return collect($chain)->map(function ($job) {
+        $matching = $this->pushed($job, $callback)->map->chained->map(static function ($chain) {
+            return collect($chain)->map(static function ($job) {
                 return get_class(unserialize($job));
             });
-        })->filter(function ($chain) use ($expectedChain) {
+        })->filter(static function ($chain) use ($expectedChain) {
             return $chain->all() === $expectedChain;
         });
 
@@ -164,7 +164,7 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function isChainOfObjects($chain)
     {
-        return ! collect($chain)->contains(function ($job) {
+        return ! collect($chain)->contains(static function ($job) {
             return ! is_object($job);
         });
     }
@@ -207,7 +207,7 @@ class QueueFake extends QueueManager implements Queue
             return collect();
         }
 
-        $callback = $callback ?: function () {
+        $callback = $callback ?: static function () {
             return true;
         };
 
@@ -246,7 +246,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function size($queue = null)
     {
-        return collect($this->jobs)->flatten(1)->filter(function ($job) use ($queue) {
+        return collect($this->jobs)->flatten(1)->filter(static function ($job) use ($queue) {
             return $job['queue'] === $queue;
         })->count();
     }
@@ -325,7 +325,7 @@ class QueueFake extends QueueManager implements Queue
      * Pop the next job off of the queue.
      *
      * @param  string|null  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return void
      */
     public function pop($queue = null)
     {

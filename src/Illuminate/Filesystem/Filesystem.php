@@ -255,7 +255,7 @@ class Filesystem
      *
      * @param  string  $target
      * @param  string  $link
-     * @return void
+     * @return void|bool
      */
     public function link($target, $link)
     {
@@ -453,6 +453,7 @@ class Filesystem
         $directories = [];
 
         foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
+            /** @var \SplFileInfo $dir */
             $directories[] = $dir->getPathname();
         }
 
@@ -551,10 +552,8 @@ class Filesystem
             // If the current items is just a regular file, we will just copy this to the new
             // location and keep looping. If for some reason the copy fails we'll bail out
             // and return false, so the developer is aware that the copy process failed.
-            else {
-                if (! $this->copy($item->getPathname(), $target)) {
-                    return false;
-                }
+            else if (! $this->copy($item->getPathname(), $target)) {
+                return false;
             }
         }
 

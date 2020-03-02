@@ -101,6 +101,7 @@ class Kernel implements KernelContract
     {
         $this->app->singleton(Schedule::class, function ($app) {
             return tap(new Schedule($this->scheduleTimezone()), function ($schedule) {
+                /** @var Schedule $schedule */
                 $this->schedule($schedule->useCache($this->scheduleCache()));
             });
         });
@@ -202,7 +203,8 @@ class Kernel implements KernelContract
     {
         $command = new ClosureCommand($signature, $callback);
 
-        Artisan::starting(function ($artisan) use ($command) {
+        Artisan::starting(static function ($artisan) use ($command) {
+            /** @var \Illuminate\Contracts\Console\Application $artisan */
             $artisan->add($command);
         });
 
@@ -219,7 +221,7 @@ class Kernel implements KernelContract
     {
         $paths = array_unique(Arr::wrap($paths));
 
-        $paths = array_filter($paths, function ($path) {
+        $paths = array_filter($paths, static function ($path) {
             return is_dir($path);
         });
 
@@ -230,15 +232,21 @@ class Kernel implements KernelContract
         $namespace = $this->app->getNamespace();
 
         foreach ((new Finder)->in($paths)->files() as $command) {
+            /** @var \SplFileInfo $command */
+
             $command = $namespace.str_replace(
                 ['/', '.php'],
                 ['\\', ''],
                 Str::after($command->getPathname(), realpath(app_path()).DIRECTORY_SEPARATOR)
             );
 
-            if (is_subclass_of($command, Command::class) &&
-                ! (new ReflectionClass($command))->isAbstract()) {
-                Artisan::starting(function ($artisan) use ($command) {
+            if (
+                is_subclass_of($command, Command::class)
+                &&
+                ! (new ReflectionClass($command))->isAbstract()
+            ) {
+                Artisan::starting(static function ($artisan) use ($command) {
+                    /** @var \Illuminate\Contracts\Console\Application $artisan */
                     $artisan->resolve($command);
                 });
             }

@@ -59,7 +59,7 @@ class RouteAction
      */
     protected static function missingAction($uri)
     {
-        return ['uses' => function () use ($uri) {
+        return ['uses' => static function () use ($uri) {
             throw new LogicException("Route for [{$uri}] has no action.");
         }];
     }
@@ -72,7 +72,7 @@ class RouteAction
      */
     protected static function findCallable(array $action)
     {
-        return Arr::first($action, function ($value, $key) {
+        return Arr::first($action, static function ($value, $key) {
             return is_callable($value) && is_numeric($key);
         });
     }

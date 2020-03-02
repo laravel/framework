@@ -450,8 +450,17 @@ class Gate implements GateContract
      */
     protected function parameterAllowsGuests($parameter)
     {
-        return ($parameter->getClass() && $parameter->allowsNull()) ||
-               ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
+        return (
+                   $parameter->getClass()
+                   &&
+                   $parameter->allowsNull()
+               )
+               ||
+               (
+                   $parameter->isDefaultValueAvailable()
+                   &&
+                   is_null($parameter->getDefaultValue())
+               );
     }
 
     /**
@@ -524,9 +533,13 @@ class Gate implements GateContract
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
-        if (isset($arguments[0]) &&
-            ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
-            $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
+        if (
+            isset($arguments[0])
+            &&
+            ! is_null($policy = $this->getPolicyFor($arguments[0]))
+            &&
+            $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)
+        ) {
             return $callback;
         }
 
@@ -538,12 +551,15 @@ class Gate implements GateContract
             }
         }
 
-        if (isset($this->abilities[$ability]) &&
-            $this->canBeCalledWithUser($user, $this->abilities[$ability])) {
+        if (
+            isset($this->abilities[$ability])
+            &&
+            $this->canBeCalledWithUser($user, $this->abilities[$ability])
+        ) {
             return $this->abilities[$ability];
         }
 
-        return function () {
+        return static function () {
             //
         };
     }
@@ -726,7 +742,7 @@ class Gate implements GateContract
      */
     public function forUser($user)
     {
-        $callback = function () use ($user) {
+        $callback = static function () use ($user) {
             return $user;
         };
 

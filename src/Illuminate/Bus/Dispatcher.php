@@ -86,7 +86,7 @@ class Dispatcher implements QueueingDispatcher
     public function dispatchNow($command, $handler = null)
     {
         if ($handler || $handler = $this->getCommandHandler($command)) {
-            $callback = function ($command) use ($handler) {
+            $callback = static function ($command) use ($handler) {
                 return $handler->handle($command);
             };
         } else {

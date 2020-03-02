@@ -26,7 +26,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
      */
     protected function registerValidationFactory()
     {
-        $this->app->singleton('validator', function ($app) {
+        $this->app->singleton('validator', static function ($app) {
             $validator = new Factory($app['translator'], $app);
 
             // The validation presence verifier is responsible for determining the existence of
@@ -47,7 +47,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
      */
     protected function registerPresenceVerifier()
     {
-        $this->app->singleton('validation.presence', function ($app) {
+        $this->app->singleton('validation.presence', static function ($app) {
             return new DatabasePresenceVerifier($app['db']);
         });
     }

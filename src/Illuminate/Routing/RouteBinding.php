@@ -33,7 +33,7 @@ class RouteBinding
      */
     protected static function createClassBinding($container, $binding)
     {
-        return function ($value, $route) use ($container, $binding) {
+        return static function ($value, $route) use ($container, $binding) {
             // If the binding has an @ sign, we will assume it's being used to delimit
             // the class name from the bind method name. This allows for bindings
             // to run multiple bind methods in a single class for convenience.

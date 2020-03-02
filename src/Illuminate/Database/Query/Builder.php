@@ -714,7 +714,7 @@ class Builder
      */
     protected function addArrayOfWheres($column, $boolean, $method = 'where')
     {
-        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
+        return $this->whereNested(static function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
                     $query->{$method}(...array_values($value));
@@ -757,8 +757,11 @@ class Builder
      */
     protected function invalidOperatorAndValue($operator, $value)
     {
-        return is_null($value) && in_array($operator, $this->operators) &&
-             ! in_array($operator, ['=', '<>', '!=']);
+        return is_null($value)
+               &&
+               in_array($operator, $this->operators)
+               &&
+               ! in_array($operator, ['=', '<>', '!=']);
     }
 
     /**
@@ -769,7 +772,8 @@ class Builder
      */
     protected function invalidOperator($operator)
     {
-        return ! in_array(strtolower($operator), $this->operators, true) &&
+        return ! in_array(strtolower($operator), $this->operators, true)
+               &&
                ! in_array(strtolower($operator), $this->grammar->getOperators(), true);
     }
 
@@ -1329,7 +1333,7 @@ class Builder
      */
     public function whereNested(Closure $callback, $boolean = 'and')
     {
-        call_user_func($callback, $query = $this->forNestedWhere());
+        $callback($query = $this->forNestedWhere());
 
         return $this->addNestedWhereQuery($query, $boolean);
     }
@@ -1380,7 +1384,7 @@ class Builder
         // Once we have the query instance we can simply execute it so it can add all
         // of the sub-select's conditions to itself, and then we can cache it off
         // in the array of where clauses for the "main" parent query instance.
-        call_user_func($callback, $query = $this->forSubQuery());
+        $callback($query = $this->forSubQuery());
 
         $this->wheres[] = compact(
             'type', 'column', 'operator', 'query', 'boolean'
@@ -1406,7 +1410,7 @@ class Builder
         // Similar to the sub-select clause, we will create a new query instance so
         // the developer may cleanly specify the entire exists query and we will
         // compile the whole thing in the grammar and insert it into the SQL.
-        call_user_func($callback, $query);
+        $callback($query);
 
         return $this->addWhereExistsQuery($query, $boolean, $not);
     }
@@ -2016,9 +2020,10 @@ class Builder
     protected function removeExistingOrdersFor($column)
     {
         return Collection::make($this->orders)
-                    ->reject(function ($order) use ($column) {
+                    ->reject(static function ($order) use ($column) {
                         return isset($order['column'])
-                               ? $order['column'] === $column : false;
+                               ? $order['column'] === $column
+                               : false;
                     })->values()->all();
     }
 
@@ -2032,7 +2037,7 @@ class Builder
     public function union($query, $all = false)
     {
         if ($query instanceof Closure) {
-            call_user_func($query, $query = $this->newQuery());
+            $query($query = $this->newQuery());
         }
 
         $this->unions[] = compact('query', 'all');
@@ -2244,9 +2249,10 @@ class Builder
      */
     protected function withoutSelectAliases(array $columns)
     {
-        return array_map(function ($column) {
+        return array_map(static function ($column) {
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
-                    ? substr($column, 0, $aliasPosition) : $column;
+                    ? substr($column, 0, $aliasPosition)
+                    : $column;
         }, $columns);
     }
 
@@ -2331,7 +2337,7 @@ class Builder
             return $column;
         }
 
-        $seperator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+        $seperator = stripos($column, ' as ') !== false ? ' as ' : '\.';
 
         return last(preg_split('~'.$seperator.'~i', $column));
     }
@@ -2943,7 +2949,7 @@ class Builder
      */
     protected function cleanBindings(array $bindings)
     {
-        return array_values(array_filter($bindings, function ($binding) {
+        return array_values(array_filter($bindings, static function ($binding) {
             return ! $binding instanceof Expression;
         }));
     }
@@ -3021,7 +3027,7 @@ class Builder
      */
     public function cloneWithout(array $properties)
     {
-        return tap(clone $this, function ($clone) use ($properties) {
+        return tap(clone $this, static function ($clone) use ($properties) {
             foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
@@ -3036,7 +3042,7 @@ class Builder
      */
     public function cloneWithoutBindings(array $except)
     {
-        return tap(clone $this, function ($clone) use ($except) {
+        return tap(clone $this, static function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }

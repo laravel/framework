@@ -113,8 +113,9 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      */
     protected function expired($session)
     {
-        return isset($session->last_activity) &&
-            $session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp();
+        return isset($session->last_activity)
+               &&
+               $session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp();
     }
 
     /**

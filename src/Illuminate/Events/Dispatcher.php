@@ -104,8 +104,10 @@ class Dispatcher implements DispatcherContract
      */
     public function hasListeners($eventName)
     {
-        return isset($this->listeners[$eventName]) ||
-               isset($this->wildcards[$eventName]) ||
+        return isset($this->listeners[$eventName])
+               ||
+               isset($this->wildcards[$eventName])
+               ||
                $this->hasWildcardListeners($eventName);
     }
 
@@ -261,8 +263,10 @@ class Dispatcher implements DispatcherContract
      */
     protected function shouldBroadcast(array $payload)
     {
-        return isset($payload[0]) &&
-               $payload[0] instanceof ShouldBroadcast &&
+        return isset($payload[0])
+               &&
+               $payload[0] instanceof ShouldBroadcast
+               &&
                $this->broadcastWhen($payload[0]);
     }
 
@@ -321,8 +325,12 @@ class Dispatcher implements DispatcherContract
 
         foreach ($this->wildcards as $key => $listeners) {
             if (Str::is($key, $eventName)) {
-                $wildcards = array_merge($wildcards, $listeners);
+                $wildcards[] = $listeners;
             }
+        }
+
+        if ($wildcards !== []) {
+            $wildcards = array_merge([], ...$wildcards);
         }
 
         return $this->wildcardsCache[$eventName] = $wildcards;
@@ -361,7 +369,7 @@ class Dispatcher implements DispatcherContract
             return $this->createClassListener($listener, $wildcard);
         }
 
-        return function ($event, $payload) use ($listener, $wildcard) {
+        return static function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
             }
@@ -445,7 +453,7 @@ class Dispatcher implements DispatcherContract
     protected function createQueuedHandlerCallable($class, $method)
     {
         return function () use ($class, $method) {
-            $arguments = array_map(function ($a) {
+            $arguments = array_map(static function ($a) {
                 return is_object($a) ? clone $a : $a;
             }, func_get_args());
 
@@ -485,6 +493,8 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
+        \var_dump($listener);
+
         $connection = $this->resolveQueue()->connection(
             $listener->connection ?? null
         );
@@ -522,7 +532,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function propagateListenerOptions($listener, $job)
     {
-        return tap($job, function ($job) use ($listener) {
+        return tap($job, static function ($job) use ($listener) {
             $job->tries = $listener->tries ?? null;
             $job->retryAfter = $listener->retryAfter ?? null;
             $job->timeout = $listener->timeout ?? null;

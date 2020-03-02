@@ -52,7 +52,7 @@ abstract class Facade
         if (! static::isMock()) {
             $class = static::getMockableClass();
 
-            return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+            return tap($class ? Mockery::spy($class) : Mockery::spy(), static function ($spy) {
                 static::swap($spy);
             });
         }
@@ -97,7 +97,7 @@ abstract class Facade
      */
     protected static function createFreshMockInstance()
     {
-        return tap(static::createMock(), function ($mock) {
+        return tap(static::createMock(), static function ($mock) {
             static::swap($mock);
 
             $mock->shouldAllowMockingProtectedMethods();
@@ -125,7 +125,8 @@ abstract class Facade
     {
         $name = static::getFacadeAccessor();
 
-        return isset(static::$resolvedInstance[$name]) &&
+        return isset(static::$resolvedInstance[$name])
+               &&
                static::$resolvedInstance[$name] instanceof MockInterface;
     }
 

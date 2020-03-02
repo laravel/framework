@@ -185,7 +185,7 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
          * @param  mixed  $other
          * @param  string  $description
          * @param  bool  $returnResult
-         * @return bool|null
+         * @return bool|null|void
          *
          * @throws \PHPUnit\Framework\ExpectationFailedException
          * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException

@@ -86,6 +86,8 @@ trait QueriesRelationships
         }
 
         $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback) {
+            /** @var Builder $q */
+
             // In order to nest "has", we need to add count relation constraints on the
             // callback Closure. We'll do this by simply passing the Closure its own
             // reference to itself so it calls itself recursively on each segment.
@@ -212,8 +214,12 @@ trait QueriesRelationships
         }
 
         return $this->where(function ($query) use ($relation, $callback, $operator, $count, $types) {
+            /** @var Builder $query */
+
             foreach ($types as $type) {
                 $query->orWhere(function ($query) use ($relation, $callback, $operator, $count, $type) {
+                    /** @var Builder $query */
+
                     $belongsTo = $this->getBelongsToRelation($relation, $type);
 
                     if ($callback) {

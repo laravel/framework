@@ -93,7 +93,7 @@ abstract class Broadcaster implements BroadcasterContract
     {
         $callbackParameters = $this->extractParameters($callback);
 
-        return collect($this->extractChannelKeys($pattern, $channel))->reject(function ($value, $key) {
+        return collect($this->extractChannelKeys($pattern, $channel))->reject(static function ($value, $key) {
             return is_numeric($key);
         })->map(function ($value, $key) use ($callbackParameters) {
             return $this->resolveBinding($key, $value, $callbackParameters);
@@ -147,6 +147,14 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function extractChannelKeys($pattern, $channel)
     {
+        if (
+            strpos($pattern, '{') === false
+            &&
+            strpos($pattern, '}') === false
+        ) {
+            return [];
+        }
+
         preg_match('/^'.preg_replace('/\{(.*?)\}/', '(?<$1>[^\.]+)', $pattern).'/', $channel, $keys);
 
         return $keys;
@@ -204,9 +212,13 @@ abstract class Broadcaster implements BroadcasterContract
                 continue;
             }
 
+            /**
+             * @var \Illuminate\Database\Eloquent\Model $instance
+             */
             $instance = $parameter->getClass()->newInstance();
 
-            if (! $model = $instance->resolveRouteBinding($value)) {
+            $model = $instance->resolveRouteBinding($value);
+            if (! $model) {
                 throw new AccessDeniedHttpException;
             }
 
@@ -225,8 +237,11 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function isImplicitlyBindable($key, $parameter)
     {
-        return $parameter->name === $key && $parameter->getClass() &&
-                        $parameter->getClass()->isSubclassOf(UrlRoutable::class);
+        return $parameter->name === $key
+               &&
+               $parameter->getClass()
+               &&
+               $parameter->getClass()->isSubclassOf(UrlRoutable::class);
     }
 
     /**
@@ -237,7 +252,7 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function formatChannels(array $channels)
     {
-        return array_map(function ($channel) {
+        return array_map(static function ($channel) {
             return (string) $channel;
         }, $channels);
     }
@@ -265,7 +280,7 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function normalizeChannelHandlerToCallable($callback)
     {
-        return is_callable($callback) ? $callback : function (...$args) use ($callback) {
+        return is_callable($callback) ? $callback : static function (...$args) use ($callback) {
             return Container::getInstance()
                 ->make($callback)
                 ->join(...$args);
@@ -290,7 +305,8 @@ abstract class Broadcaster implements BroadcasterContract
         }
 
         foreach (Arr::wrap($guards) as $guard) {
-            if ($user = $request->user($guard)) {
+            $user = $request->user($guard);
+            if ($user) {
                 return $user;
             }
         }
@@ -324,6 +340,14 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function channelNameMatchesPattern($channel, $pattern)
     {
-        return Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel);
+        if (
+            strpos($pattern, '{') !== false
+            &&
+            strpos($pattern, '}') !== false
+        ) {
+            $pattern = preg_replace('/\{(.*?)\}/', '*', $pattern);
+        }
+
+        return Str::is($pattern, $channel);
     }
 }

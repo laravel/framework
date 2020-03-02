@@ -648,7 +648,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function runRoute(Request $request, Route $route)
     {
-        $request->setRouteResolver(function () use ($route) {
+        $request->setRouteResolver(static function () use ($route) {
             return $route;
         });
 
@@ -668,7 +668,8 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function runRouteWithinStack(Route $route, Request $request)
     {
-        $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
+        $shouldSkipMiddleware = $this->container->bound('middleware.disable')
+                                &&
                                 $this->container->make('middleware.disable') === true;
 
         $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
@@ -1076,7 +1077,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function currentRouteName()
     {
-        return $this->current() ? $this->current()->getName() : null;
+        $current = $this->current();
+
+        return $current ? $current->getName() : null;
     }
 
     /**

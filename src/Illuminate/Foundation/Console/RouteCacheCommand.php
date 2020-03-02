@@ -76,7 +76,7 @@ class RouteCacheCommand extends Command
      */
     protected function getFreshApplicationRoutes()
     {
-        return tap($this->getFreshApplication()['router']->getRoutes(), function ($routes) {
+        return tap($this->getFreshApplication()['router']->getRoutes(), static function ($routes) {
             $routes->refreshNameLookups();
             $routes->refreshActionLookups();
         });
@@ -89,7 +89,9 @@ class RouteCacheCommand extends Command
      */
     protected function getFreshApplication()
     {
-        return tap(require $this->laravel->bootstrapPath().'/app.php', function ($app) {
+        return tap(require $this->laravel->bootstrapPath().'/app.php', static function ($app) {
+            /** @var \Illuminate\Contracts\Foundation\Application $app */
+
             $app->make(ConsoleKernelContract::class)->bootstrap();
         });
     }

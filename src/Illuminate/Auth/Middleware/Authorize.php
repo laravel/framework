@@ -68,16 +68,19 @@ class Authorize
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $model
-     * @return \Illuminate\Database\Eloquent\Model|string
+     * @return \Illuminate\Database\Eloquent\Model|string|null
      */
     protected function getModel($request, $model)
     {
         if ($this->isClassName($model)) {
             return trim($model);
-        } else {
-            return $request->route($model, null) ?:
-                ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches)) ? $matches[1] : null);
         }
+
+        if ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches))) {
+            return $request->route($model, null) ?: $matches[1];
+        }
+
+        return $request->route($model, null) ?: null;
     }
 
     /**

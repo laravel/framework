@@ -310,7 +310,7 @@ class Builder
     {
         $instance = $this->newModelInstance();
 
-        return $instance->newCollection(array_map(function ($item) use ($instance) {
+        return $instance->newCollection(array_map(static function ($item) use ($instance) {
             return $instance->newFromBuilder($item);
         }, $items));
     }
@@ -434,7 +434,8 @@ class Builder
             return $instance;
         }
 
-        return tap($this->newModelInstance($attributes + $values), function ($instance) {
+        return tap($this->newModelInstance($attributes + $values), static function ($instance) {
+            /** @var Model $instance */
             $instance->save();
         });
     }
@@ -448,7 +449,8 @@ class Builder
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+        return tap($this->firstOrNew($attributes), static function ($instance) use ($values) {
+            /** @var Model $instance */
             $instance->fill($values)->save();
         });
     }
@@ -541,8 +543,8 @@ class Builder
     /**
      * Eager load the relationships for the models.
      *
-     * @param  array  $models
-     * @return array
+     * @param  Model[]  $models
+     * @return Model[]
      */
     public function eagerLoadRelations(array $models)
     {
@@ -561,7 +563,7 @@ class Builder
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param  array  $models
+     * @param  Model[]  $models
      * @param  string  $name
      * @param  \Closure  $constraints
      * @return array
@@ -689,9 +691,13 @@ class Builder
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
-        if (! $this->model->hasGetMutator($column) &&
-            ! $this->model->hasCast($column) &&
-            ! in_array($column, $this->model->getDates())) {
+        if (
+            ! $this->model->hasGetMutator($column)
+            &&
+            ! $this->model->hasCast($column)
+            &&
+            ! in_array($column, $this->model->getDates())
+        ) {
             return $results;
         }
 
@@ -761,7 +767,8 @@ class Builder
      */
     public function create(array $attributes = [])
     {
-        return tap($this->newModelInstance($attributes), function ($instance) {
+        return tap($this->newModelInstance($attributes), static function ($instance) {
+            /** @var Model $instance */
             $instance->save();
         });
     }
@@ -774,7 +781,7 @@ class Builder
      */
     public function forceCreate(array $attributes)
     {
-        return $this->model->unguarded(function () use ($attributes) {
+        return $this->model::unguarded(function () use ($attributes) {
             return $this->newModelInstance()->create($attributes);
         });
     }
@@ -828,8 +835,11 @@ class Builder
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if (! $this->model->usesTimestamps() ||
-            is_null($this->model->getUpdatedAtColumn())) {
+        if (
+            ! $this->model->usesTimestamps()
+            ||
+            is_null($this->model->getUpdatedAtColumn())
+        ) {
             return $values;
         }
 
@@ -1135,6 +1145,7 @@ class Builder
     protected function createSelectWithConstraint($name)
     {
         return [explode(':', $name)[0], static function ($query) use ($name) {
+            /** @var QueryBuilder $query */
             $query->select(explode(',', explode(':', $name)[1]));
         }];
     }

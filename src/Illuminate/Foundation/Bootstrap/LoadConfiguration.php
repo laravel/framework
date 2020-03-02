@@ -42,7 +42,7 @@ class LoadConfiguration
         // Finally, we will set the application's environment based on the configuration
         // values that were loaded. We will pass a callback which will be used to get
         // the environment in a web context where an "--env" switch is not present.
-        $app->detectEnvironment(function () use ($config) {
+        $app->detectEnvironment(static function () use ($config) {
             return $config->get('app.env', 'production');
         });
 
@@ -86,9 +86,11 @@ class LoadConfiguration
         $configPath = realpath($app->configPath());
 
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
+            /** @var SplFileInfo $file */
             $directory = $this->getNestedDirectory($file, $configPath);
+            $path = $file->getRealPath();
 
-            $files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+            $files[$directory.basename($path, '.php')] = $path;
         }
 
         ksort($files, SORT_NATURAL);
@@ -107,7 +109,8 @@ class LoadConfiguration
     {
         $directory = $file->getPath();
 
-        if ($nested = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
+        $nested = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR);
+        if ($nested) {
             $nested = str_replace(DIRECTORY_SEPARATOR, '.', $nested).'.';
         }
 

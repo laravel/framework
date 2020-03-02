@@ -50,8 +50,11 @@ trait RouteDependencyResolverTrait
                 $instanceCount++;
 
                 $this->spliceIntoParameters($parameters, $key, $instance);
-            } elseif (! isset($values[$key - $instanceCount]) &&
-                      $parameter->isDefaultValueAvailable()) {
+            } elseif (
+                ! isset($values[$key - $instanceCount])
+                &&
+                $parameter->isDefaultValueAvailable()
+            ) {
                 $this->spliceIntoParameters($parameters, $key, $parameter->getDefaultValue());
             }
         }
@@ -89,7 +92,7 @@ trait RouteDependencyResolverTrait
      */
     protected function alreadyInParameters($class, array $parameters)
     {
-        return ! is_null(Arr::first($parameters, function ($value) use ($class) {
+        return ! is_null(Arr::first($parameters, static function ($value) use ($class) {
             return $value instanceof $class;
         }));
     }

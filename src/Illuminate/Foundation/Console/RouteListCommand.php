@@ -127,7 +127,7 @@ class RouteListCommand extends Command
      */
     protected function sortRoutes($sort, array $routes)
     {
-        return Arr::sort($routes, function ($route) use ($sort) {
+        return Arr::sort($routes, static function ($route) use ($sort) {
             return $route[$sort];
         });
     }
@@ -170,7 +170,7 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        return collect($route->gatherMiddleware())->map(function ($middleware) {
+        return collect($route->gatherMiddleware())->map(static function ($middleware) {
             return $middleware instanceof Closure ? 'Closure' : $middleware;
         })->implode(',');
     }
@@ -183,9 +183,25 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
-             $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
+        if (
+            (
+                $this->option('name')
+                &&
+                ! Str::contains($route['name'], $this->option('name'))
+            )
+            ||
+            (
+                $this->option('path')
+                &&
+                ! Str::contains($route['uri'], $this->option('path'))
+            )
+            ||
+            (
+                $this->option('method')
+                &&
+                ! Str::contains($route['method'], strtoupper($this->option('method')))
+            )
+        ) {
             return;
         }
 

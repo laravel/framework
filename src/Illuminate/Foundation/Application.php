@@ -583,7 +583,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function registerConfiguredProviders()
     {
         $providers = Collection::make($this->config['app.providers'])
-                        ->partition(function ($provider) {
+                        ->partition(static function ($provider) {
                             return strpos($provider, 'Illuminate\\') === 0;
                         });
 
@@ -663,7 +663,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::where($this->serviceProviders, function ($value) use ($name) {
+        return Arr::where($this->serviceProviders, static function ($value) use ($name) {
             return $value instanceof $name;
         });
     }
@@ -828,7 +828,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Boot the given service provider.
      *
      * @param  \Illuminate\Support\ServiceProvider  $provider
-     * @return mixed
+     * @return mixed|void
      */
     protected function bootProvider(ServiceProvider $provider)
     {
@@ -891,7 +891,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function shouldSkipMiddleware()
     {
-        return $this->bound('middleware.disable') &&
+        return $this->bound('middleware.disable')
+               &&
                $this->make('middleware.disable') === true;
     }
 

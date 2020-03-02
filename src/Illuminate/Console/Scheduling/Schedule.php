@@ -106,7 +106,7 @@ class Schedule
      */
     public function job($job, $queue = null, $connection = null)
     {
-        return $this->call(function () use ($job, $queue, $connection) {
+        return $this->call(static function () use ($job, $queue, $connection) {
             $job = is_string($job) ? resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
@@ -145,12 +145,12 @@ class Schedule
      */
     protected function compileParameters(array $parameters)
     {
-        return collect($parameters)->map(function ($value, $key) {
+        return collect($parameters)->map(static function ($value, $key) {
             if (is_array($value)) {
-                $value = collect($value)->map(function ($value) {
+                $value = collect($value)->map(static function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');
-            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
+            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/', $value)) {
                 $value = ProcessUtils::escapeArgument($value);
             }
 

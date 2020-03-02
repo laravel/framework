@@ -144,7 +144,8 @@ class MorphPivot extends Pivot
         foreach ($ids as $id) {
             $segments = explode(':', $id);
 
-            $query->orWhere(function ($query) use ($segments) {
+            $query->orWhere(static function ($query) use ($segments) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
                 return $query->where($segments[0], $segments[1])
                              ->where($segments[2], $segments[3])
                              ->where($segments[4], $segments[5]);

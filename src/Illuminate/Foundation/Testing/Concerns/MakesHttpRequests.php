@@ -9,6 +9,9 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
+/**
+ * @property \Illuminate\Foundation\Application $app
+ */
 trait MakesHttpRequests
 {
     /**
@@ -121,6 +124,12 @@ trait MakesHttpRequests
 
         foreach ((array) $middleware as $abstract) {
             $this->app->instance($abstract, new class {
+                /**
+                 * @param Request $request
+                 * @param \Closure $next
+                 *
+                 * @return mixed
+                 */
                 public function handle($request, $next)
                 {
                     return $next($request);
@@ -505,7 +514,7 @@ trait MakesHttpRequests
     protected function transformHeadersToServerVars(array $headers)
     {
         return collect(array_merge($this->defaultHeaders, $headers))->mapWithKeys(function ($value, $name) {
-            $name = strtr(strtoupper($name), '-', '_');
+            $name = str_replace('-', '_', strtoupper($name));
 
             return [$this->formatServerHeaderKey($name) => $value];
         })->all();
@@ -564,7 +573,7 @@ trait MakesHttpRequests
             return array_merge($this->defaultCookies, $this->unencryptedCookies);
         }
 
-        return collect($this->defaultCookies)->map(function ($value) {
+        return collect($this->defaultCookies)->map(static function ($value) {
             return encrypt($value, false);
         })->merge($this->unencryptedCookies)->all();
     }

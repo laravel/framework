@@ -73,8 +73,11 @@ trait SerializesAndRestoresModelIdentifiers
             (new $value->class)->setConnection($value->connection), $value->id
         )->useWritePdo()->get();
 
-        if (is_a($value->class, Pivot::class, true) ||
-            in_array(AsPivot::class, class_uses($value->class))) {
+        if (
+            is_a($value->class, Pivot::class, true)
+            ||
+            in_array(AsPivot::class, class_uses($value->class))
+        ) {
             return $collection;
         }
 
@@ -83,7 +86,7 @@ trait SerializesAndRestoresModelIdentifiers
         $collectionClass = get_class($collection);
 
         return new $collectionClass(
-            collect($value->id)->map(function ($id) use ($collection) {
+            collect($value->id)->map(static function ($id) use ($collection) {
                 return $collection[$id] ?? null;
             })->filter()
         );

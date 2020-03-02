@@ -48,10 +48,14 @@ class MailChannel
      */
     public function send($notifiable, Notification $notification)
     {
+        /** @var \Illuminate\Notifications\Messages\MailMessage $message */
         $message = $notification->toMail($notifiable);
 
-        if (! $notifiable->routeNotificationFor('mail', $notification) &&
-            ! $message instanceof Mailable) {
+        if (
+            ! $notifiable->routeNotificationFor('mail', $notification)
+            &&
+            ! $message instanceof Mailable
+        ) {
             return;
         }
 
@@ -207,7 +211,7 @@ class MailChannel
             $recipients = [$recipients];
         }
 
-        return collect($recipients)->mapWithKeys(function ($recipient, $email) {
+        return collect($recipients)->mapWithKeys(static function ($recipient, $email) {
             return is_numeric($email)
                     ? [$email => (is_string($recipient) ? $recipient : $recipient->email)]
                     : [$email => $recipient];

@@ -63,7 +63,7 @@ class AnonymousNotifiable
     /**
      * Get the value of the notifiable's primary key.
      *
-     * @return mixed
+     * @return void
      */
     public function getKey()
     {

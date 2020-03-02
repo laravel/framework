@@ -119,7 +119,7 @@ class MailgunTransport extends Transport
      */
     protected function getTo(Swift_Mime_SimpleMessage $message)
     {
-        return collect($this->allContacts($message))->map(function ($display, $address) {
+        return collect($this->allContacts($message))->map(static function ($display, $address) {
             return $display ? $display." <{$address}>" : $address;
         })->values()->implode(',');
     }

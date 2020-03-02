@@ -158,7 +158,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return collect(token_get_all($contents))
             ->pluck(0)
-            ->filter(function ($token) {
+            ->filter(static function ($token) {
                 return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
             });
     }
@@ -446,25 +446,25 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $this->conditions[$name] = $callback;
 
-        $this->directive($name, function ($expression) use ($name) {
+        $this->directive($name, static function ($expression) use ($name) {
             return $expression !== ''
                     ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                     : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('unless'.$name, function ($expression) use ($name) {
+        $this->directive('unless'.$name, static function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                 : "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('else'.$name, function ($expression) use ($name) {
+        $this->directive('else'.$name, static function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                 : "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('end'.$name, function () {
+        $this->directive('end'.$name, static function () {
             return '<?php endif; ?>';
         });
     }
@@ -492,13 +492,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $alias = $alias ?: Arr::last(explode('.', $path));
 
-        $this->directive($alias, function ($expression) use ($path) {
+        $this->directive($alias, static function ($expression) use ($path) {
             return $expression
                         ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
                         : "<?php \$__env->startComponent('{$path}'); ?>";
         });
 
-        $this->directive('end'.$alias, function ($expression) {
+        $this->directive('end'.$alias, static function ($expression) {
             return '<?php echo $__env->renderComponent(); ?>';
         });
     }

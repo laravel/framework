@@ -136,7 +136,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * The list of models classes that should not be affected with touch.
      *
-     * @var array
+     * @var string[]
      */
     protected static $ignoreOnTouch = [];
 
@@ -269,7 +269,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Disables relationship model touching for the given model classes during given callback scope.
      *
-     * @param  array  $models
+     * @param  string[]  $models
      * @param  callable  $callback
      * @return void
      */
@@ -292,9 +292,14 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public static function isIgnoringTouch($class = null)
     {
+        /** @var Model $class */
         $class = $class ?: static::class;
 
-        if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
+        if (
+            ! get_class_vars($class)['timestamps']
+            ||
+            ! $class::UPDATED_AT
+        ) {
             return true;
         }
 
@@ -584,7 +589,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method)
     {
-        $this->{$column} = $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
+        $this->{$column} += ($method === 'increment' ? $amount : $amount * -1);
 
         $this->forceFill($extra);
 
@@ -666,8 +671,11 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         else {
             $saved = $this->performInsert($query);
 
-            if (! $this->getConnectionName() &&
-                $connection = $query->getConnection()) {
+            if (
+                ! $this->getConnectionName()
+                &&
+                $connection = $query->getConnection()
+            ) {
                 $this->setConnection($connection->getName());
             }
         }
@@ -866,6 +874,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         $key = ($instance = new static)->getKeyName();
 
         foreach ($instance->whereIn($key, $ids)->get() as $model) {
+            /** @var Model $model */
             if ($model->delete()) {
                 $count++;
             }
@@ -1054,8 +1063,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     /**
      * Create a new Eloquent Collection instance.
      *
-     * @param  array  $models
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param  Model[]  $models
+     * @return \Illuminate\Database\Eloquent\Collection|Model[]
      */
     public function newCollection(array $models = [])
     {
@@ -1074,6 +1083,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function newPivot(self $parent, array $attributes, $table, $exists, $using = null)
     {
+        /** @var \Illuminate\Database\Eloquent\Relations\Pivot $using */
         return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
                       : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
@@ -1129,7 +1139,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
             return;
         }
 
-        return static::newQueryWithoutScopes()
+        return $this->newQueryWithoutScopes()
                         ->with(is_string($with) ? func_get_args() : $with)
                         ->where($this->getKeyName(), $this->getKey())
                         ->first();
@@ -1147,10 +1157,10 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         }
 
         $this->setRawAttributes(
-            static::newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
+            $this->newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
         );
 
-        $this->load(collect($this->relations)->reject(function ($relation) {
+        $this->load(collect($this->relations)->reject(static function ($relation) {
             return $relation instanceof Pivot;
         })->keys()->all());
 
@@ -1178,6 +1188,8 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         );
 
         return tap(new static, function ($instance) use ($attributes) {
+            assert($instance instanceof self);
+
             $instance->setRawAttributes($attributes);
 
             $instance->setRelations($this->relations);
@@ -1194,9 +1206,12 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function is($model)
     {
-        return ! is_null($model) &&
-               $this->getKey() === $model->getKey() &&
-               $this->getTable() === $model->getTable() &&
+        return ! is_null($model)
+               &&
+               $this->getKey() === $model->getKey()
+               &&
+               $this->getTable() === $model->getTable()
+               &&
                $this->getConnectionName() === $model->getConnectionName();
     }
 

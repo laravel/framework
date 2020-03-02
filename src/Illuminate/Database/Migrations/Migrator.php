@@ -326,7 +326,7 @@ class Migrator
         // Since the getRan method that retrieves the migration name just gives us the
         // migration name, we will format the names into objects with the name as a
         // property on the objects so that we can pass it to the rollback method.
-        $migrations = collect($migrations)->map(function ($m) {
+        $migrations = collect($migrations)->map(static function ($m) {
             return (object) ['migration' => $m];
         })->all();
 
@@ -433,7 +433,7 @@ class Migrator
             $migration->getConnection()
         );
 
-        return $db->pretend(function () use ($migration, $method) {
+        return $db->pretend(static function () use ($migration, $method) {
             if (method_exists($migration, $method)) {
                 $migration->{$method}();
             }
@@ -465,7 +465,7 @@ class Migrator
             return Str::endsWith($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php');
         })->filter()->values()->keyBy(function ($file) {
             return $this->getMigrationName($file);
-        })->sortBy(function ($file, $key) {
+        })->sortBy(static function ($file, $key) {
             return $key;
         })->all();
     }

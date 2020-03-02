@@ -155,7 +155,7 @@ class SyncQueue extends Queue implements QueueContract
      * Pop the next job off of the queue.
      *
      * @param  string|null  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return void
      */
     public function pop($queue = null)
     {

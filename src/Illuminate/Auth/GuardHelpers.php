@@ -73,12 +73,14 @@ trait GuardHelpers
     /**
      * Get the ID for the currently authenticated user.
      *
-     * @return int|null
+     * @return int|null|void
      */
     public function id()
     {
-        if ($this->user()) {
-            return $this->user()->getAuthIdentifier();
+        /** @var \Illuminate\Contracts\Auth\Authenticatable|null $user */
+        $user = $this->user();
+        if ($user) {
+            return $user->getAuthIdentifier();
         }
     }
 

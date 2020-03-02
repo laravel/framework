@@ -24,7 +24,9 @@ trait SerializesModels
             ));
         }
 
-        return array_values(array_filter(array_map(function ($p) {
+        return array_values(array_filter(array_map(static function ($p) {
+            /** @var ReflectionProperty $p */
+
             return $p->isStatic() ? null : $p->getName();
         }, $properties)));
     }

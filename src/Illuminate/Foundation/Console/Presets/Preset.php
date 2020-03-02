@@ -55,7 +55,9 @@ class Preset
      */
     protected static function removeNodeModules()
     {
-        tap(new Filesystem, function ($files) {
+        tap(new Filesystem, static function ($files) {
+            /** @var Filesystem $files */
+
             $files->deleteDirectory(base_path('node_modules'));
 
             $files->delete(base_path('yarn.lock'));

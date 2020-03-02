@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
  * @method array validate(array $rules, ...$params)
  * @method array validateWithBag(string $errorBag, array $rules, ...$params)
  * @method string hasValidSignature(bool $absolute = true)
+ *
+ * @property \Illuminate\Contracts\Session\Session|null $session
  */
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
@@ -176,7 +178,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $segments = explode('/', $this->decodedPath());
 
-        return array_values(array_filter($segments, function ($value) {
+        return array_values(array_filter($segments, static function ($value) {
             return $value !== '';
         }));
     }
@@ -431,6 +433,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             $request->query->all(), $request->request->all(), $request->attributes->all(),
             $request->cookies->all(), $request->files->all(), $request->server->all()
         );
+        assert($newRequest instanceof static);
 
         $newRequest->headers->replace($request->headers->all());
 
@@ -453,7 +456,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Filter the given array of files, removing any empty values.
      *
      * @param  mixed  $files
-     * @return mixed
+     * @return mixed|void
      */
     protected function filterFiles($files)
     {
@@ -477,7 +480,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the session associated with the request.
      *
-     * @return \Illuminate\Session\Store
+     * @return \Illuminate\Contracts\Session\Session
      *
      * @throws \RuntimeException
      */
@@ -493,7 +496,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the session associated with the request.
      *
-     * @return \Illuminate\Session\Store|null
+     * @return \Illuminate\Contracts\Session\Session|null
      */
     public function getSession()
     {
@@ -579,7 +582,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function getUserResolver()
     {
-        return $this->userResolver ?: function () {
+        return $this->userResolver ?: static function () {
             //
         };
     }
@@ -604,7 +607,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function getRouteResolver()
     {
-        return $this->routeResolver ?: function () {
+        return $this->routeResolver ?: static function () {
             //
         };
     }

@@ -718,7 +718,7 @@ class Grammar extends BaseGrammar
     protected function compileOrdersToArray(Builder $query, $orders)
     {
         return array_map(function ($order) {
-            return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'];
+            return $order['sql'] ?? ($this->wrap($order['column']).' '.$order['direction']);
         }, $orders);
     }
 
@@ -1226,7 +1226,7 @@ class Grammar extends BaseGrammar
      */
     protected function concatenate($segments)
     {
-        return implode(' ', array_filter($segments, function ($value) {
+        return implode(' ', array_filter($segments, static function ($value) {
             return (string) $value !== '';
         }));
     }

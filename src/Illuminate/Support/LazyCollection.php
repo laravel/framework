@@ -60,7 +60,7 @@ class LazyCollection implements Enumerable
             return new static;
         }
 
-        $instance = new static(function () use ($number) {
+        $instance = new static(static function () use ($number) {
             for ($current = 1; $current <= $number; $current++) {
                 yield $current;
             }
@@ -78,7 +78,7 @@ class LazyCollection implements Enumerable
      */
     public static function range($from, $to)
     {
-        return new static(function () use ($from, $to) {
+        return new static(static function () use ($from, $to) {
             for (; $from <= $to; $from++) {
                 yield $from;
             }
@@ -122,7 +122,7 @@ class LazyCollection implements Enumerable
 
         $cache = [];
 
-        return new static(function () use ($iterator, &$iteratorIndex, &$cache) {
+        return new static(static function () use ($iterator, &$iteratorIndex, &$cache) {
             for ($index = 0; true; $index++) {
                 if (array_key_exists($index, $cache)) {
                     yield $cache[$index][0] => $cache[$index][1];
@@ -352,7 +352,7 @@ class LazyCollection implements Enumerable
     public function filter(callable $callback = null)
     {
         if (is_null($callback)) {
-            $callback = function ($value) {
+            $callback = static function ($value) {
                 return (bool) $value;
             };
         }
@@ -900,8 +900,9 @@ class LazyCollection implements Enumerable
     {
         $predicate = $this->useAsCallable($value)
             ? $value
-            : function ($item) use ($value, $strict) {
-                return $strict ? $item === $value : $item == $value;
+            : static function ($item) use ($value, $strict) {
+                return $strict ? $item === $value
+                               : $item == $value;
             };
 
         foreach ($this as $key => $item) {

@@ -37,7 +37,11 @@ trait ManagesEvents
         $registered = [];
 
         foreach ($composers as $callback => $views) {
-            $registered = array_merge($registered, $this->composer($views, $callback));
+            $registered[] = $this->composer($views, $callback);
+        }
+
+        if ($registered !== []) {
+            $registered = array_merge([], ...$registered);
         }
 
         return $registered;

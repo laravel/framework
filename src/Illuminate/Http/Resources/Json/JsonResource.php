@@ -75,7 +75,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public static function collection($resource)
     {
-        return tap(new AnonymousResourceCollection($resource, static::class), function ($collection) {
+        return tap(new AnonymousResourceCollection($resource, static::class), static function ($collection) {
             if (property_exists(static::class, 'preserveKeys')) {
                 $collection->preserveKeys = (new static([]))->preserveKeys === true;
             }

@@ -44,7 +44,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
      *
      * @param  \PDO  $connection
      * @param  array  $config
-     * @return void
+     * @return \PDO|void
      */
     protected function configureEncoding($connection, array $config)
     {

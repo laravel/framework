@@ -156,7 +156,7 @@ class HasManyThrough extends Relation
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array  $models
+     * @param  Model[]  $models
      * @param  string  $relation
      * @return array
      */

@@ -45,7 +45,7 @@ class StatusCommand extends BaseCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return void|int
      */
     public function handle()
     {

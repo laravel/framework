@@ -196,11 +196,14 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        return $this->database->transaction(function () use ($queue) {
-            if ($job = $this->getNextAvailableJob($queue)) {
-                return $this->marshalJob($queue, $job);
+        return $this->database->transaction(
+            function () use ($queue) {
+                $job = $this->getNextAvailableJob($queue);
+                if ($job) {
+                    return $this->marshalJob($queue, $job);
+                }
             }
-        });
+        );
     }
 
     /**
@@ -234,8 +237,21 @@ class DatabaseQueue extends Queue implements QueueContract
         $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
         $databaseVersion = $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
-        if ($databaseEngine == 'mysql' && ! strpos($databaseVersion, 'MariaDB') && version_compare($databaseVersion, '8.0.1', '>=') ||
-            $databaseEngine == 'pgsql' && version_compare($databaseVersion, '9.5', '>=')) {
+        if (
+            (
+                $databaseEngine == 'pgsql'
+                &&
+                version_compare($databaseVersion, '9.5', '>=')
+            )
+            ||
+            (
+                $databaseEngine == 'mysql'
+                &&
+                strpos($databaseVersion, 'MariaDB') === false
+                &&
+                version_compare($databaseVersion, '8.0.1', '>=')
+            )
+        ) {
             return 'FOR UPDATE SKIP LOCKED';
         }
 
@@ -250,10 +266,13 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function isAvailable($query)
     {
-        $query->where(function ($query) {
-            $query->whereNull('reserved_at')
-                  ->where('available_at', '<=', $this->currentTime());
-        });
+        $query->where(
+            function ($query) {
+                assert($query instanceof \Illuminate\Database\Query\Builder);
+                $query->whereNull('reserved_at')
+                      ->where('available_at', '<=', $this->currentTime());
+            }
+        );
     }
 
     /**
@@ -266,9 +285,12 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $expiration = Carbon::now()->subSeconds($this->retryAfter)->getTimestamp();
 
-        $query->orWhere(function ($query) use ($expiration) {
-            $query->where('reserved_at', '<=', $expiration);
-        });
+        $query->orWhere(
+            static function ($query) use ($expiration) {
+                assert($query instanceof \Illuminate\Database\Query\Builder);
+                $query->where('reserved_at', '<=', $expiration);
+            }
+        );
     }
 
     /**
@@ -283,7 +305,11 @@ class DatabaseQueue extends Queue implements QueueContract
         $job = $this->markJobAsReserved($job);
 
         return new DatabaseJob(
-            $this->container, $this, $job, $this->connectionName, $queue
+            $this->container,
+            $this,
+            $job,
+            $this->connectionName,
+            $queue
         );
     }
 

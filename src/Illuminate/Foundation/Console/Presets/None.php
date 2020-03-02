@@ -17,7 +17,9 @@ class None extends Preset
         static::updateBootstrapping();
         static::updateWebpackConfiguration();
 
-        tap(new Filesystem, function ($filesystem) {
+        tap(new Filesystem, static function ($filesystem) {
+            /** @var Filesystem $filesystem */
+
             $filesystem->deleteDirectory(resource_path('js/components'));
             $filesystem->delete(resource_path('sass/_variables.scss'));
             $filesystem->deleteDirectory(base_path('node_modules'));

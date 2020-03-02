@@ -66,10 +66,12 @@ class FileSessionHandler implements SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        if ($this->files->isFile($path = $this->path.'/'.$sessionId)) {
-            if ($this->files->lastModified($path) >= Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
-                return $this->files->sharedGet($path);
-            }
+        if (
+            $this->files->isFile($path = $this->path . '/' . $sessionId)
+            &&
+            $this->files->lastModified($path) >= Carbon::now()->subMinutes($this->minutes)->getTimestamp()
+        ) {
+            return $this->files->sharedGet($path);
         }
 
         return '';
@@ -107,6 +109,7 @@ class FileSessionHandler implements SessionHandlerInterface
                     ->date('<= now - '.$lifetime.' seconds');
 
         foreach ($files as $file) {
+            /** @var \SplFileInfo $file */
             $this->files->delete($file->getRealPath());
         }
     }

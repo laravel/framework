@@ -5,6 +5,9 @@ namespace Illuminate\Contracts\Foundation;
 use Closure;
 use Illuminate\Contracts\Container\Container;
 
+/**
+ * @property-read array $config
+ */
 interface Application extends Container
 {
     /**

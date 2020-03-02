@@ -284,7 +284,8 @@ class Event
             return false;
         }
 
-        return $this->expressionPasses() &&
+        return $this->expressionPasses()
+               &&
                $this->runsInEnvironment($app->environment());
     }
 
@@ -560,7 +561,7 @@ class Event
      */
     protected function pingCallback($url)
     {
-        return function (Container $container, HttpClient $http) use ($url) {
+        return static function (Container $container, HttpClient $http) use ($url) {
             try {
                 $http->get($url);
             } catch (ClientExceptionInterface | TransferException $e) {

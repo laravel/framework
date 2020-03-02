@@ -272,6 +272,7 @@ class Factory implements ArrayAccess
 
         if (is_dir($path)) {
             foreach (Finder::create()->files()->name('*.php')->in($path) as $file) {
+                /** @var \SplFileInfo $file */
                 require $file->getRealPath();
             }
         }

@@ -55,8 +55,17 @@ class Encrypter implements EncrypterContract
     {
         $length = mb_strlen($key, '8bit');
 
-        return ($cipher === 'AES-128-CBC' && $length === 16) ||
-               ($cipher === 'AES-256-CBC' && $length === 32);
+        return (
+                   $cipher === 'AES-128-CBC'
+                   &&
+                   $length === 16
+               )
+               ||
+               (
+                   $cipher === 'AES-256-CBC'
+                   &&
+                   $length === 32
+               );
     }
 
     /**
@@ -210,7 +219,8 @@ class Encrypter implements EncrypterContract
      */
     protected function validPayload($payload)
     {
-        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
+        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac'])
+               &&
                strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
     }
 
