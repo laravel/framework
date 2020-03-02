@@ -3,11 +3,11 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use function GuzzleHttp\Promise\promise_for;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
-use function GuzzleHttp\Promise\promise_for;
 
 class Factory
 {
