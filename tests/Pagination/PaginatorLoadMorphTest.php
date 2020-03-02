@@ -47,7 +47,7 @@ class PaginatorLoadMorphTest extends TestCase
         $this->expectExceptionMessage('loadMorph method does not exist for this Collection.');
 
         $items = m::mock(BaseCollection::class);
-        $items->shouldNotReceive('loadMorph')->once();
+        $items->shouldNotReceive('loadMorph');
 
         $p = (new class extends AbstractPaginator {
             //
