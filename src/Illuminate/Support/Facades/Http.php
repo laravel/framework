@@ -13,6 +13,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest acceptJson()
  * @method static \Illuminate\Http\Client\PendingRequest accept(string $contentType)
+ * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0)
  * @method static \Illuminate\Http\Client\PendingRequest withHeaders(array $headers)
  * @method static \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
