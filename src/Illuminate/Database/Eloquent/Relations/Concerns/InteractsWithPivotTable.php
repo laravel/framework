@@ -532,7 +532,7 @@ trait InteractsWithPivotTable
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function newPivotQuery()
+    public function newPivotQuery()
     {
         $query = $this->newPivotStatement();
 
