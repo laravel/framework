@@ -81,6 +81,10 @@ abstract class Component
         );
 
         if (! file_exists($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
             file_put_contents($viewFile, $contents);
         }
 
