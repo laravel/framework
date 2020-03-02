@@ -45,6 +45,17 @@ class ViewComponentTest extends TestCase
         $component->data();
         $this->assertEquals(3, $component->counter);
     }
+
+    public function testAttributesAreMergedNotOverwritten()
+    {
+        $component = new TestDefaultAttributesComponent;
+
+        $this->assertEquals('text-red-500', $component->attributes->get('class'));
+
+        $component->withAttributes(['class' => 'bg-blue-100']);
+
+        $this->assertEquals('bg-blue-100 text-red-500', $component->attributes->get('class'));
+    }
 }
 
 class TestViewComponent extends Component
@@ -97,5 +108,18 @@ class TestSampleViewComponent extends Component
     private function privateHello()
     {
         $this->counter++;
+    }
+}
+
+class TestDefaultAttributesComponent extends Component
+{
+    public function __construct()
+    {
+        $this->withAttributes(['class' => 'text-red-500']);
+    }
+
+    public function render()
+    {
+        return $this->attributes->get('id');
     }
 }

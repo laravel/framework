@@ -214,7 +214,7 @@ abstract class Component
     {
         $this->attributes = $this->attributes ?: new ComponentAttributeBag;
 
-        $this->attributes->setAttributes($attributes);
+        $this->attributes = $this->attributes->merge($attributes);
 
         return $this;
     }
