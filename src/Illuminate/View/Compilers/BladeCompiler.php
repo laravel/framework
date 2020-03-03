@@ -65,7 +65,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $compilers = [
-        'Comments',
+        // 'Comments',
         'Extensions',
         'Statements',
         'Echos',
@@ -219,7 +219,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // step which compiles the component Blade tags into @component directives
         // that may be used by Blade. Then we should call any other precompilers.
         $value = $this->compileComponentTags(
-            $this->storeUncompiledBlocks($value)
+            $this->compileComments($this->storeUncompiledBlocks($value))
         );
 
         foreach ($this->precompilers as $precompiler) {
