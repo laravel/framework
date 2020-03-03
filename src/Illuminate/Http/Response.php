@@ -8,10 +8,10 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-class Response extends BaseResponse
+class Response extends SymfonyResponse
 {
     use ResponseTrait, Macroable {
         Macroable::__call as macroCall;
