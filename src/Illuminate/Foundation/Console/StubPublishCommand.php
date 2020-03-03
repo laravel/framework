@@ -8,11 +8,11 @@ use Illuminate\Filesystem\Filesystem;
 class StubPublishCommand extends Command
 {
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'stub:publish';
+    protected $name = 'stub:publish';
 
     /**
      * The console command description.
