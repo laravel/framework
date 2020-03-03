@@ -228,7 +228,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             $attributes['uri']
         ), '/');
 
-        return (new Route($attributes['methods'], $baseUri, $attributes['action']))
+        return (new Route($attributes['methods'], $baseUri == '' ? '/' : $baseUri, $attributes['action']))
             ->setFallback($attributes['fallback'])
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
