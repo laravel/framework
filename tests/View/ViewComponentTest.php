@@ -70,17 +70,6 @@ class ViewComponentTest extends TestCase
         $this->assertArrayHasKey('world', $variables);
         $this->assertEquals('world property', $variables['world']);
     }
-
-    public function testAttributesAreMergedNotOverwritten()
-    {
-        $component = new TestDefaultAttributesComponent;
-
-        $this->assertEquals('text-red-500', $component->attributes->get('class'));
-
-        $component->withAttributes(['class' => 'bg-blue-100']);
-
-        $this->assertEquals('bg-blue-100 text-red-500', $component->attributes->get('class'));
-    }
 }
 
 class TestViewComponent extends Component
