@@ -64,6 +64,7 @@ class Response implements ArrayAccess
     /**
      * Get a header from the response.
      *
+     * @param  string  $header
      * @return string
      */
     public function header(string $header)
@@ -134,7 +135,7 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Detemine if the response indicates a client error occurred.
+     * Determine if the response indicates a client error occurred.
      *
      * @return bool
      */
@@ -144,7 +145,7 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Detemine if the response indicates a server error occurred.
+     * Determine if the response indicates a server error occurred.
      *
      * @return bool
      */
@@ -177,6 +178,8 @@ class Response implements ArrayAccess
      * Throw an exception if a server or client error occurred.
      *
      * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
      */
     public function throw()
     {

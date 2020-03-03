@@ -36,7 +36,7 @@ class Request implements ArrayAccess
     /**
      * Get the request method.
      *
-     * @return strign
+     * @return string
      */
     public function method()
     {
@@ -70,6 +70,7 @@ class Request implements ArrayAccess
     /**
      * Get the values for the header with the given name.
      *
+     * @param  string  $key
      * @return array
      */
     public function header($key)

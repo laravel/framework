@@ -28,34 +28,6 @@ class Stringable
     }
 
     /**
-     * The cache of snake-cased words.
-     *
-     * @var array
-     */
-    protected static $snakeCache = [];
-
-    /**
-     * The cache of camel-cased words.
-     *
-     * @var array
-     */
-    protected static $camelCache = [];
-
-    /**
-     * The cache of studly-cased words.
-     *
-     * @var array
-     */
-    protected static $studlyCache = [];
-
-    /**
-     * The callback that should be used to generate UUIDs.
-     *
-     * @var callable
-     */
-    protected static $uuidFactory;
-
-    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $search
@@ -327,7 +299,7 @@ class Stringable
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
-     * @return static|null
+     * @return \Illuminate\Support\Collection
      */
     public function matchAll($pattern)
     {
@@ -348,7 +320,7 @@ class Stringable
      */
     public function parseCallback($default = null)
     {
-        return Str::parseCallback($this->value);
+        return Str::parseCallback($this->value, $default);
     }
 
     /**

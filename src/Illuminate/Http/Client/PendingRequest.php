@@ -2,6 +2,9 @@
 
 namespace Illuminate\Http\Client;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\HandlerStack;
 use Illuminate\Support\Traits\Macroable;
 
 class PendingRequest
@@ -452,6 +455,8 @@ class PendingRequest
      * @param  string  $url
      * @param  array  $options
      * @return \Illuminate\Http\Client\Response
+     *
+     * @throws \Exception
      */
     public function send(string $method, string $url, array $options = [])
     {
@@ -481,7 +486,7 @@ class PendingRequest
                         $response->throw();
                     }
                 });
-            } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            } catch (ConnectException $e) {
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
         }, $this->retryDelay ?? 100);
@@ -494,7 +499,7 @@ class PendingRequest
      */
     public function buildClient()
     {
-        return new \GuzzleHttp\Client([
+        return new Client([
             'handler' => $this->buildHandlerStack(),
             'cookies' => true,
         ]);
@@ -507,7 +512,7 @@ class PendingRequest
      */
     public function buildHandlerStack()
     {
-        return tap(\GuzzleHttp\HandlerStack::create(), function ($stack) {
+        return tap(HandlerStack::create(), function ($stack) {
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
             $stack->push($this->buildStubHandler());
