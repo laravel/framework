@@ -429,6 +429,13 @@ class SupportStrTest extends TestCase
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
     }
 
+    public function testAsciiNull()
+    {
+        $this->assertSame('', Str::ascii(null));
+        $this->assertTrue(Str::isAscii(null));
+        $this->assertSame('', Str::slug(null));
+    }
+
     public function validUuidList()
     {
         return [
