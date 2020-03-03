@@ -30,18 +30,18 @@ class Factory
     protected $recording = false;
 
     /**
+     * The recorded response array.
+     *
+     * @var array
+     */
+    protected $recorded = [];
+
+    /**
      * All created response sequences.
      *
      * @var array
      */
     protected $responseSequences = [];
-
-    /**
-     * The record array.
-     *
-     * @var array
-     */
-    protected $recorded;
 
     /**
      * Create a new factory instance.
