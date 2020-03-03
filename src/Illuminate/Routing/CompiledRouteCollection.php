@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 
@@ -221,7 +222,9 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     protected function newRoute(array $attributes)
     {
-        return (new Route($attributes['methods'], $attributes['uri'], $attributes['action']))
+        $baseUri = ltrim(Str::replaceFirst(ltrim($attributes['action']['prefix'] ?? '', '/'), '', $attributes['uri']), '/');
+
+        return (new Route($attributes['methods'], $baseUri, $attributes['action']))
             ->setFallback($attributes['fallback'])
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
