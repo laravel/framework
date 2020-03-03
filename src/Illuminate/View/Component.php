@@ -12,6 +12,20 @@ use ReflectionProperty;
 abstract class Component
 {
     /**
+     * The methods that should be exposed to the component.
+     *
+     * @var string[]
+     */
+    protected $exposedMethods = [];
+
+    /**
+     * The properties that should be exposed to the component.
+     *
+     * @var string[]
+     */
+    protected $exposedProperties = [];
+
+    /**
      * The cache of public property names, keyed by class.
      *
      * @var array
@@ -116,15 +130,22 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$propertyCache[$class])) {
-            $reflection = new ReflectionClass($this);
+            if ($this->exposedProperties) {
+                static::$propertyCache[$class] = $this->exposedProperties;
+            } else {
+                // If user does not provide the exposed method names
+                // we get all the public methods using reflection
+                // and then clean up the all black listed ones.
+                $reflection = new ReflectionClass($this);
 
-            static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
-                ->reject(function (ReflectionProperty $property) {
-                    return $this->shouldIgnore($property->getName());
-                })
-                ->map(function (ReflectionProperty $property) {
-                    return $property->getName();
-                })->all();
+                static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
+                    ->reject(function (ReflectionProperty $property) {
+                        return $this->shouldIgnore($property->getName());
+                    })
+                    ->map(function (ReflectionProperty $property) {
+                        return $property->getName();
+                    })->all();
+            }
         }
 
         $values = [];
@@ -146,15 +167,22 @@ abstract class Component
         $class = get_class($this);
 
         if (! isset(static::$methodCache[$class])) {
-            $reflection = new ReflectionClass($this);
+            if ($this->exposedMethods) {
+                static::$methodCache[$class] = $this->exposedMethods;
+            } else {
+                // if the user doesn't provide exposed property name
+                // we get all the public properties by reflection
+                // and then clean up the all black listed ones.
+                $reflection = new ReflectionClass($this);
 
-            static::$methodCache[$class] = collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
-                ->reject(function (ReflectionMethod $method) {
-                    return $this->shouldIgnore($method->getName());
-                })
-                ->map(function (ReflectionMethod $method) {
-                    return $method->getName();
-                });
+                static::$methodCache[$class] = collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
+                    ->reject(function (ReflectionMethod $method) {
+                        return $this->shouldIgnore($method->getName());
+                    })
+                    ->map(function (ReflectionMethod $method) {
+                        return $method->getName();
+                    });
+            }
         }
 
         $values = [];
