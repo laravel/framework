@@ -59,6 +59,19 @@ class ViewComponentTest extends TestCase
         $this->assertArrayNotHasKey('taylor', $variables);
     }
 
+    public function testItCanExposeMethodsAndProperties()
+    {
+        $component = new TestExposableViewComponent();
+        $variables = $component->data();
+
+        $this->assertArrayHasKey('hello', $variables);
+        $this->assertArrayHasKey('taylor', $variables);
+        $this->assertArrayNotHasKey('notExposed', $variables);
+        $this->assertArrayNotHasKey('notExposedMethod', $variables);
+        $this->assertArrayNotHasKey('render', $variables);
+        $this->assertArrayNotHasKey('__construct', $variables);
+    }
+
     public function testMethodsOverridePropertyValues()
     {
         $component = new TestHelloPropertyHelloMethodComponent();
@@ -148,6 +161,37 @@ class TestExceptedViewComponent extends Component
     }
 
     public function hello2()
+    {
+        return $this->taylor = '';
+    }
+
+    public function render()
+    {
+        return 'test';
+    }
+}
+
+class TestExposableViewComponent extends Component
+{
+    protected $exposedMethods = ['hello'];
+
+    protected $exposedProperties = ['taylor'];
+
+    public $taylor = 'Otwell';
+
+    public $notExposed = 'hide';
+
+    public function __construct()
+    {
+        //
+    }
+
+    public function hello($string = 'world')
+    {
+        return $string;
+    }
+
+    public function notExposedMethod()
     {
         return $this->taylor = '';
     }
