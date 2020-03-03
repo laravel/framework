@@ -528,6 +528,33 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function testPaginatorResourceWorksWithObject()
+    {
+        Route::get('/', function () {
+            $paginator = new LengthAwarePaginator(
+                collect([(object) ['id' => 5, 'title' => 'Test Title']]),
+                10, 15, 1
+            );
+
+            return new PostCollectionResource($paginator);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                ],
+            ],
+        ]);
+    }
+
     public function testPaginatorResourceCanPreserveQueryParameters()
     {
         Route::get('/', function () {

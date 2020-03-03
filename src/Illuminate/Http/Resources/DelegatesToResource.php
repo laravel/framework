@@ -50,6 +50,10 @@ trait DelegatesToResource
      */
     public function offsetExists($offset)
     {
+        if (is_object($this->resource)) {
+            return $this->__isset($offset);
+        }
+
         return isset($this->resource[$offset]);
     }
 
@@ -61,6 +65,10 @@ trait DelegatesToResource
      */
     public function offsetGet($offset)
     {
+        if (is_object($this->resource)) {
+            return $this->__get($offset);
+        }
+
         return $this->resource[$offset];
     }
 
@@ -73,6 +81,12 @@ trait DelegatesToResource
      */
     public function offsetSet($offset, $value)
     {
+        if (is_object($this->resource)) {
+            $this->resource->{$offset} = $value;
+
+            return;
+        }
+
         $this->resource[$offset] = $value;
     }
 
@@ -84,6 +98,12 @@ trait DelegatesToResource
      */
     public function offsetUnset($offset)
     {
+        if (is_object($this->resource)) {
+            $this->__unset($offset);
+
+            return;
+        }
+
         unset($this->resource[$offset]);
     }
 
