@@ -222,7 +222,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     protected function newRoute(array $attributes)
     {
-        $baseUri = ltrim(Str::replaceFirst(ltrim($attributes['action']['prefix'] ?? '', '/'), '', $attributes['uri']), '/');
+        $baseUri = ltrim(Str::replaceFirst(
+            ltrim($attributes['action']['prefix'] ?? '', '/'),
+            '',
+            $attributes['uri']
+        ), '/');
 
         return (new Route($attributes['methods'], $baseUri, $attributes['action']))
             ->setFallback($attributes['fallback'])
