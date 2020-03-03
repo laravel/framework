@@ -278,7 +278,7 @@ class Route
     }
 
     /**
-     * Determine if the route matches given request.
+     * Determine if the route matches a given request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  bool  $includingMethod
