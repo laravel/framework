@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class ArrayLock extends Lock
 {
