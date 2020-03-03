@@ -26,7 +26,7 @@ abstract class Component
     protected static $methodCache = [];
 
     /**
-     * That properties / methods that should not be exposed to the component.
+     * The properties / methods that should not be exposed to the component.
      *
      * @var array
      */
