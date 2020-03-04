@@ -204,11 +204,13 @@ class HttpClientTest extends TestCase
             CookieJar::fromArray(['foo' => 'bar'], 'https://laravel.com')
         )->get('https://laravel.com');
 
-        /** @var CookieJarInterface $responseCookies */
-        $responseCookies = $response->cookies();
+        $this->assertCount(1, $response->cookies()->toArray());
 
-        $this->assertSame('foo', $responseCookies->toArray()[0]['Name']);
-        $this->assertSame('bar', $responseCookies->toArray()[0]['Value']);
-        $this->assertSame('https://laravel.com', $responseCookies->toArray()[0]['Domain']);
+        /** @var CookieJarInterface $responseCookies */
+        $responseCookie = $response->cookies()->toArray()[0];
+
+        $this->assertSame('foo', $responseCookie['Name']);
+        $this->assertSame('bar', $responseCookie['Value']);
+        $this->assertSame('https://laravel.com', $responseCookie['Domain']);
     }
 }
