@@ -524,7 +524,7 @@ class Stringable
      * @param  string  $characters
      * @return static
      */
-    public function trim($characters = ' ')
+    public function trim($characters = ' \t\n\r\0\x0B')
     {
         return new static(trim(...array_merge([$this->value], func_get_args())));
     }
