@@ -84,7 +84,7 @@ trait ConditionallyLoadsAttributes
             }
         }
 
-        if (property_exists($this, 'preserveKeys') && $this->preserveKeys === true) {
+        if (($this->preserveKeys ?? false) === true) {
             return $data;
         }
 
