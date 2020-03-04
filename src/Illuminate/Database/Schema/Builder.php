@@ -4,7 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use Doctrine\DBAL\Types\Type;
-use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionInterface;
 use LogicException;
 use RuntimeException;
 
@@ -13,7 +13,7 @@ class Builder
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var \Illuminate\Database\ConnectionInterface
      */
     protected $connection;
 
@@ -41,10 +41,10 @@ class Builder
     /**
      * Create a new database Schema manager.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return void
      */
-    public function __construct(Connection $connection)
+    public function __construct(ConnectionInterface $connection)
     {
         $this->connection = $connection;
         $this->grammar = $connection->getSchemaGrammar();
@@ -342,7 +342,7 @@ class Builder
     /**
      * Get the database connection instance.
      *
-     * @return \Illuminate\Database\Connection
+     * @return \Illuminate\Database\ConnectionInterface
      */
     public function getConnection()
     {
@@ -352,10 +352,10 @@ class Builder
     /**
      * Set the database connection instance.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return $this
      */
-    public function setConnection(Connection $connection)
+    public function setConnection(ConnectionInterface $connection)
     {
         $this->connection = $connection;
 

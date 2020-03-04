@@ -4,7 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use BadMethodCallException;
 use Closure;
-use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
@@ -87,11 +87,11 @@ class Blueprint
     /**
      * Execute the blueprint against the database.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\ConnectionInterface $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    public function build(Connection $connection, Grammar $grammar)
+    public function build(ConnectionInterface $connection, Grammar $grammar)
     {
         foreach ($this->toSql($connection, $grammar) as $statement) {
             $connection->statement($statement);
@@ -101,11 +101,11 @@ class Blueprint
     /**
      * Get the raw SQL statements for the blueprint.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\ConnectionInterface $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return array
      */
-    public function toSql(Connection $connection, Grammar $grammar)
+    public function toSql(ConnectionInterface $connection, Grammar $grammar)
     {
         $this->addImpliedCommands($grammar);
 
@@ -132,12 +132,12 @@ class Blueprint
     /**
      * Ensure the commands on the blueprint are valid for the connection type.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\ConnectionInterface $connection
      * @return void
      *
      * @throws \BadMethodCallException
      */
-    protected function ensureCommandsAreValid(Connection $connection)
+    protected function ensureCommandsAreValid(ConnectionInterface $connection)
     {
         if ($connection instanceof SQLiteConnection) {
             if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
