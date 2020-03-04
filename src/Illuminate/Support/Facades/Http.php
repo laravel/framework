@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use GuzzleHttp\Cookie\CookieJarInterface;
 use Illuminate\Http\Client\Factory;
 
 /**
@@ -18,7 +19,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
  * @method static \Illuminate\Http\Client\PendingRequest withToken(string $token, string $type = 'Bearer')
- * @method static \Illuminate\Http\Client\PendingRequest withCookies(array $cookies)
+ * @method static \Illuminate\Http\Client\PendingRequest withCookies(CookieJarInterface $cookies)
  * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)

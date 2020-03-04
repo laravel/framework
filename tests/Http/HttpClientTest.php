@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\CookieJarInterface;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Request;
@@ -192,5 +194,21 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(201, $this->factory->get('https://example.com')->status());
         $this->assertSame(301, $this->factory->get('https://example.com')->status());
+    }
+
+    public function testWithCookies()
+    {
+        $this->factory->fakeSequence()->pushStatus(200);
+
+        $response = $this->factory->withCookies(
+            CookieJar::fromArray(['foo' => 'bar'], 'https://laravel.com')
+        )->get('https://laravel.com');
+
+        /** @var CookieJarInterface $responseCookies */
+        $responseCookies = $response->cookies();
+
+        $this->assertSame('foo', $responseCookies->toArray()[0]['Name']);
+        $this->assertSame('bar', $responseCookies->toArray()[0]['Value']);
+        $this->assertSame('https://laravel.com', $responseCookies->toArray()[0]['Domain']);
     }
 }

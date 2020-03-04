@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
 use Illuminate\Support\Traits\Macroable;
@@ -284,10 +285,10 @@ class PendingRequest
     /**
      * Specify the cookies that should be included with the request.
      *
-     * @param  array  $cookies
+     * @param  \GuzzleHttp\Cookie\CookieJarInterface  $cookies
      * @return $this
      */
-    public function withCookies(array $cookies)
+    public function withCookies(CookieJarInterface $cookies)
     {
         return tap($this, function ($request) use ($cookies) {
             return $this->options = array_merge_recursive($this->options, [
