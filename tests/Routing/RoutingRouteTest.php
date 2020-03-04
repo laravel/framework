@@ -21,8 +21,10 @@ use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -1660,6 +1662,10 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Request::class, function () use ($request) {
             return $request;
         });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');
         });
@@ -1681,6 +1687,10 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Request::class, function () use ($request) {
             return $request;
         });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');
         });
@@ -1701,6 +1711,10 @@ class RoutingRouteTest extends TestCase
         $request = Request::create('contact_us', 'GET');
         $container->singleton(Request::class, function () use ($request) {
             return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
         });
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');
@@ -1726,6 +1740,10 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Request::class, function () use ($request) {
             return $request;
         });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
         $router->get('users', function () {
             throw new Exception('Route should not be reachable.');
         });
@@ -1744,6 +1762,10 @@ class RoutingRouteTest extends TestCase
         $request = Request::create('contact_us', 'GET');
         $container->singleton(Request::class, function () use ($request) {
             return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
         });
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');
@@ -1765,6 +1787,10 @@ class RoutingRouteTest extends TestCase
         $request = Request::create('contact_us', 'GET');
         $container->singleton(Request::class, function () use ($request) {
             return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
         });
         $router->get('contact_us', function () {
             throw new Exception('Route should not be reachable.');

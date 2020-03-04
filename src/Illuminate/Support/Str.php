@@ -95,7 +95,7 @@ class Str
      */
     public static function ascii($value, $language = 'en')
     {
-        return ASCII::to_ascii($value, $language);
+        return ASCII::to_ascii((string) $value, $language);
     }
 
     /**
@@ -278,7 +278,7 @@ class Str
      */
     public static function isAscii($value)
     {
-        return ASCII::is_ascii($value);
+        return ASCII::is_ascii((string) $value);
     }
 
     /**
@@ -553,7 +553,7 @@ class Str
     {
         $language = $language ?? '';
 
-        return ASCII::to_slugify($title, $separator, $language, [], true);
+        return ASCII::to_slugify((string) $title, $separator, $language, [], true);
     }
 
     /**
