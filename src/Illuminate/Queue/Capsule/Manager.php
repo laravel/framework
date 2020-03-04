@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Capsule;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\QueueServiceProvider;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
@@ -25,10 +26,10 @@ class Manager
     /**
      * Create a new queue capsule manager.
      *
-     * @param  \Illuminate\Container\Container|null  $container
+     * @param  \Illuminate\Contracts\Container\Container|null $container
      * @return void
      */
-    public function __construct(Container $container = null)
+    public function __construct(ContainerContract $container = null)
     {
         $this->setupContainer($container ?: new Container);
 

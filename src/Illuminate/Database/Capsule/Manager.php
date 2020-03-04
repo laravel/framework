@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Capsule;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\DatabaseManager;
@@ -24,10 +25,10 @@ class Manager
     /**
      * Create a new database capsule manager.
      *
-     * @param  \Illuminate\Container\Container|null  $container
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(Container $container = null)
+    public function __construct(ContainerContract $container = null)
     {
         $this->setupContainer($container ?: new Container);
 
