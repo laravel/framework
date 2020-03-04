@@ -221,14 +221,15 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     protected function newRoute(array $attributes)
     {
-        if (! empty($attributes['action']['prefix'] ?? '')) {
-            $prefixSegments = explode('/', trim($attributes['action']['prefix'], '/'));
-
-            $baseUri = trim(implode(
-                '/', array_slice(explode('/', trim($attributes['uri'], '/')), count($prefixSegments))
-            ), '/');
-        } else {
+        if (empty($attributes['action']['prefix'] ?? '')) {
             $baseUri = $attributes['uri'];
+        } else {
+            $baseUri = trim(implode(
+                '/', array_slice(
+                    explode('/', trim($attributes['uri'], '/')),
+                    count(explode('/', trim($attributes['action']['prefix'], '/')))
+                )
+            ), '/');
         }
 
         return (new Route($attributes['methods'], $baseUri == '' ? '/' : $baseUri, $attributes['action']))
