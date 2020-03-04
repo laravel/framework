@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 
@@ -95,8 +96,12 @@ class CompiledRouteCollection extends AbstractRouteCollection
             $this->compiled, (new RequestContext)->fromRequest($request)
         );
 
-        if ($result = $matcher->matchRequest($request)) {
-            $route = $this->getByName($result['_route']);
+        try {
+            if ($result = $matcher->matchRequest($request)) {
+                $route = $this->getByName($result['_route']);
+            }
+        } catch (ResourceNotFoundException $e) {
+            //
         }
 
         return $this->handleMatchedRoute($request, $route);
