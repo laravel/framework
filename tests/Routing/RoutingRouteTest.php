@@ -790,6 +790,15 @@ class RoutingRouteTest extends TestCase
         $this->assertFalse($route->matches($request));
     }
 
+    public function testRoutePrefixParameterParsing()
+    {
+        $route = new Route('GET', '/foo', ['prefix' => 'profiles/{user:username}/portfolios', 'uses' => function () {
+            //
+        }]);
+
+        $this->assertEquals('profiles/{user}/portfolios/foo', $route->uri());
+    }
+
     public function testDotDoesNotMatchEverything()
     {
         $route = new Route('GET', 'images/{id}.{ext}', function () {
