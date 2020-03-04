@@ -7,6 +7,13 @@ use Closure;
 interface ConnectionInterface
 {
     /**
+     * Get the current PDO connection.
+     *
+     * @return \PDO
+     */
+    public function getPdo();
+    
+    /**
      * Begin a fluent query against a database table.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
