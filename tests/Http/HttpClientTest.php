@@ -193,4 +193,22 @@ class HttpClientTest extends TestCase
         $this->assertSame(201, $this->factory->get('https://example.com')->status());
         $this->assertSame(301, $this->factory->get('https://example.com')->status());
     }
+
+    public function testWithCookies()
+    {
+        $this->factory->fakeSequence()->pushStatus(200);
+
+        $response = $this->factory->withCookies(
+            ['foo' => 'bar'], 'https://laravel.com'
+        )->get('https://laravel.com');
+
+        $this->assertCount(1, $response->cookies()->toArray());
+
+        /** @var CookieJarInterface $responseCookies */
+        $responseCookie = $response->cookies()->toArray()[0];
+
+        $this->assertSame('foo', $responseCookie['Name']);
+        $this->assertSame('bar', $responseCookie['Value']);
+        $this->assertSame('https://laravel.com', $responseCookie['Domain']);
+    }
 }
