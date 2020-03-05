@@ -23,7 +23,7 @@ class SqsConnector implements ConnectorInterface
         }
 
         return new SqsQueue(
-            new SqsClient($config), $config['queue'], $config['prefix'] ?? ''
+            new SqsClient($config), $config['queue'], $config['prefix'] ?? '', $config['suffix'] ?? ''
         );
     }
 
