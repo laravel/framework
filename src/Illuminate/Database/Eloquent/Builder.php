@@ -537,7 +537,6 @@ class Builder
      */
     public function getOrFail($columns = ['*'])
     {
-
         $models = $this->get($columns);
 
         if (count($models)) {
@@ -545,7 +544,6 @@ class Builder
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->model));
-
     }
 
     /**
