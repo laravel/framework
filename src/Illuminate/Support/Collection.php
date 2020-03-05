@@ -31,6 +31,17 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Create a new collection instance from the characters in the given string.
+     *
+     * @param  string  $string
+     * @return static
+     */
+    public static function fromString($string)
+    {
+        return new static(str_split($string));
+    }
+
+    /**
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $number

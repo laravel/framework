@@ -24,6 +24,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testFromString($collection)
+    {
+        $data = $collection::fromString('123');
+
+        $this->assertSame(['1', '2', '3'], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testFirstReturnsFirstItemInCollection($collection)
     {
         $c = new $collection(['foo', 'bar']);

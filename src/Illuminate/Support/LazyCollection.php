@@ -70,6 +70,21 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Create a new collection instance from the characters in the given string.
+     *
+     * @param  string  $string
+     * @return static
+     */
+    public static function fromString($string)
+    {
+        return new static(function () use ($string) {
+            for ($i = 0, $l = Str::length($string); $i < $l; $i++) {
+                yield $string[$i];
+            }
+        });
+    }
+
+    /**
      * Create an enumerable with the given range.
      *
      * @param  int  $from
