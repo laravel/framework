@@ -4,7 +4,6 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Support\Arr;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcaster extends Broadcaster
 {
@@ -59,11 +58,6 @@ class RedisBroadcaster extends Broadcaster
         $channelName = $this->normalizeChannelName(
             str_replace($this->prefix, '', $request->channel_name)
         );
-
-        if ($this->isGuardedChannel($request->channel_name) &&
-            ! $this->retrieveUser($request, $channelName)) {
-            throw new AccessDeniedHttpException;
-        }
 
         return parent::verifyUserCanAccessChannel(
             $request, $channelName

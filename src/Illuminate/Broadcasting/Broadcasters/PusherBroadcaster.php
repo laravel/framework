@@ -6,7 +6,6 @@ use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Pusher\Pusher;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PusherBroadcaster extends Broadcaster
 {
@@ -41,11 +40,6 @@ class PusherBroadcaster extends Broadcaster
     public function auth($request)
     {
         $channelName = $this->normalizeChannelName($request->channel_name);
-
-        if ($this->isGuardedChannel($request->channel_name) &&
-            ! $this->retrieveUser($request, $channelName)) {
-            throw new AccessDeniedHttpException;
-        }
 
         return parent::verifyUserCanAccessChannel(
             $request, $channelName
