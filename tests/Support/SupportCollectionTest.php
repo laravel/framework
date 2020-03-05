@@ -1624,6 +1624,39 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testExplode($collection)
+    {
+        $data = new $collection([1, 2, 0, 3, 0, 4, 5, 6, 7]);
+
+        $this->assertSame(
+            [[1, 2], [3], [4, 5, 6, 7]],
+            $data->explode(0)->map->values()->toArray()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testExplodeWithEmptyCollection($collection)
+    {
+        $data = new $collection([]);
+
+        $this->assertSame([[]], $data->explode(0)->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testExplodeWithJustTheDelimiter($collection)
+    {
+        $data = new $collection([',']);
+
+        $this->assertSame([[], []], $data->explode(',')->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);

@@ -509,6 +509,31 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Explodes the values into chunks at the boundaries of the delimiter.
+     *
+     * @param  string  $delimiter
+     * @return static
+     */
+    public function explode($delimiter)
+    {
+        return new static(function () use ($delimiter) {
+            $chunk = [];
+
+            foreach ($this as $key => $value) {
+                if ($value == $delimiter) {
+                    yield new Collection($chunk);
+
+                    $chunk = [];
+                } else {
+                    $chunk[$key] = $value;
+                }
+            }
+
+            yield new Collection($chunk);
+        });
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value

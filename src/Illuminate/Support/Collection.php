@@ -510,6 +510,17 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Explodes the values into chunks at the boundaries of the delimiter.
+     *
+     * @param  string  $delimiter
+     * @return static
+     */
+    public function explode($delimiter)
+    {
+        return $this->lazy()->explode($delimiter);
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
