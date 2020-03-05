@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use IteratorAggregate;
+use LogicException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
@@ -200,6 +201,8 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             $route->name($name = $this->generateRouteName());
 
             $this->add($route);
+        } elseif (! is_null($symfonyRoutes->get($name))) {
+            throw new LogicException("Unable to prepare route [{$route->uri}] for serialization. Has a duplicate name [{$name}].");
         }
 
         $symfonyRoutes->add($name, $route->toSymfonyRoute());
