@@ -716,7 +716,7 @@ trait HasRelationships
     protected function newRelatedInstance($class)
     {
         return tap(new $class, function ($instance) {
-
+            //
         });
     }
 
