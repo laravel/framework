@@ -229,10 +229,12 @@ class CompiledRouteCollection extends AbstractRouteCollection
         if (empty($attributes['action']['prefix'] ?? '')) {
             $baseUri = $attributes['uri'];
         } else {
+            $prefixParts = trim($attributes['action']['prefix'], '/');
+
             $baseUri = trim(implode(
                 '/', array_slice(
                     explode('/', trim($attributes['uri'], '/')),
-                    count(explode('/', trim($attributes['action']['prefix'], '/')))
+                    count($prefixParts !== '' ? explode('/', $prefixParts) : [])
                 )
             ), '/');
         }
