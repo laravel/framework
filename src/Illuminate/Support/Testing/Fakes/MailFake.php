@@ -7,8 +7,9 @@ use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Contracts\Mail\Factory as MailFactory;
 
-class MailFake implements Mailer, MailQueue
+class MailFake implements Mailer, MailQueue, MailFactory
 {
     /**
      * The mailer currently being used to send a message.
