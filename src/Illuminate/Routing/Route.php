@@ -688,7 +688,7 @@ class Route
     {
         $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
 
-        return $this->setUri(trim($uri, '/'));
+        return $this->setUri($uri !== '/' ? trim($uri, '/') : $uri);
     }
 
     /**

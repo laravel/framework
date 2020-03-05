@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Closure;
 use DateTime;
 use Exception;
 use Illuminate\Auth\Middleware\Authenticate;
