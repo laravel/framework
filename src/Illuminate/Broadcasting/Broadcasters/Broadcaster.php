@@ -91,7 +91,7 @@ abstract class Broadcaster implements BroadcasterContract
      * Determine whether the callback can be called with the given user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  \Closure|callable $callback
+     * @param  callable $callback
      * @return bool
      */
     protected function canBeCalledWithUser($user, $callback)
@@ -106,7 +106,7 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Determine if the callback allows guests.
      *
-     * @param  \Closure|callable  $callback
+     * @param  callable $callback
      * @return bool
      *
      * @throws \ReflectionException
