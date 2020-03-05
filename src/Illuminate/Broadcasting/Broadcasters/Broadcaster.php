@@ -73,12 +73,61 @@ abstract class Broadcaster implements BroadcasterContract
 
             $handler = $this->normalizeChannelHandlerToCallable($callback);
 
-            if ($result = $handler($this->retrieveUser($request, $channel), ...$parameters)) {
+            $user = $this->retrieveUser($request, $channel);
+
+            if (! $this->canBeCalledWithUser($user, $handler)) {
+                continue;
+            }
+
+            if ($result = $handler($user, ...$parameters)) {
                 return $this->validAuthenticationResponse($request, $result);
             }
         }
 
         throw new AccessDeniedHttpException;
+    }
+
+    /**
+     * Determine whether the callback can be called with the given user.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Closure|callable $callback
+     * @return bool
+     */
+    protected function canBeCalledWithUser($user, $callback)
+    {
+        if (! is_null($user)) {
+            return true;
+        }
+
+        return $this->callbackAllowsGuests($callback);
+    }
+
+    /**
+     * Determine if the callback allows guests.
+     *
+     * @param  \Closure|callable  $callback
+     * @return bool
+     *
+     * @throws \ReflectionException
+     */
+    protected function callbackAllowsGuests($callback)
+    {
+        $parameters = (new ReflectionFunction($callback))->getParameters();
+
+        return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
+    }
+
+    /**
+     * Determine if the given parameter allows guests.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @return bool
+     */
+    protected function parameterAllowsGuests($parameter)
+    {
+        return ($parameter->getClass() && $parameter->allowsNull()) ||
+               ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
     }
 
     /**
