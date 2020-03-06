@@ -229,7 +229,10 @@ class SupportStringableTest extends TestCase
         $this->assertSame('hello-world', (string) $this->stringable('hello_world')->slug());
         $this->assertSame('hello_world', (string) $this->stringable('hello_world')->slug('_'));
         $this->assertSame('user-at-host', (string) $this->stringable('user@host')->slug());
-        $this->assertSame('slam-dnya', (string) $this->stringable('سلام دنیا')->slug('-', null));
+        $this->assertSame('سلام-دنیا', (string) $this->stringable('سلام دنیا')->slug('-', null));
+        $this->assertSame('sometext', (string) $this->stringable('some text')->slug(''));
+        $this->assertSame('', (string) $this->stringable('')->slug(''));
+        $this->assertSame('', (string) $this->stringable('')->slug());
     }
 
     public function testStart()

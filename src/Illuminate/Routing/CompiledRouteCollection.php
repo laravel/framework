@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -100,7 +101,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             if ($result = $matcher->matchRequest($request)) {
                 $route = $this->getByName($result['_route']);
             }
-        } catch (ResourceNotFoundException $e) {
+        } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
             //
         }
 
@@ -229,10 +230,12 @@ class CompiledRouteCollection extends AbstractRouteCollection
         if (empty($attributes['action']['prefix'] ?? '')) {
             $baseUri = $attributes['uri'];
         } else {
+            $prefix = trim($attributes['action']['prefix'], '/');
+
             $baseUri = trim(implode(
                 '/', array_slice(
                     explode('/', trim($attributes['uri'], '/')),
-                    count(explode('/', trim($attributes['action']['prefix'], '/')))
+                    count($prefix !== '' ? explode('/', $prefix) : [])
                 )
             ), '/');
         }

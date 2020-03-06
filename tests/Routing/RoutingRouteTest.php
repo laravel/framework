@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Closure;
 use DateTime;
 use Exception;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -788,6 +789,15 @@ class RoutingRouteTest extends TestCase
         });
         $route->where('bar', '[0-9]+');
         $this->assertFalse($route->matches($request));
+    }
+
+    public function testRoutePrefixParameterParsing()
+    {
+        $route = new Route('GET', '/foo', ['prefix' => 'profiles/{user:username}/portfolios', 'uses' => function () {
+            //
+        }]);
+
+        $this->assertEquals('profiles/{user}/portfolios/foo', $route->uri());
     }
 
     public function testDotDoesNotMatchEverything()

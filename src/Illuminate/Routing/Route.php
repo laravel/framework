@@ -144,7 +144,7 @@ class Route
      */
     public function __construct($methods, $uri, $action)
     {
-        $this->uri = $this->parseUri($uri);
+        $this->uri = $uri;
         $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
 
@@ -152,22 +152,7 @@ class Route
             $this->methods[] = 'HEAD';
         }
 
-        if (isset($this->action['prefix'])) {
-            $this->prefix($this->action['prefix']);
-        }
-    }
-
-    /**
-     * Parse the route URI and normalize / store any implicit binding fields.
-     *
-     * @param  string  $uri
-     * @return string
-     */
-    protected function parseUri($uri)
-    {
-        return tap(RouteUri::parse($uri), function ($uri) {
-            $this->bindingFields = $uri->bindingFields;
-        })->uri;
+        $this->prefix($this->action['prefix'] ?? '');
     }
 
     /**
@@ -703,9 +688,7 @@ class Route
     {
         $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
 
-        $this->uri = trim($uri, '/');
-
-        return $this;
+        return $this->setUri($uri !== '/' ? trim($uri, '/') : $uri);
     }
 
     /**
@@ -726,9 +709,24 @@ class Route
      */
     public function setUri($uri)
     {
-        $this->uri = $uri;
+        $this->uri = $this->parseUri($uri);
 
         return $this;
+    }
+
+    /**
+     * Parse the route URI and normalize / store any implicit binding fields.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    protected function parseUri($uri)
+    {
+        $this->bindingFields = [];
+
+        return tap(RouteUri::parse($uri), function ($uri) {
+            $this->bindingFields = $uri->bindingFields;
+        })->uri;
     }
 
     /**
