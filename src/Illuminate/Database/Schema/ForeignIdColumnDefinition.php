@@ -35,7 +35,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      */
     public function constrained($foreignTable = null)
     {
-        if (!$foreignTable) {
+        if (! $foreignTable) {
             return $this->references('id')->on(Str::plural(Str::before($this->name, '_id')));
         }
 
