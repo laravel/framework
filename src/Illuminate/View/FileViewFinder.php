@@ -192,7 +192,7 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function addNamespace($namespace, $hints)
     {
-        $hints = (array) $hints;
+        $hints = array_map([$this, 'resolvePath'], (array) $hints);
 
         if (isset($this->hints[$namespace])) {
             $hints = array_merge($this->hints[$namespace], $hints);
@@ -210,7 +210,7 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function prependNamespace($namespace, $hints)
     {
-        $hints = (array) $hints;
+        $hints = array_map([$this, 'resolvePath'], (array) $hints);
 
         if (isset($this->hints[$namespace])) {
             $hints = array_merge($hints, $this->hints[$namespace]);
@@ -228,7 +228,7 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function replaceNamespace($namespace, $hints)
     {
-        $this->hints[$namespace] = (array) $hints;
+        $this->hints[$namespace] = array_map([$this, 'resolvePath'], (array) $hints);
     }
 
     /**
