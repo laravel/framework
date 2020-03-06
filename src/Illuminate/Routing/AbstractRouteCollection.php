@@ -146,6 +146,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
                 'fallback' => $route->isFallback,
                 'defaults' => $route->defaults,
                 'wheres' => $route->wheres,
+                'bindingFields' => $route->bindingFields(),
             ];
         }
 

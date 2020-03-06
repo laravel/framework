@@ -70,6 +70,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             'fallback' => $route->isFallback,
             'defaults' => $route->defaults,
             'wheres' => $route->wheres,
+            'bindingFields' => $route->bindingFields(),
         ];
 
         $this->compiled = [];
@@ -244,6 +245,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ->setFallback($attributes['fallback'])
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
+            ->setBindingFields($attributes['bindingFields'])
             ->setRouter($this->router)
             ->setContainer($this->container);
     }
