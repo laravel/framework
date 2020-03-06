@@ -327,10 +327,31 @@ class SupportCollectionTest extends TestCase
 
     public function testArrayAccessOffsetExists()
     {
-        $c = new Collection(['foo', 'bar']);
+        $c = new Collection(['foo', 'bar', null]);
         $this->assertTrue($c->offsetExists(0));
         $this->assertTrue($c->offsetExists(1));
-        $this->assertFalse($c->offsetExists(1000));
+        $this->assertFalse($c->offsetExists(2));
+    }
+
+    public function testBehavesLikeAnArrayWithArrayAccess()
+    {
+        // indexed array
+        $input = ['foo', null];
+        $c = new Collection($input);
+        $this->assertEquals(isset($input[0]), isset($c[0])); // existing value
+        $this->assertEquals(isset($input[1]), isset($c[1])); // existing but null value
+        $this->assertEquals(isset($input[1000]), isset($c[1000])); // non-existing value
+        $this->assertEquals($input[0], $c[0]);
+        $this->assertEquals($input[1], $c[1]);
+
+        // associative array
+        $input = ['k1' => 'foo', 'k2' => null];
+        $c = new Collection($input);
+        $this->assertEquals(isset($input['k1']), isset($c['k1'])); // existing value
+        $this->assertEquals(isset($input['k2']), isset($c['k2'])); // existing but null value
+        $this->assertEquals(isset($input['k3']), isset($c['k3'])); // non-existing value
+        $this->assertEquals($input['k1'], $c['k1']);
+        $this->assertEquals($input['k2'], $c['k2']);
     }
 
     public function testArrayAccessOffsetGet()
