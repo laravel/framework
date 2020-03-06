@@ -12,7 +12,7 @@ class SometimesIf
     public $condition;
 
     /**
-     * Create a new required sometimes rule based on a condition.
+     * Create a new sometimes rule based on a condition.
      *
      * @param  callable|bool  $condition
      * @return void
