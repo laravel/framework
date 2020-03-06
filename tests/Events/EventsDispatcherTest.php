@@ -336,6 +336,27 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
     }
 
+    public function testQueuedEventHandlersAreQueued2()
+    {
+        $d = new Dispatcher;
+        $queue = m::mock(Queue::class);
+
+        $queue->shouldReceive('connection')->once()->with('redis')->andReturnSelf();
+
+        $queue->shouldReceive('laterOn')->once()->with('my_queue', 10, m::type(CallQueuedListener::class));
+
+        $d->setQueueResolver(function () use ($queue) {
+            return $queue;
+        });
+
+        $d->listen('some.event', TestDispatcherConnectionQueuedHandler::class.'@handle');
+        $resp = $d->dispatch('some.event', ['foo', 'bar']);
+
+        // queued listeners respond with null
+        $this->assertNull($resp[0]);
+        $this->assertCount(1, $resp);
+    }
+
     public function testClassesWork()
     {
         unset($_SERVER['__event.test']);
@@ -467,6 +488,20 @@ class EventsDispatcherTest extends TestCase
 
 class TestDispatcherQueuedHandler implements ShouldQueue
 {
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestDispatcherConnectionQueuedHandler implements ShouldQueue
+{
+    public $connection = 'redis';
+
+    public $delay = 10;
+
+    public $queue = 'my_queue';
+
     public function handle()
     {
         //
