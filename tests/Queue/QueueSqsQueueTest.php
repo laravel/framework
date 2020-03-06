@@ -145,4 +145,12 @@ class QueueSqsQueueTest extends TestCase
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
         $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));
     }
+
+    public function testGetQueueProperlyResolvesUrlWithSuffix()
+    {
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, $suffix = '-staging');
+        $this->assertEquals($this->queueUrl.$suffix, $queue->getQueue(null));
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
+        $this->assertEquals($queueUrl, $queue->getQueue('test'));
+    }
 }
