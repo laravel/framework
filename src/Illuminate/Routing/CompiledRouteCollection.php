@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use LogicException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
@@ -61,21 +62,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function add(Route $route)
     {
-        $name = $route->getName() ?: $this->generateRouteName();
-
-        $this->attributes[$name] = [
-            'methods' => $route->methods(),
-            'uri' => $route->uri(),
-            'action' => $route->getAction() + ['as' => $name],
-            'fallback' => $route->isFallback,
-            'defaults' => $route->defaults,
-            'wheres' => $route->wheres,
-            'bindingFields' => $route->bindingFields(),
-        ];
-
-        $this->compiled = [];
-
-        return $route;
+        throw new LogicException('Dynamically adding routes at runtime when routes are cached is not supported.');
     }
 
     /**
@@ -88,10 +75,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function match(Request $request)
     {
-        if (empty($this->compiled) && $this->attributes) {
-            $this->recompileRoutes();
-        }
-
         $route = null;
 
         $matcher = new CompiledUrlMatcher(
@@ -107,16 +90,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
         }
 
         return $this->handleMatchedRoute($request, $route);
-    }
-
-    /**
-     * Recompile the routes from the attributes array.
-     *
-     * @return void
-     */
-    protected function recompileRoutes()
-    {
-        $this->compiled = $this->dumper()->getCompiledRoutes();
     }
 
     /**
@@ -161,7 +134,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
     public function getByAction($action)
     {
         $attributes = collect($this->attributes)->first(function (array $attributes) use ($action) {
-            return $attributes['action']['controller'] === $action;
+            if (isset($attributes['action']['controller'])) {
+                return $attributes['action']['controller'] === $action;
+            }
+
+            return $attributes['action']['uses'] === $action;
         });
 
         return $attributes ? $this->newRoute($attributes) : null;

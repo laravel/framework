@@ -247,4 +247,16 @@ class RouteCollection extends AbstractRouteCollection
 
         return $symfonyRoutes;
     }
+
+    /**
+     * Convert the collection to a CompiledRouteCollection instance.
+     *
+     * @return \Illuminate\Routing\CompiledRouteCollection
+     */
+    public function toCompiledRouteCollection()
+    {
+        ['compiled' => $compiled, 'attributes' => $attributes] = $this->compile();
+
+        return new CompiledRouteCollection($compiled, $attributes);
+    }
 }

@@ -3,14 +3,16 @@
 namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
-use Illuminate\Routing\CompiledRouteCollection;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Arr;
 use Illuminate\Tests\Integration\IntegrationTest;
+use LogicException;
 
 class CompiledRouteCollectionTest extends IntegrationTest
 {
     /**
-     * @var \Illuminate\Routing\CompiledRouteCollection
+     * @var \Illuminate\Routing\RouteCollection
      */
     protected $routeCollection;
 
@@ -24,10 +26,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
         parent::setUp();
 
         $this->router = $this->app['router'];
-
-        $this->routeCollection = (new CompiledRouteCollection([], []))
-            ->setRouter($this->router)
-            ->setContainer($this->app);
+        $this->routeCollection = new RouteCollection;
     }
 
     protected function tearDown(): void
@@ -38,114 +37,147 @@ class CompiledRouteCollectionTest extends IntegrationTest
         unset($this->router);
     }
 
-    public function testRouteCollectionCanAddRoute()
+    public function addRoute(Route $route)
     {
-        $this->routeCollection->add($this->newRoute('GET', 'foo', [
-            'uses' => 'FooController@index',
-            'as' => 'foo_index',
-        ]));
-        $this->assertCount(1, $this->routeCollection);
+        return $this->routeCollection->add($route);
     }
 
-    public function testRouteCollectionAddReturnsTheRoute()
+    public function compiledRouteCollection()
     {
-        $outputRoute = $this->routeCollection->add($inputRoute = $this->newRoute('GET', 'foo', [
+        return $this->routeCollection->toCompiledRouteCollection()
+            ->setRouter($this->router)
+            ->setContainer($this->app);
+    }
+
+    public function testRouteCollectionCanAddRoute()
+    {
+        $this->addRoute($this->newRoute('GET', 'foo', [
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
-        $this->assertInstanceOf(Route::class, $outputRoute);
-        $this->assertEquals($inputRoute, $outputRoute);
+
+        $this->assertCount(1, $this->compiledRouteCollection());
+    }
+
+    public function testRouteCollectionAddThrowsAnException()
+    {
+        $this->expectException(LogicException::class);
+
+        $this->compiledRouteCollection()->add($inputRoute = $this->newRoute('GET', 'foo', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]));
     }
 
     public function testRouteCollectionCanRetrieveByName()
     {
-        $this->routeCollection->add($routeIndex = $this->newRoute('GET', 'foo/index', [
+        $this->addRoute($routeIndex = $this->newRoute('GET', 'foo/index', [
             'uses' => 'FooController@index',
             'as' => 'route_name',
         ]));
 
+        $routes = $this->compiledRouteCollection();
+
         $this->assertSame('route_name', $routeIndex->getName());
-        $this->assertSame('route_name', $this->routeCollection->getByName('route_name')->getName());
-        $this->assertEquals($routeIndex, $this->routeCollection->getByName('route_name'));
+        $this->assertSame('route_name', $routes->getByName('route_name')->getName());
+        $this->assertEquals($routeIndex, $routes->getByName('route_name'));
     }
 
     public function testRouteCollectionCanRetrieveByAction()
     {
-        $this->routeCollection->add($routeIndex = $this->newRoute('GET', 'foo/index', $action = [
+        $this->addRoute($routeIndex = $this->newRoute('GET', 'foo/index', $action = [
             'uses' => 'FooController@index',
-            'as' => 'route_name',
         ]));
 
-        $this->assertSame($action, $routeIndex->getAction());
+        $routes = $this->compiledRouteCollection();
+
+        $this->assertSame($action, Arr::except($routeIndex->getAction(), 'as'));
+        $this->assertEquals($routeIndex, $routes->getByAction('FooController@index'));
     }
 
     public function testRouteCollectionCanGetIterator()
     {
-        $this->routeCollection->add($this->newRoute('GET', 'foo/index', [
+        $this->addRoute($this->newRoute('GET', 'foo/index', [
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
-        $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
+
+        $this->assertInstanceOf(ArrayIterator::class, $this->compiledRouteCollection()->getIterator());
     }
 
     public function testRouteCollectionCanGetIteratorWhenEmpty()
     {
-        $this->assertCount(0, $this->routeCollection);
-        $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
+        $routes = $this->compiledRouteCollection();
+
+        $this->assertCount(0, $routes);
+        $this->assertInstanceOf(ArrayIterator::class, $routes->getIterator());
     }
 
     public function testRouteCollectionCanGetIteratorWhenRouteAreAdded()
     {
-        $this->routeCollection->add($routeIndex = $this->newRoute('GET', 'foo/index', [
+        $this->addRoute($routeIndex = $this->newRoute('GET', 'foo/index', [
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
-        $this->assertCount(1, $this->routeCollection);
 
-        $this->routeCollection->add($routeShow = $this->newRoute('GET', 'bar/show', [
+        $routes = $this->compiledRouteCollection();
+
+        $this->assertCount(1, $routes);
+
+        $this->addRoute($routeShow = $this->newRoute('GET', 'bar/show', [
             'uses' => 'BarController@show',
             'as' => 'bar_show',
         ]));
-        $this->assertCount(2, $this->routeCollection);
 
-        $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
+        $routes = $this->compiledRouteCollection();
+
+        $this->assertCount(2, $routes);
+
+        $this->assertInstanceOf(ArrayIterator::class, $routes->getIterator());
     }
 
     public function testRouteCollectionCanHandleSameRoute()
     {
-        $routeIndex = $this->newRoute('GET', 'foo/index', [
+        $this->addRoute($routeIndex = $this->newRoute('GET', 'foo/index', [
             'uses' => 'FooController@index',
             'as' => 'foo_index',
-        ]);
+        ]));
 
-        $this->routeCollection->add($routeIndex);
-        $this->assertCount(1, $this->routeCollection);
+        $routes = $this->compiledRouteCollection();
+
+        $this->assertCount(1, $routes);
 
         // Add exactly the same route
-        $this->routeCollection->add($routeIndex);
-        $this->assertCount(1, $this->routeCollection);
+        $this->addRoute($routeIndex);
+
+        $routes = $this->compiledRouteCollection();
+
+        $this->assertCount(1, $routes);
 
         // Add a non-existing route
-        $this->routeCollection->add($this->newRoute('GET', 'bar/show', [
+        $this->addRoute($this->newRoute('GET', 'bar/show', [
             'uses' => 'BarController@show',
             'as' => 'bar_show',
         ]));
-        $this->assertCount(2, $this->routeCollection);
+
+        $routes = $this->compiledRouteCollection();
+
+        $this->assertCount(2, $routes);
     }
 
     public function testRouteCollectionCanGetAllRoutes()
     {
-        $this->routeCollection->add($routeIndex = $this->newRoute('GET', 'foo/index', [
+        $this->addRoute($routeIndex = $this->newRoute('GET', 'foo/index', [
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
 
-        $this->routeCollection->add($routeShow = $this->newRoute('GET', 'foo/show', [
+        $this->addRoute($routeShow = $this->newRoute('GET', 'foo/show', [
             'uses' => 'FooController@show',
             'as' => 'foo_show',
         ]));
 
-        $this->routeCollection->add($routeNew = $this->newRoute('POST', 'bar', [
+        $this->addRoute($routeNew = $this->newRoute('POST', 'bar', [
             'uses' => 'BarController@create',
             'as' => 'bar_create',
         ]));
@@ -155,7 +187,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
             $routeShow,
             $routeNew,
         ];
-        $this->assertEquals($allRoutes, $this->routeCollection->getRoutes());
+        $this->assertEquals($allRoutes, $this->compiledRouteCollection()->getRoutes());
     }
 
     public function testRouteCollectionCanGetRoutesByName()
@@ -175,11 +207,11 @@ class CompiledRouteCollectionTest extends IntegrationTest
             ]),
         ];
 
-        $this->routeCollection->add($routesByName['foo_index']);
-        $this->routeCollection->add($routesByName['foo_show']);
-        $this->routeCollection->add($routesByName['bar_create']);
+        $this->addRoute($routesByName['foo_index']);
+        $this->addRoute($routesByName['foo_show']);
+        $this->addRoute($routesByName['bar_create']);
 
-        $this->assertEquals($routesByName, $this->routeCollection->getRoutesByName());
+        $this->assertEquals($routesByName, $this->compiledRouteCollection()->getRoutesByName());
     }
 
     public function testRouteCollectionCanGetRoutesByMethod()
@@ -199,9 +231,9 @@ class CompiledRouteCollectionTest extends IntegrationTest
             ]),
         ];
 
-        $this->routeCollection->add($routes['foo_index']);
-        $this->routeCollection->add($routes['foo_show']);
-        $this->routeCollection->add($routes['bar_create']);
+        $this->addRoute($routes['foo_index']);
+        $this->addRoute($routes['foo_show']);
+        $this->addRoute($routes['bar_create']);
 
         $this->assertEquals([
             'GET' => [
@@ -215,7 +247,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
             'POST' => [
                 'bar' => $routes['bar_create'],
             ],
-        ], $this->routeCollection->getRoutesByMethod());
+        ], $this->compiledRouteCollection()->getRoutesByMethod());
     }
 
     public function testRouteCollectionCleansUpOverwrittenRoutes()
@@ -224,18 +256,15 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $routeA = $this->newRoute('GET', 'product', ['controller' => 'View@view', 'as' => 'routeA']);
         $routeB = $this->newRoute('GET', 'product', ['controller' => 'OverwrittenView@view', 'as' => 'overwrittenRouteA']);
 
-        $this->routeCollection->add($routeA);
-        $this->routeCollection->add($routeB);
+        $this->addRoute($routeA);
+        $this->addRoute($routeB);
 
-        // Check if the lookups of $routeA and $routeB are there.
-        $this->assertEquals($routeA, $this->routeCollection->getByName('routeA'));
-        $this->assertEquals($routeA, $this->routeCollection->getByAction('View@view'));
-        $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
-        $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
+        $routes = $this->compiledRouteCollection();
 
-        // The lookups of $routeB are still there.
-        $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
-        $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
+        $this->assertNull($routes->getByName('routeA'));
+        $this->assertNull($routes->getByAction('View@view'));
+        $this->assertEquals($routeB, $routes->getByName('overwrittenRouteA'));
+        $this->assertEquals($routeB, $routes->getByAction('OverwrittenView@view'));
     }
 
     /**
