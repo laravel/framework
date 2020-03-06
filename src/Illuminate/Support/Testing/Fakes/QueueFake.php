@@ -212,7 +212,7 @@ class QueueFake extends QueueManager implements Queue
         };
 
         return collect($this->jobs[$job])->filter(function ($data) use ($callback) {
-            return $callback($data['job'], $data['queue']);
+            return $callback($data['job'], $data['queue'], $data['delay']);
         })->pluck('job');
     }
 
@@ -257,13 +257,16 @@ class QueueFake extends QueueManager implements Queue
      * @param  string  $job
      * @param  mixed  $data
      * @param  string|null  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     *
      * @return mixed
      */
-    public function push($job, $data = '', $queue = null)
+    public function push($job, $data = '', $queue = null, $delay = null)
     {
         $this->jobs[is_object($job) ? get_class($job) : $job][] = [
             'job' => $job,
             'queue' => $queue,
+            'delay' => $delay,
         ];
     }
 
@@ -291,7 +294,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->push($job, $data, $queue);
+        return $this->push($job, $data, $queue, $delay);
     }
 
     /**
@@ -318,7 +321,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function laterOn($queue, $delay, $job, $data = '')
     {
-        return $this->push($job, $data, $queue);
+        return $this->push($job, $data, $queue, $delay);
     }
 
     /**
