@@ -44,6 +44,8 @@ class CompiledRouteCollectionTest extends IntegrationTest
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
+        $this->routeCollection->recompile();
+
         $this->assertCount(1, $this->routeCollection);
     }
 
@@ -53,6 +55,8 @@ class CompiledRouteCollectionTest extends IntegrationTest
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
+        $this->routeCollection->recompile();
+
         $this->assertInstanceOf(Route::class, $outputRoute);
         $this->assertEquals($inputRoute, $outputRoute);
     }
@@ -63,6 +67,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
             'uses' => 'FooController@index',
             'as' => 'route_name',
         ]));
+        $this->routeCollection->recompile();
 
         $this->assertSame('route_name', $routeIndex->getName());
         $this->assertSame('route_name', $this->routeCollection->getByName('route_name')->getName());
@@ -85,6 +90,8 @@ class CompiledRouteCollectionTest extends IntegrationTest
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
+        $this->routeCollection->recompile();
+
         $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
     }
 
@@ -100,12 +107,16 @@ class CompiledRouteCollectionTest extends IntegrationTest
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
+        $this->routeCollection->recompile();
+
         $this->assertCount(1, $this->routeCollection);
 
         $this->routeCollection->add($routeShow = $this->newRoute('GET', 'bar/show', [
             'uses' => 'BarController@show',
             'as' => 'bar_show',
         ]));
+        $this->routeCollection->recompile();
+
         $this->assertCount(2, $this->routeCollection);
 
         $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
@@ -119,10 +130,14 @@ class CompiledRouteCollectionTest extends IntegrationTest
         ]);
 
         $this->routeCollection->add($routeIndex);
+        $this->routeCollection->recompile();
+
         $this->assertCount(1, $this->routeCollection);
 
         // Add exactly the same route
         $this->routeCollection->add($routeIndex);
+        $this->routeCollection->recompile();
+
         $this->assertCount(1, $this->routeCollection);
 
         // Add a non-existing route
@@ -130,6 +145,8 @@ class CompiledRouteCollectionTest extends IntegrationTest
             'uses' => 'BarController@show',
             'as' => 'bar_show',
         ]));
+        $this->routeCollection->recompile();
+
         $this->assertCount(2, $this->routeCollection);
     }
 
@@ -139,16 +156,15 @@ class CompiledRouteCollectionTest extends IntegrationTest
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
-
         $this->routeCollection->add($routeShow = $this->newRoute('GET', 'foo/show', [
             'uses' => 'FooController@show',
             'as' => 'foo_show',
         ]));
-
         $this->routeCollection->add($routeNew = $this->newRoute('POST', 'bar', [
             'uses' => 'BarController@create',
             'as' => 'bar_create',
         ]));
+        $this->routeCollection->recompile();
 
         $allRoutes = [
             $routeIndex,
@@ -178,6 +194,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->routeCollection->add($routesByName['foo_index']);
         $this->routeCollection->add($routesByName['foo_show']);
         $this->routeCollection->add($routesByName['bar_create']);
+        $this->routeCollection->recompile();
 
         $this->assertEquals($routesByName, $this->routeCollection->getRoutesByName());
     }
@@ -202,6 +219,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->routeCollection->add($routes['foo_index']);
         $this->routeCollection->add($routes['foo_show']);
         $this->routeCollection->add($routes['bar_create']);
+        $this->routeCollection->recompile();
 
         $this->assertEquals([
             'GET' => [
@@ -233,6 +251,11 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
         $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
 
+        $this->routeCollection->recompile();
+
+        // The lookups of $routeA should not be there anymore, because they are no longer valid.
+        $this->assertNull($this->routeCollection->getByName('routeA'));
+        $this->assertNull($this->routeCollection->getByAction('View@view'));
         // The lookups of $routeB are still there.
         $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
         $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
