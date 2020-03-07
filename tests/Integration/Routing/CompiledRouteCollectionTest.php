@@ -3,9 +3,13 @@
 namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
+use Illuminate\Http\Request;
 use Illuminate\Routing\CompiledRouteCollection;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Arr;
 use Illuminate\Tests\Integration\IntegrationTest;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CompiledRouteCollectionTest extends IntegrationTest
 {
@@ -73,10 +77,12 @@ class CompiledRouteCollectionTest extends IntegrationTest
     {
         $this->routeCollection->add($routeIndex = $this->newRoute('GET', 'foo/index', $action = [
             'uses' => 'FooController@index',
-            'as' => 'route_name',
         ]));
 
-        $this->assertSame($action, $routeIndex->getAction());
+        $route = $this->routeCollection->getByAction('FooController@index');
+
+        $this->assertSame($action, Arr::except($routeIndex->getAction(), 'as'));
+        $this->assertSame($action, Arr::except($route->getAction(), 'as'));
     }
 
     public function testRouteCollectionCanGetIterator()
@@ -236,6 +242,47 @@ class CompiledRouteCollectionTest extends IntegrationTest
         // The lookups of $routeB are still there.
         $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
         $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
+    }
+
+    public function testMatchingThrowsNotFoundExceptionWhenRouteIsNotFound()
+    {
+        $this->routeCollection->add($this->newRoute('GET', '/', ['uses' => 'FooController@index']));
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->routeCollection->match(Request::create('/foo'));
+    }
+
+    public function testMatchingThrowsMethodNotAllowedHttpExceptionWhenMethodIsNotAllowed()
+    {
+        $this->routeCollection->add($this->newRoute('POST', '/foo', ['uses' => 'FooController@index']));
+
+        $this->expectException(MethodNotAllowedHttpException::class);
+
+        $this->routeCollection->match(Request::create('/foo'));
+    }
+
+    public function testSlashPrefixIsProperly()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '/']));
+
+        $route = $this->routeCollection->getByAction('FooController@index');
+
+        $this->assertEquals('foo/bar', $route->uri());
+    }
+
+    public function testRouteBindingsAreProperlySaved()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'posts/{post:slug}/show', [
+            'uses' => 'FooController@index',
+            'prefix' => 'profile/{user:username}',
+            'as' => 'foo',
+        ]));
+
+        $route = $this->routeCollection->getByName('foo');
+
+        $this->assertEquals('profile/{user}/posts/{post}/show', $route->uri());
+        $this->assertSame(['user' => 'username', 'post' => 'slug'], $route->bindingFields());
     }
 
     /**

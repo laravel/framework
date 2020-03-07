@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Routing;
 use ArrayIterator;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 class RouteCollectionTest extends TestCase
@@ -246,5 +247,19 @@ class RouteCollectionTest extends TestCase
         // The lookups of $routeB are still there.
         $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
         $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
+    }
+
+    public function testCannotCacheDuplicateRouteNames()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+        $this->routeCollection->add(
+            new Route('GET', 'users/{user}', ['uses' => 'UsersController@show', 'as' => 'users'])
+        );
+
+        $this->expectException(LogicException::class);
+
+        $this->routeCollection->compile();
     }
 }
