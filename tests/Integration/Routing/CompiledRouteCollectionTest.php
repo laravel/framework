@@ -295,7 +295,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->collection()->match(Request::create('/foo', 'POST'));
     }
 
-    public function testMatchingThrowsMethodNotAllowedHttpExceptionWhenMethodIsNotAllowedWhileSameRouteIsAddedDynamically()
+    public function testMatchingThrowsExceptionWhenMethodIsNotAllowedWhileSameRouteIsAddedDynamically()
     {
         $this->routeCollection->add($this->newRoute('GET', '/', ['uses' => 'FooController@index']));
 
@@ -349,7 +349,35 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertSame('foo', $routes->match(Request::create('/foo', 'GET'))->getName());
     }
 
-    public function testSlashPrefixIsProperly()
+    public function testMatchingDynamicallyAddedRoutesTakePrecedenceOverFallbackRoutes()
+    {
+        $this->routeCollection->add($this->fallbackRoute(['uses' => 'FooController@index']));
+        $this->routeCollection->add(
+            $this->newRoute('GET', '/foo/{id}', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $routes = $this->collection();
+
+        $routes->add($this->newRoute('GET', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
+
+        $this->assertEquals('bar', $routes->match(Request::create('/bar/1', 'GET'))->getName());
+    }
+
+    public function testMatchingFallbackRouteCatchesAll()
+    {
+        $this->routeCollection->add($this->fallbackRoute(['uses' => 'FooController@index', 'as' => 'fallback']));
+        $this->routeCollection->add(
+            $this->newRoute('GET', '/foo/{id}', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $routes = $this->collection();
+
+        $routes->add($this->newRoute('GET', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
+
+        $this->assertEquals('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
+    }
+
+    public function testSlashPrefixIsProperlyHandled()
     {
         $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '/']));
 
@@ -385,5 +413,20 @@ class CompiledRouteCollectionTest extends IntegrationTest
         return (new Route($methods, $uri, $action))
             ->setRouter($this->router)
             ->setContainer($this->app);
+    }
+
+    /**
+     * Create a new fallback Route object.
+     *
+     * @param  mixed  $action
+     * @return \Illuminate\Routing\Route
+     */
+    protected function fallbackRoute($action)
+    {
+        $placeholder = 'fallbackPlaceholder';
+
+        return $this->newRoute(
+            'GET', "{{$placeholder}}", $action
+        )->where($placeholder, '.*')->fallback();
     }
 }
