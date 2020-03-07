@@ -758,7 +758,7 @@ class Mailable implements MailableContract, Renderable
 
         return $this;
     }
-    
+
     /**
      * Apply the callback's message changes if the given "value" is true.
      *
