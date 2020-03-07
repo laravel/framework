@@ -258,7 +258,6 @@ class QueueFake extends QueueManager implements Queue
      * @param  mixed  $data
      * @param  string|null  $queue
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
-     *
      * @return mixed
      */
     public function push($job, $data = '', $queue = null, $delay = null)
