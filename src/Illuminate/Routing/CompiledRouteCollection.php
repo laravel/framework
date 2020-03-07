@@ -5,7 +5,6 @@ namespace Illuminate\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -122,7 +121,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
         } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
             try {
                 return $this->routes->match($request);
-            } catch (NotFoundHttpException | MethodNotAllowedHttpException $e) {
+            } catch (NotFoundHttpException $e) {
                 //
             }
         }
