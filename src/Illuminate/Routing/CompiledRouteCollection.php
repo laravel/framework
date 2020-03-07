@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -114,17 +115,37 @@ class CompiledRouteCollection extends AbstractRouteCollection
 
         $route = null;
 
+        $checkedDynamicRoutes = false;
+        $matchedCachedRouteIsFallback = false;
+
         try {
             if ($result = $matcher->matchRequest($request)) {
                 $route = $this->getByName($result['_route']);
             }
+
+            $matchedCachedRouteIsFallback = $route->isFallback;
         } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
+            $checkedDynamicRoutes = true;
+
             try {
                 return $this->routes->match($request);
             } catch (NotFoundHttpException $e) {
                 //
             }
         }
+
+        if ($matchedCachedRouteIsFallback && ! $checkedDynamicRoutes) {
+            try {
+                $dynamicRoute = $this->routes->match($request);
+
+                if (! $dynamicRoute->isFallback) {
+                    $route = $dynamicRoute;
+                }
+            } catch (Exception $e) {
+                //
+            }
+        }
+
 
         return $this->handleMatchedRoute($request, $route);
     }
