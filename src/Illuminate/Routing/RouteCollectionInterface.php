@@ -15,6 +15,24 @@ interface RouteCollectionInterface
     public function add(Route $route);
 
     /**
+     * Refresh the name look-up table.
+     *
+     * This is done in case any names are fluently defined or if routes are overwritten.
+     *
+     * @return void
+     */
+    public function refreshNameLookups();
+
+    /**
+     * Refresh the action look-up table.
+     *
+     * This is done in case any actions are overwritten with new controllers.
+     *
+     * @return void
+     */
+    public function refreshActionLookups();
+
+    /**
      * Find the first route matching a given request.
      *
      * @param  \Illuminate\Http\Request  $request
