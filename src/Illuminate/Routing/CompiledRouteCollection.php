@@ -146,7 +146,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
             }
         }
 
-
         return $this->handleMatchedRoute($request, $route);
     }
 
