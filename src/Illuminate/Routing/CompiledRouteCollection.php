@@ -5,6 +5,8 @@ namespace Illuminate\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
@@ -25,6 +27,13 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * @var array
      */
     protected $attributes = [];
+
+    /**
+     * An array of the routes that were added after loading the compiled routes.
+     *
+     * @var \Illuminate\Routing\RouteCollection|null
+     */
+    protected $routes;
 
     /**
      * The router instance used by the route.
@@ -51,6 +60,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
     {
         $this->compiled = $compiled;
         $this->attributes = $attributes;
+        $this->routes = new RouteCollection;
     }
 
     /**
@@ -61,21 +71,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function add(Route $route)
     {
-        $name = $route->getName() ?: $this->generateRouteName();
-
-        $this->attributes[$name] = [
-            'methods' => $route->methods(),
-            'uri' => $route->uri(),
-            'action' => $route->getAction() + ['as' => $name],
-            'fallback' => $route->isFallback,
-            'defaults' => $route->defaults,
-            'wheres' => $route->wheres,
-            'bindingFields' => $route->bindingFields(),
-        ];
-
-        $this->compiled = [];
-
-        return $route;
+        return $this->routes->add($route);
     }
 
     /**
@@ -108,39 +104,30 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function match(Request $request)
     {
-        if (empty($this->compiled) && $this->attributes) {
-            $this->recompileRoutes();
-        }
-
-        $route = null;
-
         $matcher = new CompiledUrlMatcher(
             $this->compiled, (new RequestContext)->fromRequest($request)
         );
+
+        $route = null;
 
         try {
             if ($result = $matcher->matchRequest($request)) {
                 $route = $this->getByName($result['_route']);
             }
         } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
-            //
+            try {
+                return $this->routes->match($request);
+            } catch (NotFoundHttpException | MethodNotAllowedHttpException $e) {
+                //
+            }
         }
 
         return $this->handleMatchedRoute($request, $route);
-    }
-
-    /**
-     * Recompile the routes from the attributes array.
-     *
-     * @return void
-     */
-    protected function recompileRoutes()
-    {
-        $this->compiled = $this->dumper()->getCompiledRoutes();
     }
 
     /**
@@ -162,7 +149,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function hasNamedRoute($name)
     {
-        return isset($this->attributes[$name]);
+        return isset($this->attributes[$name]) || $this->routes->hasNamedRoute($name);
     }
 
     /**
@@ -173,7 +160,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getByName($name)
     {
-        return isset($this->attributes[$name]) ? $this->newRoute($this->attributes[$name]) : null;
+        if (isset($this->attributes[$name])) {
+            return $this->newRoute($this->attributes[$name]);
+        }
+
+        return $this->routes->getByName($name);
     }
 
     /**
@@ -192,7 +183,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
             return $attributes['action']['uses'] === $action;
         });
 
-        return $attributes ? $this->newRoute($attributes) : null;
+        if ($attributes) {
+            return $this->newRoute($attributes);
+        }
+
+        return $this->routes->getByAction($action);
     }
 
     /**
@@ -202,7 +197,13 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutes()
     {
-        return $this->mapAttributesToRoutes()->values()->all();
+        return collect($this->attributes)
+            ->map(function (array $attributes) {
+                return $this->newRoute($attributes);
+            })
+            ->merge($this->routes->getRoutes())
+            ->values()
+            ->all();
     }
 
     /**
@@ -212,7 +213,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutesByMethod()
     {
-        return $this->mapAttributesToRoutes()
+        return collect($this->getRoutes())
             ->groupBy(function (Route $route) {
                 return $route->methods();
             })
@@ -231,21 +232,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutesByName()
     {
-        return $this->mapAttributesToRoutes()->keyBy(function (Route $route) {
-            return $route->getName();
-        })->all();
-    }
-
-    /**
-     * Get all of the routes in the collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function mapAttributesToRoutes()
-    {
-        return collect($this->attributes)->map(function (array $attributes) {
-            return $this->newRoute($attributes);
-        });
+        return collect($this->getRoutes())
+            ->keyBy(function (Route $route) {
+                return $route->getName();
+            })
+            ->all();
     }
 
     /**

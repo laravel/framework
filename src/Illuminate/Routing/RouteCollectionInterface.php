@@ -38,6 +38,7 @@ interface RouteCollectionInterface
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function match(Request $request);
