@@ -295,6 +295,19 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->collection()->match(Request::create('/foo', 'POST'));
     }
 
+    public function testMatchingThrowsMethodNotAllowedHttpExceptionWhenMethodIsNotAllowedWhileSameRouteIsAddedDynamically()
+    {
+        $this->routeCollection->add($this->newRoute('GET', '/', ['uses' => 'FooController@index']));
+
+        $routes = $this->collection();
+
+        $routes->add($this->newRoute('POST', '/', ['uses' => 'FooController@index']));
+
+        $this->expectException(MethodNotAllowedHttpException::class);
+
+        $routes->match(Request::create('/', 'PUT'));
+    }
+
     public function testMatchingRouteWithSameDynamicallyAddedRouteAlwaysMatchesCachedOneFirst()
     {
         $this->routeCollection->add(

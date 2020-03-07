@@ -122,7 +122,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
         } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
             try {
                 return $this->routes->match($request);
-            } catch (NotFoundHttpException | MethodNotAllowedHttpException $e) {
+            } catch (NotFoundHttpException $e) {
                 //
             }
         }
