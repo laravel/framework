@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
