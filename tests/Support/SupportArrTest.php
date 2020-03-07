@@ -143,12 +143,37 @@ class SupportArrTest extends TestCase
     {
         $array = [100, 200, 300];
 
+        //Callback is null and array is empty
+        $this->assertNull(Arr::first([], null));
+        $this->assertSame('foo', Arr::first([], null, 'foo'));
+        $this->assertSame('bar', Arr::first([], null, function () {
+            return 'bar';
+        }));
+
+        //Callback is null and array is not empty
+        $this->assertEquals(100, Arr::first($array));
+
+        //Callback is not null and array is not empty
         $value = Arr::first($array, function ($value) {
             return $value >= 150;
         });
-
         $this->assertEquals(200, $value);
-        $this->assertEquals(100, Arr::first($array));
+
+        //Callback is not null, array is not empty but no satisfied item
+        $value2 = Arr::first($array, function ($value) {
+            return $value > 300;
+        });
+        $value3 = Arr::first($array, function ($value) {
+            return $value > 300;
+        }, 'bar');
+        $value4 = Arr::first($array, function ($value) {
+            return $value > 300;
+        }, function () {
+            return 'baz';
+        });
+        $this->assertNull($value2);
+        $this->assertSame('bar', $value3);
+        $this->assertSame('baz', $value4);
     }
 
     public function testLast()
