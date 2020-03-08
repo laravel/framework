@@ -50,9 +50,10 @@ class Response implements ArrayAccess
     /**
      * Get the JSON decoded body of the response.
      *
+     * @param string $attribute
      * @return array
      */
-    public function json()
+    public function json(string $attribute = null)
     {
         if (! $this->decoded) {
             $this->decoded = json_decode((string) $this->response->getBody(), true);
