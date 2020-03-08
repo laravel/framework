@@ -170,7 +170,7 @@ class Command extends SymfonyCommand
     /**
      * {@inheritdoc}
      */
-    public function setHidden($hidden)
+    public function setHidden(bool $hidden)
     {
         parent::setHidden($this->hidden = $hidden);
 
