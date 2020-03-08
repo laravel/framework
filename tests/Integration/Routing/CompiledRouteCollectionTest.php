@@ -388,6 +388,17 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertEquals('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
     }
 
+    public function testMatchingCachedFallbackTakesPrecedenceOverDynamicRouteWithWrongMethod()
+    {
+        $this->routeCollection->add($this->fallbackRoute(['uses' => 'FooController@index', 'as' => 'fallback']));
+
+        $routes = $this->collection();
+
+        $routes->add($this->newRoute('POST', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
+
+        $this->assertEquals('fallback', $routes->match(Request::create('/bar/1', 'GET'))->getName());
+    }
+
     public function testSlashPrefixIsProperlyHandled()
     {
         $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '/']));
