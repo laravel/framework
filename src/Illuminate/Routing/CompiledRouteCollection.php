@@ -128,7 +128,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
 
         if ($route && $route->isFallback) {
             try {
-                return $this->routes->match($request);
+                $dynamicRoute = $this->routes->match($request);
+
+                if (! $dynamicRoute->isFallback || ! $route->isFallback) {
+                    $route = $dynamicRoute;
+                }
             } catch (NotFoundHttpException $e) {
                 //
             }
