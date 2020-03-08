@@ -29,7 +29,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
     protected $attributes = [];
 
     /**
-     * An array of the routes that were added after loading the compiled routes.
+     * The dynamically added routes that were added after loading the cached, compiled routes.
      *
      * @var \Illuminate\Routing\RouteCollection|null
      */
