@@ -29,6 +29,7 @@ class KeyGenerateCommand extends Command
     /**
      * Execute the console command.
      *
+     * @throws \Exception
      * @return void
      */
     public function handle()
@@ -37,6 +38,10 @@ class KeyGenerateCommand extends Command
 
         if ($this->option('show')) {
             return $this->line('<comment>'.$key.'</comment>');
+        }
+
+        if (! $this->checkForKey()) {
+            throw new \Exception('Key \'APP_KEY\' does not exist in file \'.env\'. Please add it.');
         }
 
         // Next, we will replace the application key in the environment file so it is
@@ -107,5 +112,15 @@ class KeyGenerateCommand extends Command
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
         return "/^APP_KEY{$escaped}/m";
+    }
+
+    /**
+     * Check if key exist in .env.
+     *
+     * @return bool|int
+     */
+    protected function checkForKey()
+    {
+        return preg_match('/^APP_KEY/m', file_get_contents($this->laravel->environmentFilePath()));
     }
 }
