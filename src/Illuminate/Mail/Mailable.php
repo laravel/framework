@@ -887,6 +887,19 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Apply the callback's message changes if the given "value" is false.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed|$this
+     */
+    public function unless($value, $callback, $default = null)
+    {
+        return $this->when(! $value, $callback, $default);
+    }
+
+    /**
      * Dynamically bind parameters to the message.
      *
      * @param  string  $method
