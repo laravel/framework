@@ -62,4 +62,19 @@ class PaginatorTest extends TestCase
 
         $this->assertSame($p->path(), 'http://website.com/test');
     }
+
+    public function testHigherOrderFunctions()
+    {
+        $entity = new class {
+            public $value = 'item';
+
+            public function setValue($string)
+            {
+                $this->value = $string;
+            }
+        };
+        $p = new Paginator([new $entity()], 2, 2);
+        $p->map->setValue('laravel');
+        $this->assertSame('laravel', $p->first()->value);
+    }
 }

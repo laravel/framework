@@ -689,6 +689,11 @@ abstract class AbstractPaginator implements Htmlable
         return $this->forwardCallTo($this->getCollection(), $method, $parameters);
     }
 
+    public function __get($key)
+    {
+        return $this->getCollection()->{$key};
+    }
+
     /**
      * Render the contents of the paginator when casting to string.
      *
