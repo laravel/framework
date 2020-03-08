@@ -83,6 +83,8 @@ class PackageManifest
      *
      * @param  string  $key
      * @return array
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function config($key)
     {
@@ -95,6 +97,8 @@ class PackageManifest
      * Get the current package manifest.
      *
      * @return array
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function getManifest()
     {
@@ -102,13 +106,13 @@ class PackageManifest
             return $this->manifest;
         }
 
-        if (! file_exists($this->manifestPath)) {
+        if (! $this->files->exists($this->manifestPath)) {
             $this->build();
         }
 
         $this->files->get($this->manifestPath);
 
-        return $this->manifest = file_exists($this->manifestPath) ?
+        return $this->manifest = $this->files->exists($this->manifestPath) ?
             $this->files->getRequire($this->manifestPath) : [];
     }
 
@@ -116,6 +120,8 @@ class PackageManifest
      * Build the manifest and write it to disk.
      *
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function build()
     {
@@ -151,16 +157,16 @@ class PackageManifest
      * Get all of the package names that should be ignored.
      *
      * @return array
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function packagesToIgnore()
     {
-        if (! file_exists($this->basePath.'/composer.json')) {
+        if (! $this->files->exists($path = $this->basePath.'/composer.json')) {
             return [];
         }
 
-        return json_decode(file_get_contents(
-            $this->basePath.'/composer.json'
-        ), true)['extra']['laravel']['dont-discover'] ?? [];
+        return json_decode($this->files->get($path), true)['extra']['laravel']['dont-discover'] ?? [];
     }
 
     /**
@@ -173,7 +179,7 @@ class PackageManifest
      */
     protected function write(array $manifest)
     {
-        if (! is_writable(dirname($this->manifestPath))) {
+        if (! $this->files->isWritable(dirname($this->manifestPath))) {
             throw new Exception('The '.dirname($this->manifestPath).' directory must be present and writable.');
         }
 
