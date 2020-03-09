@@ -659,7 +659,7 @@ class Arr
     }
     
     /**
-     * Loop through multiple arrays in parallel
+     * Loop through multiple arrays in parallel.
      *
      * @param iterable ...$arrays
      * @return array
