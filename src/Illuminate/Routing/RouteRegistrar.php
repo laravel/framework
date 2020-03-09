@@ -111,6 +111,19 @@ class RouteRegistrar
     }
 
     /**
+     * Route an API resource to a controller.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function apiResource($name, $controller, array $options = [])
+    {
+        return $this->router->apiResource($name, $controller, $this->attributes + $options);
+    }
+
+    /**
      * Create a route group with shared attributes.
      *
      * @param  \Closure|string  $callback
