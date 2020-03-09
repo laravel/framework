@@ -791,7 +791,7 @@ class AuthAccessGateTest extends TestCase
         yield [$abilities, '', false];
         yield [$noAbilities, '', false];
         yield [$noAbilities, [], true];
-        }
+    }
 
     public function testClassesCanBeDefinedAsCallbacksUsingAtNotationForGuests()
     {

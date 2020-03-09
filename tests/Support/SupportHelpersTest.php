@@ -660,7 +660,7 @@ class SupportHelpersTest extends TestCase
         yield ['/%s/', ['a', 'b', 'c'], 'Hi', 'Hi'];
         yield ['//', [], '', ''];
         yield ['/%s/', ['a'], '', ''];
-         // The internal pointer of this array is not at the beginning
+        // The internal pointer of this array is not at the beginning
         yield ['/%s/', $pointerArray, 'Hi, %s %s', 'Hi, Taylor Otwell'];
     }
 
