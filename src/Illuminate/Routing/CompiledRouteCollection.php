@@ -109,14 +109,10 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function match(Request $request)
     {
-        $trimmedRequest = clone $request;
-
-        $trimmedRequest->server->set(
-            'REQUEST_URI', rtrim($request->server->get('REQUEST_URI'), '/')
-        );
-
         $matcher = new CompiledUrlMatcher(
-            $this->compiled, (new RequestContext)->fromRequest($trimmedRequest)
+            $this->compiled, (new RequestContext)->fromRequest(
+                $trimmedRequest = $this->requestWithoutTrailingSlash($request)
+            )
         );
 
         $route = null;
@@ -146,6 +142,23 @@ class CompiledRouteCollection extends AbstractRouteCollection
         }
 
         return $this->handleMatchedRoute($request, $route);
+    }
+
+    /**
+     * Get a cloned instance of the given request without any trailing slash on the URI.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Request
+     */
+    protected function requestWithoutTrailingSlash(Request $request)
+    {
+        $trimmedRequest = clone $request;
+
+        $trimmedRequest->server->set(
+            'REQUEST_URI', rtrim($request->server->get('REQUEST_URI'), '/')
+        );
+
+        return $trimmedRequest;
     }
 
     /**
