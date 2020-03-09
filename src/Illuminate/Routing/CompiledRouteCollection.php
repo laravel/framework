@@ -109,14 +109,20 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function match(Request $request)
     {
+        $trimmedRequest = clone $request;
+
+        $trimmedRequest->server->set(
+            'REQUEST_URI', rtrim($request->server->get('REQUEST_URI'), '/')
+        );
+
         $matcher = new CompiledUrlMatcher(
-            $this->compiled, (new RequestContext)->fromRequest($request)
+            $this->compiled, (new RequestContext)->fromRequest($trimmedRequest)
         );
 
         $route = null;
 
         try {
-            if ($result = $matcher->matchRequest($request)) {
+            if ($result = $matcher->matchRequest($trimmedRequest)) {
                 $route = $this->getByName($result['_route']);
             }
         } catch (ResourceNotFoundException | MethodNotAllowedException $e) {

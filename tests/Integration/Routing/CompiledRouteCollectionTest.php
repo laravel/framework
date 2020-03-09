@@ -422,6 +422,15 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertSame(['user' => 'username', 'post' => 'slug'], $route->bindingFields());
     }
 
+    public function testMatchingSlashedRoutes()
+    {
+        $this->routeCollection->add(
+            $route = $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/'))->getName());
+    }
+
     /**
      * Create a new Route object.
      *
