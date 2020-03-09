@@ -8,6 +8,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Str;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
 
 class HttpClientTest extends TestCase
 {
@@ -21,6 +22,20 @@ class HttpClientTest extends TestCase
         parent::setUp();
 
         $this->factory = new Factory;
+    }
+
+    public function testToPsrResponse()
+    {
+        $this->factory->fake();
+
+        /** @var \Illuminate\Http\Client\Response $response */
+        $response = $this->factory->post('http://laravel.com/test-missing-page');
+        $psrResponse = $response->toPsrResponse();
+
+        $this->assertInstanceOf(ResponseInterface::class, $psrResponse);
+        $this->assertSame('OK', $psrResponse->getReasonPhrase());
+        $this->assertSame(200, $psrResponse->getStatusCode());
+        $this->assertSame('1.1', $psrResponse->getProtocolVersion());
     }
 
     public function testStubbedResponsesAreReturnedAfterFaking()
