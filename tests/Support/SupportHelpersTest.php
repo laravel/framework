@@ -644,23 +644,24 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('From $_ENV', env('foo'));
     }
 
+    /**
+     * @return \Generator
+     */
     public function providesPregReplaceArrayData()
     {
         $pointerArray = ['Taylor', 'Otwell'];
 
         next($pointerArray);
 
-        return [
-            ['/:[a-z_]+/', ['8:30', '9:00'], 'The event will take place between :start and :end', 'The event will take place between 8:30 and 9:00'],
-            ['/%s/', ['Taylor'], 'Hi, %s', 'Hi, Taylor'],
-            ['/%s/', ['Taylor', 'Otwell'], 'Hi, %s %s', 'Hi, Taylor Otwell'],
-            ['/%s/', [], 'Hi, %s %s', 'Hi,  '],
-            ['/%s/', ['a', 'b', 'c'], 'Hi', 'Hi'],
-            ['//', [], '', ''],
-            ['/%s/', ['a'], '', ''],
-            // The internal pointer of this array is not at the beginning
-            ['/%s/', $pointerArray, 'Hi, %s %s', 'Hi, Taylor Otwell'],
-        ];
+        yield ['/:[a-z_]+/', ['8:30', '9:00'], 'The event will take place between :start and :end', 'The event will take place between 8:30 and 9:00'];
+        yield ['/%s/', ['Taylor'], 'Hi, %s', 'Hi, Taylor'];
+        yield ['/%s/', ['Taylor', 'Otwell'], 'Hi, %s %s', 'Hi, Taylor Otwell'];
+        yield ['/%s/', [], 'Hi, %s %s', 'Hi,  '];
+        yield ['/%s/', ['a', 'b', 'c'], 'Hi', 'Hi'];
+        yield ['//', [], '', ''];
+        yield ['/%s/', ['a'], '', ''];
+         // The internal pointer of this array is not at the beginning
+        yield ['/%s/', $pointerArray, 'Hi, %s %s', 'Hi, Taylor Otwell'];
     }
 
     /** @dataProvider providesPregReplaceArrayData */

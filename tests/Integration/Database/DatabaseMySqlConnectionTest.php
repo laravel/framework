@@ -62,19 +62,20 @@ class DatabaseMySqlConnectionTest extends TestCase
         );
     }
 
-    public function floatComparisonsDataProvider(): array
+    /**
+     * @return \Generator
+     */
+    public function floatComparisonsDataProvider()
     {
-        return [
-            [0.2, '=', true],
-            [0.2, '>', false],
-            [0.2, '<', false],
-            [0.1, '=', false],
-            [0.1, '<', false],
-            [0.1, '>', true],
-            [0.3, '=', false],
-            [0.3, '<', true],
-            [0.3, '>', false],
-        ];
+        yield [0.2, '=', true];
+        yield [0.2, '>', false];
+        yield [0.2, '<', false];
+        yield [0.1, '=', false];
+        yield [0.1, '<', false];
+        yield [0.1, '>', true];
+        yield [0.3, '=', false];
+        yield [0.3, '<', true];
+        yield [0.3, '>', false];
     }
 
     public function testFloatValueStoredCorrectly(): void

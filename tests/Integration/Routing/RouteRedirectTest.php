@@ -28,19 +28,19 @@ class RouteRedirectTest extends TestCase
         $response->assertStatus(301);
     }
 
-    public function routeRedirectDataSets(): array
+    /**
+     * @return \Generator
+     */
+    public function routeRedirectDataSets()
     {
-        return [
-            'route redirect with no parameters' => ['from', 'to', '/from', '/to'],
-            'route redirect with one parameter' => ['from/{param}/{param2?}', 'to', '/from/value1', '/to'],
-            'route redirect with two parameters' => ['from/{param}/{param2?}', 'to', '/from/value1/value2', '/to'],
-            'route redirect with one parameter replacement' => ['users/{user}/repos', 'members/{user}/repos', '/users/22/repos', '/members/22/repos'],
-            'route redirect with two parameter replacements' => ['users/{user}/repos/{repo}', 'members/{user}/projects/{repo}', '/users/22/repos/laravel-framework', '/members/22/projects/laravel-framework'],
-            'route redirect with two parameter replacements' => ['users/{user}/repos/{repo}', 'members/{user}/projects/{repo}', '/users/22/repos/laravel-framework', '/members/22/projects/laravel-framework'],
-            'route redirect with non existent optional parameter replacements' => ['users/{user?}', 'members/{user?}', '/users', '/members'],
-            'route redirect with existing parameter replacements' => ['users/{user?}', 'members/{user?}', '/users/22', '/members/22'],
-            'route redirect with two optional replacements' => ['users/{user?}/{repo?}', 'members/{user?}', '/users/22', '/members/22'],
-            'route redirect with two optional replacements that switch position' => ['users/{user?}/{switch?}', 'members/{switch?}/{user?}', '/users/11/22', '/members/22/11'],
-        ];
+        yield 'route redirect with no parameters' => ['from', 'to', '/from', '/to'];
+        yield 'route redirect with one parameter' => ['from/{param}/{param2?}', 'to', '/from/value1', '/to'];
+        yield 'route redirect with two parameters' => ['from/{param}/{param2?}', 'to', '/from/value1/value2', '/to'];
+        yield 'route redirect with one parameter replacement' => ['users/{user}/repos', 'members/{user}/repos', '/users/22/repos', '/members/22/repos'];
+        yield 'route redirect with two parameter replacements' => ['users/{user}/repos/{repo}', 'members/{user}/projects/{repo}', '/users/22/repos/laravel-framework', '/members/22/projects/laravel-framework'];
+        yield 'route redirect with non existent optional parameter replacements' => ['users/{user?}', 'members/{user?}', '/users', '/members'];
+        yield 'route redirect with existing parameter replacements' => ['users/{user?}', 'members/{user?}', '/users/22', '/members/22'];
+        yield 'route redirect with two optional replacements' => ['users/{user?}/{repo?}', 'members/{user?}', '/users/22', '/members/22'];
+        yield 'route redirect with two optional replacements that switch position' => ['users/{user?}/{switch?}', 'members/{switch?}/{user?}', '/users/11/22', '/members/22/11'];
     }
 }

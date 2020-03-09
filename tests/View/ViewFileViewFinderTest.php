@@ -146,11 +146,12 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertFalse($finder->hasHintInformation('::foo.bar'));
     }
 
+    /**
+     * @return \Generator
+     */
     public function pathsProvider()
     {
-        return [
-            ['incorrect_path', 'incorrect_path'],
-        ];
+        yield ['incorrect_path', 'incorrect_path'];
     }
 
     /**

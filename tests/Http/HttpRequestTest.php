@@ -79,14 +79,15 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($expected, $request->segment($segment, 'default'));
     }
 
+    /**
+     * @return \Generator
+     */
     public function segmentProvider()
     {
-        return [
-            ['', 1, 'default'],
-            ['foo/bar//baz', 1, 'foo'],
-            ['foo/bar//baz', 2, 'bar'],
-            ['foo/bar//baz', 3, 'baz'],
-        ];
+        yield ['', 1, 'default'];
+        yield ['foo/bar//baz', 1, 'foo'];
+        yield ['foo/bar//baz', 2, 'bar'];
+        yield ['foo/bar//baz', 3, 'baz'];
     }
 
     /**
@@ -101,14 +102,15 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $request->segments());
     }
 
+    /**
+     * @return \Generator
+     */
     public function segmentsProvider()
     {
-        return [
-            ['', []],
-            ['foo/bar', ['foo', 'bar']],
-            ['foo/bar//baz', ['foo', 'bar', 'baz']],
-            ['foo/0/bar', ['foo', '0', 'bar']],
-        ];
+        yield ['', []];
+        yield ['foo/bar', ['foo', 'bar']];
+        yield ['foo/bar//baz', ['foo', 'bar', 'baz']];
+        yield ['foo/0/bar', ['foo', '0', 'bar']];
     }
 
     public function testUrlMethod()

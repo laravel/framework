@@ -2357,263 +2357,265 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    /**
+     * @return \Generator
+     */
     public function validUrls()
     {
-        return [
-            ['aaa://fully.qualified.domain/path'],
-            ['aaas://fully.qualified.domain/path'],
-            ['about://fully.qualified.domain/path'],
-            ['acap://fully.qualified.domain/path'],
-            ['acct://fully.qualified.domain/path'],
-            ['acr://fully.qualified.domain/path'],
-            ['adiumxtra://fully.qualified.domain/path'],
-            ['afp://fully.qualified.domain/path'],
-            ['afs://fully.qualified.domain/path'],
-            ['aim://fully.qualified.domain/path'],
-            ['apt://fully.qualified.domain/path'],
-            ['attachment://fully.qualified.domain/path'],
-            ['aw://fully.qualified.domain/path'],
-            ['barion://fully.qualified.domain/path'],
-            ['beshare://fully.qualified.domain/path'],
-            ['bitcoin://fully.qualified.domain/path'],
-            ['blob://fully.qualified.domain/path'],
-            ['bolo://fully.qualified.domain/path'],
-            ['callto://fully.qualified.domain/path'],
-            ['cap://fully.qualified.domain/path'],
-            ['chrome://fully.qualified.domain/path'],
-            ['chrome-extension://fully.qualified.domain/path'],
-            ['cid://fully.qualified.domain/path'],
-            ['coap://fully.qualified.domain/path'],
-            ['coaps://fully.qualified.domain/path'],
-            ['com-eventbrite-attendee://fully.qualified.domain/path'],
-            ['content://fully.qualified.domain/path'],
-            ['crid://fully.qualified.domain/path'],
-            ['cvs://fully.qualified.domain/path'],
-            ['data://fully.qualified.domain/path'],
-            ['dav://fully.qualified.domain/path'],
-            ['dict://fully.qualified.domain/path'],
-            ['dlna-playcontainer://fully.qualified.domain/path'],
-            ['dlna-playsingle://fully.qualified.domain/path'],
-            ['dns://fully.qualified.domain/path'],
-            ['dntp://fully.qualified.domain/path'],
-            ['dtn://fully.qualified.domain/path'],
-            ['dvb://fully.qualified.domain/path'],
-            ['ed2k://fully.qualified.domain/path'],
-            ['example://fully.qualified.domain/path'],
-            ['facetime://fully.qualified.domain/path'],
-            ['fax://fully.qualified.domain/path'],
-            ['feed://fully.qualified.domain/path'],
-            ['feedready://fully.qualified.domain/path'],
-            ['file://fully.qualified.domain/path'],
-            ['filesystem://fully.qualified.domain/path'],
-            ['finger://fully.qualified.domain/path'],
-            ['fish://fully.qualified.domain/path'],
-            ['ftp://fully.qualified.domain/path'],
-            ['geo://fully.qualified.domain/path'],
-            ['gg://fully.qualified.domain/path'],
-            ['git://fully.qualified.domain/path'],
-            ['gizmoproject://fully.qualified.domain/path'],
-            ['go://fully.qualified.domain/path'],
-            ['gopher://fully.qualified.domain/path'],
-            ['gtalk://fully.qualified.domain/path'],
-            ['h323://fully.qualified.domain/path'],
-            ['ham://fully.qualified.domain/path'],
-            ['hcp://fully.qualified.domain/path'],
-            ['http://fully.qualified.domain/path'],
-            ['https://fully.qualified.domain/path'],
-            ['iax://fully.qualified.domain/path'],
-            ['icap://fully.qualified.domain/path'],
-            ['icon://fully.qualified.domain/path'],
-            ['im://fully.qualified.domain/path'],
-            ['imap://fully.qualified.domain/path'],
-            ['info://fully.qualified.domain/path'],
-            ['iotdisco://fully.qualified.domain/path'],
-            ['ipn://fully.qualified.domain/path'],
-            ['ipp://fully.qualified.domain/path'],
-            ['ipps://fully.qualified.domain/path'],
-            ['irc://fully.qualified.domain/path'],
-            ['irc6://fully.qualified.domain/path'],
-            ['ircs://fully.qualified.domain/path'],
-            ['iris://fully.qualified.domain/path'],
-            ['iris.beep://fully.qualified.domain/path'],
-            ['iris.lwz://fully.qualified.domain/path'],
-            ['iris.xpc://fully.qualified.domain/path'],
-            ['iris.xpcs://fully.qualified.domain/path'],
-            ['itms://fully.qualified.domain/path'],
-            ['jabber://fully.qualified.domain/path'],
-            ['jar://fully.qualified.domain/path'],
-            ['jms://fully.qualified.domain/path'],
-            ['keyparc://fully.qualified.domain/path'],
-            ['lastfm://fully.qualified.domain/path'],
-            ['ldap://fully.qualified.domain/path'],
-            ['ldaps://fully.qualified.domain/path'],
-            ['magnet://fully.qualified.domain/path'],
-            ['mailserver://fully.qualified.domain/path'],
-            ['mailto://fully.qualified.domain/path'],
-            ['maps://fully.qualified.domain/path'],
-            ['market://fully.qualified.domain/path'],
-            ['message://fully.qualified.domain/path'],
-            ['mid://fully.qualified.domain/path'],
-            ['mms://fully.qualified.domain/path'],
-            ['modem://fully.qualified.domain/path'],
-            ['ms-help://fully.qualified.domain/path'],
-            ['ms-settings://fully.qualified.domain/path'],
-            ['ms-settings-airplanemode://fully.qualified.domain/path'],
-            ['ms-settings-bluetooth://fully.qualified.domain/path'],
-            ['ms-settings-camera://fully.qualified.domain/path'],
-            ['ms-settings-cellular://fully.qualified.domain/path'],
-            ['ms-settings-cloudstorage://fully.qualified.domain/path'],
-            ['ms-settings-emailandaccounts://fully.qualified.domain/path'],
-            ['ms-settings-language://fully.qualified.domain/path'],
-            ['ms-settings-location://fully.qualified.domain/path'],
-            ['ms-settings-lock://fully.qualified.domain/path'],
-            ['ms-settings-nfctransactions://fully.qualified.domain/path'],
-            ['ms-settings-notifications://fully.qualified.domain/path'],
-            ['ms-settings-power://fully.qualified.domain/path'],
-            ['ms-settings-privacy://fully.qualified.domain/path'],
-            ['ms-settings-proximity://fully.qualified.domain/path'],
-            ['ms-settings-screenrotation://fully.qualified.domain/path'],
-            ['ms-settings-wifi://fully.qualified.domain/path'],
-            ['ms-settings-workplace://fully.qualified.domain/path'],
-            ['msnim://fully.qualified.domain/path'],
-            ['msrp://fully.qualified.domain/path'],
-            ['msrps://fully.qualified.domain/path'],
-            ['mtqp://fully.qualified.domain/path'],
-            ['mumble://fully.qualified.domain/path'],
-            ['mupdate://fully.qualified.domain/path'],
-            ['mvn://fully.qualified.domain/path'],
-            ['news://fully.qualified.domain/path'],
-            ['nfs://fully.qualified.domain/path'],
-            ['ni://fully.qualified.domain/path'],
-            ['nih://fully.qualified.domain/path'],
-            ['nntp://fully.qualified.domain/path'],
-            ['notes://fully.qualified.domain/path'],
-            ['oid://fully.qualified.domain/path'],
-            ['opaquelocktoken://fully.qualified.domain/path'],
-            ['pack://fully.qualified.domain/path'],
-            ['palm://fully.qualified.domain/path'],
-            ['paparazzi://fully.qualified.domain/path'],
-            ['pkcs11://fully.qualified.domain/path'],
-            ['platform://fully.qualified.domain/path'],
-            ['pop://fully.qualified.domain/path'],
-            ['pres://fully.qualified.domain/path'],
-            ['prospero://fully.qualified.domain/path'],
-            ['proxy://fully.qualified.domain/path'],
-            ['psyc://fully.qualified.domain/path'],
-            ['query://fully.qualified.domain/path'],
-            ['redis://fully.qualified.domain/path'],
-            ['rediss://fully.qualified.domain/path'],
-            ['reload://fully.qualified.domain/path'],
-            ['res://fully.qualified.domain/path'],
-            ['resource://fully.qualified.domain/path'],
-            ['rmi://fully.qualified.domain/path'],
-            ['rsync://fully.qualified.domain/path'],
-            ['rtmfp://fully.qualified.domain/path'],
-            ['rtmp://fully.qualified.domain/path'],
-            ['rtsp://fully.qualified.domain/path'],
-            ['rtsps://fully.qualified.domain/path'],
-            ['rtspu://fully.qualified.domain/path'],
-            ['s3://fully.qualified.domain/path'],
-            ['secondlife://fully.qualified.domain/path'],
-            ['service://fully.qualified.domain/path'],
-            ['session://fully.qualified.domain/path'],
-            ['sftp://fully.qualified.domain/path'],
-            ['sgn://fully.qualified.domain/path'],
-            ['shttp://fully.qualified.domain/path'],
-            ['sieve://fully.qualified.domain/path'],
-            ['sip://fully.qualified.domain/path'],
-            ['sips://fully.qualified.domain/path'],
-            ['skype://fully.qualified.domain/path'],
-            ['smb://fully.qualified.domain/path'],
-            ['sms://fully.qualified.domain/path'],
-            ['smtp://fully.qualified.domain/path'],
-            ['snews://fully.qualified.domain/path'],
-            ['snmp://fully.qualified.domain/path'],
-            ['soap.beep://fully.qualified.domain/path'],
-            ['soap.beeps://fully.qualified.domain/path'],
-            ['soldat://fully.qualified.domain/path'],
-            ['spotify://fully.qualified.domain/path'],
-            ['ssh://fully.qualified.domain/path'],
-            ['steam://fully.qualified.domain/path'],
-            ['stun://fully.qualified.domain/path'],
-            ['stuns://fully.qualified.domain/path'],
-            ['submit://fully.qualified.domain/path'],
-            ['svn://fully.qualified.domain/path'],
-            ['tag://fully.qualified.domain/path'],
-            ['teamspeak://fully.qualified.domain/path'],
-            ['tel://fully.qualified.domain/path'],
-            ['teliaeid://fully.qualified.domain/path'],
-            ['telnet://fully.qualified.domain/path'],
-            ['tftp://fully.qualified.domain/path'],
-            ['things://fully.qualified.domain/path'],
-            ['thismessage://fully.qualified.domain/path'],
-            ['tip://fully.qualified.domain/path'],
-            ['tn3270://fully.qualified.domain/path'],
-            ['turn://fully.qualified.domain/path'],
-            ['turns://fully.qualified.domain/path'],
-            ['tv://fully.qualified.domain/path'],
-            ['udp://fully.qualified.domain/path'],
-            ['unreal://fully.qualified.domain/path'],
-            ['urn://fully.qualified.domain/path'],
-            ['ut2004://fully.qualified.domain/path'],
-            ['vemmi://fully.qualified.domain/path'],
-            ['ventrilo://fully.qualified.domain/path'],
-            ['videotex://fully.qualified.domain/path'],
-            ['view-source://fully.qualified.domain/path'],
-            ['wais://fully.qualified.domain/path'],
-            ['webcal://fully.qualified.domain/path'],
-            ['ws://fully.qualified.domain/path'],
-            ['wss://fully.qualified.domain/path'],
-            ['wtai://fully.qualified.domain/path'],
-            ['wyciwyg://fully.qualified.domain/path'],
-            ['xcon://fully.qualified.domain/path'],
-            ['xcon-userid://fully.qualified.domain/path'],
-            ['xfire://fully.qualified.domain/path'],
-            ['xmlrpc.beep://fully.qualified.domain/path'],
-            ['xmlrpc.beeps://fully.qualified.domain/path'],
-            ['xmpp://fully.qualified.domain/path'],
-            ['xri://fully.qualified.domain/path'],
-            ['ymsgr://fully.qualified.domain/path'],
-            ['z39.50://fully.qualified.domain/path'],
-            ['z39.50r://fully.qualified.domain/path'],
-            ['z39.50s://fully.qualified.domain/path'],
-            ['http://a.pl'],
-            ['http://localhost/url.php'],
-            ['http://local.dev'],
-            ['http://google.com'],
-            ['http://www.google.com'],
-            ['http://goog_le.com'],
-            ['https://google.com'],
-            ['http://illuminate.dev'],
-            ['http://localhost'],
-            ['https://laravel.com/?'],
-            ['http://президент.рф/'],
-            ['http://스타벅스코리아.com'],
-            ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
-            ['https://laravel.com?'],
-            ['https://laravel.com?q=1'],
-            ['https://laravel.com/?q=1'],
-            ['https://laravel.com#'],
-            ['https://laravel.com#fragment'],
-            ['https://laravel.com/#fragment'],
-        ];
+        yield ['aaa://fully.qualified.domain/path'];
+        yield ['aaas://fully.qualified.domain/path'];
+        yield ['about://fully.qualified.domain/path'];
+        yield ['acap://fully.qualified.domain/path'];
+        yield ['acct://fully.qualified.domain/path'];
+        yield ['acr://fully.qualified.domain/path'];
+        yield ['adiumxtra://fully.qualified.domain/path'];
+        yield ['afp://fully.qualified.domain/path'];
+        yield ['afs://fully.qualified.domain/path'];
+        yield ['aim://fully.qualified.domain/path'];
+        yield ['apt://fully.qualified.domain/path'];
+        yield ['attachment://fully.qualified.domain/path'];
+        yield ['aw://fully.qualified.domain/path'];
+        yield ['barion://fully.qualified.domain/path'];
+        yield ['beshare://fully.qualified.domain/path'];
+        yield ['bitcoin://fully.qualified.domain/path'];
+        yield ['blob://fully.qualified.domain/path'];
+        yield ['bolo://fully.qualified.domain/path'];
+        yield ['callto://fully.qualified.domain/path'];
+        yield ['cap://fully.qualified.domain/path'];
+        yield ['chrome://fully.qualified.domain/path'];
+        yield ['chrome-extension://fully.qualified.domain/path'];
+        yield ['cid://fully.qualified.domain/path'];
+        yield ['coap://fully.qualified.domain/path'];
+        yield ['coaps://fully.qualified.domain/path'];
+        yield ['com-eventbrite-attendee://fully.qualified.domain/path'];
+        yield ['content://fully.qualified.domain/path'];
+        yield ['crid://fully.qualified.domain/path'];
+        yield ['cvs://fully.qualified.domain/path'];
+        yield ['data://fully.qualified.domain/path'];
+        yield ['dav://fully.qualified.domain/path'];
+        yield ['dict://fully.qualified.domain/path'];
+        yield ['dlna-playcontainer://fully.qualified.domain/path'];
+        yield ['dlna-playsingle://fully.qualified.domain/path'];
+        yield ['dns://fully.qualified.domain/path'];
+        yield ['dntp://fully.qualified.domain/path'];
+        yield ['dtn://fully.qualified.domain/path'];
+        yield ['dvb://fully.qualified.domain/path'];
+        yield ['ed2k://fully.qualified.domain/path'];
+        yield ['example://fully.qualified.domain/path'];
+        yield ['facetime://fully.qualified.domain/path'];
+        yield ['fax://fully.qualified.domain/path'];
+        yield ['feed://fully.qualified.domain/path'];
+        yield ['feedready://fully.qualified.domain/path'];
+        yield ['file://fully.qualified.domain/path'];
+        yield ['filesystem://fully.qualified.domain/path'];
+        yield ['finger://fully.qualified.domain/path'];
+        yield ['fish://fully.qualified.domain/path'];
+        yield ['ftp://fully.qualified.domain/path'];
+        yield ['geo://fully.qualified.domain/path'];
+        yield ['gg://fully.qualified.domain/path'];
+        yield ['git://fully.qualified.domain/path'];
+        yield ['gizmoproject://fully.qualified.domain/path'];
+        yield ['go://fully.qualified.domain/path'];
+        yield ['gopher://fully.qualified.domain/path'];
+        yield ['gtalk://fully.qualified.domain/path'];
+        yield ['h323://fully.qualified.domain/path'];
+        yield ['ham://fully.qualified.domain/path'];
+        yield ['hcp://fully.qualified.domain/path'];
+        yield ['http://fully.qualified.domain/path'];
+        yield ['https://fully.qualified.domain/path'];
+        yield ['iax://fully.qualified.domain/path'];
+        yield ['icap://fully.qualified.domain/path'];
+        yield ['icon://fully.qualified.domain/path'];
+        yield ['im://fully.qualified.domain/path'];
+        yield ['imap://fully.qualified.domain/path'];
+        yield ['info://fully.qualified.domain/path'];
+        yield ['iotdisco://fully.qualified.domain/path'];
+        yield ['ipn://fully.qualified.domain/path'];
+        yield ['ipp://fully.qualified.domain/path'];
+        yield ['ipps://fully.qualified.domain/path'];
+        yield ['irc://fully.qualified.domain/path'];
+        yield ['irc6://fully.qualified.domain/path'];
+        yield ['ircs://fully.qualified.domain/path'];
+        yield ['iris://fully.qualified.domain/path'];
+        yield ['iris.beep://fully.qualified.domain/path'];
+        yield ['iris.lwz://fully.qualified.domain/path'];
+        yield ['iris.xpc://fully.qualified.domain/path'];
+        yield ['iris.xpcs://fully.qualified.domain/path'];
+        yield ['itms://fully.qualified.domain/path'];
+        yield ['jabber://fully.qualified.domain/path'];
+        yield ['jar://fully.qualified.domain/path'];
+        yield ['jms://fully.qualified.domain/path'];
+        yield ['keyparc://fully.qualified.domain/path'];
+        yield ['lastfm://fully.qualified.domain/path'];
+        yield ['ldap://fully.qualified.domain/path'];
+        yield ['ldaps://fully.qualified.domain/path'];
+        yield ['magnet://fully.qualified.domain/path'];
+        yield ['mailserver://fully.qualified.domain/path'];
+        yield ['mailto://fully.qualified.domain/path'];
+        yield ['maps://fully.qualified.domain/path'];
+        yield ['market://fully.qualified.domain/path'];
+        yield ['message://fully.qualified.domain/path'];
+        yield ['mid://fully.qualified.domain/path'];
+        yield ['mms://fully.qualified.domain/path'];
+        yield ['modem://fully.qualified.domain/path'];
+        yield ['ms-help://fully.qualified.domain/path'];
+        yield ['ms-settings://fully.qualified.domain/path'];
+        yield ['ms-settings-airplanemode://fully.qualified.domain/path'];
+        yield ['ms-settings-bluetooth://fully.qualified.domain/path'];
+        yield ['ms-settings-camera://fully.qualified.domain/path'];
+        yield ['ms-settings-cellular://fully.qualified.domain/path'];
+        yield ['ms-settings-cloudstorage://fully.qualified.domain/path'];
+        yield ['ms-settings-emailandaccounts://fully.qualified.domain/path'];
+        yield ['ms-settings-language://fully.qualified.domain/path'];
+        yield ['ms-settings-location://fully.qualified.domain/path'];
+        yield ['ms-settings-lock://fully.qualified.domain/path'];
+        yield ['ms-settings-nfctransactions://fully.qualified.domain/path'];
+        yield ['ms-settings-notifications://fully.qualified.domain/path'];
+        yield ['ms-settings-power://fully.qualified.domain/path'];
+        yield ['ms-settings-privacy://fully.qualified.domain/path'];
+        yield ['ms-settings-proximity://fully.qualified.domain/path'];
+        yield ['ms-settings-screenrotation://fully.qualified.domain/path'];
+        yield ['ms-settings-wifi://fully.qualified.domain/path'];
+        yield ['ms-settings-workplace://fully.qualified.domain/path'];
+        yield ['msnim://fully.qualified.domain/path'];
+        yield ['msrp://fully.qualified.domain/path'];
+        yield ['msrps://fully.qualified.domain/path'];
+        yield ['mtqp://fully.qualified.domain/path'];
+        yield ['mumble://fully.qualified.domain/path'];
+        yield ['mupdate://fully.qualified.domain/path'];
+        yield ['mvn://fully.qualified.domain/path'];
+        yield ['news://fully.qualified.domain/path'];
+        yield ['nfs://fully.qualified.domain/path'];
+        yield ['ni://fully.qualified.domain/path'];
+        yield ['nih://fully.qualified.domain/path'];
+        yield ['nntp://fully.qualified.domain/path'];
+        yield ['notes://fully.qualified.domain/path'];
+        yield ['oid://fully.qualified.domain/path'];
+        yield ['opaquelocktoken://fully.qualified.domain/path'];
+        yield ['pack://fully.qualified.domain/path'];
+        yield ['palm://fully.qualified.domain/path'];
+        yield ['paparazzi://fully.qualified.domain/path'];
+        yield ['pkcs11://fully.qualified.domain/path'];
+        yield ['platform://fully.qualified.domain/path'];
+        yield ['pop://fully.qualified.domain/path'];
+        yield ['pres://fully.qualified.domain/path'];
+        yield ['prospero://fully.qualified.domain/path'];
+        yield ['proxy://fully.qualified.domain/path'];
+        yield ['psyc://fully.qualified.domain/path'];
+        yield ['query://fully.qualified.domain/path'];
+        yield ['redis://fully.qualified.domain/path'];
+        yield ['rediss://fully.qualified.domain/path'];
+        yield ['reload://fully.qualified.domain/path'];
+        yield ['res://fully.qualified.domain/path'];
+        yield ['resource://fully.qualified.domain/path'];
+        yield ['rmi://fully.qualified.domain/path'];
+        yield ['rsync://fully.qualified.domain/path'];
+        yield ['rtmfp://fully.qualified.domain/path'];
+        yield ['rtmp://fully.qualified.domain/path'];
+        yield ['rtsp://fully.qualified.domain/path'];
+        yield ['rtsps://fully.qualified.domain/path'];
+        yield ['rtspu://fully.qualified.domain/path'];
+        yield ['s3://fully.qualified.domain/path'];
+        yield ['secondlife://fully.qualified.domain/path'];
+        yield ['service://fully.qualified.domain/path'];
+        yield ['session://fully.qualified.domain/path'];
+        yield ['sftp://fully.qualified.domain/path'];
+        yield ['sgn://fully.qualified.domain/path'];
+        yield ['shttp://fully.qualified.domain/path'];
+        yield ['sieve://fully.qualified.domain/path'];
+        yield ['sip://fully.qualified.domain/path'];
+        yield ['sips://fully.qualified.domain/path'];
+        yield ['skype://fully.qualified.domain/path'];
+        yield ['smb://fully.qualified.domain/path'];
+        yield ['sms://fully.qualified.domain/path'];
+        yield ['smtp://fully.qualified.domain/path'];
+        yield ['snews://fully.qualified.domain/path'];
+        yield ['snmp://fully.qualified.domain/path'];
+        yield ['soap.beep://fully.qualified.domain/path'];
+        yield ['soap.beeps://fully.qualified.domain/path'];
+        yield ['soldat://fully.qualified.domain/path'];
+        yield ['spotify://fully.qualified.domain/path'];
+        yield ['ssh://fully.qualified.domain/path'];
+        yield ['steam://fully.qualified.domain/path'];
+        yield ['stun://fully.qualified.domain/path'];
+        yield ['stuns://fully.qualified.domain/path'];
+        yield ['submit://fully.qualified.domain/path'];
+        yield ['svn://fully.qualified.domain/path'];
+        yield ['tag://fully.qualified.domain/path'];
+        yield ['teamspeak://fully.qualified.domain/path'];
+        yield ['tel://fully.qualified.domain/path'];
+        yield ['teliaeid://fully.qualified.domain/path'];
+        yield ['telnet://fully.qualified.domain/path'];
+        yield ['tftp://fully.qualified.domain/path'];
+        yield ['things://fully.qualified.domain/path'];
+        yield ['thismessage://fully.qualified.domain/path'];
+        yield ['tip://fully.qualified.domain/path'];
+        yield ['tn3270://fully.qualified.domain/path'];
+        yield ['turn://fully.qualified.domain/path'];
+        yield ['turns://fully.qualified.domain/path'];
+        yield ['tv://fully.qualified.domain/path'];
+        yield ['udp://fully.qualified.domain/path'];
+        yield ['unreal://fully.qualified.domain/path'];
+        yield ['urn://fully.qualified.domain/path'];
+        yield ['ut2004://fully.qualified.domain/path'];
+        yield ['vemmi://fully.qualified.domain/path'];
+        yield ['ventrilo://fully.qualified.domain/path'];
+        yield ['videotex://fully.qualified.domain/path'];
+        yield ['view-source://fully.qualified.domain/path'];
+        yield ['wais://fully.qualified.domain/path'];
+        yield ['webcal://fully.qualified.domain/path'];
+        yield ['ws://fully.qualified.domain/path'];
+        yield ['wss://fully.qualified.domain/path'];
+        yield ['wtai://fully.qualified.domain/path'];
+        yield ['wyciwyg://fully.qualified.domain/path'];
+        yield ['xcon://fully.qualified.domain/path'];
+        yield ['xcon-userid://fully.qualified.domain/path'];
+        yield ['xfire://fully.qualified.domain/path'];
+        yield ['xmlrpc.beep://fully.qualified.domain/path'];
+        yield ['xmlrpc.beeps://fully.qualified.domain/path'];
+        yield ['xmpp://fully.qualified.domain/path'];
+        yield ['xri://fully.qualified.domain/path'];
+        yield ['ymsgr://fully.qualified.domain/path'];
+        yield ['z39.50://fully.qualified.domain/path'];
+        yield ['z39.50r://fully.qualified.domain/path'];
+        yield ['z39.50s://fully.qualified.domain/path'];
+        yield ['http://a.pl'];
+        yield ['http://localhost/url.php'];
+        yield ['http://local.dev'];
+        yield ['http://google.com'];
+        yield ['http://www.google.com'];
+        yield ['http://goog_le.com'];
+        yield ['https://google.com'];
+        yield ['http://illuminate.dev'];
+        yield ['http://localhost'];
+        yield ['https://laravel.com/?'];
+        yield ['http://президент.рф/'];
+        yield ['http://스타벅스코리아.com'];
+        yield ['http://xn--d1abbgf6aiiy.xn--p1ai/'];
+        yield ['https://laravel.com?'];
+        yield ['https://laravel.com?q=1'];
+        yield ['https://laravel.com/?q=1'];
+        yield ['https://laravel.com#'];
+        yield ['https://laravel.com#fragment'];
+        yield ['https://laravel.com/#fragment'];
     }
 
+    /**
+     * @return \Generator
+     */
     public function invalidUrls()
     {
-        return [
-            ['aslsdlks'],
-            ['google.com'],
-            ['://google.com'],
-            ['http ://google.com'],
-            ['http:/google.com'],
-            ['http://google.com::aa'],
-            ['http://google.com:aa'],
-            ['http://127.0.0.1:aa'],
-            ['http://[::1'],
-            ['foo://bar'],
-            ['javascript://test%0Aalert(321)'],
-        ];
+        yield ['aslsdlks'];
+        yield ['google.com'];
+        yield ['://google.com'];
+        yield ['http ://google.com'];
+        yield ['http:/google.com'];
+        yield ['http://google.com::aa'];
+        yield ['http://google.com:aa'];
+        yield ['http://127.0.0.1:aa'];
+        yield ['http://[::1'];
+        yield ['foo://bar'];
+        yield ['javascript://test%0Aalert(321)'];
     }
 
     public function testValidateActiveUrl()
@@ -4781,36 +4783,38 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    /**
+     * @return \Generator
+     */
     public function validUuidList()
     {
-        return [
-            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
-            ['00000000-0000-0000-0000-000000000000'],
-            ['e60d3f48-95d7-4d8d-aad0-856f29a27da2'],
-            ['ff6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-21e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-31e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-41e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-51e1-9b21-0800200c9a66'],
-            ['FF6F8CB0-C57D-11E1-9B21-0800200C9A66'],
-        ];
+        yield ['a0a2a2d2-0b87-4a18-83f2-2529882be2de'];
+        yield ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'];
+        yield ['00000000-0000-0000-0000-000000000000'];
+        yield ['e60d3f48-95d7-4d8d-aad0-856f29a27da2'];
+        yield ['ff6f8cb0-c57d-11e1-9b21-0800200c9a66'];
+        yield ['ff6f8cb0-c57d-21e1-9b21-0800200c9a66'];
+        yield ['ff6f8cb0-c57d-31e1-9b21-0800200c9a66'];
+        yield ['ff6f8cb0-c57d-41e1-9b21-0800200c9a66'];
+        yield ['ff6f8cb0-c57d-51e1-9b21-0800200c9a66'];
+        yield ['FF6F8CB0-C57D-11E1-9B21-0800200C9A66'];
     }
 
+    /**
+     * @return \Generator
+     */
     public function invalidUuidList()
     {
-        return [
-            ['not a valid uuid so we can test this'],
-            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '],
-            [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
-            ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'],
-            ['3f6f8cb0-c57d-11e1-9b21-0800200c9a6'],
-            ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
-            ['af6f8cb0c57d11e19b210800200c9a66'],
-            ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
-        ];
+        yield ['not a valid uuid so we can test this'];
+        yield ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'];
+        yield ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL];
+        yield ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '];
+        yield [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'];
+        yield ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'];
+        yield ['3f6f8cb0-c57d-11e1-9b21-0800200c9a6'];
+        yield ['af6f8cb-c57d-11e1-9b21-0800200c9a66'];
+        yield ['af6f8cb0c57d11e19b210800200c9a66'];
+        yield ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'];
     }
 
     public function providesPassingExcludeIfData()

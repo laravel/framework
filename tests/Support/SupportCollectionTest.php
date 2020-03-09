@@ -4073,14 +4073,12 @@ class SupportCollectionTest extends TestCase
     /**
      * Provides each collection class, respectively.
      *
-     * @return array
+     * @return \Generator
      */
     public function collectionClassProvider()
     {
-        return [
-            [Collection::class],
-            [LazyCollection::class],
-        ];
+        yield [Collection::class];
+        yield [LazyCollection::class];
     }
 }
 

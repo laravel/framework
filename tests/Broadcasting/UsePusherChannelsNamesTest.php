@@ -44,6 +44,9 @@ class UsePusherChannelConventionsTest extends TestCase
         );
     }
 
+    /**
+     * @return \Generator
+     */
     public function channelsProvider()
     {
         $prefixesInfos = [
@@ -67,10 +70,9 @@ class UsePusherChannelConventionsTest extends TestCase
             '{a}-{b}.{c}',
         ];
 
-        $tests = [];
         foreach ($prefixesInfos as $prefixInfos) {
             foreach ($channels as $channel) {
-                $tests[] = [
+                yield [
                     $prefixInfos['prefix'].$channel,
                     $channel,
                     $prefixInfos['guarded'],
@@ -78,13 +80,11 @@ class UsePusherChannelConventionsTest extends TestCase
             }
         }
 
-        $tests[] = ['private-private-test', 'private-test', true];
-        $tests[] = ['private-presence-test', 'presence-test', true];
-        $tests[] = ['presence-private-test', 'private-test', true];
-        $tests[] = ['presence-presence-test', 'presence-test', true];
-        $tests[] = ['public-test', 'public-test', false];
-
-        return $tests;
+        yield ['private-private-test', 'private-test', true];
+        yield ['private-presence-test', 'presence-test', true];
+        yield ['presence-private-test', 'private-test', true];
+        yield ['presence-presence-test', 'presence-test', true];
+        yield ['public-test', 'public-test', false];
     }
 }
 

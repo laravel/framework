@@ -25,14 +25,15 @@ class HttpJsonResponseTest extends TestCase
         $this->assertSame('bar', $response->getData()->foo);
     }
 
-    public function setAndRetrieveDataProvider(): array
+    /**
+     * @return \Generator
+     */
+    public function setAndRetrieveDataProvider()
     {
-        return [
-            'Jsonable data' => [new JsonResponseTestJsonableObject],
-            'JsonSerializable data' => [new JsonResponseTestJsonSerializeObject],
-            'Arrayable data' => [new JsonResponseTestArrayableObject],
-            'Array data' => [['foo' => 'bar']],
-        ];
+        yield 'Jsonable data' => [new JsonResponseTestJsonableObject];
+        yield 'JsonSerializable data' => [new JsonResponseTestJsonSerializeObject];
+        yield 'Arrayable data' => [new JsonResponseTestArrayableObject];
+        yield 'Array data' => [['foo' => 'bar']];
     }
 
     public function testGetOriginalContent()
@@ -89,7 +90,7 @@ class HttpJsonResponseTest extends TestCase
     }
 
     /**
-     * @return array
+     * @return \Generator
      */
     public function jsonErrorDataProvider()
     {
@@ -105,11 +106,9 @@ class HttpJsonResponseTest extends TestCase
         // NAN or INF can't be encoded
         $nan = NAN;
 
-        return [
-            [$resource],
-            [$recursiveObject],
-            [$nan],
-        ];
+        yield [$resource];
+        yield [$recursiveObject];
+        yield [$nan];
     }
 }
 

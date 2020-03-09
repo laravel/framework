@@ -292,21 +292,22 @@ class BroadcasterTest extends TestCase
         $this->assertEquals($shouldMatch, $this->broadcaster->channelNameMatchesPattern($channel, $pattern));
     }
 
+    /**
+     * @return \Generator
+     */
     public function channelNameMatchPatternProvider()
     {
-        return [
-            ['something', 'something', true],
-            ['something.23', 'something.{id}', true],
-            ['something.23.test', 'something.{id}.test', true],
-            ['something.23.test.42', 'something.{id}.test.{id2}', true],
-            ['something-23:test-42', 'something-{id}:test-{id2}', true],
-            ['something..test.42', 'something.{id}.test.{id2}', true],
-            ['23:string:test', '{id}:string:{text}', true],
-            ['something.23', 'something', false],
-            ['something.23.test.42', 'something.test.{id}', false],
-            ['something-23-test-42', 'something-{id}-test', false],
-            ['23:test', '{id}:test:abcd', false],
-        ];
+        yield ['something', 'something', true];
+        yield ['something.23', 'something.{id}', true];
+        yield ['something.23.test', 'something.{id}.test', true];
+        yield ['something.23.test.42', 'something.{id}.test.{id2}', true];
+        yield ['something-23:test-42', 'something-{id}:test-{id2}', true];
+        yield ['something..test.42', 'something.{id}.test.{id2}', true];
+        yield ['23:string:test', '{id}:string:{text}', true];
+        yield ['something.23', 'something', false];
+        yield ['something.23.test.42', 'something.test.{id}', false];
+        yield ['something-23-test-42', 'something-{id}-test', false];
+        yield ['23:test', '{id}:test:abcd', false];
     }
 }
 

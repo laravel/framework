@@ -208,17 +208,18 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @return \Generator
+     */
     public function dataProviderTestGetSeconds()
     {
         Carbon::setTestNow(Carbon::parse($this->getTestDate()));
 
-        return [
-            [Carbon::now()->addMinutes(5)],
-            [(new DateTime($this->getTestDate()))->modify('+5 minutes')],
-            [(new DateTimeImmutable($this->getTestDate()))->modify('+5 minutes')],
-            [new DateInterval('PT5M')],
-            [300],
-        ];
+        yield [Carbon::now()->addMinutes(5)];
+        yield [(new DateTime($this->getTestDate()))->modify('+5 minutes')];
+        yield [(new DateTimeImmutable($this->getTestDate()))->modify('+5 minutes')];
+        yield [new DateInterval('PT5M')];
+        yield [300];
     }
 
     /**

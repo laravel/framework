@@ -37,337 +37,338 @@ class ConfigurationUrlParserTest extends TestCase
         ], ConfigurationUrlParser::getDriverAliases());
 
         $this->assertEquals([
-            'driver' => 'mysql',
+            yield 'driver' => 'mysql',
         ], (new ConfigurationUrlParser)->parseConfiguration('some-particular-alias://null'));
     }
 
+    /**
+     * @return \Generator
+     */
     public function databaseUrls()
     {
-        return [
-            'simple URL' => [
-                'mysql://foo:bar@localhost/baz',
-                [
-                    'driver' => 'mysql',
-                    'username' => 'foo',
-                    'password' => 'bar',
-                    'host' => 'localhost',
-                    'database' => 'baz',
-                ],
+        yield 'simple URL' => [
+            'mysql://foo:bar@localhost/baz',
+            [
+                'driver' => 'mysql',
+                'username' => 'foo',
+                'password' => 'bar',
+                'host' => 'localhost',
+                'database' => 'baz',
             ],
-            'simple URL with port' => [
-                'mysql://foo:bar@localhost:134/baz',
-                [
-                    'driver' => 'mysql',
-                    'username' => 'foo',
-                    'password' => 'bar',
-                    'host' => 'localhost',
-                    'port' => 134,
-                    'database' => 'baz',
-                ],
+        ];
+        yield 'simple URL with port' => [
+            'mysql://foo:bar@localhost:134/baz',
+            [
+                'driver' => 'mysql',
+                'username' => 'foo',
+                'password' => 'bar',
+                'host' => 'localhost',
+                'port' => 134,
+                'database' => 'baz',
             ],
-            'sqlite relative URL with host' => [
-                'sqlite://localhost/foo/database.sqlite',
-                [
-                    'database' => 'foo/database.sqlite',
-                    'driver' => 'sqlite',
-                    'host' => 'localhost',
-                ],
+        ];
+        yield 'sqlite relative URL with host' => [
+            'sqlite://localhost/foo/database.sqlite',
+            [
+                'database' => 'foo/database.sqlite',
+                'driver' => 'sqlite',
+                'host' => 'localhost',
             ],
-            'sqlite absolute URL with host' => [
-                'sqlite://localhost//tmp/database.sqlite',
-                [
-                    'database' => '/tmp/database.sqlite',
-                    'driver' => 'sqlite',
-                    'host' => 'localhost',
-                ],
+        ];
+        yield 'sqlite absolute URL with host' => [
+            'sqlite://localhost//tmp/database.sqlite',
+            [
+                'database' => '/tmp/database.sqlite',
+                'driver' => 'sqlite',
+                'host' => 'localhost',
             ],
-            'sqlite relative URL without host' => [
-                'sqlite:///foo/database.sqlite',
-                [
-                    'database' => 'foo/database.sqlite',
-                    'driver' => 'sqlite',
-                ],
+        ];
+        yield 'sqlite relative URL without host' => [
+            'sqlite:///foo/database.sqlite',
+            [
+                'database' => 'foo/database.sqlite',
+                'driver' => 'sqlite',
             ],
-            'sqlite absolute URL without host' => [
-                'sqlite:////tmp/database.sqlite',
-                [
-                    'database' => '/tmp/database.sqlite',
-                    'driver' => 'sqlite',
-                ],
+        ];
+        yield 'sqlite absolute URL without host' => [
+            'sqlite:////tmp/database.sqlite',
+            [
+                'database' => '/tmp/database.sqlite',
+                'driver' => 'sqlite',
             ],
-            'sqlite memory' => [
-                'sqlite:///:memory:',
-                [
-                    'database' => ':memory:',
-                    'driver' => 'sqlite',
-                ],
+        ];
+        yield 'sqlite memory' => [
+            'sqlite:///:memory:',
+            [
+                'database' => ':memory:',
+                'driver' => 'sqlite',
             ],
-            'params parsed from URL override individual params' => [
-                [
-                    'url' => 'mysql://foo:bar@localhost/baz',
-                    'password' => 'lulz',
-                    'driver' => 'sqlite',
-                ],
-                [
-                    'username' => 'foo',
-                    'password' => 'bar',
-                    'host' => 'localhost',
-                    'database' => 'baz',
-                    'driver' => 'mysql',
-                ],
+        ];
+        yield 'params parsed from URL override individual params' => [
+            [
+                'url' => 'mysql://foo:bar@localhost/baz',
+                'password' => 'lulz',
+                'driver' => 'sqlite',
             ],
-            'params not parsed from URL but individual params are preserved' => [
-                [
-                    'url' => 'mysql://foo:bar@localhost/baz',
-                    'port' => 134,
-                ],
-                [
-                    'username' => 'foo',
-                    'password' => 'bar',
-                    'host' => 'localhost',
-                    'port' => 134,
-                    'database' => 'baz',
-                    'driver' => 'mysql',
-                ],
+            [
+                'username' => 'foo',
+                'password' => 'bar',
+                'host' => 'localhost',
+                'database' => 'baz',
+                'driver' => 'mysql',
             ],
-            'query params from URL are used as extra params' => [
-                'url' => 'mysql://foo:bar@localhost/database?charset=UTF-8',
-                [
-                    'driver' => 'mysql',
-                    'database' => 'database',
-                    'host' => 'localhost',
-                    'username' => 'foo',
-                    'password' => 'bar',
-                    'charset' => 'UTF-8',
-                ],
+        ];
+        yield 'params not parsed from URL but individual params are preserved' => [
+            [
+                'url' => 'mysql://foo:bar@localhost/baz',
+                'port' => 134,
             ],
-            'simple URL with driver set apart' => [
-                [
-                    'url' => '//foo:bar@localhost/baz',
-                    'driver' => 'sqlsrv',
-                ],
-                [
-                    'username' => 'foo',
-                    'password' => 'bar',
-                    'host' => 'localhost',
-                    'database' => 'baz',
-                    'driver' => 'sqlsrv',
-                ],
+            [
+                'username' => 'foo',
+                'password' => 'bar',
+                'host' => 'localhost',
+                'port' => 134,
+                'database' => 'baz',
+                'driver' => 'mysql',
             ],
-            'simple URL with percent encoding' => [
-                'mysql://foo%3A:bar%2F@localhost/baz+baz%40',
-                [
-                    'username' => 'foo:',
-                    'password' => 'bar/',
-                    'host' => 'localhost',
-                    'database' => 'baz+baz@',
-                    'driver' => 'mysql',
-                ],
+        ];
+        yield 'query params from URL are used as extra params' => [
+            'url' => 'mysql://foo:bar@localhost/database?charset=UTF-8',
+            [
+                'driver' => 'mysql',
+                'database' => 'database',
+                'host' => 'localhost',
+                'username' => 'foo',
+                'password' => 'bar',
+                'charset' => 'UTF-8',
             ],
-            'simple URL with percent sign in password' => [
-                'mysql://foo:bar%25bar@localhost/baz',
-                [
-                    'username' => 'foo',
-                    'password' => 'bar%bar',
-                    'host' => 'localhost',
-                    'database' => 'baz',
-                    'driver' => 'mysql',
-                ],
+        ];
+        yield 'simple URL with driver set apart' => [
+            [
+                'url' => '//foo:bar@localhost/baz',
+                'driver' => 'sqlsrv',
             ],
-            'URL with mssql alias driver' => [
-                'mssql://null',
-                [
-                    'driver' => 'sqlsrv',
-                ],
+            [
+                'username' => 'foo',
+                'password' => 'bar',
+                'host' => 'localhost',
+                'database' => 'baz',
+                'driver' => 'sqlsrv',
             ],
-            'URL with sqlsrv alias driver' => [
-                'sqlsrv://null',
-                [
-                    'driver' => 'sqlsrv',
-                ],
+        ];
+        yield 'simple URL with percent encoding' => [
+            'mysql://foo%3A:bar%2F@localhost/baz+baz%40',
+            [
+                'username' => 'foo:',
+                'password' => 'bar/',
+                'host' => 'localhost',
+                'database' => 'baz+baz@',
+                'driver' => 'mysql',
             ],
-            'URL with mysql alias driver' => [
-                'mysql://null',
-                [
-                    'driver' => 'mysql',
-                ],
+        ];
+        yield 'simple URL with percent sign in password' => [
+            'mysql://foo:bar%25bar@localhost/baz',
+            [
+                'username' => 'foo',
+                'password' => 'bar%bar',
+                'host' => 'localhost',
+                'database' => 'baz',
+                'driver' => 'mysql',
             ],
-            'URL with mysql2 alias driver' => [
-                'mysql2://null',
-                [
-                    'driver' => 'mysql',
-                ],
+        ];
+        yield 'URL with mssql alias driver' => [
+            'mssql://null',
+            [
+                'driver' => 'sqlsrv',
             ],
-            'URL with postgres alias driver' => [
-                'postgres://null',
-                [
-                    'driver' => 'pgsql',
-                ],
+        ];
+        yield 'URL with sqlsrv alias driver' => [
+            'sqlsrv://null',
+            [
+                'driver' => 'sqlsrv',
             ],
-            'URL with postgresql alias driver' => [
-                'postgresql://null',
-                [
-                    'driver' => 'pgsql',
-                ],
+        ];
+        yield 'URL with mysql alias driver' => [
+            'mysql://null',
+            [
+                'driver' => 'mysql',
             ],
-            'URL with pgsql alias driver' => [
-                'pgsql://null',
-                [
-                    'driver' => 'pgsql',
-                ],
+        ];
+        yield 'URL with mysql2 alias driver' => [
+            'mysql2://null',
+            [
+                'driver' => 'mysql',
             ],
-            'URL with sqlite alias driver' => [
-                'sqlite://null',
-                [
-                    'driver' => 'sqlite',
-                ],
+        ];
+        yield 'URL with postgres alias driver' => [
+            'postgres://null',
+            [
+                'driver' => 'pgsql',
             ],
-            'URL with sqlite3 alias driver' => [
-                'sqlite3://null',
-                [
-                    'driver' => 'sqlite',
-                ],
+        ];
+        yield 'URL with postgresql alias driver' => [
+            'postgresql://null',
+            [
+                'driver' => 'pgsql',
             ],
+        ];
+        yield 'URL with pgsql alias driver' => [
+            'pgsql://null',
+            [
+                'driver' => 'pgsql',
+            ],
+        ];
+        yield 'URL with sqlite alias driver' => [
+            'sqlite://null',
+            [
+                'driver' => 'sqlite',
+            ],
+        ];
+        yield 'URL with sqlite3 alias driver' => [
+            'sqlite3://null',
+            [
+                'driver' => 'sqlite',
+            ],
+        ];
 
-            'URL with unknown driver' => [
-                'foo://null',
-                [
-                    'driver' => 'foo',
-                ],
+        yield 'URL with unknown driver' => [
+            'foo://null',
+            [
+                'driver' => 'foo',
             ],
-            'Sqlite with foreign_key_constraints' => [
-                'sqlite:////absolute/path/to/database.sqlite?foreign_key_constraints=true',
-                [
-                    'driver' => 'sqlite',
-                    'database' => '/absolute/path/to/database.sqlite',
-                    'foreign_key_constraints' => true,
-                ],
+        ];
+        yield 'Sqlite with foreign_key_constraints' => [
+            'sqlite:////absolute/path/to/database.sqlite?foreign_key_constraints=true',
+            [
+                'driver' => 'sqlite',
+                'database' => '/absolute/path/to/database.sqlite',
+                'foreign_key_constraints' => true,
             ],
+        ];
 
-            'Most complex example with read and write subarrays all in string' => [
-                'mysql://root:@null/database?read[host][]=192.168.1.1&write[host][]=196.168.1.2&sticky=true&charset=utf8mb4&collation=utf8mb4_unicode_ci&prefix=',
-                [
-                    'read' => [
-                        'host' => ['192.168.1.1'],
-                    ],
-                    'write' => [
-                        'host' => ['196.168.1.2'],
-                    ],
-                    'sticky' => true,
-                    'driver' => 'mysql',
-                    'database' => 'database',
-                    'username' => 'root',
-                    'password' => '',
-                    'charset' => 'utf8mb4',
-                    'collation' => 'utf8mb4_unicode_ci',
-                    'prefix' => '',
+        yield 'Most complex example with read and write subarrays all in string' => [
+            'mysql://root:@null/database?read[host][]=192.168.1.1&write[host][]=196.168.1.2&sticky=true&charset=utf8mb4&collation=utf8mb4_unicode_ci&prefix=',
+            [
+                'read' => [
+                    'host' => ['192.168.1.1'],
                 ],
+                'write' => [
+                    'host' => ['196.168.1.2'],
+                ],
+                'sticky' => true,
+                'driver' => 'mysql',
+                'database' => 'database',
+                'username' => 'root',
+                'password' => '',
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
             ],
+        ];
 
-            'Full example from doc that prove that there isn\'t any Breaking Change' => [
-                [
-                    'driver' => 'mysql',
-                    'host' => '127.0.0.1',
-                    'port' => '3306',
-                    'database' => 'forge',
-                    'username' => 'forge',
-                    'password' => '',
-                    'unix_socket' => '',
-                    'charset' => 'utf8mb4',
-                    'collation' => 'utf8mb4_unicode_ci',
-                    'prefix' => '',
-                    'prefix_indexes' => true,
-                    'strict' => true,
-                    'engine' => null,
-                    'options' => ['foo' => 'bar'],
-                ],
-                [
-                    'driver' => 'mysql',
-                    'host' => '127.0.0.1',
-                    'port' => '3306',
-                    'database' => 'forge',
-                    'username' => 'forge',
-                    'password' => '',
-                    'unix_socket' => '',
-                    'charset' => 'utf8mb4',
-                    'collation' => 'utf8mb4_unicode_ci',
-                    'prefix' => '',
-                    'prefix_indexes' => true,
-                    'strict' => true,
-                    'engine' => null,
-                    'options' => ['foo' => 'bar'],
-                ],
+        yield 'Full example from doc that prove that there isn\'t any Breaking Change' => [
+            [
+                'driver' => 'mysql',
+                'host' => '127.0.0.1',
+                'port' => '3306',
+                'database' => 'forge',
+                'username' => 'forge',
+                'password' => '',
+                'unix_socket' => '',
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'prefix_indexes' => true,
+                'strict' => true,
+                'engine' => null,
+                'options' => ['foo' => 'bar'],
             ],
+            [
+                'driver' => 'mysql',
+                'host' => '127.0.0.1',
+                'port' => '3306',
+                'database' => 'forge',
+                'username' => 'forge',
+                'password' => '',
+                'unix_socket' => '',
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'prefix_indexes' => true,
+                'strict' => true,
+                'engine' => null,
+                'options' => ['foo' => 'bar'],
+            ],
+        ];
 
-            'Full example from doc with url overwriting parameters' => [
-                [
-                    'url' => 'mysql://root:pass@db/local',
-                    'driver' => 'mysql',
-                    'host' => '127.0.0.1',
-                    'port' => '3306',
-                    'database' => 'forge',
-                    'username' => 'forge',
-                    'password' => '',
-                    'unix_socket' => '',
-                    'charset' => 'utf8mb4',
-                    'collation' => 'utf8mb4_unicode_ci',
-                    'prefix' => '',
-                    'prefix_indexes' => true,
-                    'strict' => true,
-                    'engine' => null,
-                    'options' => ['foo' => 'bar'],
-                ],
-                [
-                    'driver' => 'mysql',
-                    'host' => 'db',
-                    'port' => '3306',
-                    'database' => 'local',
-                    'username' => 'root',
-                    'password' => 'pass',
-                    'unix_socket' => '',
-                    'charset' => 'utf8mb4',
-                    'collation' => 'utf8mb4_unicode_ci',
-                    'prefix' => '',
-                    'prefix_indexes' => true,
-                    'strict' => true,
-                    'engine' => null,
-                    'options' => ['foo' => 'bar'],
-                ],
+        yield 'Full example from doc with url overwriting parameters' => [
+            [
+                'url' => 'mysql://root:pass@db/local',
+                'driver' => 'mysql',
+                'host' => '127.0.0.1',
+                'port' => '3306',
+                'database' => 'forge',
+                'username' => 'forge',
+                'password' => '',
+                'unix_socket' => '',
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'prefix_indexes' => true,
+                'strict' => true,
+                'engine' => null,
+                'options' => ['foo' => 'bar'],
             ],
-            'Redis Example' => [
-                [
-                    // Coming directly from Heroku documentation
-                    'url' => 'redis://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
-                    'host' => '127.0.0.1',
-                    'password' =>  null,
-                    'port' =>  6379,
-                    'database' => 0,
-                ],
-                [
-                    'driver' => 'redis',
-                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
-                    'port' => 111,
-                    'database' => 0,
-                    'username' => 'h',
-                    'password' => 'asdfqwer1234asdf',
-                ],
+            [
+                'driver' => 'mysql',
+                'host' => 'db',
+                'port' => '3306',
+                'database' => 'local',
+                'username' => 'root',
+                'password' => 'pass',
+                'unix_socket' => '',
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'prefix_indexes' => true,
+                'strict' => true,
+                'engine' => null,
+                'options' => ['foo' => 'bar'],
             ],
-            'Redis example where URL ends with "/" and database is not present'  => [
-                [
-                    'url' => 'redis://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111/',
-                    'host' => '127.0.0.1',
-                    'password' =>  null,
-                    'port' =>  6379,
-                    'database' => 2,
-                ],
-                [
-                    'driver' => 'redis',
-                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
-                    'port' => 111,
-                    'database' => 2,
-                    'username' => 'h',
-                    'password' => 'asdfqwer1234asdf',
-                ],
+        ];
+        yield 'Redis Example' => [
+            [
+                // Coming directly from Heroku documentation
+                'url' => 'redis://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                'host' => '127.0.0.1',
+                'password' =>  null,
+                'port' =>  6379,
+                'database' => 0,
+            ],
+            [
+                'driver' => 'redis',
+                'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                'port' => 111,
+                'database' => 0,
+                'username' => 'h',
+                'password' => 'asdfqwer1234asdf',
+            ],
+        ];
+        yield 'Redis example where URL ends with "/" and database is not present'  => [
+            [
+                'url' => 'redis://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111/',
+                'host' => '127.0.0.1',
+                'password' =>  null,
+                'port' =>  6379,
+                'database' => 2,
+            ],
+            [
+                'driver' => 'redis',
+                'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                'port' => 111,
+                'database' => 2,
+                'username' => 'h',
+                'password' => 'asdfqwer1234asdf',
             ],
         ];
     }

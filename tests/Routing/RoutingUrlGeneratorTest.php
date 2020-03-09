@@ -520,13 +520,14 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
+    /**
+     * @return \Generator
+     */
     public function providerRouteParameters()
     {
-        return [
-            [['test' => 123]],
-            [['one' => null, 'test' => 123]],
-            [['one' => '', 'test' => 123]],
-        ];
+        yield [['test' => 123]];
+        yield [['one' => null, 'test' => 123]];
+        yield [['one' => '', 'test' => 123]];
     }
 
     /**

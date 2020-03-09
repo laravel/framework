@@ -566,16 +566,14 @@ class AuthAccessGateTest extends TestCase
     }
 
     /**
-     * @return array
+     * @return \Generator
      */
     public function notCallableDataProvider()
     {
-        return [
-            [1],
-            [new stdClass],
-            [[]],
-            [1.1],
-        ];
+        yield [1];
+        yield [new stdClass];
+        yield [[]];
+        yield [1.1];
     }
 
     public function testAuthorizeThrowsUnauthorizedException()
@@ -773,26 +771,27 @@ class AuthAccessGateTest extends TestCase
         $this->assertEquals($expectedHasValue, $gate->has($abilitiesToCheck));
     }
 
+    /**
+     * @return \Generator
+     */
     public function hasAbilitiesTestDataProvider()
     {
         $abilities = ['foo' => 'foo', 'bar' => 'bar'];
         $noAbilities = [];
 
-        return [
-            [$abilities, ['test.foo', 'test.bar'], true],
-            [$abilities, ['test.bar', 'test.foo'], true],
-            [$abilities, ['test.bar', 'test.foo', 'test.baz'], false],
-            [$abilities, ['test.bar'], true],
-            [$abilities, ['baz'], false],
-            [$abilities, [''], false],
-            [$abilities, [], true],
-            [$abilities, 'test.bar', true],
-            [$abilities, 'test.foo', true],
-            [$abilities, '', false],
-            [$noAbilities, '', false],
-            [$noAbilities, [], true],
-        ];
-    }
+        yield [$abilities, ['test.foo', 'test.bar'], true];
+        yield [$abilities, ['test.bar', 'test.foo'], true];
+        yield [$abilities, ['test.bar', 'test.foo', 'test.baz'], false];
+        yield [$abilities, ['test.bar'], true];
+        yield [$abilities, ['baz'], false];
+        yield [$abilities, [''], false];
+        yield [$abilities, [], true];
+        yield [$abilities, 'test.bar', true];
+        yield [$abilities, 'test.foo', true];
+        yield [$abilities, '', false];
+        yield [$noAbilities, '', false];
+        yield [$noAbilities, [], true];
+        }
 
     public function testClassesCanBeDefinedAsCallbacksUsingAtNotationForGuests()
     {

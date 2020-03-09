@@ -439,36 +439,38 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::slug(null));
     }
 
+    /**
+     * @return \Generator
+     */
     public function validUuidList()
     {
-        return [
-            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
-            ['00000000-0000-0000-0000-000000000000'],
-            ['e60d3f48-95d7-4d8d-aad0-856f29a27da2'],
-            ['ff6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-21e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-31e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-41e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-51e1-9b21-0800200c9a66'],
-            ['FF6F8CB0-C57D-11E1-9B21-0800200C9A66'],
-        ];
+        yield ['a0a2a2d2-0b87-4a18-83f2-2529882be2de'];
+        yield ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'];
+        yield ['00000000-0000-0000-0000-000000000000'];
+        yield ['e60d3f48-95d7-4d8d-aad0-856f29a27da2'];
+        yield ['ff6f8cb0-c57d-11e1-9b21-0800200c9a66'];
+        yield ['ff6f8cb0-c57d-21e1-9b21-0800200c9a66'];
+        yield ['ff6f8cb0-c57d-31e1-9b21-0800200c9a66'];
+        yield ['ff6f8cb0-c57d-41e1-9b21-0800200c9a66'];
+        yield ['ff6f8cb0-c57d-51e1-9b21-0800200c9a66'];
+        yield ['FF6F8CB0-C57D-11E1-9B21-0800200C9A66'];
     }
 
+    /**
+     * @return \Generator
+     */
     public function invalidUuidList()
     {
-        return [
-            ['not a valid uuid so we can test this'],
-            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '],
-            [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
-            ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'],
-            ['3f6f8cb0-c57d-11e1-9b21-0800200c9a6'],
-            ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
-            ['af6f8cb0c57d11e19b210800200c9a66'],
-            ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
-        ];
+        yield ['not a valid uuid so we can test this'];
+        yield ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'];
+        yield ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL];
+        yield ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '];
+        yield [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'];
+        yield ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'];
+        yield ['3f6f8cb0-c57d-11e1-9b21-0800200c9a6'];
+        yield ['af6f8cb-c57d-11e1-9b21-0800200c9a66'];
+        yield ['af6f8cb0c57d11e19b210800200c9a66'];
+        yield ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'];
     }
 }
 
