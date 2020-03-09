@@ -305,6 +305,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $foreignId = $blueprint->foreignId('foo');
         $blueprint->foreignId('company_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
+        $blueprint->foreignId('team_column_id')->constrained('teams');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
@@ -313,6 +314,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             'alter table "users" add column "foo" integer not null',
             'alter table "users" add column "company_id" integer not null',
             'alter table "users" add column "team_id" integer not null',
+            'alter table "users" add column "team_column_id" integer not null',
         ], $statements);
     }
 

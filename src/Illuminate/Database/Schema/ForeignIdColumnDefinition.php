@@ -30,16 +30,18 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     /**
      * Create a foreign key constraint on this column referencing the "id" column of the conventionally related table.
      *
+     * @param  string|null  $table
      * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
-    public function constrained()
+    public function constrained($table = null)
     {
-        return $this->references('id')->on(Str::plural(Str::before($this->name, '_id')));
+        return $this->references('id')->on($table ?: Str::plural(Str::before($this->name, '_id')));
     }
 
     /**
      * Specify which column this foreign ID references on another table.
      *
+     * @param  string  $column
      * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function references($column)
