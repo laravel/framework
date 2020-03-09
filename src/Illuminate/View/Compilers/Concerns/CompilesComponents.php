@@ -61,7 +61,7 @@ trait CompilesComponents
     {
         return implode(PHP_EOL, [
             '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
-            '<?php $component = app()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
+            '<?php $component = $__env->getContainer()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
             '<?php if ($component->shouldRender()): ?>',
             '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
         ]);
