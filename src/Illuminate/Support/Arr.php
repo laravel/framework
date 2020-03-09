@@ -657,4 +657,21 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+    
+    /**
+     * Loop through multiple arrays in parallel
+     *
+     * @param iterable ...$arrays
+     * @return array
+     */
+    public static function map(callable $callback, ...$arrays)
+    {
+        $result = [];
+
+        foreach (array_map(null, ...$arrays) as $values) {
+            array_push($result, call_user_func_array($callback, $values));
+        }
+
+        return $result;
+    }
 }
