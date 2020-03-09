@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 
 class CompiledRouteCollection extends AbstractRouteCollection
@@ -109,9 +110,16 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function match(Request $request)
     {
-        $matcher = new CompiledUrlMatcher(
-            $this->compiled, (new RequestContext)->fromRequest($request)
-        );
+        $matcher = new class($this->compiled, (new RequestContext)->fromRequest($request)) extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface {
+            public function redirect(string $path, string $route, string $scheme = null): array
+            {
+                if (null !== $scheme) {
+                    throw new ResourceNotFoundException();
+                }
+
+                return ['_route' => $route];
+            }
+        };
 
         $route = null;
 
