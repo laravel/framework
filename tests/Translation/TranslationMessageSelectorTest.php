@@ -41,7 +41,7 @@ class TranslationMessageSelectorTest extends TestCase
         yield ['first
         line', '{1}first
         line|{2}second', 1];
-        ["first \n
+        yield ["first \n
         line", "{1}first \n
         line|{2}second", 1];
 
