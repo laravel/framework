@@ -399,7 +399,6 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertEquals('fallback', $routes->match(Request::create('/bar/1', 'GET'))->getName());
     }
 
-    /** @group Slash */
     public function testMatchingSlashedRoutes()
     {
         $this->routeCollection->add(

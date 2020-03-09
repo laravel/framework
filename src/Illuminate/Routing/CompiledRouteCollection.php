@@ -110,21 +110,10 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function match(Request $request)
     {
-        $matcher = new class($this->compiled, (new RequestContext)->fromRequest($request)) extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface {
-            public function redirect(string $path, string $route, string $scheme = null): array
-            {
-                if (null !== $scheme) {
-                    throw new ResourceNotFoundException();
-                }
-
-                return ['_route' => $route];
-            }
-        };
-
         $route = null;
 
         try {
-            if ($result = $matcher->matchRequest($request)) {
+            if ($result = $this->matcher($request)->matchRequest($request)) {
                 $route = $this->getByName($result['_route']);
             }
         } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
@@ -148,6 +137,28 @@ class CompiledRouteCollection extends AbstractRouteCollection
         }
 
         return $this->handleMatchedRoute($request, $route);
+    }
+
+    /**
+     * Returns an instance of Symfony's RequestMatcherInterface.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Symfony\Component\Routing\Matcher\RequestMatcherInterface
+     */
+    protected function matcher(Request $request)
+    {
+        $context = (new RequestContext)->fromRequest($request);
+
+        return new class($this->compiled, $context) extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface {
+            public function redirect(string $path, string $route, string $scheme = null)
+            {
+                if (null !== $scheme) {
+                    throw new ResourceNotFoundException();
+                }
+
+                return ['_route' => $route];
+            }
+        };
     }
 
     /**
