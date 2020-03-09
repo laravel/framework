@@ -122,6 +122,18 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testItCanSendToken()
+    {
+        $this->factory->fake();
+
+        $this->factory->withToken('token')->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                $request->hasHeader('Authorization', 'Bearer token');
+        });
+    }
+
     public function testSequenceBuilder()
     {
         $this->factory->fake([
