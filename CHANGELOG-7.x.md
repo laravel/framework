@@ -1,6 +1,31 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.0.7...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.0.8...7.x)
+
+### Added
+- Added `Illuminate\Routing\RouteRegistrar::apiResource()` method ([#31857](https://github.com/laravel/framework/pull/31857)) 
+- Added optional $table parameter to `ForeignIdColumnDefinition::constrained()` method ([#31853](https://github.com/laravel/framework/pull/31853))
+
+### Fixed
+- Fixed phpredis `zadd` and `exists` on cluster ([#31838](https://github.com/laravel/framework/pull/31838))
+
+### Changed
+- Fire `MessageLogged` event after the message has been logged (not before) ([#31843](https://github.com/laravel/framework/pull/31843))
+- Avoid using array_merge_recursive in HTTP client ([#31858](https://github.com/laravel/framework/pull/31858))
+- Expire the jobs cache keys after 1 day ([#31854](https://github.com/laravel/framework/pull/31854))
+
+
+## [v7.0.8 (2020-03-08)](https://github.com/laravel/framework/compare/v7.0.7...v7.0.8)
+
+### Added
+- Added `Illuminate\Mail\Mailable::when()` method ([#31828](https://github.com/laravel/framework/pull/31828))
+- Allowed dynamically adding of routes during caching ([#31829](https://github.com/laravel/framework/pull/31829))
+
+### Fixed
+- Match Symfony's `Command::setHidden` declaration ([#31840](https://github.com/laravel/framework/pull/31840))
+
+### Changed
+- Update the encryption algorithm to provide deterministic encryption sizes ([#31721](https://github.com/laravel/framework/pull/31721))
 
 
 ## [v7.0.7 (2020-03-07)](https://github.com/laravel/framework/compare/v7.0.6...v7.0.7)
