@@ -489,6 +489,29 @@ class Route
     }
 
     /**
+     * Get the binding fields for the route.
+     *
+     * @return array
+     */
+    public function bindingFields()
+    {
+        return $this->bindingFields ?? [];
+    }
+
+    /**
+     * Set the binding fields for the route.
+     *
+     * @param  array  $bindingFields
+     * @return $this
+     */
+    public function setBindingFields(array $bindingFields)
+    {
+        $this->bindingFields = $bindingFields;
+
+        return $this;
+    }
+
+    /**
      * Get the parent parameter of the given parameter.
      *
      * @param  string  $parameter

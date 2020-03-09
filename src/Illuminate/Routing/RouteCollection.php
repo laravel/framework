@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -146,6 +147,7 @@ class RouteCollection extends AbstractRouteCollection
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function match(Request $request)
@@ -246,5 +248,21 @@ class RouteCollection extends AbstractRouteCollection
         $this->refreshNameLookups();
 
         return $symfonyRoutes;
+    }
+
+    /**
+     * Convert the collection to a CompiledRouteCollection instance.
+     *
+     * @param  \Illuminate\Routing\Router  $router
+     * @param  \Illuminate\Container\Container  $container
+     * @return \Illuminate\Routing\CompiledRouteCollection
+     */
+    public function toCompiledRouteCollection(Router $router, Container $container)
+    {
+        ['compiled' => $compiled, 'attributes' => $attributes] = $this->compile();
+
+        return (new CompiledRouteCollection($compiled, $attributes))
+            ->setRouter($router)
+            ->setContainer($container);
     }
 }

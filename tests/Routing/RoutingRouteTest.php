@@ -1144,6 +1144,18 @@ class RoutingRouteTest extends TestCase
         $routes = $routes->getRoutes();
         $routes[0]->prefix('prefix');
         $this->assertSame('prefix', $routes[0]->uri());
+
+        /*
+         * Prefix homepage with empty prefix
+         */
+        $router = $this->getRouter();
+        $router->get('/', function () {
+            return 'hello';
+        });
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+        $routes[0]->prefix('/');
+        $this->assertSame('/', $routes[0]->uri());
     }
 
     public function testRoutePreservingOriginalParametersState()

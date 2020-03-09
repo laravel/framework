@@ -61,9 +61,9 @@ abstract class Component
 
         $factory = Container::getInstance()->make('view');
 
-        return $factory->exists($this->render())
-                    ? $this->render()
-                    : $this->createBladeViewFromString($factory, $this->render());
+        return $factory->exists($view)
+                    ? $view
+                    : $this->createBladeViewFromString($factory, $view);
     }
 
     /**
