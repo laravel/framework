@@ -246,9 +246,7 @@ class PendingRequest
     public function withBasicAuth(string $username, string $password)
     {
         return tap($this, function ($request) use ($username, $password) {
-            return $this->options = array_merge_recursive($this->options, [
-                'auth' => [$username, $password],
-            ]);
+            return $this->options['auth'] = [$username, $password];
         });
     }
 
@@ -262,9 +260,7 @@ class PendingRequest
     public function withDigestAuth($username, $password)
     {
         return tap($this, function ($request) use ($username, $password) {
-            return $this->options = array_merge_recursive($this->options, [
-                'auth' => [$username, $password, 'digest'],
-            ]);
+            return $this->options['auth'] = [$username, $password, 'digest'];
         });
     }
 
@@ -277,9 +273,9 @@ class PendingRequest
      */
     public function withToken($token, $type = 'Bearer')
     {
-        return $this->withHeaders([
-            'Authorization' => trim($type.' '.$token),
-        ]);
+        return tap($this, function ($request) use ($token, $type) {
+            return $this->options['headers']['Authorization'] = trim($type.' '.$token);
+        });
     }
 
     /**
@@ -306,9 +302,7 @@ class PendingRequest
     public function withoutRedirecting()
     {
         return tap($this, function ($request) {
-            return $this->options = array_merge_recursive($this->options, [
-                'allow_redirects' => false,
-            ]);
+            return $this->options['allow_redirects'] = false;
         });
     }
 
@@ -320,9 +314,7 @@ class PendingRequest
     public function withoutVerifying()
     {
         return tap($this, function ($request) {
-            return $this->options = array_merge_recursive($this->options, [
-                'verify' => false,
-            ]);
+            return $this->options['verify'] = false;
         });
     }
 
