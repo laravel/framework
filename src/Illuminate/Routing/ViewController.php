@@ -11,17 +11,17 @@ class ViewController extends Controller
      *
      * @var \Illuminate\Contracts\View\Factory
      */
-    protected $view;
+    protected $factory;
 
     /**
      * Create a new controller instance.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $view
+     * @param  \Illuminate\Contracts\View\Factory  $factory
      * @return void
      */
-    public function __construct(ViewFactory $view)
+    public function __construct(ViewFactory $factory)
     {
-        $this->view = $view;
+        $this->factory = $view;
     }
 
     /**
@@ -34,6 +34,6 @@ class ViewController extends Controller
     {
         [$view, $data] = array_slice($args, -2);
 
-        return $this->view->make($view, $data);
+        return $this->factory->make($view, $data);
     }
 }
