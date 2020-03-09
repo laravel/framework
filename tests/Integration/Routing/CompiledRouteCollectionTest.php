@@ -399,6 +399,16 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertEquals('fallback', $routes->match(Request::create('/bar/1', 'GET'))->getName());
     }
 
+    /** @group Slash */
+    public function testMatchingSlashedRoutes()
+    {
+        $this->routeCollection->add(
+            $route = $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/'))->getName());
+    }
+
     public function testSlashPrefixIsProperlyHandled()
     {
         $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '/']));
