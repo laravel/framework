@@ -144,6 +144,10 @@ class Arr
      */
     public static function exists($array, $key)
     {
+        if ($array instanceof Enumerable) {
+            return $array->has($key);
+        }
+
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
         }
