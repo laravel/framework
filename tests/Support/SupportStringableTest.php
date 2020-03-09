@@ -11,9 +11,23 @@ class SupportStringableTest extends TestCase
      * @param  string  $string
      * @return \Illuminate\Support\Stringable
      */
-    protected function stringable($string)
+    protected function stringable($string = '')
     {
         return new Stringable($string);
+    }
+
+    public function testIsAscii()
+    {
+        $this->assertTrue($this->stringable('A')->isAscii());
+        $this->assertFalse($this->stringable('ù')->isAscii());
+    }
+
+    public function testPluralStudly()
+    {
+        $this->assertSame('LaraCon', (string) $this->stringable('LaraCon')->pluralStudly(1));
+        $this->assertSame('LaraCons', (string) $this->stringable('LaraCon')->pluralStudly(2));
+        $this->assertSame('LaraCon', (string) $this->stringable('LaraCon')->pluralStudly(-1));
+        $this->assertSame('LaraCons', (string) $this->stringable('LaraCon')->pluralStudly(-2));
     }
 
     public function testMatch()
@@ -37,39 +51,50 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo', (string) $this->stringable(' foo ')->trim());
     }
 
-    public function testingCanBeLimitedByWords()
+    public function testCanBeLimitedByWords()
     {
         $this->assertSame('Taylor...', (string) $this->stringable('Taylor Otwell')->words(1));
         $this->assertSame('Taylor___', (string) $this->stringable('Taylor Otwell')->words(1, '___'));
         $this->assertSame('Taylor Otwell', (string) $this->stringable('Taylor Otwell')->words(3));
     }
 
-    public function testingTrimmedOnlyWhereNecessary()
+    public function testWhenEmpty()
+    {
+        $this->assertSame('empty', (string) $this->stringable()->whenEmpty(function () {
+            return 'empty';
+        }));
+
+        $this->assertSame('not-empty', (string) $this->stringable('not-empty')->whenEmpty(function () {
+            return 'empty';
+        }));
+    }
+
+    public function testTrimmedOnlyWhereNecessary()
     {
         $this->assertSame(' Taylor Otwell ', (string) $this->stringable(' Taylor Otwell ')->words(3));
         $this->assertSame(' Taylor...', (string) $this->stringable(' Taylor Otwell ')->words(1));
     }
 
-    public function testingTitle()
+    public function testTitle()
     {
         $this->assertSame('Jefferson Costella', (string) $this->stringable('jefferson costella')->title());
         $this->assertSame('Jefferson Costella', (string) $this->stringable('jefFErson coSTella')->title());
     }
 
-    public function testingWithoutWordsDoesntProduceError()
+    public function testWithoutWordsDoesntProduceError()
     {
         $nbsp = chr(0xC2).chr(0xA0);
         $this->assertSame(' ', (string) $this->stringable(' ')->words());
         $this->assertEquals($nbsp, (string) $this->stringable($nbsp)->words());
     }
 
-    public function testingAscii()
+    public function testAscii()
     {
         $this->assertSame('@', (string) $this->stringable('@')->ascii());
         $this->assertSame('u', (string) $this->stringable('ü')->ascii());
     }
 
-    public function testingAsciiWithSpecificLocale()
+    public function testAsciiWithSpecificLocale()
     {
         $this->assertSame('h H sht Sht a A ia yo', (string) $this->stringable('х Х щ Щ ъ Ъ иа йо')->ascii('bg'));
         $this->assertSame('ae oe ue Ae Oe Ue', (string) $this->stringable('ä ö ü Ä Ö Ü')->ascii('de'));
