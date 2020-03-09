@@ -4328,11 +4328,11 @@ class ValidationValidatorTest extends TestCase
 
         $implicit_no_connection = $v->parseTable(ImplicitTableModel::class);
         $this->assertEquals(null, $implicit_no_connection[0]);
-        $this->assertEquals('implicit_table_models', $implicit_no_connection[1]);
+        $this->assertSame('implicit_table_models', $implicit_no_connection[1]);
 
         $explicit_no_connection = $v->parseTable(ExplicitTableModel::class);
         $this->assertEquals(null, $explicit_no_connection[0]);
-        $this->assertEquals('explicits', $explicit_no_connection[1]);
+        $this->assertSame('explicits', $explicit_no_connection[1]);
 
         $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
         $this->assertEquals(null, $noneloquent_no_connection[0]);
@@ -4340,27 +4340,27 @@ class ValidationValidatorTest extends TestCase
 
         $raw_no_connection = $v->parseTable('table');
         $this->assertEquals(null, $raw_no_connection[0]);
-        $this->assertEquals('table', $raw_no_connection[1]);
+        $this->assertSame('table', $raw_no_connection[1]);
 
         $implicit_connection = $v->parseTable('connection.'.ImplicitTableModel::class);
-        $this->assertEquals('connection', $implicit_connection[0]);
-        $this->assertEquals('implicit_table_models', $implicit_connection[1]);
+        $this->assertSame('connection', $implicit_connection[0]);
+        $this->assertSame('implicit_table_models', $implicit_connection[1]);
 
         $explicit_connection = $v->parseTable('connection.'.ExplicitTableModel::class);
-        $this->assertEquals('connection', $explicit_connection[0]);
-        $this->assertEquals('explicits', $explicit_connection[1]);
+        $this->assertSame('connection', $explicit_connection[0]);
+        $this->assertSame('explicits', $explicit_connection[1]);
 
         $explicit_model_implicit_connection = $v->parseTable(ExplicitTableAndConnectionModel::class);
-        $this->assertEquals('connection', $explicit_model_implicit_connection[0]);
-        $this->assertEquals('explicits', $explicit_model_implicit_connection[1]);
+        $this->assertSame('connection', $explicit_model_implicit_connection[0]);
+        $this->assertSame('explicits', $explicit_model_implicit_connection[1]);
 
         $noneloquent_connection = $v->parseTable('connection.'.NonEloquentModel::class);
-        $this->assertEquals('connection', $noneloquent_connection[0]);
+        $this->assertSame('connection', $noneloquent_connection[0]);
         $this->assertEquals(NonEloquentModel::class, $noneloquent_connection[1]);
 
         $raw_connection = $v->parseTable('connection.table');
-        $this->assertEquals('connection', $raw_connection[0]);
-        $this->assertEquals('table', $raw_connection[1]);
+        $this->assertSame('connection', $raw_connection[0]);
+        $this->assertSame('table', $raw_connection[1]);
     }
 
     public function testUsingSettersWithImplicitRules()

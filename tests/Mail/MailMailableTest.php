@@ -124,7 +124,7 @@ class MailMailableTest extends TestCase
 
         $mailable = unserialize(serialize($mailable));
 
-        $this->assertEquals('array', $mailable->mailer);
+        $this->assertSame('array', $mailable->mailer);
     }
 }
 

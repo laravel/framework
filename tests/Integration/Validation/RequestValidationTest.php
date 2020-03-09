@@ -45,7 +45,7 @@ class RequestValidationTest extends TestCase
         try {
             $request->validateWithBag('some_bag', ['name' => 'string']);
         } catch (ValidationException $validationException) {
-            $this->assertEquals('some_bag', $validationException->errorBag);
+            $this->assertSame('some_bag', $validationException->errorBag);
         }
     }
 }

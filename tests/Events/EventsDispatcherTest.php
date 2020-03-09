@@ -48,10 +48,10 @@ class EventsDispatcherTest extends TestCase
         });
 
         $response = $d->dispatch('foo', ['bar'], true);
-        $this->assertEquals('here', $response);
+        $this->assertSame('here', $response);
 
         $response = $d->until('foo', ['bar']);
-        $this->assertEquals('here', $response);
+        $this->assertSame('here', $response);
     }
 
     public function testResponseWhenNoListenersAreSet()

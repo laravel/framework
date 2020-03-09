@@ -383,7 +383,7 @@ class RoutingRouteTest extends TestCase
             return 'foo';
         })->name('foo');
 
-        $this->assertEquals('slug', $route->bindingFieldFor('bar'));
+        $this->assertSame('slug', $route->bindingFieldFor('bar'));
 
         $route = $router->get('foo/{bar:slug}/{baz}', function () {
             return 'foo';
@@ -797,7 +797,7 @@ class RoutingRouteTest extends TestCase
             //
         }]);
 
-        $this->assertEquals('profiles/{user}/portfolios/foo', $route->uri());
+        $this->assertSame('profiles/{user}/portfolios/foo', $route->uri());
     }
 
     public function testDotDoesNotMatchEverything()

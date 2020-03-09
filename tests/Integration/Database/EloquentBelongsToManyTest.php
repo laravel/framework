@@ -229,8 +229,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertSame('exclude', $tag->pivot->flag);
-            $this->assertEquals('1507630210', $tag->pivot->getAttributes()['created_at']);
-            $this->assertEquals('1507630220', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            $this->assertSame('1507630210', $tag->pivot->getAttributes()['created_at']);
+            $this->assertSame('1507630220', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
         }
     }
 

@@ -318,7 +318,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'bar']));
 
-        $this->assertEquals('foo', $routes->match(Request::create('/', 'GET'))->getName());
+        $this->assertSame('foo', $routes->match(Request::create('/', 'GET'))->getName());
     }
 
     public function testMatchingFindsRouteWithDifferentMethodDynamically()
@@ -360,7 +360,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->newRoute('GET', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
 
-        $this->assertEquals('bar', $routes->match(Request::create('/bar/1', 'GET'))->getName());
+        $this->assertSame('bar', $routes->match(Request::create('/bar/1', 'GET'))->getName());
     }
 
     public function testMatchingFallbackRouteCatchesAll()
@@ -374,7 +374,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->newRoute('GET', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
 
-        $this->assertEquals('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
+        $this->assertSame('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
     }
 
     public function testMatchingCachedFallbackTakesPrecedenceOverDynamicFallback()
@@ -385,7 +385,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->fallbackRoute(['uses' => 'FooController@index', 'as' => 'dynamic_fallback']));
 
-        $this->assertEquals('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
+        $this->assertSame('fallback', $routes->match(Request::create('/baz/1', 'GET'))->getName());
     }
 
     public function testMatchingCachedFallbackTakesPrecedenceOverDynamicRouteWithWrongMethod()
@@ -396,7 +396,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $routes->add($this->newRoute('POST', '/bar/{id}', ['uses' => 'FooController@index', 'as' => 'bar']));
 
-        $this->assertEquals('fallback', $routes->match(Request::create('/bar/1', 'GET'))->getName());
+        $this->assertSame('fallback', $routes->match(Request::create('/bar/1', 'GET'))->getName());
     }
 
     public function testSlashPrefixIsProperlyHandled()
@@ -405,7 +405,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $route = $this->collection()->getByAction('FooController@index');
 
-        $this->assertEquals('foo/bar', $route->uri());
+        $this->assertSame('foo/bar', $route->uri());
     }
 
     public function testRouteBindingsAreProperlySaved()
@@ -418,7 +418,7 @@ class CompiledRouteCollectionTest extends IntegrationTest
 
         $route = $this->collection()->getByName('foo');
 
-        $this->assertEquals('profile/{user}/posts/{post}/show', $route->uri());
+        $this->assertSame('profile/{user}/posts/{post}/show', $route->uri());
         $this->assertSame(['user' => 'username', 'post' => 'slug'], $route->bindingFields());
     }
 
