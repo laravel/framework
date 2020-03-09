@@ -30,7 +30,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     /**
      * Create a foreign key constraint on this column referencing the "id" column of the conventionally related table.
      *
-     * @param string $table
+     * @param  string|null  $table
      * @return \Illuminate\Support\Fluent|\Illuminate\Database\Schema\ForeignKeyDefinition
      */
     public function constrained($table = null)
