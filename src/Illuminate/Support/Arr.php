@@ -669,7 +669,7 @@ class Arr
         $result = [];
 
         foreach (array_map(null, ...$arrays) as $values) {
-            array_push($result, call_user_func_array($callback, $values));
+            $result[] = call_user_func_array($callback, $values);
         }
 
         return $result;
