@@ -898,6 +898,26 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `geo` add `coordinates` point not null', $statements[0]);
     }
 
+    public function testAddingPointWithSrid()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->point('coordinates', 4326);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `geo` add `coordinates` point not null srid 4326', $statements[0]);
+    }
+
+    public function testAddingPointWithSridColumn()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->point('coordinates', 4326)->after('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `geo` add `coordinates` point not null srid 4326 after `id`', $statements[0]);
+    }
+
     public function testAddingLineString()
     {
         $blueprint = new Blueprint('geo');
