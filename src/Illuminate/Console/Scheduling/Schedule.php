@@ -26,16 +26,23 @@ class Schedule
     /**
      * The event mutex implementation.
      *
-     * @var \Illuminate\Console\Scheduling\EventMutex
+     * @var \Illuminate\Console\Scheduling\EventMutex|null
      */
     protected $eventMutex;
 
     /**
      * The scheduling mutex implementation.
      *
-     * @var \Illuminate\Console\Scheduling\SchedulingMutex
+     * @var \Illuminate\Console\Scheduling\SchedulingMutex|null
      */
     protected $schedulingMutex;
+
+    /**
+     * The job dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Bus\Dispatcher|null
+     */
+    protected $dispatcher;
 
     /**
      * The timezone the date should be evaluated on.
@@ -54,17 +61,21 @@ class Schedule
     {
         $this->timezone = $timezone;
 
-        if (class_exists(Container::class)) {
-            $container = Container::getInstance();
-
-            $this->eventMutex = $container->bound(EventMutex::class)
-                                    ? $container->make(EventMutex::class)
-                                    : $container->make(CacheEventMutex::class);
-
-            $this->schedulingMutex = $container->bound(SchedulingMutex::class)
-                                    ? $container->make(SchedulingMutex::class)
-                                    : $container->make(CacheSchedulingMutex::class);
+        if (!class_exists(Container::class)) {
+            throw new RuntimeException(
+                'The container implementation is required to use the scheduler. Please install illuminate/container.'
+            );
         }
+
+        $container = Container::getInstance();
+
+        $this->eventMutex = $container->bound(EventMutex::class)
+                                ? $container->make(EventMutex::class)
+                                : $container->make(CacheEventMutex::class);
+
+        $this->schedulingMutex = $container->bound(SchedulingMutex::class)
+                                ? $container->make(SchedulingMutex::class)
+                                : $container->make(CacheSchedulingMutex::class);
     }
 
     /**
@@ -92,13 +103,7 @@ class Schedule
      */
     public function command($command, array $parameters = [])
     {
-        if (class_exists($command)) {
-            if (class_exists(Container::class)) {
-                $command = Container::getInstance()->make($command)->getName();
-            } else {
-                $command = (new $command)->getName();
-            }
-        }
+        $command = Container::getInstance()->make($command)->getName();
 
         return $this->exec(
             Application::formatCommandString($command), $parameters
@@ -227,12 +232,6 @@ class Schedule
     protected function getDispatcher()
     {
         if ($this->dispatcher === null) {
-            if (!class_exists(Container::class)) {
-                throw new RuntimeException(
-                    'Unable to find the service container in order to resolve the dispatcher. Please install illuminate/container.'
-                );
-            }
-
             try {
                 $this->dispatcher = Container::getInstance()->make(Dispatcher::class);
             } catch (BindingResolutionException $e) {
