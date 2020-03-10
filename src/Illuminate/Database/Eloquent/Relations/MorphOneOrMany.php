@@ -31,11 +31,11 @@ abstract class MorphOneOrMany extends HasOneOrMany
      * @param  string  $localKey
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $type, $id, $localKey)
+    public function __construct(Builder $query, Model $parent, $type, $id, $localKey, $morphClass = null)
     {
         $this->morphType = $type;
 
-        $this->morphClass = $parent->getMorphClass();
+        $this->morphClass = $morphClass ?? $parent->getMorphClass();
 
         parent::__construct($query, $parent, $id, $localKey);
     }

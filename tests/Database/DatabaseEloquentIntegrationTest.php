@@ -120,6 +120,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->timestamps();
             });
 
+            $this->schema($connection)->create('attachments', function ($table) {
+                $table->increments('id');
+                $table->morphs('attacheable');
+                $table->string('name');
+                $table->timestamps();
+            });
+
             $this->schema($connection)->create('soft_deleted_users', function ($table) {
                 $table->increments('id');
                 $table->string('name')->nullable();
@@ -946,6 +953,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Relation::morphMap($map2, false);
         $this->assertEquals($map2, Relation::morphMap());
     }
+
+    public function testMorphClassIsUsedWhenFetchingParent()
+    {
+        Relation::morphMap([
+            'rw_attacheable' => EloquentTestPost::class,
+            'attacheable' => EloquentTestPost::class,
+        ]);
+
+        $post = EloquentTestPost::create(['name' => 'Post', 'user_id' => 1]);
+        $post->readOnlyAttachments()->create(['name' => 'Read only file']);
+        $post->attachments()->create(['name' => 'Normal file']);
+
+        $attachements = EloquentTestAttachment::orderBy('id')->get();
+        $this->assertSame('rw_attacheable', $attachements[0]->attacheable_type);
+        $this->assertInstanceOf(EloquentTestPost::class, $attachements[0]->attacheable);
+        $this->assertSame('Read only file', $attachements[0]->name);
+        $this->assertSame('attacheable', $attachements[1]->attacheable_type);
+        $this->assertInstanceOf(EloquentTestPost::class, $attachements[1]->attacheable);
+        $this->assertSame('Normal file', $attachements[1]->name);
+    }
+
 
     public function testEmptyMorphToRelationship()
     {
@@ -1829,6 +1857,16 @@ class EloquentTestPost extends Eloquent
         return $this->morphMany(EloquentTestPhoto::class, 'imageable');
     }
 
+    public function readOnlyAttachments()
+    {
+        return $this->morphMany(EloquentTestAttachment::class, 'attacheable', 'attacheable_type', 'attacheable_id', 'id', 'rw_attacheable');
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(EloquentTestAttachment::class, 'attacheable', 'attacheable_type', 'attacheable_id', 'id', 'attacheable');
+    }
+
     public function childPosts()
     {
         return $this->hasMany(self::class, 'parent_id');
@@ -1854,6 +1892,22 @@ class EloquentTestPhoto extends Eloquent
     public function imageable()
     {
         return $this->morphTo();
+    }
+}
+
+class EloquentTestAttachment extends Eloquent
+{
+    protected $table = 'attachments';
+    protected $guarded = [];
+
+    public function readOnlyAttacheable()
+    {
+        return $this->morphTo('attacheable', 'attacheable_type', 'attacheable_id', 'id', 'rw_attacheable');
+    }
+
+    public function attacheable()
+    {
+        return $this->morphTo('attacheable', 'attacheable_type', 'attacheable_id', 'id', 'attacheable');
     }
 }
 

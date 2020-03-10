@@ -159,9 +159,9 @@ class CustomPost extends Post
         return new CustomMorphOne($query, $parent, $type, $id, $localKey);
     }
 
-    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey, $morphClass = null)
     {
-        return new CustomMorphMany($query, $parent, $type, $id, $localKey);
+        return new CustomMorphMany($query, $parent, $type, $id, $localKey, $morphClass);
     }
 
     protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
@@ -183,15 +183,15 @@ class CustomPost extends Post
     }
 
     protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
-        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false)
+        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false, $morphClass = null)
     {
         return new CustomMorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
-            $relationName, $inverse);
+            $relationName, $inverse, $morphClass);
     }
 
-    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
+    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $morphClass = null)
     {
-        return new CustomMorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
+        return new CustomMorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation, $morphClass);
     }
 }
 

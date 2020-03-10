@@ -219,7 +219,7 @@ trait HasRelationships
      * @param  string|null  $ownerKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function morphTo($name = null, $type = null, $id = null, $ownerKey = null)
+    public function morphTo($name = null, $type = null, $id = null, $ownerKey = null, $morphClass = null)
     {
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
@@ -234,8 +234,8 @@ trait HasRelationships
         // the relationship. In this case we'll just pass in a dummy query where we
         // need to remove any eager loads that may already be defined on a model.
         return empty($class = $this->{$type})
-                    ? $this->morphEagerTo($name, $type, $id, $ownerKey)
-                    : $this->morphInstanceTo($class, $name, $type, $id, $ownerKey);
+                    ? $this->morphEagerTo($name, $type, $id, $ownerKey, $morphClass)
+                    : $this->morphInstanceTo($class, $name, $type, $id, $ownerKey, $morphClass);
     }
 
     /**
@@ -247,10 +247,10 @@ trait HasRelationships
      * @param  string  $ownerKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function morphEagerTo($name, $type, $id, $ownerKey)
+    protected function morphEagerTo($name, $type, $id, $ownerKey, $morphClass = null)
     {
         return $this->newMorphTo(
-            $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name
+            $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name, $morphClass
         );
     }
 
@@ -264,14 +264,14 @@ trait HasRelationships
      * @param  string  $ownerKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey)
+    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey, $morphClass = null)
     {
         $instance = $this->newRelatedInstance(
             static::getActualClassNameForMorph($target)
         );
 
         return $this->newMorphTo(
-            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name
+            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name, $morphClass
         );
     }
 
@@ -286,9 +286,9 @@ trait HasRelationships
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
+    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $morphClass = null)
     {
-        return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
+        return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation, $morphClass);
     }
 
     /**
@@ -402,7 +402,7 @@ trait HasRelationships
      * @param  string|null  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
+    public function morphMany($related, $name, $type = null, $id = null, $localKey = null, $morphClass = null)
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -415,7 +415,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return $this->newMorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+        return $this->newMorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey, $morphClass);
     }
 
     /**
@@ -428,9 +428,9 @@ trait HasRelationships
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey, $morphClass = null)
     {
-        return new MorphMany($query, $parent, $type, $id, $localKey);
+        return new MorphMany($query, $parent, $type, $id, $localKey, $morphClass);
     }
 
     /**
@@ -512,7 +512,7 @@ trait HasRelationships
      */
     public function morphToMany($related, $name, $table = null, $foreignPivotKey = null,
                                 $relatedPivotKey = null, $parentKey = null,
-                                $relatedKey = null, $inverse = false)
+                                $relatedKey = null, $inverse = false, $morphClass = null)
     {
         $caller = $this->guessBelongsToManyRelation();
 
@@ -539,7 +539,7 @@ trait HasRelationships
         return $this->newMorphToMany(
             $instance->newQuery(), $this, $name, $table,
             $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(),
-            $relatedKey ?: $instance->getKeyName(), $caller, $inverse
+            $relatedKey ?: $instance->getKeyName(), $caller, $inverse, $morphClass
         );
     }
 
@@ -560,10 +560,10 @@ trait HasRelationships
      */
     protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
                                       $relatedPivotKey, $parentKey, $relatedKey,
-                                      $relationName = null, $inverse = false)
+                                      $relationName = null, $inverse = false, $morphClass = null)
     {
         return new MorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
-            $relationName, $inverse);
+            $relationName, $inverse, $morphClass);
     }
 
     /**
@@ -579,7 +579,7 @@ trait HasRelationships
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null,
-                                  $relatedPivotKey = null, $parentKey = null, $relatedKey = null)
+                                  $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $morphClass = null)
     {
         $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
 
@@ -590,7 +590,7 @@ trait HasRelationships
 
         return $this->morphToMany(
             $related, $name, $table, $foreignPivotKey,
-            $relatedPivotKey, $parentKey, $relatedKey, true
+            $relatedPivotKey, $parentKey, $relatedKey, true, $morphClass
         );
     }
 
