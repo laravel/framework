@@ -203,14 +203,14 @@ class MorphTo extends BelongsTo
      */
     public function associate($model)
     {
-        $morphClass = $this->morphClass ?? $model->getMorphClass();
-
         $this->parent->setAttribute(
-            $this->foreignKey, $model instanceof Model ? $model->getKey() : null
+            $this->foreignKey,
+            $model instanceof Model ? $model->getKey() : null
         );
 
         $this->parent->setAttribute(
-            $this->morphType, $model instanceof Model ? $morphClass : null
+            $this->morphType,
+            $this->morphClass ?? ($model instanceof Model ? $model->getMorphClass() : null)
         );
 
         return $this->parent->setRelation($this->relationName, $model);
