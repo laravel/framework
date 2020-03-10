@@ -41,7 +41,7 @@ trait RouteDependencyResolverTrait
 
         $values = array_values($parameters);
 
-        $shouldSkipValue = new \StdClass;
+        $shouldSkipValue = new \stdClass;
 
         foreach ($reflector->getParameters() as $key => $parameter) {
             $instance = $this->transformDependency($parameter, $parameters, $shouldSkipValue);
