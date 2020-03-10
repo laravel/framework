@@ -712,4 +712,19 @@ class Str
     {
         static::$uuidFactory = null;
     }
+
+    /**
+     * Count word(s) number in a string
+     *
+     * @param  string  $value
+     * @return int
+     */
+    public static function wordsCount($value)
+    {
+        if (is_string($value)) {
+            return str_word_count($value);
+        } else {
+            return 0;
+        }
+    }
 }
