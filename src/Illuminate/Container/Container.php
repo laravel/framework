@@ -715,7 +715,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the concrete type for a given abstract.
      *
      * @param  string  $abstract
-     * @return mixed   $concrete
+     * @return mixed
      */
     protected function getConcrete($abstract)
     {
