@@ -27,7 +27,7 @@ class Recaller
     /**
      * Get the user ID from the recaller.
      *
-     * @return string
+     * @return int|string|null
      */
     public function id()
     {
