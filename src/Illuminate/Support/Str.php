@@ -717,12 +717,12 @@ class Str
      * Count word(s) number in a string.
      *
      * @param  string  $value
-     * @param  int  $format
-     * @param  string  $charlist
+     * @param  int|null  $format
+     * @param  string|null  $charlist
      * @return int
      */
-    public static function wordsCount($value)
+    public static function wordsCount($value, $format = null, $charlist = null)
     {
-        return str_word_count($value, $format = null, $charlist = null);
+        return str_word_count($value, $format, $charlist);
     }
 }
