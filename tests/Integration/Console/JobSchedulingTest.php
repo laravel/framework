@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Container\Container;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,6 +15,7 @@ class JobSchedulingTest extends TestCase
     public function testJobQueuingRespectsJobQueue()
     {
         Queue::fake();
+        Container::setInstance($this->app);
 
         /** @var Schedule $scheduler */
         $scheduler = $this->app->make(Schedule::class);
@@ -42,6 +44,7 @@ class JobSchedulingTest extends TestCase
     public function testJobQueuingRespectsJobConnection()
     {
         Queue::fake();
+        Container::setInstance($this->app);
 
         /** @var Schedule $scheduler */
         $scheduler = $this->app->make(Schedule::class);

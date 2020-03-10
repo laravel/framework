@@ -33,6 +33,8 @@
     "suggest": {
         "dragonmantank/cron-expression": "Required to use scheduling component (^2.0).",
         "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^6.0|^7.0).",
+        "illuminate/bus": "Required to use the scheduled job dispatcher (^6.0)",
+        "illuminate/container": "Required to use the scheduler (^6.0)",
         "illuminate/filesystem": "Required to use the generator command (^6.0)"
     },
     "config": {

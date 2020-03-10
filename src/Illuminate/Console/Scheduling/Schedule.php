@@ -5,9 +5,12 @@ namespace Illuminate\Console\Scheduling;
 use DateTimeInterface;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
+use RuntimeException;
 
 class Schedule
 {
@@ -35,6 +38,13 @@ class Schedule
     protected $schedulingMutex;
 
     /**
+     * The job dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * The timezone the date should be evaluated on.
      *
      * @var \DateTimeZone|string
@@ -50,6 +60,12 @@ class Schedule
     public function __construct($timezone = null)
     {
         $this->timezone = $timezone;
+
+        if (! class_exists(Container::class)) {
+            throw new RuntimeException(
+                'The container implementation is required to use the scheduler. Please install illuminate/container.'
+            );
+        }
 
         $container = Container::getInstance();
 
@@ -110,11 +126,13 @@ class Schedule
             $job = is_string($job) ? resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
-                dispatch($job)
-                    ->onConnection($connection ?? $job->connection)
-                    ->onQueue($queue ?? $job->queue);
+                $pending = $this->getDispatcher()->dispatch($job);
+                if ($pending !== null) {
+                    $pending->onConnection($connection ?? $job->connection)
+                            ->onQueue($queue ?? $job->queue);
+                }
             } else {
-                dispatch_now($job);
+                $this->getDispatcher()->dispatchNow($job);
             }
         })->name(is_string($job) ? $job : get_class($job));
     }
@@ -208,5 +226,27 @@ class Schedule
         }
 
         return $this;
+    }
+
+    /**
+     * Get the job dispatcher, if available.
+     *
+     * @return \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected function getDispatcher()
+    {
+        if ($this->dispatcher === null) {
+            try {
+                $this->dispatcher = Container::getInstance()->make(Dispatcher::class);
+            } catch (BindingResolutionException $e) {
+                throw new RuntimeException(
+                    'Unable to resolve the dispatcher from the service container. Please bind it or install illuminate/bus.',
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
+
+        return $this->dispatcher;
     }
 }
