@@ -123,7 +123,7 @@ class Schedule
                     ->onConnection($connection ?? $job->connection)
                     ->onQueue($queue ?? $job->queue);
             } else {
-                $this->getDispatcher()->dispatchNow(($job);
+                $this->getDispatcher()->dispatchNow($job);
             }
         })->name(is_string($job) ? $job : get_class($job));
     }
