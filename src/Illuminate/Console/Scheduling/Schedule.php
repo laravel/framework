@@ -5,9 +5,12 @@ namespace Illuminate\Console\Scheduling;
 use DateTimeInterface;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
+use RuntimeExceptionl;
 
 class Schedule
 {
@@ -51,15 +54,17 @@ class Schedule
     {
         $this->timezone = $timezone;
 
-        $container = Container::getInstance();
+        if (class_exists(Container::class)) {
+            $container = Container::getInstance();
 
-        $this->eventMutex = $container->bound(EventMutex::class)
-                                ? $container->make(EventMutex::class)
-                                : $container->make(CacheEventMutex::class);
+            $this->eventMutex = $container->bound(EventMutex::class)
+                                    ? $container->make(EventMutex::class)
+                                    : $container->make(CacheEventMutex::class);
 
-        $this->schedulingMutex = $container->bound(SchedulingMutex::class)
-                                ? $container->make(SchedulingMutex::class)
-                                : $container->make(CacheSchedulingMutex::class);
+            $this->schedulingMutex = $container->bound(SchedulingMutex::class)
+                                    ? $container->make(SchedulingMutex::class)
+                                    : $container->make(CacheSchedulingMutex::class);
+        }
     }
 
     /**
@@ -88,7 +93,11 @@ class Schedule
     public function command($command, array $parameters = [])
     {
         if (class_exists($command)) {
-            $command = Container::getInstance()->make($command)->getName();
+            if (class_exists(Container::class)) {
+                $command = Container::getInstance()->make($command)->getName();
+            } else {
+                $command = (new $command)->getName();
+            }
         }
 
         return $this->exec(
@@ -110,11 +119,11 @@ class Schedule
             $job = is_string($job) ? resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
-                dispatch($job)
+                $this->getDispatcher()->dispatch($job)
                     ->onConnection($connection ?? $job->connection)
                     ->onQueue($queue ?? $job->queue);
             } else {
-                dispatch_now($job);
+                $this->getDispatcher()->dispatchNow(($job);
             }
         })->name(is_string($job) ? $job : get_class($job));
     }
@@ -208,5 +217,33 @@ class Schedule
         }
 
         return $this;
+    }
+
+    /**
+     * Get the job dispatcher, if available.
+     *
+     * @return \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected function getDispatcher()
+    {
+        if ($this->dispatcher === null) {
+            if (!class_exists(Container::class)) {
+                throw new RuntimeException(
+                    'Unable to find the service container in order to resolve the dispatcher. Please install illuminate/container.'
+                );
+            }
+
+            try {
+                $this->dispatcher = Container::getInstance()->make(Dispatcher::class);
+            } catch (BindingResolutionException $e) {
+                throw new RuntimeException(
+                    'Unable to resolve the dispatcher from the service container. Please bind it or install illuminate/bus.',
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
+
+        return $this->dispatcher;
     }
 }
