@@ -10,7 +10,6 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
-use RuntimeExceptionl;
 
 class Schedule
 {
@@ -227,7 +226,7 @@ class Schedule
     protected function getDispatcher()
     {
         if ($this->dispatcher === null) {
-            if (!class_exists(Container::class)) {
+            if (! class_exists(Container::class)) {
                 throw new RuntimeException(
                     'Unable to find the service container in order to resolve the dispatcher. Please install illuminate/container.'
                 );
