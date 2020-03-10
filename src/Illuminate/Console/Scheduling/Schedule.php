@@ -10,6 +10,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
+use RuntimeException;
 
 class Schedule
 {
