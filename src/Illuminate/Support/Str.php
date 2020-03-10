@@ -714,7 +714,7 @@ class Str
     }
 
     /**
-     * Count word(s) number in a string
+     * Count word(s) number in a string.
      *
      * @param  string  $value
      * @return int
