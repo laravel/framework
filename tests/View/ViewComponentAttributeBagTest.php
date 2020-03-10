@@ -11,18 +11,18 @@ class ViewComponentAttributeBagTest extends TestCase
     {
         $bag = new ComponentAttributeBag(['class' => 'font-bold', 'name' => 'test']);
 
-        $this->assertEquals('class="mt-4 font-bold" name="test"', (string) $bag->merge(['class' => 'mt-4']));
-        $this->assertEquals('class="mt-4 font-bold" name="foo"', (string) $bag->merge(['class' => 'mt-4', 'name' => 'foo']));
-        $this->assertEquals('class="mt-4 font-bold" name="test"', (string) $bag(['class' => 'mt-4']));
-        $this->assertEquals('class="mt-4 font-bold"', (string) $bag->only('class')->merge(['class' => 'mt-4']));
-        $this->assertEquals('class="mt-4 font-bold"', (string) $bag->merge(['class' => 'mt-4'])->only('class'));
-        $this->assertEquals('class="mt-4 font-bold"', (string) $bag->only('class')(['class' => 'mt-4']));
-        $this->assertEquals('font-bold', $bag->get('class'));
-        $this->assertEquals('bar', $bag->get('foo', 'bar'));
-        $this->assertEquals('font-bold', $bag['class']);
+        $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag->merge(['class' => 'mt-4']));
+        $this->assertSame('class="mt-4 font-bold" name="foo"', (string) $bag->merge(['class' => 'mt-4', 'name' => 'foo']));
+        $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag(['class' => 'mt-4']));
+        $this->assertSame('class="mt-4 font-bold"', (string) $bag->only('class')->merge(['class' => 'mt-4']));
+        $this->assertSame('class="mt-4 font-bold"', (string) $bag->merge(['class' => 'mt-4'])->only('class'));
+        $this->assertSame('class="mt-4 font-bold"', (string) $bag->only('class')(['class' => 'mt-4']));
+        $this->assertSame('font-bold', $bag->get('class'));
+        $this->assertSame('bar', $bag->get('foo', 'bar'));
+        $this->assertSame('font-bold', $bag['class']);
 
         $bag = new ComponentAttributeBag([]);
 
-        $this->assertEquals('class="mt-4"', (string) $bag->merge(['class' => 'mt-4']));
+        $this->assertSame('class="mt-4"', (string) $bag->merge(['class' => 'mt-4']));
     }
 }

@@ -14,8 +14,8 @@ class ViewComponentTest extends TestCase
         $variables = $component->data();
 
         $this->assertEquals(10, $variables['votes']);
-        $this->assertEquals('world', $variables['hello']());
-        $this->assertEquals('taylor', $variables['hello']('taylor'));
+        $this->assertSame('world', $variables['hello']());
+        $this->assertSame('taylor', $variables['hello']('taylor'));
     }
 
     public function testPublicMethodsWithNoArgsAreEagerlyInvokedAndNotCached()
@@ -26,7 +26,7 @@ class ViewComponentTest extends TestCase
         $variables = $component->data();
         $this->assertEquals(1, $component->counter);
 
-        $this->assertEquals('noArgs val', $variables['noArgs']);
+        $this->assertSame('noArgs val', $variables['noArgs']);
         $this->assertEquals(0, $variables['counter']);
 
         // make sure non-public members are not invoked nor counted.
@@ -52,7 +52,7 @@ class ViewComponentTest extends TestCase
         $variables = $component->data();
 
         // Ignored methods (with no args) are not invoked behind the scenes.
-        $this->assertEquals('Otwell', $component->taylor);
+        $this->assertSame('Otwell', $component->taylor);
 
         $this->assertArrayNotHasKey('hello', $variables);
         $this->assertArrayNotHasKey('hello2', $variables);
@@ -64,11 +64,11 @@ class ViewComponentTest extends TestCase
         $component = new TestHelloPropertyHelloMethodComponent();
         $variables = $component->data();
         $this->assertArrayHasKey('hello', $variables);
-        $this->assertEquals('world', $variables['hello']());
+        $this->assertSame('world', $variables['hello']());
 
         // protected methods do not override public properties.
         $this->assertArrayHasKey('world', $variables);
-        $this->assertEquals('world property', $variables['world']);
+        $this->assertSame('world property', $variables['world']);
     }
 }
 

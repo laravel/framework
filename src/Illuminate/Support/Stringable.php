@@ -416,9 +416,9 @@ class Stringable
     {
         if ($replace instanceof Closure) {
             return new static(preg_replace_callback($pattern, $replace, $this->value, $limit));
-        } else {
-            return new static(preg_replace($pattern, $replace, $this->value, $limit));
         }
+
+        return new static(preg_replace($pattern, $replace, $this->value, $limit));
     }
 
     /**

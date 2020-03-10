@@ -240,7 +240,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
         $original->setRelation('foo', 'baz');
 
-        $this->assertEquals('baz', $original->getRelation('foo'));
+        $this->assertSame('baz', $original->getRelation('foo'));
 
         $model = $original->withoutRelations();
 

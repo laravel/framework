@@ -224,7 +224,7 @@ class DatabaseEloquentModelTest extends TestCase
         $newInstance = $model->newInstance();
 
         $this->assertArrayHasKey('foo', $newInstance->getCasts());
-        $this->assertEquals('date', $newInstance->getCasts()['foo']);
+        $this->assertSame('date', $newInstance->getCasts()['foo']);
     }
 
     public function testCreateMethodSavesNewModel()
@@ -2039,8 +2039,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(0.443, $model->floatAttribute);
 
         $this->assertIsString($model->getOriginal('stringAttribute'));
-        $this->assertEquals('432', $model->getOriginal('stringAttribute'));
-        $this->assertEquals('12', $model->stringAttribute);
+        $this->assertSame('432', $model->getOriginal('stringAttribute'));
+        $this->assertSame('12', $model->stringAttribute);
 
         $this->assertIsBool($model->getOriginal('boolAttribute'));
         $this->assertTrue($model->getOriginal('boolAttribute'));

@@ -56,15 +56,12 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // Here we will spin through all verbs except for the current request verb and
         // check to see if any routes respond to them. If they do, we will return a
         // proper error response with the correct headers on the response string.
-        $others = [];
-
-        foreach ($methods as $method) {
-            if (! is_null($this->matchAgainstRoutes($this->get($method), $request, false))) {
-                $others[] = $method;
+        return array_values(array_filter(
+            $methods,
+            function ($method) use ($request) {
+                return ! is_null($this->matchAgainstRoutes($this->get($method), $request, false));
             }
-        }
-
-        return $others;
+        ));
     }
 
     /**
