@@ -974,7 +974,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Normal file', $attachements[1]->name);
     }
 
-
     public function testEmptyMorphToRelationship()
     {
         $photo = new EloquentTestPhoto;

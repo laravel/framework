@@ -52,7 +52,7 @@ class MorphToMany extends BelongsToMany
         $this->inverse = $inverse;
         $this->morphType = $name.'_type';
         $this->morphClass = $morphClass ? $morphClass 
-                                        : ($inverse ? $query->getModel()->getMorphClass() 
+                                        : ($inverse ? $query->getModel()->getMorphClass()
                                                     : $parent->getMorphClass());
 
         parent::__construct(
