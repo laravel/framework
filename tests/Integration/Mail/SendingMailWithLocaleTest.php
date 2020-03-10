@@ -46,11 +46,6 @@ class SendingMailWithLocaleTest extends TestCase
         ]);
     }
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testMailIsSentWithDefaultLocale()
     {
         Mail::to('test@mail.com')->send(new TestMail);

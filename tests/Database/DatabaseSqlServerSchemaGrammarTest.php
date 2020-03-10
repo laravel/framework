@@ -123,7 +123,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals("DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[foo] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM SYS.COLUMNS WHERE [object_id] = OBJECT_ID('[dbo].[foo]') AND [name] in ('bar') AND [default_object_id] <> 0;EXEC(@sql);alter table \"foo\" drop column \"bar\"", $statements[0]);
+        $this->assertSame("DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[foo] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM SYS.COLUMNS WHERE [object_id] = OBJECT_ID('[dbo].[foo]') AND [name] in ('bar') AND [default_object_id] <> 0;EXEC(@sql);alter table \"foo\" drop column \"bar\"", $statements[0]);
     }
 
     public function testDropPrimary()
@@ -203,7 +203,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);
-        $this->assertEquals('drop index "photos_imageable_type_imageable_id_index" on "photos"', $statements[0]);
+        $this->assertSame('drop index "photos_imageable_type_imageable_id_index" on "photos"', $statements[0]);
         $this->assertStringContainsString('alter table "photos" drop column "imageable_type", "imageable_id"', $statements[1]);
     }
 

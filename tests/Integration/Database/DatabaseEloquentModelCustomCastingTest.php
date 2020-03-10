@@ -16,21 +16,21 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model = new TestEloquentModelWithCustomCast;
         $model->uppercase = 'taylor';
 
-        $this->assertEquals('TAYLOR', $model->uppercase);
-        $this->assertEquals('TAYLOR', $model->getAttributes()['uppercase']);
-        $this->assertEquals('TAYLOR', $model->toArray()['uppercase']);
+        $this->assertSame('TAYLOR', $model->uppercase);
+        $this->assertSame('TAYLOR', $model->getAttributes()['uppercase']);
+        $this->assertSame('TAYLOR', $model->toArray()['uppercase']);
 
         $unserializedModel = unserialize(serialize($model));
 
-        $this->assertEquals('TAYLOR', $unserializedModel->uppercase);
-        $this->assertEquals('TAYLOR', $unserializedModel->getAttributes()['uppercase']);
-        $this->assertEquals('TAYLOR', $unserializedModel->toArray()['uppercase']);
+        $this->assertSame('TAYLOR', $unserializedModel->uppercase);
+        $this->assertSame('TAYLOR', $unserializedModel->getAttributes()['uppercase']);
+        $this->assertSame('TAYLOR', $unserializedModel->toArray()['uppercase']);
 
         $model = new TestEloquentModelWithCustomCast;
 
         $model->address = $address = new Address('110 Kingsbrook St.', 'My Childhood House');
         $address->lineOne = '117 Spencer St.';
-        $this->assertEquals('117 Spencer St.', $model->getAttributes()['address_line_one']);
+        $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
 
         $model = new TestEloquentModelWithCustomCast;
 
@@ -39,20 +39,20 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
             'address_line_two' => 'My Childhood House',
         ]);
 
-        $this->assertEquals('110 Kingsbrook St.', $model->address->lineOne);
-        $this->assertEquals('My Childhood House', $model->address->lineTwo);
+        $this->assertSame('110 Kingsbrook St.', $model->address->lineOne);
+        $this->assertSame('My Childhood House', $model->address->lineTwo);
 
-        $this->assertEquals('110 Kingsbrook St.', $model->toArray()['address_line_one']);
-        $this->assertEquals('My Childhood House', $model->toArray()['address_line_two']);
+        $this->assertSame('110 Kingsbrook St.', $model->toArray()['address_line_one']);
+        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
 
         $model->address->lineOne = '117 Spencer St.';
 
         $this->assertFalse(isset($model->toArray()['address']));
-        $this->assertEquals('117 Spencer St.', $model->toArray()['address_line_one']);
-        $this->assertEquals('My Childhood House', $model->toArray()['address_line_two']);
+        $this->assertSame('117 Spencer St.', $model->toArray()['address_line_one']);
+        $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
 
-        $this->assertEquals('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
-        $this->assertEquals('My Childhood House', json_decode($model->toJson(), true)['address_line_two']);
+        $this->assertSame('117 Spencer St.', json_decode($model->toJson(), true)['address_line_one']);
+        $this->assertSame('My Childhood House', json_decode($model->toJson(), true)['address_line_two']);
 
         $model->address = null;
 
@@ -104,14 +104,14 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
             'address_line_two' => 'My Childhood House',
         ]);
 
-        $this->assertEquals('110 Kingsbrook St.', $model->address->lineOne);
+        $this->assertSame('110 Kingsbrook St.', $model->address->lineOne);
 
         $model->setRawAttributes([
             'address_line_one' => '117 Spencer St.',
             'address_line_two' => 'My Childhood House',
         ]);
 
-        $this->assertEquals('117 Spencer St.', $model->address->lineOne);
+        $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
 }
 
