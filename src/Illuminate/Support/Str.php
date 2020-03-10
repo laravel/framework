@@ -721,10 +721,6 @@ class Str
      */
     public static function wordsCount($value)
     {
-        if (is_string($value)) {
-            return str_word_count($value);
-        } else {
-            return 0;
-        }
+        return str_word_count($value);
     }
 }
