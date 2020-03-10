@@ -61,7 +61,7 @@ class Schedule
     {
         $this->timezone = $timezone;
 
-        if (!class_exists(Container::class)) {
+        if (! class_exists(Container::class)) {
             throw new RuntimeException(
                 'The container implementation is required to use the scheduler. Please install illuminate/container.'
             );
