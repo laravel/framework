@@ -17,6 +17,13 @@ class MorphTo extends BelongsTo
     protected $morphType;
 
     /**
+     * The class name of the morph type constraint.
+     *
+     * @var string
+     */
+    protected $morphClass;
+
+    /**
      * The models whose relations are being eager loaded.
      *
      * @var \Illuminate\Database\Eloquent\Collection
@@ -55,9 +62,10 @@ class MorphTo extends BelongsTo
      * @param  string  $relation
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $morphClass)
     {
         $this->morphType = $type;
+        $this->morphClass = $morphClass;
 
         parent::__construct($query, $parent, $foreignKey, $ownerKey, $relation);
     }
@@ -195,12 +203,14 @@ class MorphTo extends BelongsTo
      */
     public function associate($model)
     {
+        $morphClass = $this->morphClass ?? $model->getMorphClass();
+
         $this->parent->setAttribute(
             $this->foreignKey, $model instanceof Model ? $model->getKey() : null
         );
 
         $this->parent->setAttribute(
-            $this->morphType, $model instanceof Model ? $model->getMorphClass() : null
+            $this->morphType, $model instanceof Model ? $morphClass : null
         );
 
         return $this->parent->setRelation($this->relationName, $model);
