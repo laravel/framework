@@ -482,7 +482,7 @@ class Router implements BindingRegistrar, RegistrarContract
     /**
      * Determine if the action is routing to a controller.
      *
-     * @param  array  $action
+     * @param  mixed  $action
      * @return bool
      */
     protected function actionReferencesController($action)
