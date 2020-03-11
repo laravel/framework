@@ -506,8 +506,10 @@ trait HasAttributes
             case 'date':
                 return $this->asDate($value);
             case 'datetime':
-            case 'custom_datetime':
                 return $this->asDateTime($value);
+            case 'custom_datetime':
+                $format = explode(':', $this->getCasts()[$key], 2)[1];
+                return tap($this->asDateTime($value))->setToStringFormat($format);
             case 'timestamp':
                 return $this->asTimestamp($value);
             default:
