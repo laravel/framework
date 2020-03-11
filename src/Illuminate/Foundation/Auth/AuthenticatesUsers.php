@@ -91,7 +91,10 @@ trait AuthenticatesUsers
      */
     protected function credentials(Request $request)
     {
-        return $request->only($this->username(), 'password');
+        return [
+            $this->username($request) => $request->username,
+            'password' => $request->password
+        ];
     }
 
     /**
@@ -142,9 +145,15 @@ trait AuthenticatesUsers
      *
      * @return string
      */
-    public function username()
+    public function username(Request $request)
     {
-        return 'email';
+        if (filter_var($request->username, FILTER_VALIDATE_EMAIL)) {
+            return 'email';
+        }
+        if (is_numeric($request->username)) {
+            return 'phone';
+        }
+        return 'username';
     }
 
     /**
@@ -180,8 +189,8 @@ trait AuthenticatesUsers
      *
      * @return \Illuminate\Contracts\Auth\StatefulGuard
      */
-    protected function guard()
+    protected function guard($guard)
     {
-        return Auth::guard();
+        return Auth::guard($guard);
     }
 }
