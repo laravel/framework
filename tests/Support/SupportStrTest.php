@@ -439,7 +439,6 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::slug(null));
     }
 
-
     public function testWordsCount()
     {
         $sentence = 'My name is John Doe';
