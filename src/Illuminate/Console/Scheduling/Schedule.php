@@ -40,18 +40,18 @@ class Schedule
     protected $schedulingMutex;
 
     /**
-     * The job dispatcher implementation.
-     *
-     * @var \Illuminate\Contracts\Bus\Dispatcher
-     */
-    protected $dispatcher;
-
-    /**
      * The timezone the date should be evaluated on.
      *
      * @var \DateTimeZone|string
      */
     protected $timezone;
+
+    /**
+     * The job dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected $dispatcher;
 
     /**
      * Create a new schedule instance.
@@ -65,7 +65,7 @@ class Schedule
 
         if (! class_exists(Container::class)) {
             throw new RuntimeException(
-                'The container implementation is required to use the scheduler. Please install illuminate/container.'
+                'A container implementation is required to use the scheduler. Please install illuminate/container.'
             );
         }
 
@@ -275,8 +275,7 @@ class Schedule
             } catch (BindingResolutionException $e) {
                 throw new RuntimeException(
                     'Unable to resolve the dispatcher from the service container. Please bind it or install illuminate/bus.',
-                    $e->getCode(),
-                    $e
+                    $e->getCode(), $e
                 );
             }
         }

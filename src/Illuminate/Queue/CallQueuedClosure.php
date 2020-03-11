@@ -46,7 +46,7 @@ class CallQueuedClosure implements ShouldQueue
      */
     public static function create(Closure $job)
     {
-        return new self(new SerializableClosure($job));
+        return new static(new SerializableClosure($job));
     }
 
     /**
