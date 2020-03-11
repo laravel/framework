@@ -99,7 +99,13 @@ class Env
                     return $matches[2];
                 }
 
-                return $value;
+                return preg_replace_callback(
+                    '/\${([a-zA-Z0-9_.]+)}/',
+                    function ($matches) {
+                        return static::get($matches[1]);
+                    },
+                    $value
+                );
             })
             ->getOrCall(function () use ($default) {
                 return value($default);

@@ -637,6 +637,24 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('x"null"x', env('foo'));
     }
 
+    public function testNestedEnvVar()
+    {
+        $_SERVER['foo'] = 'var with nested [${bar}]';
+        $_SERVER['bar'] = 'bar var';
+
+        $this->assertSame('bar var', env('bar'));
+        $this->assertSame('var with nested [bar var]', env('foo'));
+
+        unset($_SERVER['bar']);
+    }
+
+    public function testUndefinedNestedEnvVar()
+    {
+        $_SERVER['foo'] = 'var with nested [${bar}]';
+
+        $this->assertSame('var with nested []', env('foo'));
+    }
+
     public function testGetFromENVFirst()
     {
         $_ENV['foo'] = 'From $_ENV';
