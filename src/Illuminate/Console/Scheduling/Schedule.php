@@ -2,12 +2,17 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Closure;
 use DateTimeInterface;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
+use RuntimeException;
 
 class Schedule
 {
@@ -42,6 +47,13 @@ class Schedule
     protected $timezone;
 
     /**
+     * The job dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
@@ -50,6 +62,12 @@ class Schedule
     public function __construct($timezone = null)
     {
         $this->timezone = $timezone;
+
+        if (! class_exists(Container::class)) {
+            throw new RuntimeException(
+                'A container implementation is required to use the scheduler. Please install illuminate/container.'
+            );
+        }
 
         $container = Container::getInstance();
 
@@ -107,16 +125,50 @@ class Schedule
     public function job($job, $queue = null, $connection = null)
     {
         return $this->call(function () use ($job, $queue, $connection) {
-            $job = is_string($job) ? resolve($job) : $job;
+            $job = is_string($job) ? Container::getInstance()->make($job) : $job;
 
             if ($job instanceof ShouldQueue) {
-                dispatch($job)
-                    ->onConnection($connection ?? $job->connection)
-                    ->onQueue($queue ?? $job->queue);
+                $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
             } else {
-                dispatch_now($job);
+                $this->dispatchNow($job);
             }
         })->name(is_string($job) ? $job : get_class($job));
+    }
+
+    /**
+     * Dispatch the given job to the queue.
+     *
+     * @param  object  $job
+     * @param  string|null  $queue
+     * @param  string|null  $connection
+     * @return void
+     */
+    protected function dispatchToQueue($job, $queue, $connection)
+    {
+        if ($job instanceof Closure) {
+            if (! class_exists(CallQueuedClosure::class)) {
+                throw new RuntimeException(
+                    'To enable support for closure jobs, please install illuminate/queue.'
+                );
+            }
+
+            $job = CallQueuedClosure::create($job);
+        }
+
+        $this->getDispatcher()->dispatch(
+            $job->onConnection($connection)->onQueue($queue)
+        );
+    }
+
+    /**
+     * Dispatch the given job right now.
+     *
+     * @param  object  $job
+     * @return void
+     */
+    protected function dispatchNow($job)
+    {
+        $this->getDispatcher()->dispatchNow($job);
     }
 
     /**
@@ -208,5 +260,26 @@ class Schedule
         }
 
         return $this;
+    }
+
+    /**
+     * Get the job dispatcher, if available.
+     *
+     * @return \Illuminate\Contracts\Bus\Dispatcher
+     */
+    protected function getDispatcher()
+    {
+        if ($this->dispatcher === null) {
+            try {
+                $this->dispatcher = Container::getInstance()->make(Dispatcher::class);
+            } catch (BindingResolutionException $e) {
+                throw new RuntimeException(
+                    'Unable to resolve the dispatcher from the service container. Please bind it or install illuminate/bus.',
+                    $e->getCode(), $e
+                );
+            }
+        }
+
+        return $this->dispatcher;
     }
 }

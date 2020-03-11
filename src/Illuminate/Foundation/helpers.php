@@ -17,7 +17,6 @@ use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
@@ -386,7 +385,7 @@ if (! function_exists('dispatch')) {
     function dispatch($job)
     {
         if ($job instanceof Closure) {
-            $job = new CallQueuedClosure(new SerializableClosure($job));
+            $job = CallQueuedClosure::create($job);
         }
 
         return new PendingDispatch($job);
