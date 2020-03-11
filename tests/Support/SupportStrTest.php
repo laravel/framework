@@ -443,6 +443,10 @@ class SupportStrTest extends TestCase
     {
         $sentence = 'My name is John Doe';
 
+        // Check if Str::wordsCount returns 0 when the sentence is empty or contains only spaces
+        $this->assertSame(0, Str::wordsCount(''));
+        $this->assertSame(0, Str::wordsCount('       '));
+
         // Check if Str::wordsCount returns the sentence's words number
         $this->assertSame(5, Str::wordsCount($sentence));
 

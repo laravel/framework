@@ -451,6 +451,9 @@ class SupportStringableTest extends TestCase
     public function testWordsCount()
     {
         $sentence = 'My name is John Doe';
+        // Check if Str::wordsCount returns 0 when the sentence is empty or contains only spaces
+        $this->assertSame('0', (string) $this->stringable('')->wordsCount());
+        $this->assertSame('0', (string) $this->stringable('        ')->wordsCount());
 
         // Check if returns the sentence's words number as a string
         $this->assertSame('5', (string) $this->stringable($sentence)->wordsCount());
