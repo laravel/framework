@@ -569,6 +569,16 @@ class Stringable
     }
 
     /**
+     * Count word(s) number in a string.
+     *
+     * @return static
+     */
+    public function wordsCount()
+    {
+        return new static(Str::wordsCount($this->value));
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param  string  $key

@@ -447,4 +447,12 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Ё', (string) $this->stringable('БГДЖИЛЁ')->substr(-1, 1));
         $this->assertSame('', (string) $this->stringable('Б')->substr(2));
     }
+
+    public function testWordsCount()
+    {
+        $sentence = 'My name is John Doe';
+
+        // Check if returns the sentence's words number as a string
+        $this->assertSame('5', (string) $this->stringable($sentence)->wordsCount());
+    }
 }

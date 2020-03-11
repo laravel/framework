@@ -719,7 +719,7 @@ class Str
      * @param  string  $value
      * @param  int|null  $format
      * @param  string|null  $charlist
-     * @return int
+     * @return int|array
      */
     public static function wordsCount($value, $format = null, $charlist = null)
     {

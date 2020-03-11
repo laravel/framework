@@ -439,6 +439,37 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::slug(null));
     }
 
+
+    public function testWordsCount()
+    {
+        $sentence = 'My name is John Doe';
+
+        // Check if Str::wordsCount returns the sentence's words number
+        $this->assertSame(5, Str::wordsCount($sentence));
+
+        // check if array returned by Str::wordsCount has the same words
+        // numbers than sentence provided
+        $arrayWordsCount = Str::wordsCount($sentence, 1);
+        $this->assertSame(5, count($arrayWordsCount));
+
+        // Check if array returned by Str::wordsCount with format 1 is the same
+        // than provided
+        $test = ['My', 'name', 'is', 'John', 'Doe'];
+        $this->assertSame(true, $test === Str::wordsCount($sentence, 1));
+
+        // Check if array returned by Str::wordsCount with format 2 is the same
+        // than provided - Evaluate position of every words start
+        $arrayOfsentenceWithWordsPosition = [0 => 'My', 3 => 'name', 8 => 'is', 11 => 'John', 16 => 'Doe'];
+        $this->assertSame(true, $arrayOfsentenceWithWordsPosition === Str::wordsCount($sentence, 2));
+
+        // Check Str::wordsCount 'charlist' options
+        $sentenceWithNumbers = 'My nam3 1s J0hn D03';
+        $arrayOfSentenceWithNumbersWithoutCharlistOptions = [0 => 'My', 1 => 'nam', 2 => 's', 3 => 'J', 4 => 'hn', 5 => 'D'];
+        $arrayOfSentenceWithNumbersWithCharlistOptions = [0 => 'My', 1 => 'nam3', 2 => '1s', 3 => 'J0hn', 4 => 'D03'];
+        $this->assertSame(false, $arrayOfSentenceWithNumbersWithoutCharlistOptions === Str::wordsCount($sentenceWithNumbers, 1, '130'));
+        $this->assertSame(true, $arrayOfSentenceWithNumbersWithCharlistOptions === Str::wordsCount($sentenceWithNumbers, 1, '130'));
+    }
+
     public function validUuidList()
     {
         return [
