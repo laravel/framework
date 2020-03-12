@@ -22,6 +22,14 @@ interface Dispatcher
     public function dispatchNow($command, $handler = null);
 
     /**
+     * Dispatch a command to its appropriate handler behind a queue.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     */
+    public function dispatchToQueue($command);
+
+    /**
      * Determine if the given command has a handler.
      *
      * @param  mixed  $command

@@ -155,7 +155,7 @@ class Schedule
             $job = CallQueuedClosure::create($job);
         }
 
-        $this->getDispatcher()->dispatch(
+        $this->getDispatcher()->dispatchToQueue(
             $job->onConnection($connection)->onQueue($queue)
         );
     }
