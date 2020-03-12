@@ -27,5 +27,15 @@ class ViewComponentAttributeBagTest extends TestCase
         $bag = new ComponentAttributeBag([]);
 
         $this->assertSame('class="mt-4"', (string) $bag->merge(['class' => 'mt-4']));
+
+        $bag = new ComponentAttributeBag(['checked' => true]);
+
+        $this->assertSame('checked="checked"', (string) $bag);
+        $this->assertSame('checked="checked"', (string) $bag->merge());
+
+        $bag = new ComponentAttributeBag(['checked' => false]);
+
+        $this->assertSame('', (string) $bag);
+        $this->assertSame('', (string) $bag->merge());
     }
 }

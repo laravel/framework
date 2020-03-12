@@ -109,12 +109,6 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         $attributes = [];
 
         foreach ($this->attributes as $key => $value) {
-            if ($value === true) {
-                $attributes[$key] = $key;
-
-                continue;
-            }
-
             if ($key !== 'class') {
                 $attributes[$key] = $value;
 
@@ -126,7 +120,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             ));
         }
 
-        return new static(array_merge($attributeDefaults, array_filter($attributes)));
+        return new static(array_merge($attributeDefaults, $attributes));
     }
 
     /**
@@ -225,10 +219,12 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $string = '';
 
-        foreach ($this->attributes as $key => $value) {
-            $string .= $value === true
-                    ? ' '.$key
-                    : ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+        foreach (array_filter($this->attributes) as $key => $value) {
+            if ($value === true) {
+                $value = $key;
+            }
+
+            $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
         }
 
         return trim($string);
