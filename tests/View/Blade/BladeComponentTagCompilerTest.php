@@ -52,6 +52,22 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
     }
 
+    public function testColonData()
+    {
+        $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile :user-id="1"></x-profile>');
+
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', ['userId' => 1])
+<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
+    }
+
+    public function testColonAttributesIsEscapedIfStrings()
+    {
+        $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile :src="\'foo\'"></x-profile>');
+
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', [])
+<?php \$component->withAttributes(['src' => is_string(with(\$attribute_25d902c24283ab8cfbac54dfa101ad31 = 'foo')) ? e(\$attribute_25d902c24283ab8cfbac54dfa101ad31) : \$attribute_25d902c24283ab8cfbac54dfa101ad31]); ?> @endcomponentClass", trim($result));
+    }
+
     public function testColonNestedComponentParsing()
     {
         $result = (new ComponentTagCompiler(['foo:alert' => TestAlertComponent::class]))->compileTags('<x-foo:alert></x-foo:alert>');

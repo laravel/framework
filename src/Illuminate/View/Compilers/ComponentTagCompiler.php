@@ -24,6 +24,13 @@ class ComponentTagCompiler
     protected $aliases = [];
 
     /**
+     * The "bind:" attributes that have been compiled.
+     *
+     * @var array
+     */
+    protected $boundAttributes = [];
+
+    /**
      * Create new component tag compiler.
      *
      * @param  array  $aliases
@@ -42,6 +49,8 @@ class ComponentTagCompiler
      */
     public function compile(string $value)
     {
+        $this->boundAttributes = [];
+
         $value = $this->compileSlots($value);
 
         return $this->compileTags($value);
@@ -173,7 +182,7 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return " @component('{$class}', [".$this->attributesToString($parameters).'])
+        return " @component('{$class}', [".$this->attributesToString($parameters, $escapeBound = false).'])
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
     }
 
@@ -319,6 +328,7 @@ class ComponentTagCompiler
 
             if (Str::startsWith($attribute, 'bind:')) {
                 $attribute = Str::after($attribute, 'bind:');
+                $this->boundAttributes[$attribute] = true;
             } else {
                 $value = "'".str_replace("'", "\\'", $value)."'";
             }
@@ -349,13 +359,18 @@ class ComponentTagCompiler
      * Convert an array of attributes to a string.
      *
      * @param  array  $attributes
+     * @param  bool  $escapeBound
      * @return string
      */
-    protected function attributesToString(array $attributes)
+    protected function attributesToString(array $attributes, $escapeBound = true)
     {
         return collect($attributes)
-                ->map(function (string $value, string $attribute) {
-                    return "'{$attribute}' => {$value}";
+                ->map(function (string $value, string $attribute) use ($escapeBound) {
+                    $attributeVariable = '$attribute_'.md5($attribute);
+
+                    return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
+                                ? "'{$attribute}' => is_string(with({$attributeVariable} = {$value})) ? e({$attributeVariable}) : {$attributeVariable}"
+                                : "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
     }
