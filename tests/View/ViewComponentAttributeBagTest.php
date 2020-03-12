@@ -27,5 +27,18 @@ class ViewComponentAttributeBagTest extends TestCase
         $bag = new ComponentAttributeBag([]);
 
         $this->assertSame('class="mt-4"', (string) $bag->merge(['class' => 'mt-4']));
+
+        $bag = new ComponentAttributeBag([
+            'test-string' => 'ok',
+            'test-null' => null,
+            'test-false' => false,
+            'test-true' => true,
+            'test-0' => 0,
+            'test-0-string' => '0',
+            'test-empty-string' => '',
+        ]);
+
+        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
+        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
     }
 }
