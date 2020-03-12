@@ -301,4 +301,17 @@ trait AsPivot
 
         return $query;
     }
+
+    /**
+     * Duplicate the instance and unset all the loaded relations.
+     *
+     * @return $this
+     */
+    public function withoutRelations()
+    {
+        $model = clone $this;
+        $model->pivotParent = null;
+
+        return $model->unsetRelations();
+    }
 }
