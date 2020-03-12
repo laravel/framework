@@ -4,7 +4,7 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Contracts\Cache\Factory as Cache;
 
-class CacheEventMutex implements EventMutex
+class CacheEventMutex implements EventMutex, CacheAware
 {
     /**
      * The cache repository implementation.

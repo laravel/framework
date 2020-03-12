@@ -1,18 +1,32 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.0.8...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.1.0...7.x)
+
+### Fixed
+- Bring `--daemon` option back to `queue:work` command ([24c1818](https://github.com/laravel/framework/commit/24c18182a82ee24be62d2ac1c6793c237944cda8))
+
+### TODO
+- Support either order of arguments for symmetry with livewire ([8d558670](https://github.com/laravel/framework/commit/8d5586700ad97b92ac622ea72c1fefe52c359265))
+- Fixed bad dependency assumptions ([#31894](https://github.com/laravel/framework/pull/31894))
+- Have a cache aware interface instead of concrete checks ([#31903](https://github.com/laravel/framework/pull/31903))
+
+
+## [v7.1.0 (2020-03-10)](https://github.com/laravel/framework/compare/v7.0.8...v7.1.0)
 
 ### Added
 - Added `Illuminate\Routing\RouteRegistrar::apiResource()` method ([#31857](https://github.com/laravel/framework/pull/31857)) 
 - Added optional $table parameter to `ForeignIdColumnDefinition::constrained()` method ([#31853](https://github.com/laravel/framework/pull/31853))
+- Added `The connection is broken and recovery is not possible. ...` to `DetectsLostConnections` ([#31539](https://github.com/laravel/framework/pull/31539))
 
 ### Fixed
 - Fixed phpredis `zadd` and `exists` on cluster ([#31838](https://github.com/laravel/framework/pull/31838))
+- Fixed trailing slash in `Illuminate\Routing\CompiledRouteCollection::match()` ([3d58cd9](https://github.com/laravel/framework/commit/3d58cd91d6ec483a43a4c23af9b75ecdd4a358de), [ac6f3a8](https://github.com/laravel/framework/commit/ac6f3a8bd0e94ea1319b6f278ecf7f3f8bada3c2))
 
 ### Changed
 - Fire `MessageLogged` event after the message has been logged (not before) ([#31843](https://github.com/laravel/framework/pull/31843))
 - Avoid using array_merge_recursive in HTTP client ([#31858](https://github.com/laravel/framework/pull/31858))
 - Expire the jobs cache keys after 1 day ([#31854](https://github.com/laravel/framework/pull/31854))
+- Avoid global app() when compiling components ([#31868](https://github.com/laravel/framework/pull/31868))
 
 
 ## [v7.0.8 (2020-03-08)](https://github.com/laravel/framework/compare/v7.0.7...v7.0.8)
