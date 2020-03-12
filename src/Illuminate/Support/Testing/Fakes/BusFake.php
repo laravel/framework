@@ -3,7 +3,6 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
-use Illuminate\Contracts\Bus\QueuingDispatcher;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 
