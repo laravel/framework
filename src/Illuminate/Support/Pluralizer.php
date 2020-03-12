@@ -35,6 +35,7 @@ class Pluralizer
         'kin',
         'knowledge',
         'love',
+        'media',
         'metadata',
         'money',
         'moose',
