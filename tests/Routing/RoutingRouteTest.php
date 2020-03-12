@@ -449,8 +449,7 @@ class RoutingRouteTest extends TestCase
             return $router;
         });
 
-        $container->bind(RoutingTestUserModel::class, function() {
-            return null;
+        $container->bind(RoutingTestUserModel::class, function () {
         });
 
         $router->get('foo/{team}/{post}', [
