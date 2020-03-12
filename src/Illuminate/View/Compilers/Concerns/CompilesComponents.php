@@ -164,7 +164,7 @@ trait CompilesComponents
     public static function sanitizeComponentAttribute($value)
     {
         return is_string($value) ||
-               (is_object($value) && method_exists($value, '__toString', $value))
+               (is_object($value) && method_exists($value, '__toString'))
                         ? e($value)
                         : $value;
     }

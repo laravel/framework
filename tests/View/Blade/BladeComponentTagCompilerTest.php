@@ -5,6 +5,7 @@ namespace Illuminate\Tests\View\Blade;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
 use Mockery;
@@ -172,6 +173,21 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame("@component('Illuminate\View\AnonymousComponent', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
 <?php \$component->withAttributes(['name' => 'Taylor','age' => 31,'wire:model' => 'foo']); ?>
 @endcomponentClass", trim($result));
+    }
+
+    public function testAttributeSanitization()
+    {
+        $class = new class {
+            public function __toString()
+            {
+                return '<hi>';
+            }
+        };
+
+        $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute('<hi>'));
+        $this->assertEquals(e('1'), BladeCompiler::sanitizeComponentAttribute('1'));
+        $this->assertEquals(1, BladeCompiler::sanitizeComponentAttribute(1));
+        $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute($class));
     }
 }
 
