@@ -369,7 +369,7 @@ class ComponentTagCompiler
                     $attributeVariable = '$attribute_'.md5($attribute);
 
                     return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
-                                ? "'{$attribute}' => is_string(with({$attributeVariable} = {$value})) ? e({$attributeVariable}) : {$attributeVariable}"
+                                ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
                                 : "'{$attribute}' => {$value}";
                 })
                 ->implode(',');

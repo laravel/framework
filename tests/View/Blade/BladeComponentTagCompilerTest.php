@@ -65,7 +65,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile :src="\'foo\'"></x-profile>');
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', [])
-<?php \$component->withAttributes(['src' => is_string(with(\$attribute_25d902c24283ab8cfbac54dfa101ad31 = 'foo')) ? e(\$attribute_25d902c24283ab8cfbac54dfa101ad31) : \$attribute_25d902c24283ab8cfbac54dfa101ad31]); ?> @endcomponentClass", trim($result));
+<?php \$component->withAttributes(['src' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('foo')]); ?> @endcomponentClass", trim($result));
     }
 
     public function testColonNestedComponentParsing()
