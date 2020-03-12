@@ -16,7 +16,7 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('class="mt-4 font-bold" id="bar" name="test"', (string) $bag->merge(['class' => 'mt-4', 'id' => 'bar']));
         $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag(['class' => 'mt-4']));
         $this->assertSame('class="mt-4 font-bold"', (string) $bag->only('class')->merge(['class' => 'mt-4']));
-        $this->assertSame('class="italic" name="test"', (string) $bag->only('name')->merge(['class' => 'italic', 'name' => 'default']));
+        $this->assertSame('name="test" class="font-bold"', (string) $bag->merge(['name' => 'default']));
         $this->assertSame('class="mt-4 font-bold"', (string) $bag->merge(['class' => 'mt-4'])->only('class'));
         $this->assertSame('class="mt-4 font-bold"', (string) $bag->only('class')(['class' => 'mt-4']));
         $this->assertSame('font-bold', $bag->get('class'));
