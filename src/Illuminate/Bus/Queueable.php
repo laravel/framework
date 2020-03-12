@@ -146,7 +146,7 @@ trait Queueable
         $this->chained = collect($chain)->map(function ($job) {
             return serialize(
                 $job instanceof Closure
-                            ? new CallQueuedClosure::create($job)
+                            ? CallQueuedClosure::create($job)
                             : $job
             );
         })->all();
