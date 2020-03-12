@@ -6,7 +6,7 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Bus\QueuingDispatcher;
+use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
@@ -49,7 +49,7 @@ class Schedule
     /**
      * The job queuing dispatcher implementation.
      *
-     * @var \Illuminate\Contracts\Bus\QueuingDispatcher
+     * @var \Illuminate\Contracts\Bus\QueueingDispatcher
      */
     protected $dispatcher;
 
@@ -265,13 +265,13 @@ class Schedule
     /**
      * Get the job dispatcher, if available.
      *
-     * @return \Illuminate\Contracts\Bus\QueuingDispatcher
+     * @return \Illuminate\Contracts\Bus\QueueingDispatcher
      */
     protected function getDispatcher()
     {
         if ($this->dispatcher === null) {
             try {
-                $this->dispatcher = Container::getInstance()->make(QueuingDispatcher::class);
+                $this->dispatcher = Container::getInstance()->make(QueueingDispatcher::class);
             } catch (BindingResolutionException $e) {
                 throw new RuntimeException(
                     'Unable to resolve the dispatcher from the service container. Please bind it or install illuminate/bus.',
