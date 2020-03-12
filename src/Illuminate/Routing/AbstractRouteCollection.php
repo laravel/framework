@@ -195,7 +195,14 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      */
     protected function addToSymfonyRoutesCollection(SymfonyRouteCollection $symfonyRoutes, Route $route)
     {
-        if (! $name = $route->getName()) {
+        $name = $route->getName();
+
+        if (Str::endsWith($name, '.') &&
+            ! is_null($symfonyRoutes->get($name))) {
+            $name = null;
+        }
+
+        if (! $name) {
             $route->name($name = $this->generateRouteName());
 
             $this->add($route);
