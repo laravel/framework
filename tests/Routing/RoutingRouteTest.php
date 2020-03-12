@@ -441,6 +441,29 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__test.route_inject']);
     }
 
+    public function testNullValuesCanBeInjectedIntoRoutes()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+
+        $container->bind(RoutingTestUserModel::class, function () {
+        });
+
+        $router->get('foo/{team}/{post}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (?RoutingTestUserModel $userFromContainer, RoutingTestTeamModel $team, $postId) {
+                $this->assertSame(null, $userFromContainer);
+                $this->assertInstanceOf(RoutingTestTeamModel::class, $team);
+                $this->assertSame('bar', $team->value);
+                $this->assertSame('baz', $postId);
+            },
+        ]);
+        $router->dispatch(Request::create('foo/bar/baz', 'GET'))->getContent();
+    }
+
     public function testOptionsResponsesAreGeneratedByDefault()
     {
         $router = $this->getRouter();
