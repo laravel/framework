@@ -116,7 +116,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
             }
 
             if ($key !== 'class') {
-                $attributes[$key] = $attributeDefaults[$key] ?? $value;
+                $attributes[$key] = $value ?? $attributeDefaults[$key];
 
                 continue;
             }
