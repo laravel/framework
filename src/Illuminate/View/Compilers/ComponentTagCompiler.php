@@ -174,7 +174,7 @@ class ComponentTagCompiler
         if (! class_exists($class)) {
             $parameters = [
                 'view' => "'$class'",
-                'data' => '['.$this->attributesToString($data->all()).']',
+                'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
             ];
 
             $class = AnonymousComponent::class;
