@@ -535,7 +535,7 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'custom_datetime':
                 $format = explode(':', $this->getCasts()[$key], 2)[1];
-                return $this->asDateTime($value)->settings([ 'toStringFormat' => $format ]);
+                return $this->asDateTime($value)->settings(['toStringFormat' => $format]);
             case 'timestamp':
                 return $this->asTimestamp($value);
         }
