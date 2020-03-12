@@ -24,7 +24,7 @@ class ComponentTagCompiler
     protected $aliases = [];
 
     /**
-     * The "bind:" attributes that have been compiled.
+     * The "bind:" attributes that have been compiled for the current component.
      *
      * @var array
      */
@@ -49,8 +49,6 @@ class ComponentTagCompiler
      */
     public function compile(string $value)
     {
-        $this->boundAttributes = [];
-
         $value = $this->compileSlots($value);
 
         return $this->compileTags($value);
@@ -105,6 +103,8 @@ class ComponentTagCompiler
         /x";
 
         return preg_replace_callback($pattern, function (array $matches) {
+            $this->boundAttributes = [];
+
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
             return $this->componentString($matches[1], $attributes);
@@ -145,6 +145,8 @@ class ComponentTagCompiler
         /x";
 
         return preg_replace_callback($pattern, function (array $matches) {
+            $this->boundAttributes = [];
+
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
             return $this->componentString($matches[1], $attributes)."\n@endcomponentClass";
@@ -328,6 +330,7 @@ class ComponentTagCompiler
 
             if (Str::startsWith($attribute, 'bind:')) {
                 $attribute = Str::after($attribute, 'bind:');
+
                 $this->boundAttributes[$attribute] = true;
             } else {
                 $value = "'".str_replace("'", "\\'", $value)."'";
