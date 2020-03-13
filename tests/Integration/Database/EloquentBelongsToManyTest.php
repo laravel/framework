@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -1025,6 +1026,25 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             Tag::whereIn('id', [$tag->id, $tag3->id])->pluck('name'),
             $post->tagsWithSoftDeletes()->withTrashed()->pluck('name')
         );
+    }
+
+    public function testWhereHasMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithSoftDeletes()->sync([$tag->id, $tag2->id, $tag3->id, $tag4->id]);
+        $post->tagsWithSoftDeletes()->sync([$tag2->id, $tag3->id]);
+
+        $posts = Post::whereHas('tagsWithSoftDeletes', function (Builder $builder) use ($tag, $tag4) {
+            $builder->whereIn('tags.id', [$tag->id, $tag4->id]);
+        })->get();
+
+        $this->assertCount(0, $posts);
     }
 }
 
