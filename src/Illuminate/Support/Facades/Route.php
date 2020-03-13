@@ -35,6 +35,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route current()
  * @method static string|null currentRouteName()
  * @method static string|null currentRouteAction()
+ * @method static \Illuminate\Routing\Route getCurrentRoute()
  *
  * @see \Illuminate\Routing\Router
  */
