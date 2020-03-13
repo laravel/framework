@@ -154,4 +154,18 @@ trait CompilesComponents
 } ?>
 <?php unset(\$__defined_vars); ?>";
     }
+
+    /**
+     * Sanitize the given component attribute value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public static function sanitizeComponentAttribute($value)
+    {
+        return is_string($value) ||
+               (is_object($value) && method_exists($value, '__toString'))
+                        ? e($value)
+                        : $value;
+    }
 }

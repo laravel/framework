@@ -5,6 +5,7 @@ namespace Illuminate\Tests\View\Blade;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
 use Mockery;
@@ -50,6 +51,22 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', ['userId' => '1'])
 <?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
+    }
+
+    public function testColonData()
+    {
+        $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile :user-id="1"></x-profile>');
+
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', ['userId' => 1])
+<?php \$component->withAttributes([]); ?> @endcomponentClass", trim($result));
+    }
+
+    public function testColonAttributesIsEscapedIfStrings()
+    {
+        $result = (new ComponentTagCompiler(['profile' => TestProfileComponent::class]))->compileTags('<x-profile :src="\'foo\'"></x-profile>');
+
+        $this->assertSame("@component('Illuminate\Tests\View\Blade\TestProfileComponent', [])
+<?php \$component->withAttributes(['src' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('foo')]); ?> @endcomponentClass", trim($result));
     }
 
     public function testColonNestedComponentParsing()
@@ -151,11 +168,26 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $factory->shouldReceive('exists')->andReturn(true);
         Container::setInstance($container);
 
-        $result = (new ComponentTagCompiler([]))->compileTags('<x-anonymous-component name="Taylor" :age="31" wire:model="foo" />');
+        $result = (new ComponentTagCompiler([]))->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
         $this->assertSame("@component('Illuminate\View\AnonymousComponent', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
-<?php \$component->withAttributes(['name' => 'Taylor','age' => 31,'wire:model' => 'foo']); ?>
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>
 @endcomponentClass", trim($result));
+    }
+
+    public function testAttributeSanitization()
+    {
+        $class = new class {
+            public function __toString()
+            {
+                return '<hi>';
+            }
+        };
+
+        $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute('<hi>'));
+        $this->assertEquals(e('1'), BladeCompiler::sanitizeComponentAttribute('1'));
+        $this->assertEquals(1, BladeCompiler::sanitizeComponentAttribute(1));
+        $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute($class));
     }
 }
 
