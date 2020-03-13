@@ -24,6 +24,13 @@ class ComponentTagCompiler
     protected $aliases = [];
 
     /**
+     * The "bind:" attributes that have been compiled for the current component.
+     *
+     * @var array
+     */
+    protected $boundAttributes = [];
+
+    /**
      * Create new component tag compiler.
      *
      * @param  array  $aliases
@@ -96,6 +103,8 @@ class ComponentTagCompiler
         /x";
 
         return preg_replace_callback($pattern, function (array $matches) {
+            $this->boundAttributes = [];
+
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
             return $this->componentString($matches[1], $attributes);
@@ -136,6 +145,8 @@ class ComponentTagCompiler
         /x";
 
         return preg_replace_callback($pattern, function (array $matches) {
+            $this->boundAttributes = [];
+
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
             return $this->componentString($matches[1], $attributes)."\n@endcomponentClass";
@@ -165,7 +176,7 @@ class ComponentTagCompiler
         if (! class_exists($class)) {
             $parameters = [
                 'view' => "'$class'",
-                'data' => '['.$this->attributesToString($data->all()).']',
+                'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
             ];
 
             $class = AnonymousComponent::class;
@@ -173,7 +184,7 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return " @component('{$class}', [".$this->attributesToString($parameters).'])
+        return " @component('{$class}', [".$this->attributesToString($parameters, $escapeBound = false).'])
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all()).']); ?>';
     }
 
@@ -319,6 +330,8 @@ class ComponentTagCompiler
 
             if (Str::startsWith($attribute, 'bind:')) {
                 $attribute = Str::after($attribute, 'bind:');
+
+                $this->boundAttributes[$attribute] = true;
             } else {
                 $value = "'".str_replace("'", "\\'", $value)."'";
             }
@@ -349,13 +362,16 @@ class ComponentTagCompiler
      * Convert an array of attributes to a string.
      *
      * @param  array  $attributes
+     * @param  bool  $escapeBound
      * @return string
      */
-    protected function attributesToString(array $attributes)
+    protected function attributesToString(array $attributes, $escapeBound = true)
     {
         return collect($attributes)
-                ->map(function (string $value, string $attribute) {
-                    return "'{$attribute}' => {$value}";
+                ->map(function (string $value, string $attribute) use ($escapeBound) {
+                    return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
+                                ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
+                                : "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
     }
