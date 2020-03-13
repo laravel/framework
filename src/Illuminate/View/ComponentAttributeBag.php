@@ -219,7 +219,11 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     {
         $string = '';
 
-        foreach (array_filter($this->attributes) as $key => $value) {
+        foreach ($this->attributes as $key => $value) {
+            if ($value === false || is_null($value)) {
+                continue;
+            }
+
             if ($value === true) {
                 $value = $key;
             }
