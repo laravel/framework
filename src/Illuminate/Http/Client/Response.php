@@ -62,6 +62,17 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Get the decoded body of the response as the given class.
+     *
+     * @param  string $class
+     * @return mixed
+     */
+    public function as($class)
+    {
+        return new $class($this->json());
+    }
+
+    /**
      * Get a header from the response.
      *
      * @param  string  $header
