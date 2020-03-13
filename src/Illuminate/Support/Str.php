@@ -236,22 +236,22 @@ class Str
      * Format a string with values.
      *
      * @param  string  $subject
-     * @param  array   $values
+     * @param  \ArrayAccess|array  $values
      * @return string
      */
-    public static function format($subject, array $values)
+    public static function format($subject, $values)
     {
-        preg_match_all('/(?<!{){(\w*)}(?!})/', $subject, $matches);
+        preg_match_all('/(?<!{){([\w\.]*)}(?!})/', $subject, $matches);
 
         $i = 0;
 
         foreach ($matches[1] as $ref) {
             $key = $ref === '' ? $i++ : $ref;
             $limit = $ref === '' ? 1 : -1;
-            $subject = preg_replace('/(?<!{)\{'.preg_quote($ref).'\}(?!})/', $values[$key], $subject, $limit);
+            $subject = preg_replace('/(?<!{)\{'.preg_quote($ref).'\}(?!})/', Arr::get($values, $key), $subject, $limit);
         }
 
-        $subject = preg_replace('/{{(\w*)}}/', '{\1}', $subject);
+        $subject = preg_replace('/{{([\w\.]*)}}/', '{\1}', $subject);
 
         return $subject;
     }
