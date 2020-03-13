@@ -232,7 +232,7 @@ class BelongsToMany extends Relation
         $query->join($this->table, $key, '=', $this->getQualifiedRelatedPivotKeyName());
 
         $query->when($this->withSoftDeletes, function (Builder $query) {
-            $query->whereNull($this->deletedAt());
+            $query->whereNull($this->getQualifiedDeletedAtColumnName());
         });
 
         return $this;
