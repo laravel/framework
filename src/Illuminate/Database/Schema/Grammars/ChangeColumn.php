@@ -79,7 +79,7 @@ class ChangeColumn
             // Doctrine column definitions - which is necessary because Laravel and Doctrine
             // use some different terminology for various column attributes on the tables.
             foreach ($fluent->getAttributes() as $key => $value) {
-                if (! is_null($option = static::mapFluentOptionToDoctrine($key))) {
+                if (($option = static::mapFluentOptionToDoctrine($key)) !== null) {
                     if (method_exists($column, $method = 'set'.ucfirst($option))) {
                         $column->{$method}(static::mapFluentValueToDoctrine($option, $value));
                         continue;

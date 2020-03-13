@@ -30,7 +30,7 @@ class LazyCollection implements Enumerable
     {
         if ($source instanceof Closure || $source instanceof self) {
             $this->source = $source;
-        } elseif (is_null($source)) {
+        } elseif ($source === null) {
             $this->source = static::empty();
         } else {
             $this->source = $this->getArrayableItems($source);
@@ -66,7 +66,7 @@ class LazyCollection implements Enumerable
             }
         });
 
-        return is_null($callback) ? $instance : $instance->map($callback);
+        return $callback === null ? $instance : $instance->map($callback);
     }
 
     /**
@@ -351,7 +351,7 @@ class LazyCollection implements Enumerable
      */
     public function filter(callable $callback = null)
     {
-        if (is_null($callback)) {
+        if ($callback === null) {
             $callback = function ($value) {
                 return (bool) $value;
             };
@@ -377,7 +377,7 @@ class LazyCollection implements Enumerable
     {
         $iterator = $this->getIterator();
 
-        if (is_null($callback)) {
+        if ($callback === null) {
             if (! $iterator->valid()) {
                 return value($default);
             }
@@ -440,7 +440,7 @@ class LazyCollection implements Enumerable
      */
     public function get($key, $default = null)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return;
         }
 
@@ -590,7 +590,7 @@ class LazyCollection implements Enumerable
         $needle = $placeholder = new stdClass;
 
         foreach ($this as $key => $value) {
-            if (is_null($callback) || $callback($value, $key)) {
+            if ($callback === null || $callback($value, $key)) {
                 $needle = $value;
             }
         }
@@ -613,7 +613,7 @@ class LazyCollection implements Enumerable
             foreach ($this as $item) {
                 $itemValue = data_get($item, $value);
 
-                if (is_null($key)) {
+                if ($key === null) {
                     yield $itemValue;
                 } else {
                     $itemKey = data_get($item, $key);
@@ -769,12 +769,12 @@ class LazyCollection implements Enumerable
     {
         if ($keys instanceof Enumerable) {
             $keys = $keys->all();
-        } elseif (! is_null($keys)) {
+        } elseif ($keys !== null) {
             $keys = is_array($keys) ? $keys : func_get_args();
         }
 
         return new static(function () use ($keys) {
-            if (is_null($keys)) {
+            if ($keys === null) {
                 yield from $this;
             } else {
                 $keys = array_flip($keys);
@@ -820,7 +820,7 @@ class LazyCollection implements Enumerable
     {
         $result = $this->collect()->random(...func_get_args());
 
-        return is_null($number) ? $result : new static($result);
+        return $number === null ? $result : new static($result);
     }
 
     /**
@@ -962,7 +962,7 @@ class LazyCollection implements Enumerable
 
         $instance = $this->skip($offset);
 
-        return is_null($length) ? $instance : $instance->take($length);
+        return $length === null ? $instance : $instance->take($length);
     }
 
     /**
@@ -1253,7 +1253,7 @@ class LazyCollection implements Enumerable
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
-        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+        $key = $key === null || is_array($key) ? $key : explode('.', $key);
 
         return [$value, $key];
     }

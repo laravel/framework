@@ -417,7 +417,7 @@ trait InteractsWithPivotTable
             // If associated IDs were passed to the method we will only delete those
             // associations, otherwise all of the association ties will be broken.
             // We'll return the numbers of affected rows when we do the deletes.
-            if (! is_null($ids)) {
+            if ($ids !== null) {
                 $ids = $this->parseIds($ids);
 
                 if (empty($ids)) {

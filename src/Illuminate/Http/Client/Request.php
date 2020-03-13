@@ -62,7 +62,7 @@ class Request implements ArrayAccess
      */
     public function hasHeader($key, $value = null)
     {
-        return is_null($value)
+        return $value === null
                     ? ! empty($this->request->getHeaders()[$key])
                     : in_array($value, $this->headers()[$key]);
     }

@@ -50,7 +50,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function only($keys)
     {
-        if (is_null($keys)) {
+        if ($keys === null) {
             $values = $this->attributes;
         } else {
             $keys = Arr::wrap($keys);
@@ -69,7 +69,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function except($keys)
     {
-        if (is_null($keys)) {
+        if ($keys === null) {
             $values = $this->attributes;
         } else {
             $keys = Arr::wrap($keys);

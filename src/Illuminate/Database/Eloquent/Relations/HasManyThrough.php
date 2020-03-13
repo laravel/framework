@@ -224,7 +224,7 @@ class HasManyThrough extends Relation
      */
     public function firstOrNew(array $attributes)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (($instance = $this->where($attributes)->first()) === null) {
             $instance = $this->related->newInstance($attributes);
         }
 
@@ -270,7 +270,7 @@ class HasManyThrough extends Relation
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (($model = $this->first($columns)) !== null) {
             return $model;
         }
 
@@ -334,7 +334,7 @@ class HasManyThrough extends Relation
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
-        } elseif (! is_null($result)) {
+        } elseif ($result !== null) {
             return $result;
         }
 
@@ -348,7 +348,7 @@ class HasManyThrough extends Relation
      */
     public function getResults()
     {
-        return ! is_null($this->farParent->{$this->localKey})
+        return $this->farParent->{$this->localKey} !== null
                 ? $this->get()
                 : $this->related->newCollection();
     }

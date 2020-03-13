@@ -30,7 +30,7 @@ trait InteractsWithInput
      */
     public function hasHeader($key)
     {
-        return ! is_null($this->header($key));
+        return $this->header($key) !== null;
     }
 
     /**
@@ -305,7 +305,7 @@ trait InteractsWithInput
      */
     public function hasCookie($key)
     {
-        return ! is_null($this->cookie($key));
+        return $this->cookie($key) !== null;
     }
 
     /**
@@ -341,7 +341,7 @@ trait InteractsWithInput
     protected function convertUploadedFiles(array $files)
     {
         return array_map(function ($file) {
-            if (is_null($file) || (is_array($file) && empty(array_filter($file)))) {
+            if ($file === null || (is_array($file) && empty(array_filter($file)))) {
                 return $file;
             }
 
@@ -405,7 +405,7 @@ trait InteractsWithInput
      */
     protected function retrieveItem($source, $key, $default)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->$source->all();
         }
 

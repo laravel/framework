@@ -565,7 +565,7 @@ class PendingRequest
                      ->filter()
                      ->first();
 
-                if (is_null($response)) {
+                if ($response === null) {
                     return $handler($request, $options);
                 } elseif (is_array($response)) {
                     return Factory::response($response);

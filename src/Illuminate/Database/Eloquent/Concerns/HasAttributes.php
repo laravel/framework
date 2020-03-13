@@ -284,7 +284,7 @@ trait HasAttributes
             // If the value is null, we'll still go ahead and set it in this list of
             // attributes since null is used to represent empty relationships if
             // if it a has one or belongs to type relationships on the models.
-            elseif (is_null($value)) {
+            elseif ($value === null) {
                 $relation = $value;
             }
 
@@ -298,7 +298,7 @@ trait HasAttributes
             // If the relation value has been set, we will set it on this attributes
             // list for returning. If it was not arrayable or null, we'll not set
             // the value on the array because it is some type of invalid value.
-            if (isset($relation) || is_null($value)) {
+            if (isset($relation) || $value === null) {
                 $attributes[$key] = $relation;
             }
 
@@ -426,7 +426,7 @@ trait HasAttributes
         $relation = $this->$method();
 
         if (! $relation instanceof Relation) {
-            if (is_null($relation)) {
+            if ($relation === null) {
                 throw new LogicException(sprintf(
                     '%s::%s must return a relationship instance, but "null" was returned. Was the "return" keyword used?', static::class, $method
                 ));
@@ -503,7 +503,7 @@ trait HasAttributes
     {
         $castType = $this->getCastType($key);
 
-        if (is_null($value) && in_array($castType, static::$primitiveCastTypes)) {
+        if ($value === null && in_array($castType, static::$primitiveCastTypes)) {
             return $value;
         }
 
@@ -635,7 +635,7 @@ trait HasAttributes
             return $this;
         }
 
-        if ($this->isJsonCastable($key) && ! is_null($value)) {
+        if ($this->isJsonCastable($key) && $value !== null) {
             $value = $this->castAttributeAsJson($key, $value);
         }
 
@@ -715,7 +715,7 @@ trait HasAttributes
     {
         $caster = $this->resolveCasterClass($key);
 
-        if (is_null($value)) {
+        if ($value === null) {
             $this->attributes = array_merge($this->attributes, array_map(
                 function () {
                 },
@@ -1359,7 +1359,7 @@ trait HasAttributes
 
         if ($attribute === $original) {
             return true;
-        } elseif (is_null($attribute)) {
+        } elseif ($attribute === null) {
             return false;
         } elseif ($this->isDateAttribute($key)) {
             return $this->fromDateTime($attribute) ===

@@ -1006,7 +1006,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function normalizeCachePath($key, $default)
     {
-        if (is_null($env = Env::get($key))) {
+        if (($env = Env::get($key)) === null) {
             return $this->bootstrapPath($default);
         }
 
@@ -1254,7 +1254,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getNamespace()
     {
-        if (! is_null($this->namespace)) {
+        if ($this->namespace !== null) {
             return $this->namespace;
         }
 

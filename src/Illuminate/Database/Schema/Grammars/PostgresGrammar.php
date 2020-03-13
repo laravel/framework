@@ -158,15 +158,15 @@ class PostgresGrammar extends Grammar
     {
         $sql = parent::compileForeign($blueprint, $command);
 
-        if (! is_null($command->deferrable)) {
+        if ($command->deferrable !== null) {
             $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
         }
 
-        if ($command->deferrable && ! is_null($command->initiallyImmediate)) {
+        if ($command->deferrable && $command->initiallyImmediate !== null) {
             $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
         }
 
-        if (! is_null($command->notValid)) {
+        if ($command->notValid !== null) {
             $sql .= ' not valid';
         }
 
@@ -526,11 +526,11 @@ class PostgresGrammar extends Grammar
      */
     protected function generatableColumn($type, Fluent $column)
     {
-        if (! $column->autoIncrement && is_null($column->generatedAs)) {
+        if (! $column->autoIncrement && $column->generatedAs === null) {
             return $type;
         }
 
-        if ($column->autoIncrement && is_null($column->generatedAs)) {
+        if ($column->autoIncrement && $column->generatedAs === null) {
             return with([
                 'integer' => 'serial',
                 'bigint' => 'bigserial',
@@ -685,7 +685,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time'.(is_null($column->precision) ? '' : "($column->precision)").' without time zone';
+        return 'time'.($column->precision === null ? '' : "($column->precision)").' without time zone';
     }
 
     /**
@@ -696,7 +696,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time'.(is_null($column->precision) ? '' : "($column->precision)").' with time zone';
+        return 'time'.($column->precision === null ? '' : "($column->precision)").' with time zone';
     }
 
     /**
@@ -707,7 +707,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $columnType = 'timestamp'.(is_null($column->precision) ? '' : "($column->precision)").' without time zone';
+        $columnType = 'timestamp'.($column->precision === null ? '' : "($column->precision)").' without time zone';
 
         return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
@@ -720,7 +720,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        $columnType = 'timestamp'.(is_null($column->precision) ? '' : "($column->precision)").' with time zone';
+        $columnType = 'timestamp'.($column->precision === null ? '' : "($column->precision)").' with time zone';
 
         return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
@@ -908,7 +908,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->collation)) {
+        if ($column->collation !== null) {
             return ' collate '.$this->wrapValue($column->collation);
         }
     }
@@ -934,7 +934,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
+        if ($column->default !== null) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }

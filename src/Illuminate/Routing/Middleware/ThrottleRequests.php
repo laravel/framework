@@ -171,7 +171,7 @@ class ThrottleRequests
             'X-RateLimit-Remaining' => $remainingAttempts,
         ];
 
-        if (! is_null($retryAfter)) {
+        if ($retryAfter !== null) {
             $headers['Retry-After'] = $retryAfter;
             $headers['X-RateLimit-Reset'] = $this->availableAt($retryAfter);
         }
@@ -189,7 +189,7 @@ class ThrottleRequests
      */
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
-        if (is_null($retryAfter)) {
+        if ($retryAfter === null) {
             return $this->limiter->retriesLeft($key, $maxAttempts);
         }
 

@@ -31,7 +31,7 @@ class RetryCommand extends Command
         foreach ($this->getJobIds() as $id) {
             $job = $this->laravel['queue.failer']->find($id);
 
-            if (is_null($job)) {
+            if ($job === null) {
                 $this->error("Unable to find failed job with ID [{$id}].");
             } else {
                 $this->retryJob($job);

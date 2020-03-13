@@ -16,7 +16,7 @@ class Util
      */
     public static function arrayWrap($value)
     {
-        if (is_null($value)) {
+        if ($value === null) {
             return [];
         }
 

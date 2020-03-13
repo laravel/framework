@@ -139,7 +139,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $this->setPath($path);
         }
 
-        if (! is_null($this->cachePath)) {
+        if ($this->cachePath !== null) {
             $contents = $this->compileString($this->files->get($this->getPath()));
 
             if (! empty($this->getPath())) {
@@ -538,11 +538,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function component($class, $alias = null, $prefix = '')
     {
-        if (! is_null($alias) && Str::contains($alias, '\\')) {
+        if ($alias !== null && Str::contains($alias, '\\')) {
             [$class, $alias] = [$alias, $class];
         }
 
-        if (is_null($alias)) {
+        if ($alias === null) {
             $alias = Str::contains($class, '\\View\\Components\\')
                             ? collect(explode('\\', Str::after($class, '\\View\\Components\\')))->map(function ($segment) {
                                 return Str::kebab($segment);

@@ -67,7 +67,7 @@ trait InteractsWithIO
      */
     public function argument($key = null)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->input->getArguments();
         }
 
@@ -103,7 +103,7 @@ trait InteractsWithIO
      */
     public function option($key = null)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->input->getOptions();
         }
 

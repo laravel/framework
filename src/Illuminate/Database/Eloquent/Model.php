@@ -911,7 +911,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     {
         $this->mergeAttributesFromClassCasts();
 
-        if (is_null($this->getKeyName())) {
+        if ($this->getKeyName() === null) {
             throw new Exception('No primary key defined on model.');
         }
 
@@ -1222,7 +1222,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function is($model)
     {
-        return ! is_null($model) &&
+        return $model !== null &&
                $this->getKey() === $model->getKey() &&
                $this->getTable() === $model->getTable() &&
                $this->getConnectionName() === $model->getConnectionName();
@@ -1587,7 +1587,7 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
      */
     public function offsetExists($offset)
     {
-        return ! is_null($this->getAttribute($offset));
+        return $this->getAttribute($offset) !== null;
     }
 
     /**

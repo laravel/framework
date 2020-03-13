@@ -55,7 +55,7 @@ class BoundMethod
         $method = count($segments) === 2
                         ? $segments[1] : $defaultMethod;
 
-        if (is_null($method)) {
+        if ($method === null) {
             throw new InvalidArgumentException('Method not provided.');
         }
 

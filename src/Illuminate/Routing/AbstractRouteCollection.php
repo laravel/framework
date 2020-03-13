@@ -27,7 +27,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      */
     protected function handleMatchedRoute(Request $request, $route)
     {
-        if (! is_null($route)) {
+        if ($route !== null) {
             return $route->bind($request);
         }
 
@@ -59,7 +59,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         return array_values(array_filter(
             $methods,
             function ($method) use ($request) {
-                return ! is_null($this->matchAgainstRoutes($this->get($method), $request, false));
+                return $this->matchAgainstRoutes($this->get($method), $request, false) !== null;
             }
         ));
     }
@@ -198,7 +198,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         $name = $route->getName();
 
         if (Str::endsWith($name, '.') &&
-            ! is_null($symfonyRoutes->get($name))) {
+            $symfonyRoutes->get($name) !== null) {
             $name = null;
         }
 
@@ -206,7 +206,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             $route->name($name = $this->generateRouteName());
 
             $this->add($route);
-        } elseif (! is_null($symfonyRoutes->get($name))) {
+        } elseif ($symfonyRoutes->get($name) !== null) {
             throw new LogicException("Unable to prepare route [{$route->uri}] for serialization. Another route has already been assigned name [{$name}].");
         }
 

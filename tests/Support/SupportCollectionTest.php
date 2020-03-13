@@ -2558,7 +2558,7 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertTrue($c->contains(function ($value) {
-            return is_null($value);
+            return $value === null;
         }));
     }
 
@@ -2599,7 +2599,7 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertTrue($c->some(function ($value) {
-            return is_null($value);
+            return $value === null;
         }));
     }
 
@@ -4123,7 +4123,7 @@ class TestAccessorEloquentTestStub
         $accessor = 'get'.lcfirst($attribute).'Attribute';
 
         if (method_exists($this, $accessor)) {
-            return ! is_null($this->$accessor());
+            return $this->$accessor() !== null;
         }
 
         return isset($this->$attribute);

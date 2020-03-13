@@ -125,7 +125,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     {
         if ($this->preserveAllQueryParameters) {
             $this->resource->appends($request->query());
-        } elseif (! is_null($this->queryParameters)) {
+        } elseif ($this->queryParameters !== null) {
             $this->resource->appends($this->queryParameters);
         }
 

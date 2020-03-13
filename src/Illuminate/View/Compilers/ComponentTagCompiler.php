@@ -320,7 +320,7 @@ class ComponentTagCompiler
             $attribute = $match['attribute'];
             $value = $match['value'] ?? null;
 
-            if (is_null($value)) {
+            if ($value === null) {
                 $value = 'true';
 
                 $attribute = Str::start($attribute, 'bind:');

@@ -25,7 +25,7 @@ trait FormatsMessages
         // First we will retrieve the custom message for the validation rule if one
         // exists. If a custom validation message is being used we'll return the
         // custom message, otherwise we'll keep searching for a valid message.
-        if (! is_null($inlineMessage)) {
+        if ($inlineMessage !== null) {
             return $inlineMessage;
         }
 
@@ -296,7 +296,7 @@ trait FormatsMessages
     {
         $actualValue = $this->getValue($attribute);
 
-        if (is_scalar($actualValue) || is_null($actualValue)) {
+        if (is_scalar($actualValue) || $actualValue === null) {
             $message = str_replace(':input', $this->getDisplayableValue($attribute, $actualValue), $message);
         }
 

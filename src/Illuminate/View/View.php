@@ -97,7 +97,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
             // another view gets rendered in the future by the application developer.
             $this->factory->flushStateIfDoneRendering();
 
-            return ! is_null($response) ? $response : $contents;
+            return $response !== null ? $response : $contents;
         } catch (Throwable $e) {
             $this->factory->flushState();
 

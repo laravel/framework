@@ -80,7 +80,7 @@ class AuthManager implements FactoryContract
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config)) {
+        if ($config === null) {
             throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
         }
 

@@ -51,7 +51,7 @@ class AliasLoader
      */
     public static function getInstance(array $aliases = [])
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             return static::$instance = new static($aliases);
         }
 

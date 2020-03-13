@@ -172,7 +172,7 @@ trait HasRelationships
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
-        if (is_null($relation)) {
+        if ($relation === null) {
             $relation = $this->guessBelongsToRelation();
         }
 
@@ -181,7 +181,7 @@ trait HasRelationships
         // If no foreign key was supplied, we can use a backtrace to guess the proper
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
-        if (is_null($foreignKey)) {
+        if ($foreignKey === null) {
             $foreignKey = Str::snake($relation).'_'.$instance->getKeyName();
         }
 
@@ -451,7 +451,7 @@ trait HasRelationships
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
-        if (is_null($relation)) {
+        if ($relation === null) {
             $relation = $this->guessBelongsToManyRelation();
         }
 
@@ -467,7 +467,7 @@ trait HasRelationships
         // If no table name was provided, we can guess it by concatenating the two
         // models using underscores in alphabetical order. The two model names
         // are transformed to snake case from their default CamelCase also.
-        if (is_null($table)) {
+        if ($table === null) {
             $table = $this->joiningTable($related, $instance);
         }
 
@@ -608,7 +608,7 @@ trait HasRelationships
             );
         });
 
-        return ! is_null($caller) ? $caller['function'] : null;
+        return $caller !== null ? $caller['function'] : null;
     }
 
     /**

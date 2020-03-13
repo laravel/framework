@@ -13,7 +13,7 @@ trait MustVerifyEmail
      */
     public function hasVerifiedEmail()
     {
-        return ! is_null($this->email_verified_at);
+        return $this->email_verified_at !== null;
     }
 
     /**

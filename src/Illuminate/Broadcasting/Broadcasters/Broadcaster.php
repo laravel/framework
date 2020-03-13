@@ -285,7 +285,7 @@ abstract class Broadcaster implements BroadcasterContract
 
         $guards = $options['guards'] ?? null;
 
-        if (is_null($guards)) {
+        if ($guards === null) {
             return $request->user();
         }
 

@@ -74,7 +74,7 @@ class RedirectResponse extends BaseRedirectResponse
     public function withInput(array $input = null)
     {
         $this->session->flashInput($this->removeFilesFromInput(
-            ! is_null($input) ? $input : $this->request->input()
+            $input !== null ? $input : $this->request->input()
         ));
 
         return $this;

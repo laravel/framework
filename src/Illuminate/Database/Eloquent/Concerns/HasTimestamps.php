@@ -40,13 +40,13 @@ trait HasTimestamps
 
         $updatedAtColumn = $this->getUpdatedAtColumn();
 
-        if (! is_null($updatedAtColumn) && ! $this->isDirty($updatedAtColumn)) {
+        if ($updatedAtColumn !== null && ! $this->isDirty($updatedAtColumn)) {
             $this->setUpdatedAt($time);
         }
 
         $createdAtColumn = $this->getCreatedAtColumn();
 
-        if (! $this->exists && ! is_null($createdAtColumn) && ! $this->isDirty($createdAtColumn)) {
+        if (! $this->exists && $createdAtColumn !== null && ! $this->isDirty($createdAtColumn)) {
             $this->setCreatedAt($time);
         }
     }

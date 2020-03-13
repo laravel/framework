@@ -80,14 +80,14 @@ class SQLiteGrammar extends Grammar
             // are building, since SQLite needs foreign keys on the tables creation.
             $sql .= $this->getForeignKey($foreign);
 
-            if (! is_null($foreign->onDelete)) {
+            if ($foreign->onDelete !== null) {
                 $sql .= " on delete {$foreign->onDelete}";
             }
 
             // If this foreign key specifies the action to be taken on update we will add
             // that to the statement here. We'll append it to this SQL and then return
             // the SQL so we can keep adding any other foreign constraints onto this.
-            if (! is_null($foreign->onUpdate)) {
+            if ($foreign->onUpdate !== null) {
                 $sql .= " on update {$foreign->onUpdate}";
             }
 
@@ -121,7 +121,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function addPrimaryKeys(Blueprint $blueprint)
     {
-        if (! is_null($primary = $this->getCommandByName($blueprint, 'primary'))) {
+        if (($primary = $this->getCommandByName($blueprint, 'primary')) !== null) {
             return ", primary key ({$this->columnize($primary->columns)})";
         }
     }
@@ -843,7 +843,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
+        if ($column->default !== null) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }

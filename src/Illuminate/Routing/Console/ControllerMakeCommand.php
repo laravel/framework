@@ -49,9 +49,9 @@ class ControllerMakeCommand extends GeneratorCommand
             $stub = '/stubs/controller.stub';
         }
 
-        if ($this->option('api') && is_null($stub)) {
+        if ($this->option('api') && $stub === null) {
             $stub = '/stubs/controller.api.stub';
-        } elseif ($this->option('api') && ! is_null($stub) && ! $this->option('invokable')) {
+        } elseif ($this->option('api') && $stub !== null && ! $this->option('invokable')) {
             $stub = str_replace('.stub', '.api.stub', $stub);
         }
 

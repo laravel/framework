@@ -53,7 +53,7 @@ class RedisStore extends TaggableStore implements LockProvider
     {
         $value = $this->connection()->get($this->prefix.$key);
 
-        return ! is_null($value) ? $this->unserialize($value) : null;
+        return $value !== null ? $this->unserialize($value) : null;
     }
 
     /**
@@ -73,7 +73,7 @@ class RedisStore extends TaggableStore implements LockProvider
         }, $keys));
 
         foreach ($values as $index => $value) {
-            $results[$keys[$index]] = ! is_null($value) ? $this->unserialize($value) : null;
+            $results[$keys[$index]] = $value !== null ? $this->unserialize($value) : null;
         }
 
         return $results;
@@ -110,7 +110,7 @@ class RedisStore extends TaggableStore implements LockProvider
         foreach ($values as $key => $value) {
             $result = $this->put($key, $value, $seconds);
 
-            $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
+            $manyResult = $manyResult === null ? $result : $result && $manyResult;
         }
 
         $this->connection()->exec();

@@ -107,7 +107,7 @@ class MailManager implements FactoryContract
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config)) {
+        if ($config === null) {
             throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
         }
 

@@ -349,7 +349,7 @@ abstract class Relation
      */
     protected static function buildMorphMapFromModels(array $models = null)
     {
-        if (is_null($models) || Arr::isAssoc($models)) {
+        if ($models === null || Arr::isAssoc($models)) {
             return $models;
         }
 

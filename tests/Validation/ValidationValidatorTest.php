@@ -3504,7 +3504,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => [['name' => 'first', 'title' => null]]], []);
         $v->sometimes('foo.*.name', 'Required|String', function ($i) {
-            return is_null($i['foo'][0]['title']);
+            return $i['foo'][0]['title'] === null;
         });
         $this->assertEquals(['foo.0.name' => ['Required', 'String']], $v->getRules());
     }

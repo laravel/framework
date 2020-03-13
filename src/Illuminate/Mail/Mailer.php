@@ -460,7 +460,7 @@ class Mailer implements MailerContract, MailQueueContract
         }
 
         return $view->mailer($this->name)->later(
-            $delay, is_null($queue) ? $this->queue : $queue
+            $delay, $queue === null ? $this->queue : $queue
         );
     }
 

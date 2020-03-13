@@ -86,7 +86,7 @@ trait DatabaseRule
             return $this->using($column);
         }
 
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->whereNull($column);
         }
 

@@ -296,11 +296,11 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatScheme($secure = null)
     {
-        if (! is_null($secure)) {
+        if ($secure !== null) {
             return $secure ? 'https://' : 'http://';
         }
 
-        if (is_null($this->cachedScheme)) {
+        if ($this->cachedScheme === null) {
             $this->cachedScheme = $this->forceScheme ?: $this->request->getScheme().'://';
         }
 
@@ -413,7 +413,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function route($name, $parameters = [], $absolute = true)
     {
-        if (! is_null($route = $this->routes->getByName($name))) {
+        if (($route = $this->routes->getByName($name)) !== null) {
             return $this->toRoute($route, $parameters, $absolute);
         }
 
@@ -455,7 +455,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function action($action, $parameters = [], $absolute = true)
     {
-        if (is_null($route = $this->routes->getByAction($action = $this->formatAction($action)))) {
+        if (($route = $this->routes->getByAction($action = $this->formatAction($action))) === null) {
             throw new InvalidArgumentException("Action {$action} not defined.");
         }
 
@@ -527,8 +527,8 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatRoot($scheme, $root = null)
     {
-        if (is_null($root)) {
-            if (is_null($this->cachedRoot)) {
+        if ($root === null) {
+            if ($this->cachedRoot === null) {
                 $this->cachedRoot = $this->forcedRoot ?: $this->request->root();
             }
 

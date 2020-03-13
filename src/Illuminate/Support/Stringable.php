@@ -550,7 +550,7 @@ class Stringable
         if ($this->isEmpty()) {
             $result = $callback($this);
 
-            return is_null($result) ? $this : $result;
+            return $result === null ? $this : $result;
         }
 
         return $this;

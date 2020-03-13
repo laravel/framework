@@ -75,7 +75,7 @@ class FileStore implements Store
         );
 
         if ($result !== false && $result > 0) {
-            if (! is_null($this->filePermission)) {
+            if ($this->filePermission !== null) {
                 $this->files->chmod($path, $this->filePermission);
             }
 

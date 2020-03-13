@@ -93,7 +93,7 @@ class Factory
     {
         $this->record();
 
-        if (is_null($callback)) {
+        if ($callback === null) {
             $callback = function () {
                 return static::response();
             };

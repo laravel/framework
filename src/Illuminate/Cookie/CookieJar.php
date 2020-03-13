@@ -110,7 +110,7 @@ class CookieJar implements JarContract
      */
     public function hasQueued($key, $path = null)
     {
-        return ! is_null($this->queued($key, null, $path));
+        return $this->queued($key, null, $path) !== null;
     }
 
     /**

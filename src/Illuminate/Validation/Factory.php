@@ -104,14 +104,14 @@ class Factory implements FactoryContract
         // The presence verifier is responsible for checking the unique and exists data
         // for the validator. It is behind an interface so that multiple versions of
         // it may be written besides database. We'll inject it into the validator.
-        if (! is_null($this->verifier)) {
+        if ($this->verifier !== null) {
             $validator->setPresenceVerifier($this->verifier);
         }
 
         // Next we'll set the IoC container instance of the validator, which is used to
         // resolve out class based validator extensions. If it is not set then these
         // types of extensions will not be possible on these validation instances.
-        if (! is_null($this->container)) {
+        if ($this->container !== null) {
             $validator->setContainer($this->container);
         }
 
@@ -147,7 +147,7 @@ class Factory implements FactoryContract
      */
     protected function resolve(array $data, array $rules, array $messages, array $customAttributes)
     {
-        if (is_null($this->resolver)) {
+        if ($this->resolver === null) {
             return new Validator($this->translator, $data, $rules, $messages, $customAttributes);
         }
 

@@ -201,7 +201,7 @@ class StartSession
      */
     protected function sessionConfigured()
     {
-        return ! is_null($this->manager->getSessionConfig()['driver'] ?? null);
+        return ($this->manager->getSessionConfig()['driver'] ?? null) !== null;
     }
 
     /**
@@ -214,6 +214,6 @@ class StartSession
     {
         $config = $config ?: $this->manager->getSessionConfig();
 
-        return ! is_null($config['driver'] ?? null);
+        return ($config['driver'] ?? null) !== null;
     }
 }

@@ -12,7 +12,7 @@ trait CompilesTranslations
      */
     protected function compileLang($expression)
     {
-        if (is_null($expression)) {
+        if ($expression === null) {
             return '<?php $__env->startTranslation(); ?>';
         } elseif ($expression[1] === '[') {
             return "<?php \$__env->startTranslation{$expression}; ?>";

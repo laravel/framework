@@ -42,7 +42,7 @@ class SortedMiddleware extends Collection
 
             $priorityIndex = $this->priorityMapIndex($priorityMap, $middleware);
 
-            if (! is_null($priorityIndex)) {
+            if ($priorityIndex !== null) {
                 // This middleware is in the priority map. If we have encountered another middleware
                 // that was also in the priority map and was at a lower priority than the current
                 // middleware, we will move this middleware to be above the previous encounter.

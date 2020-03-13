@@ -33,7 +33,7 @@ class SqlServerGrammar extends Grammar
         // If an offset is present on the query, we will need to wrap the query in
         // a big "ANSI" offset syntax block. This is very nasty compared to the
         // other database systems but is necessary for implementing features.
-        if (is_null($query->columns)) {
+        if ($query->columns === null) {
             $query->columns = ['*'];
         }
 
@@ -51,7 +51,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileColumns(Builder $query, $columns)
     {
-        if (! is_null($query->aggregate)) {
+        if ($query->aggregate !== null) {
             return;
         }
 
@@ -82,7 +82,7 @@ class SqlServerGrammar extends Grammar
             return $from.' '.$query->lock;
         }
 
-        if (! is_null($query->lock)) {
+        if ($query->lock !== null) {
             return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
         }
 

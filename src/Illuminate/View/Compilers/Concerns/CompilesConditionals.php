@@ -19,7 +19,7 @@ trait CompilesConditionals
      */
     protected function compileAuth($guard = null)
     {
-        $guard = is_null($guard) ? '()' : $guard;
+        $guard = $guard === null ? '()' : $guard;
 
         return "<?php if(auth()->guard{$guard}->check()): ?>";
     }
@@ -32,7 +32,7 @@ trait CompilesConditionals
      */
     protected function compileElseAuth($guard = null)
     {
-        $guard = is_null($guard) ? '()' : $guard;
+        $guard = $guard === null ? '()' : $guard;
 
         return "<?php elseif(auth()->guard{$guard}->check()): ?>";
     }
@@ -55,7 +55,7 @@ trait CompilesConditionals
      */
     protected function compileGuest($guard = null)
     {
-        $guard = is_null($guard) ? '()' : $guard;
+        $guard = $guard === null ? '()' : $guard;
 
         return "<?php if(auth()->guard{$guard}->guest()): ?>";
     }
@@ -68,7 +68,7 @@ trait CompilesConditionals
      */
     protected function compileElseGuest($guard = null)
     {
-        $guard = is_null($guard) ? '()' : $guard;
+        $guard = $guard === null ? '()' : $guard;
 
         return "<?php elseif(auth()->guard{$guard}->guest()): ?>";
     }

@@ -170,7 +170,7 @@ class RouteCollection extends AbstractRouteCollection
      */
     public function get($method = null)
     {
-        return is_null($method) ? $this->getRoutes() : Arr::get($this->routes, $method, []);
+        return $method === null ? $this->getRoutes() : Arr::get($this->routes, $method, []);
     }
 
     /**
@@ -181,7 +181,7 @@ class RouteCollection extends AbstractRouteCollection
      */
     public function hasNamedRoute($name)
     {
-        return ! is_null($this->getByName($name));
+        return $this->getByName($name) !== null;
     }
 
     /**

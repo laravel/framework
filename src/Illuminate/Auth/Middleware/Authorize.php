@@ -54,7 +54,7 @@ class Authorize
      */
     protected function getGateArguments($request, $models)
     {
-        if (is_null($models)) {
+        if ($models === null) {
             return [];
         }
 

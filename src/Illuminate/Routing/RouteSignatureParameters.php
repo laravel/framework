@@ -21,7 +21,7 @@ class RouteSignatureParameters
                         ? static::fromClassMethodString($action['uses'])
                         : (new ReflectionFunction($action['uses']))->getParameters();
 
-        return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
+        return $subClass === null ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
             return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
         });
     }

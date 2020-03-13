@@ -51,7 +51,7 @@ class PasswordBroker implements PasswordBrokerContract
         // "flash" data in the session to indicate to the developers the errors.
         $user = $this->getUser($credentials);
 
-        if (is_null($user)) {
+        if ($user === null) {
             return static::INVALID_USER;
         }
 
@@ -107,7 +107,7 @@ class PasswordBroker implements PasswordBrokerContract
      */
     protected function validateReset(array $credentials)
     {
-        if (is_null($user = $this->getUser($credentials))) {
+        if (($user = $this->getUser($credentials)) === null) {
             return static::INVALID_USER;
         }
 

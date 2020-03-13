@@ -109,7 +109,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
             return false;
         }
 
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->any();
         }
 
@@ -156,7 +156,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function first($key = null, $format = null)
     {
-        $messages = is_null($key) ? $this->all($format) : $this->get($key, $format);
+        $messages = $key === null ? $this->all($format) : $this->get($key, $format);
 
         $firstMessage = Arr::first($messages, null, '');
 

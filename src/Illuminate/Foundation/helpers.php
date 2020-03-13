@@ -112,7 +112,7 @@ if (! function_exists('app')) {
      */
     function app($abstract = null, array $parameters = [])
     {
-        if (is_null($abstract)) {
+        if ($abstract === null) {
             return Container::getInstance();
         }
 
@@ -156,7 +156,7 @@ if (! function_exists('auth')) {
      */
     function auth($guard = null)
     {
-        if (is_null($guard)) {
+        if ($guard === null) {
             return app(AuthFactory::class);
         }
 
@@ -264,7 +264,7 @@ if (! function_exists('config')) {
      */
     function config($key = null, $default = null)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return app('config');
         }
 
@@ -308,7 +308,7 @@ if (! function_exists('cookie')) {
     {
         $cookie = app(CookieFactory::class);
 
-        if (is_null($name)) {
+        if ($name === null) {
             return $cookie;
         }
 
@@ -519,7 +519,7 @@ if (! function_exists('logger')) {
      */
     function logger($message = null, array $context = [])
     {
-        if (is_null($message)) {
+        if ($message === null) {
             return app('log');
         }
 
@@ -636,7 +636,7 @@ if (! function_exists('redirect')) {
      */
     function redirect($to = null, $status = 302, $headers = [], $secure = null)
     {
-        if (is_null($to)) {
+        if ($to === null) {
             return app('redirect');
         }
 
@@ -667,7 +667,7 @@ if (! function_exists('request')) {
      */
     function request($key = null, $default = null)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return app('request');
         }
 
@@ -677,7 +677,7 @@ if (! function_exists('request')) {
 
         $value = app('request')->__get($key);
 
-        return is_null($value) ? value($default) : $value;
+        return $value === null ? value($default) : $value;
     }
 }
 
@@ -806,7 +806,7 @@ if (! function_exists('session')) {
      */
     function session($key = null, $default = null)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return app('session');
         }
 
@@ -855,7 +855,7 @@ if (! function_exists('trans')) {
      */
     function trans($key = null, $replace = [], $locale = null)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return app('translator');
         }
 
@@ -890,7 +890,7 @@ if (! function_exists('__')) {
      */
     function __($key = null, $replace = [], $locale = null)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $key;
         }
 
@@ -909,7 +909,7 @@ if (! function_exists('url')) {
      */
     function url($path = null, $parameters = [], $secure = null)
     {
-        if (is_null($path)) {
+        if ($path === null) {
             return app(UrlGenerator::class);
         }
 

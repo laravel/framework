@@ -43,7 +43,7 @@ class MessageSelector
     private function extract($segments, $number)
     {
         foreach ($segments as $part) {
-            if (! is_null($line = $this->extractFromString($part, $number))) {
+            if (($line = $this->extractFromString($part, $number)) !== null) {
                 return $line;
             }
         }
