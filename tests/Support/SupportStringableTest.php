@@ -100,6 +100,43 @@ class SupportStringableTest extends TestCase
         $this->assertSame('ae oe ue Ae Oe Ue', (string) $this->stringable('ä ö ü Ä Ö Ü')->ascii('de'));
     }
 
+    public function testFormat()
+    {
+        $this->assertEquals('Steve Lacey', (string) $this->stringable('{} {}')->format(['Steve', 'Lacey']));
+        $this->assertEquals('Steve Lacey', (string) $this->stringable('{} {1}')->format(['Steve', 'Lacey']));
+        $this->assertEquals('Steve Lacey', (string) $this->stringable('{1} {}')->format(['Lacey', 'Steve']));
+        $this->assertEquals('Steve Lacey', (string) $this->stringable('{1} {0}')->format(['Lacey', 'Steve']));
+        $this->assertEquals('Steve Lacey', (string) $this->stringable('{a} {b}')->format(['a' => 'Steve', 'b' => 'Lacey']));
+        $this->assertEquals('Steve Lacey', (string) $this->stringable('{a.b}')->format(['a' => ['b' => 'Steve Lacey']]));
+    }
+
+    public function testFormatEscapeBraces()
+    {
+        $this->assertEquals('{1} {0}', (string) $this->stringable('{{1}} {{0}}')->format(['Lacey', 'Steve']));
+        $this->assertEquals('\Steve \Lacey', (string) $this->stringable('\{1} \{0}')->format(['Lacey', 'Steve']));
+        $this->assertEquals('\{1\} \{0\}', (string) $this->stringable('\{1\} \{0\}')->format(['Lacey', 'Steve']));
+    }
+
+    public function testFormatMissingKey()
+    {
+        $this->assertEquals('Steve ', (string) $this->stringable('{a} {}')->format(['a' => 'Steve']));
+    }
+
+    public function testFormatMissingPositionalKey()
+    {
+        $this->assertEquals(' Steve', (string) $this->stringable('{1} {a}')->format(['a' => 'Steve']));
+    }
+
+    public function testFormatMissingStringKey()
+    {
+        $this->assertEquals(' Steve', (string) $this->stringable('{b} {a}')->format(['a' => 'Steve']));
+    }
+
+    public function testFormatNull()
+    {
+        $this->assertEquals('', (string) $this->stringable('{}')->format([null]));
+    }
+
     public function testStartsWith()
     {
         $this->assertTrue($this->stringable('jason')->startsWith('jas'));

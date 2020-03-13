@@ -205,6 +205,17 @@ class Stringable
     }
 
     /**
+     * Format a string with values.
+     *
+     * @param  \ArrayAccess|array  $values
+     * @return static
+     */
+    public function format($values)
+    {
+        return new static(Str::format($this->value, $values));
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|array  $pattern
