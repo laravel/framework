@@ -42,7 +42,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $this->assertDatabaseHas($this->table, [
             $this->data,
-            $this->data
+            $this->data,
         ]);
     }
 
@@ -59,7 +59,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $this->assertDatabaseHas($this->table, [
             $this->data,
-            $this->data
+            $this->data,
         ]);
     }
 
@@ -78,7 +78,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $this->assertDatabaseHas($this->table, [
             $this->data,
-            $this->data
+            $this->data,
         ]);
     }
 
@@ -100,7 +100,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $this->assertDatabaseHas($this->table, [
             $this->data,
-            $this->data
+            $this->data,
         ]);
     }
 
