@@ -21,9 +21,19 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
-        $this->assertThat(
-            $table, new HasInDatabase($this->getConnection($connection), $data)
-        );
+        foreach ($data as $record) {
+            if (is_array($record)) {
+                $this->assertThat(
+                    $table, new HasInDatabase($this->getConnection($connection), $record)
+                );
+                continue;
+            }
+
+            $this->assertThat(
+                $table, new HasInDatabase($this->getConnection($connection), $data)
+            );
+            break;
+        }
 
         return $this;
     }

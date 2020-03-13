@@ -39,6 +39,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseHas($this->table, $this->data);
+
+        $this->assertDatabaseHas($this->table, [
+            $this->data,
+            $this->data
+        ]);
     }
 
     public function testSeeInDatabaseDoesNotFindResults()
@@ -51,6 +56,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->shouldReceive('get')->andReturn(collect());
 
         $this->assertDatabaseHas($this->table, $this->data);
+
+        $this->assertDatabaseHas($this->table, [
+            $this->data,
+            $this->data
+        ]);
     }
 
     public function testSeeInDatabaseFindsNotMatchingResults()
@@ -65,6 +75,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
 
         $this->assertDatabaseHas($this->table, $this->data);
+
+        $this->assertDatabaseHas($this->table, [
+            $this->data,
+            $this->data
+        ]);
     }
 
     public function testSeeInDatabaseFindsManyNotMatchingResults()
@@ -82,6 +97,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         );
 
         $this->assertDatabaseHas($this->table, $this->data);
+
+        $this->assertDatabaseHas($this->table, [
+            $this->data,
+            $this->data
+        ]);
     }
 
     public function testDontSeeInDatabaseDoesNotFindResults()
