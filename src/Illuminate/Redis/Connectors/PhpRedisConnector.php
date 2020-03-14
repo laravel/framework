@@ -98,6 +98,10 @@ class PhpRedisConnector implements Connector
                 $client->setOption(Redis::OPT_READ_TIMEOUT, $config['read_timeout']);
             }
 
+            if (! empty($config['serializer'])) {
+                $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
+            }
+
             if (! empty($config['scan'])) {
                 $client->setOption(Redis::OPT_SCAN, $config['scan']);
             }
@@ -154,6 +158,10 @@ class PhpRedisConnector implements Connector
         return tap(new RedisCluster(...$parameters), function ($client) use ($options) {
             if (! empty($options['prefix'])) {
                 $client->setOption(RedisCluster::OPT_PREFIX, $options['prefix']);
+            }
+
+            if (! empty($options['serializer'])) {
+                $client->setOption(RedisCluster::OPT_SERIALIZER, $options['serializer']);
             }
 
             if (! empty($options['scan'])) {
