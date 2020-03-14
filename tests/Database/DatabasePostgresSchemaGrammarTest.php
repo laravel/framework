@@ -319,7 +319,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $foreignId = $blueprint->foreignId('foo');
-        $foreignNullableId = $blueprint->foreignId('bar', true);
+        $foreignNullableId = $blueprint->foreignId('bar')->nullable();
         $blueprint->foreignId('company_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
         $blueprint->foreignId('team_column_id')->constrained('teams');

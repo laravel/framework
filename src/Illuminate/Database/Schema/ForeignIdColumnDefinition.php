@@ -4,6 +4,9 @@ namespace Illuminate\Database\Schema;
 
 use Illuminate\Support\Str;
 
+/**
+ * @method ForeignIdColumnDefinition nullable(bool $value = true) Allow NULL values to be inserted into the column
+ */
 class ForeignIdColumnDefinition extends ColumnDefinition
 {
     /**
