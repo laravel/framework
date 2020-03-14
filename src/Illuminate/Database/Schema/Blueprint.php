@@ -802,14 +802,16 @@ class Blueprint
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
+     * @param  bool  $nullable
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignId($column)
+    public function foreignId($column, $nullable = false)
     {
         $this->columns[] = $column = new ForeignIdColumnDefinition($this, [
             'type' => 'bigInteger',
             'name' => $column,
             'autoIncrement' => false,
+            'nullable' => $nullable,
             'unsigned' => true,
         ]);
 

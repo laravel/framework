@@ -319,6 +319,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $foreignId = $blueprint->foreignId('foo');
+        $foreignNullableId = $blueprint->foreignId('bar', true);
         $blueprint->foreignId('company_id')->constrained();
         $blueprint->foreignId('team_id')->references('id')->on('teams');
         $blueprint->foreignId('team_column_id')->constrained('teams');
@@ -326,8 +327,9 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
+        $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignNullableId);
         $this->assertSame([
-            'alter table "users" add column "foo" bigint not null, add column "company_id" bigint not null, add column "team_id" bigint not null, add column "team_column_id" bigint not null',
+            'alter table "users" add column "foo" bigint not null, add column "bar" bigint null, add column "company_id" bigint not null, add column "team_id" bigint not null, add column "team_column_id" bigint not null',
             'alter table "users" add constraint "users_company_id_foreign" foreign key ("company_id") references "companies" ("id")',
             'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
             'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
