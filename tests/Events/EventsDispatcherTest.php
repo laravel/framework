@@ -455,19 +455,6 @@ class TestDispatcherConnectionQueuedHandler implements ShouldQueue
     }
 }
 
-class TestDispatcherQueuedHandlerCustomQueue implements ShouldQueue
-{
-    public function handle()
-    {
-        //
-    }
-
-    public function queue($queue, $handler, array $payload)
-    {
-        $queue->push($handler, $payload);
-    }
-}
-
 class ExampleEvent
 {
     //
