@@ -73,7 +73,7 @@ class PendingCommand
     }
 
     /**
-     * Specify a question that should be asked when the command runs.
+     * Specify an expected question that will be asked when the command runs.
      *
      * @param  string  $question
      * @param  string|bool  $answer
@@ -87,7 +87,7 @@ class PendingCommand
     }
 
     /**
-     * Specify a confirmation question that should be asked when the command runs.
+     * Specify an expected confirmation question that will be asked when the command runs.
      *
      * @param  string  $question
      * @param  string  $answer
