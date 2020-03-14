@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\State;
+use PHPUnit\Framework\TestCase;
 
 class SupportStateTest extends TestCase
 {
@@ -36,7 +36,7 @@ class SupportStateTest extends TestCase
 
         $enum = State::from($states = [
             'foo' => 10,
-            'qux' => null
+            'qux' => null,
         ]);
 
         $this->assertTrue($enum->has('foo'));
@@ -81,9 +81,11 @@ class SupportStateTest extends TestCase
     {
         $enum = State::from($states = [
             'foo' => 10,
-            'bar' => function() {return true; },
+            'bar' => function () {
+                return true;
+            },
             'quz' => [],
-            'qux' => null
+            'qux' => null,
         ]);
 
         $this->assertIsInt($enum->foo()->value());
@@ -113,9 +115,11 @@ class SupportStateTest extends TestCase
 
         $enum = State::from($states = [
             'foo' => 10,
-            'bar' => function() {return true; },
+            'bar' => function () {
+                return true;
+            },
             'quz' => [],
-            'qux' => null
+            'qux' => null,
         ]);
 
         $enum->bar();
