@@ -95,7 +95,7 @@ class PendingCommand
      */
     public function expectsConfirmation($question, $answer = 'no')
     {
-        return $this->expectsQuestion($question, $answer === 'yes');
+        return $this->expectsQuestion($question, strtolower($answer) === 'yes');
     }
 
     /**
