@@ -229,6 +229,10 @@ class MailManager implements FactoryContract
             $transport->setLocalDomain($config['local_domain']);
         }
 
+        if (isset($config['timeout'])) {
+            $transport->setTimeout($config['timeout']);
+        }
+
         return $transport;
     }
 
