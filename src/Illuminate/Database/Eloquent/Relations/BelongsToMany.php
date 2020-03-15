@@ -1189,7 +1189,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedDeletedAtColumnName()
     {
-        return $this->getQualifiedColumnName($this->pivotDeletedAt);
+        return $this->getQualifiedColumnName($this->deletedAt());
     }
 
     /**
