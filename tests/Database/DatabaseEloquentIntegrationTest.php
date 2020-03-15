@@ -821,6 +821,58 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('taylorotwell@gmail.com', $post->first()->user->email);
     }
 
+    public function testBasicEagerLoadingWithAlias()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->posts()->create(['name' => 'First Post']);
+        $user->posts()->create(['name' => 'Second Post']);
+        $user = EloquentTestUser::with([
+            'posts' => function ($q) {
+            },
+            'posts AS posts2' => function ($q) {
+                $q->where('name', 'Second Post');
+            },
+        ])->where('email', 'taylorotwell@gmail.com')->first();
+
+        $this->assertSame('First Post', $user->posts->first()->name);
+        $this->assertSame('Second Post', $user->posts2->first()->name);
+    }
+
+    public function testNestedEagerLoadingWithAlias()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post = $user->posts()->create(['name' => 'First Post']);
+        $post2 = $user->posts()->create(['name' => 'Second Post']);
+        $post->childPosts()->create(['name' => 'Child Post', 'user_id' => $user->id]);
+        $post->childPosts()->create(['name' => 'Child Post2', 'user_id' => $user->id]);
+
+        $user = EloquentTestUser::with([
+            'posts as aliasPosts' => function ($q) {
+                $q->where('name', 'Second Post');
+            },
+            'posts.childPosts' => function ($q) {
+            },
+            'posts.childPosts AS aliasChildPosts' => function ($q) {
+                $q->where('name', 'Child Post2');
+            },
+
+        ])->where('email', 'taylorotwell@gmail.com')->first();
+
+        $this->assertNotNull($user->aliasPosts->first());
+        $this->assertFalse(property_exists($user->aliasPosts->first(), 'childPosts'));
+        $this->assertFalse(property_exists($user->aliasPosts->first(), 'aliasChildPosts'));
+        $this->assertSame('Second Post', $user->aliasPosts->first()->name);
+
+        $this->assertNotNull($user->posts->first());
+        $this->assertSame('First Post', $user->posts->first()->name);
+
+        $this->assertNotNull($user->posts->first()->childPosts->first());
+        $this->assertSame('Child Post', $user->posts->first()->childPosts->first()->name);
+
+        $this->assertNotNull($user->posts->first()->childPosts->first());
+        $this->assertSame('Child Post2', $user->posts->first()->aliasChildPosts->first()->name);
+    }
+
     public function testBasicNestedSelfReferencingHasManyEagerLoading()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);

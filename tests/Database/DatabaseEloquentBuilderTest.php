@@ -513,7 +513,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $relation->shouldReceive('initRelation')->once()->with(['models'], 'orders')->andReturn(['models']);
         $relation->shouldReceive('getEager')->once()->andReturn(['results']);
         $relation->shouldReceive('match')->once()->with(['models'], ['results'], 'orders')->andReturn(['models.matched']);
-        $builder->shouldReceive('getRelation')->once()->with('orders')->andReturn($relation);
+        $builder->shouldReceive('getRelation')->once()->with('orders', null)->andReturn($relation);
         $results = $builder->eagerLoadRelations(['models']);
 
         $this->assertEquals(['models.matched'], $results);

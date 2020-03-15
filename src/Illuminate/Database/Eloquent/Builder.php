@@ -570,21 +570,30 @@ class Builder
      */
     protected function eagerLoadRelation(array $models, $name, Closure $constraints)
     {
+        $segments = explode(' ', $name);
+
+        unset($alias);
+
+        if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
+            [$name, $alias] = [$segments[0], $segments[2]];
+        }
+
         // First we will "back up" the existing where conditions on the query so we can
         // add our eager constraints. Then we will merge the wheres that were on the
         // query back to it in order that any where conditions might be specified.
-        $relation = $this->getRelation($name);
+        $relation = $this->getRelation($name, $alias ?? null);
 
         $relation->addEagerConstraints($models);
 
         $constraints($relation);
 
+        $relationshipName = $alias ?? $name;
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
-            $relation->initRelation($models, $name),
-            $relation->getEager(), $name
+            $relation->initRelation($models, $relationshipName),
+            $relation->getEager(), $relationshipName
         );
     }
 
@@ -594,7 +603,7 @@ class Builder
      * @param  string  $name
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function getRelation($name)
+    public function getRelation($name, $alias = null)
     {
         // We want to run a relationship query without any constrains so that we will
         // not have to remove these where clauses manually which gets really hacky
@@ -607,7 +616,7 @@ class Builder
             }
         });
 
-        $nested = $this->relationsNestedUnder($name);
+        $nested = $this->relationsNestedUnder($alias ?? $name);
 
         // If there are nested relationships set on the query, we will put those onto
         // the query instances so that they can be handled after this relationship
