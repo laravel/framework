@@ -73,10 +73,10 @@ class PendingCommand
     }
 
     /**
-     * Specify a question that should be asked when the command runs.
+     * Specify an expected question that will be asked when the command runs.
      *
      * @param  string  $question
-     * @param  string  $answer
+     * @param  string|bool  $answer
      * @return $this
      */
     public function expectsQuestion($question, $answer)
@@ -84,6 +84,18 @@ class PendingCommand
         $this->test->expectedQuestions[] = [$question, $answer];
 
         return $this;
+    }
+
+    /**
+     * Specify an expected confirmation question that will be asked when the command runs.
+     *
+     * @param  string  $question
+     * @param  string  $answer
+     * @return $this
+     */
+    public function expectsConfirmation($question, $answer = 'no')
+    {
+        return $this->expectsQuestion($question, strtolower($answer) === 'yes');
     }
 
     /**

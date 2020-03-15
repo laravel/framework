@@ -4,11 +4,7 @@ namespace Illuminate\Tests\Events;
 
 use Exception;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -318,39 +314,6 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch('foo.bar', ['first', 'second']);
     }
 
-    public function testQueuedEventHandlersAreQueued()
-    {
-        $d = new Dispatcher;
-        $queue = m::mock(Queue::class);
-
-        $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
-
-        $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
-
-        $d->setQueueResolver(function () use ($queue) {
-            return $queue;
-        });
-
-        $d->listen('some.event', TestDispatcherQueuedHandler::class.'@someMethod');
-        $d->dispatch('some.event', ['foo', 'bar']);
-    }
-
-    public function testCustomizedQueuedEventHandlersAreQueued()
-    {
-        $d = new Dispatcher;
-
-        $fakeQueue = new QueueFake(new Container());
-
-        $d->setQueueResolver(function () use ($fakeQueue) {
-            return $fakeQueue;
-        });
-
-        $d->listen('some.event', TestDispatcherConnectionQueuedHandler::class.'@handle');
-        $d->dispatch('some.event', ['foo', 'bar']);
-
-        $fakeQueue->assertPushedOn('my_queue', CallQueuedListener::class);
-    }
-
     public function testClassesWork()
     {
         unset($_SERVER['__event.test']);
@@ -410,75 +373,11 @@ class EventsDispatcherTest extends TestCase
         unset($_SERVER['__event.test1']);
         unset($_SERVER['__event.test2']);
     }
-
-    public function testEventSubscribers()
-    {
-        $d = new Dispatcher($container = m::mock(Container::class));
-        $subs = m::mock(ExampleSubscriber::class);
-        $subs->shouldReceive('subscribe')->once()->with($d);
-        $container->shouldReceive('make')->once()->with(ExampleSubscriber::class)->andReturn($subs);
-
-        $d->subscribe(ExampleSubscriber::class);
-        $this->assertTrue(true);
-    }
-
-    public function testEventSubscribeCanAcceptObject()
-    {
-        $d = new Dispatcher();
-        $subs = m::mock(ExampleSubscriber::class);
-        $subs->shouldReceive('subscribe')->once()->with($d);
-
-        $d->subscribe($subs);
-        $this->assertTrue(true);
-    }
-}
-
-class TestDispatcherQueuedHandler implements ShouldQueue
-{
-    public function handle()
-    {
-        //
-    }
-}
-
-class TestDispatcherConnectionQueuedHandler implements ShouldQueue
-{
-    public $connection = 'redis';
-
-    public $delay = 10;
-
-    public $queue = 'my_queue';
-
-    public function handle()
-    {
-        //
-    }
-}
-
-class TestDispatcherQueuedHandlerCustomQueue implements ShouldQueue
-{
-    public function handle()
-    {
-        //
-    }
-
-    public function queue($queue, $handler, array $payload)
-    {
-        $queue->push($handler, $payload);
-    }
 }
 
 class ExampleEvent
 {
     //
-}
-
-class ExampleSubscriber
-{
-    public function subscribe($e)
-    {
-        //
-    }
 }
 
 interface SomeEventInterface
