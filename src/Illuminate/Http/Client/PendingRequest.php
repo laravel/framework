@@ -604,19 +604,6 @@ class PendingRequest
     }
 
     /**
-     * Parse the query parameters in the given URL.
-     *
-     * @param  string  $url
-     * @return array
-     */
-    public function parseQueryParams(string $url)
-    {
-        return tap([], function (&$query) use ($url) {
-            parse_str(parse_url($url, PHP_URL_QUERY), $query);
-        });
-    }
-
-    /**
      * Register a stub callable that will intercept requests and be able to return stub responses.
      *
      * @param  callable  $callback
