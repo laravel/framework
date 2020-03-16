@@ -462,13 +462,18 @@ class PendingRequest
             );
         }
 
+        if (! empty($options['query'])) {
+            $options['query'] = array_merge_recursive(
+                $options['query'], $this->parseQueryParams($url)
+            );
+        }
+
         $this->pendingFiles = [];
 
         return retry($this->tries ?? 1, function () use ($method, $url, $options) {
             try {
                 return tap(new Response($this->buildClient()->request($method, $url, $this->mergeOptions([
                     'laravel_data' => $options[$this->bodyFormat] ?? [],
-                    'query' => $this->parseQueryParams($url),
                     'on_stats' => function ($transferStats) {
                         $this->transferStats = $transferStats;
                     },
