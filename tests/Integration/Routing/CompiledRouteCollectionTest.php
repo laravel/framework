@@ -408,6 +408,15 @@ class CompiledRouteCollectionTest extends IntegrationTest
         $this->assertSame('foo/bar', $route->uri());
     }
 
+    public function testGroupPrefixAndRoutePrefixAreProperlyHandled()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '{locale}'])->prefix('pre'));
+
+        $route = $this->collection()->getByAction('FooController@index');
+
+        $this->assertSame('pre/{locale}', $route->getPrefix());
+    }
+
     public function testRouteBindingsAreProperlySaved()
     {
         $this->routeCollection->add($this->newRoute('GET', 'posts/{post:slug}/show', [

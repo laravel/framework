@@ -146,13 +146,13 @@ class Route
     {
         $this->uri = $uri;
         $this->methods = (array) $methods;
-        $this->action = $this->parseAction($action);
+        $this->action = Arr::except($this->parseAction($action), ['prefix']);
 
         if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
 
-        $this->prefix($this->action['prefix'] ?? '');
+        $this->prefix(is_array($action) ? Arr::get($action, 'prefix') : '');
     }
 
     /**
@@ -709,9 +709,24 @@ class Route
      */
     public function prefix($prefix)
     {
+        $this->updatePrefixOnAction($prefix);
+
         $uri = rtrim($prefix, '/').'/'.ltrim($this->uri, '/');
 
         return $this->setUri($uri !== '/' ? trim($uri, '/') : $uri);
+    }
+
+    /**
+     * Update the "prefix" attribute on the action array.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    protected function updatePrefixOnAction($prefix)
+    {
+        if (! empty($newPrefix = trim(rtrim($prefix, '/').'/'.ltrim($this->action['prefix'] ?? '', '/'), '/'))) {
+            $this->action['prefix'] = $newPrefix;
+        }
     }
 
     /**
