@@ -24,6 +24,48 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testAnyReturnsFalseForEmptyCollectionWithoutCallback($collection)
+    {
+        $c = new $collection();
+        $this->assertFalse($c->any());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testAnyReturnsTrueForNonEmptyCollectionWithoutCallback($collection)
+    {
+        $c = new $collection(['foo', 'bar']);
+        $this->assertTrue($c->any());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testAnyWithCallbackMatch($collection)
+    {
+        $data = new $collection(['foo', 'bar']);
+        $result = $data->any(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testAnyWithCallbackMiss($collection)
+    {
+        $data = new $collection(['foo', 'bar']);
+        $result = $data->any(function ($value) {
+            return $value === 'baz';
+        });
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testFirstReturnsFirstItemInCollection($collection)
     {
         $c = new $collection(['foo', 'bar']);

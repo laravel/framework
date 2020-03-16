@@ -71,6 +71,21 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Determine if any items in the collection pass a given truth test.
+     *
+     * @param  callable|null  $callback
+     * @return bool
+     */
+    public function any(callable $callback = null)
+    {
+        if ( ! $callback) {
+            return $this->isNotEmpty();
+        }
+
+        return Arr::any($this->items, $callback);
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback

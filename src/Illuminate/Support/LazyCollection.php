@@ -100,6 +100,17 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Determine if any items in the collection pass a given truth test.
+     *
+     * @param  callable|null  $callback
+     * @return bool
+     */
+    public function any(callable $callback = null)
+    {
+        return $this->collect()->any($callback);
+    }
+
+    /**
      * Eager load all items into a new lazy collection backed by an array.
      *
      * @return static

@@ -39,6 +39,22 @@ class Arr
     }
 
     /**
+     * Determine if any elements in the provided array pass a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @return bool
+     */
+    public static function any($array, callable $callback = null)
+    {
+        if (is_null($callback)) {
+            return ! empty($array);
+        }
+
+        return ! empty(static::where($array, $callback));
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  iterable  $array
