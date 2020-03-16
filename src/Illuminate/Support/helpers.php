@@ -467,6 +467,19 @@ if (! function_exists('throw_unless')) {
     }
 }
 
+if (! function_exists('times')) {
+    /**
+     * Throw the given exception unless the given condition is true.
+     *
+     * @param $times
+     * @return \Illuminate\Support\Collection
+     */
+    function times($times)
+    {
+        return collect(range(1, $times));
+    }
+}
+
 if (! function_exists('trait_uses_recursive')) {
     /**
      * Returns all traits used by a trait and its traits.
