@@ -148,7 +148,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $namespace;
 
     /**
-     * The application namespace.
+     * The prefixes of absolute paths for normalization.
      *
      * @var array
      */
